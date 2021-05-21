@@ -21,13 +21,13 @@
 
 #include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
-#include "imstkCube.h"
 #include "imstkCylinder.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkOrientedBox.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
@@ -75,8 +75,8 @@ main()
     scene->addSceneObject(planeObj);
 
     //  Cube
-    imstkNew<Cube> cubeGeom;
-    cubeGeom->setWidth(10.0);
+    imstkNew<OrientedBox> cubeGeom;
+    cubeGeom->setExtents(5.0, 5.0, 5.0);
     cubeGeom->scale(0.5, Geometry::TransformType::ConcatenateToTransform);
     cubeGeom->rotate(Vec3d(1.0, 1.0, 0.0), PI_4, Geometry::TransformType::ApplyToData);
     cubeGeom->translate(Vec3d(0.0, 0.0, 10.0));

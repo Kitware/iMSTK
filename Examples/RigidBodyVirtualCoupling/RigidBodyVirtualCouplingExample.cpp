@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCube.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkIsometricMap.h"
@@ -30,6 +29,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkOrientedBox.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel.h"
@@ -93,7 +93,7 @@ makeCubeRigidObject(const std::string& name, const Vec3d& pos)
     imstkNew<RigidObject> cubeObj(name);
 
     // Create Cube object
-    imstkNew<Cube> cubeGeom(pos, 20.0);
+    imstkNew<OrientedBox> cubeGeom(pos, Vec3d(10.0, 15.0, 10.0));
 
     // cube visual model
     auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
@@ -268,7 +268,7 @@ main()
             const Vec3d& devPos = controller->getPosition();
             const Quatd& devQ   = controller->getRotation();
             rbdModel->getModelGeometry()->rotate(devQ);
-            auto cubeGeo = std::dynamic_pointer_cast<Cube>(cubeObj->getPhysicsGeometry());
+            auto cubeGeo = std::dynamic_pointer_cast<OrientedBox>(cubeObj->getPhysicsGeometry());
             const Vec3d cubePos      = rbdModel->getModelGeometry()->getTranslation();
             const Vec3d cubeVelocity = (cubePos - prevCubePos) / 2.0;
             const Vec3d damp  = -1000000 * cubeVelocity;

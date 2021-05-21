@@ -21,7 +21,6 @@
 
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
-#include "imstkCube.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
@@ -29,6 +28,7 @@
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkOrientedBox.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
@@ -56,7 +56,7 @@ main()
     std::shared_ptr<HapticDeviceClient> client     = server->makeDeviceClient(deviceName);
 
     // Object
-    imstkNew<Cube>            geom(Vec3d(0.0, 1.0, 0.0), 2.0);
+    imstkNew<OrientedBox>     geom(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 5.0, 1.0));
     imstkNew<CollidingObject> object("VirtualObject");
     object->setVisualGeometry(geom);
     object->setCollidingGeometry(geom);

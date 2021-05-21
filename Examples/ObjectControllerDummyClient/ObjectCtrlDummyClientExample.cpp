@@ -21,11 +21,11 @@
 
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
-#include "imstkCube.h"
 #include "imstkDummyClient.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkNew.h"
+#include "imstkOrientedBox.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
@@ -49,9 +49,7 @@ main()
     imstkNew<DummyClient> client("DummyClient");
 
     // Object
-    imstkNew<Cube> geom;
-    geom->setPosition(0.0, 1.0, 0.0);
-    geom->setWidth(2.0);
+    imstkNew<OrientedBox> geom(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 1.0, 1.0));
 
     imstkNew<CollidingObject> object("VirtualObject");
     object->setVisualGeometry(geom);

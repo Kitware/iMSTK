@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkRigidBodyModel.h"
-#include "imstkCube.h"
+#include "imstkOrientedBox.h"
 #include "imstkLogger.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
@@ -48,9 +48,9 @@ RigidBodyModel::initialize()
         {
             createSphere();
         }
-        else if (geomType == "Cube")
+        else if (geomType == "OrientedBox")
         {
-            createCube();
+            createOrientedBox();
         }
         else if (geomType == "Plane")
         {
@@ -151,7 +151,7 @@ RigidBodyModel::createPlane()
 }
 
 void
-RigidBodyModel::createCube()
+RigidBodyModel::createOrientedBox()
 {
     const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_config->m_staticFriction,
         (PxReal)m_config->m_dynamicFriction,
@@ -160,12 +160,12 @@ RigidBodyModel::createCube()
     const auto physics = m_rigidBodyWorld->m_Physics;
     const auto PxScene = m_rigidBodyWorld->m_Scene;
 
-    const auto cubeGeo = std::dynamic_pointer_cast<imstk::Cube>(m_geometry);
+    const auto obbGeo = std::dynamic_pointer_cast<OrientedBox>(m_geometry);
 
-    auto l = (PxReal)cubeGeo->getWidth();
+    Vec3d extents = obbGeo->getExtents();
 
-    const auto  p = cubeGeo->getPosition() + cubeGeo->getTranslation();
-    const Quatd q(cubeGeo->getRotation());
+    const auto  p = obbGeo->getPosition() + obbGeo->getTranslation();
+    const Quatd q(obbGeo->getRotation());
 
     PxTransform trans((float)p[0], (float)p[1], (float)p[2], PxQuat((float)q.x(), (float)q.y(), (float)q.z(), (float)q.w()));
 
@@ -173,7 +173,10 @@ RigidBodyModel::createCube()
     {
         m_pxStaticActor = PxCreateStatic(*physics,
                                          trans,
-                                         PxBoxGeometry(l / (PxReal)2., l / (PxReal)2., l / (PxReal)2.),
+                                         PxBoxGeometry(
+                                             static_cast<PxReal>(extents[0]),
+                                             static_cast<PxReal>(extents[1]),
+                                             static_cast<PxReal>(extents[2])),
                                          *physxMaterial);
         if (m_pxStaticActor)
         {
@@ -184,7 +187,10 @@ RigidBodyModel::createCube()
     {
         m_pxDynamicActor = PxCreateDynamic(*physics,
                                            trans,
-                                           PxBoxGeometry(l / (PxReal)2., l / (PxReal)2., l / (PxReal)2.),
+                                           PxBoxGeometry(
+                                               static_cast<PxReal>(extents[0]),
+                                               static_cast<PxReal>(extents[1]),
+                                               static_cast<PxReal>(extents[2])),
                                            *physxMaterial,
             (PxReal)0.1);
 

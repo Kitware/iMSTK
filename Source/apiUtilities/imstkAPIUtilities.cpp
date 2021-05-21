@@ -32,7 +32,7 @@
 
 // Geometry
 #include "imstkCapsule.h"
-#include "imstkCube.h"
+#include "imstkOrientedBox.h"
 #include "imstkImageData.h"
 #include "imstkMeshIO.h"
 #include "imstkPlane.h"
@@ -48,7 +48,7 @@ std::unordered_map<std::string, std::function<std::shared_ptr<Geometry>()>> geom
 {
     { "Sphere", []() { return std::make_shared<Sphere>(); } },
     { "Plane", []() { return std::make_shared<Sphere>(); } },
-    { "Cube", []() { return std::make_shared<Sphere>(); } },
+    { "OrientedBox", []() { return std::make_shared<OrientedBox>(); } },
     { "Capsule", []() { return std::make_shared<Sphere>(); } },
     { "Cylinder", []() { return std::make_shared<Sphere>(); } }
 };
