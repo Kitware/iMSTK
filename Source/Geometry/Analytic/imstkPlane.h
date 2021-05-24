@@ -57,11 +57,6 @@ public:
 
 public:
     ///
-    /// \brief Print the plane info
-    ///
-    void print() const override;
-
-    ///
     /// \brief Returns the normal of the plane
     ///
     Vec3d getNormal(DataType type = DataType::PostTransform);
@@ -73,9 +68,9 @@ public:
     void setNormal(const double x, const double y, const double z);
 
     ///
-    /// \brief Returns the width of the plane
+    /// \brief Returns the width of the plane after transform
     ///
-    double getWidth(DataType type = DataType::PostTransform);
+    double getWidth();
 
     ///
     /// \brief Sets the width of the plane
@@ -85,7 +80,7 @@ public:
     ///
     /// \brief Returns signed distance to surface at pos
     ///
-    double getFunctionValue(const Vec3d& pos) const override { return m_orientationAxisPostTransform.dot(pos - m_positionPostTransform); }
+    double getFunctionValue(const Vec3d& pos) const override { return m_normalPostTransform.dot(pos - m_positionPostTransform); }
 
     ///
     /// \brief Get the min, max of the AABB around the plane
@@ -100,7 +95,8 @@ public:
 protected:
     void applyTransform(const Mat4d& m) override;
 
-    double m_width = 1.0;                      ///> Width of the plane
-    mutable double m_widthPostTransform = 1.0; ///> Width of the plane once transform applied
+protected:
+    Vec3d m_normal;
+    mutable Vec3d m_normalPostTransform;
 };
 } // imstk

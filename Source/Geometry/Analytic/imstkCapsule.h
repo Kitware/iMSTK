@@ -28,7 +28,7 @@ namespace imstk
 ///
 /// \class Capsule
 ///
-/// \brief Capsule geometry
+/// \brief Capsule geometry, default configuration is at origin with length running up the y axes
 ///
 class Capsule : public AnalyticalGeometry
 {
@@ -36,12 +36,12 @@ public:
     ///
     /// \brief Constructor
     ///
-    Capsule(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 0.5, const double length = 1.0, const Vec3d orientationAxis = Vec3d(0.0, 1.0, 0.0),
+    Capsule(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 0.5, const double length = 1.0, const Quatd orientation = Quatd::Identity(),
             const std::string& name = std::string("defaultCapsule")) :
         AnalyticalGeometry(name)
     {
         setPosition(pos);
-        setOrientationAxis(orientationAxis);
+        setOrientation(orientation);
         setRadius(radius);
         setLength(length);
     }

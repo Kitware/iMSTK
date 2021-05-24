@@ -836,7 +836,7 @@ GeometryUtils::toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
 std::shared_ptr<SurfaceMesh>
 GeometryUtils::toQuadSurfaceMesh(std::shared_ptr<Plane> plane)
 {
-    const Quatd r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), plane->getOrientationAxis());
+    const Quatd r = Quatd(plane->getRotation());
     const Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
     const Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
 

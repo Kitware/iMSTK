@@ -30,16 +30,20 @@
 
 namespace imstk
 {
-VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel)
+VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+    m_capsuleSource(vtkSmartPointer<vtkCapsuleSource>::New())
 {
-    auto geometry = std::static_pointer_cast<Capsule>(visualModel->getGeometry());
+    auto geometry = std::dynamic_pointer_cast<Capsule>(visualModel->getGeometry());
 
-    m_capsuleSource = vtkSmartPointer<vtkCapsuleSource>::New();
-    m_capsuleSource->SetRadius(geometry->getRadius());
-    m_capsuleSource->SetCylinderLength(geometry->getLength());
+    m_capsuleSource->SetCenter(0.0, 0.0, 0.0);
+    m_capsuleSource->SetRadius(geometry->getRadius(Geometry::DataType::PreTransform));
+    m_capsuleSource->SetCylinderLength(geometry->getLength(Geometry::DataType::PreTransform));
     m_capsuleSource->SetLatLongTessellation(20);
     m_capsuleSource->SetPhiResolution(20);
     m_capsuleSource->SetThetaResolution(20);
+
+    const Mat4d& transform = geometry->getTransform().transpose();
+    m_transform->SetMatrix(transform.data());
 
     // Setup mapper
     {
@@ -62,17 +66,17 @@ VTKCapsuleRenderDelegate::processEvents()
     VTKRenderDelegate::processEvents();
 
     // Don't use events for primitives, just always update
-    auto geometry = std::static_pointer_cast<Capsule>(m_visualModel->getGeometry());
+    auto geometry = std::dynamic_pointer_cast<Capsule>(m_visualModel->getGeometry());
 
-    m_capsuleSource->SetRadius(geometry->getRadius());
-    m_capsuleSource->SetCylinderLength(geometry->getLength());
+    m_capsuleSource->SetRadius(geometry->getRadius(Geometry::DataType::PreTransform));
+    m_capsuleSource->SetCylinderLength(geometry->getLength(Geometry::DataType::PreTransform));
+    m_capsuleSource->Modified();
 
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
-    T.scale(1.0);
+    T.rotate(geometry->getOrientation(Geometry::DataType::PostTransform));
+    T.scale(geometry->getScaling());
     T.matrix().transposeInPlace();
-
     m_transform->SetMatrix(T.data());
 }
 } // imstk

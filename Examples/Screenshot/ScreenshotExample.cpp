@@ -58,7 +58,6 @@ main()
 
     // Cube
     imstkNew<OrientedBox> cubeGeom(Vec3d(1.0, -1.0, 0.5), Vec3d(0.25, 0.25, 0.25));
-    // rotates could be replaced by cubeGeom->setOrientationAxis(1,1,1) (normalized inside)
     cubeGeom->rotate(UP_VECTOR, PI_4, Geometry::TransformType::ApplyToData);
     cubeGeom->rotate(RIGHT_VECTOR, PI_4, Geometry::TransformType::ApplyToData);
     imstkNew<SceneObject> cubeObj("VisualCube");
