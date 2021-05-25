@@ -20,19 +20,24 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkCapsule.h"
 #include "imstkCollidingObject.h"
+#include "imstkCylinder.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOrientedBox.h"
+#include "imstkPlane.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
+#include "imstkSphere.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -52,14 +57,18 @@ main()
 
     // Device Server
     imstkNew<HapticDeviceManager>       server;
-    const std::string                   deviceName = "";
-    std::shared_ptr<HapticDeviceClient> client     = server->makeDeviceClient(deviceName);
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
 
-    // Object
-    imstkNew<OrientedBox>     geom(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 5.0, 1.0));
-    imstkNew<CollidingObject> object("VirtualObject");
-    object->setVisualGeometry(geom);
-    object->setCollidingGeometry(geom);
+    std::shared_ptr<AnalyticalGeometry> geometries[] = {
+        std::make_shared<OrientedBox>(Vec3d::Zero(), Vec3d(1.0, 5.0, 1.0)),
+        std::make_shared<Plane>(Vec3d::Zero(), Vec3d(0.0, 1.0, 0.0)),
+        std::make_shared<Capsule>(Vec3d::Zero(), 0.5, 1.0),
+        std::make_shared<Cylinder>(Vec3d::Zero(), 5.0, 1.0),
+        std::make_shared<Sphere>(Vec3d::Zero(), 2.0)
+    };
+
+    imstkNew<SceneObject> object("VirtualObject");
+    object->setVisualGeometry(geometries[0]);
     scene->addSceneObject(object);
 
     imstkNew<SceneObjectController> controller(object, client);
@@ -69,7 +78,7 @@ main()
     // Update Camera position
     std::shared_ptr<Camera> cam = scene->getActiveCamera();
     cam->setPosition(Vec3d(0.0, 0.0, 10.0));
-    cam->setFocalPoint(geom->getPosition());
+    cam->setFocalPoint(geometries[0]->getPosition());
 
     // Light
     imstkNew<DirectionalLight> light("light");
@@ -86,11 +95,13 @@ main()
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager 1");
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->addModule(server);
+        driver->setDesiredDt(0.01);
 
         // Add mouse and keyboard controls to the viewer
         {

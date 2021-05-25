@@ -775,37 +775,6 @@ GeometryUtils::copyToVtkDataAttributes(vtkDataSetAttributes* pointData, const st
 }
 
 std::shared_ptr<SurfaceMesh>
-GeometryUtils::toSurfaceMesh(std::shared_ptr<OrientedBox> obb)
-{
-    vtkNew<vtkCubeSource> cubeSource;
-    cubeSource->SetCenter(obb->getPosition(Geometry::DataType::PreTransform).data());
-    Vec3d extents = obb->getExtents();
-    cubeSource->SetXLength(extents[0] * 2.0);
-    cubeSource->SetYLength(extents[1] * 2.0);
-    cubeSource->SetZLength(extents[2] * 2.0);
-    cubeSource->Update();
-
-    Mat4d mat;
-    mat.setIdentity();
-    mat.block<3, 3>(0, 0) = obb->getRotation();
-
-    vtkNew<vtkTransform> transform;
-    transform->SetMatrix(mat.data());
-
-    vtkNew<vtkTransformFilter> transformCube;
-    transformCube->SetInputData(cubeSource->GetOutput());
-    transformCube->SetTransform(transform);
-    transformCube->Update();
-    vtkNew<vtkTriangleFilter> triangulate;
-    triangulate->SetInputData(transformCube->GetOutput());
-    triangulate->Update();
-    vtkNew<vtkCleanPolyData> cleanData;
-    cleanData->SetInputData(triangulate->GetOutput());
-    cleanData->Update();
-    return copyToSurfaceMesh(cleanData->GetOutput());
-}
-
-std::shared_ptr<SurfaceMesh>
 GeometryUtils::toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
                                      const unsigned int phiDivisions, const unsigned int thetaDivisions)
 {
@@ -834,25 +803,59 @@ GeometryUtils::toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
 }
 
 std::shared_ptr<SurfaceMesh>
-GeometryUtils::toQuadSurfaceMesh(std::shared_ptr<Plane> plane)
+GeometryUtils::toSurfaceMesh(std::shared_ptr<AnalyticalGeometry> geom)
 {
-    const Quatd r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), plane->getOrientationAxis());
-    const Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
-    const Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
+    vtkSmartPointer<vtkPointSet> results = nullptr;
+    if (auto plane = std::dynamic_pointer_cast<Plane>(geom))
+    {
+        const Quatd r = Quatd(plane->getRotation());
+        const Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
+        const Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
 
-    //Vec3d p1 = plane->getPosition() + plane->getWidth() * (i + j);
-    Vec3d p2 = plane->getPosition() + plane->getWidth() * (i - j);
-    Vec3d p3 = plane->getPosition() + plane->getWidth() * (-i + j);
-    Vec3d p4 = plane->getPosition() + plane->getWidth() * (-i - j);
+        //Vec3d p1 = plane->getPosition() + plane->getWidth() * (i + j);
+        Vec3d p2 = plane->getPosition() + plane->getWidth() * (i - j);
+        Vec3d p3 = plane->getPosition() + plane->getWidth() * (-i + j);
+        Vec3d p4 = plane->getPosition() + plane->getWidth() * (-i - j);
 
-    vtkNew<vtkPlaneSource> planeSource;
-    planeSource->SetOrigin(p4.data());
-    planeSource->SetPoint1(p3.data());
-    planeSource->SetPoint2(p2.data());
-    planeSource->Update();
+        vtkNew<vtkPlaneSource> planeSource;
+        planeSource->SetOrigin(p4.data());
+        planeSource->SetPoint1(p3.data());
+        planeSource->SetPoint2(p2.data());
+        planeSource->Update();
+        results = planeSource->GetOutput();
+    }
+    else if (auto orientedBox = std::dynamic_pointer_cast<OrientedBox>(geom))
+    {
+        vtkNew<vtkCubeSource> cubeSource;
+        cubeSource->SetCenter(orientedBox->getPosition(Geometry::DataType::PreTransform).data());
+        Vec3d extents = orientedBox->getExtents();
+        cubeSource->SetXLength(extents[0] * 2.0);
+        cubeSource->SetYLength(extents[1] * 2.0);
+        cubeSource->SetZLength(extents[2] * 2.0);
+        cubeSource->Update();
 
+        Mat4d mat;
+        mat.setIdentity();
+        mat.block<3, 3>(0, 0) = orientedBox->getRotation();
+
+        vtkNew<vtkTransform> transform;
+        transform->SetMatrix(mat.data());
+
+        vtkNew<vtkTransformFilter> transformCube;
+        transformCube->SetInputData(cubeSource->GetOutput());
+        transformCube->SetTransform(transform);
+        transformCube->Update();
+        results = transformCube->GetOutput();
+    }
+    else
+    {
+        LOG(WARNING) << "Failed to produce SurfaceMesh from provided AnalyticalGeometry";
+        return nullptr;
+    }
+
+    // Triangulate, mesh could have quads or other primitives
     vtkNew<vtkTriangleFilter> triangulate;
-    triangulate->SetInputData(planeSource->GetOutput());
+    triangulate->SetInputData(results);
     triangulate->Update();
     vtkNew<vtkCleanPolyData> cleanData;
     cleanData->SetInputConnection(triangulate->GetOutputPort());

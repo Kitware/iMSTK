@@ -33,13 +33,16 @@ namespace imstk
 VTKOrientedCubeRenderDelegate::VTKOrientedCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
     m_cubeSource(vtkSmartPointer<vtkCubeSource>::New())
 {
-    auto         geometry = std::dynamic_pointer_cast<OrientedBox>(visualModel->getGeometry());
-    const Vec3d& extents  = geometry->getExtents();
+    auto geometry = std::dynamic_pointer_cast<OrientedBox>(visualModel->getGeometry());
 
+    const Vec3d& extents = geometry->getExtents(Geometry::DataType::PreTransform);
     m_cubeSource->SetCenter(0.0, 0.0, 0.0);
     m_cubeSource->SetXLength(extents[0] * 2.0);
     m_cubeSource->SetYLength(extents[1] * 2.0);
     m_cubeSource->SetZLength(extents[2] * 2.0);
+
+    const Mat4d& transform = geometry->getTransform().transpose();
+    m_transform->SetMatrix(transform.data());
 
     // Setup mapper
     {
@@ -61,10 +64,10 @@ VTKOrientedCubeRenderDelegate::processEvents()
 {
     VTKRenderDelegate::processEvents();
 
-    // Don't use events for primitives, just always update
-    auto         geometry = std::dynamic_pointer_cast<OrientedBox>(m_visualModel->getGeometry());
-    const Vec3d& extents  = geometry->getExtents();
+    // Events aren't used for primitives, always update
+    auto geometry = std::dynamic_pointer_cast<OrientedBox>(m_visualModel->getGeometry());
 
+    const Vec3d& extents = geometry->getExtents(Geometry::DataType::PreTransform);
     m_cubeSource->SetXLength(extents[0] * 2.0);
     m_cubeSource->SetYLength(extents[1] * 2.0);
     m_cubeSource->SetZLength(extents[2] * 2.0);
@@ -72,10 +75,9 @@ VTKOrientedCubeRenderDelegate::processEvents()
 
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
-    T.scale(1.0);
+    T.rotate(geometry->getOrientation(Geometry::DataType::PostTransform));
+    T.scale(geometry->getScaling());
     T.matrix().transposeInPlace();
-
     m_transform->SetMatrix(T.data());
 }
 } // imstk

@@ -46,13 +46,14 @@ TEST_F(imstkPlaneTest, SetGetWidth)
     EXPECT_DOUBLE_EQ(0.003, m_plane.getWidth());
 
     m_plane.setWidth(400000000);
-    EXPECT_DOUBLE_EQ(400000000, m_plane.getWidth());
+    EXPECT_DOUBLE_EQ(400000000.0, m_plane.getWidth());
 
-    m_plane.setWidth(0);
-    EXPECT_LT(0, m_plane.getWidth());
+    // Should not apply
+    m_plane.setWidth(0.0);
+    EXPECT_DOUBLE_EQ(400000000.0, m_plane.getWidth());
 
-    m_plane.setWidth(-5);
-    EXPECT_LT(0, m_plane.getWidth());
+    m_plane.setWidth(-5.0);
+    EXPECT_LT(-5.0, m_plane.getWidth());
 }
 
 ///
@@ -73,8 +74,8 @@ TEST_F(imstkPlaneTest, SetGetNormal)
     m_plane.setNormal(n3);
     EXPECT_TRUE(m_plane.getNormal().isApprox(n3.normalized()));
 
-    m_plane.setNormal(0, 0, 0);
-    EXPECT_FALSE(m_plane.getNormal().isApprox(Vec3d(0, 0, 0)));
+    m_plane.setNormal(Vec3d::Zero());
+    EXPECT_FALSE(m_plane.getNormal().isApprox(Vec3d::Zero()));
 }
 
 ///

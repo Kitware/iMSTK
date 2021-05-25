@@ -86,15 +86,77 @@ OrientedBox::updatePostTransformData() const
     m_transformApplied     = true;
 }
 
+double
+OrientedBox::getFunctionValue(const Vec3d& pos) const
+{
+    const Mat3d  rot     = m_orientationPostTransform.toRotationMatrix();
+    const Vec3d& extents = m_extentsPostTransform;
+
+    const Vec3d diff   = (pos - m_positionPostTransform);
+    const Mat3d rotInv = rot.transpose();
+    const Vec3d proj   = rotInv * diff; // dot product/project onto each axes
+
+    bool inside[3] =
+    {
+        (std::abs(proj[0]) < extents[0]),
+        (std::abs(proj[1]) < extents[1]),
+        (std::abs(proj[2]) < extents[2])
+    };
+    bool isInsideCube = inside[0] && inside[1] && inside[2];
+
+    double signedDist = 0.0;
+    if (isInsideCube)
+    {
+        // If inside, find closest face, that is the signed distance
+        signedDist = std::numeric_limits<double>::lowest();
+        for (int i = 0; i < 3; i++)
+        {
+            double dist = proj[i];
+            if (dist < extents[i] && dist >= 0.0)
+            {
+                const double unsignedDistToSide = (extents[i] - dist);
+                if (-unsignedDistToSide > signedDist)
+                {
+                    signedDist = -unsignedDistToSide;
+                }
+            }
+            else if (dist > -extents[i] && dist < 0.0)
+            {
+                const double unsignedDistToSide = (extents[i] + dist);
+                if (-unsignedDistToSide > signedDist)
+                {
+                    signedDist = -unsignedDistToSide;
+                }
+            }
+        }
+    }
+    else
+    {
+        // If outside we need to also consider diagonal distance to corners and edges
+        // Compute nearest point
+        Vec3d closestPt = Vec3d::Zero();
+        Vec3d axialSignedDists = Vec3d::Zero();
+        for (int i = 0; i < 3; i++)
+        {
+            double dist = proj[i];
+
+            // If distance farther than the box extents, clamp to the box
+            if (dist >= extents[i] || dist <= -extents[i])
+            {
+                axialSignedDists[i] = std::abs(dist) - extents[i];
+            }
+        }
+        signedDist = axialSignedDists.norm();
+    }
+    return signedDist;
+}
+
 void
 OrientedBox::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(paddingPercent))
 {
     updatePostTransformData();
 
-    const Mat3d r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), m_orientationAxisPostTransform).toRotationMatrix();
-
-    Vec3d rotatedExtents = r * m_extentsPostTransform;
-
+    const Mat3d r = m_orientationPostTransform.toRotationMatrix();
     const Vec3d a = r.col(0) * m_extentsPostTransform[0];
     const Vec3d b = r.col(1) * m_extentsPostTransform[1];
     const Vec3d c = r.col(2) * m_extentsPostTransform[2];

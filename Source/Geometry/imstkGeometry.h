@@ -161,7 +161,7 @@ public:
     ///
     /// \brief Get/Set the transform
     ///
-    const Mat4d& getTransform() { return m_transform; }
+    const Mat4d& getTransform() const { return m_transform; }
     void setTransform(const Mat4d& m)
     {
         m_transform = m;

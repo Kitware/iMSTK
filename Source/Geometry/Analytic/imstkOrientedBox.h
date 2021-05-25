@@ -28,16 +28,16 @@ namespace imstk
 ///
 /// \class OrientedBox
 ///
-/// \brief OrientedBox geometry
+/// \brief OrientedBox geometry, specified with extents (half lengths)
 ///
 class OrientedBox : public AnalyticalGeometry
 {
 public:
-    OrientedBox(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d extents = Vec3d(0.5, 0.5, 0.5), const Vec3d& orientationAxis = Vec3d(0.0, 1.0, 0.0),
+    OrientedBox(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d extents = Vec3d(0.5, 0.5, 0.5), const Quatd& orientation = Quatd::Identity(),
                 const std::string& name = std::string("defaultOrientedBox")) : AnalyticalGeometry(name)
     {
         setPosition(pos);
-        setOrientationAxis(orientationAxis);
+        setOrientation(orientation);
         setExtents(extents);
     }
 
@@ -76,71 +76,8 @@ public:
 
     ///
     /// \brief Returns signed distance to surface at pos
-    /// \todo Doesn't support orientation yet
     ///
-    double getFunctionValue(const Vec3d& pos) const override
-    {
-        const Mat3d  rot     = Quatd::FromTwoVectors(m_orientationAxisPostTransform, Vec3d(0.0, 1.0, 0.0)).toRotationMatrix();
-        const Vec3d& extents = m_extentsPostTransform;
-
-        const Vec3d diff   = (pos - m_positionPostTransform);
-        const Mat3d rotInv = rot.transpose();
-        const Vec3d proj   = rotInv * diff; // dot product/project onto each axes
-
-        bool inside[3] =
-        {
-            (std::abs(proj[0]) < extents[0]),
-            (std::abs(proj[1]) < extents[1]),
-            (std::abs(proj[2]) < extents[2])
-        };
-        bool isInsideCube = inside[0] && inside[1] && inside[2];
-
-        double signedDist = 0.0;
-        if (isInsideCube)
-        {
-            // If inside, find closest face, that is the signed distance
-            signedDist = std::numeric_limits<double>::lowest();
-            for (int i = 0; i < 3; i++)
-            {
-                double dist = proj[i];
-                if (dist < extents[i] && dist >= 0.0)
-                {
-                    const double unsignedDistToSide = (extents[i] - dist);
-                    if (-unsignedDistToSide > signedDist)
-                    {
-                        signedDist = -unsignedDistToSide;
-                    }
-                }
-                else if (dist > -extents[i] && dist < 0.0)
-                {
-                    const double unsignedDistToSide = (extents[i] + dist);
-                    if (-unsignedDistToSide > signedDist)
-                    {
-                        signedDist = -unsignedDistToSide;
-                    }
-                }
-            }
-        }
-        else
-        {
-            // If outside we need to also consider diagonal distance to corners and edges
-            // Compute nearest point
-            Vec3d closestPt = Vec3d::Zero();
-            Vec3d axialSignedDists = Vec3d::Zero();
-            for (int i = 0; i < 3; i++)
-            {
-                double dist = proj[i];
-
-                // If distance farther than the box extents, clamp to the box
-                if (dist >= extents[i] || dist <= -extents[i])
-                {
-                    axialSignedDists[i] = std::abs(dist) - extents[i];
-                }
-            }
-            signedDist = axialSignedDists.norm();
-        }
-        return signedDist;
-    }
+    double getFunctionValue(const Vec3d& pos) const override;
 
     ///
     /// \brief Get the min, max of the AABB around the cube
