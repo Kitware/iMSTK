@@ -44,30 +44,52 @@ public:
     // Accessors
 
     ///
-    /// \brief Get/Set position
+    /// \brief Get the local or global position (post transformed)
     ///
     Vec3d getPosition(DataType type = DataType::PostTransform);
+
+    ///
+    /// \brief Set the local position
+    ///
     void setPosition(const Vec3d p);
     void setPosition(const double x, const double y, const double z);
 
     ///
-    /// \brief Get/Set orientation axis
+    /// \brief Get the local or globa orientation (post transformed)
     ///
-    Vec3d getOrientationAxis(DataType type = DataType::PostTransform);
-    void setOrientationAxis(const Vec3d axis);
+    Quatd getOrientation(DataType type = DataType::PostTransform);
 
+    ///
+    /// \brief Set the local orientation
+    ///
+    void setOrientation(const Quatd r);
+
+    ///
+    /// \brief Returns the implicit function value, this could signed, unsigned distance,
+    /// or some other scalar.
+    /// \param Position in global space
+    /// Note: Called frequently and often in parallel
+    ///
     double getFunctionValue(const Vec3d& imstkNotUsed(pos)) const override { return 0.0; }
+
+    ///
+    /// \brief Apply the global transform to the local parameters producing post
+    /// transformed parameters.
+    ///
+    void updatePostTransformData() const override;
 
 protected:
     AnalyticalGeometry(const std::string& name = std::string(""));
 
+    ///
+    /// \brief Apply a user transform directly to (pre-transformed) parameters producing
+    /// new parameters.
+    ///
     virtual void applyTransform(const Mat4d& m) override;
-    virtual void updatePostTransformData() const override;
 
-    Vec3d m_position;                             ///> position
-    mutable Vec3d m_positionPostTransform;        ///> position once transform applied
-
-    Vec3d m_orientationAxis;                      ///> orientation
-    mutable Vec3d m_orientationAxisPostTransform; ///> orientation once transform applied
+    Vec3d m_position;                         ///> position
+    mutable Vec3d m_positionPostTransform;    ///> position once transform applied
+    Quatd m_orientation;                      ///> orientation
+    mutable Quatd m_orientationPostTransform; ///> orientation once transform is applied
 };
 } //imstk

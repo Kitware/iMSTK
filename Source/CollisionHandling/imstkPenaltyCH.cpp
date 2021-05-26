@@ -48,7 +48,7 @@ PenaltyCH::processCollisionData()
     }
     else
     {
-        LOG(FATAL) << "no penalty collision handling available for " << m_object->getName()
+        LOG(FATAL) << "No penalty collision handling available for " << m_object->getName()
                    << " (rigid mesh not yet supported).";
     }
 }
@@ -90,7 +90,7 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<FeDeform
         return;
     }
 
-    CHECK(deformableObj != nullptr) << "PenaltyRigidCH::computeContactForcesDiscreteDeformable error: "
+    CHECK(deformableObj != nullptr) << "error: "
                                     << m_object->getName() << " is not a deformable object.";
 
     // Get current force vector

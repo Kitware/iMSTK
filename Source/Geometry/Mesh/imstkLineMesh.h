@@ -79,7 +79,7 @@ public:
     ///
     /// \brief Get the number of segments/cells
     ///
-    size_t getNumLines() const;
+    int getNumLines() const;
 
     ///
     /// \brief Set the connectivity of the segments

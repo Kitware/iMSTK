@@ -32,7 +32,7 @@
 
 // Geometry
 #include "imstkCapsule.h"
-#include "imstkCube.h"
+#include "imstkOrientedBox.h"
 #include "imstkImageData.h"
 #include "imstkMeshIO.h"
 #include "imstkPlane.h"
@@ -48,7 +48,7 @@ std::unordered_map<std::string, std::function<std::shared_ptr<Geometry>()>> geom
 {
     { "Sphere", []() { return std::make_shared<Sphere>(); } },
     { "Plane", []() { return std::make_shared<Sphere>(); } },
-    { "Cube", []() { return std::make_shared<Sphere>(); } },
+    { "OrientedBox", []() { return std::make_shared<OrientedBox>(); } },
     { "Capsule", []() { return std::make_shared<Sphere>(); } },
     { "Cylinder", []() { return std::make_shared<Sphere>(); } }
 };
@@ -63,12 +63,12 @@ createVisualAnalyticalSceneObject(std::string            type,
                                   const Vec3d            scale /* = 1.*/,
                                   const Vec3d            t /*= Vec3d(0., 0., 0.)*/)
 {
-    CHECK(scene != nullptr) << "createVisualAnalyticalSceneObject: Scene is not valid!";
-    CHECK(!objName.empty()) << "createVisualAnalyticalSceneObject: Name is empty!";
+    CHECK(scene != nullptr) << "Error: Scene object is not valid!";
+    CHECK(!objName.empty()) << "Error: Name is empty!";
 
     if (geomMakeFunctions.count(type) == 0)
     {
-        LOG(WARNING) << "createVisualAnalyticalSceneObject: Scene object geometry type is not analytical!";
+        LOG(WARNING) << "Scene object geometry type " << type << " is not analytical!";
         return nullptr;
     }
     std::shared_ptr<Geometry> geom = geomMakeFunctions[type]();
@@ -93,12 +93,12 @@ createCollidingAnalyticalSceneObject(std::string            type,
                                      const Vec3d            scale /*= 1.*/,
                                      const Vec3d            t /*= Vec3d(0., 0., 0.)*/)
 {
-    CHECK(scene != nullptr) << "createCollidingSphereSceneObject: Scene is not valid!";
-    CHECK(!objName.empty()) << "createCollidingAnalyticalSceneObject: Name is empty!";
+    CHECK(scene != nullptr) << "Scene is not valid!";
+    CHECK(!objName.empty()) << "Name is empty!";
 
     if (geomMakeFunctions.count(type) == 0)
     {
-        LOG(WARNING) << "createCollidingAnalyticalSceneObject: Scene object geometry type is not analytical!";
+        LOG(WARNING) << "Scene object geometry type " << type << " is not analytical!";
         return nullptr;
     }
     std::shared_ptr<Geometry> geom = geomMakeFunctions[type]();
@@ -122,8 +122,8 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
                               const std::string&     fileName,
                               const std::string&     objectName)
 {
-    CHECK(scene != nullptr) << "createAndAddVisualSceneObject: Scene is not valid!";
-    CHECK(!fileName.empty()) << "createAndAddVisualSceneObject: Name is empty!";
+    CHECK(scene != nullptr) << "Error: Scene object supplied is not valid!";
+    CHECK(!fileName.empty()) << "Error: Name is empty!";
 
     auto mesh = MeshIO::read(fileName);
     auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
@@ -143,7 +143,7 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
 std::shared_ptr<NonLinearSystem<SparseMatrixd>>
 createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel)
 {
-    CHECK(dynaModel != nullptr) << "createNonLinearSystem: Dynamic model is not valid!";
+    CHECK(dynaModel != nullptr) << "Dynamic model object supplied is not valid!";
 
     auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(
                 dynaModel->getFunction(),
@@ -164,7 +164,7 @@ createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel)
 std::shared_ptr<Graph>
 getMeshGraph(std::shared_ptr<PointSet> m)
 {
-    LOG(WARNING) << "The graph of a point set has no edges";
+    LOG(WARNING) << "Note: The graph of a point set has no edges";
 
     return std::make_shared<Graph>(m->getNumVertices());
 }

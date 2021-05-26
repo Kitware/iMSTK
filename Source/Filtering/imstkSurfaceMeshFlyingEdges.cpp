@@ -32,6 +32,8 @@ namespace imstk
 {
 SurfaceMeshFlyingEdges::SurfaceMeshFlyingEdges()
 {
+    setInputPortReq<ImageData>(0);
+
     setNumberOfInputPorts(1);
     setNumberOfOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());
@@ -62,6 +64,7 @@ SurfaceMeshFlyingEdges::requestUpdate()
     vtkNew<vtkFlyingEdges3D> filter;
     filter->SetInputData(GeometryUtils::coupleVtkImageData(inputImage));
     filter->SetValue(0, m_IsoValue);
+    filter->ComputeNormalsOff();
     filter->Update();
 
     std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0))->deepCopy(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));

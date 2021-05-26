@@ -49,7 +49,8 @@ public:
         WireframeSurface,
         VolumeRendering,
         Fluid,               ///< Renders a set of points using a screen-space fluid renderer
-        Image
+        Image,
+        SurfaceNormals
     };
 
     /// surface shading model. Defaults to Phong
@@ -75,51 +76,53 @@ public:
     virtual ~RenderMaterial() = default;
 
 public:
+    // *INDENT-OFF*
     ///
     /// \brief Posted when material parameters are modified
     ///
-    SIGNAL(RenderMaterial,modified);
+    SIGNAL(RenderMaterial, modified);
 
     ///
     /// \brief Posted when textures are modified
     ///
-    SIGNAL(RenderMaterial,texturesModified);
+    SIGNAL(RenderMaterial, texturesModified);
+    // *INDENT-ON*
 
 public:
     ///
     /// \brief Get/Set the material name
     ///
-    const std::string& getName() const{ return m_name; }
+    const std::string& getName() const { return m_name; }
     void setName(std::string name) { m_name = name; }
 
     ///
     /// \brief Get/Set display mode
     ///
-    const DisplayMode getDisplayMode() const{ return m_displayMode; }
+    const DisplayMode getDisplayMode() const { return m_displayMode; }
     void setDisplayMode(const DisplayMode displayMode);
 
     ///
     /// \brief Get/Set tessellated
     ///
-    const bool getTessellated() const{ return m_tessellated; }
+    const bool getTessellated() const { return m_tessellated; }
     void setTessellated(const bool tessellated);
 
     ///
     /// \brief Get/Set line width or the wireframe
     ///
-    const float getLineWidth() const{ return m_lineWidth; }
-    void setLineWidth(const float width);
+    const double getLineWidth() const { return m_lineWidth; }
+    void setLineWidth(const double width);
 
     ///
     /// \brief Get/Set point radius
     ///
-    const float getPointSize() const{ return m_pointSize; }
-    void setPointSize(const float size);
+    const double getPointSize() const { return m_pointSize; }
+    void setPointSize(const double size);
 
     ///
     /// \brief Backface culling on/off
     ///
-    const bool getBackFaceCulling() const{ return m_backfaceCulling; }
+    const bool getBackFaceCulling() const { return m_backfaceCulling; }
     void setBackFaceCulling(const bool culling);
     void backfaceCullingOn();
     void backfaceCullingOff();
@@ -128,64 +131,64 @@ public:
     /// \brief Get/Set the color. This affects the diffuse color directly, but
     /// it affects the specular color in the case of metals.
     ///
-    const Color& getDiffuseColor() const{ return m_diffuseColor; }
+    const Color& getDiffuseColor() const { return m_diffuseColor; }
     void setDiffuseColor(const Color& color);
-    const Color& getColor() const{ return this->getDiffuseColor(); }
+    const Color& getColor() const { return this->getDiffuseColor(); }
     void setColor(const Color& color);
 
     ///
     /// \brief Get/Set the specular color
     ///
-    const Color& getSpecularColor() const{ return m_specularColor; }
+    const Color& getSpecularColor() const { return m_specularColor; }
     void setSpecularColor(const Color& color);
 
     ///
     /// \brief Get/Set the specular amount
     ///
-    float getSpecular() const{ return m_specular; }
-    void setSpecular(float specular) { m_specular = specular; }
+    double getSpecular() const { return m_specular; }
+    void setSpecular(double specular) { m_specular = specular; }
 
     ///
     /// \brief Get/Set the ambient color
     ///
-    const Color& getAmbientColor() const{ return m_ambientColor; }
+    const Color& getAmbientColor() const { return m_ambientColor; }
     void setAmbientColor(const Color& color);
 
     ///
     /// \brief Get/Set the metalness
     ///
-    const float getMetalness() const{ return m_metalness; }
-    void setMetalness(const float metalness);
+    const double getMetalness() const { return m_metalness; }
+    void setMetalness(const double metalness);
 
     ///
     /// \brief Get/Set ambient light coefficient
     ///
-    const float getAmbient() const{ return m_ambient; };
-    void setAmbient(float ambient) { m_ambient = ambient; }
+    const double getAmbient() const { return m_ambient; };
+    void setAmbient(double ambient) { m_ambient = ambient; }
 
     ///
     /// \brief Get/Set diffuse light coefficient
     ///
-    const float getDiffuse() const{ return m_diffuse; }
-    void setDiffuse(float diffuse) { m_diffuse = diffuse; }
+    const double getDiffuse() const { return m_diffuse; }
+    void setDiffuse(double diffuse) { m_diffuse = diffuse; }
 
     ///
     /// \brief Get/Set ambient light coefficient
     ///
-    const float getSpecularPower() const{ return m_specularPower; }
-    void setSpecularPower(const float p) { m_specularPower = p; }
+    const double getSpecularPower() const { return m_specularPower; }
+    void setSpecularPower(const double p) { m_specularPower = p; }
 
     ///
     /// \brief Get/Set the roughness
     ///
-    const float getRoughness() const{ return m_roughness; }
-    void setRoughness(const float roughness);
+    const double getRoughness() const { return m_roughness; }
+    void setRoughness(const double roughness);
 
     ///
     /// \brief Get/Set emissivity
     ///
-    const float getEmissivity() const{ return m_emissivity; }
-    void setEmissivity(const float emissivity);
+    const double getEmissivity() const { return m_emissivity; }
+    void setEmissivity(const double emissivity);
 
     ///
     /// \brief Add/Remove/Get texture
@@ -199,19 +202,19 @@ public:
     /// \brief Get/Set shadow receiving ability
     ///
     void setReceivesShadows(const bool receivesShadows);
-    bool getReceivesShadows() const{ return m_receivesShadows; }
+    bool getReceivesShadows() const { return m_receivesShadows; }
 
     ///
     /// \brief Get/Set shadow cast status
     ///
     void setCastsShadows(const bool castsShadows);
-    bool getCastsShadows() const{ return m_castsShadows; }
+    bool getCastsShadows() const { return m_castsShadows; }
 
     ///
     /// \brief Get/Set edge visibility
     ///
     void setEdgeVisibility(const bool visibility) { m_edgeVisibility = visibility; };
-    bool getEdgeVisibility() const{ return m_edgeVisibility; };
+    bool getEdgeVisibility() const { return m_edgeVisibility; };
 
     ///
     /// \brief Get/Set blend mode
@@ -219,50 +222,50 @@ public:
     /// and the MAXIMUM_INTENSITY and MINIMUM_INTENSITY blend modes are only available for volumes
     ///
     virtual void setBlendMode(const BlendMode blendMode);
-    const BlendMode getBlendMode() const{ return m_blendMode; }
+    const BlendMode getBlendMode() const { return m_blendMode; }
 
     ///
     /// \brief Checks if the material must be handled uniquely
     ///
-    bool isDecal() const{ return m_isDecal; }
-    bool isParticle() const{ return m_isParticle; }
-    bool isLineMesh() const{ return m_isLineMesh; }
+    bool isDecal() const { return m_isDecal; }
+    bool isParticle() const { return m_isParticle; }
+    bool isLineMesh() const { return m_isLineMesh; }
 
-    const DisplayMode getRenderMode() const{ return m_displayMode; }
-    const ShadingModel getShadingModel() const{ return m_shadingModel; }
+    const DisplayMode getRenderMode() const { return m_displayMode; }
+    const ShadingModel getShadingModel() const { return m_shadingModel; }
     void setShadingModel(const ShadingModel& model);
 
-    float getOcclusionStrength() const{ return m_occlusionStrength; }
-    void setOcclusionStrength(const float o);
+    double getOcclusionStrength() const { return m_occlusionStrength; }
+    void setOcclusionStrength(const double o);
 
-    float getNormalStrength() const{ return m_normalStrength; }
-    void setNormalStrength(const float n);
+    double getNormalStrength() const { return m_normalStrength; }
+    void setNormalStrength(const double n);
 
-    float getIndexOfRefraction() const{ return m_indexOfRefraction; }
-    void setIndexOfRefraction(const float n);
+    double getIndexOfRefraction() const { return m_indexOfRefraction; }
+    void setIndexOfRefraction(const double n);
 
-    const Color& getEdgeColor() const{ return m_edgeColor; }
+    const Color& getEdgeColor() const { return m_edgeColor; }
     void setEdgeColor(const Color& color);
 
-    const Color& getVertexColor() const{ return m_vertexColor; }
+    const Color& getVertexColor() const { return m_vertexColor; }
     void setVertexColor(const Color& color);
 
-    const double getOpacity() const{ return m_opacity; }
-    void setOpacity(const float opacity);
+    const double getOpacity() const { return m_opacity; }
+    void setOpacity(const double opacity);
 
-    const bool getBackfaceCulling() const{ return m_backfaceCulling; }
+    const bool getBackfaceCulling() const { return m_backfaceCulling; }
     void setBackfaceCulling(const bool c);
 
-    std::shared_ptr<ColorFunction> getColorLookupTable() const{ return m_lookupTable; }
+    std::shared_ptr<ColorFunction> getColorLookupTable() const { return m_lookupTable; }
     void setColorLookupTable(std::shared_ptr<ColorFunction> lut);
 
-    const bool getScalarVisibility() const{ return m_scalarVisibility; }
+    const bool getScalarVisibility() const { return m_scalarVisibility; }
     void setScalarVisibility(const bool scalarVisibility);
 
-    const bool getRecomputeVertexNormals() const{ return m_recomputeVertexNormals; }
+    const bool getRecomputeVertexNormals() const { return m_recomputeVertexNormals; }
     void setRecomputeVertexNormals(const bool recomputeVertexNormals) { m_recomputeVertexNormals = recomputeVertexNormals; }
 
-    const bool getRenderPointsAsSpheres() const{ return m_renderPointsAsSpheres; }
+    const bool getRenderPointsAsSpheres() const { return m_renderPointsAsSpheres; }
     void setRenderPointsAsSpheres(const bool renderPointsAsSpheres) { m_renderPointsAsSpheres = renderPointsAsSpheres; }
 
     void postModified() { this->postEvent(Event(RenderMaterial::modified())); }
@@ -284,35 +287,35 @@ protected:
     BlendMode m_blendMode = BlendMode::Alpha;
 
     ///-------------------Common properties---------------------
-    float m_diffuse      = 1.0f;
-    Color m_diffuseColor = Color::LightGray;
+    double m_diffuse      = 1.0;
+    Color  m_diffuseColor = Color::LightGray;
 
-    float m_specularPower = 100.0f;
-    float m_specular      = 0.0f;
-    Color m_specularColor = Color::Red;
+    double m_specularPower = 100.0;
+    double m_specular      = 0.0;
+    Color  m_specularColor = Color::Red;
 
-    float m_ambient      = 0.1f;
-    Color m_ambientColor = Color::White;
+    double m_ambient      = 0.1;
+    Color  m_ambientColor = Color::White;
 
-    float m_opacity = 1.0f;
+    double m_opacity = 1.0;
 
     ///-------------Wireframe specific properties----------------
-    float m_lineWidth        = 1.f;
-    float m_pointSize        = 2.f;
-    Color m_edgeColor        = Color::Marigold;
-    Color m_vertexColor      = Color::Teal;
-    bool  m_edgeVisibility   = true; ///< \note not used (vtk backend)
-    bool  m_vertexVisibility = true; ///< \note not used (vtk backend)
+    double m_lineWidth        = 1.0;
+    double m_pointSize        = 2.0;
+    Color  m_edgeColor        = Color::Marigold;
+    Color  m_vertexColor      = Color::Teal;
+    bool   m_edgeVisibility   = true; ///< \note not used (vtk backend)
+    bool   m_vertexVisibility = true; ///< \note not used (vtk backend)
 
     ///----------------PBR specific properties-------------------
-    float m_emissivity    = 0.f;
-    Color m_emmisiveColor = Color::White;
+    double m_emissivity    = 0.0;
+    Color  m_emmisiveColor = Color::White;
 
-    float m_metalness = 1.0f; ///< Value for metalness with range: [0.0, 1.0]
-    float m_roughness = 1.0f; ///< Value for roughness with range: [0.0, 1.0]
-    float m_occlusionStrength = 1.0f;
-    float m_normalStrength    = 1.0f;
-    float m_indexOfRefraction = 1.0f;
+    double m_metalness = 1.0; ///< Value for metalness with range: [0.0, 1.0]
+    double m_roughness = 1.0; ///< Value for roughness with range: [0.0, 1.0]
+    double m_occlusionStrength = 1.0;
+    double m_normalStrength    = 1.0;
+    double m_indexOfRefraction = 1.0;
 
     ///---------------------Global states------------------------
     bool m_imageBasedLighting = false;

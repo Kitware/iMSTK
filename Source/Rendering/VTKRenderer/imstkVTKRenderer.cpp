@@ -456,7 +456,7 @@ VTKRenderer::addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::share
     auto renderDelegate = m_renderDelegates[visualModel] = VTKRenderDelegate::makeDelegate(visualModel);
     if (renderDelegate == nullptr)
     {
-        LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
+        LOG(WARNING) << "error: Could not create render delegate for '"
                      << sceneObject->getName() << "'.";
         return;
     }
@@ -536,7 +536,7 @@ VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
             auto delegate = VTKRenderDelegate::makeDebugDelegate(dbgVizModel);
             if (delegate == nullptr)
             {
-                LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
+                LOG(WARNING) << "error: Could not create render delegate for '"
                              << geom->getName() << "'.";
                 continue;
             }

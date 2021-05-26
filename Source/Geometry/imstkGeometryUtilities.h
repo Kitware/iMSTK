@@ -48,6 +48,7 @@ class vtkDataSetAttributes;
 namespace imstk
 {
 class AbstractDataArray;
+class AnalyticalGeometry;
 class ImageData;
 class HexahedralMesh;
 class LineMesh;
@@ -56,7 +57,7 @@ class SurfaceMesh;
 class TetrahedralMesh;
 class VolumetricMesh;
 
-class Cube;
+class OrientedBox;
 class Sphere;
 class Plane;
 
@@ -185,7 +186,7 @@ std::shared_ptr<VecDataArray<int, dim>> copyToVecDataArray(vtkCellArray* vtkCell
 ///
 /// \brief Copy vtkPointData to a data map
 ///
-void copyToDataMap(vtkDataSetAttributes* const pointData, std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap);
+void copyToDataMap(vtkDataSetAttributes* pointData, std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap);
 
 ///
 /// \brief Copy from a data map to vtkDataAttributes (used for vtkCellData and vtkPointData)
@@ -194,20 +195,15 @@ void copyToDataMap(vtkDataSetAttributes* const pointData, std::unordered_map<std
 void copyToVtkDataAttributes(vtkDataSetAttributes* pointData, const std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap);
 
 ///
-/// \brief Produces SurfaceMesh cube from imstkCube
-///
-std::shared_ptr<SurfaceMesh> toCubeSurfaceMesh(std::shared_ptr<Cube> cube);
-
-///
 /// \brief UV sphere from imstkSphere
 ///
 std::shared_ptr<SurfaceMesh> toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
                                                    const unsigned int phiDivisions, const unsigned int thetaDivisions);
 
 ///
-/// \brief Produces SurfaceMesh cube from imstkPlane
+/// \brief Produces SurfaceMesh from an analytical geometry
 ///
-std::shared_ptr<SurfaceMesh> toQuadSurfaceMesh(std::shared_ptr<Plane> plane);
+std::shared_ptr<SurfaceMesh> toSurfaceMesh(std::shared_ptr<AnalyticalGeometry> geom);
 
 ///
 /// \brief Returns the number of open edges, use to tell if manifold (==0)

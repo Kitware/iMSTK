@@ -201,12 +201,12 @@ public:
     ///
     /// \brief Returns the number of triangles
     ///
-    size_t getNumTriangles() const;
+    int getNumTriangles() const;
 
     ///
     /// \brief Get the maximum number of triangles
     ///
-    size_t getMaxNumTriangles() const { return m_maxNumTriangles; }
+    int getMaxNumTriangles() const { return m_maxNumTriangles; }
 
     ///
     /// \brief Get the volume enclosed by the surface mesh
@@ -265,6 +265,10 @@ public:
     std::shared_ptr<VecDataArray<double, 3>> getCellTangents() const;
 
 protected:
+    void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
+                                const int expectedNumComponents, const ScalarType expectedScalarType);
+
+protected:
     std::shared_ptr<VecDataArray<int, 3>> m_triangleIndices;
     std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices
     std::vector<NeighborsType> m_vertexNeighborVertices;  ///> Neighbor vertices to vertices
@@ -276,7 +280,7 @@ protected:
     std::string m_activeCellTangents = "";
     std::string m_activeCellScalars  = "";
 
-    size_t m_originalNumTriangles = 0;
-    size_t m_maxNumTriangles      = 0;
+    int m_originalNumTriangles = 0;
+    int m_maxNumTriangles      = 0;
 };
 } // imstk

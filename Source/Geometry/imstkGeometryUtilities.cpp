@@ -20,11 +20,11 @@
 =========================================================================*/
 
 #include "imstkGeometryUtilities.h"
-#include "imstkCube.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkImageData.h"
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
+#include "imstkOrientedBox.h"
 #include "imstkParallelUtils.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
@@ -255,10 +255,22 @@ GeometryUtils::copyToPointSet(vtkSmartPointer<vtkPointSet> vtkMesh)
         vtkDataArray* tCoords   = pointData->GetTCoords();
         vtkDataArray* scalars   = pointData->GetScalars();
         vtkDataArray* tangents  = pointData->GetTangents();
-        mesh->setVertexNormals((normals == nullptr || normals->GetName() == nullptr) ? "" : std::string(normals->GetName()));
-        mesh->setVertexTCoords((tCoords == nullptr || tCoords->GetName() == nullptr) ? "" : std::string(tCoords->GetName()));
-        mesh->setVertexScalars((scalars == nullptr || scalars->GetName() == nullptr) ? "" : std::string(scalars->GetName()));
-        mesh->setVertexTangents((tangents == nullptr || tangents->GetName() == nullptr) ? "" : std::string(tangents->GetName()));
+        if (normals != nullptr)
+        {
+            mesh->setVertexNormals(std::string(normals->GetName()));
+        }
+        if (tCoords != nullptr)
+        {
+            mesh->setVertexTCoords(std::string(tCoords->GetName()));
+        }
+        if (scalars != nullptr)
+        {
+            mesh->setVertexScalars(std::string(scalars->GetName()));
+        }
+        if (tangents != nullptr)
+        {
+            mesh->setVertexTangents(std::string(tangents->GetName()));
+        }
     }
 
     return mesh;
@@ -286,10 +298,22 @@ GeometryUtils::copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
         vtkDataArray* tCoords   = pointData->GetTCoords();
         vtkDataArray* scalars   = pointData->GetScalars();
         vtkDataArray* tangents  = pointData->GetTangents();
-        mesh->setVertexNormals((normals == nullptr || normals->GetName() == nullptr) ? "" : std::string(normals->GetName()));
-        mesh->setVertexTCoords((tCoords == nullptr || tCoords->GetName() == nullptr) ? "" : std::string(tCoords->GetName()));
-        mesh->setVertexScalars((scalars == nullptr || scalars->GetName() == nullptr) ? "" : std::string(scalars->GetName()));
-        mesh->setVertexTangents((tangents == nullptr || tangents->GetName() == nullptr) ? "" : std::string(tangents->GetName()));
+        if (normals != nullptr)
+        {
+            mesh->setVertexNormals(std::string(normals->GetName()));
+        }
+        if (tCoords != nullptr)
+        {
+            mesh->setVertexTCoords(std::string(tCoords->GetName()));
+        }
+        if (scalars != nullptr)
+        {
+            mesh->setVertexScalars(std::string(scalars->GetName()));
+        }
+        if (tangents != nullptr)
+        {
+            mesh->setVertexTangents(std::string(tangents->GetName()));
+        }
     }
 
     // Cell Data
@@ -302,9 +326,18 @@ GeometryUtils::copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
         vtkDataArray* normals  = cellData->GetNormals();
         vtkDataArray* scalars  = cellData->GetScalars();
         vtkDataArray* tangents = cellData->GetTangents();
-        mesh->setCellNormals((normals == nullptr || normals->GetName() == nullptr) ? "" : std::string(normals->GetName()));
-        mesh->setCellScalars((scalars == nullptr || scalars->GetName() == nullptr) ? "" : std::string(scalars->GetName()));
-        mesh->setCellTangents((tangents == nullptr || tangents->GetName() == nullptr) ? "" : std::string(tangents->GetName()));
+        if (normals != nullptr)
+        {
+            mesh->setCellNormals(std::string(normals->GetName()));
+        }
+        if (scalars != nullptr)
+        {
+            mesh->setCellScalars(std::string(scalars->GetName()));
+        }
+        if (tangents != nullptr)
+        {
+            mesh->setCellTangents(std::string(tangents->GetName()));
+        }
     }
 
     // Active Texture
@@ -327,6 +360,12 @@ GeometryUtils::copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
     std::shared_ptr<VecDataArray<double, 3>> vertices = copyToVecDataArray(vtkMesh->GetPoints());
     std::shared_ptr<VecDataArray<int, 2>>    cells    = copyToVecDataArray<2>(vtkMesh->GetPolys());
 
+    // If polys is empty use lines instead
+    if (cells->size() == 0)
+    {
+        cells = copyToVecDataArray<2>(vtkMesh->GetLines());
+    }
+
     auto mesh = std::make_unique<LineMesh>();
     mesh->initialize(vertices, cells);
 
@@ -341,10 +380,22 @@ GeometryUtils::copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
         vtkDataArray* tCoords   = pointData->GetTCoords();
         vtkDataArray* scalars   = pointData->GetScalars();
         vtkDataArray* tangents  = pointData->GetTangents();
-        mesh->setVertexNormals((normals == nullptr || normals->GetName() == nullptr) ? "" : std::string(normals->GetName()));
-        mesh->setVertexTCoords((tCoords == nullptr || tCoords->GetName() == nullptr) ? "" : std::string(tCoords->GetName()));
-        mesh->setVertexScalars((scalars == nullptr || scalars->GetName() == nullptr) ? "" : std::string(scalars->GetName()));
-        mesh->setVertexTangents((tangents == nullptr || tangents->GetName() == nullptr) ? "" : std::string(tangents->GetName()));
+        if (normals != nullptr)
+        {
+            mesh->setVertexNormals(std::string(normals->GetName()));
+        }
+        if (tCoords != nullptr)
+        {
+            mesh->setVertexTCoords(std::string(tCoords->GetName()));
+        }
+        if (scalars != nullptr)
+        {
+            mesh->setVertexScalars(std::string(scalars->GetName()));
+        }
+        if (tangents != nullptr)
+        {
+            mesh->setVertexTangents(std::string(tangents->GetName()));
+        }
     }
 
     return mesh;
@@ -365,7 +416,7 @@ GeometryUtils::copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh
 
         std::shared_ptr<TetrahedralMesh> mesh = std::make_unique<TetrahedralMesh>();
         vMesh = mesh;
-        mesh->initialize(vertices, cells, false);
+        mesh->initialize(vertices, cells);
     }
     else if (cellType == VTK_HEXAHEDRON)
     {
@@ -373,7 +424,7 @@ GeometryUtils::copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh
 
         std::shared_ptr<HexahedralMesh> mesh = std::make_unique<HexahedralMesh>();
         vMesh = mesh;
-        mesh->initialize(vertices, cells, false);
+        mesh->initialize(vertices, cells);
     }
     else
     {
@@ -392,10 +443,22 @@ GeometryUtils::copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh
         vtkDataArray* tCoords   = pointData->GetTCoords();
         vtkDataArray* scalars   = pointData->GetScalars();
         vtkDataArray* tangents  = pointData->GetTangents();
-        vMesh->setVertexNormals((normals == nullptr || normals->GetName() == nullptr) ? "" : std::string(normals->GetName()));
-        vMesh->setVertexTCoords((tCoords == nullptr || tCoords->GetName() == nullptr) ? "" : std::string(tCoords->GetName()));
-        vMesh->setVertexScalars((scalars == nullptr || scalars->GetName() == nullptr) ? "" : std::string(scalars->GetName()));
-        vMesh->setVertexTangents((tangents == nullptr || tangents->GetName() == nullptr) ? "" : std::string(tangents->GetName()));
+        if (normals != nullptr)
+        {
+            vMesh->setVertexNormals(std::string(normals->GetName()));
+        }
+        if (tCoords != nullptr)
+        {
+            vMesh->setVertexTCoords(std::string(tCoords->GetName()));
+        }
+        if (scalars != nullptr)
+        {
+            vMesh->setVertexScalars(std::string(scalars->GetName()));
+        }
+        if (tangents != nullptr)
+        {
+            vMesh->setVertexTangents(std::string(tangents->GetName()));
+        }
     }
 
     // Cell Data
@@ -668,17 +731,28 @@ GeometryUtils::copyToVecDataArray(vtkCellArray* vtkCells)
 }
 
 void
-GeometryUtils::copyToDataMap(vtkDataSetAttributes* const dataAttributes, std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap)
+GeometryUtils::copyToDataMap(vtkDataSetAttributes* dataAttributes, std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap)
 {
     CHECK(dataAttributes != nullptr) << "No point data provided!";
 
     for (int i = 0; i < dataAttributes->GetNumberOfArrays(); ++i)
     {
         vtkDataArray* array = dataAttributes->GetArray(i);
-        std::string   name  = "";
-        if (array->GetName() != NULL)
+        std::string   name  = "unnamed";
+        if (array->GetName() == NULL)
         {
-            name = array->GetName();
+            int iter = 0;
+            // If name already exists, iterate key
+            while (dataMap.count(name + std::to_string(iter)) != 0)
+            {
+                iter++;
+            }
+            name = name + std::to_string(iter);
+            array->SetName(name.c_str());
+        }
+        else
+        {
+            name = std::string(array->GetName());
         }
         dataMap[name] = copyToDataArray(array);
     }
@@ -698,36 +772,6 @@ GeometryUtils::copyToVtkDataAttributes(vtkDataSetAttributes* pointData, const st
         }
         pointData->AddArray(arr);
     }
-}
-
-std::shared_ptr<SurfaceMesh>
-GeometryUtils::toCubeSurfaceMesh(std::shared_ptr<Cube> cube)
-{
-    vtkNew<vtkCubeSource> cubeSource;
-    cubeSource->SetCenter(cube->getPosition(Geometry::DataType::PreTransform).data());
-    cubeSource->SetXLength(cube->getWidth());
-    cubeSource->SetYLength(cube->getWidth());
-    cubeSource->SetZLength(cube->getWidth());
-    cubeSource->Update();
-
-    Mat4d mat;
-    mat.setIdentity();
-    mat.block<3, 3>(0, 0) = cube->getRotation();
-
-    vtkNew<vtkTransform> transform;
-    transform->SetMatrix(mat.data());
-
-    vtkNew<vtkTransformFilter> transformCube;
-    transformCube->SetInputData(cubeSource->GetOutput());
-    transformCube->SetTransform(transform);
-    transformCube->Update();
-    vtkNew<vtkTriangleFilter> triangulate;
-    triangulate->SetInputData(transformCube->GetOutput());
-    triangulate->Update();
-    vtkNew<vtkCleanPolyData> cleanData;
-    cleanData->SetInputData(triangulate->GetOutput());
-    cleanData->Update();
-    return copyToSurfaceMesh(cleanData->GetOutput());
 }
 
 std::shared_ptr<SurfaceMesh>
@@ -759,25 +803,59 @@ GeometryUtils::toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
 }
 
 std::shared_ptr<SurfaceMesh>
-GeometryUtils::toQuadSurfaceMesh(std::shared_ptr<Plane> plane)
+GeometryUtils::toSurfaceMesh(std::shared_ptr<AnalyticalGeometry> geom)
 {
-    const Quatd r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), plane->getOrientationAxis());
-    const Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
-    const Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
+    vtkSmartPointer<vtkPointSet> results = nullptr;
+    if (auto plane = std::dynamic_pointer_cast<Plane>(geom))
+    {
+        const Quatd r = Quatd(plane->getRotation());
+        const Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
+        const Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
 
-    //Vec3d p1 = plane->getPosition() + plane->getWidth() * (i + j);
-    Vec3d p2 = plane->getPosition() + plane->getWidth() * (i - j);
-    Vec3d p3 = plane->getPosition() + plane->getWidth() * (-i + j);
-    Vec3d p4 = plane->getPosition() + plane->getWidth() * (-i - j);
+        //Vec3d p1 = plane->getPosition() + plane->getWidth() * (i + j);
+        Vec3d p2 = plane->getPosition() + plane->getWidth() * (i - j);
+        Vec3d p3 = plane->getPosition() + plane->getWidth() * (-i + j);
+        Vec3d p4 = plane->getPosition() + plane->getWidth() * (-i - j);
 
-    vtkNew<vtkPlaneSource> planeSource;
-    planeSource->SetOrigin(p4.data());
-    planeSource->SetPoint1(p3.data());
-    planeSource->SetPoint2(p2.data());
-    planeSource->Update();
+        vtkNew<vtkPlaneSource> planeSource;
+        planeSource->SetOrigin(p4.data());
+        planeSource->SetPoint1(p3.data());
+        planeSource->SetPoint2(p2.data());
+        planeSource->Update();
+        results = planeSource->GetOutput();
+    }
+    else if (auto orientedBox = std::dynamic_pointer_cast<OrientedBox>(geom))
+    {
+        vtkNew<vtkCubeSource> cubeSource;
+        cubeSource->SetCenter(orientedBox->getPosition(Geometry::DataType::PreTransform).data());
+        Vec3d extents = orientedBox->getExtents();
+        cubeSource->SetXLength(extents[0] * 2.0);
+        cubeSource->SetYLength(extents[1] * 2.0);
+        cubeSource->SetZLength(extents[2] * 2.0);
+        cubeSource->Update();
 
+        Mat4d mat;
+        mat.setIdentity();
+        mat.block<3, 3>(0, 0) = orientedBox->getRotation();
+
+        vtkNew<vtkTransform> transform;
+        transform->SetMatrix(mat.data());
+
+        vtkNew<vtkTransformFilter> transformCube;
+        transformCube->SetInputData(cubeSource->GetOutput());
+        transformCube->SetTransform(transform);
+        transformCube->Update();
+        results = transformCube->GetOutput();
+    }
+    else
+    {
+        LOG(WARNING) << "Failed to produce SurfaceMesh from provided AnalyticalGeometry";
+        return nullptr;
+    }
+
+    // Triangulate, mesh could have quads or other primitives
     vtkNew<vtkTriangleFilter> triangulate;
-    triangulate->SetInputData(planeSource->GetOutput());
+    triangulate->SetInputData(results);
     triangulate->Update();
     vtkNew<vtkCleanPolyData> cleanData;
     cleanData->SetInputConnection(triangulate->GetOutputPort());

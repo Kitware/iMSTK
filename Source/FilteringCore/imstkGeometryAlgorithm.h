@@ -20,6 +20,7 @@
 =========================================================================*/
 #pragma once
 
+#include "imstkLogger.h"
 #include "imstkMacros.h"
 
 #include <memory>
@@ -29,15 +30,64 @@ namespace imstk
 {
 class Geometry;
 
-// Base class for geometry algorithms
+///
+/// \class GeometryAlgorithm
+///
+/// \brief Base abstract class for geometry algorithms. GeometryAlgorithms take N input
+/// geometries and produce N output geometries. Sublcasses should implement requestUpdate
+/// to do algorithm logic. Subclasses may also setInputPortReq to require an input to be
+/// a certain type.
+///
 class GeometryAlgorithm
 {
+public:
+    ///
+    /// \brief Used for type erasure of the port requirements
+    /// \todo: Type names can't be deduced for abstract classes.
+    /// Would be nice to have static type name as well
+    ///
+    class PortReq
+    {
+    public:
+        struct BaseReq
+        {
+            virtual ~BaseReq() = default;
+            virtual bool isValid(std::shared_ptr<Geometry> geom) const = 0;
+            //virtual std::string name() const = 0;
+        };
+
+        template<typename T>
+        struct Requirement : public BaseReq
+        {
+            virtual ~Requirement() override = default;
+            bool isValid(std::shared_ptr<Geometry> geom) const override
+            {
+                return std::dynamic_pointer_cast<T>(geom) != nullptr;
+            }
+
+            //std::string name() const override
+            //{
+            //    T t; // Can't use
+            //    return t.getTypeName();
+            //}
+        };
+
+        std::shared_ptr<BaseReq> req = nullptr;
+
+    public:
+        PortReq() = default;
+
+        template<typename T>
+        PortReq(T*) : req(std::make_shared<Requirement<T>>()) { }
+
+        bool isValid(std::shared_ptr<Geometry> geom) const { return req->isValid(geom); }
+        //std::string validGeomName() const { return req->name(); }
+    };
+
 protected:
     GeometryAlgorithm() = default;
 
 public:
-    GeometryAlgorithm(const GeometryAlgorithm&)  = delete;
-    GeometryAlgorithm(const GeometryAlgorithm&&) = delete;
     virtual ~GeometryAlgorithm() = default;
 
 public:
@@ -74,11 +124,30 @@ protected:
     ///
     void setNumberOfOutputPorts(size_t numPorts);
 
+    ///
+    /// \brief Set a type requirement on the inputs, it will check when running
+    /// the algorithm and warn at runtime
+    ///
+    template<typename T>
+    void setInputPortReq(size_t port)
+    {
+        T* ptr = nullptr;
+        m_inputPortTypeReqs[port] = PortReq(ptr);
+    }
+
 public:
     //void modified() { this->m_modified = true; }
 
+    ///
+    /// \brief Do the actual algorithm
+    ///
     void update()
     {
+        if (!checkInputRequirements(m_inputs, m_inputPortTypeReqs))
+        {
+            LOG(WARNING) << "GeometryAlgorithm failed to run, inputs not satisfied";
+            return;
+        }
         //if (m_modified)
         //{
         requestUpdate();
@@ -87,9 +156,21 @@ public:
     }
 
 protected:
+    ///
+    /// \brief Check inputs are correct
+    /// \return true if all inputs match the requirements, false if not
+    ///
+    virtual bool checkInputRequirements(
+        const std::unordered_map<size_t, std::shared_ptr<Geometry>>& inputs,
+        const std::unordered_map<size_t, PortReq>& inputPortReqs);
+
+    ///
+    /// \brief Users can implement this for the logic to be run
+    ///
     virtual void requestUpdate() = 0;
 
 private:
+    std::unordered_map<size_t, PortReq> m_inputPortTypeReqs; // The desired types of the input
     std::unordered_map<size_t, std::shared_ptr<Geometry>> m_inputs;
     std::unordered_map<size_t, std::shared_ptr<Geometry>> m_outputs;
     //bool m_modified = true;

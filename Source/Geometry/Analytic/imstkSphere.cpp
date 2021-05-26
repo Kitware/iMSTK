@@ -47,7 +47,7 @@ Sphere::setRadius(const double r)
 {
     if (r <= 0)
     {
-        LOG(WARNING) << "Sphere::setRadius error: radius should be positive.";
+        LOG(WARNING) << "error: radius supplied is negative";
         return;
     }
     if (std::abs(m_radius - r) < 1e-20)

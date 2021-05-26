@@ -1,30 +1,26 @@
 /*=========================================================================
-
    Library: iMSTK
-
    Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
    & Imaging in Medicine, Rensselaer Polytechnic Institute.
-
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
-
       http://www.apache.org/licenses/LICENSE-2.0.txt
-
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-
 =========================================================================*/
 
 #pragma once
 
 #include "imstkGeometryMap.h"
+#include "imstkTypes.h"
 
 namespace imstk
 {
+template<typename T, int N> class VecDataArray;
 class PointSet;
 
 ///
@@ -56,6 +52,7 @@ public:
     ///
     virtual ~OneToOneMap() override = default;
 
+public:
     ///
     /// \brief Compute the tetra-triangle mesh map
     ///
@@ -92,20 +89,31 @@ public:
     void setSlave(std::shared_ptr<Geometry> slave) override;
 
     ///
-    /// \brief
+    /// \brief Get the corresponding master index, given a slave index
+    /// \param index on the slave geometry
     ///
     size_t getMapIdx(const size_t& idx) override;
+
+    ///
+    /// \brief Set the tolerance, that is the distance to consider
+    /// two points equivalent/corresponding
+    ///
+    void setTolerance(const double tolerance) { m_epsilon = tolerance; }
+
+    double getTolerance() const { return m_epsilon; }
 
 protected:
 
     ///
     /// \brief Returns the first matching vertex
     ///
-    bool findMatchingVertex(const std::shared_ptr<PointSet>& masterMesh, const Vec3d& p, size_t& nodeId);
+    bool findMatchingVertex(const VecDataArray<double, 3>& masterMesh, const Vec3d& p, size_t& nodeId);
 
     std::map<size_t, size_t> m_oneToOneMap;   ///> One to one mapping data
 
     // This vector is for parallel processing, it should contain identical data as m_oneToOneMap
-    std::vector<std::pair<size_t, size_t>> m_oneToOneMapVector;   ///> One to one mapping data
+    std::vector<std::pair<size_t, size_t>> m_oneToOneMapVector; ///> One to one mapping data
+
+    double m_epsilon = IMSTK_DOUBLE_EPS;                        // Tolerance for considering two points equivalent
 };
 } // imstk

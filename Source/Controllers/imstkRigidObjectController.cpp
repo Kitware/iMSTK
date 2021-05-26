@@ -27,8 +27,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 RigidObjectController::RigidObjectController(std::shared_ptr<RigidObject2> rigidObject,
                                              std::shared_ptr<DeviceClient> trackingDevice) :
     SceneObjectController(rigidObject, trackingDevice),
@@ -52,7 +50,7 @@ RigidObjectController::update(const double dt)
     {
         if (!updateTrackingData(dt))
         {
-            LOG(WARNING) << "RigidObjectController::update warning: could not update tracking info.";
+            LOG(WARNING) << "warning: could not update tracking info.";
             return;
         }
     }
@@ -156,6 +154,5 @@ RigidObjectController::applyForces()
     {
         m_deviceClient->setForce(Vec3d(0.0, 0.0, 0.0));
     }
-}
 }
 }

@@ -11,6 +11,5 @@ imstk_add_library( Filtering
   CPP_FILES
     ${cppFiles}
   DEPENDS
-    Geometry
-    DataStructures
+    FilteringCore
     ${VTK_LIBRARIES})

@@ -146,7 +146,7 @@ SPHModel::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
     m_pointSetGeometry = std::dynamic_pointer_cast<PointSet>(m_geometry);
-    const int numParticles = static_cast<int>(m_pointSetGeometry->getNumVertices());
+    const int numParticles = m_pointSetGeometry->getNumVertices();
 
     // Allocate init and current state
     m_initialState = std::make_shared<SPHState>(numParticles);
@@ -197,11 +197,6 @@ SPHModel::initialize()
     m_pointSetGeometry->setVertexAttribute("Diffuse Velocities", m_currentState->getDiffuseVelocities());
     m_pointSetGeometry->setVertexAttribute("Normals", m_currentState->getNormals());
     m_pointSetGeometry->setVertexAttribute("Accels", m_currentState->getAccelerations());
-
-    if (m_geomUnstructuredGrid)
-    {
-        m_minIndices.resize(m_geomUnstructuredGrid->getNumVertices());
-    }
 
     return true;
 }
@@ -769,29 +764,7 @@ SPHModel::moveParticles(const Real timestep)
                 m_sphBoundaryConditions->getBufferIndices().push_back(p);
             }
         }
-
-        if (m_SPHHemorrhage && m_SPHHemorrhage->pointCrossedHemorrhagePlane(oldPosition, newPosition))
-        {
-            averageVelThroughHemorrhage += m_SPHHemorrhage->getNormal() * fullStepVelocities[p].dot(m_SPHHemorrhage->getNormal());
-            numParticlesAcrossHemorrhagePlane++;
-        }
     }
-
-    if (m_SPHHemorrhage)
-    {
-        if (numParticlesAcrossHemorrhagePlane > 0)
-        {
-            averageVelThroughHemorrhage /= numParticlesAcrossHemorrhagePlane;
-        }
-        else
-        {
-            averageVelThroughHemorrhage = m_prevAvgVelThroughHemorrhage;
-        }
-        m_prevAvgVelThroughHemorrhage = averageVelThroughHemorrhage;
-        const double hemorrhageFlowRate = averageVelThroughHemorrhage.norm() * m_SPHHemorrhage->getHemorrhagePlaneArea();
-        m_SPHHemorrhage->setHemorrhageRate(hemorrhageFlowRate);
-    }
-    m_totalTime += m_dt;
     m_timeStepCount++;
 }
 
@@ -842,54 +815,6 @@ SPHModel::findNearestParticleToVertex(const VecDataArray<double, 3>& points, con
             }
         }
         m_minIndices[i] = minIndex;
-    }
-}
-
-void
-SPHModel::writeStateToVtk()
-{
-    if (!m_geomUnstructuredGrid)
-    {
-        return;
-    }
-
-    if (m_vtkPreviousTime <= m_vtkTimeModulo && m_totalTime >= m_vtkTimeModulo)
-    {
-        LOG(INFO) << "Writing VTK at time: " << m_totalTime;
-        const VecDataArray<double, 3>& particleVelocities = *getCurrentState()->getFullStepVelocities();
-        const DataArray<double>&       particleDensities  = *getCurrentState()->getDensities();
-
-        std::shared_ptr<VecDataArray<double, 3>> velocityPtr = std::make_shared<VecDataArray<double, 3>>();
-        VecDataArray<double, 3>&                 velocity    = *velocityPtr;
-        std::shared_ptr<DataArray<double>>       pressurePtr = std::make_shared<DataArray<double>>();
-        DataArray<double>&                       pressure    = *pressurePtr;
-        std::shared_ptr<DataArray<double>>       densityPtr  = std::make_shared<DataArray<double>>();
-        DataArray<double>&                       density     = *densityPtr;
-
-        velocity.reserve(static_cast<int>(m_geomUnstructuredGrid->getNumVertices()));
-        pressure.reserve(static_cast<int>(m_geomUnstructuredGrid->getNumVertices()));
-        density.reserve(static_cast<int>(m_geomUnstructuredGrid->getNumVertices()));
-
-        std::vector<std::vector<size_t>> result;
-        m_neighborSearcher->getNeighbors(result, *m_geomUnstructuredGrid->getInitialVertexPositions(), *getCurrentState()->getPositions());
-        findNearestParticleToVertex(*m_geomUnstructuredGrid->getInitialVertexPositions(), result);
-
-        for (auto i : m_minIndices)
-        {
-            velocity.push_back(particleVelocities[i]);
-            density.push_back(particleDensities[i]);
-            pressure.push_back(particlePressure(particleDensities[i]));
-        }
-        m_geomUnstructuredGrid->setVertexAttribute("velocity", velocityPtr);
-        m_geomUnstructuredGrid->setVertexAttribute("pressure", pressurePtr);
-        m_geomUnstructuredGrid->setVertexAttribute("density", densityPtr);
-
-        VTKMeshIO   vtkWriter;
-        std::string filePath = std::string("sph_output_") + std::to_string(m_totalTime) + std::string(".vtu");
-        vtkWriter.write(m_geomUnstructuredGrid, filePath, MeshFileType::VTU);
-
-        m_vtkTimeModulo  += m_writeToOutputModulo;
-        m_vtkPreviousTime = m_totalTime;
     }
 }
 } // end namespace imstk

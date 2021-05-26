@@ -51,17 +51,19 @@ public:
     VisualModel(std::shared_ptr<DebugRenderGeometry> geometry);
     VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
                 std::shared_ptr<RenderMaterial>      renderMaterial);
-    VisualModel() = default;
-    virtual ~VisualModel() override= default;
+    VisualModel();
+    virtual ~VisualModel() override = default;
 
 public:
-    SIGNAL(VisualModel,modified);
+    // *INDENT-OFF*
+    SIGNAL(VisualModel, modified);
+    // *INDENT-ON*
 
 public:
     ///
     /// \brief Get/set geometry
     ///
-    std::shared_ptr<Geometry> getGeometry() const{ return m_geometry; }
+    std::shared_ptr<Geometry> getGeometry() const { return m_geometry; }
     void setGeometry(std::shared_ptr<Geometry> geometry) { m_geometry = geometry; }
 
     ///
@@ -73,7 +75,7 @@ public:
     ///
     /// \brief Get/set geometry
     ///
-    std::shared_ptr<DebugRenderGeometry> getDebugGeometry() const{ return m_DbgGeometry; }
+    std::shared_ptr<DebugRenderGeometry> getDebugGeometry() const { return m_DbgGeometry; }
     void setDebugGeometry(std::shared_ptr<DebugRenderGeometry> geometry) { m_DbgGeometry = geometry; }
 
     ///
@@ -85,14 +87,14 @@ public:
         this->postModified();
     }
 
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const{ return m_renderMaterial; }
+    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_renderMaterial; }
 
     ///
     /// \brief Visibility functions
     ///
     void show() { setIsVisible(true); }
     void hide() { setIsVisible(false); }
-    bool isVisible() const{ return m_isVisible; }
+    bool isVisible() const { return m_isVisible; }
     void setIsVisible(const bool visible)
     {
         m_isVisible = visible;
@@ -103,7 +105,7 @@ public:
     /// \brief Get/Set whether the delegate has been created
     ///
     bool getRenderDelegateCreated(Renderer* ren);
-    void setRenderDelegateCreated(Renderer* ren,bool created) { m_renderDelegateCreated[ren] = created; }
+    void setRenderDelegateCreated(Renderer* ren, bool created) { m_renderDelegateCreated[ren] = created; }
 
     void postModified() { this->postEvent(Event(VisualModel::modified())); }
 
@@ -118,6 +120,6 @@ protected:
     std::shared_ptr<RenderMaterial>      m_renderMaterial;
 
     bool m_isVisible = true;              ///< true if mesh is shown, false if mesh is hidden
-    std::unordered_map<Renderer*,bool> m_renderDelegateCreated;
+    std::unordered_map<Renderer*, bool> m_renderDelegateCreated;
 };
 }

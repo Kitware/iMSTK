@@ -23,8 +23,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 void
 RbdContactConstraint::compute(double dt)
 {
@@ -52,4 +50,3 @@ RbdContactConstraint::compute(double dt)
     vu = m_contactDepth * m_beta / dt;
 }
 }
-};

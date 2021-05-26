@@ -189,9 +189,9 @@ FastMarch::solveNode(Vec3i coord, int index)
             const double spaceFactor = std::sqrt(1.0 / m_spacing[dimReorder[i]]);
             aa += spaceFactor;
             bb += value * spaceFactor;
-            cc += std::pow(value, 2) * spaceFactor;
+            cc += value * value * spaceFactor;
 
-            discrim = std::pow(bb, 2) - aa * cc;
+            discrim = bb * bb - aa * cc;
             if (discrim < 0.0)
             {
                 // Whoops

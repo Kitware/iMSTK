@@ -31,6 +31,8 @@ namespace imstk
 QuadricDecimate::QuadricDecimate() :
     m_VolumePreserving(true), m_TargetReduction(0.6)
 {
+    setInputPortReq<SurfaceMesh>(0);
+
     setNumberOfInputPorts(1);
     setNumberOfOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());

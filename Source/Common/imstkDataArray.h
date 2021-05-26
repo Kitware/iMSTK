@@ -376,6 +376,42 @@ public:
 
     inline virtual int getNumberOfComponents() const override { return 1; }
 
+    ///
+    /// \brief Cast array to specific c++ type
+    ///
+    template<typename N>
+    DataArray<N> cast()
+    {
+        if (m_mapped)
+        {
+            throw(std::runtime_error("Can't cast a mapped array"));
+        }
+        DataArray<N> result;
+        result.reserve(size());
+        for (auto& i : *this)
+        {
+            result.push_back(static_cast<N>(i));
+        }
+        return result;
+    }
+
+    ///
+    /// \brief Cast array to the IMSTK type on the abstract interface
+    ///
+    std::shared_ptr<AbstractDataArray> cast(ScalarType type) override
+    {
+        if (type == AbstractDataArray::m_scalarType)
+        {
+            return std::make_shared<DataArray<T>>(*this);
+        }
+        switch (type)
+        {
+            TemplateMacro(return std::make_shared<DataArray<IMSTK_TT>>(cast<IMSTK_TT>()));
+        default:
+            throw(std::runtime_error("Unknown scalar type"));
+        }
+    }
+
 protected:
     bool m_mapped;
     T*   m_data;

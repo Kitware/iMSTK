@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkGeometry.h"
+#include "imstkTypes.h"
 
 #include <unordered_map>
 
@@ -116,7 +117,7 @@ public:
     ///
     /// \brief Returns the number of total vertices in the mesh
     ///
-    size_t getNumVertices() const;
+    int getNumVertices() const;
 
     ///
     /// \brief Set load factor
@@ -128,7 +129,7 @@ public:
     ///
     /// \brief Get the maximum number of vertices
     ///
-    size_t getMaxNumVertices() const { return m_maxNumVertices; }
+    int getMaxNumVertices() const { return m_maxNumVertices; }
 
 // Attributes
 public:
@@ -200,6 +201,13 @@ protected:
     ///
     void applyTransform(const Mat4d& m) override;
 
+    ///
+    /// \brief Sets the active vertex attribute name as long as the # components is satisfied.
+    /// Throws message and casts if incorrect scalar type is provided.
+    ///
+    void setActiveVertexAttribute(std::string& activeAttributeName, const std::string attributeName,
+                                  const int expectedNumComponents, const ScalarType expectedScalarType);
+
     std::shared_ptr<VecDataArray<double, 3>> m_initialVertexPositions;
     std::shared_ptr<VecDataArray<double, 3>> m_vertexPositions;
 
@@ -210,7 +218,7 @@ protected:
     std::string m_activeVertexTCoords  = "";
 
     double m_loadFactor          = 2.0;
-    size_t m_maxNumVertices      = 0;
-    size_t m_originalNumVertices = 0;
+    int    m_maxNumVertices      = 0;
+    int    m_originalNumVertices = 0;
 };
 } // imstk

@@ -46,6 +46,10 @@ VisualModel::VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
 {
 }
 
+VisualModel::VisualModel() : m_renderMaterial(std::make_shared<RenderMaterial>())
+{
+}
+
 bool
 VisualModel::getRenderDelegateCreated(Renderer* ren)
 {

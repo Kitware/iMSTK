@@ -29,8 +29,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 LevelSetCH::LevelSetCH(const Side&                               side,
                        const std::shared_ptr<CollisionData>      colData,
                        std::shared_ptr<LevelSetDeformableObject> lvlSetObj,
@@ -91,7 +89,7 @@ LevelSetCH::processCollisionData()
 
     if (grid == nullptr)
     {
-        LOG(FATAL) << "LevelSetCH::processCollisionData: level set model geometry is not ImageData";
+        LOG(FATAL) << "Error: level set model geometry is not ImageData";
         return;
     }
 
@@ -168,10 +166,9 @@ void
 LevelSetCH::maskAllPoints()
 {
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(m_rigidObj->getCollidingGeometry());
-    for (int i = 0; i < static_cast<int>(pointSet->getNumVertices()); i++)
+    for (int i = 0; i < pointSet->getNumVertices(); i++)
     {
         m_ptIdMask.insert(i);
     }
-}
 }
 }

@@ -28,8 +28,6 @@
 namespace imstk
 {
 struct CollisionData;
-namespace expiremental
-{
 class RigidObject2;
 
 ///
@@ -76,5 +74,4 @@ private:
     double m_frictionalCoefficient = 0.8;
     bool   m_useFriction = true;
 };
-}
 }

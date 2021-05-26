@@ -34,111 +34,61 @@ DeviceClient::DeviceClient(const std::string& name, const std::string& ip) :
 {
 }
 
-const std::string&
-DeviceClient::getIp()
+const Vec3d
+DeviceClient::getPosition()
 {
-    return m_ip;
+    Vec3d pos;
+    m_transformLock.lock();
+    pos = m_position;
+    m_transformLock.unlock();
+    return pos;
 }
 
-void
-DeviceClient::setIp(const std::string& ip)
+const Vec3d
+DeviceClient::getVelocity()
 {
-    m_ip = ip;
+    Vec3d vel;
+    m_transformLock.lock();
+    vel = m_velocity;
+    m_transformLock.unlock();
+    return vel;
 }
 
-const std::string&
-DeviceClient::getDeviceName()
+const Vec3d
+DeviceClient::getAngularVelocity()
 {
-    return m_deviceName;
+    Vec3d angVel;
+    m_transformLock.lock();
+    angVel = m_angularVelocity;
+    m_transformLock.unlock();
+    return angVel;
 }
 
-void
-DeviceClient::setDeviceName(const std::string& deviceName)
+const Quatd
+DeviceClient::getOrientation()
 {
-    m_deviceName = deviceName;
+    Quatd orientation;
+    m_transformLock.lock();
+    orientation = m_orientation;
+    m_transformLock.unlock();
+    return orientation;
 }
 
-const bool&
-DeviceClient::getTrackingEnabled() const
+const Vec3d
+DeviceClient::getForce()
 {
-    return m_trackingEnabled;
-}
-
-void
-DeviceClient::setTrackingEnabled(const bool& status)
-{
-    m_trackingEnabled = status;
-}
-
-const bool&
-DeviceClient::getAnalogicEnabled() const
-{
-    return m_analogicEnabled;
-}
-
-void
-DeviceClient::setAnalogicEnabled(const bool& status)
-{
-    m_analogicEnabled = status;
-}
-
-const bool&
-DeviceClient::getButtonsEnabled() const
-{
-    return m_buttonsEnabled;
-}
-
-void
-DeviceClient::setButtonsEnabled(const bool& status)
-{
-    m_buttonsEnabled = status;
-}
-
-const bool&
-DeviceClient::getForceEnabled() const
-{
-    return m_forceEnabled;
-}
-
-void
-DeviceClient::setForceEnabled(const bool& status)
-{
-    m_forceEnabled = status;
-}
-
-const Vec3d&
-DeviceClient::getPosition() const
-{
-    return m_position;
-}
-
-const Vec3d&
-DeviceClient::getVelocity() const
-{
-    return m_velocity;
-}
-
-const Vec3d&
-DeviceClient::getAngularVelocity() const
-{
-    return m_angularVelocity;
-}
-
-const Quatd&
-DeviceClient::getOrientation() const
-{
-    return m_orientation;
-}
-
-const Vec3d&
-DeviceClient::getForce() const
-{
-    return m_force;
+    Vec3d force;
+    m_transformLock.lock();
+    force = m_force;
+    m_transformLock.unlock();
+    return force;
 }
 
 void
 DeviceClient::setForce(Vec3d force)
 {
+    m_forceLock.lock();
     m_force = force;
+    m_forceLock.unlock();
 }
 } // imstk

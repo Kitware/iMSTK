@@ -42,23 +42,11 @@ public:
 
 public:
     ///
-    /// \brief Computes the attached surface mesh
+    /// \brief Compute the conforming surface mesh
     ///
-    virtual void computeAttachedSurfaceMesh() = 0;
-
-    ///
-    /// \brief Returns the attached surface mesh
-    ///
-    std::shared_ptr<SurfaceMesh> getAttachedSurfaceMesh();
-
-    ///
-    /// \brief Sets the surface mesh that is attached
-    ///
-    void setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
+    virtual std::shared_ptr<SurfaceMesh> extractSurfaceMesh() { return nullptr; }
 
 protected:
     VolumetricMesh(const std::string& name = std::string("")) : PointSet(name) {}
-
-    std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh;          ///> Attached surface mesh
 };
 } // imstk

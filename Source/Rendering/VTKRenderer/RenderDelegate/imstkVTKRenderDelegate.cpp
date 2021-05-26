@@ -33,16 +33,17 @@
 
 // VTK render delegates
 #include "imstkVTKCapsuleRenderDelegate.h"
-#include "imstkVTKCubeRenderDelegate.h"
 #include "imstkVTKCylinderRenderDelegate.h"
 #include "imstkVTKFluidRenderDelegate.h"
 #include "imstkVTKHexahedralMeshRenderDelegate.h"
 #include "imstkVTKImageDataRenderDelegate.h"
 #include "imstkVTKLineMeshRenderDelegate.h"
+#include "imstkVTKOrientedBoxRenderDelegate.h"
 #include "imstkVTKPlaneRenderDelegate.h"
 #include "imstkVTKPointSetRenderDelegate.h"
 #include "imstkVTKSphereRenderDelegate.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
+#include "imstkVTKSurfaceNormalRenderDelegate.h"
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
 
 #include <vtkActor.h>
@@ -73,6 +74,7 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
 {
     const std::string geomType = visualModel->getGeometry()->getTypeName();
 
+    // Two edge cases
     if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Fluid)
     {
         if (std::dynamic_pointer_cast<PointSet>(visualModel->getGeometry()) != nullptr)
@@ -80,14 +82,17 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
             return std::make_shared<VTKFluidRenderDelegate>(visualModel);
         }
     }
+    if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::SurfaceNormals)
+    {
+        if (std::dynamic_pointer_cast<PointSet>(visualModel->getGeometry()) != nullptr)
+        {
+            return std::make_shared<VTKSurfaceNormalRenderDelegate>(visualModel);
+        }
+    }
 
     if (visualModel->getGeometry()->isMesh())
     {
-        if (geomType == "PointSet")
-        {
-            return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
-        }
-        else if (geomType == "SurfaceMesh")
+        if (geomType == "SurfaceMesh")
         {
             return std::make_shared<VTKSurfaceMeshRenderDelegate>(visualModel);
         }
@@ -106,7 +111,11 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
     }
     else
     {
-        if (geomType == "Plane")
+        if (geomType == "PointSet")
+        {
+            return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
+        }
+        else if (geomType == "Plane")
         {
             return std::make_shared<VTKPlaneRenderDelegate>(visualModel);
         }
@@ -118,9 +127,9 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
         {
             return std::make_shared<VTKCapsuleRenderDelegate>(visualModel);
         }
-        else if (geomType == "Cube")
+        else if (geomType == "OrientedBox")
         {
-            return std::make_shared<VTKCubeRenderDelegate>(visualModel);
+            return std::make_shared<VTKOrientedCubeRenderDelegate>(visualModel);
         }
         else if (geomType == "Cylinder")
         {

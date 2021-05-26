@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCube.h"
 #include "imstkIsometricMap.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
@@ -28,6 +27,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkOrientedBox.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel.h"
@@ -51,16 +51,13 @@ makeMeshRigidObject(const std::string& name, const Vec3d& pos)
 
     // Load a tetrahedral mesh
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-
-    // Extract the surface mesh
-    imstkNew<SurfaceMesh> surfMesh;
-
     tetMesh->scale(15., Geometry::TransformType::ApplyToData);
     tetMesh->translate(pos, Geometry::TransformType::ApplyToData);
-    tetMesh->extractSurfaceMesh(surfMesh, true);
+
+    std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     // add visual model
-    imstkNew<VisualModel>    renderModel(surfMesh.get());
+    imstkNew<VisualModel>    renderModel(surfMesh);
     imstkNew<RenderMaterial> mat;
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.);
@@ -87,8 +84,7 @@ makeCubeRigidObject(std::string& name, const Vec3d& pos)
     imstkNew<RigidObject> cubeObj(name);
 
     // Create cube geometry
-    imstkNew<Cube> cubeGeom;
-    cubeGeom->setWidth(20.0);
+    imstkNew<OrientedBox> cubeGeom(Vec3d::Zero(), Vec3d(10.0, 10.0, 10.0));
     cubeGeom->translate(pos);
 
     // Create cube VisualModel

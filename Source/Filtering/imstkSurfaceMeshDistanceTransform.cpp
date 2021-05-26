@@ -149,7 +149,7 @@ computeNarrowBandedDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<Surf
 }
 
 static void
-computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh> surfMesh)
+computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh> surfMesh, double tolerance)
 {
     // Get the optimal number of threads
     const size_t numThreads = ParallelUtils::ThreadManager::getThreadPoolSize();
@@ -167,6 +167,7 @@ computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh>
             vtkSmartPointer<vtkPolyData> inputPolyData = GeometryUtils::copyToVtkPolyData(surfMesh);
             vtkSmartPointer<vtkImplicitPolyDataDistance> polyDataDist = vtkSmartPointer<vtkImplicitPolyDataDistance>::New();
             polyDataDist->SetInput(inputPolyData);
+            polyDataDist->SetTolerance(tolerance);
             for (int z = static_cast<int>(i); z < dim[2]; z += static_cast<int>(numThreads))
             {
                 int j = z * dim[0] * dim[1];
@@ -201,6 +202,8 @@ computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh>
 
 SurfaceMeshDistanceTransform::SurfaceMeshDistanceTransform()
 {
+    setInputPortReq<SurfaceMesh>(0);
+
     setNumberOfInputPorts(1);
     setNumberOfOutputPorts(1);
     setOutput(std::make_shared<ImageData>(), 0);
@@ -273,7 +276,7 @@ SurfaceMeshDistanceTransform::requestUpdate()
     }
     else
     {
-        computeFullDT(outputImageData, inputSurfaceMesh);
+        computeFullDT(outputImageData, inputSurfaceMesh, m_Tolerance);
     }
 
     //printf("time: %f\n", timer.getTimeElapsed());

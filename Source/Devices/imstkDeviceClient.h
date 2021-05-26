@@ -23,6 +23,7 @@
 
 #include "imstkMath.h"
 #include "imstkEventObject.h"
+#include "imstkSpinLock.h"
 
 #include <unordered_map>
 
@@ -50,7 +51,7 @@ public:
     {
     }
 
-    virtual ~ButtonEvent() override= default;
+    virtual ~ButtonEvent() override = default;
 
 public:
     ButtonStateType m_buttonState;
@@ -74,71 +75,76 @@ public:
     virtual ~DeviceClient() = default;
 
 public:
+    // *INDENT-OFF*
     SIGNAL(DeviceClient,buttonStateChanged);
+    // *INDENT-ON*
 
 public:
     ///
     /// \brief Get/Set the device IP
     ///
-    const std::string& getIp();
-    void setIp(const std::string& ip);
+    const std::string& getIp() { return m_ip; }
+    void setIp(const std::string& ip) { m_ip = ip; }
 
     ///
     /// \brief Get/Set the device name
     ///
-    const std::string& getDeviceName();
-    void setDeviceName(const std::string& deviceName);
+    const std::string& getDeviceName() { return m_deviceName; }
+    void setDeviceName(const std::string& deviceName) { m_deviceName = deviceName; }
 
     ///
     /// \brief Get/Set what listeners to enable on the device: tracking, analogic, force, buttons.
     ///
-    const bool& getTrackingEnabled() const;
-    void setTrackingEnabled(const bool& status);
-    const bool& getAnalogicEnabled() const;
-    void setAnalogicEnabled(const bool& status);
-    const bool& getButtonsEnabled() const;
-    void setButtonsEnabled(const bool& status);
-    const bool& getForceEnabled() const;
-    void setForceEnabled(const bool& status);
+    const bool getTrackingEnabled() const { return m_trackingEnabled; }
+    void setTrackingEnabled(const bool status) { m_trackingEnabled = status; }
+    const bool getAnalogicEnabled() const { return m_analogicEnabled; }
+    void setAnalogicEnabled(const bool status) { m_analogicEnabled = status; }
+    const bool getButtonsEnabled() const { return m_buttonsEnabled; }
+    void setButtonsEnabled(const bool status) { m_buttonsEnabled = status; }
+    const bool getForceEnabled() const { return m_forceEnabled; }
+    void setForceEnabled(const bool status) { m_forceEnabled = status; }
 
     ///
     /// \brief Get the device position
     ///
-    const Vec3d& getPosition() const;
+    const Vec3d getPosition();
 
     ///
     /// \brief Get the device velocity
     ///
-    const Vec3d& getVelocity() const;
+    const Vec3d getVelocity();
 
     ///
     /// \brief Get the device angular velocity
     ///
-    const Vec3d& getAngularVelocity() const;
+    const Vec3d getAngularVelocity();
 
     ///
     /// \brief Get the device orientation
     ///
-    const Quatd& getOrientation() const;
+    const Quatd getOrientation();
 
     ///
     /// \brief Get offset from position for device end effector
     ///
-    const Vec3d& getOffset() const{ return m_endEffectorOffset; }
+    const Vec3d& getOffset() const { return m_endEffectorOffset; }
 
     ///
     /// \brief Get/Set the device force
     ///
-    const Vec3d& getForce() const;
+    const Vec3d getForce();
     void setForce(Vec3d force);
 
-    const std::unordered_map<int,int>& getButtons() const{ return m_buttons; }
+    ///
+    /// \brief Get button map
+    ///
+    const std::unordered_map<int, int>& getButtons() const { return m_buttons; }
 
     ///
     /// \brief Get the state of a button
     /// returns 0 if can't find button
     ///
-    const int getButton(const int buttonId) const
+    const int getButton(const int buttonId)
     {
         if (m_buttons.find(buttonId) != m_buttons.end())
         {
@@ -150,10 +156,13 @@ public:
         }
     }
 
+    ///
+    /// \brief Do runtime logic
+    ///
     virtual void update() {}
 
 protected:
-    DeviceClient(const std::string& name,const std::string& ip);
+    DeviceClient(const std::string& name, const std::string& ip);
 
     std::string m_deviceName;                         ///< Device Name
     std::string m_ip;                                 ///< Connection device IP
@@ -168,8 +177,11 @@ protected:
     Vec3d m_angularVelocity;                          ///< Angular velocity of the end effector
     Quatd m_orientation;                              ///< Orientation of the end effector
     Vec3d m_force;                                    ///< Force vector
-    Vec3d m_endEffectorOffset = Vec3d(0.0,0.0,0.0);   ///> Offset from origin
+    Vec3d m_endEffectorOffset = Vec3d(0.0, 0.0, 0.0); ///> Offset from origin
 
-    std::unordered_map<int,int> m_buttons;
+    std::unordered_map<int, int> m_buttons;
+
+    ParallelUtils::SpinLock m_transformLock; /// > Used for devices filling data from other threads
+    ParallelUtils::SpinLock m_forceLock;     /// > Used for devices filling data from other threads
 };
 }

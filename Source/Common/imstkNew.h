@@ -58,7 +58,7 @@ public:
 
 public:
     T* operator->() const { return object.get(); }
-    T& operator*() const { return *static_cast<T*>(object); }
+    T& operator*() const { return *object.get(); }
 
     ///
     /// \brief Returns the raw pointer

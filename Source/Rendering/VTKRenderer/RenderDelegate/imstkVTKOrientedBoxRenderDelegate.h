@@ -19,25 +19,38 @@
 
 =========================================================================*/
 
-#include "imstkVolumetricMesh.h"
-#include "imstkLogger.h"
+#pragma once
+
+#include "imstkVTKPolyDataRenderDelegate.h"
+
+class vtkCubeSource;
 
 namespace imstk
 {
-std::shared_ptr<SurfaceMesh>
-VolumetricMesh::getAttachedSurfaceMesh()
+///
+/// \class VTKOrientedCubeRenderDelegate
+///
+/// \brief Oriented box render delegate with VTK backend
+///
+class VTKOrientedCubeRenderDelegate : public VTKPolyDataRenderDelegate
 {
-    if (m_attachedSurfaceMesh == nullptr)
-    {
-        LOG(WARNING) << "VolumetricMesh::getAttachedSurfaceMesh warning: attachedSurfaceMesh not set.\n"
-                     << "Extract a surface mesh to attach using computeAttachedSurfaceMesh().";
-    }
-    return m_attachedSurfaceMesh;
-}
+public:
+    ///
+    /// \brief Constructor
+    ///
+    VTKOrientedCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
-void
-VolumetricMesh::setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
-{
-    m_attachedSurfaceMesh = surfaceMesh;
-}
+    ///
+    /// \brief Destructor
+    ///
+    virtual ~VTKOrientedCubeRenderDelegate() override = default;
+
+    ///
+    /// \brief Update cube source based on the cube geometry
+    ///
+    void processEvents() override;
+
+protected:
+    vtkSmartPointer<vtkCubeSource> m_cubeSource;
+};
 } // imstk

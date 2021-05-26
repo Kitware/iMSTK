@@ -23,6 +23,8 @@
 
 #include "imstkVTKPolyDataRenderDelegate.h"
 
+class vtkPlaneSource;
+
 namespace imstk
 {
 ///
@@ -47,5 +49,8 @@ public:
     /// \brief Update plane source based on the plane geometry
     ///
     void processEvents() override;
+
+protected:
+    vtkSmartPointer<vtkPlaneSource> m_planeSource;
 };
 } // imstk

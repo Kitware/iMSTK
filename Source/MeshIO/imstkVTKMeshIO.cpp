@@ -117,7 +117,7 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
     }
     default:
     {
-        LOG(FATAL) << "VTKMeshIO::read error: file type not supported";
+        LOG(FATAL) << "Error: file type not supported for input " << filePath;
         return nullptr;
     }
     }
@@ -151,7 +151,7 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
             return VTKMeshIO::writeVtkImageData<vtkBMPWriter>(imgMesh, filePath);
         }
         default:
-            LOG(WARNING) << "VTKMeshIO::write error: file type not supported for volumetric mesh.";
+            LOG(WARNING) << "Error: file type not supported for volumetric mesh. Target path supplied:" << filePath;
             return false;
         }
     }
@@ -188,7 +188,7 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
             }
 
         default:
-            LOG(WARNING) << "VTKMeshIO::write error: file type not supported for volumetric mesh.";
+            LOG(WARNING) << "Error: file type not supported for volumetric mesh. Target path supplied:" << filePath;
             return false;
         }
     }
@@ -205,7 +205,7 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::VTK:
             return VTKMeshIO::writeVtkPolyData<vtkPolyDataWriter>(sMesh, filePath);
         default:
-            LOG(WARNING) << "VTKMeshIO::write error: file type not supported for surface mesh.";
+            LOG(WARNING) << "Error: file type not supported for surface mesh. Target path supplied:" << filePath;
             return false;
         }
     }
@@ -218,7 +218,7 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::VTP:
             return VTKMeshIO::writeVtkPolyData<vtkXMLPolyDataWriter>(lMesh, filePath);
         default:
-            LOG(WARNING) << "vtkMeshIO::write error: file type not supported for line mesh.";
+            LOG(WARNING) << "Error: file type not supported for line mesh. Target path supplied:" << filePath;
             return false;
         }
     }
@@ -229,13 +229,13 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::VTK:
             return VTKMeshIO::writeVtkPointSet<vtkGenericDataObjectWriter>(ptMesh, filePath);
         default:
-            LOG(WARNING) << "vtkMeshIO::write error: file type not supported for point mesh.";
+            LOG(WARNING) << "Error: file type not supported for point mesh. Target path supplied:" << filePath;
             return false;
         }
     }
     else
     {
-        LOG(WARNING) << "VTKMeshIO::write error: the provided mesh is not a surface or volumetric mesh.";
+        LOG(WARNING) << "Error: the provided mesh is not a surface or volumetric mesh. Target path supplied:" << filePath;
         return false;
     }
 }
@@ -250,7 +250,18 @@ VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
 
     if (vtkSmartPointer<vtkPolyData> vtkMesh = reader->GetPolyDataOutput())
     {
-        return GeometryUtils::copyToSurfaceMesh(vtkMesh);
+        // Try to convert to surface mesh, if no elements exist try reading as a line mesh
+        std::shared_ptr<SurfaceMesh> surfMesh = GeometryUtils::copyToSurfaceMesh(vtkMesh);
+        if (surfMesh->getNumTriangles() > 0)
+        {
+            return surfMesh;
+        }
+        std::shared_ptr<LineMesh> lineMesh = GeometryUtils::copyToLineMesh(vtkMesh);
+        if (lineMesh->getNumLines() > 0)
+        {
+            return lineMesh;
+        }
+        return GeometryUtils::copyToPointSet(vtkMesh);
     }
 
     if (vtkUnstructuredGrid* vtkMesh = reader->GetUnstructuredGridOutput())
@@ -258,7 +269,7 @@ VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
         return GeometryUtils::copyToVolumetricMesh(vtkMesh);
     }
 
-    LOG(FATAL) << "VTKMeshIO::readVtkGenericFormatData error: could not read with VTK reader.";
+    LOG(FATAL) << "Error: could not read with VTK reader for input " << filePath;
     return nullptr;
 }
 
@@ -288,7 +299,6 @@ VTKMeshIO::writeVtkImageData(const std::shared_ptr<ImageData> imstkMesh, const s
         return false;
     }
 
-    int* dim    = vtkMesh->GetDimensions();
     auto writer = vtkSmartPointer<WriterType>::New();
     if (vtkMesh->GetDimensions()[2] == 1)
     {
@@ -376,7 +386,7 @@ VTKMeshIO::readVtkImageDataDICOM(const std::string& filePath)
 {
     bool isDirectory;
 
-    CHECK(MeshIO::fileExists(filePath, isDirectory)) << "VTKMeshIO::read error: file not found: " << filePath;
+    CHECK(MeshIO::fileExists(filePath, isDirectory)) << "Error: file " << filePath << " not found!";
 
     if (!isDirectory)
     {
@@ -400,7 +410,7 @@ VTKMeshIO::writeVtkUnstructuredGrid(std::shared_ptr<TetrahedralMesh> tetMesh, co
 
     if (!vtkMesh)
     {
-        LOG(WARNING) << "VTKMeshIO::writeVtkUnstructuredGrid error: conversion unsuccessful";
+        LOG(WARNING) << "Error: conversion unsuccessful. Target path supplied:" << filePath;
         return false;
     }
 
@@ -420,7 +430,7 @@ VTKMeshIO::writeVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> hMesh, const
 
     if (!vtkMesh)
     {
-        LOG(WARNING) << "VTKMeshIO::writeVtkUnstructuredGrid error: conversion unsuccessful";
+        LOG(WARNING) << "Error: conversion unsuccessful. Target path supplied:" << filePath;
         return false;
     }
 
@@ -463,7 +473,7 @@ VTKMeshIO::writeVtkImageDataNIFTI(std::shared_ptr<ImageData> imageData, const st
     auto vtkMesh = GeometryUtils::copyToVtkImageData(imageData);
     if (!vtkMesh)
     {
-        LOG(WARNING) << "VTKMeshIO::writeVtkImageDataNIFTI error: conversion unsuccessful";
+        LOG(WARNING) << "Error: conversion unsuccessful. Target path supplied:" << filePath;
         return false;
     }
 
@@ -485,14 +495,15 @@ VTKMeshIO::writeVtkImageDataNIFTI(std::shared_ptr<ImageData> imageData, const st
 bool
 VTKMeshIO::writeMetaImageData(std::shared_ptr<ImageData> imageData, const std::string& filePath)
 {
-    vtkSmartPointer<vtkImageData> vtkMesh = GeometryUtils::copyToVtkImageData(imageData);
-    if (!vtkMesh)
+    vtkSmartPointer<vtkImageData> vtkImage = GeometryUtils::copyToVtkImageData(imageData);
+    if (!vtkImage)
     {
+        LOG(WARNING) << "Error: conversion unsuccessful. Target path supplied:" << filePath;
         return false;
     }
 
     auto writer = vtkSmartPointer<vtkMetaImageWriter>::New();
-    if (vtkMesh->GetDimensions()[2] == 1)
+    if (vtkImage->GetDimensions()[2] == 1)
     {
         writer->SetFileDimensionality(2);
     }
@@ -500,7 +511,7 @@ VTKMeshIO::writeMetaImageData(std::shared_ptr<ImageData> imageData, const std::s
     {
         writer->SetFileDimensionality(3);
     }
-    writer->SetInputData(vtkMesh);
+    writer->SetInputData(vtkImage);
     writer->SetFileName(filePath.c_str());
     writer->SetRAWFileName((filePath + ".raw").c_str());
     writer->Write();

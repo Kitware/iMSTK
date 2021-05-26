@@ -57,7 +57,7 @@ Cylinder::getLength(DataType type /* = DataType::PostTransform */)
 void
 Cylinder::setRadius(const double r)
 {
-    CHECK(r > 0) << "Cylinder::setRadius error: radius should be positive.";
+    CHECK(r > 0) << "error: radius should be positive.";
 
     if (m_radius == r)
     {
@@ -74,7 +74,7 @@ Cylinder::setLength(const double l)
 {
     if (l <= 0)
     {
-        LOG(WARNING) << "Cylinder::setLength error: length should be positive.";
+        LOG(WARNING) << "error: length is negative.";
         return;
     }
     if (m_length == l)
@@ -90,13 +90,12 @@ void
 Cylinder::applyTransform(const Mat4d& m)
 {
     AnalyticalGeometry::applyTransform(m);
-    /*const Vec3d s = Vec3d(
-        m.block<3, 1>(0, 0).norm(),
-        m.block<3, 1>(0, 1).norm(),
-        m.block<3, 1>(0, 2).norm());*/
-    const double s0 = m.block<3, 1>(0, 0).norm();
-    this->setRadius(m_radius * s0);
-    this->setLength(m_length * s0);
+    const double s = std::sqrt(Vec3d(
+        m.block<3, 1>(0, 0).squaredNorm(),
+        m.block<3, 1>(0, 1).squaredNorm(),
+        m.block<3, 1>(0, 2).squaredNorm()).maxCoeff());
+    this->setRadius(m_radius * s);
+    this->setLength(m_length * s);
     this->postModified();
 }
 
@@ -108,9 +107,9 @@ Cylinder::updatePostTransformData() const
         return;
     }
     AnalyticalGeometry::updatePostTransformData();
-    const double s0 = m_transform.block<3, 1>(0, 0).norm();
-    m_radiusPostTransform = s0 * m_radius;
-    m_lengthPostTransform = s0 * m_length;
+    const double s = m_transform.block<3, 1>(0, 0).norm();
+    m_radiusPostTransform = s * m_radius;
+    m_lengthPostTransform = s * m_length;
     m_transformApplied    = true;
 }
 
@@ -119,7 +118,8 @@ Cylinder::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(p
 {
     updatePostTransformData();
 
-    const Vec3d d  = m_orientationAxisPostTransform * m_lengthPostTransform * 0.5;
+    const Vec3d orientationAxes = getRotation().transpose().col(1);
+    const Vec3d d  = orientationAxes * m_lengthPostTransform * 0.5;
     const Vec3d p1 = m_positionPostTransform - d;
     const Vec3d p2 = m_positionPostTransform + d;
 

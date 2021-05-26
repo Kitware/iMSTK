@@ -173,6 +173,40 @@ public:
 
     virtual ~VecDataArray() override = default;
 
+    ///
+    /// \brief Templated copy the current array with a new internal data type, does not change the number
+    ///        of components, pass in the new type as a template argument
+    ///
+    template<typename U>
+    VecDataArray<U, N> cast()
+    {
+        if (DataArray<T>::m_mapped)
+        {
+            throw(std::runtime_error("Can't cast a mapped array"));
+        }
+        VecDataArray<U, N> other;
+        other.reserve(size());
+        for (auto item : *this)
+        {
+            other.push_back(item.template cast<U>());
+        }
+        return other;
+    }
+
+    std::shared_ptr<AbstractDataArray> cast(ScalarType type) override
+    {
+        if (type == AbstractDataArray::m_scalarType)
+        {
+            return std::make_shared<VecDataArray<T, N>>(*this);
+        }
+        switch (type)
+        {
+            TemplateMacro(return (std::make_shared<VecDataArray<IMSTK_TT, N>>(cast<IMSTK_TT>())));
+        default:
+            throw(std::runtime_error("Unknown scalar type"));
+        }
+    }
+
 public:
     ///
     /// \brief Resize data array to hold exactly size number of values

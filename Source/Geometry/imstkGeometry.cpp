@@ -87,7 +87,7 @@ Geometry::rotate(const Quatd& q, TransformType type)
 void
 Geometry::rotate(const Vec3d& axis, double radians, TransformType type)
 {
-    this->rotate(Rotd(radians, axis).toRotationMatrix(), type);
+    this->rotate(Rotd(radians, axis.normalized()).toRotationMatrix(), type);
 }
 
 void
@@ -175,6 +175,12 @@ Geometry::setRotation(const Vec3d& axis, const double angle)
 void
 Geometry::setScaling(const Vec3d& s)
 {
+    // Applying 0 scales will destroy the basis, would need another transform
+    if (s == Vec3d::Zero())
+    {
+        LOG(WARNING) << "Cannot apply 0 scales";
+        return;
+    }
     m_transform.block<3, 1>(0, 0) = m_transform.block<3, 1>(0, 0).normalized() * s[0];
     m_transform.block<3, 1>(0, 1) = m_transform.block<3, 1>(0, 1).normalized() * s[1];
     m_transform.block<3, 1>(0, 2) = m_transform.block<3, 1>(0, 2).normalized() * s[2];
@@ -184,10 +190,7 @@ Geometry::setScaling(const Vec3d& s)
 void
 Geometry::setScaling(const double s)
 {
-    m_transform.block<3, 1>(0, 0) = m_transform.block<3, 1>(0, 0).normalized() * s;
-    m_transform.block<3, 1>(0, 1) = m_transform.block<3, 1>(0, 1).normalized() * s;
-    m_transform.block<3, 1>(0, 2) = m_transform.block<3, 1>(0, 2).normalized() * s;
-    m_transformApplied = false;
+    setScaling(Vec3d(s, s, s));
 }
 
 Mat3d

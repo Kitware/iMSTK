@@ -23,10 +23,10 @@
 
 #include "imstkVTKPolyDataRenderDelegate.h"
 
+class vtkSphereSource;
+
 namespace imstk
 {
-class VisualModel;
-
 ///
 /// \class VTKSphereRenderDelegate
 ///
@@ -49,5 +49,8 @@ public:
     /// \brief Update sphere source based on the sphere geometry
     ///
     void processEvents() override;
+
+protected:
+    vtkSmartPointer<vtkSphereSource> m_sphereSource;
 };
 } // imstk

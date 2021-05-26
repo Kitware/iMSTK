@@ -24,69 +24,58 @@
 
 namespace imstk
 {
-void
-Plane::print() const
-{
-    AnalyticalGeometry::print();
-    LOG(INFO) << "Width: " << m_width;
-}
-
 Vec3d
 Plane::getNormal(DataType type /* = DataType::PostTransform */)
 {
-    return this->getOrientationAxis(type);
+    if (type == DataType::PostTransform)
+    {
+        this->updatePostTransformData();
+        return m_normalPostTransform;
+    }
+    return m_normal;
 }
 
 void
 Plane::setNormal(const Vec3d n)
 {
-    this->setOrientationAxis(n);
+    // A normal with no direction would destroy the basis
+    // of the transform
+    if (m_normal == n || n.norm() == 0.0)
+    {
+        return;
+    }
+    m_normal = n.normalized();
+    m_transformApplied = false;
+    this->postModified();
 }
 
 void
-Plane::setNormal(double x, double y, double z)
+Plane::setNormal(const double x, const double y, const double z)
 {
     this->setNormal(Vec3d(x, y, z));
 }
 
 double
-Plane::getWidth(DataType type /* = DataType::PostTransform */)
+Plane::getWidth()
 {
-    if (type == DataType::PostTransform)
-    {
-        this->updatePostTransformData();
-        return m_widthPostTransform;
-    }
-    return m_width;
+    const Vec3d s = Vec3d(
+        m_transform.block<3, 1>(0, 0).squaredNorm(),
+        m_transform.block<3, 1>(0, 1).squaredNorm(),
+        m_transform.block<3, 1>(0, 2).squaredNorm());
+    double t = s.cwiseAbs().maxCoeff();
+    return std::sqrt(t);
 }
 
 void
 Plane::setWidth(const double w)
 {
-    if (w <= 0)
-    {
-        LOG(WARNING) << "Plane::setWidth error: width should be positive.";
-        return;
-    }
-    if (m_width == w)
-    {
-        return;
-    }
-    m_width = w;
-    m_transformApplied = false;
-    this->postModified();
+    setScaling(Vec3d(w, w, w));
 }
 
 void
 Plane::applyTransform(const Mat4d& m)
 {
     AnalyticalGeometry::applyTransform(m);
-    /* const Vec3d s = Vec3d(
-         m_transform.block<3, 1>(0, 0).norm(),
-         m_transform.block<3, 1>(0, 1).norm(),
-         m_transform.block<3, 1>(0, 2).norm());*/
-    const double s0 = m.block<3, 1>(0, 0).norm();
-    this->setWidth(m_width * s0);
     this->postModified();
 }
 
@@ -98,23 +87,24 @@ Plane::updatePostTransformData() const
         return;
     }
     AnalyticalGeometry::updatePostTransformData();
-    const double s0 = m_transform.block<3, 1>(0, 0).norm();
-    m_widthPostTransform = s0 * m_width;
-    m_transformApplied   = true;
+    m_normalPostTransform = m_orientation._transformVector(m_normal);
+    m_transformApplied    = true;
 }
 
 void
 Plane::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(paddingPercent))
 {
     updatePostTransformData();
-    const Quatd r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), m_orientationAxisPostTransform);
-    const Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
-    const Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
 
-    const Vec3d p1 = m_positionPostTransform + m_widthPostTransform * (i + j);
-    const Vec3d p2 = m_positionPostTransform + m_widthPostTransform * (i - j);
-    const Vec3d p3 = m_positionPostTransform + m_widthPostTransform * (-i + j);
-    const Vec3d p4 = m_positionPostTransform + m_widthPostTransform * (-i - j);
+    Vec3d p1 = m_position + Vec3d(0.5, 0.0, 0.5);
+    Vec3d p2 = m_position + Vec3d(0.5, 0.0, -0.5);
+    Vec3d p3 = m_position + Vec3d(-0.5, 0.0, 0.5);
+    Vec3d p4 = m_position + Vec3d(-0.5, 0.0, -0.5);
+
+    p1 = (m_transform * Vec4d(p1[0], p1[1], p1[2], 1.0)).head<3>();
+    p2 = (m_transform * Vec4d(p2[0], p2[1], p2[2], 1.0)).head<3>();
+    p3 = (m_transform * Vec4d(p3[0], p3[1], p3[2], 1.0)).head<3>();
+    p4 = (m_transform * Vec4d(p4[0], p4[1], p4[2], 1.0)).head<3>();
 
     min = p1.cwiseMin(p2);
     min = min.cwiseMin(p3);

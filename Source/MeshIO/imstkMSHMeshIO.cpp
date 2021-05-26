@@ -32,7 +32,7 @@ namespace imstk
 std::shared_ptr<imstk::VolumetricMesh>
 MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
 {
-    CHECK(meshType == MeshFileType::MSH) << "MSHMeshIO::read error: file type not supported";
+    CHECK(meshType == MeshFileType::MSH) << "Error: file type other than .msh not supported for input " << filePath;
 
     // based on the format provided on
     // http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
@@ -56,7 +56,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     // Open the file
     std::ifstream mshStream(filePath);
 
-    CHECK(mshStream.is_open()) << "Failed to open the input .msh file";
+    CHECK(mshStream.is_open()) << "Error: Failed to open the input file" << filePath;
 
     // Look for "$MeshFormat"
     while (getline(mshStream, mshLine))
@@ -98,7 +98,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     }
     if (mshStream.eof())
     {
-        LOG(WARNING) << "MSHMeshIO::read error : Elements not defined in the file";
+        LOG(WARNING) << "Error: Elements not defined in the file for input file " << filePath;
         return nullptr;
     }
 
@@ -115,7 +115,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
             break;
         }
     }
-    LOG(INFO) << "The MSH mesh comprises of: \n" << '\t' << "Number of NODES: " << nNodes;
+    LOG(INFO) << "MSH mesh comprises of: \n" << '\t' << "Number of NODES: " << nNodes;
 
     // Get the node IDs and the node coordinates
     nodeIDs.resize(nNodes);
@@ -150,8 +150,8 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     // Check to the $Nodes field is in the correct format in .msh file
     if (nodes_count != nNodes)
     {
-        LOG(WARNING) << " MSHMeshIO::read error: number of nodes read (" << nodes_count << ") "
-                     << "inconsistent with number of nodes defined in file (" << nNodes << ").";
+        LOG(WARNING) << "Error: number of nodes read (" << nodes_count << ") "
+                     << "inconsistent with number of nodes defined in file (" << nNodes << "). Input file: " << filePath;
         return nullptr;
     }
 
@@ -174,7 +174,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     }
     if (mshStream.eof())
     {
-        LOG(WARNING) << "MSHMeshIO::read error : Elements not defined in the file";
+        LOG(WARNING) << "Error: Elements not defined in the file " << filePath;
         return nullptr;
     }
 
@@ -215,9 +215,9 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
             // To avoid out of range casting, and to check validity of the .msh file
             if (elemType < ElemType::line || elemType > ElemType::tetrahedronFifthOrder)
             {
-                LOG(FATAL) << "MSHMeshIO::read error : elm-type ( " << elemType << " ) "
+                LOG(FATAL) << "Error : elm-type ( " << elemType << " ) "
                            << "is not in the range" << "(" << ElemType::line << " to "
-                           << ElemType::tetrahedronFifthOrder << "), so is not a valid element type.";
+                           << ElemType::tetrahedronFifthOrder << "), so is not a valid element type. Input: " << filePath;
                 return nullptr;
             }
             ++elemCountMap[ElemType(elemType)];
@@ -234,15 +234,57 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     // Set the stream back to the elem field
     if (!(nElements == totalElem))
     {
-        LOG(WARNING) << "MSHMeshIO::read error: number of elements read (" << nElements << ") "
-                     << "inconsistent with number of elements defined in file (" << totalElem << ").";
+        LOG(WARNING) << "Error: number of elements read (" << nElements << ") "
+                     << "inconsistent with number of elements defined in file (" << totalElem << "). Input: " << filePath;
         return nullptr;
     }
     if (elemCountMap[ElemType::tetrahedron] == 0 && elemCountMap[ElemType::hexahedron] == 0)
     {
-        LOG(WARNING) << "MSHMeshIO::read error: No tet or hex elements present in the mesh!";
+        LOG(WARNING) << "Error: No tet or hex elements present in the mesh! Input: " << filePath;
         return nullptr;
     }
+
+    // Lambda to determine number of nodes per element of given type
+    auto numElemNodes = [&filePath](const ElemType& elType) -> size_t
+                        {
+                            switch (elType)
+                            {
+                            case ElemType::line:                            return 2;
+                            case ElemType::triangle:                        return 3;
+                            case ElemType::quadrangle:                      return 4;
+                            case ElemType::tetrahedron:                     return 4;
+                            case ElemType::hexahedron:                      return 8;
+                            case ElemType::prism:                           return 6;
+                            case ElemType::pyramid:                         return 5;
+                            case ElemType::lineSecondOrder:                 return 3;
+                            case ElemType::triangleSecondOrder:             return 6;
+                            case ElemType::quadrangleSecondOrderType1:      return 9;
+                            case ElemType::tetrahedronSecondOrder:          return 10;
+                            case ElemType::hexahedronSecondOrderType1:      return 27;
+                            case ElemType::prismSecondOrderType1:           return 18;
+                            case ElemType::pyramidSecondOrderType1:         return 14;
+                            case ElemType::point:                           return 1;
+                            case ElemType::quadrangleSecondOrderType2:      return 8;
+                            case ElemType::hexahedronSecondOrderType2:      return 20;
+                            case ElemType::prismSecondOrderType2:           return 15;
+                            case ElemType::pyramidSecondOrderType2:         return 13;
+                            case ElemType::triangleThirdOrderIncomplete:    return 9;
+                            case ElemType::triangleThirdOrder:              return 10;
+                            case ElemType::triangleFourthOrderIncomplete:   return 12;
+                            case ElemType::triangleFourthOrder:             return 15;
+                            case ElemType::triangleFifthOrderIncomplete:    return 15;
+                            case ElemType::triangleFifthOrder:              return 21;
+                            case ElemType::edgeThirdOrder:                  return 4;
+                            case ElemType::edgeFourthOrder:                 return 5;
+                            case ElemType::edgeFifthOrder:                  return 6;
+                            case ElemType::tetrahedronThirdOrder:           return 20;
+                            case ElemType::tetrahedronFourthOrder:          return 35;
+                            case ElemType::tetrahedronFifthOrder:           return 56;
+                            default:
+                                LOG(FATAL) << "Error: Unknown element type to compute number of nodes. Input: " << filePath;
+                                return 0;
+                            }
+                        };
 
     // Read the tet and hex (if any) elements IDs and connectivity in the $Element field in the .msh file
     tetrahedronIDs.resize(elemCountMap[ElemType::tetrahedron]);
@@ -347,7 +389,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
         }
 
         auto volMesh = std::make_shared<TetrahedralMesh>();
-        volMesh->initialize(vertices, cellsPtr, false);
+        volMesh->initialize(vertices, cellsPtr);
         return volMesh;
     }
     else if (elemCountMap[ElemType::hexahedron] != 0)
@@ -363,55 +405,13 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
             cells.push_back(hexahedronConnectivity[iHex]);
         }
         auto volMesh = std::make_shared<HexahedralMesh>();
-        volMesh->initialize(vertices, cellsPtr, false);
+        volMesh->initialize(vertices, cellsPtr);
         return volMesh;
     }
     else
     {
-        LOG(FATAL) << "This volume type is not supported in iMSTK";
+        LOG(FATAL) << "Error: Element types other than tetrahedron and hexahedron not supported! Input: " << filePath;
         return nullptr;
-    }
-}
-
-size_t
-MSHMeshIO::numElemNodes(const ElemType& elType)
-{
-    switch (elType)
-    {
-    case ElemType::line:                            return 2;
-    case ElemType::triangle:                        return 3;
-    case ElemType::quadrangle:                      return 4;
-    case ElemType::tetrahedron:                     return 4;
-    case ElemType::hexahedron:                      return 8;
-    case ElemType::prism:                           return 6;
-    case ElemType::pyramid:                         return 5;
-    case ElemType::lineSecondOrder:                 return 3;
-    case ElemType::triangleSecondOrder:             return 6;
-    case ElemType::quadrangleSecondOrderType1:      return 9;
-    case ElemType::tetrahedronSecondOrder:          return 10;
-    case ElemType::hexahedronSecondOrderType1:      return 27;
-    case ElemType::prismSecondOrderType1:           return 18;
-    case ElemType::pyramidSecondOrderType1:         return 14;
-    case ElemType::point:                           return 1;
-    case ElemType::quadrangleSecondOrderType2:      return 8;
-    case ElemType::hexahedronSecondOrderType2:      return 20;
-    case ElemType::prismSecondOrderType2:           return 15;
-    case ElemType::pyramidSecondOrderType2:         return 13;
-    case ElemType::triangleThirdOrderIncomplete:    return 9;
-    case ElemType::triangleThirdOrder:              return 10;
-    case ElemType::triangleFourthOrderIncomplete:   return 12;
-    case ElemType::triangleFourthOrder:             return 15;
-    case ElemType::triangleFifthOrderIncomplete:    return 15;
-    case ElemType::triangleFifthOrder:              return 21;
-    case ElemType::edgeThirdOrder:                  return 4;
-    case ElemType::edgeFourthOrder:                 return 5;
-    case ElemType::edgeFifthOrder:                  return 6;
-    case ElemType::tetrahedronThirdOrder:           return 20;
-    case ElemType::tetrahedronFourthOrder:          return 35;
-    case ElemType::tetrahedronFifthOrder:           return 56;
-    default:
-        LOG(FATAL) << "MSHMeshIO::numElemNodes: Unknown element type";
-        return 0;
     }
 }
 } // iMSTK

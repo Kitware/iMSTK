@@ -29,8 +29,6 @@ namespace imstk
 {
 class PointSet;
 
-namespace expiremental
-{
 ///
 /// \brief Serves as a handle to the body
 ///
@@ -117,5 +115,4 @@ public:
 
     Side m_side = Side::AB;
 };
-}
 }

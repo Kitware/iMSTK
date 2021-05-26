@@ -26,8 +26,6 @@ limitations under the License.
 
 namespace imstk
 {
-namespace expiremental
-{
 class RigidObject2;
 
 ///
@@ -43,5 +41,4 @@ public:
 
     virtual ~RigidObjectCollidingCollisionPair() override = default;
 };
-}
 }

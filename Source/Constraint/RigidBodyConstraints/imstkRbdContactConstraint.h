@@ -27,8 +27,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 ///
 /// \class RbdContactConstraint
 ///
@@ -61,5 +59,4 @@ private:
     double m_contactDepth;
     double m_beta = 0.05;
 };
-}
 }

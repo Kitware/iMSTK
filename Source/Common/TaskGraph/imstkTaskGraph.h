@@ -206,7 +206,15 @@ public:
     ///
     static std::shared_ptr<TaskGraph> reduce(std::shared_ptr<TaskGraph> graph)
     {
-        return removeRedundantNodes(transitiveReduce(graph));
+        std::shared_ptr<TaskGraph> reducedGraph = transitiveReduce(graph);
+        if (reducedGraph != nullptr)
+        {
+            return removeRedundantNodes(reducedGraph);
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
     ///

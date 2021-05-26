@@ -39,7 +39,7 @@ ImplicitGeometryToPointSetCCD::ImplicitGeometryToPointSetCCD(std::shared_ptr<Imp
         centralGrad.setDx(sdf->getImage()->getSpacing());
     }
 
-    displacementsPtr = std::make_shared<VecDataArray<double, 3>>(static_cast<int>(m_pointSetB->getNumVertices()));
+    displacementsPtr = std::make_shared<VecDataArray<double, 3>>(m_pointSetB->getNumVertices());
     m_pointSetB->setVertexAttribute("displacements", displacementsPtr);
 }
 

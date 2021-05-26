@@ -175,7 +175,7 @@ SurfaceMesh::computeTrianglesNormals()
     {
         if (m_triangleIndices->size() != triangleNormalsPtr->size())
         {
-            triangleNormalsPtr->resize(static_cast<int>(m_triangleIndices->size()));
+            triangleNormalsPtr->resize(m_triangleIndices->size());
         }
     }
     VecDataArray<double, 3>& triangleNormals = *triangleNormalsPtr;
@@ -210,7 +210,7 @@ SurfaceMesh::computeTriangleTangents()
         {
             if (m_triangleIndices->size() != triangleTangentsPtr->size())
             {
-                triangleTangentsPtr->resize(static_cast<int>(m_triangleIndices->size()));
+                triangleTangentsPtr->resize(m_triangleIndices->size());
             }
         }
         VecDataArray<double, 3>& triangleTangents = *triangleTangentsPtr;
@@ -471,7 +471,7 @@ SurfaceMesh::optimizeForDataLocality()
     this->initialize(optimallyOrderedNodalPos, optConnectivityRenumbered);
 }
 
-size_t
+int
 SurfaceMesh::getNumTriangles() const
 {
     return m_triangleIndices->size();
@@ -621,7 +621,7 @@ SurfaceMesh::computeUVSeamVertexGroups()
 void
 SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
 {
-    // todo: Add deep copies to all geometry classes
+    // \todo: Add deep copies to all geometry classes
     // SurfaceMesh members
     this->m_triangleIndices = std::make_shared<VecDataArray<int, 3>>(*srcMesh->m_triangleIndices);
     this->m_vertexNeighborTriangles = srcMesh->m_vertexNeighborTriangles;
@@ -630,7 +630,7 @@ SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
     {
         this->m_UVSeamVertexGroups[i.first] = std::make_shared<std::vector<size_t>>(*i.second);
     }
-    // todo: abstract DataArray's can't be copied
+    // \todo: abstract DataArray's can't be copied currently
     for (auto i : srcMesh->m_cellAttributes)
     {
         this->m_cellAttributes[i.first] = i.second;
@@ -644,7 +644,7 @@ SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
     // PointSet members
     this->m_initialVertexPositions = std::make_shared<VecDataArray<double, 3>>(*srcMesh->m_initialVertexPositions);
     this->m_vertexPositions = std::make_shared<VecDataArray<double, 3>>(*srcMesh->m_vertexPositions);
-    // todo: abstract DataArray's can't be copied
+    // \todo: abstract DataArray's can't be copied currently
     for (auto i : srcMesh->m_vertexAttributes)
     {
         this->m_vertexAttributes[i.first] = i.second;
@@ -747,7 +747,7 @@ SurfaceMesh::setCellNormals(const std::string& arrayName)
 {
     if (hasCellAttribute(arrayName))
     {
-        m_activeCellNormals = arrayName;
+        setCellActiveAttribute(m_activeCellNormals, arrayName, 3, IMSTK_DOUBLE);
     }
 }
 
@@ -776,7 +776,7 @@ SurfaceMesh::setCellTangents(const std::string& arrayName)
 {
     if (hasCellAttribute(arrayName))
     {
-        m_activeCellTangents = arrayName;
+        setCellActiveAttribute(m_activeCellTangents, arrayName, 3, IMSTK_DOUBLE);
     }
 }
 
@@ -791,5 +791,27 @@ SurfaceMesh::getCellTangents() const
     {
         return nullptr;
     }
+}
+
+void
+SurfaceMesh::setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
+                                    const int expectedNumComponents, const ScalarType expectedScalarType)
+{
+    std::shared_ptr<AbstractDataArray> attribute = m_cellAttributes[attributeName];
+    if (attribute->getNumberOfComponents() != expectedNumComponents)
+    {
+        LOG(WARNING) << "Failed to set cell attribute on " << getName() << " with "
+                     << attribute->getNumberOfComponents() << " components. Expected " <<
+            expectedNumComponents << " components.";
+        return;
+    }
+    else if (attribute->getScalarType() != expectedScalarType)
+    {
+        LOG(INFO) << "Tried to set cell attribute on " << getName() << " with scalar type "
+                  << static_cast<int>(attribute->getScalarType()) << ". Casting to "
+                  << static_cast<int>(expectedScalarType) << " scalar type";
+        m_cellAttributes[attributeName] = attribute->cast(expectedScalarType);
+    }
+    activeAttributeName = attributeName;
 }
 }  // namespace imstk

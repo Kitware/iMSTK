@@ -28,7 +28,7 @@ namespace imstk
 ///
 /// \class Capsule
 ///
-/// \brief Capsule geometry
+/// \brief Capsule geometry, default configuration is at origin with length running up the y axes
 ///
 class Capsule : public AnalyticalGeometry
 {
@@ -36,7 +36,15 @@ public:
     ///
     /// \brief Constructor
     ///
-    Capsule(const std::string& name = std::string("defaultCapsule")) : AnalyticalGeometry(name) { }
+    Capsule(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 0.5, const double length = 1.0, const Quatd orientation = Quatd::Identity(),
+            const std::string& name = std::string("defaultCapsule")) :
+        AnalyticalGeometry(name)
+    {
+        setPosition(pos);
+        setOrientation(orientation);
+        setRadius(radius);
+        setLength(length);
+    }
 
     ///
     /// \brief Deconstructor
@@ -89,9 +97,13 @@ public:
     ///
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent);
 
+    ///
+    /// \brief Update the Capsule parameters applying the latest transform
+    ///
+    void updatePostTransformData() const override;
+
 protected:
     void applyTransform(const Mat4d& m) override;
-    void updatePostTransformData() const override;
 
     double m_radius = 1.0;                      ///> Radius of the hemispheres at the end of the capsule
     mutable double m_radiusPostTransform = 1.0; ///> Radius after transform

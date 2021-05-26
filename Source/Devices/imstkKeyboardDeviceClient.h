@@ -35,7 +35,7 @@ class KeyEvent : public Event
 {
 public:
     KeyEvent(const std::string type, const char key, const KeyStateType keyPressType) : Event(type), m_keyPressType(keyPressType), m_key(key) { }
-    virtual ~KeyEvent() override= default;
+    virtual ~KeyEvent() override = default;
 
 public:
     KeyStateType m_keyPressType;
@@ -61,25 +61,27 @@ protected:
     static std::shared_ptr<KeyboardDeviceClient> New();
 
 public:
-    virtual ~KeyboardDeviceClient() override= default;
+    virtual ~KeyboardDeviceClient() override = default;
 
     // Only these classes may provide this object
     friend class VTKInteractorStyle;
     friend class ConsoleModule;
 
 public:
+    // *INDENT-OFF*
     ///
     /// \brief Posted when key is pressed (not continuously)
     ///
-    SIGNAL(KeyboardDeviceClient,keyPress);
+    SIGNAL(KeyboardDeviceClient, keyPress);
 
     ///
     /// \brief Posted when key is released (not continuously)
     ///
-    SIGNAL(KeyboardDeviceClient,keyRelease);
+    SIGNAL(KeyboardDeviceClient, keyRelease);
+    // *INDENT-ON*
 
 public:
-    const std::unordered_map<int,KeyStateType>& getKeyState() const{ return m_buttons; }
+    const std::unordered_map<int, KeyStateType>& getKeyState() const { return m_buttons; }
 
 protected:
     ///

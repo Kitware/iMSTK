@@ -5,7 +5,7 @@
 set(VTK_H_FILES
     VTKRenderer/imstkVTKRenderer.h
     VTKRenderer/imstkVTKTextureDelegate.h
-    VTKRenderer/RenderDelegate/imstkVTKCubeRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKOrientedBoxRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKLineMeshRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKPlaneRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKRenderDelegate.h
@@ -13,6 +13,7 @@ set(VTK_H_FILES
     VTKRenderer/RenderDelegate/imstkVTKImageDataRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKCapsuleRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKSurfaceNormalRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKCylinderRenderDelegate.h
@@ -27,13 +28,14 @@ set(VTK_H_FILES
 set(VTK_CPP_FILES
     VTKRenderer/imstkVTKRenderer.cpp
     VTKRenderer/imstkVTKTextureDelegate.cpp
-    VTKRenderer/RenderDelegate/imstkVTKCubeRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKOrientedBoxRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKLineMeshRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKPlaneRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKSphereRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKCapsuleRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKSurfaceNormalRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKCylinderRenderDelegate.cpp

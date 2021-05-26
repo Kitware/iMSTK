@@ -31,15 +31,18 @@
 
 namespace imstk
 {
-VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel)
+VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+    m_cylinderSource(vtkSmartPointer<vtkCylinderSource>::New())
 {
-    auto geometry = std::static_pointer_cast<Cylinder>(visualModel->getGeometry());
+    auto geometry = std::dynamic_pointer_cast<Cylinder>(visualModel->getGeometry());
 
-    m_cylinderSource = vtkSmartPointer<vtkCylinderSource>::New();
     m_cylinderSource->SetCenter(0.0, 0.0, 0.0);
-    m_cylinderSource->SetRadius(1.0);
-    m_cylinderSource->SetHeight(geometry->getLength());
+    m_cylinderSource->SetRadius(geometry->getRadius(Geometry::DataType::PreTransform));
+    m_cylinderSource->SetHeight(geometry->getLength(Geometry::DataType::PreTransform));
     m_cylinderSource->SetResolution(100);
+
+    const Mat4d& transform = geometry->getTransform().transpose();
+    m_transform->SetMatrix(transform.data());
 
     // Setup mapper
     {
@@ -61,17 +64,17 @@ VTKCylinderRenderDelegate::processEvents()
 {
     VTKRenderDelegate::processEvents();
 
-    auto geometry = std::static_pointer_cast<Cylinder>(m_visualModel->getGeometry());
+    auto geometry = std::dynamic_pointer_cast<Cylinder>(m_visualModel->getGeometry());
 
-    m_cylinderSource->SetRadius(geometry->getRadius());
-    m_cylinderSource->SetHeight(geometry->getLength());
+    m_cylinderSource->SetRadius(geometry->getRadius(Geometry::DataType::PreTransform));
+    m_cylinderSource->SetHeight(geometry->getLength(Geometry::DataType::PreTransform));
+    m_cylinderSource->Modified();
 
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
-    T.scale(1.0);
+    T.rotate(geometry->getOrientation(Geometry::DataType::PostTransform));
+    T.scale(geometry->getScaling());
     T.matrix().transposeInPlace();
-
     m_transform->SetMatrix(T.data());
 }
 } // imstk

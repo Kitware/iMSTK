@@ -28,7 +28,7 @@ namespace imstk
 ///
 /// \class Cylinder
 ///
-/// \brief Cylinder geometry
+/// \brief Cylinder geometry, default configuration is at origin with length running up the y axes
 ///
 class Cylinder : public AnalyticalGeometry
 {
@@ -37,11 +37,11 @@ public:
     /// \brief Constructor
     ///
     Cylinder(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const double length = 1.0,
-             const Vec3d& orientationAxis = Vec3d(0.0, 1.0, 0.0), const std::string& name = std::string("defaultCylinder")) :
+             const Quatd& orientation = Quatd::Identity(), const std::string& name = std::string("defaultCylinder")) :
         AnalyticalGeometry(name)
     {
         setPosition(pos);
-        setOrientationAxis(orientationAxis);
+        setOrientation(orientation);
         setRadius(radius);
         setLength(length);
         updatePostTransformData();
@@ -90,12 +90,16 @@ public:
     ///
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent);
 
+    ///
+    /// \brief Update the Cylinder parameters applying the latest transform
+    ///
+    void updatePostTransformData() const override;
+
 protected:
     // Hide these unimplemented functions
     using AnalyticalGeometry::getFunctionValue;
 
     void applyTransform(const Mat4d& m) override;
-    void updatePostTransformData() const override;
 
     double m_radius = 1.0;                      ///> Radius of the cylinder
     double m_length = 1.0;                      ///> Length of the cylinder

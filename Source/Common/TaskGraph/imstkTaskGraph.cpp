@@ -77,6 +77,17 @@ TaskGraph::containsEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskN
 void
 TaskGraph::addEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode)
 {
+    if (!containsNode(srcNode))
+    {
+        LOG(WARNING) << "srcNode " << srcNode->m_name << " does not exist in graph";
+        return;
+    }
+    if (!containsNode(destNode))
+    {
+        LOG(WARNING) << "destNode " << destNode->m_name << " does not exist n graph";
+        return;
+    }
+
     m_adjList[srcNode].insert(destNode);
     m_invAdjList[destNode].insert(srcNode);
 }

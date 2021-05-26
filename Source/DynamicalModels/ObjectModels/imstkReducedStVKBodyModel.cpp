@@ -160,8 +160,7 @@ ReducedStVK::initialize()
 {
     // prerequisite of for successfully initializing
     CHECK(m_geometry != nullptr && m_config != nullptr)
-        << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set "
-        "yet!";
+        << "Physics mesh or force model configuration not set yet!";
 
     // Setup default solver if model wasn't assigned one
     if (m_solver == nullptr)
@@ -240,7 +239,7 @@ ReducedStVK::loadInitialStates()
 {
     if (m_numDOF == 0 || m_numDOFReduced == 0)
     {
-        LOG(WARNING) << "ReducedStVK::loadInitialStates() - Num. of degree of freedom is zero!";
+        LOG(WARNING) << "Num. of degree of freedom is zero!";
     }
 
     // For now the initial states are set to zero
@@ -272,7 +271,7 @@ bool
 ReducedStVK::initializeMassMatrix()
 {
     CHECK(m_geometry != nullptr)
-        << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
+        << "Force model geometry not set!";
     this->m_massMatrix.resize(m_numDOFReduced * m_numDOFReduced, 0.0);
 
     // set M to identity
@@ -308,8 +307,7 @@ bool
 ReducedStVK::initializeTangentStiffness()
 {
     CHECK(m_forceModel != nullptr)
-        << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be "
-        "initialized without force model";
+        << "Tangent stiffness cannot be initialized without force model";
 
     this->m_stiffnessMatrix.resize(m_numDOFReduced * m_numDOFReduced, 0.0);
     m_forceModel->GetTangentStiffnessMatrix(m_initialStateReduced->getQ().data(),
@@ -373,7 +371,7 @@ ReducedStVK::computeImplicitSystemRHS(kinematicState&       stateAtT,
 
         break;
     default:
-        LOG(WARNING) << "ReducedStVK::computeImplicitSystemRHS: Update type not supported";
+        LOG(WARNING) << "Update type not supported";
     }
 }
 
@@ -417,7 +415,7 @@ ReducedStVK::computeSemiImplicitSystemRHS(kinematicState&       stateAtT,
         break;
 
     default:
-        LOG(FATAL) << "ReducedStVK::computeSemiImplicitSystemRHS: Update type not supported";
+        LOG(FATAL) << "Update type not supported";
     }
 }
 
@@ -451,7 +449,7 @@ ReducedStVK::computeImplicitSystemLHS(const kinematicState& stateAtT,
         break;
 
     default:
-        LOG(FATAL) << "ReducedStVK::computeImplicitSystemLHS: Update type not supported";
+        LOG(FATAL) << "Update type not supported";
     }
 }
 
@@ -561,8 +559,7 @@ ReducedStVK::updateBodyIntermediateStates(const Vectord& solution, const StateUp
         break;
 
     default:
-        LOG(FATAL) << "DeformableBodyModel::updateBodyIntermediateStates: Unknown state update "
-            "type";
+        LOG(FATAL) << "Unknown state update type";
     }
     prolongate(*m_currentStateReduced, *m_currentState);
     m_qSolReduced = m_currentStateReduced->getQ();

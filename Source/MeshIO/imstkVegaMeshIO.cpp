@@ -33,7 +33,7 @@ namespace imstk
 std::shared_ptr<VolumetricMesh>
 VegaMeshIO::read(const std::string& filePath, MeshFileType meshType)
 {
-    CHECK(meshType == MeshFileType::VEG) << "VegaMeshIO::read error: file type not supported";
+    CHECK(meshType == MeshFileType::VEG) << "@VegaMeshIO::read error: input file type is not veg for input " << filePath;
 
     // Read Vega Mesh
     std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshIO::readVegaMesh(filePath);
@@ -45,29 +45,30 @@ VegaMeshIO::read(const std::string& filePath, MeshFileType meshType)
 bool
 VegaMeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath, const MeshFileType meshType)
 {
-    CHECK(meshType == MeshFileType::VEG) << "VegaMeshIO::write error: file type is not veg";
+    CHECK(meshType == MeshFileType::VEG) << "@VegaMeshIO::write error: file type is not veg for input " << filePath;
 
     // extract volumetric mesh
     const auto imstkVolMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(imstkMesh);
 
-    CHECK(imstkVolMesh != nullptr) << "VegaMeshIO::write error: imstk::Mesh is not a volumetric mesh";
+    CHECK(imstkVolMesh != nullptr) << "@VegaMeshIO::write error: imstk::PointSet object supplied is not a imstk::VolumetricMesh type for input" << filePath;
 
     const std::string geometryType = imstkVolMesh->getTypeName();
     if (geometryType == "TetrahedralMesh" || geometryType == "HexahedralMesh")
     {
         auto vegaMesh = convertVolumetricMeshToVegaMesh(imstkVolMesh);
 
-        CHECK(vegaMesh != nullptr) << "VegaMeshIO::write error: failed to convert volumetric mesh to vega mesh";
+        CHECK(vegaMesh != nullptr) << "@VegaMeshIO::write error: failed to convert volumetric mesh to vega mesh for input" << filePath;
 
         const auto fileName     = const_cast<char*>(filePath.c_str());
         const int  write_status = vegaMesh->save(fileName);
 
-        CHECK(write_status == 0) << "VegaMeshIO::write error: failed to write .veg file";
+        CHECK(write_status == 0) << "@VegaMeshIO::write error: failed (vega fail code " << write_status <<
+            ". Check vega::VolumetricMesh::save for documentation)to write .veg file for input" << filePath;
 
         return true;
     }
 
-    LOG(WARNING) << "VegaMeshIO::write error: this element type not supported in vega";
+    LOG(WARNING) << "Error: Unknown element type (only tetrahedral and hexahedral elements supported) for input " << filePath;
     return false;
 }
 
@@ -96,7 +97,7 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
         VegaMeshIO::copyCells<4>(vegaMesh, cells);
 
         auto tetMesh = std::make_shared<TetrahedralMesh>();
-        tetMesh->initialize(vertices, cellsPtr, false);
+        tetMesh->initialize(vertices, cellsPtr);
         mesh = tetMesh;
     }
     else if (cellType == vega::VolumetricMesh::CUBIC)
@@ -106,13 +107,13 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
         VegaMeshIO::copyCells<8>(vegaMesh, cells);
 
         auto hexMesh = std::make_shared<HexahedralMesh>();
-        hexMesh->initialize(vertices, cellsPtr, false);
+        hexMesh->initialize(vertices, cellsPtr);
         mesh = hexMesh;
     }
     else
     {
         vegaMesh.reset();
-        LOG(WARNING) << "VegaMeshIO::read error: invalid cell type.";
+        LOG(WARNING) << "Error: invalid cell type";
         return nullptr;
     }
     return mesh;
@@ -151,11 +152,6 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
     // as of now, only works for TET elements
     if (imstkVolMesh->getTypeName() == "TetrahedralMesh")
     {
-        // Using default material properties to append to the .veg file
-        const double E       = 1E7;
-        const double nu      = 0.4;
-        const double density = 1000.0;
-
         auto imstkVolTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(imstkVolMesh);
 
         auto                vertexArray = *imstkVolMesh->getVertexPositions();
@@ -177,16 +173,23 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
             elements.emplace_back(int(tet[3]));
         }
 
-        std::shared_ptr<vega::TetMesh> vegaMesh = std::make_shared<vega::TetMesh>(int(imstkVolTetMesh->getNumVertices()), &vertices[0],
-            int(imstkVolTetMesh->getNumTetrahedra()), &elements[0], E, nu, density);
+        // Using default material properties to append to the .veg file
+        auto vegaMesh = std::make_shared<vega::TetMesh>(int(imstkVolTetMesh->getNumVertices()),
+            &vertices[0],
+            int(imstkVolTetMesh->getNumTetrahedra()),
+            &elements[0],
+            1E7, /* Young's modulus */
+            0.4, /* Poisson's ratio */
+            1000.0 /* density */);
 
-        CHECK(vegaMesh != nullptr) << "VegaMeshIO::convertVolumetricMeshToVegaMesh error: Failed to create vega mesh";
+        CHECK(vegaMesh != nullptr) << "@VegaMeshIO::convertVolumetricMeshToVegaMesh error: Failed to create vega mesh. "
+                                   << "Check vega::TetMesh::TetMesh() for clues";
 
         return vegaMesh;
     }
     else
     {
-        LOG(WARNING) << "VegaMeshIO::convertVolumetricMeshToVegaMesh error: Geometry type not supported";
+        LOG(WARNING) << "Error: Geometry type other than tetrahedral mesh not supported";
         return nullptr;
     }
 }

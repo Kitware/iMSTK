@@ -26,8 +26,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 bool
 RigidObject2::initialize()
 {
@@ -71,6 +69,5 @@ RigidObject2::updatePhysicsGeometry()
     m_physicsGeometry->updatePostTransformData();
 
     DynamicObject::updatePhysicsGeometry();
-}
 }
 } // imstk

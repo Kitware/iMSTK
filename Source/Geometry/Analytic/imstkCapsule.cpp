@@ -78,7 +78,8 @@ double
 Capsule::getFunctionValue(const Vec3d& x) const
 {
     // Two lines points
-    const Vec3d a = m_positionPostTransform + 0.5 * m_orientationAxisPostTransform * m_lengthPostTransform;
+    const Vec3d orientationAxes = getRotation().col(1);
+    const Vec3d a = m_positionPostTransform + 0.5 * orientationAxes * m_lengthPostTransform;
     const Vec3d b = 2.0 * m_positionPostTransform - a;
 
     const Vec3d  pa = x - a;
@@ -91,13 +92,12 @@ void
 Capsule::applyTransform(const Mat4d& m)
 {
     AnalyticalGeometry::applyTransform(m);
-    /* const Vec3d s = Vec3d(
-         m.block<3, 1>(0, 0).norm(),
-         m.block<3, 1>(0, 1).norm(),
-         m.block<3, 1>(0, 2).norm());*/
-    const double s0 = m.block<3, 1>(0, 0).norm();
-    this->setRadius(m_radius * s0);
-    this->setLength(m_length * s0);
+    const double s = std::sqrt(Vec3d(
+         m.block<3, 1>(0, 0).squaredNorm(),
+         m.block<3, 1>(0, 1).squaredNorm(),
+         m.block<3, 1>(0, 2).squaredNorm()).maxCoeff());
+    this->setRadius(m_radius * s);
+    this->setLength(m_length * s);
     this->postModified();
 }
 
@@ -109,9 +109,9 @@ Capsule::updatePostTransformData() const
         return;
     }
     AnalyticalGeometry::updatePostTransformData();
-    const double s0 = m_transform.block<3, 1>(0, 0).norm();
-    m_radiusPostTransform = s0 * m_radius;
-    m_lengthPostTransform = s0 * m_length;
+    const double s = getScaling().maxCoeff();
+    m_radiusPostTransform = s * m_radius;
+    m_lengthPostTransform = s * m_length;
     m_transformApplied    = true;
 }
 
@@ -120,7 +120,8 @@ Capsule::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(pa
 {
     updatePostTransformData();
 
-    const Vec3d l  = (m_lengthPostTransform * 0.5 + m_radiusPostTransform) * m_orientationAxisPostTransform;
+    const Vec3d orientationAxes = getRotation().col(1);
+    const Vec3d l  = (m_lengthPostTransform * 0.5 + m_radiusPostTransform) * orientationAxes;
     const Vec3d p1 = m_positionPostTransform - l;
     const Vec3d p2 = m_positionPostTransform + l;
 

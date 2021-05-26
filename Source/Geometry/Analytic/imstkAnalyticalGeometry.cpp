@@ -25,16 +25,23 @@
 namespace imstk
 {
 AnalyticalGeometry::AnalyticalGeometry(const std::string& name) : ImplicitGeometry(name),
-    m_position(WORLD_ORIGIN), m_positionPostTransform(WORLD_ORIGIN),
-    m_orientationAxis(UP_VECTOR), m_orientationAxisPostTransform(UP_VECTOR)
+    m_position(Vec3d::Zero()), m_positionPostTransform(Vec3d::Zero()),
+    m_orientation(Quatd::Identity()), m_orientationPostTransform(Quatd::Identity())
 {
 }
 
 void
 AnalyticalGeometry::print() const
 {
-    LOG(INFO) << "Position: (" << m_position.x() << ", " << m_position.y() << ", " << m_position.z() << ")";
-    LOG(INFO) << "Orientation Axis: (" << m_orientationAxis.x() << ", " << m_orientationAxis.y() << ", " << m_orientationAxis.z() << ")";
+    LOG(INFO) << "Position: (" <<
+        m_position.x() << ", " <<
+        m_position.y() << ", " <<
+        m_position.z() << ")";
+    LOG(INFO) << "Orientation: (" <<
+        m_orientation.x() << ", " <<
+        m_orientation.y() << ", " <<
+        m_orientation.z() << ", " <<
+        m_orientation.w();
 }
 
 Vec3d
@@ -67,31 +74,28 @@ AnalyticalGeometry::setPosition(const double x, const double y, const double z)
     this->setPosition(Vec3d(x, y, z));
 }
 
-Vec3d
-AnalyticalGeometry::getOrientationAxis(DataType type /* = DataType::PostTransform */)
+Quatd
+AnalyticalGeometry::getOrientation(DataType type)
 {
     if (type == DataType::PostTransform)
     {
         this->updatePostTransformData();
-        return m_orientationAxisPostTransform;
+        return m_orientationPostTransform;
     }
-    return m_orientationAxis;
+    return m_orientation;
 }
 
 void
-AnalyticalGeometry::setOrientationAxis(const Vec3d orientation)
+AnalyticalGeometry::setOrientation(const Quatd r)
 {
-    if (orientation == Vec3d::Zero())
-    {
-        LOG(WARNING) << "AnalyticalGeometry::setOrientationAxis error: "
-                     << "orientation can not be defined by a null vector.";
-        return;
-    }
-    if (m_orientationAxis == orientation)
+    // Two quats can represent the same rotation, check coeffs
+    // for true difference
+    if (m_orientation.coeffs() == r.coeffs())
     {
         return;
     }
-    m_orientationAxis  = orientation.normalized();
+
+    m_orientation      = r;
     m_transformApplied = false;
     this->postModified();
 }
@@ -100,14 +104,13 @@ void
 AnalyticalGeometry::applyTransform(const Mat4d& m)
 {
     this->setPosition((m * Vec4d(m_position[0], m_position[1], m_position[2], 1.0)).head<3>());
-    this->setOrientationAxis((m * Vec4d(m_orientationAxis[0], m_orientationAxis[1], m_orientationAxis[2], 0.0)).head<3>());
+    this->setOrientation((m_orientation * Quatd(m.block<3, 3>(0, 0))).normalized());
 }
 
 void
 AnalyticalGeometry::updatePostTransformData() const
 {
-    m_orientationAxisPostTransform = (m_transform * Vec4d(m_orientationAxis[0], m_orientationAxis[1], m_orientationAxis[2], 0.0)).head<3>();
-    m_orientationAxisPostTransform.normalize();
-    m_positionPostTransform = (m_transform * Vec4d(m_position[0], m_position[1], m_position[2], 1.0)).head<3>();
+    m_positionPostTransform    = (m_transform * Vec4d(m_position[0], m_position[1], m_position[2], 1.0)).head<3>();
+    m_orientationPostTransform = (Quatd(getRotation()) * m_orientation).normalized();
 }
 } // imstk

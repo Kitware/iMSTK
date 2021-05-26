@@ -43,6 +43,7 @@ struct ImplicitFunctionGradient
         const Vec3d& getDx() const { return m_dx; }
 
         void setFunction(std::shared_ptr<ImplicitGeometry> func) { this->m_func = func; }
+        std::shared_ptr<ImplicitGeometry> getFunction() const { return m_func; }
 
     protected:
         std::shared_ptr<ImplicitGeometry> m_func;

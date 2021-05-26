@@ -79,11 +79,15 @@ public:
     ///
     /// \brief Returns signed distance to surface given position
     ///
-    double getFunctionValue(const Vec3d& pos) const override { return (pos - m_position).norm() - m_radius; }
+    double getFunctionValue(const Vec3d& pos) const override { return (pos - m_positionPostTransform).norm() - m_radiusPostTransform; }
+
+    ///
+    /// \brief Update the Sphere parameters applying the latest transform
+    ///
+    void updatePostTransformData() const override;
 
 protected:
     void applyTransform(const Mat4d& m) override;
-    void updatePostTransformData() const override;
 
     double m_radius = 1.0;                      ///> Radius of the sphere
     mutable double m_radiusPostTransform = 1.0; ///> Radius of the sphere once transform applied

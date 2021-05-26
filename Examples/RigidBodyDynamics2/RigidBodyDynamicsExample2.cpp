@@ -22,7 +22,6 @@
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 #include "imstkCompositeImplicitGeometry.h"
-#include "imstkCube.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkImplicitGeometryToImageData.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -31,6 +30,7 @@
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkOrientedBox.h"
 #include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
@@ -49,7 +49,6 @@
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 ///
 /// \brief This example demonstrates a rigid body model. The rigid body model uses
@@ -117,9 +116,8 @@ main()
 
         // Create surface mesh cube (so we can use pointset for point->implicit collision)
         {
-            imstkNew<Cube> cubeGeom;
-            cubeGeom->setWidth(4.0);
-            std::shared_ptr<SurfaceMesh> surfMesh = GeometryUtils::toCubeSurfaceMesh(cubeGeom);
+            imstkNew<OrientedBox>        cubeGeom(Vec3d::Zero(), Vec3d(1.5, 3.0, 1.0));
+            std::shared_ptr<SurfaceMesh> surfMesh = GeometryUtils::toSurfaceMesh(cubeGeom);
 
             imstkNew<SurfaceMeshSubdivide> subdivide;
             subdivide->setInputMesh(surfMesh);

@@ -25,8 +25,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 ///
 /// \class RbdFrictionConstraint
 ///
@@ -54,5 +52,4 @@ private:
     double m_contactDepth;
     double m_frictionCoefficient;
 };
-}
 }

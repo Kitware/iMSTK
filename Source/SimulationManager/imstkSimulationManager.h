@@ -53,18 +53,20 @@ public:
     };
 
 public:
-    virtual ~SimulationManager() override= default;
+    virtual ~SimulationManager() override = default;
 
 public:
+    // *INDENT-OFF*
     ///
     /// \brief Called after initialization but before starting the loop
     ///
-    SIGNAL(SimulationManager,starting);
+    SIGNAL(SimulationManager, starting);
 
     ///
     /// \brief Called after ending, but before un initialization
     ///
-    SIGNAL(SimulationManager,ending);
+    SIGNAL(SimulationManager, ending);
+    // *INDENT-ON*
 
 public:
     void start() override;
@@ -114,7 +116,7 @@ protected:
 protected:
     std::vector<std::shared_ptr<Viewer>> m_viewers;
 
-    std::unordered_map<Module*,bool> m_running;
+    std::unordered_map<Module*, bool> m_running;
 
     std::vector<std::shared_ptr<Module>> m_syncModules;      ///> Modules called once per update
     std::vector<std::shared_ptr<Module>> m_asyncModules;     ///> Modules that run on completely other threads without restraint
