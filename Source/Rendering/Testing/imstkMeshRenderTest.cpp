@@ -54,6 +54,23 @@ run_for(SimulationManager* driver, int i)
     driver->requestStatus(ModuleDriverStopped);
     t.join();
 }
+
+std::shared_ptr<RenderMaterial>
+makeMaterial()
+{
+    std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
+    colorFunc->setNumberOfColors(3);
+    colorFunc->setColor(0, imstk::Color::Green);
+    colorFunc->setColor(1, imstk::Color::Blue);
+    colorFunc->setColor(2, imstk::Color::Red);
+    colorFunc->setColorSpace(imstk::ColorFunction::ColorSpace::RGB);
+    colorFunc->setRange(0, 6);
+
+    auto material = std::make_shared<imstk::RenderMaterial>();
+    material->setScalarVisibility(true);
+    material->setColorLookupTable(colorFunc);
+    return material;
+}
 }
 
 class RenderTest : public testing::Test
@@ -100,7 +117,7 @@ TEST_F(RenderTest, plain_mesh)
 
     ASSERT_TRUE(sceneObj != nullptr) << "ERROR: Unable to create scene object";
 
-    run_for(driver.get(), 2);
+    //run_for(driver.get(), 2);
 }
 
 TEST_F(RenderTest, mesh_material)
@@ -115,7 +132,7 @@ TEST_F(RenderTest, mesh_material)
 
     ASSERT_TRUE(sceneObj != nullptr) << "ERROR: Unable to create scene object";
 
-    run_for(driver.get(), 2);
+    //run_for(driver.get(), 2);
 }
 
 TEST_F(RenderTest, material_color_function_vertices)
@@ -153,7 +170,7 @@ TEST_F(RenderTest, material_color_function_vertices)
     auto  onPreUpdate = [scalars, abstracScalars, &val](Event*) {
                             if (val < 6.0)
                             {
-                                val += 0.01;
+                                val += 0.05;
                             }
                             else
                             {
@@ -169,18 +186,7 @@ TEST_F(RenderTest, material_color_function_vertices)
     connect<Event>(viewer, VTKViewer::preUpdate, onPreUpdate);
     onPreUpdate(nullptr);
 
-    std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
-    colorFunc->setNumberOfColors(3);
-    colorFunc->setColor(0, imstk::Color::Green);
-    colorFunc->setColor(1, imstk::Color::Blue);
-    colorFunc->setColor(2, imstk::Color::Red);
-    colorFunc->setColorSpace(imstk::ColorFunction::ColorSpace::RGB);
-    colorFunc->setRange(0, 6);
-
-    auto material = std::make_shared<imstk::RenderMaterial>();
-    material->setScalarVisibility(true);
-    material->setColorLookupTable(colorFunc);
-    visualModel->setRenderMaterial(material);
+    visualModel->setRenderMaterial(makeMaterial());
 
     auto sceneObj = std::make_shared<SceneObject>("plains");
     sceneObj->addVisualModel(visualModel);
@@ -189,13 +195,13 @@ TEST_F(RenderTest, material_color_function_vertices)
     scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
 
-    run_for(driver.get(), 4);
+    //run_for(driver.get(), 2);
 }
 
 TEST_F(RenderTest, material_color_function_cells)
 {
     imstk::VecDataArray<double, 3> points;
-    imstk::DataArray<float>        scalars;
+    auto                           scalars = std::make_shared<imstk::DataArray<float>>();
 
     for (int i = 0; i < 6; ++i)
     {
@@ -210,29 +216,36 @@ TEST_F(RenderTest, material_color_function_cells)
     {
         int j = i * 2;
         tris.push_back({ j + 2, j + 1, j });
-        scalars.push_back(i);
+        scalars->push_back(i);
         tris.push_back({ j + 3, j + 1, j + 2 });
-        scalars.push_back(i);
+        scalars->push_back(i);
     }
-
     mesh.initialize(std::make_shared<VecDataArray<double, 3>>(points), std::make_shared<VecDataArray<int, 3>>(tris));
-    mesh.setCellAttribute("scalars", std::make_shared<DataArray<float>>(scalars));
+    mesh.setCellAttribute("scalars", scalars);
     mesh.setCellScalars("scalars");
 
+    float val = 0.0;
+    auto  onPreUpdate = [scalars, &val](Event*) {
+                            if (val < 6.0)
+                            {
+                                val += 0.05;
+                            }
+                            else
+                            {
+                                val = 0.0;
+                            }
+                            (*scalars)[0] = val;
+                            (*scalars)[1] = val;
+                            (*scalars)[2] = val;
+                            (*scalars)[3] = val;
+                            scalars->postModified();
+                        };
+
+    connect<Event>(viewer, VTKViewer::preUpdate, onPreUpdate);
+    onPreUpdate(nullptr);
+
     auto visualModel = std::make_shared<VisualModel>(std::make_shared<SurfaceMesh>(mesh));
-
-    std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
-    colorFunc->setNumberOfColors(3);
-    colorFunc->setColor(0, imstk::Color::Green);
-    colorFunc->setColor(1, imstk::Color::Blue);
-    colorFunc->setColor(2, imstk::Color::Red);
-    colorFunc->setColorSpace(imstk::ColorFunction::ColorSpace::RGB);
-    colorFunc->setRange(0, 6);
-
-    auto material = std::make_shared<imstk::RenderMaterial>();
-    material->setScalarVisibility(true);
-    material->setColorLookupTable(colorFunc);
-    visualModel->setRenderMaterial(material);
+    visualModel->setRenderMaterial(makeMaterial());
 
     auto sceneObj = std::make_shared<SceneObject>("plains");
     sceneObj->addVisualModel(visualModel);
@@ -241,10 +254,10 @@ TEST_F(RenderTest, material_color_function_cells)
     scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
 
-    run_for(driver.get(), 2);
+    //run_for(driver.get(), 2);
 }
 
-TEST_F(RenderTest, material_color_function_dynamical_vertices)
+TEST_F(RenderTest, material_color_function_dynamic_vertices)
 {
     auto mesh    = std::make_shared<imstk::SurfaceMesh>();
     auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
@@ -252,55 +265,42 @@ TEST_F(RenderTest, material_color_function_dynamical_vertices)
     auto scalars = std::make_shared<imstk::DataArray<float>>();
     mesh->initialize(points, tris);
 
-    auto updateMesh = [mesh](Event*)
-                      {
-                          // ODD ... updating the values in the original arrays fails somewhere (no surface can be seen)
-                          // , this is unexpected, when the data is in a new array then the update call successfully
-                          // produces a surface
-                          auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
-                          auto tris    = std::make_shared<imstk::VecDataArray<int, 3>>();
-                          auto scalars = std::make_shared<imstk::DataArray<float>>();
-                          mesh->clear();
-                          for (int i = 0; i < 6; ++i)
-                          {
-                              points->push_back({ 0, 0, static_cast<double>(i) });
-                              scalars->push_back(i);
-                              points->push_back({ 1, 0, static_cast<double>(i) });
-                              scalars->push_back(i);
-                          }
+    double scale      = 1.0;
+    auto   updateMesh = [mesh, &scale](Event*)
+                        {
+                            scale += 0.01;
+                            auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
+                            auto tris    = std::make_shared<imstk::VecDataArray<int, 3>>();
+                            auto scalars = std::make_shared<imstk::DataArray<float>>();
+                            mesh->clear();
+                            for (int i = 0; i < 6; ++i)
+                            {
+                                points->push_back({ 0, 0, static_cast<double>(i) });
+                                scalars->push_back(i);
+                                points->push_back({ 1 * scale, 0, static_cast<double>(i) });
+                                scalars->push_back(i);
+                            }
 
-                          for (int i = 0; i < 5; ++i)
-                          {
-                              int j = i * 2;
-                              tris->push_back({ j + 2, j + 1, j });
-                              tris->push_back({ j + 3, j + 1, j + 2 });
-                          }
+                            for (int i = 0; i < 5; ++i)
+                            {
+                                int j = i * 2;
+                                tris->push_back({ j + 2, j + 1, j });
+                                tris->push_back({ j + 3, j + 1, j + 2 });
+                            }
 
-                          mesh->initialize(points, tris);
-                          mesh->setVertexAttribute("scalars", scalars);
-                          mesh->setVertexScalars("scalars");
-                          mesh->computeVertexNormals();
-                          mesh->modified();
-                      };
+                            mesh->initialize(points, tris);
+                            mesh->setVertexAttribute("scalars", scalars);
+                            mesh->setVertexScalars("scalars");
+                            mesh->computeVertexNormals();
+                            mesh->postModified();
+                        };
 
     connect<Event>(viewer, VTKViewer::preUpdate, updateMesh);
 
-    auto         visualModel = std::make_shared<VisualModel>(mesh);
-    imstk::Event e("test");
-    updateMesh(&e);
+    auto visualModel = std::make_shared<VisualModel>(mesh);
+    updateMesh(nullptr);
 
-    std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
-    colorFunc->setNumberOfColors(3);
-    colorFunc->setColor(0, imstk::Color::Green);
-    colorFunc->setColor(1, imstk::Color::Blue);
-    colorFunc->setColor(2, imstk::Color::Red);
-    colorFunc->setColorSpace(imstk::ColorFunction::ColorSpace::RGB);
-    colorFunc->setRange(0, 6);
-
-    auto material = std::make_shared<imstk::RenderMaterial>();
-    material->setScalarVisibility(true);
-    material->setColorLookupTable(colorFunc);
-    visualModel->setRenderMaterial(material);
+    visualModel->setRenderMaterial(makeMaterial());
 
     auto sceneObj = std::make_shared<SceneObject>("plains");
     sceneObj->addVisualModel(visualModel);
@@ -312,7 +312,7 @@ TEST_F(RenderTest, material_color_function_dynamical_vertices)
     run_for(driver.get(), 2);
 }
 
-TEST_F(RenderTest, material_color_function_dynamical_cells)
+TEST_F(RenderTest, material_color_function_dynamic_cells)
 {
     auto mesh    = std::make_shared<imstk::SurfaceMesh>();
     auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
@@ -320,55 +320,41 @@ TEST_F(RenderTest, material_color_function_dynamical_cells)
     auto scalars = std::make_shared<imstk::DataArray<float>>();
     mesh->initialize(points, tris);
 
-    auto updateMesh = [mesh](Event*)
-                      {
-                          // ODD ... updating the values in the original arrays fails somewhere (no surface can be seen)
-                          // , this is unexpected, when the data is in a new array then the update call successfully
-                          // produces a surface
-                          auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
-                          auto tris    = std::make_shared<imstk::VecDataArray<int, 3>>();
-                          auto scalars = std::make_shared<imstk::DataArray<float>>();
-                          mesh->clear();
-                          for (int i = 0; i < 6; ++i)
-                          {
-                              points->push_back({ 0, 0, static_cast<double>(i) });
-                              points->push_back({ 1, 0, static_cast<double>(i) });
-                          }
+    double scale      = 1.0;
+    auto   updateMesh = [mesh, &scale](Event*)
+                        {
+                            scale += 0.01;
+                            auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
+                            auto tris    = std::make_shared<imstk::VecDataArray<int, 3>>();
+                            auto scalars = std::make_shared<imstk::DataArray<float>>();
+                            mesh->clear();
+                            for (int i = 0; i < 6; ++i)
+                            {
+                                points->push_back({ 0, 0, static_cast<double>(i) });
+                                points->push_back({ 1, 0, static_cast<double>(i) });
+                            }
 
-                          for (int i = 0; i < 5; ++i)
-                          {
-                              int j = i * 2;
-                              tris->push_back({ j + 2, j + 1, j });
-                              scalars->push_back(i);
-                              tris->push_back({ j + 3, j + 1, j + 2 });
-                              scalars->push_back(i);
-                          }
+                            for (int i = 0; i < 5; ++i)
+                            {
+                                int j = i * 2;
+                                tris->push_back({ j + 2, j + 1, j });
+                                scalars->push_back(i);
+                                tris->push_back({ j + 3, j + 1, j + 2 });
+                                scalars->push_back(i);
+                            }
 
-                          mesh->initialize(points, tris);
-                          mesh->setCellAttribute("scalars", scalars);
-                          mesh->setCellScalars("scalars");
-                          mesh->computeVertexNormals();
-                          mesh->modified();
-                      };
+                            mesh->initialize(points, tris);
+                            mesh->setCellAttribute("scalars", scalars);
+                            mesh->setCellScalars("scalars");
+                            mesh->computeVertexNormals();
+                            mesh->postModified();
+                        };
 
     connect<Event>(viewer, viewer->preUpdate, updateMesh);
 
-    auto         visualModel = std::make_shared<VisualModel>(mesh);
-    imstk::Event e("test");
-    updateMesh(&e);
-
-    std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
-    colorFunc->setNumberOfColors(3);
-    colorFunc->setColor(0, imstk::Color::Green);
-    colorFunc->setColor(1, imstk::Color::Blue);
-    colorFunc->setColor(2, imstk::Color::Red);
-    colorFunc->setColorSpace(imstk::ColorFunction::ColorSpace::RGB);
-    colorFunc->setRange(0, 6);
-
-    auto material = std::make_shared<imstk::RenderMaterial>();
-    material->setScalarVisibility(true);
-    material->setColorLookupTable(colorFunc);
-    visualModel->setRenderMaterial(material);
+    auto visualModel = std::make_shared<VisualModel>(mesh);
+    updateMesh(nullptr);
+    visualModel->setRenderMaterial(makeMaterial());
 
     auto sceneObj = std::make_shared<SceneObject>("plains");
     sceneObj->addVisualModel(visualModel);

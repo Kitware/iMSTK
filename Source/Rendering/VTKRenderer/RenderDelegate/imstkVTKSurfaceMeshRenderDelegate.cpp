@@ -152,12 +152,17 @@ void
 VTKSurfaceMeshRenderDelegate::processEvents()
 {
     // Custom handling of events
-    std::shared_ptr<SurfaceMesh>             geom     = std::dynamic_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    std::shared_ptr<SurfaceMesh> geom = std::dynamic_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+
     std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
+
+    auto cellScalars   = geom->getCellScalars();
+    auto vertexScalars = geom->getVertexScalars();
 
     // Only use the most recent event from respective sender
     std::list<Command> cmds;
-    bool               contains[4] = { false, false, false, false };
+    bool               contains[6] = { false, false, false, false, false, false };
+    EventObject*       sender[4]   = { m_visualModel.get(), m_material.get(), geom.get(), vertices.get() };
     rforeachEvent([&](Command cmd)
         {
             if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
@@ -180,9 +185,19 @@ VTKSurfaceMeshRenderDelegate::processEvents()
                 cmds.push_back(cmd);
                 contains[3] = true;
             }
+            else if (cmd.m_event->m_sender == cellScalars.get() && !contains[4])
+            {
+                cmds.push_back(cmd);
+                contains[3] = true;
+            }
+            else if (cmd.m_event->m_sender == vertexScalars.get() && !contains[5])
+            {
+                cmds.push_back(cmd);
+                contains[3] = true;
+            }
         });
 
-    // Now do each event in order recieved
+    // Now do each event in order received
     for (std::list<Command>::reverse_iterator i = cmds.rbegin(); i != cmds.rend(); i++)
     {
         i->invoke();
@@ -269,7 +284,7 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
 
     if (m_cellScalars != m_geometry->getCellScalars())
     {
-        setCellScalarBuffer(geometry->getVertexScalars());
+        setCellScalarBuffer(geometry->getCellScalars());
     }
 }
 
