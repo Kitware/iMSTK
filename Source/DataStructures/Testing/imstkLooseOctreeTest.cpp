@@ -139,25 +139,16 @@ randomizePositions(const std::shared_ptr<SurfaceMesh>& mesh)
 
 namespace imstk
 {
-///
-/// \brief TODO
-///
 class LooseOctreeTest : public ::testing::Test
 {
 public:
     LooseOctreeTest() {}
 
-    ///
-    /// \brief TODO
-    ///
     void reset()
     {
         m_Octree.reset(new LooseOctree(Vec3d(0, 0, 0), 100.0, 0.1, 4));
     }
 
-    ///
-    /// \brief TODO
-    ///
     void buildExample()
     {
         reset();
@@ -177,9 +168,6 @@ public:
         m_Octree->build();
     }
 
-    ///
-    /// \brief TODO
-    ///
     void testOctree()
     {
         m_Octree->update();
@@ -265,9 +253,6 @@ public:
         }
     }
 
-    ///
-    /// \brief TODO
-    ///
     void testDummyPrimitives(bool bRebuild)
     {
         // Test points
@@ -378,25 +363,4 @@ TEST_F(LooseOctreeTest, TestTeleportingPrimitives)
         randomizePositions(m_PointSet);
         randomizePositions(m_Mesh);
     }
-}
-
-///
-/// \brief Test octree update while primitives moving around randomly
-///
-TEST_F(LooseOctreeTest, TestDummyPrimitives)
-{
-    testDummyPrimitives(true);
-    testDummyPrimitives(false);
-}
-
-///
-/// \brief TODO
-///
-int
-imstkLooseOctreeTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

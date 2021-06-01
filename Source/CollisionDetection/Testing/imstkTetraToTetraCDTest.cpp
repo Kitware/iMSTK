@@ -37,9 +37,6 @@ protected:
     TetraToTetraCD* m_CD;
 };
 
-///
-/// \brief TODO
-///
 std::shared_ptr<TetrahedralMesh>
 loadMesh(const std::string& externalDataSuffix)
 {
@@ -52,18 +49,12 @@ loadMesh(const std::string& externalDataSuffix)
     return volMesh;
 }
 
-///
-/// \brief TODO
-///
 std::shared_ptr<TetrahedralMesh>
 duplicate(std::shared_ptr<TetrahedralMesh> mesh)
 {
     return std::make_shared<TetrahedralMesh>(*mesh.get());
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkTetraToTetraCDTest, DISABLED_NoSelfIntersection)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
@@ -80,9 +71,6 @@ TEST_F(imstkTetraToTetraCDTest, DISABLED_NoSelfIntersection)
     EXPECT_EQ(cd->PTColData.getSize(), 0);
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersection1T)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/oneTet/oneTet.veg");
@@ -117,9 +105,6 @@ TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersection1T)
     EXPECT_EQ(cd->PTColData.getSize(), 0);
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersectionHuman)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/human/human.veg");
@@ -161,9 +146,6 @@ TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersectionHuman)
     EXPECT_EQ(cd->PTColData.getSize(), 0);
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionOfDifferentMeshes)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
@@ -173,17 +155,4 @@ TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionOfDifferentMeshes)
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
     EXPECT_EQ(cd->PTColData.getSize(), 595);
-}
-
-///
-/// \brief TODO
-///
-int
-imstkTetraToTetraCDTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

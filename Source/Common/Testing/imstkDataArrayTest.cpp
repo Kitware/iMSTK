@@ -145,6 +145,7 @@ TEST(imstkDataArrayTest, Iterators)
     for (const auto& val : a)
     {
         GTEST_FAIL() << "Should not enter here";
+        int i = val;
     }
 
     auto itBegin = a.begin();
@@ -202,14 +203,4 @@ TEST(imstkDataArrayTest, ParameterCast)
     {
         EXPECT_DOUBLE_EQ(static_cast<double>(a[i]), (*actualB)[i]);
     }
-}
-
-int
-imstkDataArrayTest(int argc, char* argv[])
-{
-    // Init Google Test
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

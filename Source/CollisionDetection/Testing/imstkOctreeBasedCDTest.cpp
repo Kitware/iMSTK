@@ -537,15 +537,3 @@ TEST_F(OctreeBasedCDTest, TestMeshMeshUsingSurfaceMeshToSurfaceMeshCD)
         testMeshMeshUsingSurfaceMeshToSurfaceMeshCD();
     }
 }
-
-///
-/// \brief TODO
-///
-int
-imstkOctreeBasedCDTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
-}

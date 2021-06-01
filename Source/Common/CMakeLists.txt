@@ -14,7 +14,6 @@ imstk_add_library( Common
 # Testing
 #-----------------------------------------------------------------------------
 if( ${PROJECT_NAME}_BUILD_TESTING )
-  include(imstkAddTest)
-  imstk_add_test( Common )
+  add_subdirectory(Testing)
 endif()
 

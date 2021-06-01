@@ -66,13 +66,3 @@ TEST(imstkImageDataTest, Cast)
         EXPECT_DOUBLE_EQ(static_cast<double>(intScalars[i]), (*actualScalars)[i]);
     }
 }
-
-int
-imstkImageDataTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
-}

@@ -25,18 +25,12 @@
 
 using namespace imstk;
 
-///
-/// \brief TODO
-///
 class imstkGeometryTest : public ::testing::Test
 {
 protected:
     Plane m_geometry; // Can't use imstk::Geometry since pure virtual. Should use google mock class.
 };
 
-///
-/// \brief TODO
-///
 TEST_F(imstkGeometryTest, GetSetScaling)
 {
     m_geometry.setScaling(Vec3d(2.0, 2.0, 2.0));
@@ -49,9 +43,6 @@ TEST_F(imstkGeometryTest, GetSetScaling)
     EXPECT_EQ(m_geometry.getScaling(), Vec3d(400000000.0, 400000000.0, 400000000.0));
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkGeometryTest, GetSetTranslation)
 {
     auto p1 = Vec3d(12.0, 0.0005, -400000.0);
@@ -70,9 +61,6 @@ TEST_F(imstkGeometryTest, GetSetTranslation)
     EXPECT_EQ(m_geometry.getTranslation(), p2);
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkGeometryTest, GetSetRotation1)
 {
     // NOTE: '==' not defined for Eigen::Quaternion, using 'isApprox'.
@@ -85,9 +73,6 @@ TEST_F(imstkGeometryTest, GetSetRotation1)
     EXPECT_TRUE(Quatd(m_geometry.getRotation()).isApprox(q1));
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkGeometryTest, GetSetRotation2)
 {
     // NOTE: '==' not defined for Eigen::Quaternion, using 'isApprox'.
@@ -100,9 +85,6 @@ TEST_F(imstkGeometryTest, GetSetRotation2)
     EXPECT_TRUE(m_geometry.getRotation().isApprox(mat2));
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkGeometryTest, GetSetRotation3)
 {
     // NOTE: '==' not defined for Eigen::Quaternion, using 'isApprox'.
@@ -115,17 +97,4 @@ TEST_F(imstkGeometryTest, GetSetRotation3)
     const Mat3d  mat3  = Mat3d(Rotd(angle, axes));
     m_geometry.setRotation(axes, angle);
     EXPECT_TRUE(m_geometry.getRotation().isApprox(mat3));
-}
-
-///
-/// \brief TODO
-///
-int
-imstkGeometryTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }
