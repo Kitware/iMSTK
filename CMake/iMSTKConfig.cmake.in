@@ -127,11 +127,3 @@ find_dependency(VTK COMPONENTS
   RenderingVolumeOpenGL2
   ViewsContext2D)
 find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
-
-# glfw, gli
-if(iMSTK_USE_Vulkan)
-  find_package( glfw REQUIRED )
-  find_package( gli REQUIRED )
-  find_package( VulkanSDK REQUIRED)
-  add_definitions( -DiMSTK_USE_Vulkan )
-endif()
