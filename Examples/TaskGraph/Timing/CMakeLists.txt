@@ -23,7 +23,6 @@ project(Example-TaskGraphTiming)
 #-----------------------------------------------------------------------------
 imstk_add_executable(${PROJECT_NAME} taskGraphTimingExample.cpp)
 
-target_compile_options(${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/bigobj>)
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
