@@ -43,7 +43,6 @@ PbdObject::initialize()
     }
 
     DynamicObject::initialize();
-    m_pbdModel->initialize();
 
     return true;
 }
