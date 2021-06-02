@@ -68,12 +68,12 @@ public:
     void setNormal(const double x, const double y, const double z);
 
     ///
-    /// \brief Returns the width of the plane after transform
+    /// \brief Returns the width of the plane
     ///
     double getWidth();
 
     ///
-    /// \brief Sets the width of the plane
+    /// \brief Sets the width of the plane, only used for visual purposes
     ///
     void setWidth(const double w);
 
@@ -98,6 +98,6 @@ protected:
 protected:
     Vec3d m_normal;
     mutable Vec3d m_normalPostTransform;
-    double m_width;
+    double m_width; ///> Width of plane, only used for visual purposes
 };
 } // imstk
