@@ -33,15 +33,6 @@ namespace imstk
 VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
     m_planeSource(vtkSmartPointer<vtkPlaneSource>::New())
 {
-    auto geometry = std::dynamic_pointer_cast<Plane>(m_visualModel->getGeometry());
-
-    m_planeSource = vtkSmartPointer<vtkPlaneSource>::New();
-    m_planeSource->SetCenter(0.0, 0.0, 0.0);
-    m_planeSource->SetNormal(geometry->getNormal(Geometry::DataType::PreTransform).data());
-
-    const Mat4d& transform = geometry->getTransform().transpose();
-    m_transform->SetMatrix(transform.data());
-
     // Setup mapper
     {
         vtkNew<vtkPolyDataMapper> mapper;
@@ -55,6 +46,9 @@ VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<VisualModel> visu
 
     update();
     updateRenderProperties();
+
+    // Call to update to initialize
+    processEvents();
 }
 
 void
@@ -65,13 +59,14 @@ VTKPlaneRenderDelegate::processEvents()
     // Events aren't used for primitives, always update
     auto geometry = std::dynamic_pointer_cast<Plane>(m_visualModel->getGeometry());
 
+    m_planeSource->SetCenter(0.0, 0.0, 0.0);
     m_planeSource->SetNormal(geometry->getNormal(Geometry::DataType::PreTransform).data());
     m_planeSource->Modified();
 
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
     T.rotate(geometry->getOrientation(Geometry::DataType::PostTransform));
-    T.scale(geometry->getScaling().maxCoeff());
+    T.scale(geometry->getWidth());
     T.matrix().transposeInPlace();
     m_transform->SetMatrix(T.data());
 }

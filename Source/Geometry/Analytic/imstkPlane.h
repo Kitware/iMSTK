@@ -38,7 +38,7 @@ public:
     ///
     Plane(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d& normal = Vec3d(0.0, 1.0, 0.0),
           const std::string& name = std::string("defaultPlane")) :
-        AnalyticalGeometry(name)
+        AnalyticalGeometry(name), m_width(1.0)
     {
         setPosition(pos);
         setNormal(normal.normalized());
@@ -98,5 +98,6 @@ protected:
 protected:
     Vec3d m_normal;
     mutable Vec3d m_normalPostTransform;
+    double m_width;
 };
 } // imstk
