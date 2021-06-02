@@ -58,19 +58,19 @@ public:
 
 protected:
     ///
-    /// \brief Callback when vertices change
+    /// \brief Callback for when vertex values are modified
     ///
     void vertexDataModified(Event* e);
-
-    ///
-    /// \brief Callback when indices change
-    ///
     void indexDataModified(Event* e);
 
     ///
-    /// \brief Callback when geometry changes
+    /// \brief Callback for when geometry is modified
     ///
     void geometryModified(Event* e);
+
+protected:
+    void setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices);
+    void setIndexBuffer(std::shared_ptr<VecDataArray<int, 4>> indices);
 
 protected:
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
