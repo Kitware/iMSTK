@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkKeyboardSceneControl.h"
+#include "imstkCamera.h"
 #include "imstkLogger.h"
 #include "imstkModuleDriver.h"
 #include "imstkScene.h"
@@ -45,6 +46,7 @@ KeyboardSceneControl::printControls()
     LOG(INFO) << " | d/D   - toggle debug/simulation mode";
     LOG(INFO) << " | p/P   - toggle visual/physics updates/second and task times display";
     LOG(INFO) << " | r/R   - reset the simulation";
+    LOG(INFO) << " | n/N   - print camera pose of the active scene's camera";
     LOG(INFO) << "----------------------------------------------------------------------";
 }
 
@@ -141,6 +143,10 @@ KeyboardSceneControl::OnKeyPress(const char key)
     else if (key == 'r' || key == 'R')
     {
         sceneManager->getActiveScene()->reset();
+    }
+    else if (key == 'n' || key == 'N')
+    {
+        sceneManager->getActiveScene()->getActiveCamera()->print();
     }
 }
 
