@@ -140,10 +140,10 @@ createAndAddPbdObject(const std::string& tetMeshName)
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_iterations = 6;
+    pbdParams->m_dt = 0.02;
 
     // Set the parameters
     pbdModel->configure(pbdParams);
-    pbdModel->setDefaultTimeStep(0.02);
     pbdModel->setTimeStepSizeType(TimeSteppingType::Fixed);
 
     deformableObj->setDynamicalModel(pbdModel);

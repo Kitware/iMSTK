@@ -270,7 +270,7 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     // Other parameters
     pbdParams->m_uniformMassValue = 5.0;
     pbdParams->m_gravity    = Vec3d(0, -1.0, 0);
-    pbdParams->m_defaultDt  = 0.01;
+    pbdParams->m_dt         = 0.01;
     pbdParams->m_iterations = 20;
     pbdParams->collisionParams->m_proximity = 0.5;
 

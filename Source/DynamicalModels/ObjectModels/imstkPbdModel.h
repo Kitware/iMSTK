@@ -51,14 +51,12 @@ struct PBDModelConfig
         });                                  ///> Info shared between the collision constraints
 
     unsigned int m_iterations = 10;          ///> Pbd iterations
-    unsigned int m_collisionIterations = 5;  ///> Pbd collision iterations
     double m_dt = 0.0;                       ///> Time step size
-    double m_defaultDt = 0.01;               ///> Default Time step size
 
     bool m_doPartitioning = true;
 
     std::vector<std::size_t> m_fixedNodeIds; ///> Nodal IDs of the nodes that are fixed
-    Vec3r m_gravity = Vec3r(0, -9.81, 0);    ///> Gravity
+    Vec3d m_gravity = Vec3d(0, -9.81, 0);    ///> Gravity
 
     std::shared_ptr<PbdFEMConstraintConfig> m_femParams =
         std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
@@ -178,21 +176,18 @@ public:
     void addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices);
 
     ///
-    /// \brief Set the time step size
+    /// \brief Adds a constraint to the system, added to the set of sequentially
+    /// solved constraints
     ///
-    virtual void setTimeStep(const Real timeStep) override { m_parameters->m_dt = timeStep; }
-    void setDefaultTimeStep(const Real timeStep) { m_parameters->m_defaultDt = static_cast<Real>(timeStep); }
+    void addConstraint(std::shared_ptr<PbdConstraint> constraint);
 
     ///
-    /// \brief Set the time step size to fixed size
+    /// \brief Searches for and removes a constraint from the system
     ///
-    virtual void setTimeStepSizeType(const TimeSteppingType type) override;
+    void removeConstraint(std::shared_ptr<PbdConstraint> constraint);
 
-    ///
-    /// \brief Returns the time step size
-    ///
-    virtual double getTimeStep() const override { return m_parameters->m_dt; }
-    double getDefaultTimeStep() const { return m_parameters->m_defaultDt; }
+    virtual void setTimeStep(const double timeStep) override { m_parameters->m_dt = timeStep; }
+    double getTimeStep() const override { return m_parameters->m_dt; }
 
     ///
     /// \brief Return all constraints that are solved sequentially
