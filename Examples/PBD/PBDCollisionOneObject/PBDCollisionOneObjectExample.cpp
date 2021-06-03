@@ -116,7 +116,7 @@ main()
         // \todo use lumped mass
         pbdParams->m_uniformMassValue = 1.0;
         pbdParams->m_gravity    = Vec3d(0, -10.0, 0);
-        pbdParams->m_defaultDt  = timeStep;
+        pbdParams->m_dt         = timeStep;
         pbdParams->m_iterations = maxIter;
         pbdParams->collisionParams->m_proximity = 0.3;
         pbdParams->collisionParams->m_stiffness = 0.1;

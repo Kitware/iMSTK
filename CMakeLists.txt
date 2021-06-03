@@ -134,7 +134,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(Uncrustify)
   endif()
 
-  option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
   option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
   
   imstk_define_dependency(Assimp)
@@ -165,12 +164,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   else()
     message("Warning: Building iMSTK WITHOUT audio support!")
     set(${PROJECT_NAME}_AUDIO_ENABLED OFF)
-  endif()
-
-  if(${PROJECT_NAME}_USE_Vulkan)
-    imstk_define_dependency(glfw)
-    imstk_define_dependency(gli)
-    imstk_define_dependency(Vulkan)
   endif()
 
   if(${PROJECT_NAME}_BUILD_TESTING)
@@ -309,22 +302,6 @@ list(APPEND VTK_DEPENDENCIES
   ViewsContext2D)
 find_package(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
-# Vulkan
-set(Vulkan_Dependency)
-if( ${PROJECT_NAME}_USE_Vulkan )
-  find_package( VulkanSDK REQUIRED)
-  add_definitions( -DiMSTK_USE_Vulkan )
-  # glfw
-  find_package( glfw REQUIRED)
-  # gli
-  find_package( gli REQUIRED)
-  set(Vulkan_Dependency VulkanSDK)
-else()
-  remove_definitions( -DiMSTK_USE_Vulkan )
-  unset(Vulkan_Dependency)
-endif()
-
-
 #--------------------------------------------------------------------------
 # External Utility Packages
 #--------------------------------------------------------------------------
@@ -356,14 +333,6 @@ if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
     "${CMAKE_SOURCE_DIR}/Data/*")
   string(REGEX REPLACE "\.sha512" "" FILE_LIST "${FILE_LIST}")
   imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
-
-  #-----------------------------------------------------------------------------
-  # Add shaders (vulkan only)
-  #-----------------------------------------------------------------------------
-  if(${PROJECT_NAME}_USE_Vulkan)    
-      include(imstkCopyAndCompileShaders)
-      CopyAndCompileShaders() 
-  endif()
 endif()
 
 # Folder name to put our headers/cmake config files under

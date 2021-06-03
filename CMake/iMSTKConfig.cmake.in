@@ -24,7 +24,7 @@ set(CMAKE_DEBUG_POSTFIX @CMAKE_DEBUG_POSTFIX@)
 find_package( Assimp REQUIRED )
 
 # Eigen3
-set(Eigen3_DIR @Eigen3_DIR@)
+set(Eigen3_DIR "@Eigen3_DIR@")
 find_dependency( Eigen3 REQUIRED )
 
 # FTD2XX
@@ -36,12 +36,12 @@ endif()
 find_package( g3log REQUIRED )
 
 # glm
-set(glm_DIR @glm_DIR@)
+set(glm_DIR "@glm_DIR@")
 find_dependency( glm REQUIRED )
 
 # GTest
 if(iMSTK_BUILD_TESTING)
-  set(GTest_DIR @GTest_DIR@)
+  set(GTest_DIR "@GTest_DIR@")
   find_dependency( GTest REQUIRED NO_DEFAULT_PATH )
 endif()
 
@@ -95,7 +95,7 @@ list(GET OPENVR_INCLUDE_DIRS 0 OpenVR_INCLUDE_DIR)
 list(GET OPENVR_LIBRARIES 1 OpenVR_LIBRARY)
 set(OpenVR_INCLUDE_DIR ${OpenVR_INCLUDE_DIR} CACHE INTERNAL "")
 set(OpenVR_LIBRARY ${OpenVR_LIBRARY} CACHE INTERNAL "")
-set(VTK_DIR @VTK_DIR@)
+set(VTK_DIR "@VTK_DIR@")
 find_dependency(VTK CONFIG)
 # modules are linked via `VTK::CommonCore`
 # vtk_module_autoinit is needed
@@ -127,11 +127,3 @@ find_dependency(VTK COMPONENTS
   RenderingVolumeOpenGL2
   ViewsContext2D)
 find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
-
-# glfw, gli
-if(iMSTK_USE_Vulkan)
-  find_package( glfw REQUIRED )
-  find_package( gli REQUIRED )
-  find_package( VulkanSDK REQUIRED)
-  add_definitions( -DiMSTK_USE_Vulkan )
-endif()

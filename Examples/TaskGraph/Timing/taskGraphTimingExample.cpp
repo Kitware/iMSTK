@@ -94,7 +94,7 @@ makePbdString(
     pbdParams->m_fixedNodeIds     = { 0 };
     pbdParams->m_uniformMassValue = 5.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_defaultDt  = 0.0005;
+    pbdParams->m_dt         = 0.0005;
     pbdParams->m_iterations = 5;
 
     // Setup the Model

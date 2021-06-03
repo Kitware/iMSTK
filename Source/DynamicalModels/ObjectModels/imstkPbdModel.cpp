@@ -323,7 +323,7 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
             lock.lock();
             m_constraints->push_back(std::move(c));
             lock.unlock();
-        });
+        }, elements.size() > 100);
     return true;
 }
 
@@ -498,24 +498,25 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
         << "Dihedral constraint should come with a triangular mesh";
 
     // Create constraints
-    const auto&                      triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-    const VecDataArray<int, 3>&      elements = *triMesh->getTriangleIndices();
-    const auto                       nV       = triMesh->getNumVertices();
-    std::vector<std::vector<size_t>> onering(nV);
+    const auto&                   triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+    const VecDataArray<int, 3>&   elements = *triMesh->getTriangleIndices();
+    const auto                    nV       = triMesh->getNumVertices();
+    std::vector<std::vector<int>> vertIdsToTriangleIds(nV);
 
     for (int k = 0; k < elements.size(); ++k)
     {
-        auto& tri = elements[k];
-        onering[tri[0]].push_back(k);
-        onering[tri[1]].push_back(k);
-        onering[tri[2]].push_back(k);
+        const Vec3i& tri = elements[k];
+        vertIdsToTriangleIds[tri[0]].push_back(k);
+        vertIdsToTriangleIds[tri[1]].push_back(k);
+        vertIdsToTriangleIds[tri[2]].push_back(k);
     }
 
+    // Used to resolve duplicates
     std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
     auto addConstraint =
-        [&](std::vector<size_t>& r1, std::vector<size_t>& r2,
-            const size_t k, size_t i1, size_t i2)
+        [&](const std::vector<int>& r1, const std::vector<int>& r2,
+            const int k, int i1, int i2)
         {
             if (i1 > i2) // Make sure i1 is always smaller than i2
             {
@@ -525,6 +526,7 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
             {
                 E[i1][i2] = 0;
 
+                // Find the shared edge
                 std::vector<size_t> rs(2);
                 auto                it = std::set_intersection(r1.begin(), r1.end(), r2.begin(), r2.end(), rs.begin());
                 rs.resize(static_cast<size_t>(it - rs.begin()));
@@ -553,21 +555,25 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
             }
         };
 
+    for (int i = 0; i < vertIdsToTriangleIds.size(); i++)
+    {
+        std::sort(vertIdsToTriangleIds[i].begin(), vertIdsToTriangleIds[i].end());
+    }
+
+    // For every triangle
     for (int k = 0; k < elements.size(); ++k)
     {
-        auto& tri = elements[k];
+        const Vec3i& tri = elements[k];
 
-        auto& r0 = onering[tri[0]];
-        auto& r1 = onering[tri[1]];
-        auto& r2 = onering[tri[2]];
+        // Get all the neighbor triangles (to the vertices)
+        std::vector<int>& neighborTriangles0 = vertIdsToTriangleIds[tri[0]];
+        std::vector<int>& neighborTriangles1 = vertIdsToTriangleIds[tri[1]];
+        std::vector<int>& neighborTriangles2 = vertIdsToTriangleIds[tri[2]];
 
-        std::sort(r0.begin(), r0.end());
-        std::sort(r1.begin(), r1.end());
-        std::sort(r2.begin(), r2.end());
-
-        addConstraint(r0, r1, k, tri[0], tri[1]);
-        addConstraint(r0, r2, k, tri[0], tri[2]);
-        addConstraint(r1, r2, k, tri[1], tri[2]);
+        // Add constraints between all the triangles
+        addConstraint(neighborTriangles0, neighborTriangles1, k, tri[0], tri[1]);
+        addConstraint(neighborTriangles0, neighborTriangles2, k, tri[0], tri[2]);
+        addConstraint(neighborTriangles1, neighborTriangles2, k, tri[1], tri[2]);
     }
     return true;
 }
@@ -780,6 +786,18 @@ PbdModel::addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices)
 }
 
 void
+PbdModel::addConstraint(std::shared_ptr<PbdConstraint> constraint)
+{
+    m_constraints->push_back(constraint);
+}
+
+void
+PbdModel::removeConstraint(std::shared_ptr<PbdConstraint> constraint)
+{
+    m_constraints->erase(std::find(m_constraints->begin(), m_constraints->end(), constraint));
+}
+
+void
 PbdModel::partitionConstraints(const bool print)
 {
     // Form the map { vertex : list_of_constraints_involve_vertex }
@@ -878,16 +896,6 @@ PbdModel::partitionConstraints(const bool print)
 }
 
 void
-PbdModel::setTimeStepSizeType(const TimeSteppingType type)
-{
-    m_timeStepSizeType = type;
-    if (type == TimeSteppingType::Fixed)
-    {
-        m_parameters->m_dt = m_parameters->m_defaultDt;
-    }
-}
-
-void
 PbdModel::setParticleMass(const double val, const size_t idx)
 {
     DataArray<double>& masses    = *m_mass;
@@ -966,4 +974,4 @@ PbdModel::updateVelocity()
             }, m_mesh->getNumVertices() > 50);
     }
 }
-} // imstk
+}

@@ -58,18 +58,18 @@ Plane::setNormal(const double x, const double y, const double z)
 double
 Plane::getWidth()
 {
-    const Vec3d s = Vec3d(
-        m_transform.block<3, 1>(0, 0).squaredNorm(),
-        m_transform.block<3, 1>(0, 1).squaredNorm(),
-        m_transform.block<3, 1>(0, 2).squaredNorm());
-    double t = s.cwiseAbs().maxCoeff();
-    return std::sqrt(t);
+    return m_width;
 }
 
 void
 Plane::setWidth(const double w)
 {
-    setScaling(Vec3d(w, w, w));
+    if (m_width == w || m_width <= 0.0)
+    {
+        return;
+    }
+    m_width = w;
+    this->postModified();
 }
 
 void
