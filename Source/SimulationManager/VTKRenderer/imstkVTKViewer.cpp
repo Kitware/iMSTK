@@ -137,6 +137,16 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
 }
 
 void
+VTKViewer::setDebugAxesLength(double x, double y, double z)
+{
+    auto vtkRenderer = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
+    if (vtkRenderer != nullptr)
+    {
+        vtkRenderer->setAxesLength(x, y, z);
+    }
+}
+
+void
 VTKViewer::setRenderingMode(const Renderer::Mode mode)
 {
     if (!m_activeScene)
