@@ -57,7 +57,6 @@ public:
     virtual void reset() {};
 
 protected:
-    friend class VulkanRenderer;
     friend class VTKRenderer;
 
     std::shared_ptr<Geometry> m_geometry = nullptr;

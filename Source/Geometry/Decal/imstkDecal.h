@@ -54,7 +54,6 @@ public:
     void updateDecal(Mat4d& viewMatrix);
 
 protected:
-    friend class VulkanDecalRenderDelegate;
 
     // Hide these functions
     using AnalyticalGeometry::getFunctionValue;

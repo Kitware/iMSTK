@@ -38,27 +38,27 @@ DecalPool::DecalPool(unsigned int maxNumDecals /*= 128*/, const std::string& nam
         LOG(WARNING) << "The maximum number of decals is 128";
     }
 
-    m_vertexPositions[0] = glm::vec3(0.5, 0.5, 0.5);
-    m_vertexPositions[1] = glm::vec3(0.5, 0.5, -0.5);
-    m_vertexPositions[2] = glm::vec3(0.5, -0.5, 0.5);
-    m_vertexPositions[3] = glm::vec3(0.5, -0.5, -0.5);
-    m_vertexPositions[4] = glm::vec3(-0.5, 0.5, 0.5);
-    m_vertexPositions[5] = glm::vec3(-0.5, 0.5, -0.5);
-    m_vertexPositions[6] = glm::vec3(-0.5, -0.5, 0.5);
-    m_vertexPositions[7] = glm::vec3(-0.5, -0.5, -0.5);
+    m_vertexPositions[0] = Vec3d(0.5, 0.5, 0.5);
+    m_vertexPositions[1] = Vec3d(0.5, 0.5, -0.5);
+    m_vertexPositions[2] = Vec3d(0.5, -0.5, 0.5);
+    m_vertexPositions[3] = Vec3d(0.5, -0.5, -0.5);
+    m_vertexPositions[4] = Vec3d(-0.5, 0.5, 0.5);
+    m_vertexPositions[5] = Vec3d(-0.5, 0.5, -0.5);
+    m_vertexPositions[6] = Vec3d(-0.5, -0.5, 0.5);
+    m_vertexPositions[7] = Vec3d(-0.5, -0.5, -0.5);
 
-    m_triangles[0]  = glm::ivec3(2, 1, 0);
-    m_triangles[1]  = glm::ivec3(1, 2, 3);
-    m_triangles[2]  = glm::ivec3(4, 5, 6);
-    m_triangles[3]  = glm::ivec3(7, 6, 5);
-    m_triangles[4]  = glm::ivec3(0, 1, 4);
-    m_triangles[5]  = glm::ivec3(5, 4, 1);
-    m_triangles[6]  = glm::ivec3(6, 3, 2);
-    m_triangles[7]  = glm::ivec3(3, 6, 7);
-    m_triangles[8]  = glm::ivec3(4, 2, 0);
-    m_triangles[9]  = glm::ivec3(2, 4, 6);
-    m_triangles[10] = glm::ivec3(1, 3, 5);
-    m_triangles[11] = glm::ivec3(7, 5, 3);
+    m_triangles[0]  = Vec3i(2, 1, 0);
+    m_triangles[1]  = Vec3i(1, 2, 3);
+    m_triangles[2]  = Vec3i(4, 5, 6);
+    m_triangles[3]  = Vec3i(7, 6, 5);
+    m_triangles[4]  = Vec3i(0, 1, 4);
+    m_triangles[5]  = Vec3i(5, 4, 1);
+    m_triangles[6]  = Vec3i(6, 3, 2);
+    m_triangles[7]  = Vec3i(3, 6, 7);
+    m_triangles[8]  = Vec3i(4, 2, 0);
+    m_triangles[9]  = Vec3i(2, 4, 6);
+    m_triangles[10] = Vec3i(1, 3, 5);
+    m_triangles[11] = Vec3i(7, 5, 3);
 
     for (unsigned int i = 0; i < maxNumDecals; i++)
     {

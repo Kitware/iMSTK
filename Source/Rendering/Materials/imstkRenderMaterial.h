@@ -272,10 +272,6 @@ public:
 
 protected:
     friend class VTKRenderDelegate;
-    friend class VulkanRenderDelegate;
-    friend class VulkanDecalRenderDelegate;
-    friend class VulkanLineMeshRenderDelegate;
-    friend class VulkanParticleRenderDelegate;
     friend class VTKdbgLinesRenderDelegate;
 
     std::string m_name = "";
