@@ -102,7 +102,7 @@ protected:
     unsigned int m_numDecals = 0;
     bool m_recycle = true;
 
-    Vec3d  m_vertexPositions[8];
+    Vec3d m_vertexPositions[8];
     Vec3i m_triangles[12];
 };
 }

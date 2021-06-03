@@ -117,11 +117,11 @@ protected:
     float m_particleSize = 0.1f;
 
     std::vector<std::unique_ptr<RenderParticle>> m_particles; ///< Particle objects
-    Vec3d  m_vertexPositions[4];
-    Vec3d  m_vertexNormals[4];
-    Vec3d  m_vertexTangents[4];
-    Vec2d  m_vertexUVs[4];
-    Vec3i  m_triangles[2];
+    Vec3d m_vertexPositions[4];
+    Vec3d m_vertexNormals[4];
+    Vec3d m_vertexTangents[4];
+    Vec2d m_vertexUVs[4];
+    Vec3i m_triangles[2];
 
     void applyTransform(const Mat4d& m) override;
 
