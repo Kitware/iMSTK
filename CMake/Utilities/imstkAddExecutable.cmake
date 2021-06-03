@@ -21,7 +21,7 @@ macro(imstk_add_executable target)
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
         -Wall -Wno-unused-function>
     $<$<CXX_COMPILER_ID:MSVC>:
-        -W4 -MP -wd4505>)
+        -W4 -MP -wd4505 /bigobj>)
   endif()
 
   set_target_properties(${target} PROPERTIES
