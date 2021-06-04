@@ -198,14 +198,10 @@ verify(std::vector<std::vector<size_t>>& neighbors1, std::vector<std::vector<siz
     return true;
 }
 
-class dummyClass : public ::testing::Test
-{
-};
-
 ///
 /// \brief Generate a sphere-shape particles and search neighbors for each particle
 ///
-TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
+TEST(imstkNeighborSearchTest, CompareGridSearchAndSpatialHashing)
 {
     const Vec3r sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
@@ -251,7 +247,7 @@ TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
 ///
 /// \brief Generate a sphere-shape particles and divide them into two point sets, then for each point in setA search neighbors in setB
 ///
-TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
+TEST(imstkNeighborSearchTest, TestGridSearchFromDifferentPointSet)
 {
     const Vec3r sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
@@ -308,16 +304,4 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
         neighborSearchGridBased(setA, setB, neighbors1);
         EXPECT_EQ(verify(neighbors1, neighbors0), true);
     }
-}
-
-///
-/// \brief TODO
-///
-int
-imstkNeighborSearchTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

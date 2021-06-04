@@ -82,16 +82,3 @@ TEST_F(imstkPGSSolverTest, Solve5x5)
         EXPECT_NEAR(bPrime(i), b(i), 10.0);
     }
 }
-
-///
-/// \brief TODO
-///
-int
-imstkPGSSolverTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
-}

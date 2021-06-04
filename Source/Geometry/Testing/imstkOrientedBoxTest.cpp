@@ -31,9 +31,6 @@ protected:
     OrientedBox m_box;
 };
 
-///
-/// \brief TODO
-///
 TEST_F(imstkOrientedBoxTest, SetGetWidth)
 {
     m_box.setExtents(1.0, 1.0, 1.0);
@@ -43,18 +40,12 @@ TEST_F(imstkOrientedBoxTest, SetGetWidth)
     EXPECT_DOUBLE_EQ(1.0, extents[2]);
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkOrientedBoxTest, GetVolume)
 {
     m_box.setExtents(1.0, 1.0, 1.0);
     EXPECT_DOUBLE_EQ(8, m_box.getVolume());
 }
 
-///
-/// \brief test the cube SDF evaluator
-///
 TEST_F(imstkOrientedBoxTest, GetFunctionValue)
 {
     m_box.setExtents(1.0, 1.0, 2.0);
@@ -71,17 +62,4 @@ TEST_F(imstkOrientedBoxTest, GetFunctionValue)
     EXPECT_DOUBLE_EQ(-1.0, m_box.getFunctionValue(Vec3d(0.0, 0.0, 0.0)));
     EXPECT_DOUBLE_EQ(-0.5, m_box.getFunctionValue(Vec3d(0.5, 0.0, 0.0)));
     EXPECT_DOUBLE_EQ(-0.5, m_box.getFunctionValue(Vec3d(0.0, -1.5, 0.0)));
-}
-
-///
-/// \brief TODO
-///
-int
-imstkOrientedBoxTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

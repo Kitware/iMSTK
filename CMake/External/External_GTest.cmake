@@ -3,12 +3,13 @@
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( GTest
-  URL https://gitlab.kitware.com/iMSTK/googletest/-/archive/release-1.10.0/googletest-release-1.10.0.zip
-  URL_MD5 1878d0300f865cb54df06b220ded5168
+   URL https://github.com/google/googletest/archive/53495a2a7d6ba7e0691a7f3602e9a5324bba6e45.zip
+   URL_MD5 8349ef674d27b005a43ce3679cb04947
   CMAKE_CACHE_ARGS
     -DBUILD_GMOCK:BOOL=ON
     -DBUILD_GTEST:BOOL=ON
-    -DBUILD_SHARED_LIBS:BOOL=ON
+    -DBUILD_SHARED_LIBS:BOOL=OFF
+    -Dgtest_force_shared_crt:BOOL=ON
   DEPENDENCIES ""
   RELATIVE_INCLUDE_PATH ""
   #VERBOSE

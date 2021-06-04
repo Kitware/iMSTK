@@ -127,13 +127,3 @@ TEST(imstkPointSetTest, VertexTexCoordAttributes)
     // HS 2021-apr-04 Death tests don't work with the current infrastructure
     //ASSERT_DEATH(p.setVertexTangents("float2"), ".*");
 }
-
-int
-imstkPointSetTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
-}

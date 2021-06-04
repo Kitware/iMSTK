@@ -237,13 +237,3 @@ TEST(imstkVecDataArrayTest, ParameterCast)
         EXPECT_TRUE(a[i].cast<double>().isApprox((*actualB)[i]));
     }
 }
-
-int
-imstkVecDataArrayTest(int argc, char* argv[])
-{
-    // Init Google Test
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
-}

@@ -11,6 +11,5 @@ imstk_add_library( Geometry
 # Testing
 #-----------------------------------------------------------------------------
 if( ${PROJECT_NAME}_BUILD_TESTING )
-  include(imstkAddTest)
-  imstk_add_test( Geometry )
+  add_subdirectory(Testing)
 endif()

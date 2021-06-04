@@ -25,18 +25,12 @@
 
 using namespace imstk;
 
-///
-/// \brief TODO
-///
 class imstkPlaneTest : public ::testing::Test
 {
 protected:
     Plane m_plane;
 };
 
-///
-/// \brief TODO
-///
 TEST_F(imstkPlaneTest, SetGetWidth)
 {
     m_plane.setWidth(2);
@@ -55,9 +49,6 @@ TEST_F(imstkPlaneTest, SetGetWidth)
     EXPECT_LT(-5.0, m_plane.getWidth());
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkPlaneTest, SetGetNormal)
 {
     Vec3d n1 = Vec3d(0.2, -0.3, 0.9);
@@ -77,23 +68,17 @@ TEST_F(imstkPlaneTest, SetGetNormal)
     EXPECT_FALSE(m_plane.getNormal().isApprox(Vec3d::Zero()));
 }
 
-///
-/// \brief TODO
-///
 TEST_F(imstkPlaneTest, GetVolume)
 {
     EXPECT_DOUBLE_EQ(0, m_plane.getVolume());
 }
 
-///
-/// \brief test the plane SDF evaluator
-///
 TEST_F(imstkPlaneTest, GetFunctionValue)
 {
     m_plane.setNormal(Vec3d(0., 1., 0.));
     m_plane.updatePostTransformData();
 
-    EXPECT_DOUBLE_EQ(0., m_plane.getFunctionValue(Vec3d(0., 0., 0.)), );
+    EXPECT_DOUBLE_EQ(0., m_plane.getFunctionValue(Vec3d(0., 0., 0.)));
     EXPECT_DOUBLE_EQ(0., m_plane.getFunctionValue(Vec3d(0.5, 0., 0.)));
     EXPECT_DOUBLE_EQ(1., m_plane.getFunctionValue(Vec3d(1., 1., 1.)));
     EXPECT_DOUBLE_EQ(-10., m_plane.getFunctionValue(Vec3d(0., -10., 0.)));
@@ -106,17 +91,4 @@ TEST_F(imstkPlaneTest, GetFunctionValue)
     EXPECT_DOUBLE_EQ(0.0, m_plane.getFunctionValue(Vec3d(1., 1., 1.)));
     EXPECT_DOUBLE_EQ(-2.0 / std::sqrt(3.0), m_plane.getFunctionValue(Vec3d(1., 0., 0.)));
     EXPECT_DOUBLE_EQ(-13.0 / std::sqrt(3.0), m_plane.getFunctionValue(Vec3d(0., -10., 0.)));
-}
-
-///
-/// \brief TODO
-///
-int
-imstkPlaneTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

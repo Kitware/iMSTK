@@ -27,9 +27,6 @@
 
 using namespace imstk;
 
-///
-/// \brief TODO
-///
 class imstkTetrahedralMeshTest : public ::testing::Test
 {
 protected:
@@ -123,17 +120,4 @@ TEST_F(imstkTetrahedralMeshTest, GetVolume)
 
     m_tetMesh.initialize(verticesPtr, indicesPtr);
     EXPECT_NEAR(expectedVolume, m_tetMesh.getVolume(), 0.000001);
-}
-
-///
-/// \brief TODO
-///
-int
-imstkTetrahedralMeshTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }
