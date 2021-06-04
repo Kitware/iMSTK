@@ -59,16 +59,6 @@ main()
         scene->setGlobalIBLProbe(globalIBLProbe);
 
         // Head mesh
-#ifdef iMSTK_USE_Vulkan
-        auto headObject = VisualObjectImporter::importVisualObject(
-            "head", iMSTK_DATA_ROOT "/head/head_revised.obj",
-            iMSTK_DATA_ROOT "/head/", 1, Vec3d(0, 0, 0), "dds");
-#else
-        /*auto headObject = VisualObjectImporter::importVisualObject(
-            "head",
-            iMSTK_DATA_ROOT "/head/head_revised.obj",
-            iMSTK_DATA_ROOT "/head/");*/
-
         auto surfaceMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/head/head_revised.obj");
 
         imstkNew<RenderMaterial> material;
@@ -84,7 +74,6 @@ main()
 
         imstkNew<SceneObject> headObject("head");
         headObject->addVisualModel(surfMeshModel);
-#endif
 
         scene->addSceneObject(headObject);
 
@@ -105,29 +94,11 @@ main()
         pointLight->setPosition(0.1, 0.2, 0.5);
         scene->addLight(pointLight);
 
-#ifdef iMSTK_USE_Vulkan
-        // Sphere
-        auto                     sphereObj = apiutils::createVisualAnalyticalSceneObject("Sphere", scene, "VisualSphere", 0.025);
-        imstkNew<RenderMaterial> sphereMaterial;
-        auto                     sphereMesh = sphereObj->getVisualGeometry();
-        sphereMesh->translate(0.1, 0.2, 0.5);
-        sphereMaterial->setEmissivity(2);
-        sphereMaterial->setCastsShadows(false);
-        sphereObj->getVisualModel(0)->setRenderMaterial(sphereMaterial);
-#endif
-
         // Plane
         auto                     planeObj = apiutils::createVisualAnalyticalSceneObject("Plane", scene, "VisualPlane", Vec3d(10.0, 10.0, 10.0));
         imstkNew<RenderMaterial> planeMaterial;
         planeMaterial->setColor(Color::LightGray);
         planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);
-
-#ifdef iMSTK_USE_Vulkan
-        auto viewer = std::dynamic_pointer_cast<VulkanViewer>(simManager->getViewer());
-        viewer->setResolution(1000, 800);
-        viewer->disableVSync();
-        //viewer->enableFullscreen();
-#endif
     }
 
     // Run the simulation

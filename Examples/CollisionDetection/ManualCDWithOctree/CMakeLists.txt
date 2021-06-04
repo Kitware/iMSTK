@@ -18,11 +18,6 @@
 
 project(Example-CD-ManualCDWithOctree)
 
-# Uses VTK Viewer
-if(iMSTK_USE_Vulkan)
-  return()
-endif()
-
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
