@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkGeometry.h"
+#include "imstkMath.h"
 
 #include <array>
 #include <queue>
@@ -30,7 +31,7 @@
 #pragma warning( push )
 #pragma warning( disable : 4201 )
 #endif
-#include "glm/glm.hpp"
+
 #ifdef WIN32
 #pragma warning( pop )
 #endif
@@ -90,7 +91,6 @@ public:
     unsigned int getMaxNumDecals();
 
 protected:
-    friend class VulkanDecalRenderDelegate;
 
     std::deque<std::shared_ptr<Decal>> m_orderedDecals;
     std::deque<std::shared_ptr<Decal>> m_freeDecals;
@@ -102,7 +102,7 @@ protected:
     unsigned int m_numDecals = 0;
     bool m_recycle = true;
 
-    glm::vec3  m_vertexPositions[8];
-    glm::ivec3 m_triangles[12];
+    Vec3d m_vertexPositions[8];
+    Vec3i m_triangles[12];
 };
 }

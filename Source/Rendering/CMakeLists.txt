@@ -53,8 +53,7 @@ set(RENDERING_CPP_FILES ${VTK_CPP_FILES})
 set(RENDERING_SUBDIR
   VTKRenderer
   VTKRenderer/RenderDelegate)
-set(RENDERING_DEPENDENCIES
-  #GUIOverlay
+set(RENDERING_DEPENDENCIES  
   Materials
   openvr)
 
@@ -70,8 +69,7 @@ imstk_add_library( Rendering
   DEPENDS
     ${RENDERING_DEPENDENCIES}
     Scene
-    Animation
-    glm
+    Animation    
     ${VTK_LIBRARIES}
     ${RENDERING_LIBRARIES})
   #VERBOSE)

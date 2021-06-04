@@ -34,13 +34,6 @@ class InteractorStyle;
 class Scene;
 class ScreenCaptureUtility;
 
-#ifdef iMSTK_USE_Vulkan
-namespace GUIOverlay
-{
-class Canvas;
-}
-#endif
-
 struct ViewerConfig
 {
     std::string m_windowName = "imstk";
@@ -115,13 +108,6 @@ public:
     ///
     virtual void setBackgroundColors(const Color color1, const Color color2 = Color(0.0, 0.0, 0.0), const bool gradientBackground = false) = 0;
 
-#ifdef iMSTK_USE_Vulkan
-    ///
-    /// \brief Get canvas
-    ///
-    std::shared_ptr<GUIOverlay::Canvas> getCanvas() const { return m_canvas; }
-#endif
-
     ///
     /// \brief Add a control whose events should be handled
     ///
@@ -153,10 +139,6 @@ protected:
     std::shared_ptr<Camera> m_debugCamera;
     std::shared_ptr<InteractorStyle>      m_interactorStyle;
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
-
-#ifdef iMSTK_USE_Vulkan
-    std::shared_ptr<GUIOverlay::Canvas> m_canvas = nullptr;
-#endif
 
     std::shared_ptr<ViewerConfig> m_config;
 };

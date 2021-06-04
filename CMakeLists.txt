@@ -139,8 +139,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(Assimp)
   imstk_define_dependency(Eigen3)
   imstk_define_dependency(g3log)
-  imstk_define_dependency(glm)
-  imstk_define_dependency(imgui)
   imstk_define_dependency(LibNiFalcon)
   imstk_define_dependency(openvr)
   imstk_define_dependency(PhysX)
@@ -216,14 +214,6 @@ if(WIN32)
 endif()
 # g3log
 find_package( g3log REQUIRED )
-# glm
-find_package( glm REQUIRED)
-# imgui
-# iMSTK actually includes and compiles imgui code
-# As imgui does not have any cmake support
-# So tell our find_package to also find the imgui source directory
-set(FIND_IMGUI_SOURCE ON)
-find_package( imgui REQUIRED )
 # LibNiFalcon
 find_package( LibNiFalcon REQUIRED)
 # Libusb
@@ -349,7 +339,6 @@ add_subdirectory(Source/DataStructures)
 add_subdirectory(Source/Constraint)
 add_subdirectory(Source/Devices)
 add_subdirectory(Source/Rendering/Materials)
-add_subdirectory(Source/Rendering/GUIOverlay)
 add_subdirectory(Source/Rendering)
 add_subdirectory(Source/Solvers)
 add_subdirectory(Source/DynamicalModels)

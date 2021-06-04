@@ -147,8 +147,6 @@ public:
     virtual void update();
 
 protected:
-    friend class VulkanParticleRenderDelegate;
-
     ///
     /// \brief Initialize particles
     ///

@@ -16,11 +16,6 @@
 #
 ###########################################################################
 
-# Uses VTK Text Status Manager
-if(iMSTK_USE_Vulkan)
-  return()
-endif()
-
 project(Example-SPHFluid-BallDrop)
 
 #-----------------------------------------------------------------------------

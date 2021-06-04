@@ -25,10 +25,6 @@
 #include "imstkInteractorStyle.h"
 #include "imstkLogger.h"
 
-#ifdef iMSTK_USE_Vulkan
-#include "imstkGUICanvas.h"
-#endif
-
 namespace imstk
 {
 Viewer::Viewer(std::string name) :
@@ -38,9 +34,6 @@ Viewer::Viewer(std::string name) :
     m_screenCapturer(nullptr),
     m_config(std::make_shared<ViewerConfig>())
 {
-#ifdef iMSTK_USE_Vulkan
-    m_canvas(std::make_shared<GUIOverlay::Canvas>())
-#endif
     // Set the preferred execution type
     m_executionType = ExecutionType::SEQUENTIAL;
 }
