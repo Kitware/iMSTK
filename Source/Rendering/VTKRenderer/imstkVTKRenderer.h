@@ -203,11 +203,7 @@ protected:
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
     vtkSmartPointer<vtkAxesActor> m_AxesActor;
 
-    // Render delegates for the props
-    std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
-    std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
-    
-    // imstk scene    
+    // imstk scene
     std::shared_ptr<Scene> m_scene;
 
     // Rendered Objects, this gives whats currently being rendered

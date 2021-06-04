@@ -60,7 +60,7 @@
 namespace imstk
 {
 VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
-    m_scene(scene), 
+    m_scene(scene),
     m_textureManager(std::make_shared<TextureManager<VTKTextureDelegate>>()),
     m_ssaoPass(vtkSmartPointer<vtkSSAOPass>::New()),
     m_renderStepsPass(vtkSmartPointer<vtkRenderStepsPass>::New()),

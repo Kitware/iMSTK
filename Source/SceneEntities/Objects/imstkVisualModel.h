@@ -59,8 +59,6 @@ public:
     SIGNAL(VisualModel, modified);
     // *INDENT-ON*
 
-    virtual ~VisualModel() override = default;
-
 public:
     ///
     /// \brief Get/set geometry
