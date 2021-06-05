@@ -59,6 +59,16 @@ public:
     void setActiveScene(std::shared_ptr<Scene> scene) override;
 
     ///
+    /// \brief Transform to physical space
+    ///
+    void setPhysicalToWorldTransform(const Mat4d& physicalToWorldMatrix);
+
+    ///
+    /// \brief Get transform to physical space
+    ///
+    Mat4d getPhysicalToWorldTransform();
+
+    ///
     /// \brief Get one of the device clients for VR
     ///
     std::shared_ptr<OpenVRDeviceClient> getVRDeviceClient(int deviceType);
