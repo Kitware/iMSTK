@@ -75,8 +75,8 @@ TEST_F(imstkPGSSolverTest, Solve5x5)
     //std::cout << "x: " << x << std::endl << std::endl;
     //std::cout << "Energy " << m_solver.getEnergy() << std::endl;
 
-    std::cout << "actual b: " << b << std::endl << std::endl;
-    std::cout << "computed b: " << bPrime << std::endl << std::endl;
+    //std::cout << "actual b: " << b << std::endl << std::endl;
+    //std::cout << "computed b: " << bPrime << std::endl << std::endl;
     for (int i = 0; i < b.size(); i++)
     {
         EXPECT_NEAR(bPrime(i), b(i), 10.0);
