@@ -291,6 +291,9 @@ list(APPEND VTK_DEPENDENCIES
   RenderingVolumeOpenGL2
   ViewsContext2D)
 find_package(VTK COMPONENTS ${VTK_DEPENDENCIES})
+if(${PROJECT_NAME}_USE_VTK_OSMESA)
+  add_definitions(-DiMSTK_USE_VTK_OSMESA)
+endif()
 
 #--------------------------------------------------------------------------
 # External Utility Packages

@@ -6,7 +6,8 @@ file(GLOB VTK_H_FILES VTKRenderer/imstk*.h)
 file(GLOB VTK_CPP_FILES VTKRenderer/imstk*.cpp)
 
 list(APPEND ExclusionFiles "")
-if(WIN32)
+# Don't build with X11 if on windows or (on linux and building headless)
+if(WIN32 OR (UNIX AND iMSTK_USE_VTK_OSMESA))
   list(APPEND ExclusionFiles
     VTKRenderer/imstkVtkXRenderWindowInteractor2.h
     VTKRenderer/imstkVtkXRenderWindowInteractor2.cpp)
