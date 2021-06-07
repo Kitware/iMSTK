@@ -213,6 +213,18 @@ public:
     ///
     double getVolume() override;
 
+    ///
+    /// \brief Returns the indices of the faces neighboring a vertex
+    /// ComputeVertexNeighborTriangles can be called to produce these
+    ///
+    const std::vector<NeighborsType>& getVertexNeighborTriangles() { return m_vertexNeighborTriangles; }
+
+    ///
+    /// \brief Returns the indices of the vertices neighboring a vertex
+    /// ComputeVertexNeighborVertices can be called to produce these
+    ///
+    const std::vector<NeighborsType>& getVertexNeighborVertices() { return m_vertexNeighborVertices; }
+
 // Attributes
 public:
     ///
