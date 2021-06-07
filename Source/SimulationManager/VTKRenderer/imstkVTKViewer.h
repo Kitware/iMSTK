@@ -55,6 +55,11 @@ public:
     void setActiveScene(std::shared_ptr<Scene> scene) override;
 
     ///
+    /// \brief Set the length of the debug axes
+    ///
+    void setDebugAxesLength(double x, double y, double z);
+
+    ///
     /// \brief Access screen shot utility
     ///
     std::shared_ptr<VTKScreenCaptureUtility> getScreenCaptureUtility() const;
