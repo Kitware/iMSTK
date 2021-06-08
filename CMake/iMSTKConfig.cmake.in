@@ -11,6 +11,7 @@ include(CMakeFindDependencyMacro)
 set(iMSTK_ROOT ${PACKAGE_PREFIX_DIR})
 set(iMSTK_DATA_DIR ${PACKAGE_PREFIX_DIR}/data)
 set(iMSTK_USE_OpenHaptics @iMSTK_USE_OpenHaptics@)
+set(iMSTK_USE_VTK_OSMESA @iMSTK_USE_VTK_OSMESA@)
 set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)
 
 # Use the iMSTK modules to find all required packages
@@ -119,3 +120,6 @@ find_dependency(VTK COMPONENTS
   RenderingVolumeOpenGL2
   ViewsContext2D)
 find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
+if(iMSTK_USE_VTK_OSMESA)
+  add_definitions(-DiMSTK_USE_VTK_OSMESA)
+endif()

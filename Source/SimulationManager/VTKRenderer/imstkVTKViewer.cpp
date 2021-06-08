@@ -39,7 +39,11 @@
 #include <vtkWin32HardwareWindow.h>
 #include <vtkWin32RenderWindowInteractor.h>
 #else
+#ifdef iMSTK_USE_VTK_OSMESA
+#include <vtkGenericRenderWindowInteractor.h>
+#else
 #include "imstkVtkXRenderWindowInteractor2.h"
+#endif
 #endif
 
 namespace imstk
@@ -58,8 +62,13 @@ VTKViewer::VTKViewer(std::string name) : AbstractVTKViewer(name),
     vtkNew<vtkRenderWindowInteractor> iren;
     iren->SetInteractorStyle(m_vtkInteractorStyle.get());
 #else
+#ifdef iMSTK_USE_VTK_OSMESA
+    vtkSmartPointer<vtkGenericRenderWindowInteractor> iren = vtkSmartPointer<vtkGenericRenderWindowInteractor>::New();
+    iren->SetInteractorStyle(m_vtkInteractorStyle.get());
+#else
     vtkSmartPointer<vtkXRenderWindowInteractor2> iren = vtkSmartPointer<vtkXRenderWindowInteractor2>::New();
     iren->SetInteractorStyle(m_vtkInteractorStyle.get());
+#endif
 #endif
 
     // Create the RenderWindow
