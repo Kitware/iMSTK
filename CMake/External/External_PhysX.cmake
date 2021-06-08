@@ -45,6 +45,13 @@ else()
   message(STATUS "Building dual PhysX configurations")
 endif()
 
+if(MSVC) 
+  set(NO_MEMSET "")
+else()
+  # Newer GCC complains with the selected physx version
+  set(NO_MEMSET "-Wno-error=class-memaccess")
+endif()
+
 set(PHYSX_iMSTK_INSTALL "${CMAKE_COMMAND}"
   -DPhysX_INSTALL_DIR=${PhysX_BINARY_DIR}/install
   -DiMSTK_INSTALL_DIR=${CMAKE_INSTALL_PREFIX}
@@ -55,6 +62,7 @@ imstk_add_external_project( PhysX
   URL_MD5 9c17263ceec705eaf1ddd7c2ee796bac
   SOURCE_SUBDIR ./physx/compiler/public
   CMAKE_CACHE_ARGS
+    -DPHYSX_CXX_FLAGS:STRING=${NO_MEMSET}
     -DCMAKE_BUILD_TYPE:STRING=${PHYSX_CONFIGURATION}
     -DCMAKE_INSTALL_PREFIX:PATH=${PhysX_BINARY_DIR}/install
     -DPXSHARED_INSTALL_PREFIX:PATH=${PhysX_BINARY_DIR}/install
