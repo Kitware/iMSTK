@@ -211,26 +211,6 @@ RenderMaterial::removeTexture(Texture::Type type)
 }
 
 void
-RenderMaterial::setReceivesShadows(const bool receivesShadows)
-{
-    if (m_receivesShadows != receivesShadows)
-    {
-        m_receivesShadows = receivesShadows;
-        postModified();
-    }
-}
-
-void
-RenderMaterial::setCastsShadows(const bool castsShadows)
-{
-    if (m_castsShadows != castsShadows)
-    {
-        m_castsShadows = castsShadows;
-        postModified();
-    }
-}
-
-void
 RenderMaterial::setBlendMode(const RenderMaterial::BlendMode blendMode)
 {
     if (m_blendMode != blendMode)

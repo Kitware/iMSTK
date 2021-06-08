@@ -183,7 +183,7 @@ VTKRenderDelegate::update()
     processEvents();
 
     // Needed to inform VTK to update things for shadows
-    m_actor->Modified();
+    //m_actor->Modified();
 }
 
 void

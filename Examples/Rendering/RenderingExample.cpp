@@ -68,8 +68,6 @@ main()
         material->addTexture(std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_Normal.png", Texture::Type::Normal));
         material->addTexture(std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_AO.png", Texture::Type::AmbientOcclusion));
         material->setRecomputeVertexNormals(false);
-        material->setReceivesShadows(true);
-        material->setCastsShadows(true);
 
         imstkNew<VisualModel> surfMeshModel(surfaceMesh);
         surfMeshModel->setRenderMaterial(material);
@@ -87,8 +85,6 @@ main()
         imstkNew<DirectionalLight> dirLight("DirectionalLight");
         dirLight->setIntensity(4.0);
         dirLight->setColor(Color(1.0, 0.95, 0.8));
-        dirLight->setCastsShadow(true);
-        dirLight->setShadowRange(1.5);
         scene->addLight(dirLight);
 
         imstkNew<PointLight> pointLight("PointLight");
@@ -100,8 +96,6 @@ main()
         auto                     planeObj = apiutils::createVisualAnalyticalSceneObject("Plane", scene, "VisualPlane", Vec3d(10.0, 10.0, 10.0));
         imstkNew<RenderMaterial> planeMaterial;
         planeMaterial->setColor(Color::LightGray);
-        planeMaterial->setReceivesShadows(true);
-        planeMaterial->setCastsShadows(true);
         planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);
     }
 

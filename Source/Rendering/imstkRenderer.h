@@ -36,12 +36,6 @@ struct SSAOConfig
     unsigned int m_KernelSize = 128;   // number of samples used
 };
 
-struct ShadowConfig
-{
-    bool m_enableShadows = false;
-    unsigned int m_shadowResolution = 2048; // Shadow map resolution, not need to be power of 2
-};
-
 struct RendererConfig
 {
     bool m_enableVR = false;
@@ -51,9 +45,6 @@ struct RendererConfig
 
     // ScreenSpace Ambient Occlusion
     SSAOConfig m_ssaoConfig;
-
-    // Shadow Settings
-    ShadowConfig m_shadowConfig;
 };
 
 ///

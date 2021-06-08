@@ -41,7 +41,6 @@ class vtkPlotBar;
 class vtkProp;
 class vtkRenderer;
 class vtkRenderStepsPass;
-class vtkShadowMapPass;
 class vtkSSAOPass;
 class vtkTable;
 
@@ -227,10 +226,6 @@ protected:
     // SSAO Effect
     vtkSmartPointer<vtkSSAOPass> m_ssaoPass;
     vtkSmartPointer<vtkRenderStepsPass> m_renderStepsPass;
-
-    // Shadow Effect
-    vtkSmartPointer<vtkShadowMapPass> m_shadowPass;
-    vtkSmartPointer<vtkCameraPass>    m_cameraPass;
 
     bool m_debugActorsVisible;
 };
