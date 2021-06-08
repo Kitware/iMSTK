@@ -19,22 +19,15 @@
 
 =========================================================================*/
 
+#include "gtest/gtest.h"
+
 #include "imstkDirectLinearSolver.h"
 #include "imstkNew.h"
 #include "imstkNewtonSolver.h"
 
-#include <ios>
-#include <iostream>
-#include <iomanip>
-
 using namespace imstk;
 
-///
-/// \brief This example is for demonstration of how to use a NewtonSolver and its verification
-/// \todo move this to a unit test
-///
-int
-main()
+TEST(imstkNewtonSolverTest, Solve)
 {
     const int N  = 2;
     auto      x  = Vectord(N);
@@ -47,6 +40,7 @@ main()
     xe[0] = 1.0;
     xe[1] = 10.0;
 
+    // Function f(x)=y
     auto func = [&y](const Vectord& x, const bool) -> const Vectord& {
                     // auto y = Vectord(x.size());
                     y[0] = x[0] * x[0] - 1.0;
@@ -55,15 +49,16 @@ main()
                     return y;
                 };
 
-    auto jac = [&A](const Vectord& x) -> const Matrixd& {
-                   // auto A = Matrixd(x.size(), x.size());
-                   A(0, 0) = 2 * x[0];
-                   A(0, 1) = 0.0;
-                   A(1, 0) = 0.0;
-                   A(1, 1) = 2 * x[1];
+    // Jacobian of function f(x)
+    auto funcJacobian = [&A](const Vectord& x) -> const Matrixd& {
+                            // auto A = Matrixd(x.size(), x.size());
+                            A(0, 0) = 2 * x[0];
+                            A(0, 1) = 0.0;
+                            A(1, 0) = 0.0;
+                            A(1, 1) = 2 * x[1];
 
-                   return A;
-               };
+                            return A;
+                        };
 
     auto updateX = [&x](const Vectord& du, const bool)
                    {
@@ -73,7 +68,7 @@ main()
 
     auto updateXold = [](void) {};
 
-    imstkNew<NonLinearSystem<Matrixd>> nlSystem(func, jac);
+    imstkNew<NonLinearSystem<Matrixd>> nlSystem(func, funcJacobian);
     nlSystem->setUnknownVector(x);
     nlSystem->setUpdateFunction(updateX);
     nlSystem->setUpdatePreviousStatesFunction(updateXold);
@@ -86,13 +81,13 @@ main()
     nlSolver->setSystem(nlSystem);
     nlSolver->setLinearSolver(linSolver);
 
-    std::cout << "init_error = " << std::setprecision(12) << std::scientific << (x - xe).norm() << std::endl;
     nlSolver->solve();
+    // Should solve to be basically exact for initial x
+    EXPECT_NEAR(0.0, (x - xe).norm(), 0.00000000000001);
 
-    std::cout << "final_error = " << std::setprecision(12) << std::scientific << (x - xe).norm() << std::endl;
-
+    // A different x should give near results
     x[0] = 100.0;
     x[1] = 100.0;
     nlSolver->solveGivenState(x);
-    std::cout << "final_error = " << std::setprecision(12) << std::scientific << (x - xe).norm() << std::endl;
+    EXPECT_NEAR(0.0, (x - xe).norm(), 0.00000001);
 }
