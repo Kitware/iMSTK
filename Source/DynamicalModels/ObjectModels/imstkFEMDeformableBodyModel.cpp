@@ -552,12 +552,12 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& imstkNotU
 }
 
 void
-FEMDeformableBodyModel::computeSemiImplicitSystemRHSAndLHS(kinematicState& stateAtT,
+FEMDeformableBodyModel::computeSemiImplicitSystemRHSAndLHS(kinematicState&       stateAtT,
                                                            kinematicState&       newState,
                                                            const StateUpdateType updateType)
 {
-    const auto& vPrev = stateAtT.getQDot();
-    const double dT = m_timeIntegrator->getTimestepSize();
+    const auto&  vPrev = stateAtT.getQDot();
+    const double dT    = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
@@ -596,15 +596,15 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHSAndLHS(kinematicState& state
 }
 
 void
-FEMDeformableBodyModel::computeImplicitSystemRHSAndLHS(kinematicState& stateAtT,
+FEMDeformableBodyModel::computeImplicitSystemRHSAndLHS(kinematicState&       stateAtT,
                                                        kinematicState&       newState,
                                                        const StateUpdateType updateType)
 {
-    const auto& uPrev = stateAtT.getQ();
-    const auto& vPrev = stateAtT.getQDot();
-    auto&       u     = newState.getQ();
-    const auto& v     = newState.getQDot();
-    const double dT = m_timeIntegrator->getTimestepSize();
+    const auto&  uPrev = stateAtT.getQ();
+    const auto&  vPrev = stateAtT.getQDot();
+    auto&        u     = newState.getQ();
+    const auto&  v     = newState.getQDot();
+    const double dT    = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
@@ -842,7 +842,7 @@ FEMDeformableBodyModel::getFunctionAndGradient()
 
     // Function to evaluate the nonlinear objective function given the current state
     // return [&, this](const Vectord& q, const bool semiImplicit) -> NonLinearSolver<SparseMatrixd>::VecMatPair
-    return [&, this](const Vectord& q, const bool semiImplicit) 
+    return [&, this](const Vectord& q, const bool semiImplicit)
            {
                (semiImplicit) ?
                this->computeSemiImplicitSystemRHSAndLHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :

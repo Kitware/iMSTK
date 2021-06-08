@@ -39,8 +39,8 @@ public:
     using MatrixFunctionType = std::function<const Matrix& (const Vectord&)>;
     // using VecMatPair = std::pair<const Vectord&, const Matrix&>;
     using VecMatPair = std::pair<const Vectord*, const Matrix*>;
-    using VectorMatrixFunctionType = std::function<VecMatPair(const Vectord&, const bool)>;
-    using UpdateFunctionType = std::function<void (const Vectord&, const bool)>;
+    using VectorMatrixFunctionType    = std::function<VecMatPair(const Vectord&, const bool)>;
+    using UpdateFunctionType          = std::function<void (const Vectord&, const bool)>;
     using UpdatePrevStateFunctionType = std::function<void ()>;
 
 public:
@@ -134,8 +134,8 @@ public:
     }*/
 
 public:
-    VectorFunctionType m_F;  ///> Nonlinear function
-    MatrixFunctionType m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
+    VectorFunctionType       m_F;  ///> Nonlinear function
+    MatrixFunctionType       m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
     VectorMatrixFunctionType m_F_dF;
     Vectord* m_unknown = nullptr;
 

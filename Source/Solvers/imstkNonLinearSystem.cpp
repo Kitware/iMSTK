@@ -28,9 +28,9 @@ template<typename Matrix>
 NonLinearSystem<Matrix>::NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF) : m_F(F), m_dF(dF)
 {
     this->m_F_dF = [this](const Vectord& x, const bool semiImplicit)
-    {
-        return std::make_pair(&(this->m_F(x, semiImplicit)), &(this->m_dF(x)));
-    };
+                   {
+                       return std::make_pair(&(this->m_F(x, semiImplicit)), &(this->m_dF(x)));
+                   };
 }
 
 template<typename Matrix>
