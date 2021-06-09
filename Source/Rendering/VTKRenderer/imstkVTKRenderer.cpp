@@ -146,7 +146,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     // Global Axis
     m_AxesActor = vtkSmartPointer<vtkAxesActor>::New();
     m_AxesActor->SetShaftType(vtkAxesActor::CYLINDER_SHAFT);
-    m_AxesActor->SetAxisLabels(true);
+    m_AxesActor->SetAxisLabels(false);
     m_debugVtkActors.push_back(m_AxesActor);
 
     // Camera and camera actor
