@@ -23,9 +23,11 @@
 
 #include <memory>
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
+#include "imstkColorFunction.h"
+#include "imstkEventObject.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkRenderMaterial.h"
@@ -37,8 +39,6 @@
 #include "imstkVTKViewer.h"
 #include "imstkVecDataArray.h"
 #include "imstkVisualModel.h"
-#include "imstkColorFunction.h"
-#include "imstkEventObject.h"
 
 using namespace imstk;
 
@@ -71,6 +71,27 @@ makeMaterial()
     material->setColorLookupTable(colorFunc);
     return material;
 }
+
+std::shared_ptr<SceneObject>
+createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
+    const std::string& fileName,
+    const std::string& objectName)
+{
+    CHECK(scene != nullptr) << "Error: Scene object supplied is not valid!";
+    CHECK(!fileName.empty()) << "Error: Name is empty!";
+
+    auto mesh = MeshIO::read(fileName);
+    auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
+
+    // Create object and add to scene
+    auto meshSceneObject = std::make_shared<SceneObject>("meshObject");
+    meshSceneObject->setVisualGeometry(SurfaceMesh);
+    meshSceneObject->setName(objectName);
+    scene->addSceneObject(meshSceneObject);
+
+    return meshSceneObject;
+}
+
 }
 
 class RenderTest : public testing::Test
@@ -113,7 +134,7 @@ public:
 
 TEST_F(RenderTest, plain_mesh)
 {
-    auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/textured_organs/heart.obj", "Heart");
+    auto sceneObj = createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/textured_organs/heart.obj", "Heart");
 
     ASSERT_TRUE(sceneObj != nullptr) << "ERROR: Unable to create scene object";
 
@@ -122,7 +143,7 @@ TEST_F(RenderTest, plain_mesh)
 
 TEST_F(RenderTest, mesh_material)
 {
-    auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/textured_organs/heart.obj", "Heart");
+    auto sceneObj = createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/textured_organs/heart.obj", "Heart");
 
     std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
@@ -195,7 +216,7 @@ TEST_F(RenderTest, material_color_function_vertices)
     scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
 
-    //run_for(driver.get(), 2);
+    run_for(driver.get(), 2);
 }
 
 TEST_F(RenderTest, material_color_function_cells)
@@ -254,7 +275,7 @@ TEST_F(RenderTest, material_color_function_cells)
     scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
 
-    //run_for(driver.get(), 2);
+    run_for(driver.get(), 2);
 }
 
 TEST_F(RenderTest, material_color_function_dynamic_vertices)

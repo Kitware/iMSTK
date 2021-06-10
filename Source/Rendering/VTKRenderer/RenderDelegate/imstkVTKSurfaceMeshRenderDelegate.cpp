@@ -188,12 +188,12 @@ VTKSurfaceMeshRenderDelegate::processEvents()
             else if (cmd.m_event->m_sender == cellScalars.get() && !contains[4])
             {
                 cmds.push_back(cmd);
-                contains[3] = true;
+                contains[4] = true;
             }
             else if (cmd.m_event->m_sender == vertexScalars.get() && !contains[5])
             {
                 cmds.push_back(cmd);
-                contains[3] = true;
+                contains[5] = true;
             }
         });
 

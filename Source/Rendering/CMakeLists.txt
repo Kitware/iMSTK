@@ -80,14 +80,5 @@ vtk_module_autoinit(TARGETS Rendering MODULES ${VTK_LIBRARIES})
 # Testing
 #-----------------------------------------------------------------------------
 if( ${PROJECT_NAME}_BUILD_TESTING )
-
-  include(imstkAddTest)
-
-  imstk_add_test(Rendering)
-  target_link_libraries(imstk_rendering_test_driver
-    GTest::gtest
-    Threads::Threads
-	Rendering
-	apiUtilities
-  )
+  add_subdirectory(Testing)
 endif()
