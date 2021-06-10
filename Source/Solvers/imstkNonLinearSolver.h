@@ -140,6 +140,6 @@ protected:
 
     std::shared_ptr<NonLinearSystem<SystemMatrix>> m_nonLinearSystem; ///< System of non-linear equations
     UpdateIterateType m_updateIterate;                                ///< Update iteration function
-    bool m_isSemiImplicit = true;                                     ///> Semi-Implicit solver
+    bool m_isSemiImplicit = false;                                     ///> Semi-Implicit solver
 };
 } // imstk
