@@ -88,13 +88,10 @@ SignedDistanceField::SignedDistanceField(std::shared_ptr<ImageData> imageData, s
     m_bounds     = m_imageDataSdf->getBounds();
     m_shift      = m_imageDataSdf->getOrigin() - m_imageDataSdf->getSpacing() * 0.5;
 
-    if (m_imageDataSdf->getScalarType() != IMSTK_DOUBLE)
-    {
-        LOG(WARNING) << "SignedDistanceField requires double input image";
-        return;
-    }
-
     m_scalars = std::dynamic_pointer_cast<DataArray<double>>(m_imageDataSdf->getScalars());
+
+    CHECK(m_scalars != nullptr)
+        << "SignedDistanceField requires doubles in the input image";
 
     // \todo: Verify the SDF distances
 }
