@@ -56,7 +56,11 @@ function(imstk_add_test_internal target kind)
     Threads::Threads
   )
 
+if (MSVC)
   gtest_discover_tests(${test_driver_executable} WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin" DISCOVERY_MODE PRE_TEST)
+else()
+  gtest_add_tests(${test_driver_executable} SOURCES "${test_files}")
+endif()
 
   #-----------------------------------------------------------------------------
   # Add the target to Testing folder
