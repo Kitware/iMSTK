@@ -33,6 +33,7 @@ namespace imstk
 {
 class SurfaceMesh;
 template<typename T, int N> class VecDataArray;
+class AbstractDataArray;
 
 ///
 /// \class VTKSurfaceMeshRenderDelegate
@@ -72,6 +73,8 @@ protected:
     void vertexDataModified(Event* e);
     void indexDataModified(Event* e);
     void normalDataModified(Event* e);
+    void vertexScalarsModified(Event* e);
+    void cellScalarsModified(Event* e);
 
     ///
     /// \brief Callback for when geometry is modified
@@ -87,12 +90,16 @@ protected:
     void setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices);
     void setNormalBuffer(std::shared_ptr<VecDataArray<double, 3>> normals);
     void setIndexBuffer(std::shared_ptr<VecDataArray<int, 3>> indices);
+    void setVertexScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
+    void setCellScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
 
 protected:
     std::shared_ptr<SurfaceMesh> m_geometry;
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
     std::shared_ptr<VecDataArray<double, 3>> m_normals;
     std::shared_ptr<VecDataArray<int, 3>>    m_indices;
+    std::shared_ptr<AbstractDataArray>       m_vertexScalars;
+    std::shared_ptr<AbstractDataArray>       m_cellScalars;
 
     vtkSmartPointer<vtkPolyData> m_polydata;
 

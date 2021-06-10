@@ -106,12 +106,12 @@ public:
     ///
     /// \brief Return the currently applied force
     ///
-    const Vec3d& getForce() const { return fS; }
+    const Vec3d getForce() const { return fS * m_forceScaling; }
 
     ///
     /// \brief Return the currently applied torque
     ///
-    const Vec3d& getTorque() const { return tS; }
+    const Vec3d getTorque() const { return tS; }
 
 public:
     ///
