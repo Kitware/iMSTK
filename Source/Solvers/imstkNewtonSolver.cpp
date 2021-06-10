@@ -72,13 +72,16 @@ NewtonSolver<SystemMatrix>::solveGivenState(Vectord& x)
 
     Vectord dx = x;
 
-    for (size_t i = 0; i < m_maxIterations; ++i)
+    const int maxIters = this->m_isSemiImplicit ? 1 : m_maxIterations;
+
+    for (size_t i = 0; i < maxIters; ++i)
     {
         if (fnorm < stopTolerance)
         {
             return;
         }
         this->updateJacobian(x);
+
         m_linearSolver->solve(dx);
         this->m_updateIterate(-dx, x);
 
@@ -123,6 +126,7 @@ NewtonSolver<SystemMatrix>::solve()
             error0 = error;
         }
 
+        // std::cout << "Num. of Newton Iterations: " << iterNum << "\tError ratio: " << error/error0 << ", " << error << " " << error0 << std::endl;
         if (error / error0 < epsilon && iterNum > 0)
         {
             // std::cout << "Num. of Newton Iterations: " << iterNum << "\tError ratio: " << error/error0 << ", " << error << " " << error0 << std::endl;
@@ -152,14 +156,23 @@ NewtonSolver<SystemMatrix>::updateJacobian(const Vectord& x)
         return -1;
     }
 
-    auto& A = this->m_nonLinearSystem->m_dF(x);
+    // auto& A = this->m_nonLinearSystem->m_dF(x);
+    // if (A.innerSize() == 0)
+    // {
+    //     LOG(WARNING) << "NewtonMethod::updateJacobian - Size of matrix is 0!";
+    //     return -1;
+    // }
+    //
+    // auto& b = this->m_nonLinearSystem->m_F(x, this->m_isSemiImplicit);
+
+    const auto& vecAndMat = this->m_nonLinearSystem->m_F_dF(x, this->m_isSemiImplicit);
+    auto&       b = *vecAndMat.first;
+    auto&       A = *vecAndMat.second;
     if (A.innerSize() == 0)
     {
         LOG(WARNING) << "NewtonMethod::updateJacobian - Size of matrix is 0!";
         return -1;
     }
-
-    auto& b = this->m_nonLinearSystem->m_F(x, this->m_isSemiImplicit);
 
     auto linearSystem = std::make_shared<typename LinearSolverType::LinearSystemType>(A, b);
     //linearSystem->setLinearProjectors(this->m_nonLinearSystem->getLinearProjectors()); /// \todo Left for near future reference. Clear in future.

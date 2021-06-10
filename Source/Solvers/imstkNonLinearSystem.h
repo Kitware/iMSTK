@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
+#include <utility>
 
 namespace imstk
 {
@@ -36,7 +37,10 @@ class NonLinearSystem
 public:
     using VectorFunctionType = std::function<const Vectord& (const Vectord&, const bool)>;
     using MatrixFunctionType = std::function<const Matrix& (const Vectord&)>;
-    using UpdateFunctionType = std::function<void (const Vectord&, const bool)>;
+    // using VecMatPair = std::pair<const Vectord&, const Matrix&>;
+    using VecMatPair = std::pair<const Vectord*, const Matrix*>;
+    using VectorMatrixFunctionType    = std::function<VecMatPair(const Vectord&, const bool)>;
+    using UpdateFunctionType          = std::function<void (const Vectord&, const bool)>;
     using UpdatePrevStateFunctionType = std::function<void ()>;
 
 public:
@@ -45,6 +49,7 @@ public:
     ///
     NonLinearSystem() {};
     NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF);
+    NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF, const VectorMatrixFunctionType& F_dF);
 
     virtual ~NonLinearSystem() {};
 
@@ -129,8 +134,9 @@ public:
     }*/
 
 public:
-    VectorFunctionType m_F;  ///> Nonlinear function
-    MatrixFunctionType m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
+    VectorFunctionType       m_F;  ///> Nonlinear function
+    MatrixFunctionType       m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
+    VectorMatrixFunctionType m_F_dF;
     Vectord* m_unknown = nullptr;
 
     UpdateFunctionType m_FUpdate;

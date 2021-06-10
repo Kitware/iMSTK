@@ -168,7 +168,8 @@ FEMDeformableBodyModel::initialize()
     if (m_solver == nullptr)
     {
         // Create a nonlinear system
-        auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(getFunction(), getFunctionGradient());
+        // auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(getFunction(), getFunctionGradient());
+        auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(getFunction(), getFunctionGradient(), getFunctionAndGradient());
 
         nlSystem->setUnknownVector(getUnknownVec());
         nlSystem->setUpdateFunction(getUpdateFunction());
@@ -455,13 +456,13 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
     const auto& v     = newState.getQDot();
 
     // Do checks if there are uninitialized matrices
-    m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
     const double dT = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
     case StateUpdateType::DeltaVelocity:
 
+        m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
         m_Feff = m_K * -(uPrev - u + v * dT);
 
         if (m_damped)
@@ -543,6 +544,97 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& imstkNotU
         }
         m_Keff += (dT * dT) * m_K;
 
+        break;
+
+    default:
+        LOG(FATAL) << "Update type not supported";
+    }
+}
+
+void
+FEMDeformableBodyModel::computeSemiImplicitSystemRHSAndLHS(kinematicState&       stateAtT,
+                                                           kinematicState&       newState,
+                                                           const StateUpdateType updateType)
+{
+    const auto&  vPrev = stateAtT.getQDot();
+    const double dT    = m_timeIntegrator->getTimestepSize();
+
+    switch (updateType)
+    {
+    case StateUpdateType::DeltaVelocity:
+        // LHS
+        this->updateMassMatrix();
+        m_internalForceModel->getForceAndMatrix(newState.getQ(), m_Finternal, m_K);
+        this->updateDampingMatrix();
+
+        m_Keff = m_M;
+        if (m_damped)
+        {
+            m_Keff += dT * m_C;
+        }
+        m_Keff += (dT * dT) * m_K;
+
+        // RHS
+        m_Feff = m_K * (vPrev * -dT);
+
+        if (m_damped)
+        {
+            m_Feff -= m_C * vPrev;
+        }
+
+        m_Feff -= m_Finternal;
+        m_Feff += m_FexplicitExternal;
+        m_Feff += m_Fgravity;
+        m_Feff += m_Fcontact;
+        m_Feff *= dT;
+
+        break;
+
+    default:
+        LOG(FATAL) << "Update type not supported";
+    }
+}
+
+void
+FEMDeformableBodyModel::computeImplicitSystemRHSAndLHS(kinematicState&       stateAtT,
+                                                       kinematicState&       newState,
+                                                       const StateUpdateType updateType)
+{
+    const auto&  uPrev = stateAtT.getQ();
+    const auto&  vPrev = stateAtT.getQDot();
+    auto&        u     = newState.getQ();
+    const auto&  v     = newState.getQDot();
+    const double dT    = m_timeIntegrator->getTimestepSize();
+
+    switch (updateType)
+    {
+    case StateUpdateType::DeltaVelocity:
+        // LHS
+        this->updateMassMatrix();
+        m_internalForceModel->getForceAndMatrix(u, m_Finternal, m_K);
+        this->updateDampingMatrix();
+
+        m_Keff = m_M;
+        if (m_damped)
+        {
+            m_Keff += dT * m_C;
+        }
+        m_Keff += (dT * dT) * m_K;
+
+        // RHS
+        m_Feff = m_K * -(uPrev - u + v * dT);
+
+        if (m_damped)
+        {
+            m_Feff -= m_C * v;
+        }
+
+        m_Feff -= m_Finternal;
+        m_Feff += m_FexplicitExternal;
+        m_Feff += m_Fgravity;
+        m_Feff += m_Fcontact;
+        m_Feff *= dT;
+        m_Feff += m_M * (vPrev - v);
         break;
 
     default:
@@ -734,6 +826,33 @@ FEMDeformableBodyModel::getFunctionGradient()
                    applyBoundaryConditions(m_Keff);
                }
                return m_Keff;
+           };
+#ifdef WIN32
+#pragma warning( pop )
+#endif
+}
+
+NonLinearSystem<SparseMatrixd>::VectorMatrixFunctionType
+FEMDeformableBodyModel::getFunctionAndGradient()
+{
+#ifdef WIN32
+#pragma warning( push )
+#pragma warning( disable : 4100 )
+#endif
+
+    // Function to evaluate the nonlinear objective function given the current state
+    // return [&, this](const Vectord& q, const bool semiImplicit) -> NonLinearSolver<SparseMatrixd>::VecMatPair
+    return [&, this](const Vectord& q, const bool semiImplicit)
+           {
+               (semiImplicit) ?
+               this->computeSemiImplicitSystemRHSAndLHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
+               this->computeImplicitSystemRHSAndLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
+               if (this->m_implementFixedBC)
+               {
+                   applyBoundaryConditions(m_Feff);
+                   applyBoundaryConditions(m_Keff);
+               }
+               return std::make_pair(&m_Feff, &m_Keff);
            };
 #ifdef WIN32
 #pragma warning( pop )
