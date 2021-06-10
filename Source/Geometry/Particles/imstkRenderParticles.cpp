@@ -37,23 +37,23 @@ RenderParticles::RenderParticles(const unsigned int maxNumParticles /*=128*/, co
         LOG(WARNING) << "The maximum number of decals is 128";
     }
 
-    m_vertexPositions[0] = glm::vec3(0.5, 0.5, 0);
-    m_vertexPositions[1] = glm::vec3(0.5, -0.5, 0);
-    m_vertexPositions[2] = glm::vec3(-0.5, 0.5, 0);
-    m_vertexPositions[3] = glm::vec3(-0.5, -0.5, 0);
+    m_vertexPositions[0] = Vec3d(0.5, 0.5, 0);
+    m_vertexPositions[1] = Vec3d(0.5, -0.5, 0);
+    m_vertexPositions[2] = Vec3d(-0.5, 0.5, 0);
+    m_vertexPositions[3] = Vec3d(-0.5, -0.5, 0);
 
-    m_vertexNormals[0] = glm::vec3(0.0, 0.0, 1.0);
-    m_vertexNormals[1] = glm::vec3(0.0, 0.0, 1.0);
-    m_vertexNormals[2] = glm::vec3(0.0, 0.0, 1.0);
-    m_vertexNormals[3] = glm::vec3(0.0, 0.0, 1.0);
+    m_vertexNormals[0] = Vec3d(0.0, 0.0, 1.0);
+    m_vertexNormals[1] = Vec3d(0.0, 0.0, 1.0);
+    m_vertexNormals[2] = Vec3d(0.0, 0.0, 1.0);
+    m_vertexNormals[3] = Vec3d(0.0, 0.0, 1.0);
 
-    m_vertexUVs[0] = glm::vec2(1.0, 1.0);
-    m_vertexUVs[1] = glm::vec2(1.0, 0);
-    m_vertexUVs[2] = glm::vec2(0, 1.0);
-    m_vertexUVs[3] = glm::vec2(0, 0);
+    m_vertexUVs[0] = Vec2d(1.0, 1.0);
+    m_vertexUVs[1] = Vec2d(1.0, 0);
+    m_vertexUVs[2] = Vec2d(0, 1.0);
+    m_vertexUVs[3] = Vec2d(0, 0);
 
-    m_triangles[0] = glm::ivec3(1, 0, 3);
-    m_triangles[1] = glm::ivec3(0, 2, 3);
+    m_triangles[0] = Vec3i(1, 0, 3);
+    m_triangles[1] = Vec3i(0, 2, 3);
 }
 
 void

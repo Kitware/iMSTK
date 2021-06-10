@@ -63,9 +63,6 @@ std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> attributes =
 };
 }
 
-///
-/// \brief TODO
-///
 class imstkSurfaceMeshTest : public ::testing::Test
 {
 protected:
@@ -188,14 +185,4 @@ TEST_F(imstkSurfaceMeshTest, GetVolume)
     std::shared_ptr<SurfaceMesh> cubeSurfMesh =
         GeometryUtils::toSurfaceMesh(std::make_shared<OrientedBox>());
     EXPECT_NEAR(1.0, cubeSurfMesh->getVolume(), 0.0000000000001);
-}
-
-int
-imstkSurfaceMeshTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

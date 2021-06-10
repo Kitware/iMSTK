@@ -96,16 +96,3 @@ TEST_F(imstkModuleTest, UnInitialize)
     m_moduleObject.uninit();
     EXPECT_EQ(m_moduleObject.getInit(), false);
 }
-
-///
-/// \brief TODO
-///
-int
-imstkModuleTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
-}

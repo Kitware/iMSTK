@@ -25,18 +25,12 @@
 
 using namespace imstk;
 
-///
-/// \brief TODO
-///
 class imstkSphereTest : public ::testing::Test
 {
 protected:
     Sphere m_sphere;
 };
 
-///
-/// \brief TODO
-///
 TEST_F(imstkSphereTest, SetGetRadius)
 {
     m_sphere.setRadius(2);
@@ -68,9 +62,6 @@ TEST_F(imstkSphereTest, GetVolume)
     EXPECT_DOUBLE_EQ(4.0 / 3.0 * PI * r * r * r, m_sphere.getVolume());
 }
 
-///
-/// \brief test the sphere SDF evaluator
-///
 TEST_F(imstkSphereTest, GetFunctionValue)
 {
     m_sphere.setRadius(20.);
@@ -90,17 +81,4 @@ TEST_F(imstkSphereTest, GetFunctionValue)
     EXPECT_DOUBLE_EQ(-20.0 + std::sqrt(3), m_sphere.getFunctionValue(Vec3d(1.0, 1.0, 1.0)));
     EXPECT_NEAR(0., m_sphere.getFunctionValue(Vec3d(0.0, 20., 0.0)), 1.0e-10);
     EXPECT_DOUBLE_EQ(30.0, m_sphere.getFunctionValue(Vec3d(0.0, 0.0, 50.0)));
-}
-
-///
-/// \brief TODO
-///
-int
-imstkSphereTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

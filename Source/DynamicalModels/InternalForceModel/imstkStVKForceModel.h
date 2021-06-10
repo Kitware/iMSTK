@@ -75,15 +75,6 @@ public:
     }
 
     ///
-    /// \brief Set the tangent stiffness matrix and internal force
-    ///
-    inline void getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) override
-    {
-        getInternalForce(u, internalForce);
-        getTangentStiffnessMatrix(u, tangentStiffnessMatrix);
-    }
-
-    ///
     /// \brief Speficy tangent stiffness matrix
     ///
     inline void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override

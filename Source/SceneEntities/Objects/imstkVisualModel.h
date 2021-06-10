@@ -110,7 +110,6 @@ public:
     void postModified() { this->postEvent(Event(VisualModel::modified())); }
 
 protected:
-    friend class VulkanRenderDelegate;
     friend class VTKRenderer;
 
     std::string m_name = "";

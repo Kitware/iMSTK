@@ -28,7 +28,7 @@
 #pragma warning( push )
 #pragma warning( disable : 4201 )
 #endif
-#include <glm/glm.hpp>
+
 #ifdef WIN32
 #pragma warning( pop )
 #endif
@@ -117,11 +117,11 @@ protected:
     float m_particleSize = 0.1f;
 
     std::vector<std::unique_ptr<RenderParticle>> m_particles; ///< Particle objects
-    glm::vec3  m_vertexPositions[4];
-    glm::vec3  m_vertexNormals[4];
-    glm::vec3  m_vertexTangents[4];
-    glm::vec2  m_vertexUVs[4];
-    glm::ivec3 m_triangles[2];
+    Vec3d m_vertexPositions[4];
+    Vec3d m_vertexNormals[4];
+    Vec3d m_vertexTangents[4];
+    Vec2d m_vertexUVs[4];
+    Vec3i m_triangles[2];
 
     void applyTransform(const Mat4d& m) override;
 

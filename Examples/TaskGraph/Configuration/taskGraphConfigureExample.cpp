@@ -104,7 +104,7 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
     pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_defaultDt  = 0.005;
+    pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 5;
 
     // Setup the Model

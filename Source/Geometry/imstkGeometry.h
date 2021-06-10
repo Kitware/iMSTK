@@ -210,11 +210,6 @@ protected:
     friend class VTKRenderer;
     friend class VTKRenderDelegate;
 
-    friend class VulkanSurfaceMeshRenderDelegate;
-    friend class VulkanLineMeshRenderDelegate;
-    friend class VulkanRenderDelegate;
-    friend class VulkanRenderer;
-
     ///
     /// \brief Directly apply transform to data
     ///

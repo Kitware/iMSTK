@@ -5,14 +5,11 @@ include(imstkAddLibrary)
 imstk_add_library( MeshIO
   DEPENDS
     Common
-	Geometry
-    glm
+	Geometry    
     Assimp    
     VegaFEM::volumetricMesh
     ${VTK_LIBRARIES}
   )
-  
-target_compile_options(MeshIO PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/bigobj>)
 
 #-----------------------------------------------------------------------------
 # Testing

@@ -36,36 +36,22 @@ namespace imstk
 {
 VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
     m_mesh(vtkSmartPointer<vtkUnstructuredGrid>::New()),
-    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
+    m_cellArray(vtkSmartPointer<vtkCellArray>::New())
 {
     auto geometry = std::static_pointer_cast<TetrahedralMesh>(visualModel->getGeometry());
-    m_vertices = geometry->getVertexPositions();
-    m_indices  = geometry->getTetrahedraIndices();
 
-    // Map vertices to VTK point data
-    if (m_vertices != nullptr)
-    {
-        m_mappedVertexArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_vertices));
-        auto points = vtkSmartPointer<vtkPoints>::New();
-        points->SetNumberOfPoints(geometry->getNumVertices());
-        points->SetData(m_mappedVertexArray);
-        m_mesh->SetPoints(points);
-    }
+    // Create vtkUnstructuredGrid vtkPoints
+    m_mappedVertexArray->SetNumberOfComponents(3);
+    auto points = vtkSmartPointer<vtkPoints>::New();
+    points->SetNumberOfPoints(0);
+    points->SetData(m_mappedVertexArray);
+    m_mesh->SetPoints(points);
 
-    // Map indices to VTK cell data (copied)
-    {
-        m_cellArray = vtkSmartPointer<vtkCellArray>::New();
-        vtkIdType cell[4];
-        for (const auto& t : *m_indices)
-        {
-            for (size_t i = 0; i < 4; ++i)
-            {
-                cell[i] = t[i];
-            }
-            m_cellArray->InsertNextCell(4, cell);
-        }
-        m_mesh->SetCells(VTK_TETRA, m_cellArray);
-    }
+    setVertexBuffer(geometry->getVertexPositions());
+
+    setIndexBuffer(geometry->getTetrahedraIndices());
+    m_mesh->SetCells(VTK_TETRA, m_cellArray);
 
     // Map vertex scalars if it has them
     if (geometry->getVertexScalars() != nullptr)
@@ -76,11 +62,6 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
     queueConnect<Event>(geometry, &Geometry::modified, this, &VTKTetrahedralMeshRenderDelegate::geometryModified);
-
-    // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKTetrahedralMeshRenderDelegate::vertexDataModified);
-
-    queueConnect<Event>(geometry->getTetrahedraIndices(), &Geometry::modified, this, &VTKTetrahedralMeshRenderDelegate::indexDataModified);
 
     // Setup the mapper
     {
@@ -148,80 +129,90 @@ void
 VTKTetrahedralMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
 {
     auto geometry = std::static_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
-    m_vertices = geometry->getVertexPositions();
-    if (m_vertices->getVoidPointer() != m_mappedVertexArray->GetVoidPointer(0))
-    {
-        m_mappedVertexArray->SetNumberOfComponents(3);
-        m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
-    }
-    m_mappedVertexArray->Modified();
+    setVertexBuffer(geometry->getVertexPositions());
 }
 
 void
 VTKTetrahedralMeshRenderDelegate::indexDataModified(Event* imstkNotUsed(e))
 {
     auto geometry = std::static_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
-
-    // When indexDataModified is called user is telling us something HAS changed, do not test
-    m_indices = geometry->getTetrahedraIndices();
-    {
-        // Copy cells
-        m_cellArray->Reset();
-        vtkIdType cell[4];
-        for (const auto& t : *m_indices)
-        {
-            for (size_t i = 0; i < 4; i++)
-            {
-                cell[i] = t[i];
-            }
-            m_cellArray->InsertNextCell(4, cell);
-        }
-        m_mesh->SetCells(VTK_TETRA, m_cellArray);
-    }
-    m_mesh->Modified();
+    setIndexBuffer(geometry->getTetrahedraIndices());
 }
 
 void
 VTKTetrahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
 {
-    // Called when the geometry posts modified
     auto geometry = std::static_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
 
-    // Test if the vertex buffer changed
+    // If the vertices were reallocated
     if (m_vertices != geometry->getVertexPositions())
     {
-        //printf("Vertex data swapped\n");
-        m_vertices = geometry->getVertexPositions();
-        {
-            // Update the pointer of the coupled array
-            m_mappedVertexArray->SetNumberOfComponents(3);
-            m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
-        }
-        m_mesh->GetPoints()->SetNumberOfPoints(m_vertices->size());
+        setVertexBuffer(geometry->getVertexPositions());
     }
 
+    // Assume vertices are always changed
     m_mappedVertexArray->Modified();
 
-    // Test if the index buffer changed
+    // Only update index buffer when reallocated
     if (m_indices != geometry->getTetrahedraIndices())
     {
-        //printf("Index data swapped\n");
-        m_indices = geometry->getTetrahedraIndices();
-        {
-            // Copy cells
-            m_cellArray->Reset();
-            vtkIdType cell[4];
-            for (const auto& t : *m_indices)
-            {
-                for (size_t i = 0; i < 4; i++)
-                {
-                    cell[i] = t[i];
-                }
-                m_cellArray->InsertNextCell(4, cell);
-            }
-            m_mesh->SetCells(VTK_TETRA, m_cellArray);
-            m_cellArray->Modified();
-        }
+        setIndexBuffer(geometry->getTetrahedraIndices());
     }
+}
+
+void
+VTKTetrahedralMeshRenderDelegate::setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices)
+{
+    // If the buffer changed
+    if (m_vertices != vertices)
+    {
+        // If previous buffer exist
+        if (m_vertices != nullptr)
+        {
+            // stop observing its changes
+            disconnect(m_vertices, this, &VecDataArray<double, 3>::modified);
+        }
+        // Set new buffer and observe
+        m_vertices = vertices;
+        queueConnect<Event>(m_vertices, &VecDataArray<double, 3>::modified, this, &VTKTetrahedralMeshRenderDelegate::vertexDataModified);
+    }
+
+    // Couple the buffer
+    m_mappedVertexArray->SetNumberOfComponents(3);
+    m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
+    m_mappedVertexArray->Modified();
+    m_mesh->GetPoints()->SetNumberOfPoints(m_vertices->size());
+}
+
+void
+VTKTetrahedralMeshRenderDelegate::setIndexBuffer(std::shared_ptr<VecDataArray<int, 4>> indices)
+{
+    // If the buffer changed
+    if (m_indices != indices)
+    {
+        // If previous buffer exist
+        if (m_indices != nullptr)
+        {
+            // stop observing its changes
+            disconnect(m_indices, this, &VecDataArray<int, 4>::modified);
+        }
+        // Set new buffer and observe
+        m_indices = indices;
+        queueConnect<Event>(m_indices, &VecDataArray<int, 4>::modified, this, &VTKTetrahedralMeshRenderDelegate::indexDataModified);
+    }
+
+    // Copy the buffer
+    m_cellArray->Reset();
+    vtkIdType cell[4];
+    for (const auto& t : *m_indices)
+    {
+        for (size_t i = 0; i < 4; i++)
+        {
+            cell[i] = t[i];
+        }
+        m_cellArray->InsertNextCell(4, cell);
+    }
+    m_cellArray->Modified();
+    m_mesh->Modified();
 }
 } // imstk

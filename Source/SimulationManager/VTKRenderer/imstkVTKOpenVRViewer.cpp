@@ -28,6 +28,7 @@
 #include "imstkVTKInteractorStyleVR.h"
 #include "imstkVTKRenderer.h"
 
+#include <vtkMatrix4x4.h>
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRRenderWindow.h>
 #include <vtkOpenVRRenderWindowInteractor.h>
@@ -93,6 +94,40 @@ VTKOpenVRViewer::setActiveScene(std::shared_ptr<Scene> scene)
     m_vtkRenderWindow->AddRenderer(vtkRenderer);
 
     m_vtkInteractorStyle->SetCurrentRenderer(vtkRenderer);
+}
+
+void
+VTKOpenVRViewer::setPhysicalToWorldTransform(const Mat4d& physicalToWorldMatrix)
+{
+    vtkSmartPointer<vtkOpenVRRenderWindow> renWin =
+        vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
+    vtkNew<vtkMatrix4x4> mat;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            mat->SetElement(i, j, physicalToWorldMatrix(i, j));
+        }
+    }
+    renWin->SetPhysicalToWorldMatrix(mat);
+}
+
+Mat4d
+VTKOpenVRViewer::getPhysicalToWorldTransform()
+{
+    vtkSmartPointer<vtkOpenVRRenderWindow> renWin =
+        vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
+    Mat4d                transform;
+    vtkNew<vtkMatrix4x4> mat;
+    renWin->GetPhysicalToWorldMatrix(mat);
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            transform(i, j) = mat->GetElement(i, j);
+        }
+    }
+    return transform;
 }
 
 void

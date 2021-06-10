@@ -44,4 +44,11 @@ InternalForceModel::updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> v
         offset += rowLengths[row];
     }
 }
+
+void
+InternalForceModel::getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
+{
+    this->getInternalForce(u, internalForce);
+    this->getTangentStiffnessMatrix(u, tangentStiffnessMatrix);
+}
 } // imstk

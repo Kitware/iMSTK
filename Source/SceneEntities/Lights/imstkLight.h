@@ -177,7 +177,6 @@ public:
     void setDirection(const double x, const double y, const double z) { setFocalPoint(Vec3d(x, y, z)); }
 
 protected:
-    friend class VulkanRenderer;
 
     bool  m_castShadow     = true;
     Vec3f m_shadowCenter   = Vec3f(0.0f, 0.0f, 0.0f);

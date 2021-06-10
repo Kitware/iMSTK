@@ -6,29 +6,20 @@ file(GLOB VTK_H_FILES VTKRenderer/imstk*.h)
 file(GLOB VTK_CPP_FILES VTKRenderer/imstk*.cpp)
 
 list(APPEND ExclusionFiles "")
-if(WIN32)
+# Don't build with X11 if on windows or (on linux and building headless)
+if(WIN32 OR (UNIX AND iMSTK_USE_VTK_OSMESA))
   list(APPEND ExclusionFiles
     VTKRenderer/imstkVtkXRenderWindowInteractor2.h
     VTKRenderer/imstkVtkXRenderWindowInteractor2.cpp)
 endif()
 
-file(GLOB VULKAN_H_FILES VulkanRenderer/imstk*.h)
-file(GLOB VULKAN_CPP_FILES VulkanRenderer/imstk*.cpp)
-
 file(GLOB SIMMANAGER_H_FILES imstk*.h)
 file(GLOB SIMMANAGER_CPP_FILES imstk*.cpp)
 
-if( NOT iMSTK_USE_Vulkan )
-  set(SIMULATIONMANAGER_H_FILES ${SIMMANAGER_H_FILES} ${VTK_H_FILES})
-  set(SIMULATIONMANAGER_CPP_FILES ${SIMMANAGER_CPP_FILES} ${VTK_CPP_FILES})
-  set(SIMULATIONMANAGER_SUBDIR
-    VTKRenderer)
-else()
-  set(SIMULATIONMANAGER_H_FILES  ${SIMMANAGER_H_FILES} ${VULKAN_H_FILES})
-  set(SIMULATIONMANAGER_CPP_FILES ${SIMMANAGER_CPP_FILES} ${VULKAN_CPP_FILES})
-  set(SIMULATIONMANAGER_SUBDIR
-    VulkanRenderer)
-endif()
+set(SIMULATIONMANAGER_H_FILES ${SIMMANAGER_H_FILES} ${VTK_H_FILES})
+set(SIMULATIONMANAGER_CPP_FILES ${SIMMANAGER_CPP_FILES} ${VTK_CPP_FILES})
+set(SIMULATIONMANAGER_SUBDIR
+  VTKRenderer)
 
 include(imstkAddLibrary)
 imstk_add_library(SimulationManager
@@ -43,7 +34,6 @@ imstk_add_library(SimulationManager
   DEPENDS
     Scene
     Rendering
-    ${Vulkan}
   )
 
 #-----------------------------------------------------------------------------

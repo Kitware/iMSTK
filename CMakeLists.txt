@@ -134,14 +134,11 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(Uncrustify)
   endif()
 
-  option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
   option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
   
   imstk_define_dependency(Assimp)
   imstk_define_dependency(Eigen3)
   imstk_define_dependency(g3log)
-  imstk_define_dependency(glm)
-  imstk_define_dependency(imgui)
   imstk_define_dependency(LibNiFalcon)
   imstk_define_dependency(openvr)
   imstk_define_dependency(PhysX)
@@ -165,12 +162,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   else()
     message("Warning: Building iMSTK WITHOUT audio support!")
     set(${PROJECT_NAME}_AUDIO_ENABLED OFF)
-  endif()
-
-  if(${PROJECT_NAME}_USE_Vulkan)
-    imstk_define_dependency(glfw)
-    imstk_define_dependency(gli)
-    imstk_define_dependency(Vulkan)
   endif()
 
   if(${PROJECT_NAME}_BUILD_TESTING)
@@ -223,14 +214,6 @@ if(WIN32)
 endif()
 # g3log
 find_package( g3log REQUIRED )
-# glm
-find_package( glm REQUIRED)
-# imgui
-# iMSTK actually includes and compiles imgui code
-# As imgui does not have any cmake support
-# So tell our find_package to also find the imgui source directory
-set(FIND_IMGUI_SOURCE ON)
-find_package( imgui REQUIRED )
 # LibNiFalcon
 find_package( LibNiFalcon REQUIRED)
 # Libusb
@@ -308,22 +291,9 @@ list(APPEND VTK_DEPENDENCIES
   RenderingVolumeOpenGL2
   ViewsContext2D)
 find_package(VTK COMPONENTS ${VTK_DEPENDENCIES})
-
-# Vulkan
-set(Vulkan_Dependency)
-if( ${PROJECT_NAME}_USE_Vulkan )
-  find_package( VulkanSDK REQUIRED)
-  add_definitions( -DiMSTK_USE_Vulkan )
-  # glfw
-  find_package( glfw REQUIRED)
-  # gli
-  find_package( gli REQUIRED)
-  set(Vulkan_Dependency VulkanSDK)
-else()
-  remove_definitions( -DiMSTK_USE_Vulkan )
-  unset(Vulkan_Dependency)
+if(${PROJECT_NAME}_USE_VTK_OSMESA)
+  add_definitions(-DiMSTK_USE_VTK_OSMESA)
 endif()
-
 
 #--------------------------------------------------------------------------
 # External Utility Packages
@@ -356,14 +326,6 @@ if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
     "${CMAKE_SOURCE_DIR}/Data/*")
   string(REGEX REPLACE "\.sha512" "" FILE_LIST "${FILE_LIST}")
   imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
-
-  #-----------------------------------------------------------------------------
-  # Add shaders (vulkan only)
-  #-----------------------------------------------------------------------------
-  if(${PROJECT_NAME}_USE_Vulkan)    
-      include(imstkCopyAndCompileShaders)
-      CopyAndCompileShaders() 
-  endif()
 endif()
 
 # Folder name to put our headers/cmake config files under
@@ -380,7 +342,6 @@ add_subdirectory(Source/DataStructures)
 add_subdirectory(Source/Constraint)
 add_subdirectory(Source/Devices)
 add_subdirectory(Source/Rendering/Materials)
-add_subdirectory(Source/Rendering/GUIOverlay)
 add_subdirectory(Source/Rendering)
 add_subdirectory(Source/Solvers)
 add_subdirectory(Source/DynamicalModels)

@@ -72,8 +72,9 @@ public:
 
     ///
     /// \brief Compute both internal force \p internalForce and stiffness matrix \p tangentStiffnessMatrix at state \u
+    /// \note This default implementation just call \p getInternalForce and \p getTangentStiffnessMatrix, but a more efficient implementation can be rewrite this.
     ///
-    virtual void getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) = 0;
+    virtual void getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix);
 
     ///
     /// \brief Update the values of the Eigen sparse matrix given the linearized array of data from the Vega matrix
