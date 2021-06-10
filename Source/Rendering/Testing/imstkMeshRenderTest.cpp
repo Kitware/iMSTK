@@ -74,8 +74,8 @@ makeMaterial()
 
 std::shared_ptr<SceneObject>
 createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
-    const std::string& fileName,
-    const std::string& objectName)
+                              const std::string&     fileName,
+                              const std::string&     objectName)
 {
     CHECK(scene != nullptr) << "Error: Scene object supplied is not valid!";
     CHECK(!fileName.empty()) << "Error: Name is empty!";
@@ -91,7 +91,6 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
 
     return meshSceneObject;
 }
-
 }
 
 class RenderTest : public testing::Test
@@ -138,7 +137,7 @@ TEST_F(RenderTest, plain_mesh)
 
     ASSERT_TRUE(sceneObj != nullptr) << "ERROR: Unable to create scene object";
 
-    //run_for(driver.get(), 2);
+    run_for(driver.get(), 2);
 }
 
 TEST_F(RenderTest, mesh_material)
@@ -153,7 +152,7 @@ TEST_F(RenderTest, mesh_material)
 
     ASSERT_TRUE(sceneObj != nullptr) << "ERROR: Unable to create scene object";
 
-    //run_for(driver.get(), 2);
+    run_for(driver.get(), 2);
 }
 
 TEST_F(RenderTest, material_color_function_vertices)
@@ -385,14 +384,4 @@ TEST_F(RenderTest, material_color_function_dynamic_cells)
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
 
     run_for(driver.get(), 2);
-}
-
-int
-imstkMeshRenderTest(int argc, char* argv[])
-{
-    // Init Google Test
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }
