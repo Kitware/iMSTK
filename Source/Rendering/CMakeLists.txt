@@ -79,6 +79,6 @@ vtk_module_autoinit(TARGETS Rendering MODULES ${VTK_LIBRARIES})
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-#if( ${PROJECT_NAME}_BUILD_TESTING )
-#  add_subdirectory( Testing )
-#endif()
+if( ${PROJECT_NAME}_BUILD_TESTING )
+  add_subdirectory(Testing)
+endif()

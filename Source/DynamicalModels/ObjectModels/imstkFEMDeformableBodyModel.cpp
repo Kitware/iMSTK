@@ -186,6 +186,7 @@ FEMDeformableBodyModel::initialize()
 
         // Create a non-linear solver and add to the scene
         auto nlSolver = std::make_shared<NewtonSolver<SparseMatrixd>>();
+        nlSolver->setToSemiImplicit();
         nlSolver->setLinearSolver(linSolver);
         nlSolver->setSystem(nlSystem);
         setSolver(nlSolver);

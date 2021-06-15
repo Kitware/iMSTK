@@ -81,15 +81,13 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     // Map vertex scalars if it has them
     if (m_geometry->getVertexScalars() != nullptr)
     {
-        m_mappedVertexScalarArray = GeometryUtils::coupleVtkDataArray(m_geometry->getVertexScalars());
-        m_polydata->GetPointData()->SetScalars(m_mappedVertexScalarArray);
+        setVertexScalarBuffer(m_geometry->getVertexScalars());
     }
 
     // Map cell scalars if it has them
     if (m_geometry->getCellScalars() != nullptr)
     {
-        m_mappedCellScalarArray = GeometryUtils::coupleVtkDataArray(m_geometry->getCellScalars());
-        m_polydata->GetCellData()->SetScalars(m_mappedCellScalarArray);
+        setCellScalarBuffer(m_geometry->getCellScalars());
     }
 
     // Map normals, if none provided compute per vertex normals
@@ -154,12 +152,17 @@ void
 VTKSurfaceMeshRenderDelegate::processEvents()
 {
     // Custom handling of events
-    std::shared_ptr<SurfaceMesh>             geom     = std::dynamic_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    std::shared_ptr<SurfaceMesh> geom = std::dynamic_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+
     std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
+
+    auto cellScalars   = geom->getCellScalars();
+    auto vertexScalars = geom->getVertexScalars();
 
     // Only use the most recent event from respective sender
     std::list<Command> cmds;
-    bool               contains[4] = { false, false, false, false };
+    bool               contains[6] = { false, false, false, false, false, false };
+    EventObject*       sender[4]   = { m_visualModel.get(), m_material.get(), geom.get(), vertices.get() };
     rforeachEvent([&](Command cmd)
         {
             if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
@@ -182,9 +185,19 @@ VTKSurfaceMeshRenderDelegate::processEvents()
                 cmds.push_back(cmd);
                 contains[3] = true;
             }
+            else if (cmd.m_event->m_sender == cellScalars.get() && !contains[4])
+            {
+                cmds.push_back(cmd);
+                contains[4] = true;
+            }
+            else if (cmd.m_event->m_sender == vertexScalars.get() && !contains[5])
+            {
+                cmds.push_back(cmd);
+                contains[5] = true;
+            }
         });
 
-    // Now do each event in order recieved
+    // Now do each event in order received
     for (std::list<Command>::reverse_iterator i = cmds.rbegin(); i != cmds.rend(); i++)
     {
         i->invoke();
@@ -220,6 +233,20 @@ VTKSurfaceMeshRenderDelegate::normalDataModified(Event* imstkNotUsed(e))
 }
 
 void
+VTKSurfaceMeshRenderDelegate::vertexScalarsModified(Event* imstkNotUsed(e))
+{
+    auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    setVertexScalarBuffer(geometry->getVertexScalars());
+}
+
+void
+VTKSurfaceMeshRenderDelegate::cellScalarsModified(Event* imstkNotUsed(e))
+{
+    auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    setCellScalarBuffer(geometry->getCellScalars());
+}
+
+void
 VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
 {
     auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
@@ -248,6 +275,16 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
     {
         geometry->computeVertexNormals();
         setNormalBuffer(geometry->getVertexNormals());
+    }
+
+    if (m_vertexScalars != m_geometry->getVertexScalars())
+    {
+        setVertexScalarBuffer(geometry->getVertexScalars());
+    }
+
+    if (m_cellScalars != m_geometry->getCellScalars())
+    {
+        setCellScalarBuffer(geometry->getCellScalars());
     }
 }
 
@@ -341,6 +378,49 @@ VTKSurfaceMeshRenderDelegate::setIndexBuffer(std::shared_ptr<VecDataArray<int, 3
         m_cellArray->InsertNextCell(3, cell);
     }
     m_cellArray->Modified();
+}
+
+void
+VTKSurfaceMeshRenderDelegate::setVertexScalarBuffer(std::shared_ptr<AbstractDataArray> scalars)
+{
+    // If the buffer changed
+    if (m_vertexScalars != scalars)
+    {
+        // If previous buffer exist
+        if (m_vertexScalars != nullptr)
+        {
+            // stop observing its changes
+            disconnect(m_vertexScalars, this, &AbstractDataArray::modified);
+        }
+        // Set new buffer and observe
+        m_vertexScalars = scalars;
+        queueConnect<Event>(m_vertexScalars, &AbstractDataArray::modified, this, &VTKSurfaceMeshRenderDelegate::vertexScalarsModified);
+        m_mappedVertexScalarArray = GeometryUtils::coupleVtkDataArray(m_geometry->getVertexScalars());
+        m_polydata->GetPointData()->SetScalars(m_mappedVertexScalarArray);
+    }
+    m_mappedVertexScalarArray->Modified();
+}
+
+void
+VTKSurfaceMeshRenderDelegate::setCellScalarBuffer(std::shared_ptr<AbstractDataArray> scalars)
+{
+    // If the buffer changed
+    if (m_cellScalars != scalars)
+    {
+        // If previous buffer exist
+        if (m_cellScalars != nullptr)
+        {
+            // stop observing its changes
+            disconnect(m_cellScalars, this, &AbstractDataArray::modified);
+        }
+        // Set new buffer and observe
+        m_cellScalars = scalars;
+        queueConnect<Event>(m_cellScalars, &AbstractDataArray::modified, this, &VTKSurfaceMeshRenderDelegate::cellScalarsModified);
+        m_mappedCellScalarArray = GeometryUtils::coupleVtkDataArray(m_geometry->getCellScalars());
+        m_polydata->GetCellData()->SetScalars(m_mappedCellScalarArray);
+    }
+
+    m_mappedCellScalarArray->Modified();
 }
 
 void

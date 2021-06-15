@@ -174,6 +174,7 @@ ReducedStVK::initialize()
 
         // create a non-linear solver and add to the scene
         auto nlSolver = std::make_shared<NewtonSolver<Matrixd>>();
+        nlSolver->setToSemiImplicit();
         // nlSolver->setLinearSolver(linSolver);
         nlSolver->setMaxIterations(1);
         nlSolver->setSystem(nlSystem);
