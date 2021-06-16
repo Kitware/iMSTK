@@ -136,7 +136,7 @@ MeshIO::getFileType(const std::string& filePath)
 
     // To lowercase
     std::transform(extString.begin(), extString.end(), extString.begin(),
-        [](unsigned char c) { return std::tolower(c); });
+        [](unsigned char c) { return static_cast<unsigned char>(std::tolower(c)); });
 
     if (extToType.count(extString) == 0)
     {
