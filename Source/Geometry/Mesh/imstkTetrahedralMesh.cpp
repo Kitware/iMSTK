@@ -183,7 +183,7 @@ TetrahedralMesh::extractSurfaceMesh()
         if (oldToNewVertId.count(face[0]) == 0)
         {
             // Use size as new index
-            const int newVertexId = oldToNewVertId.size();
+            const int newVertexId = static_cast<int>(oldToNewVertId.size());
             oldToNewVertId[face[0]] = newVertexId;
             face[0] = newVertexId; // Relabel the old one
         }
@@ -195,7 +195,7 @@ TetrahedralMesh::extractSurfaceMesh()
 
         if (oldToNewVertId.count(face[1]) == 0)
         {
-            const int newVertexId = oldToNewVertId.size();
+            const int newVertexId = static_cast<int>(oldToNewVertId.size());
             oldToNewVertId[face[1]] = newVertexId;
             face[1] = newVertexId;
         }
@@ -206,7 +206,7 @@ TetrahedralMesh::extractSurfaceMesh()
 
         if (oldToNewVertId.count(face[2]) == 0)
         {
-            const int newVertexId = oldToNewVertId.size();
+            const int newVertexId = static_cast<int>(oldToNewVertId.size());
             oldToNewVertId[face[2]] = newVertexId;
             face[2] = newVertexId;
         }
@@ -216,7 +216,7 @@ TetrahedralMesh::extractSurfaceMesh()
         }
     }
 
-    auto                     triVerticesPtr = std::make_shared<VecDataArray<double, 3>>(oldToNewVertId.size());
+    auto                     triVerticesPtr = std::make_shared<VecDataArray<double, 3>>(static_cast<int>(oldToNewVertId.size()));
     VecDataArray<double, 3>& triVertices    = *triVerticesPtr;
 
     for (auto vertIndexPair : oldToNewVertId)

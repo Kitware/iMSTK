@@ -81,17 +81,17 @@ TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersection1T)
     auto cd = std::make_shared<CollisionData>();
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.getSize(), 1);
+    EXPECT_EQ(cd->PTColData.getSize(), 1UL);
     EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionDataElement::bPenetratingA);
-    EXPECT_EQ(cd->PTColData[0].vertexIdx, 0);
-    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 0);
+    EXPECT_EQ(cd->PTColData[0].vertexIdx, 0UL);
+    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 0UL);
 
     m_CD = new TetraToTetraCD(b, a, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.getSize(), 1);
+    EXPECT_EQ(cd->PTColData.getSize(), 1UL);
     EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionDataElement::aPenetratingB);
-    EXPECT_EQ(cd->PTColData[0].vertexIdx, 0);
-    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 0);
+    EXPECT_EQ(cd->PTColData[0].vertexIdx, 0UL);
+    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 0UL);
 
     //now translate b more so there is no intersection
     b->translate(Vec3d(0.0, 2.0, 0.0));
@@ -129,15 +129,15 @@ TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersectionHuman)
     m_CD->computeCollisionData();
     EXPECT_EQ(cd->PTColData.getSize(), 1);
     EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionDataElement::aPenetratingB);
-    EXPECT_EQ(cd->PTColData[0].vertexIdx, 81);
-    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 367);
+    EXPECT_EQ(cd->PTColData[0].vertexIdx, 81UL);
+    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 367UL);
 
     m_CD = new TetraToTetraCD(b, a, cd);
     m_CD->computeCollisionData();
     EXPECT_EQ(cd->PTColData.getSize(), 1);
     EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionDataElement::bPenetratingA);
-    EXPECT_EQ(cd->PTColData[0].vertexIdx, 81);
-    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 367);
+    EXPECT_EQ(cd->PTColData[0].vertexIdx, 81UL);
+    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 367UL);
 
     //now translate b more so there is no intersection
     b->translate(Vec3d(0.0, 0.0, 1.0));

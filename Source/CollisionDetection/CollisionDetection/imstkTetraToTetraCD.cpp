@@ -52,7 +52,7 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
             Vec4i& vInd = mesh->getTetrahedronIndices(tId);
             for (size_t i = 0; i < 4; ++i)  //if idOffset!=0 ?
             {
-                vInd[i] += idOffset;
+                vInd[i] += static_cast<int>(idOffset);
             }
 
             Vec3d min, max; //bounding box of a tetrahedron

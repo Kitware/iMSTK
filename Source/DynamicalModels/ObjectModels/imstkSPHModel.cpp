@@ -702,8 +702,6 @@ SPHModel::moveParticles(const Real timestep)
     //ParallelUtils::parallelFor(getState().getNumParticles(),
     //  [&](const size_t p) {
 
-    Vec3d                    averageVelThroughHemorrhage(0, 0, 0);
-    int                      numParticlesAcrossHemorrhagePlane = 0;
     VecDataArray<double, 3>& neighborVelContr = *m_neighborVelContr;
     VecDataArray<double, 3>& particleShift    = *m_particleShift;
     VecDataArray<double, 3>& positions = *getCurrentState()->getPositions();

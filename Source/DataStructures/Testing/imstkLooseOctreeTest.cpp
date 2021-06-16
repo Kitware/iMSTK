@@ -269,13 +269,13 @@ public:
             pointsets.push_back(std::move(pointset));
 
             m_Octree->build();
-            EXPECT_EQ(m_Octree->m_MaxDepth, 10);
+            EXPECT_EQ(m_Octree->m_MaxDepth, 10U);
             const auto vPrimitives = m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Point];
             EXPECT_EQ(vPrimitives.size(), iter + 1);
 
             const auto pPrimitive = vPrimitives.back();
             const auto pNode      = pPrimitive->m_pNode;
-            EXPECT_EQ(pNode->m_Depth, 10);
+            EXPECT_EQ(pNode->m_Depth, 10U);
             EXPECT_EQ(std::abs(pNode->m_HalfWidth * 2.0 - 0.1953125) < 1e-8, true);
             EXPECT_EQ(pNode->looselyContains(pPrimitive->m_Position), true);
             EXPECT_EQ(pNode->contains(pPrimitive->m_Position), true);
@@ -311,14 +311,14 @@ public:
 
                     if (bHasPoint)
                     {
-                        EXPECT_EQ(m_Octree->m_MaxDepth, 10);
-                        EXPECT_EQ(pNode->m_Depth, 8);
+                        EXPECT_EQ(m_Octree->m_MaxDepth, 10U);
+                        EXPECT_EQ(pNode->m_Depth, 8U);
                         EXPECT_EQ(std::abs(pNode->m_HalfWidth * 2.0 - 0.78125) < 1e-8, true);
                     }
                     else
                     {
-                        EXPECT_EQ(m_Octree->m_MaxDepth, 5);
-                        EXPECT_EQ(pNode->m_Depth, 5);
+                        EXPECT_EQ(m_Octree->m_MaxDepth, 5U);
+                        EXPECT_EQ(pNode->m_Depth, 5U);
                         EXPECT_EQ(std::abs(pNode->m_HalfWidth * 2.0 - 6.25) < 1e-8, true);
                     }
                 }

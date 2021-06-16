@@ -26,7 +26,7 @@ limitations under the License.
 namespace imstk
 {
 SPHBoundaryConditions::SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,
-                                             const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
+                                             const Vec3d& inletNormal, const StdVectorOfVec3d&, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
                                              StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions) :
     m_inletDomain(inletCoords), m_outletDomain(outletCoords),
     m_fluidDomain(fluidCoords),

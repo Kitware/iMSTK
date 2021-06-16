@@ -198,12 +198,12 @@ public:
         std::vector<int>    pointPenetrations(pointset->getNumVertices());
         std::vector<double> pointPenetrationDistances(pointset->getNumVertices());
         size_t              numPenetrations = 0;
-        for (uint32_t p = 0; p < pointset->getNumVertices(); ++p)
+        for (size_t p = 0; p < pointset->getNumVertices(); ++p)
         {
             const auto& point = pointset->getVertexPosition(p);
             bool        bPenetration = true;
             double      penetrationDistance = 1e10;
-            for (uint32_t i = 0; i < 3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 if (point[i] < -0.5 || point[i] > 0.5)
                 {
@@ -252,12 +252,12 @@ public:
         std::vector<int>    pointPenetrations(pointset->getNumVertices());
         std::vector<double> pointPenetrationDistances(pointset->getNumVertices());
         size_t              numPenetrations = 0;
-        for (uint32_t p = 0; p < pointset->getNumVertices(); ++p)
+        for (int p = 0; p < pointset->getNumVertices(); ++p)
         {
             const auto& point = pointset->getVertexPosition(p);
             bool        bPenetration = true;
             double      penetrationDistance = 1e10;
-            for (uint32_t i = 0; i < 3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 if (point[i] < -0.5 || point[i] > 0.5)
                 {
@@ -312,7 +312,7 @@ public:
         // Manually check for penetration
         std::vector<int> pointPenetration(pointset->getNumVertices());
         size_t           numPenetrations = 0;
-        for (uint32_t p = 0; p < pointset->getNumVertices(); ++p)
+        for (int p = 0; p < pointset->getNumVertices(); ++p)
         {
             const auto& point = pointset->getVertexPosition(p);
             if ((point - SPHERE_CENTER).norm() < sphereRadius)
@@ -353,9 +353,9 @@ public:
 
         // Brute-force check for collision
         auto collisionData = std::make_shared<CollisionData>();
-        for (uint32_t i = 0; i < mesh->getNumTriangles(); ++i)
+        for (int i = 0; i < mesh->getNumTriangles(); ++i)
         {
-            for (uint32_t j = 0; j < box->getNumTriangles(); ++j)
+            for (int j = 0; j < box->getNumTriangles(); ++j)
             {
                 NarrowPhaseCD::triangleToTriangle(i, mesh.get(), j, box.get(), collisionData);
             }
@@ -418,9 +418,9 @@ public:
 
         // Brute-force check for collision
         auto collisionData = std::make_shared<CollisionData>();
-        for (uint32_t i = 0; i < mesh->getNumTriangles(); ++i)
+        for (int i = 0; i < mesh->getNumTriangles(); ++i)
         {
-            for (uint32_t j = 0; j < box->getNumTriangles(); ++j)
+            for (int j = 0; j < box->getNumTriangles(); ++j)
             {
                 NarrowPhaseCD::triangleToTriangle(i, mesh.get(), j, box.get(), collisionData);
             }

@@ -77,7 +77,7 @@ static std::shared_ptr<PbdObject>
 makePbdString(
     const std::string& name,
     const Vec3d&       pos,
-    const size_t       numVerts,
+    const int          numVerts,
     const double       stringLength,
     const double       bendStiffness,
     const Color&       color)
