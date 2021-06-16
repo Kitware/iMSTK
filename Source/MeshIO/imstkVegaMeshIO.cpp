@@ -19,14 +19,20 @@
 
 =========================================================================*/
 
-#include "imstkVegaMeshIO.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkLogger.h"
+#include "imstkMacros.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVecDataArray.h"
+#include "imstkVegaMeshIO.h"
+
+DISABLE_WARNING_PUSH
+    DISABLE_WARNING_HIDES_CLASS_MEMBER
 
 #include <tetMesh.h>
 #include <volumetricMeshLoader.h>
+
+DISABLE_WARNING_POP
 
 namespace imstk
 {

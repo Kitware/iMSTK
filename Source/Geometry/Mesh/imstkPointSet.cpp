@@ -203,7 +203,7 @@ void
 PointSet::setLoadFactor(const double loadFactor)
 {
     m_loadFactor     = loadFactor;
-    m_maxNumVertices = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
+    m_maxNumVertices = static_cast<int>(m_originalNumVertices * m_loadFactor);
     m_vertexPositions->reserve(static_cast<int>(m_maxNumVertices));
 }
 

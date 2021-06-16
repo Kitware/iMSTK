@@ -19,10 +19,17 @@
 
 =========================================================================*/
 
+#include "imstkMacros.h"
+
+DISABLE_WARNING_PUSH
+    DISABLE_WARNING_HIDES_CLASS_MEMBER
+
 #include "imstkStVKForceModel.h"
 
 #include <StVKElementABCDLoader.h>
 #include <tetMesh.h>
+
+DISABLE_WARNING_POP
 
 namespace imstk
 {

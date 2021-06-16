@@ -27,7 +27,6 @@
 #include "imstkLogger.h"
 #include "imstkNewtonSolver.h"
 #include "imstkPointSet.h"
-#include "imstkStVKForceModel.h"
 #include "imstkTaskGraph.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkTypes.h"
@@ -35,16 +34,15 @@
 #include "imstkVegaMeshIO.h"
 #include "imstkVolumetricMesh.h"
 
+DISABLE_WARNING_PUSH
+    DISABLE_WARNING_HIDES_CLASS_MEMBER
+#include "imstkStVKForceModel.h"
+
 #include <generateMassMatrix.h>
 #include <generateMeshGraph.h>
-#ifdef WIN32
-#pragma warning( push )
-#pragma warning( disable : 4458 )
-#endif
 #include <configFile.h>
-#ifdef WIN32
-#pragma warning( pop )
-#endif
+
+DISABLE_WARNING_POP
 
 namespace imstk
 {

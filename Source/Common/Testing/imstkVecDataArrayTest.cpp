@@ -157,10 +157,6 @@ TEST(imstkVecDataArrayTest, CapacityManagement)
 TEST(imstkVecDataArrayTest, Iterators)
 {
     VecDataArray<int, 2> a;
-    for (const auto& val : a)
-    {
-        GTEST_FAIL() << "Should not enter here";
-    }
 
     auto itBegin = a.begin();
     auto itEnd   = a.end();

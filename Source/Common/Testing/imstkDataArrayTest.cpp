@@ -142,11 +142,6 @@ TEST(imstkDataArrayTest, CapacityManagement)
 TEST(imstkDataArrayTest, Iterators)
 {
     DataArray<int> a;
-    for (const auto& val : a)
-    {
-        GTEST_FAIL() << "Should not enter here";
-        int i = val;
-    }
 
     auto itBegin = a.begin();
     auto itEnd   = a.end();

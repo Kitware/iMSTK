@@ -43,10 +43,10 @@
 using namespace imstk;
 
 // Parameters to play with
-const double width  = 50.0;
-const double height = 50.0;
-const int    nRows  = 12;
-const int    nCols  = 12;
+const double gWidth  = 50.0;
+const double gHeight = 50.0;
+const int    gNRows  = 12;
+const int    gNCols  = 12;
 
 ///
 /// \brief Creates cloth geometry
@@ -173,7 +173,7 @@ main()
     scene->addSceneObject(cutObj);
 
     // Create a pbd cloth object in the scene
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
+    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", gWidth, gHeight, gNRows, gNCols);
     scene->addSceneObject(clothObj);
 
     // Add interaction pair for pbd cutting
