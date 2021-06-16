@@ -19,10 +19,11 @@
 
 =========================================================================*/
 
-#include "imstkLevelSetModel.h"
 #include "imstkDataArray.h"
 #include "imstkImageData.h"
+#include "imstkLevelSetModel.h"
 #include "imstkLogger.h"
+#include "imstkMacros.h"
 #include "imstkParallelFor.h"
 #include "imstkTaskGraph.h"
 
@@ -132,6 +133,8 @@ LevelSetModel::evolve()
         {
             baseIndexToImageIndex.push_back(iter->first);
         }
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_PADDING
 
         // Compute gradients
         const double                             constantVel = m_config->m_constantVelocity;
@@ -197,7 +200,7 @@ LevelSetModel::evolve()
                     }
             }, noteUpdatePoolSize > m_maxVelocitiesParallel);
         }
-
+        DISABLE_WARNING_POP
         m_nodesToUpdate.clear();
     }
     else
