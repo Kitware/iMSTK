@@ -175,7 +175,6 @@ TEST(imstkSurfaceMeshTest, CellTangentAttributes)
 
 TEST(imstkSurfaceMeshTest, ComputeTriangleNormals)
 {
-
     // This is counter clockwise, when looking down on y, so normal should be directly up
     // opengl coordinate system with -z going "out" from identity view
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(3);
@@ -184,7 +183,7 @@ TEST(imstkSurfaceMeshTest, ComputeTriangleNormals)
     (*verticesPtr)[2] = Vec3d(0.0, 0.0, 0.5);
     {
         SurfaceMesh surfMesh;
-        auto indicesPtr = std::make_shared<VecDataArray<int, 3>>(1);
+        auto        indicesPtr = std::make_shared<VecDataArray<int, 3>>(1);
         (*indicesPtr)[0] = Vec3i(0, 1, 2);
         surfMesh.initialize(verticesPtr, indicesPtr);
 
@@ -195,9 +194,9 @@ TEST(imstkSurfaceMeshTest, ComputeTriangleNormals)
         EXPECT_EQ(1, normalsPtr->size());
         EXPECT_TRUE(Vec3d(0.0, 1.0, 0.0).isApprox((*normalsPtr)[0]));
     }
-    {    
+    {
         SurfaceMesh surfMesh;
-        auto indicesPtr = std::make_shared<VecDataArray<int, 3>>(1);
+        auto        indicesPtr = std::make_shared<VecDataArray<int, 3>>(1);
         (*indicesPtr)[0] = Vec3i(2, 1, 0);
         surfMesh.initialize(verticesPtr, indicesPtr);
 
@@ -208,7 +207,6 @@ TEST(imstkSurfaceMeshTest, ComputeTriangleNormals)
         EXPECT_EQ(1, normalsPtr->size());
         EXPECT_TRUE(Vec3d(0.0, -1.0, 0.0).isApprox((*normalsPtr)[0]));
     }
-
 }
 
 TEST(imstkSurfaceMeshTest, ComputeVertexNormals)
