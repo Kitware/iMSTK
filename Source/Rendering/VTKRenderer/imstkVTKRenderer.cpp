@@ -64,6 +64,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     m_renderStepsPass(vtkSmartPointer<vtkRenderStepsPass>::New())
 {
     // create m_vtkRenderer depending on enableVR
+    m_VrEnabled = enableVR;
     if (!enableVR)
     {
         m_vtkRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -173,9 +174,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     camActor->SetCamera(m_camera);
     m_debugVtkActors.push_back(camActor);
 
-    ///TODO : based on scene properties
     // Customize background colors
-
     m_vtkRenderer->SetBackground(m_config->m_BGColor1.r, m_config->m_BGColor1.g, m_config->m_BGColor1.b);
     m_vtkRenderer->SetBackground2(m_config->m_BGColor2.r, m_config->m_BGColor2.g, m_config->m_BGColor2.b);
 
@@ -628,34 +627,34 @@ VTKRenderer::updateBackground(const Vec3d backgroundOne, const Vec3d backgroundT
 }
 
 void
-VTKRenderer::applyConfigChanges(std::shared_ptr<RendererConfig> config)
+VTKRenderer::setConfig(std::shared_ptr<RendererConfig> config)
 {
-    bool enableSSAO = m_config->m_ssaoConfig.m_enableSSAO;
+    m_config = config;
+    updateConfig();
+}
 
+void
+VTKRenderer::updateConfig()
+{
+    // update SSAO if enabled
+    if (m_config->m_ssaoConfig.m_enableSSAO)
     {
-        m_ssaoPass->SetRadius(config->m_ssaoConfig.m_SSAORadius);     // comparison radius
-        m_ssaoPass->SetBias(config->m_ssaoConfig.m_SSAOBias);         // comparison bias
-        m_ssaoPass->SetKernelSize(config->m_ssaoConfig.m_KernelSize); // number of samples used
+        m_config->m_ssaoConfig.m_SSAOBlur ? m_ssaoPass->BlurOn() : m_ssaoPass->BlurOff(); // Blur on/off
+        m_ssaoPass->SetRadius(m_config->m_ssaoConfig.m_SSAORadius);                       // comparison radius
+        m_ssaoPass->SetBias(m_config->m_ssaoConfig.m_SSAOBias);                           // comparison bias
+        m_ssaoPass->SetKernelSize(m_config->m_ssaoConfig.m_KernelSize);                   // number of samples used
 
-        if (config->m_ssaoConfig.m_SSAOBlur)
-        {
-            m_ssaoPass->BlurOn(); // blur occlusion
-        }
-        else
-        {
-            m_ssaoPass->BlurOff(); // do not blur occlusion
-        }
-    }
-
-    if (enableSSAO)
-    {
         m_ssaoPass->SetDelegatePass(m_renderStepsPass);
         m_vtkRenderer->SetPass(m_ssaoPass);
     }
     else
     {
-        m_vtkRenderer->SetPass(NULL);
+        m_vtkRenderer->SetPass(nullptr);
     }
+
+    // update background colors
+    m_vtkRenderer->SetBackground(m_config->m_BGColor1.r, m_config->m_BGColor1.g, m_config->m_BGColor1.b);
+    m_vtkRenderer->SetBackground2(m_config->m_BGColor2.r, m_config->m_BGColor2.g, m_config->m_BGColor2.b);
 }
 
 void

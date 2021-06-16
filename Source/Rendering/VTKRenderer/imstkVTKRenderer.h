@@ -147,7 +147,9 @@ protected:
     ///
     /// \brief Apply config changes
     ///
-    void applyConfigChanges(std::shared_ptr<RendererConfig> config) override;
+    void setConfig(std::shared_ptr<RendererConfig> config) override;
+
+    void updateConfig() override;
 
 protected:
     ///

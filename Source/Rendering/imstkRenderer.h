@@ -38,8 +38,7 @@ struct SSAOConfig
 
 struct RendererConfig
 {
-    bool m_enableVR = false;
-
+    // Blue background
     Color m_BGColor1 = Color(0.3285, 0.3285, 0.6525);
     Color m_BGColor2 = Color(0.13836, 0.13836, 0.2748);
 
@@ -96,8 +95,8 @@ public:
     ///
     /// \brief Apply config changes
     ///
-    void updateConfig() { applyConfigChanges(m_config); }
-    virtual void applyConfigChanges(std::shared_ptr<RendererConfig> config) = 0;
+    virtual void updateConfig() = 0;
+    virtual void setConfig(std::shared_ptr<RendererConfig> config) = 0;
 
 protected:
     bool m_VrEnabled = false;

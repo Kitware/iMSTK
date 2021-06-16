@@ -49,6 +49,7 @@ main()
     // Write log to stdout and file
     Logger::startLogger();
 
+    double          sceneSize;
     imstkNew<Scene> scene("Rendering");
     {
         // Add IBL Probe
@@ -60,6 +61,10 @@ main()
 
         // Head mesh
         auto surfaceMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/head/head_revised.obj");
+
+        Vec3d l, u;
+        surfaceMesh->computeBoundingBox(l, u, 20.);
+        sceneSize = (u - l).norm() * 2;
 
         imstkNew<RenderMaterial> material;
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
@@ -83,14 +88,9 @@ main()
 
         // Lights
         imstkNew<DirectionalLight> dirLight("DirectionalLight");
-        dirLight->setIntensity(4.0);
+        dirLight->setIntensity(15.0);
         dirLight->setColor(Color(1.0, 0.95, 0.8));
         scene->addLight(dirLight);
-
-        imstkNew<PointLight> pointLight("PointLight");
-        pointLight->setIntensity(0.1);
-        pointLight->setPosition(0.1, 0.2, 0.5);
-        //scene->addLight(pointLight);
 
         // Plane
         auto                     planeObj = apiutils::createVisualAnalyticalSceneObject("Plane", scene, "VisualPlane", Vec3d(10.0, 10.0, 10.0));
@@ -126,6 +126,16 @@ main()
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
+
+        // Enable SSAO
+        auto rendConfig = std::make_shared<RendererConfig>();
+        rendConfig->m_ssaoConfig.m_enableSSAO = true;
+        rendConfig->m_ssaoConfig.m_SSAOBlur   = true;
+        rendConfig->m_ssaoConfig.m_SSAORadius = 0.1 * sceneSize;
+        rendConfig->m_ssaoConfig.m_SSAOBias   = 0.001 * sceneSize;
+        rendConfig->m_ssaoConfig.m_KernelSize = 128;
+
+        viewer->getActiveRenderer()->setConfig(rendConfig);
 
         driver->start();
     }
