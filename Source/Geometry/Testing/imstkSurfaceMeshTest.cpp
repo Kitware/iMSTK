@@ -124,10 +124,9 @@ TEST(imstkSurfaceMeshTest, CellNormalAttributes)
 
     // This could work we'd need to make the DataArray a little bit more standards compliant
     // EXPECT_THAT(*normals, ElementsAreArray(doubleArray3->begin(), doubleArray3->end()));
-    //ASSERT_DEATH(surfMesh.setVertexNormals("float2"), ".*");
 }
 
-TEST(imstkSurfaceMeshTest, VertexNeighbors)
+TEST(imstkSurfaceMeshTest, VertexNeighborVertices)
 {
     using testing::UnorderedElementsAre;
 
@@ -141,7 +140,7 @@ TEST(imstkSurfaceMeshTest, VertexNeighbors)
     EXPECT_THAT(neighbors[3], UnorderedElementsAre(1, 2, 4, 5));
 }
 
-TEST(imstkSurfaceMeshTest, TriangleNeigbors)
+TEST(imstkSurfaceMeshTest, VertexTriangleNeigbors)
 {
     using testing::UnorderedElementsAre;
 
@@ -172,31 +171,44 @@ TEST(imstkSurfaceMeshTest, CellTangentAttributes)
     {
         EXPECT_TRUE((*floatArray3)[i].cast<double>().isApprox((*tangents)[i]));
     }
-
-    // HS 2021-apr-04 Death tests don't work with the current infrastructure
-    //ASSERT_DEATH(p.setVertexTangents("float2"), ".*");
 }
 
 TEST(imstkSurfaceMeshTest, ComputeTriangleNormals)
 {
-    SurfaceMesh surfMesh;
+
     // This is counter clockwise, when looking down on y, so normal should be directly up
     // opengl coordinate system with -z going "out" from identity view
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(3);
     (*verticesPtr)[0] = Vec3d(0.5, 0.0, -0.5);
     (*verticesPtr)[1] = Vec3d(-0.5, 0.0, -0.5);
     (*verticesPtr)[2] = Vec3d(0.0, 0.0, 0.5);
+    {
+        SurfaceMesh surfMesh;
+        auto indicesPtr = std::make_shared<VecDataArray<int, 3>>(1);
+        (*indicesPtr)[0] = Vec3i(0, 1, 2);
+        surfMesh.initialize(verticesPtr, indicesPtr);
 
-    auto indicesPtr = std::make_shared<VecDataArray<int, 3>>(1);
-    (*indicesPtr)[0] = Vec3i(0, 1, 2);
-    surfMesh.initialize(verticesPtr, indicesPtr);
+        surfMesh.computeTrianglesNormals();
+        auto normalsPtr = surfMesh.getCellNormals();
 
-    surfMesh.computeTrianglesNormals();
-    auto normalsPtr = surfMesh.getCellNormals();
+        EXPECT_NE(nullptr, normalsPtr);
+        EXPECT_EQ(1, normalsPtr->size());
+        EXPECT_TRUE(Vec3d(0.0, 1.0, 0.0).isApprox((*normalsPtr)[0]));
+    }
+    {    
+        SurfaceMesh surfMesh;
+        auto indicesPtr = std::make_shared<VecDataArray<int, 3>>(1);
+        (*indicesPtr)[0] = Vec3i(2, 1, 0);
+        surfMesh.initialize(verticesPtr, indicesPtr);
 
-    EXPECT_NE(nullptr, normalsPtr);
-    EXPECT_EQ(1, normalsPtr->size());
-    EXPECT_EQ(Vec3d(0.0, 1.0, 0.0), (*normalsPtr)[0]);
+        surfMesh.computeTrianglesNormals();
+        auto normalsPtr = surfMesh.getCellNormals();
+
+        EXPECT_NE(nullptr, normalsPtr);
+        EXPECT_EQ(1, normalsPtr->size());
+        EXPECT_TRUE(Vec3d(0.0, -1.0, 0.0).isApprox((*normalsPtr)[0]));
+    }
+
 }
 
 TEST(imstkSurfaceMeshTest, ComputeVertexNormals)
@@ -228,13 +240,13 @@ TEST(imstkSurfaceMeshTest, ComputeVertexNormals)
     const Vec3d results2 = Vec3d(-1.0, 1.0, 0.0).normalized();
 
     // Check the endpoint normals (these are summed to the face)
-    EXPECT_NEAR(results1[0], (*normalsPtr)[2][0], 0.00000001);
-    EXPECT_NEAR(results1[1], (*normalsPtr)[2][1], 0.00000001);
-    EXPECT_NEAR(results1[2], (*normalsPtr)[2][2], 0.00000001);
+    EXPECT_NEAR(results1[0], (*normalsPtr)[2][0], 1e-8);
+    EXPECT_NEAR(results1[1], (*normalsPtr)[2][1], 1e-8);
+    EXPECT_NEAR(results1[2], (*normalsPtr)[2][2], 1e-8);
 
-    EXPECT_NEAR(results2[0], (*normalsPtr)[3][0], 0.00000001);
-    EXPECT_NEAR(results2[1], (*normalsPtr)[3][1], 0.00000001);
-    EXPECT_NEAR(results2[2], (*normalsPtr)[3][2], 0.00000001);
+    EXPECT_NEAR(results2[0], (*normalsPtr)[3][0], 1e-8);
+    EXPECT_NEAR(results2[1], (*normalsPtr)[3][1], 1e-8);
+    EXPECT_NEAR(results2[2], (*normalsPtr)[3][2], 1e-8);
 
     // Check the shared vertex normals which should point straight up
     EXPECT_EQ(Vec3d(0.0, 1.0, 0.0), (*normalsPtr)[0]);
@@ -245,5 +257,10 @@ TEST(imstkSurfaceMeshTest, GetVolume)
 {
     std::shared_ptr<SurfaceMesh> cubeSurfMesh =
         GeometryUtils::toSurfaceMesh(std::make_shared<OrientedBox>());
-    EXPECT_NEAR(1.0, cubeSurfMesh->getVolume(), 0.0000000000001);
+    EXPECT_DOUBLE_EQ(1.0, cubeSurfMesh->getVolume());
+
+    cubeSurfMesh->scale(2);
+    cubeSurfMesh->updatePostTransformData();
+
+    EXPECT_DOUBLE_EQ(8.0, cubeSurfMesh->getVolume());
 }
