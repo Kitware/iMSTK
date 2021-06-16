@@ -133,6 +133,4 @@ protected:
 
     std::vector<Vec3d> m_dcdx;
 };
-
-using PBDConstraintVector = std::vector<std::shared_ptr<PbdConstraint>>;
 }
