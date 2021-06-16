@@ -72,7 +72,7 @@ NewtonSolver<SystemMatrix>::solveGivenState(Vectord& x)
 
     Vectord dx = x;
 
-    const int maxIters = this->m_isSemiImplicit ? 1 : m_maxIterations;
+    const int maxIters = this->m_isSemiImplicit ? 1 : static_cast<int>(m_maxIterations);
 
     for (size_t i = 0; i < maxIters; ++i)
     {

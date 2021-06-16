@@ -170,7 +170,7 @@ RigidBodyModel2::computeTentativeVelocities()
     const Vec3d&            fG      = m_config->m_gravity;
 
     // Sum gravity to the forces
-    ParallelUtils::parallelFor(forces.size(), [&forces, &fG](const int& i)
+    ParallelUtils::parallelFor(forces.size(), [&forces, &fG](const size_t& i)
         {
             forces[i] += fG;
         }, forces.size() > m_maxBodiesParallel);
