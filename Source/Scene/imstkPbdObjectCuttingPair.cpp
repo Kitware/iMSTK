@@ -83,7 +83,7 @@ PbdObjectCuttingPair::apply()
 
     // update pbd states, constraints and solver
     pbdModel->initState();
-    pbdModel->getConstraints()->removeConstraintVertices(m_removeConstraintVertices);
+    pbdModel->getConstraints()->removeConstraints(m_removeConstraintVertices);
     // pbdModel->getConstraints()->addConstraintVertices(m_addConstraintVertices);
     pbdModel->addConstraints(m_addConstraintVertices);
     pbdModel->getSolver()->setInvMasses(pbdModel->getInvMasses());

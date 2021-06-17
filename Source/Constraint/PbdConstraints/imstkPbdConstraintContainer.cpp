@@ -47,7 +47,7 @@ PbdConstraintContainer::removeConstraint(std::shared_ptr<PbdConstraint> constrai
 }
 
 void
-PbdConstraintContainer::removeConstraintVertices(std::shared_ptr<std::unordered_set<size_t>> vertices)
+PbdConstraintContainer::removeConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices)
 {
     // Remove constraints that contain the given vertices
     auto removeConstraintFunc = [&](std::shared_ptr<PbdConstraint> constraint)
