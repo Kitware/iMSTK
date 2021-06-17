@@ -124,7 +124,7 @@ PbdObjectCuttingPair::modifyVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
 
     auto nModifiedVertices = modifiedVertices->size();
     if (nModifiedVertices != modifiedInitialVertices->size()
-        || nModifiedVertices != modifiedVertexIndices->size())
+        || static_cast<size_t>(nModifiedVertices) != modifiedVertexIndices->size())
     {
         LOG(WARNING) << "Numbers of vertices do not match.";
         return;
@@ -165,14 +165,14 @@ PbdObjectCuttingPair::modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
                                       std::shared_ptr<VecDataArray<int, 3>> modifiedTriangles)
 {
     auto triangles = pbdMesh->getTriangleIndices();
-    auto nModifiedTriangles = modifiedTriangles->size();
+    auto nModifiedTriangles = static_cast<size_t>(modifiedTriangles->size());
     if (nModifiedTriangles != modifiedTriangleIndices->size())
     {
         LOG(WARNING) << "Numbers of vertices do not match.";
         return;
     }
 
-    for (int i = 0; i < nModifiedTriangles; ++i)
+    for (size_t i = 0; i < nModifiedTriangles; ++i)
     {
         auto  triId  = (*modifiedTriangleIndices)[i];
         auto& oldTri = (*triangles)[triId];

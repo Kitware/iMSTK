@@ -149,7 +149,6 @@ Geometry::setRotation(const Mat3d& m)
 {
     // Decompose trs, getRotation assumes no shear
     const Vec3d s = getScaling();
-    const Mat3d r = getRotation();
     const Vec3d t = getTranslation();
     m_transform = Mat4d::Identity();
     m_transform.block<3, 3>(0, 0) = m;

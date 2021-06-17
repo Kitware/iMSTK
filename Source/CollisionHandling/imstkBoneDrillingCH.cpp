@@ -40,26 +40,26 @@ BoneDrillingCH::BoneDrillingCH(const Side&                          side,
 
     // Initialize bone density values
     m_nodalDensity.reserve(boneMesh->getNumVertices());
-    for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
+    for (int i = 0; i < boneMesh->getNumVertices(); ++i)
     {
         m_nodalDensity.push_back(m_initialBoneDensity);
     }
 
     m_nodeRemovalStatus.reserve(boneMesh->getNumVertices());
-    for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
+    for (int i = 0; i < boneMesh->getNumVertices(); ++i)
     {
         m_nodeRemovalStatus.push_back(false);
     }
 
     m_nodalCardinalSet.reserve(boneMesh->getNumVertices());
-    for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
+    for (int i = 0; i < boneMesh->getNumVertices(); ++i)
     {
         std::vector<size_t> row;
         m_nodalCardinalSet.push_back(row);
     }
 
     // Pre-compute the nodal cardinality set
-    for (size_t tetId = 0; tetId < boneMesh->getNumTetrahedra(); ++tetId)
+    for (int tetId = 0; tetId < boneMesh->getNumTetrahedra(); ++tetId)
     {
         const Vec4i& indices = boneMesh->getTetrahedronIndices(tetId);
         for (int i = 0; i < 4; i++)

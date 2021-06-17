@@ -68,11 +68,11 @@ generatePointSet(const Real sphereRadius)
     particles->reserve(N * N * N);
     const Vec3r corner = sphereCenter - Vec3r(1, 1, 1) * sphereRadius;
 
-    for (uint64_t i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        for (uint64_t j = 0; j < N; ++j)
+        for (int j = 0; j < N; ++j)
         {
-            for (uint64_t k = 0; k < N; ++k)
+            for (int k = 0; k < N; ++k)
             {
                 const Vec3r ppos = corner + Vec3r(spacing * Real(i), spacing * Real(j), spacing * Real(k));
                 const Vec3r d    = ppos - sphereCenter;
@@ -198,7 +198,7 @@ public:
         std::vector<int>    pointPenetrations(pointset->getNumVertices());
         std::vector<double> pointPenetrationDistances(pointset->getNumVertices());
         size_t              numPenetrations = 0;
-        for (size_t p = 0; p < pointset->getNumVertices(); ++p)
+        for (int p = 0; p < pointset->getNumVertices(); ++p)
         {
             const auto& point = pointset->getVertexPosition(p);
             bool        bPenetration = true;

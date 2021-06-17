@@ -219,13 +219,13 @@ RigidBodyModel::createMesh()
     PxVec3* vertices = new PxVec3[numVerts];
     PxU32*  indices  = new PxU32[numTriangles * 3];
 
-    for (size_t i = 0; i < numVerts; ++i)
+    for (int i = 0; i < numVerts; ++i)
     {
         const Vec3d& v = vertData[i];
         vertices[i] = PxVec3(static_cast<float>(v[0]), static_cast<float>(v[1]), static_cast<float>(v[2]));
     }
 
-    for (size_t i = 0; i < numTriangles; ++i)
+    for (int i = 0; i < numTriangles; ++i)
     {
         auto t = triVerts[i];
         indices[3 * i]     = static_cast<PxU32>(t[0]);

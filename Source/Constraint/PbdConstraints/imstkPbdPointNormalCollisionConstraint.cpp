@@ -19,8 +19,6 @@
 
 =========================================================================*/
 
-#pragma once
-
 #include "imstkPbdPointNormalCollisionConstraint.h"
 
 namespace imstk

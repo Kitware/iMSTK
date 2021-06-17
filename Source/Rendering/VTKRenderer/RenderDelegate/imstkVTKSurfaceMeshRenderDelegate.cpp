@@ -162,7 +162,6 @@ VTKSurfaceMeshRenderDelegate::processEvents()
     // Only use the most recent event from respective sender
     std::list<Command> cmds;
     bool               contains[6] = { false, false, false, false, false, false };
-    EventObject*       sender[4]   = { m_visualModel.get(), m_material.get(), geom.get(), vertices.get() };
     rforeachEvent([&](Command cmd)
         {
             if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])

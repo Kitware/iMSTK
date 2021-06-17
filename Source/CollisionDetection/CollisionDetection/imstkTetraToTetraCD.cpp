@@ -62,7 +62,7 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
 
             if (collP.size() > 4)
             {
-                for (size_t vId : collP)
+                for (int vId : collP)
                 {
                     //vertex does not belong to this tetrahedron
                     if (vId != vInd[0]
