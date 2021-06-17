@@ -23,13 +23,13 @@
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 #include "imstkPbdCollisionConstraint.h"
+#include "imstkPbdConstraintContainer.h"
 
 namespace imstk
 {
 PbdSolver::PbdSolver() :
     m_dt(0.0),
-    m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
-    m_constraints(std::make_shared<PBDConstraintVector>()),
+    m_constraints(std::make_shared<PbdConstraintContainer>()),
     m_positions(std::make_shared<VecDataArray<double, 3>>()),
     m_invMasses(std::make_shared<DataArray<double>>())
 {
@@ -55,8 +55,8 @@ PbdSolver::solve()
     VecDataArray<double, 3>& currPositions = *m_positions;
     const DataArray<double>& invMasses     = *m_invMasses;
 
-    const PBDConstraintVector&              constraints = *m_constraints;
-    const std::vector<PBDConstraintVector>& partitionedConstraints = *m_partitionedConstraints;
+    const std::vector<std::shared_ptr<PbdConstraint>>&              constraints = m_constraints->getConstraints();
+    const std::vector<std::vector<std::shared_ptr<PbdConstraint>>>& partitionedConstraints = m_constraints->getPartitionedConstraints();
 
     // zero out the Lagrange multiplier
     for (size_t j = 0; j < constraints.size(); ++j)
@@ -66,7 +66,7 @@ PbdSolver::solve()
 
     for (size_t j = 0; j < partitionedConstraints.size(); j++)
     {
-        const PBDConstraintVector& constraintPartition = partitionedConstraints[j];
+        const std::vector<std::shared_ptr<PbdConstraint>>& constraintPartition = partitionedConstraints[j];
         ParallelUtils::parallelFor(constraintPartition.size(),
             [&](const size_t idx) { constraintPartition[idx]->zeroOutLambda(); }
             );
@@ -82,7 +82,7 @@ PbdSolver::solve()
 
         for (size_t j = 0; j < partitionedConstraints.size(); j++)
         {
-            const PBDConstraintVector& constraintPartition = partitionedConstraints[j];
+            const std::vector<std::shared_ptr<PbdConstraint>>& constraintPartition = partitionedConstraints[j];
 
             ParallelUtils::parallelFor(constraintPartition.size(),
                 [&](const size_t idx)

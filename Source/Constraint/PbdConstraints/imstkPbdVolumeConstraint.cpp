@@ -21,7 +21,7 @@
 
 #include "imstkPbdVolumeConstraint.h"
 
-namespace  imstk
+namespace imstk
 {
 void
 PbdVolumeConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
@@ -68,7 +68,8 @@ PbdVolumeConstraint::computeValueAndGradient(
     dcdx[2] = onesixth * (x3 - x0).cross(x1 - x0);
     dcdx[3] = onesixth * (x1 - x0).cross(x2 - x0);
 
-    c = dcdx[3].dot(x3 - x0);
+    const double volume = dcdx[3].dot(x3 - x0);
+    c = (volume - m_restVolume);
     return true;
 }
 } // imstk

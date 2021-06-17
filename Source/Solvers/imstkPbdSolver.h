@@ -27,6 +27,7 @@
 namespace imstk
 {
 class PbdCollisionConstraint;
+class PbdConstraintContainer;
 
 ///
 /// \struct CollisionConstraintData
@@ -71,16 +72,10 @@ public:
     void setIterations(const size_t iterations) { this->m_iterations = iterations; }
 
     ///
-    /// \brief Sets the partioned constraints the solver should solve for
-    /// These will be solved in parallel
-    ///
-    void setPartitionedConstraints(std::shared_ptr<std::vector<PBDConstraintVector>> partitionedConstraints) { this->m_partitionedConstraints = partitionedConstraints; }
-
-    ///
     /// \brief Sets the constraints the solver should solve for
     /// These wil be solved sequentially
     ///
-    void setConstraints(std::shared_ptr<PBDConstraintVector> constraints) { this->m_constraints = constraints; }
+    void setConstraints(std::shared_ptr<PbdConstraintContainer> constraints) { this->m_constraints = constraints; }
 
     ///
     /// \brief Sets the positions the solver should solve with
@@ -113,11 +108,10 @@ public:
     void solve() override;
 
 private:
-    size_t m_iterations = 20;                                                             ///> Number of NL Gauss-Seidel iterations for regular constraints
-    double m_dt;                                                                          ///> time step
+    size_t m_iterations = 20;                                         ///> Number of NL Gauss-Seidel iterations for regular constraints
+    double m_dt;                                                      ///> time step
 
-    std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> Set of vector'd/partitioned pbd constraints
-    std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> Vector of constraints
+    std::shared_ptr<PbdConstraintContainer> m_constraints = nullptr;  ///> Vector of constraints
 
     std::shared_ptr<VecDataArray<double, 3>> m_positions = nullptr;
     std::shared_ptr<DataArray<double>>       m_invMasses = nullptr;

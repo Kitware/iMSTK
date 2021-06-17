@@ -31,7 +31,9 @@
 
 namespace imstk
 {
+struct PbdConstraintFunctor;
 class PointSet;
+class PbdConstraintContainer;
 class PbdSolver;
 
 ///
@@ -125,66 +127,11 @@ public:
     void computeElasticConstants();
 
     ///
-    /// \brief Initialize FEM constraints
-    ///
-    bool initializeFEMConstraints(PbdFEMConstraint::MaterialType type);
-
-    ///
-    /// \brief Initialize volume constraints
-    ///
-    bool initializeVolumeConstraints(const double stiffness);
-
-    ///
-    /// \brief Initialize distance constraints
-    ///
-    bool initializeDistanceConstraints(const double stiffness);
-
-    ///
-    /// \brief Initialize area constraints
-    ///
-    bool initializeAreaConstraints(const double stiffness);
-
-    ///
-    /// \brief Initialize bend constraints
-    ///
-    bool initializeBendConstraints(const double stiffness);
-
-    ///
-    /// \brief Initialize dihedral constraints
-    ///
-    bool initializeDihedralConstraints(const double stiffness);
-
-    ///
-    /// \brief Initialize constant density constraints for PBD fluid
-    ///
-    bool initializeConstantDensityConstraint(const double stiffness);
-
-    ///
-    /// \brief Returns true if there is at least one constraint
-    ///
-    bool hasConstraints() const { return !m_constraints->empty() || !m_partitionedConstraints->empty(); }
-
-    ///
-    /// \brief Remove constraints related to a set of vertices.
-    ///
-    void removeConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices);
-
-    ///
     /// \brief Add constraints related to a set of vertices.
     /// \brief Does not check for duplicating pre-existed constraints.
+    /// \todo: Move to containers and functors
     ///
     void addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices);
-
-    ///
-    /// \brief Adds a constraint to the system, added to the set of sequentially
-    /// solved constraints
-    ///
-    void addConstraint(std::shared_ptr<PbdConstraint> constraint);
-
-    ///
-    /// \brief Searches for and removes a constraint from the system
-    ///
-    void removeConstraint(std::shared_ptr<PbdConstraint> constraint);
 
     virtual void setTimeStep(const double timeStep) override { m_parameters->m_dt = timeStep; }
     double getTimeStep() const override { return m_parameters->m_dt; }
@@ -192,12 +139,7 @@ public:
     ///
     /// \brief Return all constraints that are solved sequentially
     ///
-    std::shared_ptr<PBDConstraintVector> getConstraints() { return m_constraints; }
-
-    ///
-    /// \brief Return the constraints that are colored and run in parallel
-    ///
-    std::shared_ptr<std::vector<PBDConstraintVector>> getPartitionedConstraints() { return m_partitionedConstraints; }
+    std::shared_ptr<PbdConstraintContainer> getConstraints() { return m_constraints; }
 
     ///
     /// \brief Set mass to particular node
@@ -259,6 +201,11 @@ public:
     ///
     void setSolver(std::shared_ptr<PbdSolver> solver) { this->m_pbdSolver = solver; }
 
+    ///
+    /// \brief Adds a functor to generate constraints
+    ///
+    void addPbdConstraintFunctor(std::shared_ptr<PbdConstraintFunctor> functor) { m_functors.push_back(functor); }
+
     std::shared_ptr<TaskNode> getIntegratePositionNode() const { return m_integrationPositionNode; }
 
     std::shared_ptr<TaskNode> getUpdateCollisionGeometryNode() const { return m_updateCollisionGeometryNode; }
@@ -268,11 +215,6 @@ public:
     std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
 
 protected:
-    ///
-    /// \brief Partition constraints for parallelization
-    ///
-    void partitionConstraints(const bool print = false);
-
     ///
     /// \brief Setup the computational graph of PBD
     ///
@@ -287,9 +229,11 @@ protected:
     std::shared_ptr<DataArray<double>> m_invMass = nullptr;                               ///> Inverse of mass of nodes
     std::shared_ptr<std::unordered_map<size_t, double>> m_fixedNodeInvMass = nullptr;     ///> Map for archiving fixed nodes' mass.
 
-    std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> List of pbd constraints
-    std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> List of pbd constraints
     std::shared_ptr<PBDModelConfig> m_parameters = nullptr;                               ///> Model parameters, must be set before simulation
+
+protected:
+    std::shared_ptr<PbdConstraintContainer> m_constraints;         ///> The set of constraints to update/use
+    std::vector<std::shared_ptr<PbdConstraintFunctor>> m_functors; ///> The set of functors for constraint generation
 
 protected:
     // Computational Nodes

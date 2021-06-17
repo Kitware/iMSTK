@@ -25,6 +25,7 @@ limitations under the License.
 #include "imstkCollidingObject.h"
 #include "imstkLogger.h"
 #include "imstkNew.h"
+#include "imstkPbdConstraintContainer.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
@@ -82,7 +83,8 @@ PbdObjectCuttingPair::apply()
 
     // update pbd states, constraints and solver
     pbdModel->initState();
-    pbdModel->removeConstraints(m_removeConstraintVertices);
+    pbdModel->getConstraints()->removeConstraints(m_removeConstraintVertices);
+    // pbdModel->getConstraints()->addConstraintVertices(m_addConstraintVertices);
     pbdModel->addConstraints(m_addConstraintVertices);
     pbdModel->getSolver()->setInvMasses(pbdModel->getInvMasses());
     pbdModel->getSolver()->setPositions(pbdModel->getCurrentState()->getPositions());
