@@ -83,6 +83,7 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
             imgReader->Update();
             m_vtkTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
             m_vtkTexture->SetRepeat(m_texture->getRepeating());
+            m_vtkTexture->SetInterpolate(m_texture->getInterpolation());
             m_vtkTexture->SetInputConnection(0, imgReader->GetOutputPort());
 
             if (texture->getType() == Texture::Type::Diffuse)
@@ -96,6 +97,7 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
         // Load by ImageData
         vtkSmartPointer<vtkImageData> vtkImgData = GeometryUtils::coupleVtkImageData(imstkImgData);
         m_vtkTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
+        m_vtkTexture->SetInterpolate(m_texture->getInterpolation());
         m_vtkTexture->SetRepeat(m_texture->getRepeating());
         m_vtkTexture->SetInputData(vtkImgData);
 
