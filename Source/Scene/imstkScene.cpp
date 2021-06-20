@@ -50,11 +50,11 @@ Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
     m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
     m_computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
 {
-    std::shared_ptr<Camera> defaultCam = std::make_shared<Camera>();
+    auto defaultCam = std::make_shared<Camera>();
     defaultCam->setPosition(0.0, 2.0, -15.0);
     defaultCam->setFocalPoint(0.0, 0.0, 0.0);
 
-    std::shared_ptr<Camera> debugCam = std::make_shared<Camera>();
+    auto debugCam = std::make_shared<Camera>();
     debugCam->setPosition(0.0, 4.0, -30.0);
     debugCam->setFocalPoint(0.0, 0.0, 0.0);
 
@@ -78,7 +78,7 @@ Scene::initialize()
     // Opportunity for user configuration
     this->postEvent(Event(Scene::configureTaskGraph()));
 
-    // Then init
+    // Initialize the task graph
     initTaskGraph();
 
     // Init the debug camera to the bounding box of the visual geometries
@@ -225,7 +225,7 @@ Scene::initTaskGraph()
 }
 
 void
-Scene::setEnableTaskTiming(bool enabled)
+Scene::setEnableTaskTiming(const bool enabled)
 {
     m_config->taskTimingEnabled = enabled;
     // If user wants to benchmark, tell all the nodes to time themselves
@@ -294,7 +294,7 @@ Scene::addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel)
 
     if (m_DebugRenderModelMap.find(name) != m_DebugRenderModelMap.end())
     {
-        LOG(WARNING) << "Can not add debug render mdoel: '" << name
+        LOG(WARNING) << "Can not add debug render model: '" << name
                      << "' is already registered in this scene.";
         return;
     }
@@ -398,6 +398,45 @@ Scene::removeLight(const std::string& lightName)
     LOG(INFO) << lightName << " light removed from " << m_name;
 }
 
+std::string 
+Scene::getCameraName(const std::shared_ptr<Camera> cam) const
+{
+    auto i = std::find_if(m_cameras.begin(), m_cameras.end(),
+        [&cam](const NamedMap<Camera>::value_type& j) { return j.second == cam; });
+    if (i != m_cameras.end())
+    {
+        return i->first;
+    }
+    else
+    {
+        return "";
+    }
+}
+
+std::shared_ptr<imstk::Camera> 
+Scene::getCamera(const std::string name) const
+{
+    auto i = m_cameras.find(name);
+    if (i != m_cameras.end())
+    {
+        return i->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void 
+Scene::setActiveCamera(const std::string name)
+{
+    auto i = m_cameras.find(name);
+    if (i != m_cameras.end())
+    {
+        m_activeCamera = m_cameras[name];
+    }
+}
+
 void
 Scene::addController(std::shared_ptr<TrackingDeviceControl> controller)
 {
@@ -481,7 +520,7 @@ Scene::advance(const double dt)
         m_resetRequested = false;
     }
 
-    // FPS of physics is given by the measured time, not the given timestep dt
+    // FPS of physics is given by the measured time, not the given time step dt
     const double elapsedTime = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
     m_fps = 1.0 / elapsedTime;
 

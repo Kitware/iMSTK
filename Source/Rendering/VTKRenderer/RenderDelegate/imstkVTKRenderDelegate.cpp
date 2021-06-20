@@ -181,8 +181,6 @@ VTKRenderDelegate::update()
 {
     // Then leave it up to subclasses to implement how to process the events
     processEvents();
-    
-    //m_actor->Modified();
 }
 
 void
