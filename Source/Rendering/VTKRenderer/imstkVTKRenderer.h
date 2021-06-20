@@ -145,11 +145,9 @@ protected:
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
 
     ///
-    /// \brief Apply config changes
+    /// \brief Apply configuration changes
     ///
     void setConfig(std::shared_ptr<RendererConfig> config) override;
-
-    void updateConfig() override;
 
 protected:
     ///
@@ -186,7 +184,7 @@ protected:
     void sceneObjectModified(Event* e);
 
     ///
-    /// \brief Function call for proccessing diffs on a SceneObject
+    /// \brief Function call for processing diffs on a SceneObject
     ///
     void sceneObjectModified(std::shared_ptr<SceneObject> sceneObject);
 

@@ -181,8 +181,7 @@ VTKRenderDelegate::update()
 {
     // Then leave it up to subclasses to implement how to process the events
     processEvents();
-
-    // Needed to inform VTK to update things for shadows
+    
     //m_actor->Modified();
 }
 

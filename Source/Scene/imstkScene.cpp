@@ -84,27 +84,39 @@ Scene::initialize()
     // Init the debug camera to the bounding box of the visual geometries
     if (m_config->debugCamBoundingBox)
     {
-        Vec3d globalMin = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
-        Vec3d globalMax = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
-        for (const auto& obj : m_sceneObjects)
-        {
-            for (auto visualModels : obj->getVisualModels())
-            {
-                Vec3d min = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
-                Vec3d max = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
-                visualModels->getGeometry()->computeBoundingBox(min, max);
-                globalMin = globalMin.cwiseMin(min);
-                globalMax = globalMax.cwiseMax(max);
-            }
-        }
+        Vec3d globalMin, globalMax;
+        Scene::computeBoundingBox(globalMin, globalMax);
+
         const Vec3d center = (globalMin + globalMax) * 0.5;
-        const Vec3d size   = globalMax - globalMin;
+        const double size   = (globalMax - globalMin).norm();
         m_cameras["debug"]->setFocalPoint(center);
-        m_cameras["debug"]->setPosition(center + Vec3d(0.0, 1.0, 1.0).normalized() * size.norm());
+        m_cameras["debug"]->setPosition(center + Vec3d(0.0, 1.0, 1.0).normalized() * size);
     }
 
     LOG(INFO) << "Scene '" << this->getName() << "' initialized!";
     return true;
+}
+
+void
+Scene::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent)
+{
+    lowerCorner = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
+    upperCorner = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
+
+    for (const auto& obj : m_sceneObjects)
+    {
+        for (auto visualModels : obj->getVisualModels())
+        {
+            Vec3d min = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
+            Vec3d max = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
+            visualModels->getGeometry()->computeBoundingBox(min, max);
+            lowerCorner = lowerCorner.cwiseMin(min);
+            upperCorner = upperCorner.cwiseMax(max);
+        }
+    }
+    const Vec3d range = upperCorner - lowerCorner;
+    lowerCorner = lowerCorner - range * (paddingPercent / 100.0);
+    upperCorner = upperCorner + range * (paddingPercent / 100.0);
 }
 
 void

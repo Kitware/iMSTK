@@ -62,10 +62,6 @@ main()
         // Head mesh
         auto surfaceMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/head/head_revised.obj");
 
-        Vec3d l, u;
-        surfaceMesh->computeBoundingBox(l, u, 20.);
-        sceneSize = (u - l).norm() * 2;
-
         imstkNew<RenderMaterial> material;
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setShadingModel(RenderMaterial::ShadingModel::PBR);
@@ -88,7 +84,7 @@ main()
 
         // Lights
         imstkNew<DirectionalLight> dirLight("DirectionalLight");
-        dirLight->setIntensity(15.0);
+        dirLight->setIntensity(10.0);
         dirLight->setColor(Color(1.0, 0.95, 0.8));
         scene->addLight(dirLight);
 
@@ -128,10 +124,14 @@ main()
         }
 
         // Enable SSAO
+        Vec3d l, u;
+        scene->computeBoundingBox(l, u);
+        sceneSize = (u - l).norm();
+
         auto rendConfig = std::make_shared<RendererConfig>();
         rendConfig->m_ssaoConfig.m_enableSSAO = true;
         rendConfig->m_ssaoConfig.m_SSAOBlur   = true;
-        rendConfig->m_ssaoConfig.m_SSAORadius = 0.1 * sceneSize;
+        rendConfig->m_ssaoConfig.m_SSAORadius = 1.0 * sceneSize;
         rendConfig->m_ssaoConfig.m_SSAOBias   = 0.001 * sceneSize;
         rendConfig->m_ssaoConfig.m_KernelSize = 128;
 

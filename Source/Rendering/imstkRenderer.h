@@ -93,9 +93,8 @@ public:
     std::shared_ptr<RendererConfig> getRenderConfig() const { return m_config; }
 
     ///
-    /// \brief Apply config changes
+    /// \brief Sets the configuration and updates the render pipeline accordingly
     ///
-    virtual void updateConfig() = 0;
     virtual void setConfig(std::shared_ptr<RendererConfig> config) = 0;
 
 protected:

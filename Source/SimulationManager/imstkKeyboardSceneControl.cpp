@@ -25,7 +25,6 @@
 #include "imstkModuleDriver.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSceneObject.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"

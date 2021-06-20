@@ -238,7 +238,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     // Prepare screen space ambient occlusion effect
     m_ssaoPass->SetDelegatePass(m_renderStepsPass);
 
-    updateConfig();
+    this->setConfig(this->m_config);
 }
 
 void
@@ -630,12 +630,7 @@ void
 VTKRenderer::setConfig(std::shared_ptr<RendererConfig> config)
 {
     m_config = config;
-    updateConfig();
-}
 
-void
-VTKRenderer::updateConfig()
-{
     // update SSAO if enabled
     if (m_config->m_ssaoConfig.m_enableSSAO)
     {

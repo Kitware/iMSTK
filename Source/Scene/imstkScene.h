@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkEventObject.h"
+#include "imstkMath.h"
 
 #include <atomic>
 #include <string>
