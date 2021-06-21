@@ -222,6 +222,26 @@ SurfaceMeshDistanceTransform::getOutputImage()
 }
 
 void
+SurfaceMeshDistanceTransform::setBounds(const Vec6d& bounds)
+{
+    m_Bounds = bounds;
+    if (m_Bounds.isZero())
+    {
+        LOG(WARNING) << "Bounds are zero, the image bounds will be used instead.";
+    }
+}
+
+void
+SurfaceMeshDistanceTransform::setBounds(const Vec3d& min, const Vec3d& max)
+{
+    m_Bounds << min.x(), max.x(), min.y(), max.y(), min.z(), max.z();
+    if (m_Bounds.isZero())
+    {
+        LOG(WARNING) << "Bounds are zero, the image bounds will be used instead.";
+    }
+}
+
+void
 SurfaceMeshDistanceTransform::requestUpdate()
 {
     std::shared_ptr<SurfaceMesh> inputSurfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(getInput(0));
@@ -239,29 +259,17 @@ SurfaceMeshDistanceTransform::requestUpdate()
         return;
     }
 
-    // Allocate an image for it
-    Vec3d min;
-    Vec3d max;
-    inputSurfaceMesh->computeBoundingBox(min, max);
-    double bounds[6];
-    if (m_UseBounds)
+    Vec6d bounds = m_Bounds;
+    if (bounds.isZero())
     {
-        bounds[0] = m_Bounds[0];
-        bounds[1] = m_Bounds[1];
-        bounds[2] = m_Bounds[2];
-        bounds[3] = m_Bounds[3];
-        bounds[4] = m_Bounds[4];
-        bounds[5] = m_Bounds[5];
+        // Using the exact bounding box will clip vertices/triangles that are on
+        // the boundary, if no bounds are given use 10% padding to prevent the clipping
+        Vec3d min;
+        Vec3d max;
+        inputSurfaceMesh->computeBoundingBox(min, max, m_BoundsMargin);
+        bounds << min.x(), max.x(), min.y(), max.y(), min.z(), max.z();
     }
-    else
-    {
-        bounds[0] = min[0];
-        bounds[1] = max[0];
-        bounds[2] = min[1];
-        bounds[3] = max[1];
-        bounds[4] = min[2];
-        bounds[5] = max[2];
-    }
+
     const Vec3d size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
     const Vec3d spacing = size.cwiseQuotient(m_Dimensions.cast<double>());
     const Vec3d origin  = Vec3d(bounds[0], bounds[2], bounds[4]);
