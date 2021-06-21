@@ -46,15 +46,25 @@
 #include <vtkTable.h>
 #include <vtkTextProperty.h>
 
-#include <vtkOpenVRRenderer.h>
+#include <vtkCameraPass.h>
 #include <vtkOpenVRCamera.h>
+#include <vtkOpenVRRenderer.h>
+#include <vtkRenderPassCollection.h>
+#include <vtkRenderStepsPass.h>
+#include <vtkSequencePass.h>
+#include <vtkSSAOPass.h>
+#include <vtkProperty.h>
 
 namespace imstk
 {
 VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
-    m_scene(scene), m_textureManager(std::make_shared<TextureManager<VTKTextureDelegate>>())
+    m_scene(scene),
+    m_textureManager(std::make_shared<TextureManager<VTKTextureDelegate>>()),
+    m_ssaoPass(vtkSmartPointer<vtkSSAOPass>::New()),
+    m_renderStepsPass(vtkSmartPointer<vtkRenderStepsPass>::New())
 {
     // create m_vtkRenderer depending on enableVR
+    m_VrEnabled = enableVR;
     if (!enableVR)
     {
         m_vtkRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -152,21 +162,19 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     // Camera and camera actor
     if (!enableVR)
     {
-        m_Camera = vtkSmartPointer<vtkCamera>::New();
+        m_camera = vtkSmartPointer<vtkCamera>::New();
     }
     else
     {
-        m_Camera = vtkSmartPointer<vtkOpenVRCamera>::New();
+        m_camera = vtkSmartPointer<vtkOpenVRCamera>::New();
     }
 
     updateCamera();
     vtkNew<vtkCameraActor> camActor;
-    camActor->SetCamera(m_Camera);
+    camActor->SetCamera(m_camera);
     m_debugVtkActors.push_back(camActor);
 
-    ///TODO : based on scene properties
     // Customize background colors
-
     m_vtkRenderer->SetBackground(m_config->m_BGColor1.r, m_config->m_BGColor1.g, m_config->m_BGColor1.b);
     m_vtkRenderer->SetBackground2(m_config->m_BGColor2.r, m_config->m_BGColor2.g, m_config->m_BGColor2.b);
 
@@ -226,6 +234,11 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
         axisY->SetGridVisible(false);
         axisY->SetCustomTickPositions(xIndices, labels);
     }
+
+    // Prepare screen space ambient occlusion effect
+    m_ssaoPass->SetDelegatePass(m_renderStepsPass);
+
+    this->setConfig(this->m_config);
 }
 
 void
@@ -275,7 +288,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
     }
 
     // Reset the camera
-    m_Camera = vtkSmartPointer<vtkCamera>::New();
+    m_camera = vtkSmartPointer<vtkCamera>::New();
 
     Renderer::setMode(mode, enableVR);
 }
@@ -386,7 +399,7 @@ void
 VTKRenderer::updateCamera()
 {
     std::shared_ptr<Camera> cam = m_scene->getActiveCamera();
-    getVtkRenderer()->SetActiveCamera(m_Camera);
+    getVtkRenderer()->SetActiveCamera(m_camera);
 
     // Update the camera to obtain corrected view/proj matrices
     cam->update();
@@ -397,11 +410,13 @@ VTKRenderer::updateCamera()
     const double eyePos[3]  = { invView(0, 3), invView(1, 3), invView(2, 3) };
     const double forward[3] = { invView(0, 2), invView(1, 2), invView(2, 2) };
     const double up[3]      = { invView(0, 1), invView(1, 1), invView(2, 1) };
-    m_Camera->SetPosition(eyePos);
-    m_Camera->SetFocalPoint(eyePos[0] - forward[0], eyePos[1] - forward[1], eyePos[2] - forward[2]);
-    m_Camera->SetViewUp(up[0], up[1], up[2]);
-    m_Camera->SetViewAngle(cam->getFieldOfView());
-    m_Camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
+
+    m_camera->SetPosition(eyePos);
+    m_camera->SetFocalPoint(eyePos[0] - forward[0], eyePos[1] - forward[1], eyePos[2] - forward[2]);
+    m_camera->SetViewUp(up[0], up[1], up[2]);
+    m_camera->SetViewAngle(cam->getFieldOfView());
+    m_camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
+    m_camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
 }
 
 void
@@ -608,6 +623,42 @@ VTKRenderer::updateBackground(const Vec3d backgroundOne, const Vec3d backgroundT
     else
     {
         m_vtkRenderer->GradientBackgroundOff();
+    }
+}
+
+void
+VTKRenderer::setConfig(std::shared_ptr<RendererConfig> config)
+{
+    m_config = config;
+
+    // update SSAO if enabled
+    if (m_config->m_ssaoConfig.m_enableSSAO)
+    {
+        m_config->m_ssaoConfig.m_SSAOBlur ? m_ssaoPass->BlurOn() : m_ssaoPass->BlurOff(); // Blur on/off
+        m_ssaoPass->SetRadius(m_config->m_ssaoConfig.m_SSAORadius);                       // comparison radius
+        m_ssaoPass->SetBias(m_config->m_ssaoConfig.m_SSAOBias);                           // comparison bias
+        m_ssaoPass->SetKernelSize(m_config->m_ssaoConfig.m_KernelSize);                   // number of samples used
+
+        m_ssaoPass->SetDelegatePass(m_renderStepsPass);
+        m_vtkRenderer->SetPass(m_ssaoPass);
+    }
+    else
+    {
+        m_vtkRenderer->SetPass(nullptr);
+    }
+
+    // update background colors
+    m_vtkRenderer->SetBackground(m_config->m_BGColor1.r, m_config->m_BGColor1.g, m_config->m_BGColor1.b);
+    m_vtkRenderer->SetBackground2(m_config->m_BGColor2.r, m_config->m_BGColor2.g, m_config->m_BGColor2.b);
+}
+
+void
+VTKRenderer::setDebugActorsVisible(const bool debugActorsVisible)
+{
+    m_debugActorsVisible = debugActorsVisible;
+    for (auto debugActors : m_debugVtkActors)
+    {
+        debugActors->SetVisibility(debugActorsVisible);
     }
 }
 } // imstk

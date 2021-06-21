@@ -121,8 +121,6 @@ main()
     imstkNew<DirectionalLight> dirLight("DirLight");
     dirLight->setIntensity(4);
     dirLight->setColor(Color(1.0, 0.95, 0.8));
-    dirLight->setCastsShadow(true);
-    dirLight->setShadowRange(1.5);
     scene->addLight(dirLight);
 
     {

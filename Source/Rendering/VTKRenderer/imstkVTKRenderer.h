@@ -32,6 +32,7 @@
 
 class vtkAxesActor;
 class vtkCamera;
+class vtkCameraPass;
 class vtkChartXY;
 class vtkContextActor;
 class vtkLight;
@@ -39,6 +40,8 @@ class vtkOpenVRCamera;
 class vtkPlotBar;
 class vtkProp;
 class vtkRenderer;
+class vtkRenderStepsPass;
+class vtkSSAOPass;
 class vtkTable;
 
 namespace imstk
@@ -127,6 +130,9 @@ public:
     ///
     void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
 
+    void setDebugActorsVisible(const bool debugActorsVisible);
+    bool getDebugActorsVisible() const { return m_debugActorsVisible; }
+
 protected:
     ///
     /// \brief Remove actors (also called props) from the scene
@@ -137,6 +143,11 @@ protected:
     /// \brief Add actors (also called props) from the scene
     ///
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
+
+    ///
+    /// \brief Apply configuration changes
+    ///
+    void setConfig(std::shared_ptr<RendererConfig> config) override;
 
 protected:
     ///
@@ -173,7 +184,7 @@ protected:
     void sceneObjectModified(Event* e);
 
     ///
-    /// \brief Function call for proccessing diffs on a SceneObject
+    /// \brief Function call for processing diffs on a SceneObject
     ///
     void sceneObjectModified(std::shared_ptr<SceneObject> sceneObject);
 
@@ -181,7 +192,7 @@ protected:
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
 
     // Camera
-    vtkSmartPointer<vtkCamera> m_Camera;
+    vtkSmartPointer<vtkCamera> m_camera;
 
     // lights
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
@@ -205,10 +216,17 @@ protected:
     // TextureManager is used to share textures among differing delegates
     std::shared_ptr<TextureManager<VTKTextureDelegate>> m_textureManager;
 
+    // Performance chart overlay
     vtkSmartPointer<vtkChartXY>      m_timeTableChart;
     vtkSmartPointer<vtkContextActor> m_timeTableChartActor;
     vtkSmartPointer<vtkTable> m_timeTable;
     vtkPlotBar* m_timeTablePlot;
     int m_timeTableIter = 0;
+
+    // SSAO Effect
+    vtkSmartPointer<vtkSSAOPass> m_ssaoPass;
+    vtkSmartPointer<vtkRenderStepsPass> m_renderStepsPass;
+
+    bool m_debugActorsVisible;
 };
 }

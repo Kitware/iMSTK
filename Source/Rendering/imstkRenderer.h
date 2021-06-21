@@ -27,12 +27,23 @@
 
 namespace imstk
 {
-struct rendererConfig
+struct SSAOConfig
 {
-    bool m_enableVR = false;
+    bool m_enableSSAO         = false;
+    bool m_SSAOBlur           = false; // blur occlusion
+    double m_SSAORadius       = 0.1;   // comparison radius
+    double m_SSAOBias         = 0.001; // comparison bias
+    unsigned int m_KernelSize = 128;   // number of samples used
+};
 
+struct RendererConfig
+{
+    // Blue background
     Color m_BGColor1 = Color(0.3285, 0.3285, 0.6525);
     Color m_BGColor2 = Color(0.13836, 0.13836, 0.2748);
+
+    // ScreenSpace Ambient Occlusion
+    SSAOConfig m_ssaoConfig;
 };
 
 ///
@@ -53,7 +64,7 @@ public:
         Simulation
     };
 
-    Renderer() : m_config(std::make_shared<rendererConfig>()) { }
+    Renderer() : m_config(std::make_shared<RendererConfig>()) { }
     virtual ~Renderer() = default;
 
 public:
@@ -76,10 +87,20 @@ public:
     ///
     virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) = 0;
 
+    ///
+    /// \brief Get the render config
+    ///
+    std::shared_ptr<RendererConfig> getRenderConfig() const { return m_config; }
+
+    ///
+    /// \brief Sets the configuration and updates the render pipeline accordingly
+    ///
+    virtual void setConfig(std::shared_ptr<RendererConfig> config) = 0;
+
 protected:
     bool m_VrEnabled = false;
     Renderer::Mode m_currentMode = Renderer::Mode::Simulation;
 
-    std::shared_ptr<rendererConfig> m_config;
+    std::shared_ptr<RendererConfig> m_config;
 };
 }

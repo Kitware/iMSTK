@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkEventObject.h"
+#include "imstkMath.h"
 
 #include <atomic>
 #include <string>
@@ -110,12 +111,17 @@ public:
     virtual bool initialize();
 
     ///
+    /// \brief Compute the bounding box of the scene as an union of bounding boxes of its objects
+    ///
+    void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0);
+
+    ///
     /// \brief Setup the task graph, this completely rebuilds the graph
     ///
     void buildTaskGraph();
 
     ///
-    /// \brief Intializes the graph after its in a built state
+    /// \brief Initializes the graph after its in a built state
     ///
     void initTaskGraph();
 
@@ -135,7 +141,7 @@ public:
     virtual void advance(const double dt);
 
     ///
-    /// \brief Update visuals of all sceneobjects
+    /// \brief Update visuals of all scene objects
     ///
     virtual void updateVisuals();
 
@@ -143,7 +149,7 @@ public:
     /// \brief If true, tasks will be time and a table produced
     /// every scene advance of the times
     ///
-    void setEnableTaskTiming(bool enabled);
+    void setEnableTaskTiming(const bool enabled);
 
     ///
     /// \brief Return the SceneObjects of the scene
@@ -197,7 +203,7 @@ public:
     void addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel);
 
     ///
-    /// \brief
+    /// \brief Returns true if the light (checked against name) is registered to the scene, else false.
     ///
     bool isLightRegistered(const std::string& lightName) const;
 
@@ -211,18 +217,29 @@ public:
     ///
     std::shared_ptr<Light> getLight(const std::string& lightName) const;
 
+    ///
+    /// \brief
+    ///
     const NamedMap<Camera>& getCameras() const { return m_cameras; }
 
     ///
-    /// \brief Add/remove lights from the scene
+    /// \brief Add light from the scene
     ///
     void addLight(std::shared_ptr<Light> newLight);
+
+    ///
+    /// \brief Remove light with a given name from the scene
+    ///
     void removeLight(const std::string& lightName);
 
     ///
-    /// \brief Add/remove lights from the scene
+    /// \brief Set global IBL probe
     ///
     void setGlobalIBLProbe(std::shared_ptr<IBLProbe> newIBLProbe) { m_globalIBLProbe = newIBLProbe; }
+
+    ///
+    /// \brief Return global IBL probe
+    ///
     std::shared_ptr<IBLProbe> getGlobalIBLProbe() { return m_globalIBLProbe; }
 
     ///
@@ -236,42 +253,19 @@ public:
     std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
     ///
-    /// \brief Get the camera for the scene
+    /// \brief Get the active camera for the scene
     ///
     std::shared_ptr<Camera> getActiveCamera() const { return m_activeCamera; }
 
     ///
-    /// \brief Get the name of the camera, if it exists
+    /// \brief Get the name of the camera given the object (if it exists)
     ///
-    std::string getCameraName(std::shared_ptr<Camera> cam) const
-    {
-        auto i = std::find_if(m_cameras.begin(), m_cameras.end(),
-            [&cam](const NamedMap<Camera>::value_type& j) { return j.second == cam; });
-        if (i != m_cameras.end())
-        {
-            return i->first;
-        }
-        else
-        {
-            return "";
-        }
-    }
+    std::string getCameraName(const std::shared_ptr<Camera> cam) const;
 
     ///
-    /// \brief Get camera by name
+    /// \brief Get camera object given the name
     ///
-    std::shared_ptr<Camera> getCamera(std::string name) const
-    {
-        auto i = m_cameras.find(name);
-        if (i != m_cameras.end())
-        {
-            return i->second;
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
+    std::shared_ptr<Camera> getCamera(const std::string name) const;
 
     ///
     /// \brief Set the camera for the scene
@@ -279,29 +273,23 @@ public:
     void addCamera(std::string name, std::shared_ptr<Camera> cam) { m_cameras[name] = cam; }
 
     ///
-    /// \brief Set the active camera by name
+    /// \brief Switch the active camera to the one requested by name.
+    /// If the requested on doesn't exist, previous on remains
     ///
-    void setActiveCamera(std::string name)
-    {
-        auto i = m_cameras.find(name);
-        if (i != m_cameras.end())
-        {
-            m_activeCamera = m_cameras[name];
-        }
-    }
+    void setActiveCamera(const std::string name);
 
     ///
-    /// \brief Return the collision graph
+    /// \brief Return the collision graph of the scene
     ///
     std::shared_ptr<CollisionGraph> getCollisionGraph() const { return m_collisionGraph; }
 
     ///
-    /// \brief Add objects controllers
+    /// \brief Add objects controller
     ///
     void addController(std::shared_ptr<TrackingDeviceControl> controller);
 
     ///
-    /// \brief Set/Get the FPS
+    /// \brief Set/Get the frames per second (FPS)
     ///
     double getFPS() const { return m_fps; }
 

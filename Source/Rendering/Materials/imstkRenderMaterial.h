@@ -199,18 +199,6 @@ public:
     std::shared_ptr<Texture> getTexture(Texture::Type type);
 
     ///
-    /// \brief Get/Set shadow receiving ability
-    ///
-    void setReceivesShadows(const bool receivesShadows);
-    bool getReceivesShadows() const { return m_receivesShadows; }
-
-    ///
-    /// \brief Get/Set shadow cast status
-    ///
-    void setCastsShadows(const bool castsShadows);
-    bool getCastsShadows() const { return m_castsShadows; }
-
-    ///
     /// \brief Get/Set edge visibility
     ///
     void setEdgeVisibility(const bool visibility) { m_edgeVisibility = visibility; };
@@ -315,10 +303,6 @@ protected:
 
     ///---------------------Global states------------------------
     bool m_imageBasedLighting = false;
-
-    // Shadows
-    bool m_receivesShadows = true; ///< \note not implemented
-    bool m_castsShadows    = true; ///< \note not implemented
 
     bool m_backfaceCulling = true; ///< For performance, uncommon for this to be false
 

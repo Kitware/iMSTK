@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkVTKViewer.h"
-#include "imstkDeviceControl.h"
 #include "imstkLogger.h"
 #include "imstkScene.h"
 #include "imstkVTKInteractorStyle.h"
@@ -194,12 +193,6 @@ VTKViewer::initModule()
         return false;
     }
 
-    // Print all controls on viewer
-    for (auto control : m_controls)
-    {
-        control->printControls();
-    }
-
     m_vtkRenderWindow->SetWindowName(m_config->m_windowName.c_str());
     if (m_vtkRenderWindow->GetInteractor()->HasObserver(vtkCommand::StartEvent))
     {
@@ -233,12 +226,6 @@ VTKViewer::getMouseDevice() const
 void
 VTKViewer::updateModule()
 {
-    // Update all controls
-    for (auto control : m_controls)
-    {
-        control->update(m_dt);
-    }
-
     std::shared_ptr<VTKRenderer> ren = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
     if (ren == nullptr)
     {

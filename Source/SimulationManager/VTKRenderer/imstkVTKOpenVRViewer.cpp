@@ -155,12 +155,6 @@ VTKOpenVRViewer::initModule()
         return false;
     }
 
-    // Print all controls on viewer
-    for (auto control : m_controls)
-    {
-        control->printControls();
-    }
-
     // VR interactor doesn't support timers, here we throw timer event every update
     // another option would be to conform VTKs VR interactor
     vtkSmartPointer<vtkOpenVRRenderWindowInteractor> iren = vtkOpenVRRenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
@@ -194,12 +188,6 @@ VTKOpenVRViewer::initModule()
 void
 VTKOpenVRViewer::updateModule()
 {
-    // Update all controls
-    for (auto control : m_controls)
-    {
-        control->update(m_dt);
-    }
-
     std::shared_ptr<imstk::VTKRenderer> ren = std::dynamic_pointer_cast<imstk::VTKRenderer>(getActiveRenderer());
     if (ren == nullptr)
     {

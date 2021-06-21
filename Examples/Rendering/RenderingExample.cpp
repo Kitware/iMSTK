@@ -49,6 +49,7 @@ main()
     // Write log to stdout and file
     Logger::startLogger();
 
+    double          sceneSize;
     imstkNew<Scene> scene("Rendering");
     {
         // Add IBL Probe
@@ -83,16 +84,9 @@ main()
 
         // Lights
         imstkNew<DirectionalLight> dirLight("DirectionalLight");
-        dirLight->setIntensity(4.0);
+        dirLight->setIntensity(10.0);
         dirLight->setColor(Color(1.0, 0.95, 0.8));
-        dirLight->setCastsShadow(true);
-        dirLight->setShadowRange(1.5);
         scene->addLight(dirLight);
-
-        imstkNew<PointLight> pointLight("PointLight");
-        pointLight->setIntensity(0.1);
-        pointLight->setPosition(0.1, 0.2, 0.5);
-        scene->addLight(pointLight);
 
         // Plane
         auto                     planeObj = apiutils::createVisualAnalyticalSceneObject("Plane", scene, "VisualPlane", Vec3d(10.0, 10.0, 10.0));
@@ -128,6 +122,20 @@ main()
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
+
+        // Enable SSAO
+        Vec3d l, u;
+        scene->computeBoundingBox(l, u);
+        sceneSize = (u - l).norm();
+
+        auto rendConfig = std::make_shared<RendererConfig>();
+        rendConfig->m_ssaoConfig.m_enableSSAO = true;
+        rendConfig->m_ssaoConfig.m_SSAOBlur   = true;
+        rendConfig->m_ssaoConfig.m_SSAORadius = 1.0 * sceneSize;
+        rendConfig->m_ssaoConfig.m_SSAOBias   = 0.001 * sceneSize;
+        rendConfig->m_ssaoConfig.m_KernelSize = 128;
+
+        viewer->getActiveRenderer()->setConfig(rendConfig);
 
         driver->start();
     }
