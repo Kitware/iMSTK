@@ -87,7 +87,7 @@ Scene::initialize()
         Vec3d globalMin, globalMax;
         Scene::computeBoundingBox(globalMin, globalMax);
 
-        const Vec3d center = (globalMin + globalMax) * 0.5;
+        const Vec3d  center = (globalMin + globalMax) * 0.5;
         const double size   = (globalMax - globalMin).norm();
         m_cameras["debug"]->setFocalPoint(center);
         m_cameras["debug"]->setPosition(center + Vec3d(0.0, 1.0, 1.0).normalized() * size);
@@ -398,7 +398,7 @@ Scene::removeLight(const std::string& lightName)
     LOG(INFO) << lightName << " light removed from " << m_name;
 }
 
-std::string 
+std::string
 Scene::getCameraName(const std::shared_ptr<Camera> cam) const
 {
     auto i = std::find_if(m_cameras.begin(), m_cameras.end(),
@@ -413,7 +413,7 @@ Scene::getCameraName(const std::shared_ptr<Camera> cam) const
     }
 }
 
-std::shared_ptr<imstk::Camera> 
+std::shared_ptr<imstk::Camera>
 Scene::getCamera(const std::string name) const
 {
     auto i = m_cameras.find(name);
@@ -427,7 +427,7 @@ Scene::getCamera(const std::string name) const
     }
 }
 
-void 
+void
 Scene::setActiveCamera(const std::string name)
 {
     auto i = m_cameras.find(name);

@@ -218,7 +218,7 @@ public:
     std::shared_ptr<Light> getLight(const std::string& lightName) const;
 
     ///
-    /// \brief 
+    /// \brief
     ///
     const NamedMap<Camera>& getCameras() const { return m_cameras; }
 
@@ -236,7 +236,7 @@ public:
     /// \brief Set global IBL probe
     ///
     void setGlobalIBLProbe(std::shared_ptr<IBLProbe> newIBLProbe) { m_globalIBLProbe = newIBLProbe; }
-    
+
     ///
     /// \brief Return global IBL probe
     ///
@@ -273,7 +273,7 @@ public:
     void addCamera(std::string name, std::shared_ptr<Camera> cam) { m_cameras[name] = cam; }
 
     ///
-    /// \brief Switch the active camera to the one requested by name. 
+    /// \brief Switch the active camera to the one requested by name.
     /// If the requested on doesn't exist, previous on remains
     ///
     void setActiveCamera(const std::string name);
