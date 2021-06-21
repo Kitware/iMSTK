@@ -149,6 +149,20 @@ public:
     void setImageData(std::shared_ptr<ImageData> imgData) { imageTexture = imgData; }
 
     ///
+    /// \brief Set whether interpolation is used when sampling the texture
+    ///
+    void setInterpolation(const bool interpolation)
+    {
+        m_interpolation = interpolation;
+        postModified();
+    }
+
+    ///
+    /// \brief Get whether interpolation is used when sampling the texture
+    ///
+    const bool getInterpolation() { return m_interpolation; }
+
+    ///
     /// \brief Get the input image data for the texture, not required (paths to files can be used instead)
     ///
     std::shared_ptr<ImageData> getImageData() const { return imageTexture; }
@@ -167,6 +181,9 @@ protected:
     // Helps sharpen mipmapped textures at more extreme angles
     bool   m_anisotropyEnabled = true;
     double m_anisotropyFactor  = 1.0;
+
+    // Use interpolation when texturing?
+    bool m_interpolation = true;
 };
 }
 
