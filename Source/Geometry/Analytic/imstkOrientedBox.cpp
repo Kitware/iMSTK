@@ -134,7 +134,6 @@ OrientedBox::getFunctionValue(const Vec3d& pos) const
     {
         // If outside we need to also consider diagonal distance to corners and edges
         // Compute nearest point
-        Vec3d closestPt = Vec3d::Zero();
         Vec3d axialSignedDists = Vec3d::Zero();
         for (int i = 0; i < 3; i++)
         {

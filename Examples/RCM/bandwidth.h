@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <unordered_set>
+#include <algorithm>
 
 ///
 /// \brief Build the vertex-to-vertex connectivity of a map

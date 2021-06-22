@@ -99,7 +99,7 @@ Vec3d&
 PointSet::getInitialVertexPosition(const size_t vertNum)
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (vertNum >= m_initialVertexPositions->size())) << "Invalid index";
+    LOG_IF(FATAL, (static_cast<int>(vertNum) >= m_initialVertexPositions->size())) << "Invalid index";
 #endif
     return (*m_initialVertexPositions)[vertNum];
 }
@@ -128,7 +128,7 @@ void
 PointSet::setVertexPosition(const size_t vertNum, const Vec3d& pos)
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (vertNum >= m_vertexPositions->size())) << "Invalid index";
+    LOG_IF(FATAL, (static_cast<int>(vertNum) >= m_vertexPositions->size())) << "Invalid index";
 #endif
     (*m_vertexPositions)[vertNum] = pos;
     m_transformApplied = false;
@@ -139,7 +139,7 @@ const Vec3d&
 PointSet::getVertexPosition(const size_t vertNum, DataType type) const
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (vertNum >= getVertexPositions()->size())) << "Invalid index";
+    LOG_IF(FATAL, (static_cast<int>(vertNum) >= getVertexPositions()->size())) << "Invalid index";
 #endif
     return (*this->getVertexPositions(type))[vertNum];
 }
@@ -148,7 +148,7 @@ Vec3d&
 PointSet::getVertexPosition(const size_t vertNum, DataType type)
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (vertNum >= getVertexPositions()->size())) << "Invalid index";
+    LOG_IF(FATAL, (static_cast<int>(vertNum) >= getVertexPositions()->size())) << "Invalid index";
 #endif
     return (*this->getVertexPositions(type))[vertNum];
 }

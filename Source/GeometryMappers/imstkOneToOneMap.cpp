@@ -68,7 +68,7 @@ bool
 OneToOneMap::findMatchingVertex(const VecDataArray<double, 3>& masterVertices, const Vec3d& p, size_t& nodeId)
 {
     const double eps2 = m_epsilon * m_epsilon;
-    for (size_t idx = 0; idx < masterVertices.size(); ++idx)
+    for (int idx = 0; idx < masterVertices.size(); ++idx)
     {
         if ((masterVertices[idx] - p).squaredNorm() < eps2)
         {

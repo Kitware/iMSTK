@@ -23,7 +23,9 @@
 
 namespace imstk
 {
-ScreenCaptureUtility::ScreenCaptureUtility(std::string prefix) : m_screenShotPrefix(prefix), m_screenShotNumber(0)
+ScreenCaptureUtility::ScreenCaptureUtility(std::string prefix) :
+    m_screenShotNumber(0),
+    m_screenShotPrefix(prefix)
 {
 }
 

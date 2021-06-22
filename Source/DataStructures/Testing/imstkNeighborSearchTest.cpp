@@ -57,13 +57,13 @@ neighborSearchBruteForce(VecDataArray<double, 3>& particles, std::vector<std::ve
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
     const Real radiusSqr = radius * radius;
 
-    for (size_t p = 0; p < particles.size(); ++p)
+    for (int p = 0; p < particles.size(); ++p)
     {
         const auto ppos       = particles[p];
         auto&      pneighbors = neighbors[p];
         pneighbors.resize(0);
 
-        for (size_t q = 0; q < particles.size(); ++q)
+        for (int q = 0; q < particles.size(); ++q)
         {
             if (p == q)
             {
@@ -112,7 +112,7 @@ neighborSearchSpatialHashing(VecDataArray<double, 3>& particles, std::vector<std
     hashTable.setCellSize(radius, radius, radius);
     hashTable.insertPoints(particles);
 
-    for (size_t p = 0; p < particles.size(); ++p)
+    for (int p = 0; p < particles.size(); ++p)
     {
         auto& v = particles[p];
         hashTable.getPointsInSphere(neighbors[p], v, radius);
@@ -129,13 +129,13 @@ neighborSearchBruteForce(VecDataArray<double, 3>& setA, VecDataArray<double, 3>&
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
     const Real radiusSqr = radius * radius;
 
-    for (size_t p = 0; p < setA.size(); ++p)
+    for (int p = 0; p < setA.size(); ++p)
     {
         const auto ppos       = setA[p];
         auto&      pneighbors = neighbors[p];
         pneighbors.resize(0);
 
-        for (size_t q = 0; q < setB.size(); ++q)
+        for (int q = 0; q < setB.size(); ++q)
         {
             const auto qpos = setB[q];
             const auto d2   = (Vec3r(ppos - qpos)).squaredNorm();

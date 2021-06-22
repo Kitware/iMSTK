@@ -104,7 +104,7 @@ generateMesh()
 void
 randomizePositions(const std::shared_ptr<PointSet>& pointset)
 {
-    for (size_t i = 0; i < pointset->getNumVertices(); ++i)
+    for (int i = 0; i < pointset->getNumVertices(); ++i)
     {
         pointset->setVertexPosition(i, Vec3r(
             (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
@@ -121,7 +121,7 @@ randomizePositions(const std::shared_ptr<PointSet>& pointset)
 void
 randomizePositions(const std::shared_ptr<SurfaceMesh>& mesh)
 {
-    for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
+    for (int i = 0; i < mesh->getNumTriangles(); ++i)
     {
         const auto translation = Vec3r(
             (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,

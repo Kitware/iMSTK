@@ -33,7 +33,7 @@ SpatialHashTableSeparateChaining::SpatialHashTableSeparateChaining() :
 void
 SpatialHashTableSeparateChaining::insertPoints(const VecDataArray<double, 3>& points)
 {
-    for (size_t i = 0; i < points.size(); i++)
+    for (int i = 0; i < points.size(); i++)
     {
         this->insertPoint(points[i]);
     }

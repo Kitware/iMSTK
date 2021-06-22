@@ -675,7 +675,7 @@ GeometryUtils::copyToVtkPoints(std::shared_ptr<VecDataArray<double, 3>> vertices
     vtkSmartPointer<vtkPoints>     points     = vtkSmartPointer<vtkPoints>::New();
     const VecDataArray<double, 3>& vertexData = *vertices;
     points->SetNumberOfPoints(vertexData.size());
-    for (size_t i = 0; i < vertexData.size(); i++)
+    for (int i = 0; i < vertexData.size(); i++)
     {
         points->SetPoint(i, vertexData[i][0], vertexData[i][1], vertexData[i][2]);
     }
@@ -689,7 +689,7 @@ GeometryUtils::copyToVtkCellArray(std::shared_ptr<VecDataArray<int, dim>> cellsP
     vtkSmartPointer<vtkCellArray> vtkCells = vtkSmartPointer<vtkCellArray>::New();
 
     VecDataArray<int, dim>& cells = *cellsPtr;
-    for (size_t i = 0; i < cells.size(); i++)
+    for (int i = 0; i < cells.size(); i++)
     {
         vtkCells->InsertNextCell(dim);
         for (size_t k = 0; k < dim; k++)
@@ -1100,7 +1100,7 @@ markPointsInsideAndOut(std::vector<bool>&      isInside,
 
     Vec3d aabbMin, aabbMax;
     surfaceMesh.computeBoundingBox(aabbMin, aabbMax, 1.0);
-
+    /*
     auto genRandomDirection = [](Vec3d& direction)
                               {
                                   for (int i = 0; i < 3; ++i)
@@ -1115,6 +1115,7 @@ markPointsInsideAndOut(std::vector<bool>&      isInside,
                                   }
                                   return;
                               };
+    */
 
     auto triangleRayIntersection = [](const Vec3d& xyz,
                                       const Vec3d& triVert0,
@@ -1165,7 +1166,7 @@ markPointsInsideAndOut(std::vector<bool>&      isInside,
     bBoxMax.resize(surfaceMesh.getNumTriangles());
 
     const VecDataArray<int, 3>& indices = *surfaceMesh.getTriangleIndices();
-    for (size_t idx = 0; idx < surfaceMesh.getNumTriangles(); ++idx)
+    for (int idx = 0; idx < surfaceMesh.getNumTriangles(); ++idx)
     {
         const auto& verts = indices[idx];
         const auto& xyz0  = surfaceMesh.getVertexPosition(verts[0]);
@@ -1215,7 +1216,7 @@ markPointsInsideAndOut(std::vector<bool>&      isInside,
                               int         numIntersections = 0;
                               const auto& xyz = *surfaceMesh.getVertexPositions();
 
-                              for (size_t j = 0; j < surfaceMesh.getNumTriangles(); ++j)
+                              for (int j = 0; j < surfaceMesh.getNumTriangles(); ++j)
                               {
                                   const Vec3i& verts = indices[j];
 
@@ -1401,7 +1402,7 @@ markPointsInsideAndOut(std::vector<bool>& isInside,
                                   double dist    = 0.0;
                                   double distMin = h[0] * (nz + 1);
 
-                                  for (size_t j = 0; j < surfaceMesh.getNumTriangles(); ++j)
+                                  for (int j = 0; j < surfaceMesh.getNumTriangles(); ++j)
                                   {
                                       const Vec3i& verts = indices[j];
 
@@ -1579,7 +1580,7 @@ GeometryUtils::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh,
                                  static TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
 
                                  // loop over the tets to find the enclosing tets
-                                 for (size_t id = tetId0; id < tetId1; ++id)
+                                 for (int id = tetId0; id < tetId1; ++id)
                                  {
                                      if (validTet[id])
                                      {
@@ -1601,7 +1602,7 @@ GeometryUtils::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh,
                                            labelEnclosingTet(xyz);
                                        };
 
-    for (int i = 0; i < validTet.size(); ++i)
+    for (size_t i = 0; i < validTet.size(); ++i)
     {
         const Vec4i& verts = uniformMesh->getTetrahedronIndices(i);
         if (insideSurfMesh[verts[0]]

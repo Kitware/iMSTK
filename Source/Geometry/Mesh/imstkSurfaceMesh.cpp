@@ -138,7 +138,7 @@ SurfaceMesh::computeVertexNeighborVertices()
     m_vertexNeighborVertices.clear();
     m_vertexNeighborVertices.resize(m_vertexPositions->size());
 
-    if (m_vertexNeighborTriangles.size() != m_vertexPositions->size())
+    if (static_cast<int>(m_vertexNeighborTriangles.size()) != m_vertexPositions->size())
     {
         this->computeVertexNeighborTriangles();
     }
@@ -182,7 +182,7 @@ SurfaceMesh::computeTrianglesNormals()
 
     const VecDataArray<double, 3>& vertices = *m_vertexPositions;
     const VecDataArray<int, 3>&    indices  = *m_triangleIndices;
-    for (size_t triangleId = 0; triangleId < triangleNormals.size(); ++triangleId)
+    for (int triangleId = 0; triangleId < triangleNormals.size(); ++triangleId)
     {
         const auto& t  = indices[triangleId];
         const auto& p0 = vertices[t[0]];
@@ -226,7 +226,7 @@ SurfaceMesh::computeTriangleTangents()
         const VecDataArray<float, 2>&  uvs      = *uvsPtr;
         const VecDataArray<double, 3>& vertices = *m_vertexPositions;
         const VecDataArray<int, 3>&    indices  = *m_triangleIndices;
-        for (size_t triangleId = 0; triangleId < triangleNormals.size(); ++triangleId)
+        for (int triangleId = 0; triangleId < triangleNormals.size(); ++triangleId)
         {
             const Vec3i& t   = indices[triangleId];
             const Vec3d& p0  = vertices[t[0]];
@@ -275,7 +275,7 @@ SurfaceMesh::computeVertexNormals()
     VecDataArray<double, 3>                  temp_normals(vertexNormals.size());
     std::shared_ptr<VecDataArray<double, 3>> triangleNormalsPtr = getCellNormals();
     const VecDataArray<double, 3>&           triangleNormals    = *triangleNormalsPtr;
-    for (size_t vertexId = 0; vertexId < vertexNormals.size(); ++vertexId)
+    for (int vertexId = 0; vertexId < vertexNormals.size(); ++vertexId)
     {
         temp_normals[vertexId] = Vec3d(0.0, 0.0, 0.0);
         for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
@@ -352,7 +352,7 @@ SurfaceMesh::computeVertexTangents()
 
         // Correct for UV seams
         Vec3d tangent;
-        for (size_t vertexId = 0; vertexId < vertexTangents.size(); ++vertexId)
+        for (int vertexId = 0; vertexId < vertexTangents.size(); ++vertexId)
         {
             tangent = temp_vertex_tangents[vertexId];
             tangent.normalize();
@@ -604,7 +604,7 @@ SurfaceMesh::computeUVSeamVertexGroups()
     // Initial pass to bin vertices based on positions
     const VecDataArray<double, 3>& vertexNormals = *vertexNormalsPtr;
     const VecDataArray<double, 3>& vertices      = *m_vertexPositions;
-    for (size_t i = 0; i < vertices.size(); i++)
+    for (int i = 0; i < vertices.size(); i++)
     {
         NormalGroup group = { vertices[i], vertexNormals[i] };
 

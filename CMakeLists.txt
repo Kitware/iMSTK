@@ -91,13 +91,15 @@ endif ()
 if (UNIX)
   option(${PROJECT_NAME}_USE_MODEL_REDUCTION "Build with model reduction, requires a VegaFEM built with Intel MKL and arpack" OFF)
   option(${PROJECT_NAME}_COLOR_OUTPUT "For coloring output in gcc" OFF)
+  option(${PROJECT_NAME}_COVERAGE "Build for calculating coverage" OFF)
+  option(${PROJECT_NAME}_USE_VTK_OSMESA "Build with VTK OSMesa rendering" OFF)
+
+  if (${PROJECT_NAME}_COVERAGE AND NOT ${CMAKE_BUILD_TYPE} MATCHES [Dd][Ee][Bb][Uu][Gg])
+    message(WARNING "Coverage requires a debug build forcing debug")
+    set(CMAKE_BUILD_TYPE "DEBUG")
+  endif()  
 endif()
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
-option(${PROJECT_NAME}_USE_VTK_OSMESA "Build with VTK OSMesa rendering" OFF)
-if (${${PROJECT_NAME}_USE_VTK_OSMESA} AND NOT UNIX)
-  message(WARNING "OSMesa only works on unix, building without")
-  set(${PROJECT_NAME}_USE_VTK_OSMESA FALSE CACHE BOOL "Build with VTK OSMesa rendering" FORCE)
-endif()
 
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
@@ -301,16 +303,33 @@ endif()
 include(imstkAddExecutable)
 # Uncrustify
 find_program(Uncrustify_EXECUTABLE uncrustify)
-include(SetupUncrustifyConfig)
+# include(SetupUncrustifyConfig)
 if(Uncrustify_EXECUTABLE)
   include(imstkAddUncrustifyCustomTarget)
 else(Uncrustify_EXECUTABLE)
   message(WARNING "uncrustify not found! Cannot run code-style test.")
 endif(Uncrustify_EXECUTABLE)
 
-# Google Test
+#-----------------------------------------------------------------------------
+# Testing
+#----------------------------------------------------------------------
 if(${PROJECT_NAME}_BUILD_TESTING)
   find_package( GTest REQUIRED NO_DEFAULT_PATH)
+endif()
+
+#-----------------------------------------------------------------------------
+# Code Coverage
+#----------------------------------------------------------------------
+if(${PROJECT_NAME}_COVERAGE)
+  # Note HS Had to add ALL in setup_target_for_coverage to force the code coverage pass 
+  set(CODE_COVERAGE_VERBOSE ON)
+  include(CodeCoverage)
+  append_coverage_compiler_flags()
+  setup_target_for_coverage_lcov(
+    NAME Coverage
+    EXECUTABLE ctest -E "(CodeFormatTest|RenderTest.*)"
+    EXCLUDE "${CMAKE_BINARY_DIR}/../install/include/*" "/usr/*" "*/Testing/*"
+  )
 endif()
 
 #-----------------------------------------------------------------------------

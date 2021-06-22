@@ -148,7 +148,7 @@ TetraTriangleMap::isValid() const
     CHECK(dynamic_cast<TetrahedralMesh*>(m_master.get()) != nullptr) << "Fail to cast from geometry to mesh";
 #endif
 
-    auto totalElementsMaster = meshMaster->getNumTetrahedra();
+    auto totalElementsMaster = static_cast<size_t>(meshMaster->getNumTetrahedra());
     bool bOK = true;
 
     ParallelUtils::parallelFor(m_verticesEnclosingTetraId.size(), [&](const size_t tetId) {
@@ -191,7 +191,7 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
     size_t     closestTetrahedron = std::numeric_limits<size_t>::max();
     Vec3d      center(0, 0, 0);
 
-    for (size_t tetId = 0; tetId < tetMesh->getNumTetrahedra(); ++tetId)
+    for (int tetId = 0; tetId < tetMesh->getNumTetrahedra(); ++tetId)
     {
         center = Vec3d::Zero();
         const Vec4i& vert = tetMesh->getTetrahedronIndices(tetId);
@@ -219,7 +219,7 @@ TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
     TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
     size_t                        enclosingTetrahedron = std::numeric_limits<size_t>::max();
 
-    for (size_t idx = 0; idx < tetMesh->getNumTetrahedra(); ++idx)
+    for (int idx = 0; idx < tetMesh->getNumTetrahedra(); ++idx)
     {
         bool inBox = (pos[0] >= m_bBoxMin[idx][0] && pos[0] <= m_bBoxMax[idx][0])
                      && (pos[1] >= m_bBoxMin[idx][1] && pos[1] <= m_bBoxMax[idx][1])

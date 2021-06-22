@@ -211,12 +211,13 @@ TEST(imstkSurfaceMeshTest, ComputeTriangleNormals)
 
 TEST(imstkSurfaceMeshTest, ComputeVertexNormals)
 {
-    //
-    //   /|\
-    //  / | \
-    // //   \\
-    //
-    // Tests two triangles that share an edge
+    /*
+        /|\
+       / | \
+      //   \\
+
+      Tests two triangles that share an edge
+    */
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
     (*verticesPtr)[0] = Vec3d(0.0, 0.0, -1.0);
     (*verticesPtr)[1] = Vec3d(0.0, 0.0, 1.0);
