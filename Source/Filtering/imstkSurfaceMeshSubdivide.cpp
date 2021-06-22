@@ -32,9 +32,9 @@ namespace imstk
 {
 SurfaceMeshSubdivide::SurfaceMeshSubdivide()
 {
-    setInputPortReq<SurfaceMesh>(0);
-
     setNumberOfInputPorts(1);
+    setRequiredInputType<SurfaceMesh>(0);
+
     setNumberOfOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());
 }
