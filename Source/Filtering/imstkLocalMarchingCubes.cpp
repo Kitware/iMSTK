@@ -360,9 +360,9 @@ lerp(double val1, double val2, double isovalue, double spacing)
 
 LocalMarchingCubes::LocalMarchingCubes()
 {
-    setInputPortReq<ImageData>(0);
-
     setNumberOfInputPorts(1);
+    setRequiredInputType<ImageData>(0);
+
     setNumberOfOutputPorts(0);
 }
 

@@ -32,9 +32,9 @@ namespace imstk
 {
 SurfaceMeshFlyingEdges::SurfaceMeshFlyingEdges()
 {
-    setInputPortReq<ImageData>(0);
-
     setNumberOfInputPorts(1);
+    setRequiredInputType<ImageData>(0);
+
     setNumberOfOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());
 }

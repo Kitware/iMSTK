@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-=========================================================================*/
+   =========================================================================*/
 
 #include "imstkGeometryAlgorithm.h"
 #include "imstkGeometry.h"
@@ -32,7 +32,9 @@ GeometryAlgorithm::setInput(std::shared_ptr<Geometry> inputGeometry, size_t port
     {
         LOG(WARNING) << "Tried to set input " << port << " on filter with " << m_NumberOfInputPorts << " ports";
     }
+
     m_inputs[port] = inputGeometry;
+    areInputsValid();
 }
 
 void
@@ -74,30 +76,39 @@ GeometryAlgorithm::setNumberOfOutputPorts(size_t numPorts)
 }
 
 bool
-GeometryAlgorithm::checkInputRequirements(
-    const std::unordered_map<size_t, std::shared_ptr<Geometry>>& inputs,
-    const std::unordered_map<size_t, PortReq>& inputPortReqs)
+GeometryAlgorithm::areInputsValid() const
 {
     // Check input types
-    for (auto i : inputs)
+    for (const auto& port : m_inputs)
     {
-        const size_t portId = i.first;
-        if (i.second == nullptr)
+        const size_t portId = port.first;
+        Geometry*    input  = port.second.get();
+        auto         found  = m_requiredTypeChecks.find(portId);
+        if (found != m_requiredTypeChecks.cend())
         {
-            LOG(WARNING) << "GeometryAlgorithm input " << portId << " missing!";
-            return false;
+            // Require Input: can't be null has to succeed type check
+            if (port.second == nullptr)
+            {
+                LOG(WARNING) << "GeometryAlgorithm input " << portId << " missing!";
+                return false;
+            }
+            else if (!found->second(input))
+            {
+                LOG(WARNING) << "GeometryAlgorithm received invalid geometry type \"" <<
+                    m_inputs.at(portId)->getTypeName() << "\" in port " << portId;
+                return false;
+            }
+            continue;
         }
 
-        // If the user added a requirement for this port
-        if (inputPortReqs.count(portId) != 0)
+        found = m_optionalTypeChecks.find(portId);
+        if (found != m_optionalTypeChecks.cend())
         {
-            // Check if it's valid
-            if (!inputPortReqs.at(portId).isValid(i.second))
+            // Require Input: may be null, if not has succeed type check
+            if (input != nullptr && !found->second(input))
             {
-                LOG(WARNING) << "GeometryAlgorithm recieved invalid geometry type \"" <<
-                    inputs.at(portId)->getTypeName() << "\" in port " << portId;
-                /*LOG(WARNING) << "GeometryAlgorithm required port " << portId; <<
-                    " to be of type " << inputPortReqs.at(portId).validGeomName();*/
+                LOG(WARNING) << "GeometryAlgorithm received invalid geometry type \"" <<
+                    m_inputs.at(portId)->getTypeName() << "\" in port " << portId;
                 return false;
             }
         }
