@@ -24,7 +24,7 @@
 #include "imstkImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"

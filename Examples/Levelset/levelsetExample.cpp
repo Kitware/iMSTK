@@ -23,7 +23,7 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"

@@ -25,7 +25,7 @@
 #include "imstkDebugRenderGeometry.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOctreeBasedCD.h"

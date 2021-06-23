@@ -22,7 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkLooseOctree.h"
 #include "imstkMouseSceneControl.h"

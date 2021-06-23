@@ -22,7 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkDummyClient.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkNew.h"
 #include "imstkOrientedBox.h"

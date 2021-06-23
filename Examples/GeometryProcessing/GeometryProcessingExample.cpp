@@ -22,7 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkDataArray.h"
 #include "imstkImageData.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkNew.h"

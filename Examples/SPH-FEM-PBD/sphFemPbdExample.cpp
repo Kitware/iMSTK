@@ -25,7 +25,7 @@
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkImageData.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"

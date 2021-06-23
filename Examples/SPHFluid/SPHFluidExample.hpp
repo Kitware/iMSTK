@@ -23,7 +23,7 @@
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkObjectInteractionFactory.h"

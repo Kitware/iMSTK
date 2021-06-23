@@ -25,7 +25,7 @@
 #include "imstkImageData.h"
 #include "imstkImageDistanceTransform.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"

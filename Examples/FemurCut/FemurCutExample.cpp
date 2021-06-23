@@ -26,7 +26,7 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetCH.h"
 #include "imstkLevelSetModel.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"

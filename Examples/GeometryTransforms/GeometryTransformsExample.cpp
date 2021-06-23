@@ -23,7 +23,7 @@
 #include "imstkCamera.h"
 #include "imstkCylinder.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"

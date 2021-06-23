@@ -28,7 +28,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOneToOneMap.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkCamera.h"
 #include "imstkReducedStVKBodyModel.h"
 #include "imstkReducedFeDeformableObject.h"
