@@ -106,6 +106,6 @@ private:
     int  m_DilateSize   = 4; ///> Only for narrow banded
     bool m_NarrowBanded = false;
 
-    double m_BoundsMargin = 110.0;
+    double m_BoundsMargin = 10.0;
 };
 }
