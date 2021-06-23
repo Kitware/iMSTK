@@ -100,6 +100,13 @@ Scene::initialize()
 void
 Scene::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent)
 {
+    if (this->getSceneObjects().size() == 0)
+    {
+        lowerCorner = Vec3d(0., 0., 0.);
+        upperCorner = Vec3d(0., 0., 0.);
+        return;
+    }
+
     lowerCorner = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
     upperCorner = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
 
