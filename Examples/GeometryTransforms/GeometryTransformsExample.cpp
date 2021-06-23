@@ -113,10 +113,10 @@ main()
     scene->getActiveCamera()->setPosition(Vec3d(0.0, 30.0, 30.0));
 
     // Light
-    imstkNew<DirectionalLight> light("light");
+    imstkNew<DirectionalLight> light;
     light->setDirection(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
-    scene->addLight(light);
+    scene->addLight("light", light);
 
     // Run the simulation
     {

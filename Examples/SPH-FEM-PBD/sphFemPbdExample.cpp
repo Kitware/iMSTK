@@ -266,10 +266,10 @@ main()
         scene->addSceneObject(sphFluidBox);
 
         // Light
-        imstkNew<DirectionalLight> light("light");
+        imstkNew<DirectionalLight> light;
         light->setDirection(0.0, -1.0, -1.0);
         light->setIntensity(1);
-        scene->addLight(light);
+        scene->addLight("light", light);
     }
 
     // Run the simulation

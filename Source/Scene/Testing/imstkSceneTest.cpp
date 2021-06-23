@@ -141,15 +141,14 @@ TEST(imstkSceneTest, add_remove_lights)
 {
     Scene m_scene("sample scene");
 
-    auto light0 = std::make_shared<SpotLight>("light0");
-    m_scene.addLight(light0);
+    auto light0 = std::make_shared<SpotLight>();
+    m_scene.addLight("light0", light0);
     EXPECT_EQ(m_scene.getLight("light0"), light0);
     EXPECT_EQ(m_scene.getLights().size(), 1);
-    EXPECT_EQ(m_scene.getLights()[0]->getName(), "light0");
 
     // Add another light with the same name
-    auto light0_2 = std::make_shared<DirectionalLight>("light0");
-    m_scene.addLight(light0_2);
+    auto light0_2 = std::make_shared<DirectionalLight>();
+    m_scene.addLight("light1", light0_2);
     EXPECT_NE(m_scene.getLight("light0"), light0_2);
 
     // test remove light

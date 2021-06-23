@@ -131,10 +131,10 @@ main()
     scene->getCollisionGraph()->addInteraction(interaction);
 
     // Light (white)
-    imstkNew<DirectionalLight> whiteLight("whiteLight");
+    imstkNew<DirectionalLight> whiteLight;
     whiteLight->setDirection(Vec3d(0.0, -8.0, 5.0));
     whiteLight->setIntensity(1.0);
-    scene->addLight(whiteLight);
+    scene->addLight("whiteLight", whiteLight);
 
     // Adjust camera
     scene->getActiveCamera()->setFocalPoint(0.25, 0.83, 1.58);

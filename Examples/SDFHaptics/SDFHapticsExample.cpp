@@ -79,11 +79,11 @@ main()
         }
 
         // Light (white)
-        imstkNew<DirectionalLight> whiteLight("whiteLight");
+        imstkNew<DirectionalLight> whiteLight;
         {
             whiteLight->setDirection(Vec3d(5.0, -8.0, -5.0));
             whiteLight->setIntensity(1.0);
-            scene->addLight(whiteLight);
+            scene->addLight("whitelight", whiteLight);
         }
     }
 

@@ -38,7 +38,7 @@ public:
     ///
     /// \brief Constructors
     ///
-    SpotLight(const std::string& name) : PointLight(name, LightType::Spot)
+    SpotLight() : PointLight(LightType::Spot)
     {
         m_coneAngle = 10.0f;
     }

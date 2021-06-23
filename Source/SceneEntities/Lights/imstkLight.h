@@ -107,18 +107,8 @@ public:
     ///
     void setIntensity(double intensity) { m_intensity = (float)intensity; }
 
-    ///
-    /// \brief Get the light name
-    ///
-    const std::string& getName() const { return m_name; }
-
-    ///
-    /// \brief Set the light name
-    ///
-    void setName(std::string name) { m_name = name; }
-
 protected:
-    Light(const std::string& name, const LightType& type) : SceneEntity(), m_name(name), m_type(type) { }
+    Light(const LightType& type) : SceneEntity(), m_type(type) { }
 
     // properties with defaults
     float m_intensity   = 1.;
@@ -126,7 +116,6 @@ protected:
     bool  m_switchState = true;
     Vec3f m_focalPoint  = Vec3f(0, 0, 0);
 
-    std::string m_name;
-    LightType   m_type;
+    LightType m_type;
 };
 } // imstk

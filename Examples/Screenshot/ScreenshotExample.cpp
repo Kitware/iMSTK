@@ -73,12 +73,12 @@ main()
     sphereObj->setVisualGeometry(sphereGeom);
 
     // Light (white)
-    imstkNew<PointLight> whiteLight("whiteLight");
+    imstkNew<PointLight> whiteLight;
     whiteLight->setIntensity(1.0);
     whiteLight->setPosition(Vec3d(5.0, 8.0, 5.0));
 
     // Light (red)
-    imstkNew<SpotLight> colorLight("colorLight");
+    imstkNew<SpotLight> colorLight;
     colorLight->setPosition(Vec3d(4.0, -3.0, 1.0));
     colorLight->setFocalPoint(Vec3d(0.0, 0.0, 0.0));
     colorLight->setIntensity(1.0);
@@ -89,8 +89,8 @@ main()
     scene->addSceneObject(planeObj);
     scene->addSceneObject(cubeObj);
     scene->addSceneObject(sphereObj);
-    scene->addLight(whiteLight);
-    scene->addLight(colorLight);
+    scene->addLight("whitelight", whiteLight);
+    scene->addLight("colorlight", colorLight);
 
     // Update Camera
     scene->getActiveCamera()->setPosition(Vec3d(-5.5, 2.5, 32.0));

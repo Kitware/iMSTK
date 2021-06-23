@@ -250,20 +250,6 @@ Scene::getSceneObject(const std::string& name) const
     return (iter == m_sceneObjects.end()) ? nullptr : *iter;
 }
 
-//bool
-//Scene::hasSceneObject(std::shared_ptr<SceneObject> sceneObject)
-//{
-//    return m_sceneObjects.count(sceneObject) != 0;
-//}
-//
-//bool
-//Scene::hasSceneObject(const std::string& name)
-//{
-//    auto iter = std::find_if(m_sceneObjects.begin(), m_sceneObjects.end(),
-//        [name](const std::shared_ptr<SceneObject>& i) { return i->getName() == name; });
-//    return iter != m_sceneObjects.end();
-//}
-
 const std::vector<std::shared_ptr<VisualModel>>
 Scene::getDebugRenderModels() const
 {
@@ -369,20 +355,18 @@ Scene::getLight(const std::string& lightName) const
 }
 
 void
-Scene::addLight(std::shared_ptr<Light> newLight)
+Scene::addLight(const std::string& name, std::shared_ptr<Light> newLight)
 {
-    std::string newlightName = newLight->getName();
-
-    if (this->getLight(newlightName) != nullptr)
+    if (this->getLight(name) != nullptr)
     {
-        LOG(WARNING) << "Can not add light: '" << newlightName
+        LOG(WARNING) << "Can not add light: '" << name
                      << "' is already registered in this scene.";
         return;
     }
 
-    m_lightsMap[newlightName] = newLight;
+    m_lightsMap[name] = newLight;
     this->postEvent(Event(modified()));
-    LOG(INFO) << newlightName << " light added to " << m_name;
+    LOG(INFO) << name << " light added to " << m_name;
 }
 
 void
@@ -429,7 +413,7 @@ Scene::getCamera(const std::string name) const
 }
 
 void
-Scene::addCamera(std::string name, std::shared_ptr<Camera> cam)
+Scene::addCamera(const std::string& name, std::shared_ptr<Camera> cam)
 {
     if (m_cameras.find(name) != m_cameras.end())
     {

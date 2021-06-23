@@ -39,7 +39,7 @@ public:
     ///
     /// \brief Constructors
     ///
-    PointLight(const std::string& name, const LightType& type = LightType::Point) : Light(name, type) { }
+    PointLight(const LightType& type = LightType::Point) : Light(type) { }
 
     virtual ~PointLight() override = default;
 

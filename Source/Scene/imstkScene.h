@@ -210,7 +210,7 @@ public:
     ///
     /// \brief Add light from the scene
     ///
-    void addLight(std::shared_ptr<Light> newLight);
+    void addLight(const std::string& name, std::shared_ptr<Light> newLight);
 
     ///
     /// \brief Remove light with a given name from the scene
@@ -255,7 +255,7 @@ public:
     ///
     /// \brief Set the camera for the scene
     ///
-    void addCamera(std::string name, std::shared_ptr<Camera> cam);
+    void addCamera(const std::string& name, std::shared_ptr<Camera> cam);
 
     ///
     /// \brief Switch the active camera to the one requested by name.

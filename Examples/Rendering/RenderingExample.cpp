@@ -83,10 +83,10 @@ main()
         scene->getActiveCamera()->setFocalPoint(0.0, 0.25, 0.0);
 
         // Lights
-        imstkNew<DirectionalLight> dirLight("DirectionalLight");
+        imstkNew<DirectionalLight> dirLight;
         dirLight->setIntensity(10.0);
         dirLight->setColor(Color(1.0, 0.95, 0.8));
-        scene->addLight(dirLight);
+        scene->addLight("directionalLight", dirLight);
 
         // Plane
         auto                     planeObj = apiutils::createVisualAnalyticalSceneObject("Plane", scene, "VisualPlane", Vec3d(10.0, 10.0, 10.0));

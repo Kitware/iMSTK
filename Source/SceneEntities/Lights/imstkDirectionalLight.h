@@ -36,7 +36,7 @@ namespace imstk
 class DirectionalLight : public Light
 {
 public:
-    DirectionalLight(const std::string& name) : Light(name, LightType::Directional)
+    DirectionalLight() : Light(LightType::Directional)
     {
         this->setFocalPoint(-1.0f, -1.0f, -1.0f);
     }

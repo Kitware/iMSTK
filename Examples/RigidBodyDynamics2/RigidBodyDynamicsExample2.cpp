@@ -153,9 +153,9 @@ main()
         scene->getActiveCamera()->setPosition(0.0, 40.0, 40.0);
 
         // Light
-        imstkNew<DirectionalLight> light("light");
+        imstkNew<DirectionalLight> light;
         light->setIntensity(1.0);
-        scene->addLight(light);
+        scene->addLight("light", light);
     }
 
     // Run the simulation

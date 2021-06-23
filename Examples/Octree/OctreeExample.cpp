@@ -264,15 +264,15 @@ main()
 
     // Lights
     {
-        imstkNew<DirectionalLight> light1("Light 1");
+        imstkNew<DirectionalLight> light1;
         light1->setFocalPoint(Vec3d(-1.0, -1.0, -1.0));
         light1->setIntensity(1.0);
-        scene->addLight(light1);
+        scene->addLight("light 1", light1);
 
-        imstkNew<DirectionalLight> light2("Light 2");
+        imstkNew<DirectionalLight> light2;
         light2->setFocalPoint(Vec3d(1.0, -1.0, -1.0));
         light2->setIntensity(1.0);
-        scene->addLight(light2);
+        scene->addLight("light 2", light2);
     }
 
     // Run the simulation
