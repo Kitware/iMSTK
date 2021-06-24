@@ -24,7 +24,7 @@
 #include "imstkImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
@@ -123,10 +123,10 @@ main()
     //scene->getCollisionGraph()->addInteraction(interaction);
 
     // Light
-    imstkNew<DirectionalLight> light("Light");
+    imstkNew<DirectionalLight> light;
     light->setFocalPoint(Vec3d(5, -8, -5));
     light->setIntensity(1);
-    scene->addLight(light);
+    scene->addLight("light", light);
 
     // Run the simulation
     {

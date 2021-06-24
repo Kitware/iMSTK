@@ -22,7 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
@@ -147,10 +147,10 @@ main()
     }
 
     // Light
-    imstkNew<DirectionalLight> light("light");
+    imstkNew<DirectionalLight> light;
     light->setFocalPoint(Vec3d(5, -8, -5));
     light->setIntensity(1);
-    scene->addLight(light);
+    scene->addLight("light", light);
 
     // Set Camera configuration
     std::shared_ptr<Camera> cam = scene->getActiveCamera();

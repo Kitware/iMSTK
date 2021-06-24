@@ -22,7 +22,9 @@
 #include "imstkVTKRenderer.h"
 #include "imstkCamera.h"
 #include "imstkDebugRenderGeometry.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
+#include "imstkPointLight.h"
+#include "imstkSpotLight.h"
 #include "imstkLogger.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
@@ -536,7 +538,8 @@ VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
     // If the SceneObject is being rendered but not in the scene
     for (auto i = m_renderedObjects.begin(); i != m_renderedObjects.end(); i++)
     {
-        if (!m_scene->hasSceneObject(*i))
+        auto sos = m_scene->getSceneObjects();
+        if (sos.find(*i) == sos.end())
         {
             i = removeSceneObject(*i);
         }

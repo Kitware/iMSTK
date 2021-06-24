@@ -22,7 +22,8 @@
 #include "imstkCamera.h"
 #include "imstkConsoleModule.h"
 #include "imstkKeyboardDeviceClient.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
+#include "imstkSpotLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkNew.h"
@@ -210,19 +211,19 @@ createClothScene(std::string sceneName)
         scene->addSceneObject(clothObj);
 
         // Light (white)
-        imstkNew<DirectionalLight> whiteLight("whiteLight");
+        imstkNew<DirectionalLight> whiteLight;
         whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
         whiteLight->setIntensity(1.0);
-        scene->addLight(whiteLight);
+        scene->addLight("whitelight", whiteLight);
 
         // Light (red)
-        imstkNew<SpotLight> colorLight("colorLight");
+        imstkNew<SpotLight> colorLight;
         colorLight->setPosition(Vec3d(-5.0, -3.0, 5.0));
         colorLight->setFocalPoint(Vec3d(0.0, -5.0, 5.0));
         colorLight->setIntensity(100.);
         colorLight->setColor(Color::Red);
         colorLight->setSpotAngle(30.0);
-        scene->addLight(colorLight);
+        scene->addLight("colorlight", colorLight);
 
         // Adjust camera
         scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 5.0);

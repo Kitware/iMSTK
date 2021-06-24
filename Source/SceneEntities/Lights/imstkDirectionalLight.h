@@ -19,21 +19,36 @@
 
 =========================================================================*/
 
+#pragma once
+
 #include "imstkLight.h"
-#include "imstkLogger.h"
 
 namespace imstk
 {
-void
-Light::setFocalPoint(const float& x, const float& y, const float& z)
+///
+/// \class DirectionalLight
+///
+/// \brief Directional light class
+///
+/// A directional light has no position or range. The focal point is the
+/// direction.
+///
+class DirectionalLight : public Light
 {
-    if (x != 0 || y != 0 || z != 0)
+public:
+    DirectionalLight() : Light(LightType::Directional)
     {
-        m_focalPoint = Vec3f((float)x, (float)y, (float)z);
+        this->setFocalPoint(-1.0f, -1.0f, -1.0f);
     }
-    else
-    {
-        LOG(WARNING) << "Directional lights can't have focal point at (0, 0, 0)";
-    }
-}
+
+    virtual ~DirectionalLight() override = default;
+
+    virtual const std::string getTypeName() const { return "DirectionalLight"; }
+
+    ///
+    /// \brief Direction of the light
+    ///
+    void setDirection(const Vec3d& dir) { setFocalPoint(dir); }
+    void setDirection(const double x, const double y, const double z) { setFocalPoint(Vec3d(x, y, z)); }
+};
 } // imstk

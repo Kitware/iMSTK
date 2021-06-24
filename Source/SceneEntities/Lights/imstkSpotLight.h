@@ -19,21 +19,46 @@
 
 =========================================================================*/
 
-#include "imstkLight.h"
-#include "imstkLogger.h"
+#pragma once
+
+#include "imstkPointLight.h"
+
+#include <string>
 
 namespace imstk
 {
-void
-Light::setFocalPoint(const float& x, const float& y, const float& z)
+///
+/// \class Spot light class
+///
+/// \brief A spot light is a point light in a cone shape.
+///
+class SpotLight : public PointLight
 {
-    if (x != 0 || y != 0 || z != 0)
+public:
+    ///
+    /// \brief Constructors
+    ///
+    SpotLight() : PointLight(LightType::Spot)
     {
-        m_focalPoint = Vec3f((float)x, (float)y, (float)z);
+        m_coneAngle = 10.0f;
     }
-    else
-    {
-        LOG(WARNING) << "Directional lights can't have focal point at (0, 0, 0)";
-    }
-}
+
+    virtual ~SpotLight() override = default;
+
+public:
+    virtual const std::string getTypeName() const { return "SpotLight"; }
+
+    ///
+    /// \brief Get the spotlight angle in degrees
+    ///
+    float getSpotAngle() const { return m_spotAngle; }
+
+    ///
+    /// \brief Set the spotlight angle in degrees
+    ///
+    void setSpotAngle(const double& angle) { m_spotAngle = static_cast<float>(angle); }
+
+protected:
+    float m_spotAngle = 45.0f;
+};
 } // imstk

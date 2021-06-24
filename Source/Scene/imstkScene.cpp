@@ -100,6 +100,13 @@ Scene::initialize()
 void
 Scene::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent)
 {
+    if (this->getSceneObjects().size() == 0)
+    {
+        lowerCorner = Vec3d(0., 0., 0.);
+        upperCorner = Vec3d(0., 0., 0.);
+        return;
+    }
+
     lowerCorner = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
     upperCorner = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
 
@@ -243,20 +250,6 @@ Scene::getSceneObject(const std::string& name) const
     return (iter == m_sceneObjects.end()) ? nullptr : *iter;
 }
 
-bool
-Scene::hasSceneObject(std::shared_ptr<SceneObject> sceneObject)
-{
-    return m_sceneObjects.count(sceneObject) != 0;
-}
-
-bool
-Scene::hasSceneObjectName(const std::string& name)
-{
-    auto iter = std::find_if(m_sceneObjects.begin(), m_sceneObjects.end(),
-        [name](const std::shared_ptr<SceneObject>& i) { return i->getName() == name; });
-    return iter != m_sceneObjects.end();
-}
-
 const std::vector<std::shared_ptr<VisualModel>>
 Scene::getDebugRenderModels() const
 {
@@ -275,7 +268,7 @@ Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 {
     std::string name = newSceneObject->getName();
 
-    if (this->hasSceneObjectName(name))
+    if (this->getSceneObject(name) != nullptr)
     {
         LOG(WARNING) << "Can not add object: '" << name
                      << "' is already registered in this scene.";
@@ -333,12 +326,6 @@ Scene::removeSceneObject(std::shared_ptr<SceneObject> sceneObject)
     }
 }
 
-bool
-Scene::isLightRegistered(const std::string& lightName) const
-{
-    return m_lightsMap.find(lightName) != m_lightsMap.end();
-}
-
 const std::vector<std::shared_ptr<Light>>
 Scene::getLights() const
 {
@@ -357,7 +344,7 @@ Scene::getLights() const
 std::shared_ptr<Light>
 Scene::getLight(const std::string& lightName) const
 {
-    if (!this->isLightRegistered(lightName))
+    if ((m_lightsMap.find(lightName) == m_lightsMap.end()))
     {
         LOG(WARNING) << "No light named '" << lightName
                      << "' was registered in this scene.";
@@ -368,26 +355,24 @@ Scene::getLight(const std::string& lightName) const
 }
 
 void
-Scene::addLight(std::shared_ptr<Light> newLight)
+Scene::addLight(const std::string& name, std::shared_ptr<Light> newLight)
 {
-    std::string newlightName = newLight->getName();
-
-    if (this->isLightRegistered(newlightName))
+    if (this->getLight(name) != nullptr)
     {
-        LOG(WARNING) << "Can not add light: '" << newlightName
+        LOG(WARNING) << "Can not add light: '" << name
                      << "' is already registered in this scene.";
         return;
     }
 
-    m_lightsMap[newlightName] = newLight;
+    m_lightsMap[name] = newLight;
     this->postEvent(Event(modified()));
-    LOG(INFO) << newlightName << " light added to " << m_name;
+    LOG(INFO) << name << " light added to " << m_name;
 }
 
 void
 Scene::removeLight(const std::string& lightName)
 {
-    if (!this->isLightRegistered(lightName))
+    if (this->getLight(lightName) == nullptr)
     {
         LOG(WARNING) << "No light named '" << lightName
                      << "' was registered in this scene.";
@@ -428,12 +413,38 @@ Scene::getCamera(const std::string name) const
 }
 
 void
+Scene::addCamera(const std::string& name, std::shared_ptr<Camera> cam)
+{
+    if (m_cameras.find(name) != m_cameras.end())
+    {
+        LOG(WARNING) << "Cannot add camera: Camera with the name " << name << " already exists.";
+    }
+    m_cameras[name] = cam;
+}
+
+void
 Scene::setActiveCamera(const std::string name)
 {
     auto i = m_cameras.find(name);
     if (i != m_cameras.end())
     {
         m_activeCamera = m_cameras[name];
+    }
+}
+
+void
+Scene::removeCamera(const std::string name)
+{
+    auto i = m_cameras.find(name);
+    if (i != m_cameras.end() && !(name == "default" || name == "debug"))
+    {
+        m_cameras.erase(name);
+        LOG(INFO) << name << " camera removed from " << m_name;
+    }
+    else
+    {
+        LOG(WARNING) << "No camera named '" << name
+                     << "' is part of the scene.";
     }
 }
 
@@ -499,7 +510,10 @@ Scene::advance(const double dt)
     CollisionDetection::updateInternalOctreeAndDetectCollision();
 
     // Execute the computational graph
-    m_taskGraphController->execute();
+    if (m_taskGraphController != nullptr)
+    {
+        m_taskGraphController->execute();
+    }
 
     // Apply updated forces on device
     for (auto controller : this->getControllers())
