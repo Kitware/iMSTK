@@ -148,7 +148,7 @@ TEST(imstkSceneTest, add_remove_lights)
 
     // Add another light with the same name
     auto light0_2 = std::make_shared<DirectionalLight>();
-    m_scene.addLight("light1", light0_2);
+    m_scene.addLight("light0", light0_2);
     EXPECT_NE(m_scene.getLight("light0"), light0_2);
 
     // test remove light
