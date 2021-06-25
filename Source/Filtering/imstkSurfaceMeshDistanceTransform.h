@@ -32,11 +32,13 @@ class SurfaceMesh;
 /// \class SurfaceMeshDistanceTransform
 ///
 /// \brief This filter computes exact signed distance fields using octrees
-/// and psuedonormal computations. One might need to adjust the tolerance
+/// and pseudonormal computations. One might need to adjust the tolerance
 /// depending on dataset scale.
-///
-/// Note that when setting the bounding box, a margin should be applied to the
-/// bounds otherwise vertices or triangles on the bounds may be ignored
+/// The bounds for the image can be set in the filter, when none are set
+/// the bounding box of the mesh plus a small margin is used, the margin is
+/// necessary to prevent issues with triangles that are parallel to the major
+/// planes. When providing your own bounds a box larger than the original object
+/// might be necessary depending on shape
 class SurfaceMeshDistanceTransform : public GeometryAlgorithm
 {
 public:
@@ -71,9 +73,8 @@ public:
     ///@}
 
     ///
-    /// \brief The margin used when the bounds are not set explicitely
+    /// \brief The margin in percent, used when the bounds are not set explicitly
     ///
-    imstkSetMacro(BoundsMargin, double);
     imstkGetMacro(BoundsMargin, double);
 
     ///
@@ -103,9 +104,9 @@ private:
     Vec6d  m_Bounds     = Vec6d::Zero();
     double m_Tolerance  = 1.0e-10;
 
-    int  m_DilateSize   = 4; ///> Only for narrow banded
+    int  m_DilateSize   = 4; ///< Only for narrow banded
     bool m_NarrowBanded = false;
 
-    double m_BoundsMargin = 10.0;
+    double m_BoundsMargin = 5.0; ///< Margin in percent
 };
 }
