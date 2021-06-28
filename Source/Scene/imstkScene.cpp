@@ -357,7 +357,7 @@ Scene::getLight(const std::string& lightName) const
 void
 Scene::addLight(const std::string& name, std::shared_ptr<Light> newLight)
 {
-    if (this->getLight(name) != nullptr)
+    if (m_lightsMap.find(name) != m_lightsMap.cend())
     {
         LOG(WARNING) << "Can not add light: '" << name
                      << "' is already registered in this scene.";
