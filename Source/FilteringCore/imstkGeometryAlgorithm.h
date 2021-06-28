@@ -149,12 +149,13 @@ protected:
     ///
     virtual bool areInputsValid() const;
 
-private:
     using GeometryCheck      = std::function<bool (Geometry*)>;
     using TypeCheckContainer = std::unordered_map<size_t, GeometryCheck>;
 
     std::unordered_map<size_t, GeometryCheck> m_requiredTypeChecks;
     std::unordered_map<size_t, GeometryCheck> m_optionalTypeChecks;
+
+private:
 
     std::unordered_map<size_t, std::shared_ptr<Geometry>> m_inputs;
     std::unordered_map<size_t, std::shared_ptr<Geometry>> m_outputs;
