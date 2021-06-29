@@ -74,7 +74,7 @@ public:
 
 public:
     ///
-    /// \brief Get/Set the timestep
+    /// \brief Get/Set the time step
     ///
     double getDt() const { return m_dt; }
     void setDt(const double dt) { m_dt = dt; }
@@ -90,6 +90,9 @@ public:
     bool getPaused() const { return m_paused; }
     void setPaused(const bool paused) { m_paused = paused; }
 
+    ///
+    /// \brief Set/Get the execution type (see imstk::ExecutionType)
+    ///
     ExecutionType getExecutionType() const { return m_executionType; }
     void setExecutionType(const ExecutionType type) { m_executionType = type; }
 
@@ -101,37 +104,9 @@ public:
 public:
     void init() { m_init = initModule(); }
 
-    void update()
-    {
-        if (m_init && !m_paused)
-        {
-            if (sleepDelay != 0.0)
-            {
-                std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(sleepDelay));
-            }
+    void update();
 
-            if (muteUpdateEvents)
-            {
-                this->updateModule();
-            }
-            else
-            {
-                this->postEvent(Event(Module::preUpdate()));
-                this->updateModule();
-                this->postEvent(Event(Module::postUpdate()));
-            }
-        }
-    }
-
-    void uninit()
-    {
-        // Can only uninit if, init'd
-        if (m_init)
-        {
-            uninitModule();
-            m_init = false;
-        }
-    }
+    void uninit();
 
 public:
     virtual bool initModule() = 0;

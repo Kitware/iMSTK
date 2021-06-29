@@ -19,45 +19,41 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkGeometry.h"
+#include "imstkModule.h"
 
 namespace imstk
 {
-///
-/// \class AnimationModel
-///
-/// \brief Contains geometric and animation render information
-///
-class AnimationModel
+void
+Module::update()
 {
-public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit AnimationModel(std::shared_ptr<Geometry> geometry);
-    AnimationModel() = delete;
+    if (m_init && !m_paused)
+    {
+        if (sleepDelay != 0.0)
+        {
+            std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(sleepDelay));
+        }
 
-    ///
-    /// \brief Get/set geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry();
-    virtual void setGeometry(std::shared_ptr<Geometry> geometry);
+        if (muteUpdateEvents)
+        {
+            this->updateModule();
+        }
+        else
+        {
+            this->postEvent(Event(Module::preUpdate()));
+            this->updateModule();
+            this->postEvent(Event(Module::postUpdate()));
+        }
+    }
+}
 
-    ///
-    /// \brief Update animation
-    ///
-    virtual void update() {};
-
-    ///
-    /// \brief Reset animation
-    ///
-    virtual void reset() {};
-
-protected:
-    friend class VTKRenderer;
-
-    std::shared_ptr<Geometry> m_geometry = nullptr;
-};
-} // imstk
+void
+Module::uninit()
+{
+    // Can only uninit if, init'd
+    if (m_init)
+    {
+        uninitModule();
+        m_init = false;
+    }
+}
+}// imstk

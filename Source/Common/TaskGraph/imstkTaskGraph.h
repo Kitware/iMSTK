@@ -142,7 +142,7 @@ public:
     void addEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode);
 
     ///
-    /// \brief Attachs another TaskGraph as a subgraph (copies nodes and edges, then connects source->subgraph::source, subgraph::sink->sink),
+    /// \brief Attaches another TaskGraph as a subgraph (copies nodes and edges, then connects source->subgraph::source, subgraph::sink->sink),
     /// source and sink must exist in this graph. Also serves as a graph sum between this and subgraph
     ///
     void nestGraph(std::shared_ptr<TaskGraph> subgraph, std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
@@ -190,7 +190,7 @@ public:
     static std::shared_ptr<TaskGraph> resolveCriticalNodes(std::shared_ptr<TaskGraph> graph);
 
     ///
-    /// \brief Remove redudant edges. Removal is such that all vertices are still reachable and graph goes from source->sink
+    /// \brief Remove redundant edges. Removal is such that all vertices are still reachable and graph goes from source->sink
     /// returns nullptr if failed. Only fails if graph is cyclic.
     ///
     static std::shared_ptr<TaskGraph> transitiveReduce(std::shared_ptr<TaskGraph> graph);

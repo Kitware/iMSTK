@@ -81,17 +81,17 @@ public:
     /// \brief Get camera view matrix
     /// \returns Camera view matrix reference
     ///
-    Mat4d& getView() { return m_view; }
+    inline Mat4d& getView() { return m_view; }
 
     ///
     /// \brief Get the inverse view matrix
     ///
-    const Mat4d& getInvView() { return m_invView; }
+    inline const Mat4d& getInvView() { return m_invView; }
 
     ///
     /// \brief Set the camera view matrix
     ///
-    void setView(const Mat4d& view)
+    inline void setView(const Mat4d& view)
     {
         m_viewModified = false;
         m_view    = view;
@@ -99,26 +99,16 @@ public:
     }
 
     ///
-    /// \brief Get camera projection matrix
-    ///
-    //const Mat4d& getProj() { return m_proj; }
-
-    ///
-    /// \brief Set camera projection matrix
-    ///
-    //void setProj(const Mat4d& proj) { m_proj = proj; }
-
-    ///
     /// \brief Gets the field of view
     /// \returns vertical field of view in degrees
     ///
-    const double getFieldOfView() const { return m_fieldOfView; }
+    inline const double getFieldOfView() const { return m_fieldOfView; }
 
     ///
     /// \brief Sets the field of view
     /// \param vertical field of view in degrees
     ///
-    void setFieldOfView(const double fov)
+    inline void setFieldOfView(const double fov)
     {
         m_fieldOfView = fov;
         //m_projModified = true;
@@ -129,20 +119,19 @@ public:
     /// note: You lose depth accuracy as the range between near and far increases
     /// could cause z fighting
     ///
-    void setNearZ(const double nearZ) { m_nearZ = nearZ; }
-
-    const double getNearZ() const { return m_nearZ; }
+    inline void setNearZ(const double nearZ) { m_nearZ = nearZ; }
+    inline const double getNearZ() const { return m_nearZ; }
 
     ///
     /// \brief Set clipping near
     /// note: You lose depth accuracy as the range between near and far increases
     /// could cause z fighting
     ///
-    void setFarZ(const double farZ) { m_farZ = farZ; }
+    inline void setFarZ(const double farZ) { m_farZ = farZ; }
 
-    const double getFarZ() const { return m_farZ; }
+    inline const double getFarZ() const { return m_farZ; }
 
-    virtual void update()
+    inline virtual void update()
     {
         if (m_viewModified)
         {
@@ -156,25 +145,24 @@ public:
         }*/
     }
 
-public:
     ///
     /// \brief Gets the camera position
     /// \returns camera position
     ///
-    const Vec3d& getPosition() const { return m_position; }
+    inline const Vec3d& getPosition() const { return m_position; }
 
     ///
     /// \brief Sets the camera position
     ///
-    void setPosition(const Vec3d& pos)
+    inline void setPosition(const Vec3d& pos)
     {
         m_position     = pos;
         m_viewModified = true;
     }
 
-    void setPosition(const double x,
-                     const double y,
-                     const double z)
+    inline void setPosition(const double x,
+                            const double y,
+                            const double z)
     {
         setPosition(Vec3d(x, y, z));
     }
@@ -184,20 +172,20 @@ public:
     ///        The focal point is the point that the camera points to
     /// \returns Focal point position
     ///
-    const Vec3d& getFocalPoint() const { return m_focalPoint; }
+    inline const Vec3d& getFocalPoint() const { return m_focalPoint; }
 
     ///
     /// \brief Sets the focal point
     ///
-    void setFocalPoint(const Vec3d& focalPt)
+    inline void setFocalPoint(const Vec3d& focalPt)
     {
         m_focalPoint   = focalPt;
         m_viewModified = true;
     }
 
-    void setFocalPoint(const double x,
-                       const double y,
-                       const double z)
+    inline void setFocalPoint(const double x,
+                              const double y,
+                              const double z)
     {
         setFocalPoint(Vec3d(x, y, z));
     }
@@ -206,20 +194,20 @@ public:
     /// \brief Get the up vector
     /// \returns up vector of camera
     ///
-    const Vec3d& getViewUp() const { return m_viewUp; }
+    inline const Vec3d& getViewUp() const { return m_viewUp; }
 
     ///
     /// \brief Set the up vector
     ///
-    void setViewUp(const Vec3d& up)
+    inline void setViewUp(const Vec3d& up)
     {
         m_viewUp       = up.normalized();
         m_viewModified = true;
     }
 
-    void setViewUp(const double x,
-                   const double y,
-                   const double z)
+    inline void setViewUp(const double x,
+                          const double y,
+                          const double z)
     {
         setViewUp(Vec3d(x, y, z));
     }
@@ -227,12 +215,7 @@ public:
     ///
     /// \brief Utility function to quickly print cam stats
     ///
-    void print()
-    {
-        std::cout << "CamPos: " << m_position[0] << ", " << m_position[1] << ", " << m_position[2] << std::endl;
-        std::cout << "FocalPoint: " << m_focalPoint[0] << ", " << m_focalPoint[1] << ", " << m_focalPoint[2] << std::endl;
-        std::cout << "Up: " << m_viewUp[0] << ", " << m_viewUp[1] << ", " << m_viewUp[2] << std::endl;
-    }
+    void print();
 
 protected:
     // Base camera values
@@ -242,7 +225,6 @@ protected:
     bool m_viewModified = true;
 //bool  m_projModified = true;
 
-protected:
     // Base projection parameters
     double m_fieldOfView = 40.0; ///> field of view in degrees
     double m_nearZ       = 0.01; ///> near plane of the camera
