@@ -19,12 +19,12 @@
 
 =========================================================================*/
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkIBLProbe.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
+#include "imstkPlane.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkRenderMaterial.h"
@@ -89,10 +89,16 @@ main()
         scene->addLight("directionalLight", dirLight);
 
         // Plane
-        auto                     planeObj = apiutils::createVisualAnalyticalSceneObject("Plane", scene, "VisualPlane", Vec3d(10.0, 10.0, 10.0));
+        auto plane = std::make_shared<Plane>();
+        plane->translate(Vec3d(10.0, 10.0, 10.0), Geometry::TransformType::ApplyToData);
+
+        auto sceneObj = std::make_shared<SceneObject>("VisualPlane");
+        sceneObj->setVisualGeometry(plane);
+        scene->addSceneObject(sceneObj);
+
         imstkNew<RenderMaterial> planeMaterial;
         planeMaterial->setColor(Color::LightGray);
-        planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);
+        sceneObj->getVisualModel(0)->setRenderMaterial(planeMaterial);
     }
 
     // Run the simulation
