@@ -377,7 +377,10 @@ add_subdirectory(Source/CollisionDetection)
 add_subdirectory(Source/CollisionHandling)
 add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
+<<<<<<< HEAD
 add_subdirectory(Source/Testing)
+=======
+>>>>>>> d1989b9d (REFAC: Remove apiutils)
 add_subdirectory(Source/Filtering)
 add_subdirectory(Source/FilteringCore)
 
