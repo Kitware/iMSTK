@@ -32,6 +32,6 @@ if(iMSTK_USE_OpenHaptics)
   #-----------------------------------------------------------------------------
   # Link libraries to executable
   #-----------------------------------------------------------------------------
-  target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
+  target_link_libraries(${PROJECT_NAME} SimulationManager)
 
 endif()

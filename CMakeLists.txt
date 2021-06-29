@@ -377,7 +377,6 @@ add_subdirectory(Source/CollisionDetection)
 add_subdirectory(Source/CollisionHandling)
 add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
-add_subdirectory(Source/apiUtilities)
 add_subdirectory(Source/Filtering)
 add_subdirectory(Source/FilteringCore)
 
