@@ -31,7 +31,7 @@
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
-#include "imstkRigidBodyWorld.h"
+
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskGraphVizWriter.h"
@@ -39,6 +39,10 @@
 #include "imstkTimer.h"
 #include "imstkTrackingDeviceControl.h"
 #include "imstkVisualModel.h"
+
+#ifdef IMSTK_USE_PHYSX
+#include "imstkRigidBodyWorld.h"
+#endif
 
 namespace imstk
 {
@@ -167,6 +171,8 @@ Scene::buildTaskGraph()
         }
     }
 
+#ifdef IMSTK_USE_PHYSX
+
     // Edge Case: Rigid bodies all have a singular update point because of how PhysX works
     // Think about generalizes these islands of interaction to Systems
     if (rigidBodies.size() > 0)
@@ -188,6 +194,7 @@ Scene::buildTaskGraph()
             m_taskGraph->addEdge(physXUpdate, (*i)->getUpdateGeometryNode());
         }
     }
+#endif
 }
 
 void

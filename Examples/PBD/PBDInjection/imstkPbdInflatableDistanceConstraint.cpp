@@ -21,6 +21,8 @@
 
 #include "imstkPbdInflatableDistanceConstraint.h"
 
+#include <cfloat>
+
 namespace  imstk
 {
 void

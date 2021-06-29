@@ -100,6 +100,7 @@ if (UNIX)
   endif()  
 endif()
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
+option(${PROJECT_NAME}_USE_PHYSX "Build with Physx support" ON)
 
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
@@ -143,7 +144,9 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(g3log)
   imstk_define_dependency(LibNiFalcon)
   imstk_define_dependency(openvr)
-  imstk_define_dependency(PhysX)
+  if (${PROJECT_NAME}_USE_PHYSX)
+    imstk_define_dependency(PhysX)
+  endif()
   imstk_define_dependency(SCCD)
   imstk_define_dependency(tbb)
   imstk_define_dependency(VegaFEM)
@@ -224,10 +227,13 @@ find_package( Libusb REQUIRED)
 find_package( openvr REQUIRED )
 
 # Select the release version of PhysX to use
-set(PHYSX_CONFIGURATION "${PHYSX_CONFIGURATION}" CACHE STRING "Select PhysX Library Type for Release and RelWithDebInfo builds")
-set(PHYSX_RELEASE_TYPES "RELEASE;CHECKED;PROFILE" CACHE INTERNAL "List of available PhysX release library types")
-set_property(CACHE PHYSX_CONFIGURATION PROPERTY STRINGS ${PHYSX_RELEASE_TYPES})
-find_package(PhysX REQUIRED)
+if (${PROJECT_NAME}_USE_PHYSX)
+  add_compile_definitions(IMSTK_USE_PHYSX)
+  set(PHYSX_CONFIGURATION "${PHYSX_CONFIGURATION}" CACHE STRING "Select PhysX Library Type for Release and RelWithDebInfo builds")
+  set(PHYSX_RELEASE_TYPES "RELEASE;CHECKED;PROFILE" CACHE INTERNAL "List of available PhysX release library types")
+  set_property(CACHE PHYSX_CONFIGURATION PROPERTY STRINGS ${PHYSX_RELEASE_TYPES})
+  find_package(PhysX REQUIRED)
+endif()
 
 # SCCD
 find_package( SCCD REQUIRED )

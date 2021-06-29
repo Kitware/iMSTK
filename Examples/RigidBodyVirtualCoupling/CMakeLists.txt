@@ -15,7 +15,7 @@
 #  limitations under the License.
 #
 ###########################################################################
-if(iMSTK_USE_OpenHaptics)
+if(iMSTK_USE_OpenHaptics AND iMSTK_USE_PHYSX)
 
   project(Example-RigidBodyVirtualCoupling)
 
