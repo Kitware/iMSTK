@@ -87,18 +87,6 @@ main()
         dirLight->setIntensity(10.0);
         dirLight->setColor(Color(1.0, 0.95, 0.8));
         scene->addLight("directionalLight", dirLight);
-
-        // Plane
-        auto plane = std::make_shared<Plane>();
-        plane->translate(Vec3d(10.0, 10.0, 10.0), Geometry::TransformType::ApplyToData);
-
-        auto sceneObj = std::make_shared<SceneObject>("VisualPlane");
-        sceneObj->setVisualGeometry(plane);
-        scene->addSceneObject(sceneObj);
-
-        imstkNew<RenderMaterial> planeMaterial;
-        planeMaterial->setColor(Color::LightGray);
-        sceneObj->getVisualModel(0)->setRenderMaterial(planeMaterial);
     }
 
     // Run the simulation
@@ -137,8 +125,8 @@ main()
         auto rendConfig = std::make_shared<RendererConfig>();
         rendConfig->m_ssaoConfig.m_enableSSAO = true;
         rendConfig->m_ssaoConfig.m_SSAOBlur   = true;
-        rendConfig->m_ssaoConfig.m_SSAORadius = 1.0 * sceneSize;
-        rendConfig->m_ssaoConfig.m_SSAOBias   = 0.001 * sceneSize;
+        rendConfig->m_ssaoConfig.m_SSAORadius = 10.0 * sceneSize;
+        rendConfig->m_ssaoConfig.m_SSAOBias   = 0.01 * sceneSize;
         rendConfig->m_ssaoConfig.m_KernelSize = 128;
 
         viewer->getActiveRenderer()->setConfig(rendConfig);
