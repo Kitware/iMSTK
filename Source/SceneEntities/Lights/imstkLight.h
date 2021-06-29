@@ -78,11 +78,6 @@ public:
     void switchOn() { m_switchState = true; }
 
     ///
-    /// \brief Get the status (On/off) of the light
-    ///
-    bool isOff() const { return m_switchState; }
-
-    ///
     /// \brief Switch the light Off
     ///
     void switchOff() { m_switchState = false; }
@@ -105,7 +100,7 @@ public:
     ///
     /// \brief Set the light intensity. This value is unbounded.
     ///
-    void setIntensity(double intensity) { m_intensity = (float)intensity; }
+    void setIntensity(const double intensity) { m_intensity = (float)intensity; }
 
 protected:
     Light(const LightType& type) : SceneEntity(), m_type(type) { }

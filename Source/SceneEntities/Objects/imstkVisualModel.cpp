@@ -50,6 +50,20 @@ VisualModel::VisualModel() : m_renderMaterial(std::make_shared<RenderMaterial>()
 {
 }
 
+void
+VisualModel::setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial)
+{
+    m_renderMaterial = renderMaterial;
+    this->postModified();
+}
+
+void
+VisualModel::setIsVisible(const bool visible)
+{
+    m_isVisible = visible;
+    this->postModified();
+}
+
 bool
 VisualModel::getRenderDelegateCreated(Renderer* ren)
 {

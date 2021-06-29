@@ -71,7 +71,7 @@ protected:
                       std::shared_ptr<VecDataArray<int, 3>> elements);
 
     ///
-    /// \brief Modify exsiting elements of pbdObj
+    /// \brief Modify existing elements of pbdObj
     ///
     void modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
                          std::shared_ptr<std::vector<size_t>> elementIndices,

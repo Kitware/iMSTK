@@ -31,7 +31,7 @@ class SceneObject;
 /// \class ObjectInteractionPair
 ///
 /// \brief This class defines an interaction between two SceneObjects
-/// An interaction is a function occuring between two SceneObjects at some point
+/// An interaction is a function occurring between two SceneObjects at some point
 ///
 class ObjectInteractionPair : public InteractionPair
 {
@@ -46,7 +46,7 @@ protected:
     virtual ~ObjectInteractionPair() override = default;
 
 public:
-    /// \brief TODO
+    /// \brief Return the pair of scene objects involved in the interaction
     const SceneObjectPair& getObjectsPair() const { return m_objects; }
 
 public:

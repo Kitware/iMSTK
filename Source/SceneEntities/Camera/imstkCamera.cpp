@@ -19,45 +19,15 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkGeometry.h"
+#include "imstkCamera.h"
 
 namespace imstk
 {
-///
-/// \class AnimationModel
-///
-/// \brief Contains geometric and animation render information
-///
-class AnimationModel
+void
+Camera::print()
 {
-public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit AnimationModel(std::shared_ptr<Geometry> geometry);
-    AnimationModel() = delete;
-
-    ///
-    /// \brief Get/set geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry();
-    virtual void setGeometry(std::shared_ptr<Geometry> geometry);
-
-    ///
-    /// \brief Update animation
-    ///
-    virtual void update() {};
-
-    ///
-    /// \brief Reset animation
-    ///
-    virtual void reset() {};
-
-protected:
-    friend class VTKRenderer;
-
-    std::shared_ptr<Geometry> m_geometry = nullptr;
-};
-} // imstk
+    std::cout << "CamPos: " << m_position[0] << ", " << m_position[1] << ", " << m_position[2] << std::endl;
+    std::cout << "FocalPoint: " << m_focalPoint[0] << ", " << m_focalPoint[1] << ", " << m_focalPoint[2] << std::endl;
+    std::cout << "Up: " << m_viewUp[0] << ", " << m_viewUp[1] << ", " << m_viewUp[2] << std::endl;
+}
+}
