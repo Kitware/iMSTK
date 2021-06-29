@@ -21,6 +21,8 @@
 
 #include "imstkPbdInflatableVolumeConstraint.h"
 
+#include <cfloat>
+
 namespace imstk
 {
 void

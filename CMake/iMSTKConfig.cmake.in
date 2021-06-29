@@ -13,6 +13,7 @@ set(iMSTK_DATA_DIR ${PACKAGE_PREFIX_DIR}/data)
 set(iMSTK_USE_OpenHaptics @iMSTK_USE_OpenHaptics@)
 set(iMSTK_USE_VTK_OSMESA @iMSTK_USE_VTK_OSMESA@)
 set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)
+set(iMSTK_USE_PHYSX @iMSTK_USE_PHYSX@)
 
 # Use the iMSTK modules to find all required packages
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")
@@ -51,7 +52,9 @@ find_package( Libusb REQUIRED)
 find_package( openvr REQUIRED )
 
 # PhysX
-find_package(PhysX REQUIRED)
+if (iMSTK_USE_PHYSX)
+  find_package(PhysX REQUIRED)
+endif()
 
 #SCCD
 find_package( SCCD REQUIRED )

@@ -87,11 +87,14 @@ Run CMake-GUI and follow the directions described [HERE](https://cmake.org/runni
 If you would like to build on multiple cores add /MP[N] to CMAKE_CXX_FLAGS in CMake-GUI, where N is optional representing the number of cores (without N supplied, the build will use as many cores as available on the device).
 
 * ##### PhysX Support
+Please note, we are currently deprecating PhysX support, by default PhysX will be OFF but can be turned on via `iMSTK_USE_PHYSX` in  the CMAKE configuration
+
 PhysX supports multiple build configurations, designed for different stages of development and deployment.
   * The DEBUG build can be useful for error analysis, but contains asserts used for SDK development which some customers may find too intrusive for daily use. Optimizations are turned off for this configuration.
   * The CHECKED build contains code to detect invalid parameters, API race conditions, and other incorrect uses of the API which might otherwise cause mysterious crashes or failures in simulation.
   * The PROFILE build omits the checks, but still has PVD and memory instrumentation.
   * The RELEASE build is built for minimal footprint and maximum speed. It omits most checks and instrumentation.
+
   
 Simulation works the same way in all of them, and all are compiled with high optimization levels (except debug configuration).
 
