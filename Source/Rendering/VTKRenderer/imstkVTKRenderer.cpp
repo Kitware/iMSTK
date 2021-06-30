@@ -418,7 +418,6 @@ VTKRenderer::updateCamera()
     m_camera->SetViewUp(up[0], up[1], up[2]);
     m_camera->SetViewAngle(cam->getFieldOfView());
     m_camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
-    m_camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
 }
 
 void

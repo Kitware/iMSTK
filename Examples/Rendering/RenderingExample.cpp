@@ -19,12 +19,12 @@
 
 =========================================================================*/
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkIBLProbe.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
+#include "imstkPlane.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkRenderMaterial.h"
@@ -87,12 +87,6 @@ main()
         dirLight->setIntensity(10.0);
         dirLight->setColor(Color(1.0, 0.95, 0.8));
         scene->addLight("directionalLight", dirLight);
-
-        // Plane
-        auto                     planeObj = apiutils::createVisualAnalyticalSceneObject("Plane", scene, "VisualPlane", Vec3d(10.0, 10.0, 10.0));
-        imstkNew<RenderMaterial> planeMaterial;
-        planeMaterial->setColor(Color::LightGray);
-        planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);
     }
 
     // Run the simulation
@@ -131,8 +125,8 @@ main()
         auto rendConfig = std::make_shared<RendererConfig>();
         rendConfig->m_ssaoConfig.m_enableSSAO = true;
         rendConfig->m_ssaoConfig.m_SSAOBlur   = true;
-        rendConfig->m_ssaoConfig.m_SSAORadius = 1.0 * sceneSize;
-        rendConfig->m_ssaoConfig.m_SSAOBias   = 0.001 * sceneSize;
+        rendConfig->m_ssaoConfig.m_SSAORadius = 10.0 * sceneSize;
+        rendConfig->m_ssaoConfig.m_SSAOBias   = 0.01 * sceneSize;
         rendConfig->m_ssaoConfig.m_KernelSize = 128;
 
         viewer->getActiveRenderer()->setConfig(rendConfig);
