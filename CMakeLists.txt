@@ -100,7 +100,7 @@ if (UNIX)
   endif()  
 endif()
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
-option(${PROJECT_NAME}_USE_PHYSX "Build with Physx support" ON)
+option(${PROJECT_NAME}_USE_PHYSX "Build with Physx support" OFF)
 
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
