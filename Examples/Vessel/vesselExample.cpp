@@ -36,7 +36,7 @@
 #include "imstkSimulationManager.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
-#include "imstkSphObjectCollisionPair.h"
+#include "imstkSphObjectCollision.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshDistanceTransform.h"
 #include "imstkSurfaceMeshImageMask.h"
@@ -238,8 +238,8 @@ main()
         scene->addSceneObject(sphObj);
 
         // Interaction
-        imstkNew<SphObjectCollisionPair> collisionInteraction(sphObj, legsObj, CollisionDetection::Type::PointSetToImplicit);
-        scene->getCollisionGraph()->addInteraction(collisionInteraction);
+        scene->getCollisionGraph()->addInteraction(
+            std::make_shared<SphObjectCollision>(sphObj, legsObj));
 
         // Light
         imstkNew<DirectionalLight> light;

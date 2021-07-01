@@ -21,177 +21,179 @@ limitations under the License.
 
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCollisionData.h"
-#include "imstkPbdPointNormalCollisionConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPBDPickingCH.h"
 #include "imstkPbdSolver.h"
 #include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkPbdPointPointConstraint.h"
 
 namespace imstk
 {
-PBDPickingCH::PBDPickingCH(const CollisionHandling::Side&       side,
-                           const std::shared_ptr<CollisionData> colData,
-                           std::shared_ptr<PbdObject>           pbdObj,
-                           std::shared_ptr<CollidingObject>     pickObj) :
-    CollisionHandling(Type::PBDPicking, side, colData),
-    m_pbdObj(pbdObj),
-    m_pickObj(pickObj),
-    m_pbdCollisionSolver(std::make_shared<PbdCollisionSolver>())
+PBDPickingCH::PBDPickingCH() :
+    m_isPrevPicking(false),
+    m_isPicking(false)
 {
-    m_isPicking = false;
     m_pickedPtIdxOffset.clear();
 }
 
-PBDPickingCH::~PBDPickingCH()
-{
-    for (const auto ptr : m_ACConstraintPool)
-    {
-        delete ptr;
-    }
-}
-
 void
-PBDPickingCH::processCollisionData()
+PBDPickingCH::handle(
+    const CDElementVector<CollisionElement>& elementsA,
+    const CDElementVector<CollisionElement>& imstkNotUsed(elementsB))
 {
-    CHECK(m_pbdObj != nullptr && m_pickObj != nullptr)
-        << "Error: invalid input pbd objects for collision handling";
+    std::shared_ptr<PbdObject>       pbdObj  = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
+    std::shared_ptr<CollidingObject> pickObj = getInputObjectB();
+
+    CHECK(pbdObj != nullptr && pickObj != nullptr)
+        << "PBDPickingCH::handleCollision error: "
+        << "no picking collision handling available the object";
+
+    // If started picking
+    if (!m_isPrevPicking && m_isPicking)
+    {
+        this->addPickConstraints(elementsA, pbdObj, pickObj);
+    }
+    // If stopped picking
+    if (!m_isPicking && m_isPrevPicking)
+    {
+        // Unfix the points
+        std::shared_ptr<PbdModel> model = pbdObj->getPbdModel();
+        for (auto iter = m_pickedPtIdxOffset.begin(); iter != m_pickedPtIdxOffset.end(); ++iter)
+        {
+            model->setPointUnfixed(iter->first);
+        }
+        m_pickedPtIdxOffset.clear();
+    }
 
     if (m_isPicking)
     {
-        this->updatePickConstraints();
-    }
-    else
-    {
-        this->generatePBDConstraints();
-        if (m_PBDConstraints.size() == 0)
+        if (m_pickedPtIdxOffset.size() == 0)
         {
+            this->endPick();
             return;
         }
 
-        m_pbdCollisionSolver->addCollisionConstraints(&m_PBDConstraints,
-            m_pbdObj->getPbdModel()->getCurrentState()->getPositions(),
-            m_pbdObj->getPbdModel()->getInvMasses(),
-            nullptr,
-            nullptr);
+        std::shared_ptr<PbdModel>           model    = pbdObj->getPbdModel();
+        std::shared_ptr<AnalyticalGeometry> pickGeom =
+            std::dynamic_pointer_cast<AnalyticalGeometry>(pickObj->getCollidingGeometry());
+        std::shared_ptr<VecDataArray<double, 3>> vertices   = model->getCurrentState()->getPositions();
+        VecDataArray<double, 3>&                 vertexData = *vertices;
+        for (auto iter = m_pickedPtIdxOffset.begin(); iter != m_pickedPtIdxOffset.end(); iter++)
+        {
+            auto rot = pickGeom->getRotation();
+            vertexData[iter->first] = pickGeom->getPosition() + rot * iter->second;
+        }
     }
+    else
+    {
+        this->generatePBDConstraints(elementsA);
+
+        // Immediately do the constraint solve
+        // Does not solve for restitution or friction
+        for (const auto& constraint : m_constraints)
+        {
+            constraint->solvePosition();
+        }
+    }
+
+    // Push back the picking state
+    m_isPrevPicking = m_isPicking;
 }
 
 void
-PBDPickingCH::updatePickConstraints()
+PBDPickingCH::addPickConstraints(const CDElementVector<CollisionElement>& elements,
+                                 std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> pickObj)
 {
-    if (m_pickedPtIdxOffset.size() == 0)
-    {
-        this->removePickConstraints();
-        return;
-    }
-
-    std::shared_ptr<PbdModel>                model      = m_pbdObj->getPbdModel();
-    std::shared_ptr<AnalyticalGeometry>      pickGeom   = std::dynamic_pointer_cast<AnalyticalGeometry>(m_pickObj->getCollidingGeometry());
-    std::shared_ptr<VecDataArray<double, 3>> vertices   = model->getCurrentState()->getPositions();
-    VecDataArray<double, 3>&                 vertexData = *vertices;
-    for (auto iter = m_pickedPtIdxOffset.begin(); iter != m_pickedPtIdxOffset.end(); iter++)
-    {
-        auto rot = pickGeom->getRotation();
-        vertexData[iter->first] = pickGeom->getPosition() + rot * iter->second;
-    }
-}
-
-void
-PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> pickObj)
-{
-    if (m_colData->PColData.isEmpty())
-    {
-        return;
-    }
-
     CHECK(pbdObj != nullptr && pickObj != nullptr)
-        << "Error: no pdb object or colliding object.";
+        << "PBDPickingCH:addPickConstraints error: "
+        << "no pdb object or colliding object.";
 
     std::shared_ptr<PbdModel>           model    = pbdObj->getPbdModel();
     std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(pickObj->getCollidingGeometry());
     CHECK(pickGeom != nullptr) << "Colliding geometry is analytical geometry ";
 
-    std::shared_ptr<VecDataArray<double, 3>> vertices   = model->getCurrentState()->getPositions();
-    VecDataArray<double, 3>&                 vertexData = *vertices;
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = model->getCurrentState()->getPositions();
+    VecDataArray<double, 3>&                 vertices    = *verticesPtr;
 
+    // For every collision element record the offsets and fix the points in the PbdModel
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_colData->PColData.getSize(),
-        [&](const size_t idx) {
-            const auto& cd = m_colData->PColData[idx];
-            if (m_pickedPtIdxOffset.find(cd.nodeIdx) == m_pickedPtIdxOffset.end() && model->getInvMass(cd.nodeIdx) != 0.0)
-            {
-                auto pv  = cd.penetrationVector;
-                auto rot = pickGeom->getRotation().transpose();
-                auto relativePos = rot * (vertexData[cd.nodeIdx] - pv - pickGeom->getPosition());
-
-                lock.lock();
-                m_pickedPtIdxOffset[cd.nodeIdx] = relativePos;
-                model->setFixedPoint(cd.nodeIdx);
-                vertexData[cd.nodeIdx] = pickGeom->getPosition() + rot.transpose() * relativePos;
-                lock.unlock();
-            }
-    });
-}
-
-void
-PBDPickingCH::removePickConstraints()
-{
-    std::shared_ptr<PbdModel> model = m_pbdObj->getPbdModel();
-    m_isPicking = false;
-    for (auto iter = m_pickedPtIdxOffset.begin(); iter != m_pickedPtIdxOffset.end(); ++iter)
-    {
-        model->setPointUnfixed(iter->first);
-    }
-    m_pickedPtIdxOffset.clear();
-}
-
-void
-PBDPickingCH::activatePickConstraints()
-{
-    if (!m_colData->PColData.isEmpty())
-    {
-        this->addPickConstraints(m_pbdObj, m_pickObj);
-        m_isPicking = true;
-    }
-}
-
-void
-PBDPickingCH::generatePBDConstraints()
-{
-    std::shared_ptr<PbdCollisionConstraintConfig> config = m_pbdObj->getPbdModel()->getParameters()->collisionParams;
-
-    {
-        // \todo: Pool not implemented correctly (see PbdCollisionHandling for proper trick), for now, just delete
-        for (size_t i = 0; i < m_ACConstraintPool.size(); ++i)
-        {
-            delete m_ACConstraintPool[i];
-        }
-    }
-    m_ACConstraintPool.resize(0);
-    m_ACConstraintPool.reserve(m_colData->PColData.getSize());
-    for (size_t i = 0; i < m_colData->PColData.getSize(); ++i)
-    {
-        m_ACConstraintPool.push_back(new PbdPointNormalCollisionConstraint);
-    }
-
-    std::shared_ptr<PointSet>      pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObj->getPhysicsGeometry());
-    const VecDataArray<double, 3>& vertices = *pointSet->getVertexPositions();
-    ParallelUtils::parallelFor(m_colData->PColData.getSize(),
+    ParallelUtils::parallelFor(elements.getSize(),
         [&](const size_t idx)
         {
-            const Vec3d& initPos = vertices[m_colData->PColData[idx].nodeIdx];
-            const Vec3d& penetrationVector = -m_colData->PColData[idx].penetrationVector; // Vector to resolve
-            m_ACConstraintPool[idx]->initConstraint(config, initPos + penetrationVector, penetrationVector, m_colData->PColData[idx].nodeIdx);
-        });
+            const CollisionElement& elem = elements[idx];
+            if (elem.m_type == CollisionElementType::PointIndexDirection)
+            {
+                const PointIndexDirectionElement& pdElem = elem.m_element.m_PointIndexDirectionElement;
+                if (m_pickedPtIdxOffset.find(pdElem.ptIndex) == m_pickedPtIdxOffset.end()
+                    && model->getInvMass(pdElem.ptIndex) != 0.0)
+                {
+                    const Vec3d pv  = pdElem.dir * pdElem.penetrationDepth;
+                    const Mat3d rot = pickGeom->getRotation().transpose();
+                    const Vec3d relativePos = rot * (vertices[pdElem.ptIndex] - pv - pickGeom->getPosition());
 
-    // Copy constraints
-    m_PBDConstraints.resize(0);
-    m_PBDConstraints.reserve(m_colData->PColData.getSize());
-    for (size_t i = 0; i < m_colData->PColData.getSize(); ++i)
+                    lock.lock();
+                    m_pickedPtIdxOffset[pdElem.ptIndex] = relativePos;
+                    model->setFixedPoint(pdElem.ptIndex);
+                    vertices[pdElem.ptIndex] = pickGeom->getPosition() + rot.transpose() * relativePos;
+                    lock.unlock();
+                }
+            }
+        }, 100);
+}
+
+void
+PBDPickingCH::generatePBDConstraints(const CDElementVector<CollisionElement>& elements)
+{
+    // Only constraint when picking is on
+    if (m_isPicking)
     {
-        m_PBDConstraints.push_back(static_cast<PbdCollisionConstraint*>(m_ACConstraintPool[i]));
+        std::shared_ptr<PbdObject>       pbdObj  = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
+        std::shared_ptr<CollidingObject> pickObj = getInputObjectB();
+
+        CHECK(pbdObj != nullptr && pickObj != nullptr)
+            << "PBDPickingCH:addPickConstraints error: "
+            << "no pdb object or colliding object.";
+
+        m_constraints.resize(0);
+        m_constraints.reserve(elements.getSize());
+
+        constraintPts.clear();
+        constraintVels.clear();
+
+        // Get the geometry and some attributes that we can assume are there so long as this is a pbdObj
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(pbdObj->getPhysicsGeometry());
+
+        std::shared_ptr<VecDataArray<double, 3>> verticesPtr   = pointSet->getVertexPositions();
+        auto                                     velocitiesPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSet->getVertexAttribute("Velocities"));
+        auto                                     invMassesPtr  = std::dynamic_pointer_cast<DataArray<double>>(pointSet->getVertexAttribute("InvMass"));
+
+        VecDataArray<double, 3>& vertices   = *verticesPtr;
+        VecDataArray<double, 3>& velocities = *velocitiesPtr;
+        const DataArray<double>& invMasses  = *invMassesPtr;
+
+        ParallelUtils::parallelFor(elements.getSize(),
+            [&](const size_t idx)
+            {
+                const CollisionElement& elem = elements[idx];
+                if (elem.m_type == CollisionElementType::PointIndexDirection)
+                {
+                    const PointIndexDirectionElement& pdElem = elem.m_element.m_PointIndexDirectionElement;
+                    const Vec3d& initPos = vertices[pdElem.ptIndex];
+                    const Vec3d penetrationVector = -pdElem.dir * pdElem.penetrationDepth; // Vector to resolve
+
+                    constraintPts.push_back(initPos - penetrationVector);
+                    constraintVels.push_back(Vec3d::Zero());
+
+                    // Mapped indices not supported
+                    m_constraints.push_back(std::make_shared<PbdPointPointConstraint>());
+                    m_constraints[idx]->initConstraint(
+                        { &vertices[pdElem.ptIndex], invMasses[pdElem.ptIndex], &velocities[pdElem.ptIndex] },
+                        { &constraintPts.back(), 0.0, &constraintVels.back() },
+                        1.0, 0.0);
+                }
+            });
     }
 }
 }

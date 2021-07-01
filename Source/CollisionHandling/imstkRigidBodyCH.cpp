@@ -21,181 +21,426 @@
 
 #include "imstkRigidBodyCH.h"
 #include "imstkCollisionData.h"
+#include "imstkLineMesh.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRbdFrictionConstraint.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
+#include "imstkSurfaceMesh.h"
+
+#include "imstkCollisionUtils.h"
 
 namespace imstk
 {
-RigidBodyCH::RigidBodyCH(const Side&                          side,
-                         const std::shared_ptr<CollisionData> colData,
-                         std::shared_ptr<RigidObject2>        rbdObjectA,
-                         std::shared_ptr<RigidObject2>        rbdObjectB,
-                         const double                         stiffness,
-                         const double                         frictionalCoefficient) :
-    CollisionHandling(Type::RBD, side, colData),
-    m_rbdObjectA(rbdObjectA),
-    m_rbdObjectB(rbdObjectB),
-    m_stiffness(stiffness),
-    m_frictionalCoefficient(frictionalCoefficient),
-    m_useFriction(frictionalCoefficient != 0.0)
+void
+RigidBodyCH::setInputRigidObjectA(std::shared_ptr<RigidObject2> rbdObjA)
 {
-    if (side == Side::AB && rbdObjectA == nullptr && rbdObjectB == nullptr)
-    {
-        LOG(WARNING) << "RigidBodyCH, side AB was specified but only one object given";
-        return;
-    }
-    if (side == Side::A && rbdObjectA == nullptr)
-    {
-        LOG(WARNING) << "RigidBodyCH, side A was specified but object A not given";
-        return;
-    }
-    if (side == Side::B && rbdObjectB == nullptr)
-    {
-        LOG(WARNING) << "RigidBodyCH, side B was specified but object B not given";
-        return;
-    }
+    setInputObjectA(rbdObjA);
 }
 
 void
-RigidBodyCH::processCollisionData()
+RigidBodyCH::setInputRigidObjectB(std::shared_ptr<RigidObject2> rbdObjB)
 {
-    if (m_side == Side::A)
-    {
-        processA();
-    }
-    else if (m_side == Side::B)
-    {
-        processB();
-    }
-    else if (m_side == Side::AB)
-    {
-        std::shared_ptr<RigidBodyModel2> rbdModelA = m_rbdObjectA->getRigidBodyModel2();
-        std::shared_ptr<RigidBodyModel2> rbdModelB = m_rbdObjectB->getRigidBodyModel2();
+    setInputObjectB(rbdObjB);
+}
 
-        // If the two bodies exist in separate models, add two one way constraints
-        if (rbdModelA != rbdModelB)
+void
+RigidBodyCH::setInputCollidingObjectB(std::shared_ptr<CollidingObject> colObjB)
+{
+    setInputObjectB(colObjB);
+}
+
+std::shared_ptr<RigidObject2>
+RigidBodyCH::getRigidObjA()
+{
+    return std::dynamic_pointer_cast<RigidObject2>(getInputObjectA());
+}
+
+std::shared_ptr<RigidObject2>
+RigidBodyCH::getRigidObjB()
+{
+    return std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
+}
+
+void
+RigidBodyCH::handle(
+    const CDElementVector<CollisionElement>& elementsA,
+    const CDElementVector<CollisionElement>& elementsB)
+{
+    std::shared_ptr<RigidObject2>    rbdObjA = getRigidObjA();
+    std::shared_ptr<RigidObject2>    rbdObjB = getRigidObjB();
+    std::shared_ptr<CollidingObject> colObjB = getInputObjectB();
+
+    // If both objects are rigid objects
+    if (rbdObjA != nullptr && rbdObjB != nullptr)
+    {
+        // If we only have elements of A, process one-sided rigid
+        if (elementsB.getSize() == 0 && elementsA.getSize() != 0)
         {
-            if (rbdModelA != nullptr)
-            {
-                processA();
-            }
-            if (rbdModelB != nullptr)
-            {
-                processB();
-            }
+            handleRbdStaticOneWay(rbdObjA, colObjB, elementsA, elementsB);
         }
+        // If we have both elements
         else
         {
-            processAB();
+            std::shared_ptr<RigidBodyModel2> rbdModelA = rbdObjA->getRigidBodyModel2();
+            std::shared_ptr<RigidBodyModel2> rbdModelB = rbdObjB->getRigidBodyModel2();
+
+            // If the two bodies exist in separate rbd models, add two one-way constraints
+            // to each system
+            if (rbdModelA != rbdModelB)
+            {
+                if (rbdModelA != nullptr)
+                {
+                    handleRbdStaticOneWay(rbdObjA, nullptr, elementsA, elementsB);
+                }
+                if (rbdModelB != nullptr)
+                {
+                    handleRbdStaticOneWay(rbdObjB, nullptr, elementsB, elementsA);
+                }
+            }
+            // If in the same model use one two-way constraint
+            else
+            {
+                handleRbdRbdTwoWay(rbdObjA, rbdObjB, elementsA, elementsB);
+            }
         }
     }
-}
-
-void
-RigidBodyCH::processA()
-{
-    std::shared_ptr<RigidBodyModel2> rbdModelA = m_rbdObjectA->getRigidBodyModel2();
-    // Generate one-way constraints
-    PositionDirectionCollisionData& pdColData = m_colData->PDColData;
-    for (size_t i = 0; i < pdColData.getSize(); i++)
+    // If objA is rigid and b is colliding
+    else if (rbdObjA != nullptr && colObjB != nullptr)
     {
-        {
-            std::shared_ptr<RbdContactConstraint> contactConstraint =
-                std::make_shared<RbdContactConstraint>(
-                    m_rbdObjectA->getRigidBody(), nullptr,
-                    pdColData[i].dirAtoB.normalized(),
-                    pdColData[i].posB,
-                    pdColData[i].penetrationDepth,
-                    m_stiffness,
-                    RbdConstraint::Side::A);
-            contactConstraint->compute(rbdModelA->getTimeStep());
-            rbdModelA->addConstraint(contactConstraint);
-        }
-
-        if (m_useFriction)
-        {
-            std::shared_ptr<RbdFrictionConstraint> frictionConstraint =
-                std::make_shared<RbdFrictionConstraint>(
-                    m_rbdObjectA->getRigidBody(), nullptr,
-                    pdColData[i].posB,
-                    pdColData[i].dirAtoB.normalized(),
-                    pdColData[i].penetrationDepth,
-                    m_frictionalCoefficient,
-                    RbdConstraint::Side::A);
-            frictionConstraint->compute(rbdModelA->getTimeStep());
-            rbdModelA->addConstraint(frictionConstraint);
-        }
+        // Process one sided with both
+        handleRbdStaticOneWay(rbdObjA, colObjB, elementsA, elementsB);
     }
 }
 
 void
-RigidBodyCH::processB()
+RigidBodyCH::handleRbdRbdTwoWay(
+    std::shared_ptr<RigidObject2>            rbdObjA,
+    std::shared_ptr<RigidObject2>            rbdObjB,
+    const CDElementVector<CollisionElement>& elementsA,
+    const CDElementVector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<RigidBodyModel2> rbdModelB = m_rbdObjectB->getRigidBodyModel2();
-    // Generate one-way constraints
-    PositionDirectionCollisionData& pdColData = m_colData->PDColData;
-    for (size_t i = 0; i < pdColData.getSize(); i++)
+    if (elementsA.getSize() != elementsB.getSize())
     {
-        std::shared_ptr<RbdContactConstraint> contactConstraint =
-            std::make_shared<RbdContactConstraint>(
-                nullptr, m_rbdObjectB->getRigidBody(),
-                pdColData[i].dirAtoB.normalized(),
-                pdColData[i].posB,
-                pdColData[i].penetrationDepth,
-                m_stiffness,
-                RbdConstraint::Side::B);
-        contactConstraint->compute(rbdModelB->getTimeStep());
-        rbdModelB->addConstraint(contactConstraint);
-
-        if (m_useFriction)
-        {
-            std::shared_ptr<RbdFrictionConstraint> frictionConstraint =
-                std::make_shared<RbdFrictionConstraint>(
-                    nullptr, m_rbdObjectB->getRigidBody(),
-                    pdColData[i].posB,
-                    pdColData[i].dirAtoB.normalized(),
-                    pdColData[i].penetrationDepth,
-                    m_frictionalCoefficient,
-                    RbdConstraint::Side::B);
-            frictionConstraint->compute(rbdModelB->getTimeStep());
-            rbdModelB->addConstraint(frictionConstraint);
-        }
+        return;
     }
-}
 
-void
-RigidBodyCH::processAB()
-{
+    auto geom = std::dynamic_pointer_cast<PointSet>(rbdObjA->getCollidingGeometry());
+
     // Generate one two-way constraint
-    std::shared_ptr<RigidBodyModel2> rbdModelAB = m_rbdObjectA->getRigidBodyModel2();
-    PositionDirectionCollisionData&  pdColData  = m_colData->PDColData;
-    for (size_t i = 0; i < pdColData.getSize(); i++)
+    std::shared_ptr<RigidBodyModel2> rbdModelAB = rbdObjA->getRigidBodyModel2();
+    for (size_t i = 0; i < elementsA.getSize(); i++)
     {
-        std::shared_ptr<RbdContactConstraint> contactConstraint =
-            std::make_shared<RbdContactConstraint>(
-                m_rbdObjectA->getRigidBody(), m_rbdObjectB->getRigidBody(),
-                pdColData[i].dirAtoB.normalized(),
-                pdColData[i].posB,
-                pdColData[i].penetrationDepth,
-                m_stiffness);
-        contactConstraint->compute(rbdModelAB->getTimeStep());
-        rbdModelAB->addConstraint(contactConstraint);
+        const CollisionElement& colElemA = elementsA[i];
+        const CollisionElement& colElemB = elementsB[i];
+        if (colElemA.m_type == CollisionElementType::PointDirection)
+        {
+            const Vec3d& contactPt = colElemA.m_element.m_PointDirectionElement.pt;
+            const Vec3d& dir       = colElemA.m_element.m_PointDirectionElement.dir;
+            const double depth     = colElemA.m_element.m_PointDirectionElement.penetrationDepth;
+
+            addConstraint(rbdObjA, rbdObjB, contactPt, dir, depth);
+        }
+        else if (colElemA.m_type == CollisionElementType::PointIndexDirection)
+        {
+            // Doesn't support mapping yet
+            const Vec3d& contactPt = (*geom->getVertexPositions())[colElemA.m_element.m_PointIndexDirectionElement.ptIndex];
+            const Vec3d& dir       = colElemA.m_element.m_PointIndexDirectionElement.dir;
+            const double depth     = colElemA.m_element.m_PointIndexDirectionElement.penetrationDepth;
+
+            addConstraint(rbdObjA, rbdObjB, contactPt, dir, depth);
+        }
+    }
+}
+
+void
+RigidBodyCH::handleRbdStaticOneWay(
+    std::shared_ptr<RigidObject2>            rbdObj,
+    std::shared_ptr<CollidingObject>         colObj,
+    const CDElementVector<CollisionElement>& elementsA,
+    const CDElementVector<CollisionElement>& elementsB)
+{
+    // First handle one-way point-direction constraints
+    for (size_t i = 0; i < elementsA.getSize(); i++)
+    {
+        const CollisionElement& colElem = elementsA[i];
+        if (colElem.m_type == CollisionElementType::PointDirection)
+        {
+            const Vec3d& contactPt = colElem.m_element.m_PointDirectionElement.pt;
+            const Vec3d& dir       = colElem.m_element.m_PointDirectionElement.dir;
+            const double depth     = colElem.m_element.m_PointDirectionElement.penetrationDepth;
+
+            addConstraint(rbdObj, contactPt, dir, depth);
+        }
+        else if (colElem.m_type == CollisionElementType::PointIndexDirection)
+        {
+            // Doesn't support mapping yet
+            auto         geom      = std::dynamic_pointer_cast<PointSet>(rbdObj->getCollidingGeometry());
+            const Vec3d& contactPt = (*geom->getVertexPositions())[colElem.m_element.m_PointIndexDirectionElement.ptIndex];
+            const Vec3d& dir       = colElem.m_element.m_PointIndexDirectionElement.dir;
+            const double depth     = colElem.m_element.m_PointIndexDirectionElement.penetrationDepth;
+
+            addConstraint(rbdObj, contactPt, dir, depth);
+        }
+    }
+
+    // So long as both sides were filled we may have two-way
+    if (elementsA.getSize() != elementsB.getSize() || colObj == nullptr)
+    {
+        return;
+    }
+
+    // Two-way is only supported through mesh-mesh
+    auto geomA = std::dynamic_pointer_cast<PointSet>(rbdObj->getCollidingGeometry());
+    auto geomB = std::dynamic_pointer_cast<PointSet>(colObj->getCollidingGeometry());
+    if (geomA == nullptr || geomB == nullptr)
+    {
+        return;
+    }
+
+    std::shared_ptr<VecDataArray<double, 3>> verticesAPtr = geomA->getVertexPositions();
+    const VecDataArray<double, 3>&           verticesA    = *verticesAPtr;
+    std::shared_ptr<VecDataArray<double, 3>> verticesBPtr = geomB->getVertexPositions();
+    const VecDataArray<double, 3>&           verticesB    = *verticesBPtr;
+
+    // Generate one two-way constraint
+    std::shared_ptr<RigidBodyModel2> rbdModelA = rbdObj->getRigidBodyModel2();
+    for (size_t i = 0; i < elementsA.getSize(); i++)
+    {
+        const CollisionElement& colElemA = elementsA[i];
+        const CollisionElement& colElemB = elementsB[i];
+
+        // Only handle mesh-mesh constraints here
+        if (colElemA.m_type != CollisionElementType::CellIndex || colElemB.m_type != CollisionElementType::CellIndex)
+        {
+            continue;
+        }
+
+        const CellIndexElement& elemA = colElemA.m_element.m_CellIndexElement;
+        const CellIndexElement& elemB = colElemB.m_element.m_CellIndexElement;
+
+        // Vertex vs Triangle
+        if (elemA.cellType == IMSTK_VERTEX && elemB.cellType == IMSTK_TRIANGLE)
+        {
+            const Vec3d& p = verticesA[elemA.ids[0]];
+
+            Vec3i tri;
+            if (elemB.idCount == 1)
+            {
+                tri = (*dynamic_cast<SurfaceMesh*>(geomB.get())->getTriangleIndices().get())[elemB.ids[0]];
+            }
+            else if (elemB.idCount == 3)
+            {
+                tri = Vec3i(elemB.ids[0], elemB.ids[1], elemB.ids[2]);
+            }
+            const Vec3d& a = verticesB[tri[0]];
+            const Vec3d& b = verticesB[tri[1]];
+            const Vec3d& c = verticesB[tri[2]];
+
+            // Project the vertex onto the triangle
+            Vec3d  n;
+            double depth;
+            {
+                const Vec3d v0 = b - a;
+                const Vec3d v1 = c - a;
+                const Vec3d v2 = p - a;
+                n     = v0.cross(v1).normalized();
+                depth = v2.dot(n);
+            }
+            Vec3d contactPt = p + n * depth; // Point n triangle
+
+            addConstraint(rbdObj, contactPt, n, depth);
+        }
+        // Edge vs Edge
+        else if (elemA.cellType == IMSTK_EDGE && elemB.cellType == IMSTK_EDGE)
+        {
+            Vec2i edgeA;
+            if (elemA.idCount == 1)
+            {
+                edgeA = (*dynamic_cast<LineMesh*>(geomA.get())->getLinesIndices().get())[elemA.ids[0]];
+            }
+            else if (elemA.idCount == 2)
+            {
+                edgeA = Vec2i(elemA.ids[0], elemA.ids[1]);
+            }
+            Vec2i edgeB;
+            if (elemB.idCount == 1)
+            {
+                edgeB = (*dynamic_cast<LineMesh*>(geomB.get())->getLinesIndices().get())[elemB.ids[0]];
+            }
+            else if (elemB.idCount == 2)
+            {
+                edgeB = Vec2i(elemB.ids[0], elemB.ids[1]);
+            }
+
+            // Measure closest distances
+            Vec3d pA, pB;
+            CollisionUtils::edgeToEdgeClosestPoints(
+                verticesA[edgeA[0]], verticesA[edgeA[1]],
+                verticesB[edgeB[0]], verticesB[edgeB[1]], pA, pB);
+
+            const Vec3d  diff = pB - pA;
+            const double l    = diff.norm();
+            if (l > 0.0)
+            {
+                // If A is within/behind edge B, then pB-pA gives direction to move A out of B
+                const Vec3d n = diff / l;
+
+                // pA is point of contact on objA which is rigid body
+                addConstraint(rbdObj, pA, n, l);
+            }
+        }
+        // Edge vs Vertex
+        else if (elemA.cellType == IMSTK_EDGE && elemB.cellType == IMSTK_VERTEX)
+        {
+            Vec2i edge;
+            if (elemA.idCount == 1)
+            {
+                edge = (*dynamic_cast<LineMesh*>(geomA.get())->getLinesIndices().get())[elemA.ids[0]];
+            }
+            else if (elemA.idCount == 2)
+            {
+                edge = Vec2i(elemA.ids[0], elemA.ids[1]);
+            }
+            const Vec3d& a = verticesA[edge[0]];
+            const Vec3d& b = verticesA[edge[1]];
+
+            const Vec3d& pt = verticesB[elemB.ids[0]];
+
+            const Vec3d  ab     = b - a;
+            const double length = ab.norm();
+            const Vec3d  dir1   = ab / length;
+
+            // Project onto the line
+            const Vec3d  diff = pt - a;
+            const double p    = dir1.dot(diff);
+
+            // Remove tangent component to get normal
+            const Vec3d  diff1 = diff - p * dir1;
+            const double l     = diff1.norm();
+            if (l > 0.0)
+            {
+                const Vec3d  n = diff1 / l;
+                const double u = p / length;
+
+                const Vec3d contactPt = pt - n * l;
+
+                addConstraint(rbdObj, contactPt, n, l);
+            }
+        }
+        else if (elemA.cellType == IMSTK_VERTEX && elemB.cellType == IMSTK_EDGE)
+        {
+            const Vec3d& pt = verticesA[elemA.ids[0]];
+
+            Vec2i edge;
+            if (elemB.idCount == 1)
+            {
+                edge = (*dynamic_cast<LineMesh*>(geomB.get())->getLinesIndices().get())[elemB.ids[0]];
+            }
+            else if (elemB.idCount == 2)
+            {
+                edge = Vec2i(elemB.ids[0], elemB.ids[1]);
+            }
+            const Vec3d& a = verticesB[edge[0]];
+            const Vec3d& b = verticesB[edge[1]];
+
+            const Vec3d  ab     = b - a;
+            const double length = ab.norm();
+            const Vec3d  dir1   = ab / length;
+
+            // Project onto the line
+            const Vec3d  diff = pt - a;
+            const double p    = dir1.dot(diff);
+
+            // Remove tangent component to get normal
+            const Vec3d  diff1 = diff - p * dir1;
+            const double l     = diff1.norm();
+            if (l > 0.0)
+            {
+                const Vec3d  n = diff1 / l;
+                const double u = p / length;
+
+                const Vec3d contactPt = pt + n * l;
+                //std::cout << "n: " << n[0] << ", " << n[1] << ", " << n[2] << std::endl;
+
+                addConstraint(rbdObj, contactPt, -n, l);
+            }
+        }
+        else if (elemA.cellType == IMSTK_VERTEX && elemB.cellType == IMSTK_VERTEX)
+        {
+            const Vec3d& a = verticesA[elemA.ids[0]];  // Vertex to resolve
+            const Vec3d& b = verticesB[elemB.ids[0]];
+
+            const Vec3d  diff = b - a;
+            const double l    = diff.norm();
+            if (l > 0.0)
+            {
+                addConstraint(rbdObj, a, diff / l, l);
+            }
+        }
+    }
+}
+
+void
+RigidBodyCH::addConstraint(
+    std::shared_ptr<RigidObject2> rbdObj,
+    const Vec3d& contactPt, const Vec3d& contactNormal,
+    const double contactDepth)
+{
+    auto contactConstraint = std::make_shared<RbdContactConstraint>(
+            rbdObj->getRigidBody(), nullptr,
+            contactNormal.normalized(), contactPt, contactDepth,
+            m_beta,
+            RbdConstraint::Side::A);
+    contactConstraint->compute(rbdObj->getRigidBodyModel2()->getTimeStep());
+    rbdObj->getRigidBodyModel2()->addConstraint(contactConstraint);
+
+    if (m_useFriction)
+    {
+        std::shared_ptr<RbdFrictionConstraint> frictionConstraint =
+            std::make_shared<RbdFrictionConstraint>(
+                rbdObj->getRigidBody(), nullptr,
+                contactPt, contactNormal.normalized(), contactDepth,
+                m_frictionalCoefficient,
+                RbdConstraint::Side::A);
+        frictionConstraint->compute(rbdObj->getRigidBodyModel2()->getTimeStep());
+        rbdObj->getRigidBodyModel2()->addConstraint(frictionConstraint);
+    }
+}
+
+void
+RigidBodyCH::addConstraint(
+    std::shared_ptr<RigidObject2> rbdObjA,
+    std::shared_ptr<RigidObject2> rbdObjB,
+    const Vec3d& contactPt, const Vec3d& contactNormal,
+    const double contactDepth)
+{
+    // Add a two-way constraint to solve both with one constraint
+    if (rbdObjA->getRigidBodyModel2() == rbdObjB->getRigidBodyModel2())
+    {
+        auto contactConstraint = std::make_shared<RbdContactConstraint>(
+            rbdObjA->getRigidBody(), rbdObjB->getRigidBody(),
+            contactNormal.normalized(), contactPt, contactDepth,
+            m_beta);
+        contactConstraint->compute(rbdObjA->getRigidBodyModel2()->getTimeStep());
+        rbdObjA->getRigidBodyModel2()->addConstraint(contactConstraint);
 
         if (m_useFriction)
         {
-            std::shared_ptr<RbdFrictionConstraint> frictionConstraint =
-                std::make_shared<RbdFrictionConstraint>(
-                    m_rbdObjectA->getRigidBody(), m_rbdObjectB->getRigidBody(),
-                    pdColData[i].posB,
-                    pdColData[i].dirAtoB.normalized(),
-                    pdColData[i].penetrationDepth,
+            auto frictionConstraint = std::make_shared<RbdFrictionConstraint>(
+                    rbdObjA->getRigidBody(), rbdObjB->getRigidBody(),
+                    contactPt, contactNormal.normalized(), contactDepth,
                     m_frictionalCoefficient,
                     RbdConstraint::Side::AB);
-            frictionConstraint->compute(rbdModelAB->getTimeStep());
-            rbdModelAB->addConstraint(frictionConstraint);
+            frictionConstraint->compute(rbdObjA->getRigidBodyModel2()->getTimeStep());
+            rbdObjA->getRigidBodyModel2()->addConstraint(frictionConstraint);
         }
+    }
+    // If both belong to differing systems then use two one-way constraints
+    else
+    {
+        addConstraint(rbdObjA, contactPt, contactNormal, contactDepth);
+        addConstraint(rbdObjB, contactPt, -contactNormal, contactDepth);
     }
 }
 }

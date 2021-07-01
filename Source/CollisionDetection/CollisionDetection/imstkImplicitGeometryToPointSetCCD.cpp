@@ -26,23 +26,6 @@ limitations under the License.
 
 namespace imstk
 {
-ImplicitGeometryToPointSetCCD::ImplicitGeometryToPointSetCCD(std::shared_ptr<ImplicitGeometry> implicitGeomA,
-                                                             std::shared_ptr<PointSet>         pointSetB,
-                                                             std::shared_ptr<CollisionData>    colData) :
-    CollisionDetection(CollisionDetection::Type::PointSetToImplicitCCD, colData),
-    m_implicitGeomA(implicitGeomA),
-    m_pointSetB(pointSetB)
-{
-    centralGrad.setFunction(m_implicitGeomA);
-    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(m_implicitGeomA))
-    {
-        centralGrad.setDx(sdf->getImage()->getSpacing());
-    }
-
-    displacementsPtr = std::make_shared<VecDataArray<double, 3>>(m_pointSetB->getNumVertices());
-    m_pointSetB->setVertexAttribute("displacements", displacementsPtr);
-}
-
 static bool
 findFirstRoot(std::shared_ptr<ImplicitGeometry> implicitGeomA, const Vec3d& start, const Vec3d& end, Vec3d& root)
 {
@@ -55,7 +38,7 @@ findFirstRoot(std::shared_ptr<ImplicitGeometry> implicitGeomA, const Vec3d& star
 
     // Root find (could be multiple roots, we want the first, so start march from front)
     // Gradient could be used for SDFs to converge faster but not for levelsets
-    const double stepRatio  = 0.01; // 100/5=20, this will fail if object moves 20xwidth of the object
+    const double stepRatio  = 0.01;    // 100/5=20, this will fail if object moves 20xwidth of the object
     const double length     = displacement.norm();
     const double stepLength = length * stepRatio;
     const Vec3d  dir = displacement * (1.0 / length);
@@ -77,24 +60,49 @@ findFirstRoot(std::shared_ptr<ImplicitGeometry> implicitGeomA, const Vec3d& star
     return false;
 }
 
-void
-ImplicitGeometryToPointSetCCD::computeCollisionData()
+ImplicitGeometryToPointSetCCD::ImplicitGeometryToPointSetCCD()
 {
-    m_colData->clearAll();
+    setRequiredInputType<ImplicitGeometry>(0);
+    setRequiredInputType<PointSet>(1);
+}
+
+void
+ImplicitGeometryToPointSetCCD::setupFunctions(std::shared_ptr<ImplicitGeometry> implicitGeom, std::shared_ptr<PointSet> pointSet)
+{
+    m_centralGrad.setFunction(implicitGeom);
+    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(implicitGeom))
+    {
+        m_centralGrad.setDx(sdf->getImage()->getSpacing());
+    }
+
+    // If the point set does not have displacements (or has them but not the right type), add them
+    m_displacementsPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSet->getVertexAttribute("displacements"));
+    if (m_displacementsPtr == nullptr)
+    {
+        m_displacementsPtr = std::make_shared<VecDataArray<double, 3>>(pointSet->getNumVertices());
+        pointSet->setVertexAttribute("displacements", m_displacementsPtr);
+        m_displacementsPtr->fill(Vec3d::Zero());
+    }
+}
+
+void
+ImplicitGeometryToPointSetCCD::computeCollisionDataAB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
+{
+    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
+    std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
+    setupFunctions(implicitGeom, pointSet);
 
     // We are going to try to catch a contact before updating via marching along
     // the displacements of every point in the mesh
 
     // First we project the mesh to the next timepoint (without collision)
+    const VecDataArray<double, 3>& displacements = *m_displacementsPtr;
 
-    if (!m_pointSetB->hasVertexAttribute("displacements"))
-    {
-        LOG(WARNING) << "ImplicitGeometry to PointSet CCD can't function without displacements on geometry";
-        return;
-    }
-    const VecDataArray<double, 3>& displacements = *displacementsPtr;
-
-    std::shared_ptr<VecDataArray<double, 3>> vertexData = m_pointSetB->getVertexPositions();
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData; // Vertices in tentative state
 
     for (int i = 0; i < vertices.size(); i++)
@@ -105,36 +113,43 @@ ImplicitGeometryToPointSetCCD::computeCollisionData()
         const Vec3d  prevPt = pt - displacement;
 
         Vec3d  prevPos      = prevPt;
-        double prevDist     = m_implicitGeomA->getFunctionValue(prevPos);
+        double prevDist     = implicitGeom->getFunctionValue(prevPos);
         bool   prevIsInside = std::signbit(prevDist);
 
         Vec3d  currPos      = pt;
-        double currDist     = m_implicitGeomA->getFunctionValue(currPos);
+        double currDist     = implicitGeom->getFunctionValue(currPos);
         bool   currIsInside = std::signbit(currDist);
 
         // If both inside
         if (prevIsInside && currIsInside)
         {
-            if (prevOuterElementCounter[i] > 0)
+            if (m_prevOuterElementCounter[i] > 0)
             {
                 // Static or persistant
-                prevOuterElementCounter[i]++;
+                m_prevOuterElementCounter[i]++;
 
-                const Vec3d start     = prevOuterElement[i]; // The last outside point in its movement history
+                const Vec3d start     = m_prevOuterElement[i]; // The last outside point in its movement history
                 const Vec3d end       = pt;
                 Vec3d       contactPt = Vec3d::Zero();
-                if (findFirstRoot(m_implicitGeomA, start, end, contactPt))
+                if (findFirstRoot(implicitGeom, start, end, contactPt))
                 {
-                    PositionDirectionCollisionDataElement elem;
-                    elem.dirAtoB = -centralGrad(contactPt).normalized(); // -centralGrad gives Outward facing contact normal
-                    elem.nodeIdx = static_cast<uint32_t>(i);
-                    elem.penetrationDepth = std::max(0.0, (contactPt - end).dot(elem.dirAtoB));
-                    if (elem.penetrationDepth <= limit)
+                    const Vec3d  n     = -m_centralGrad(contactPt).normalized();
+                    const double depth = std::max(0.0, (contactPt - end).dot(n));
+
+                    if (depth <= limit)
                     {
-                        // Could be useful to find the closest point on the shape, as reprojected
-                        // contact points could be outside
-                        elem.posB = contactPt;
-                        m_colData->PDColData.safeAppend(elem);
+                        PointDirectionElement elemA;
+                        elemA.dir = n;
+                        elemA.pt  = pt;
+                        elemA.penetrationDepth = depth;
+
+                        PointIndexDirectionElement elemB;
+                        elemB.dir     = -n;
+                        elemB.ptIndex = i;
+                        elemB.penetrationDepth = depth;
+
+                        elementsA.unsafeAppend(elemA);
+                        elementsB.unsafeAppend(elemB);
                     }
                 }
             }
@@ -145,29 +160,228 @@ ImplicitGeometryToPointSetCCD::computeCollisionData()
             const Vec3d start     = prevPt;
             const Vec3d end       = pt;
             Vec3d       contactPt = Vec3d::Zero();
-            if (findFirstRoot(m_implicitGeomA, start, end, contactPt))
+            if (findFirstRoot(implicitGeom, start, end, contactPt))
             {
-                PositionDirectionCollisionDataElement elem;
-                elem.dirAtoB = -centralGrad(contactPt).normalized(); // -centralGrad gives Outward facing contact normal
-                elem.nodeIdx = static_cast<uint32_t>(i);
-                elem.penetrationDepth = std::max(0.0, (contactPt - end).dot(elem.dirAtoB));
-                if (elem.penetrationDepth <= limit)
+                const Vec3d  n     = -m_centralGrad(contactPt).normalized();
+                const double depth = std::max(0.0, (contactPt - end).dot(n));
+
+                if (depth <= limit)
                 {
-                    elem.posB = contactPt;
-                    m_colData->PDColData.safeAppend(elem);
+                    PointDirectionElement elemA;
+                    elemA.dir = n;
+                    elemA.pt  = pt;
+                    elemA.penetrationDepth = depth;
+
+                    PointIndexDirectionElement elemB;
+                    elemB.dir     = -n;
+                    elemB.ptIndex = i;
+                    elemB.penetrationDepth = depth;
+
+                    elementsA.unsafeAppend(elemA);
+                    elementsB.unsafeAppend(elemB);
                 }
-                prevOuterElementCounter[i] = 1;
+                m_prevOuterElementCounter[i] = 1;
                 // Store the previous exterior point
-                prevOuterElement[i] = start;
+                m_prevOuterElement[i] = start;
             }
             else
             {
-                prevOuterElementCounter[i] = 0;
+                m_prevOuterElementCounter[i] = 0;
             }
         }
         else
         {
-            prevOuterElementCounter[i] = 0;
+            m_prevOuterElementCounter[i] = 0;
+        }
+    }
+}
+
+void
+ImplicitGeometryToPointSetCCD::computeCollisionDataA(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA)
+{
+    // Note: Duplicate of AB, but does not add one side to avoid inner loop branching
+    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
+    std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
+    setupFunctions(implicitGeom, pointSet);
+
+    const VecDataArray<double, 3>& displacements = *m_displacementsPtr;
+
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices   = *vertexData; // Vertices in tentative state
+
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        const Vec3d& pt = vertices[i];
+        const Vec3d& displacement = displacements[i];
+        const double limit  = displacement.norm() * m_depthRatioLimit;
+        const Vec3d  prevPt = pt - displacement;
+
+        Vec3d  prevPos      = prevPt;
+        double prevDist     = implicitGeom->getFunctionValue(prevPos);
+        bool   prevIsInside = std::signbit(prevDist);
+
+        Vec3d  currPos      = pt;
+        double currDist     = implicitGeom->getFunctionValue(currPos);
+        bool   currIsInside = std::signbit(currDist);
+
+        // If both inside
+        if (prevIsInside && currIsInside)
+        {
+            if (m_prevOuterElementCounter[i] > 0)
+            {
+                // Static or persistant
+                m_prevOuterElementCounter[i]++;
+
+                const Vec3d start     = m_prevOuterElement[i]; // The last outside point in its movement history
+                const Vec3d end       = pt;
+                Vec3d       contactPt = Vec3d::Zero();
+                if (findFirstRoot(implicitGeom, start, end, contactPt))
+                {
+                    const Vec3d  n     = -m_centralGrad(contactPt).normalized();
+                    const double depth = std::max(0.0, (contactPt - end).dot(n));
+
+                    if (depth <= limit)
+                    {
+                        PointDirectionElement elemA;
+                        elemA.dir = n;
+                        elemA.pt  = pt;
+                        elemA.penetrationDepth = depth;
+
+                        elementsA.unsafeAppend(elemA);
+                    }
+                }
+            }
+        }
+        // If it just entered
+        else if (!prevIsInside && currIsInside)
+        {
+            const Vec3d start     = prevPt;
+            const Vec3d end       = pt;
+            Vec3d       contactPt = Vec3d::Zero();
+            if (findFirstRoot(implicitGeom, start, end, contactPt))
+            {
+                const Vec3d  n     = -m_centralGrad(contactPt).normalized();
+                const double depth = std::max(0.0, (contactPt - end).dot(n));
+
+                if (depth <= limit)
+                {
+                    PointDirectionElement elemA;
+                    elemA.dir = n;
+                    elemA.pt  = pt;
+                    elemA.penetrationDepth = depth;
+
+                    elementsA.unsafeAppend(elemA);
+                }
+                m_prevOuterElementCounter[i] = 1;
+                // Store the previous exterior point
+                m_prevOuterElement[i] = start;
+            }
+            else
+            {
+                m_prevOuterElementCounter[i] = 0;
+            }
+        }
+        else
+        {
+            m_prevOuterElementCounter[i] = 0;
+        }
+    }
+}
+
+void
+ImplicitGeometryToPointSetCCD::computeCollisionDataB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsB)
+{
+    // Note: Duplicate of AB, but does not add one side to avoid inner loop branching
+    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
+    std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
+    setupFunctions(implicitGeom, pointSet);
+
+    const VecDataArray<double, 3>& displacements = *m_displacementsPtr;
+
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices   = *vertexData; // Vertices in tentative state
+
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        const Vec3d& pt = vertices[i];
+        const Vec3d& displacement = displacements[i];
+        const double limit  = displacement.norm() * m_depthRatioLimit;
+        const Vec3d  prevPt = pt - displacement;
+
+        Vec3d  prevPos      = prevPt;
+        double prevDist     = implicitGeom->getFunctionValue(prevPos);
+        bool   prevIsInside = std::signbit(prevDist);
+
+        Vec3d  currPos      = pt;
+        double currDist     = implicitGeom->getFunctionValue(currPos);
+        bool   currIsInside = std::signbit(currDist);
+
+        // If both inside
+        if (prevIsInside && currIsInside)
+        {
+            if (m_prevOuterElementCounter[i] > 0)
+            {
+                // Static or persistant
+                m_prevOuterElementCounter[i]++;
+
+                const Vec3d start     = m_prevOuterElement[i]; // The last outside point in its movement history
+                const Vec3d end       = pt;
+                Vec3d       contactPt = Vec3d::Zero();
+                if (findFirstRoot(implicitGeom, start, end, contactPt))
+                {
+                    const Vec3d  n     = -m_centralGrad(contactPt).normalized();
+                    const double depth = std::max(0.0, (contactPt - end).dot(n));
+
+                    if (depth <= limit)
+                    {
+                        PointIndexDirectionElement elemB;
+                        elemB.dir     = -n;
+                        elemB.ptIndex = i;
+                        elemB.penetrationDepth = depth;
+
+                        elementsB.unsafeAppend(elemB);
+                    }
+                }
+            }
+        }
+        // If it just entered
+        else if (!prevIsInside && currIsInside)
+        {
+            const Vec3d start     = prevPt;
+            const Vec3d end       = pt;
+            Vec3d       contactPt = Vec3d::Zero();
+            if (findFirstRoot(implicitGeom, start, end, contactPt))
+            {
+                const Vec3d  n     = -m_centralGrad(contactPt).normalized();
+                const double depth = std::max(0.0, (contactPt - end).dot(n));
+
+                if (depth <= limit)
+                {
+                    PointIndexDirectionElement elemB;
+                    elemB.dir     = -n;
+                    elemB.ptIndex = i;
+                    elemB.penetrationDepth = depth;
+
+                    elementsB.unsafeAppend(elemB);
+                }
+                m_prevOuterElementCounter[i] = 1;
+                // Store the previous exterior point
+                m_prevOuterElement[i] = start;
+            }
+            else
+            {
+                m_prevOuterElementCounter[i] = 0;
+            }
+        }
+        else
+        {
+            m_prevOuterElementCounter[i] = 0;
         }
     }
 }

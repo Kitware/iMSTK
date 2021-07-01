@@ -125,7 +125,7 @@ makeClothObj(const std::string& name,
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
     pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
-    pbdParams->m_dt         = 0.005;
+    pbdParams->m_dt         = 0.01;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
@@ -195,11 +195,13 @@ main()
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.005);
 
         // Add mouse and keyboard controls to the viewer
         {

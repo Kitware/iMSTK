@@ -6,8 +6,7 @@ imstk_add_library( CollisionHandling
   DEPENDS
     CollisionDetection
     SceneEntities
-    Controllers
-  )
+    Controllers)
 
 #-----------------------------------------------------------------------------
 # Testing

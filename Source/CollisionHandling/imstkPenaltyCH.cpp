@@ -23,101 +23,128 @@
 #include "imstkCollisionData.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
+#include "imstkRigidObject2.h"
+#include "imstkRbdConstraint.h"
 
 namespace imstk
 {
-PenaltyCH::PenaltyCH(const Side&                             side,
-                     const std::shared_ptr<CollisionData>&   colData,
-                     const std::shared_ptr<CollidingObject>& obj) :
-    CollisionHandling(Type::Penalty, side, colData), m_object(obj)
+void
+PenaltyCH::setInputFeObject(std::shared_ptr<FeDeformableObject> feObj)
 {
-    LOG_IF(FATAL, (!obj)) << "Empty colliding object";
+    setInputObjectA(feObj);
 }
 
 void
-PenaltyCH::processCollisionData()
+PenaltyCH::setInputRbdObject(std::shared_ptr<RigidObject2> rbdObj)
 {
-    if (auto deformableObj = std::dynamic_pointer_cast<FeDeformableObject>(m_object))
+    setInputObjectB(rbdObj);
+}
+
+std::shared_ptr<FeDeformableObject>
+PenaltyCH::getInputFeObject()
+{
+    return std::dynamic_pointer_cast<FeDeformableObject>(getInputObjectA());
+}
+
+std::shared_ptr<RigidObject2>
+PenaltyCH::getInputRbdObject()
+{
+    return std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
+}
+
+void
+PenaltyCH::handle(
+    const CDElementVector<CollisionElement>& elementsA,
+    const CDElementVector<CollisionElement>& elementsB)
+{
+    auto deformableObj = std::dynamic_pointer_cast<FeDeformableObject>(getInputObjectA());
+    auto rbdObj = std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
+
+    if (deformableObj != nullptr)
     {
-        this->computeContactForcesDiscreteDeformable(deformableObj);
+        this->computeContactForcesDiscreteDeformable(elementsA, deformableObj);
     }
-    //else if(auto obj = std::dynamic_pointer_cast<RigidObject>(m_object)) computeContactForcesDiscreteRigid
-    else if (auto analyticObj = std::dynamic_pointer_cast<CollidingObject>(m_object))
+    if (rbdObj != nullptr)
     {
-        this->computeContactForcesAnalyticRigid(analyticObj);
+        this->computeContactForcesAnalyticRigid(elementsB, rbdObj);
     }
     else
     {
-        LOG(FATAL) << "No penalty collision handling available for " << m_object->getName()
+        LOG(FATAL) << "no penalty collision handling available for " << getInputObjectA()->getName()
                    << " (rigid mesh not yet supported).";
     }
 }
 
 void
-PenaltyCH::computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObject>& analyticObj)
+PenaltyCH::computeContactForcesAnalyticRigid(
+    const CDElementVector<CollisionElement>& elements,
+    std::shared_ptr<RigidObject2>            analyticObj)
 {
-    if (m_colData->PDColData.isEmpty())
+    if (elements.isEmpty())
     {
         return;
     }
 
-    CHECK(analyticObj != nullptr) << m_object->getName() << " is not a colliding object";
-
-    // If collision data is valid, append forces
-    Vec3d force(0., 0., 0.);
-    for (size_t i = 0; i < m_colData->PDColData.getSize(); ++i)
+    // Sum forces (only supports PointDirection contacts)
+    Vec3d force = Vec3d::Zero();
+    for (size_t i = 0; i < elements.getSize(); i++)
     {
-        const auto& cd = m_colData->PDColData[i];
-        if (m_side == CollisionHandling::Side::A)
+        const CollisionElement& elem = elements[i];
+        if (elem.m_type == CollisionElementType::PointDirection)
         {
-            force -= cd.dirAtoB * ((cd.penetrationDepth + 1) * (cd.penetrationDepth + 1) - 1) * 10;
-        }
-        else if (m_side == CollisionHandling::Side::B)
-        {
-            force += cd.dirAtoB * ((cd.penetrationDepth + 1) * (cd.penetrationDepth + 1) - 1) * 10;
+            const Vec3d  dir = elem.m_element.m_PointDirectionElement.dir;
+            const double penetrationDepth = elem.m_element.m_PointDirectionElement.penetrationDepth;
+            force += dir * ((penetrationDepth + 1.0) * (penetrationDepth + 1.0) - 1.0) * 10.0;
         }
     }
 
-    // Update object contact force
-    analyticObj->appendForce(force);
+    // Apply as external force
+    *analyticObj->getRigidBody()->m_force = force;
 }
 
 void
-PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<FeDeformableObject>& deformableObj)
+PenaltyCH::computeContactForcesDiscreteDeformable(
+    const CDElementVector<CollisionElement>& elements,
+    std::shared_ptr<FeDeformableObject>      deformableObj)
 {
-    if (m_colData->PColData.isEmpty())
+    if (elements.isEmpty())
     {
         return;
     }
 
-    CHECK(deformableObj != nullptr) << "error: "
-                                    << m_object->getName() << " is not a deformable object.";
-
     // Get current force vector
     std::shared_ptr<FEMDeformableBodyModel> model     = deformableObj->getFEMModel();
-    auto&                                   force     = model->getContactForce();
-    const auto&                             velVector = model->getCurrentState()->getQDot();
+    Vectord&                                force     = model->getContactForce();
+    const Vectord&                          velVector = model->getCurrentState()->getQDot();
 
     // If collision data, append forces
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_colData->PColData.getSize(),
-        [&](const size_t idx) {
-            const auto& cd       = m_colData->PColData[idx];
-            const auto nodeDofID = static_cast<Eigen::Index>(3 * cd.nodeIdx);
-            const auto unit      = cd.penetrationVector / cd.penetrationVector.norm();
+    ParallelUtils::parallelFor(elements.getSize(),
+        [&](const size_t i)
+        {
+            const CollisionElement& elem = elements[i];
+            if (elem.m_type == CollisionElementType::PointIndexDirection)
+            {
+                const Vec3d dir = elem.m_element.m_PointDirectionElement.dir;
+                const double penetrationDepth = elem.m_element.m_PointDirectionElement.penetrationDepth;
+                const int ptIndex = elem.m_element.m_PointIndexDirectionElement.ptIndex;
 
-            auto velocityProjection = Vec3d(velVector(nodeDofID),
-                                            velVector(nodeDofID + 1),
-                                            velVector(nodeDofID + 2));
-            velocityProjection = velocityProjection.dot(unit) * cd.penetrationVector;
+                const Vec3d penetrationVector = dir * penetrationDepth;
+                const Eigen::Index nodeDofID  = static_cast<Eigen::Index>(3 * ptIndex);
 
-            const auto nodalForce = -m_stiffness * cd.penetrationVector - m_damping * velocityProjection;
+                Vec3d velocityProjection = Vec3d(velVector(nodeDofID),
+                    velVector(nodeDofID + 1),
+                    velVector(nodeDofID + 2));
+                velocityProjection = velocityProjection.dot(dir) * penetrationVector;
 
-            lock.lock();
-            force(nodeDofID)     += nodalForce.x();
-            force(nodeDofID + 1) += nodalForce.y();
-            force(nodeDofID + 2) += nodalForce.z();
-            lock.unlock();
-    });
+                const Vec3d nodalForce = -m_stiffness * penetrationVector - m_damping * velocityProjection;
+
+                lock.lock();
+                force(nodeDofID)     += nodalForce.x();
+                force(nodeDofID + 1) += nodalForce.y();
+                force(nodeDofID + 2) += nodalForce.z();
+                lock.unlock();
+            }
+        });
 }
 } // end namespace imstk

@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,23 +21,124 @@
 
 #include "imstkUnidirectionalPlaneToSphereCD.h"
 #include "imstkCollisionData.h"
-#include "imstkNarrowPhaseCD.h"
+#include "imstkCollisionUtils.h"
+#include "imstkSphere.h"
+#include "imstkPlane.h"
 
 namespace imstk
 {
-UnidirectionalPlaneToSphereCD::UnidirectionalPlaneToSphereCD(std::shared_ptr<Plane>         planeA,
-                                                             std::shared_ptr<Sphere>        sphereB,
-                                                             std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::UnidirectionalPlaneToSphere, colData),
-    m_planeA(planeA),
-    m_sphereB(sphereB)
+UnidirectionalPlaneToSphereCD::UnidirectionalPlaneToSphereCD()
 {
+    setRequiredInputType<Plane>(0);
+    setRequiredInputType<Sphere>(1);
 }
 
 void
-UnidirectionalPlaneToSphereCD::computeCollisionData()
+UnidirectionalPlaneToSphereCD::computeCollisionDataAB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
 {
-    m_colData->clearAll();
-    NarrowPhaseCD::unidirectionalPlaneToSphere(m_planeA.get(), m_sphereB.get(), m_colData);
+    std::shared_ptr<Plane>  plane  = std::dynamic_pointer_cast<Plane>(geomA);
+    std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(geomB);
+
+    // Get geometry properties
+    const Vec3d  spherePos = sphere->getPosition();
+    const double r = sphere->getRadius();
+    const Vec3d  planePos = plane->getPosition();
+    const Vec3d  n = plane->getNormal();
+
+    Vec3d  planeContactPt, sphereContactPt;
+    Vec3d  planeContactNormal, sphereContactNormal;
+    double depth;
+    if (CollisionUtils::testPlaneToSphere(
+                planePos, n,
+                spherePos, r,
+                planeContactPt, planeContactNormal,
+                sphereContactPt, sphereContactNormal,
+                depth))
+    {
+        PointDirectionElement elemA;
+        elemA.dir = planeContactNormal;         // Direction to resolve plane
+        elemA.pt  = planeContactPt;
+        elemA.penetrationDepth = depth;
+
+        PointDirectionElement elemB;
+        elemB.dir = sphereContactNormal;         // Direction to resolve sphere
+        elemB.pt  = sphereContactPt;
+        elemB.penetrationDepth = depth;
+
+        elementsA.unsafeAppend(elemA);
+        elementsB.unsafeAppend(elemB);
+    }
 }
-} //iMSTK
+
+void
+UnidirectionalPlaneToSphereCD::computeCollisionDataA(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA)
+{
+    std::shared_ptr<Plane>  plane  = std::dynamic_pointer_cast<Plane>(geomA);
+    std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(geomB);
+
+    // Get geometry properties
+    const Vec3d  spherePos = sphere->getPosition();
+    const double r = sphere->getRadius();
+    const Vec3d  planePos = plane->getPosition();
+    const Vec3d  n = plane->getNormal();
+
+    Vec3d  planeContactPt, sphereContactPt;
+    Vec3d  planeContactNormal, sphereContactNormal;
+    double depth;
+    if (CollisionUtils::testPlaneToSphere(
+                planePos, n,
+                spherePos, r,
+                planeContactPt, planeContactNormal,
+                sphereContactPt, sphereContactNormal,
+                depth))
+    {
+        PointDirectionElement elemA;
+        elemA.dir = planeContactNormal;         // Direction to resolve plane
+        elemA.pt  = planeContactPt;
+        elemA.penetrationDepth = depth;
+
+        elementsA.unsafeAppend(elemA);
+    }
+}
+
+void
+UnidirectionalPlaneToSphereCD::computeCollisionDataB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsB)
+{
+    std::shared_ptr<Plane>  plane  = std::dynamic_pointer_cast<Plane>(geomA);
+    std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(geomB);
+
+    // Get geometry properties
+    const Vec3d  spherePos = sphere->getPosition();
+    const double r = sphere->getRadius();
+    const Vec3d  planePos = plane->getPosition();
+    const Vec3d  n = plane->getNormal();
+
+    Vec3d  planeContactPt, sphereContactPt;
+    Vec3d  planeContactNormal, sphereContactNormal;
+    double depth;
+    if (CollisionUtils::testPlaneToSphere(
+                planePos, n,
+                spherePos, r,
+                planeContactPt, planeContactNormal,
+                sphereContactPt, sphereContactNormal,
+                depth))
+    {
+        PointDirectionElement elemB;
+        elemB.dir = sphereContactNormal;         // Direction to resolve sphere
+        elemB.pt  = sphereContactPt;
+        elemB.penetrationDepth = depth;
+
+        elementsB.unsafeAppend(elemB);
+    }
+}
+}

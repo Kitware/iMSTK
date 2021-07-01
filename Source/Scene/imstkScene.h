@@ -188,11 +188,6 @@ public:
     void removeSceneObject(std::shared_ptr<SceneObject> sceneObject);
 
     ///
-    /// \brief Add a debug visual model object
-    ///
-    void addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel);
-
-    ///
     /// \brief Return a vector of lights in the scene
     ///
     const std::vector<std::shared_ptr<Light>> getLights() const;

@@ -25,354 +25,539 @@
 #include "imstkLineMesh.h"
 #include "imstkSurfaceMesh.h"
 
+#include <stdint.h>
+
 namespace imstk
 {
-MeshToMeshBruteForceCD::MeshToMeshBruteForceCD(std::shared_ptr<Geometry>      obj1,
-                                               std::shared_ptr<SurfaceMesh>   obj2,
-                                               std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::MeshToMeshBruteForce, colData),
-    m_object1(obj1),
-    m_object2(obj2)
+struct PointSetData
+{
+    PointSetData(std::shared_ptr<PointSet> pointSet);
+
+    // Get geometry A data
+    std::shared_ptr<PointSet> m_pointSet;
+    const VecDataArray<double, 3>& vertices;
+};
+
+struct SurfMeshData
+{
+    SurfMeshData(std::shared_ptr<SurfaceMesh> surfMesh);
+
+    // Get geometry B data
+    std::shared_ptr<SurfaceMesh> m_surfMesh;
+    const VecDataArray<int, 3>& cells;
+    const VecDataArray<double, 3>& vertices;
+    const std::vector<std::set<size_t>>& vertexFaces;
+    const VecDataArray<double, 3>& faceNormals;
+};
+
+PointSetData::PointSetData(std::shared_ptr<PointSet> pointSet) :
+    m_pointSet(pointSet),
+    vertices(*pointSet->getVertexPositions())
 {
 }
 
-// The above error is caused by the
-void
-MeshToMeshBruteForceCD::computeCollisionData()
+SurfMeshData::SurfMeshData(std::shared_ptr<SurfaceMesh> surfMesh) :
+    m_surfMesh(surfMesh),
+    cells(*surfMesh->getTriangleIndices()),
+    vertices(*surfMesh->getVertexPositions()),
+    vertexFaces(surfMesh->getVertexNeighborTriangles()),
+    faceNormals(*surfMesh->getCellNormals())
 {
-    // Clear collisionData
-    m_colData->clearAll();
+}
 
+///
+/// \brief Compute the pseudonormal of the vertex given by vertexIndex
+///
+static Vec3d
+vertexPseudoNormalFromTriangle(const int vertexIndex, const SurfMeshData& surfMeshData)
+{
+    // Compute the pseudonormal on the mesh at the point
+    // Identify incident faces to the point and weight sum their normals
+    double sum  = 0.0;
+    Vec3d  nSum = Vec3d::Zero();
+    for (size_t neighborFaceIndex : surfMeshData.vertexFaces[vertexIndex])
+    {
+        Vec3i cell = surfMeshData.cells[neighborFaceIndex];
+        // Ensure vertexIndex is in 0
+        if (cell[1] == vertexIndex)
+        {
+            std::swap(cell[0], cell[1]);
+        }
+        else if (cell[2] == vertexIndex)
+        {
+            std::swap(cell[0], cell[2]);
+        }
+
+        const Vec3d  ab    = (surfMeshData.vertices[cell[1]] - surfMeshData.vertices[vertexIndex]).normalized();
+        const Vec3d  bc    = (surfMeshData.vertices[cell[2]] - surfMeshData.vertices[vertexIndex]).normalized();
+        const double angle = acos(ab.dot(bc));
+        const Vec3d  n     = angle * surfMeshData.faceNormals[neighborFaceIndex];
+
+        sum  += n.norm();
+        nSum += n;
+    }
+    return nSum / sum;
+}
+
+///
+/// \brief Compute the pseudonormal of the edge given by vertexIds
+///
+static Vec3d
+edgePseudoNormalFromTriangle(const Vec2i& vertexIds, const SurfMeshData& surfMeshData)
+{
+    // Find the two cells that have both vertexIds
+    double sum  = 0.0;
+    Vec3d  nSum = Vec3d::Zero();
+    for (size_t neighborFaceIndex : surfMeshData.vertexFaces[vertexIds[0]])
+    {
+        const Vec3i& cell     = surfMeshData.cells[neighborFaceIndex];
+        bool         found[2] = { false, false };
+        for (int j = 0; j < 3; j++)
+        {
+            if (cell[j] == vertexIds[0])
+            {
+                found[0] = true;
+            }
+            else if (cell[j] == vertexIds[1])
+            {
+                found[1] = true;
+            }
+        }
+        // If it contains both vertices its a face to the edge
+        if (found[0] && found[1])
+        {
+            const Vec3d n = PI * surfMeshData.faceNormals[neighborFaceIndex];
+            sum  += n.norm();
+            nSum += n;
+        }
+    }
+    return nSum / sum;
+}
+
+///
+/// \brief Returns signed distance, reports caseType (ie: which element type
+/// is nearest, vertex, edge, or triangle)
+/// \param position to measure signed distance from
+/// \param SurfaceMesh to measure signed distance too
+/// \param nearest element case, vertex-0, edge-1, triangle-2
+/// \param vertexIds of nearest element (maximum 3 verts)
+///
+static double
+polySignedDist(const Vec3d& pos, const SurfMeshData& surfMeshData,
+               int& caseType, Vec3i& vIds)
+{
+    int    closestCell     = -1;
+    Vec3d  closestPt       = Vec3d::Zero();
+    double minSqrDist      = IMSTK_DOUBLE_MAX;
+    int    closestCellCase = -1;
+
+    // Find the closest point out of all elements
+    // \todo: We could early reject backface cull all triangles (this is effectively case 6 done early)
+    for (int j = 0; j < surfMeshData.cells.size(); j++)
+    {
+        const Vec3i& cell = surfMeshData.cells[j];
+        const Vec3d& x1   = surfMeshData.vertices[cell[0]];
+        const Vec3d& x2   = surfMeshData.vertices[cell[1]];
+        const Vec3d& x3   = surfMeshData.vertices[cell[2]];
+
+        int          caseType;
+        const Vec3d  closestPtOnTri = CollisionUtils::closestPointOnTriangle(pos, x1, x2, x3, caseType);
+        const double sqrDist = (closestPtOnTri - pos).squaredNorm();
+        if (sqrDist < minSqrDist)
+        {
+            minSqrDist      = sqrDist;
+            closestPt       = closestPtOnTri;
+            closestCell     = j;
+            closestCellCase = caseType;
+        }
+    }
+
+    // We use the normal of the nearest element to determine sign, but we can't just use the
+    // normal as there are discontinuities at the edges and vertices. We instead use the
+    // "angle-weighted psuedonormal" given adjacent elements
+
+    // Closest element is a vertex
+    if (closestCellCase == 0 || closestCellCase == 1 || closestCellCase == 2)
+    {
+        int vertexIndex = surfMeshData.cells[closestCell][0]; // a
+        if (closestCellCase == 1)
+        {
+            vertexIndex = surfMeshData.cells[closestCell][1]; // b
+        }
+        else if (closestCellCase == 2)
+        {
+            vertexIndex = surfMeshData.cells[closestCell][2]; // c
+        }
+
+        const Vec3d psuedoN = vertexPseudoNormalFromTriangle(vertexIndex, surfMeshData);
+        caseType = 0;
+        vIds[0]  = vertexIndex;
+        return (pos - closestPt).dot(psuedoN);
+    }
+    // Closest element is an edge
+    else if (closestCellCase == 3 || closestCellCase == 4 || closestCellCase == 5)
+    {
+        Vec2i vertexIds = { surfMeshData.cells[closestCell][0], surfMeshData.cells[closestCell][1] }; // ab
+        if (closestCellCase == 4)
+        {
+            vertexIds = { surfMeshData.cells[closestCell][1], surfMeshData.cells[closestCell][2] }; // bc
+        }
+        else if (closestCellCase == 5)
+        {
+            vertexIds = { surfMeshData.cells[closestCell][2], surfMeshData.cells[closestCell][0] }; // ca
+        }
+
+        const Vec3d psuedoN = edgePseudoNormalFromTriangle(vertexIds, surfMeshData);
+        caseType = 1;
+        vIds[0]  = vertexIds[0];
+        vIds[1]  = vertexIds[1];
+        return (pos - closestPt).dot(psuedoN);
+    }
+    // Closest element is the triangle
+    else if (closestCellCase == 6)
+    {
+        //const Vec3d psuedoN = (2.0 * PI * faceNormals[closestCell]).normalized();
+        const Vec3d psuedoN = surfMeshData.faceNormals[closestCell]; // Assume normalized
+        caseType = 2;
+        vIds[0]  = surfMeshData.cells[closestCell][0];
+        vIds[1]  = surfMeshData.cells[closestCell][1];
+        vIds[2]  = surfMeshData.cells[closestCell][2];
+        return (pos - closestPt).dot(psuedoN);
+    }
+    // Should only ever occur if there are no elements
+    else
+    {
+        caseType = -1;
+        return IMSTK_DOUBLE_MAX;
+    }
+}
+
+MeshToMeshBruteForceCD::MeshToMeshBruteForceCD()
+{
+    setRequiredInputType<PointSet>(0);
+    setRequiredInputType<SurfaceMesh>(1);
+}
+
+void
+MeshToMeshBruteForceCD::computeCollisionDataAB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
+{
     // Broad phase collision
-    doBroadPhaseCollisionCheck();
-
-    // Narrow phase collision
-    const auto                     mesh2         = std::dynamic_pointer_cast<SurfaceMesh>(m_object2);
-    const VecDataArray<int, 3>&    mesh2Cells    = *mesh2->getTriangleIndices();
-    const VecDataArray<double, 3>& mesh2Vertices = *mesh2->getVertexPositions();
-
-    if (m_object1->getTypeName() == "LineMesh")
+    if (doBroadPhaseCollisionCheck(geomA, geomB))
     {
-        auto                           lineMesh      = std::dynamic_pointer_cast<LineMesh>(m_object1);
-        const VecDataArray<double, 3>& mesh1Vertices = *lineMesh->getVertexPositions();
+        auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(geomB);
+        surfMesh->computeTrianglesNormals();
+        surfMesh->computeVertexNeighborTriangles();
 
-        // brute force, use BVH or spatial grid would be much better
-        for (int i = 0; i < lineMesh->getNumVertices(); ++i)
+        // Narrow phase
+        if (m_generateVertexTriangleContacts)
         {
-            const Vec3d p = mesh1Vertices[i];
-
-            for (int j = 0; j < mesh2Cells.size(); ++j)
+            if (m_vertexInside.size() < surfMesh->getNumVertices())
             {
-                const Vec3i& e  = mesh2Cells[j];
-                const Vec3d  p0 = mesh2Vertices[e[0]];
-                const Vec3d  p1 = mesh2Vertices[e[1]];
-                const Vec3d  p2 = mesh2Vertices[e[2]];
-
-                if (CollisionUtils::testPointToTriAABB(p[0], p[1], p[2],
-                                       p0[0], p0[1], p0[2],
-                                       p1[0], p1[1], p1[2],
-                                       p2[0], p2[1], p2[2],
-                                       m_proximityTolerance,
-                                       m_proximityTolerance))
+                m_vertexInside = std::vector<bool>(surfMesh->getNumVertices(), false);
+            }
+            else
+            {
+                for (int i = 0; i < m_vertexInside.size(); i++)
                 {
-                    m_colData->VTColData.safeAppend({ static_cast<uint32_t>(i), static_cast<uint32_t>(j), 0.0 });
+                    m_vertexInside[i] = false;
                 }
             }
-        }
 
-        const int                      numLines    = static_cast<int>(lineMesh->getNumLines());
-        const int                      numVertices = static_cast<int>(mesh2->getNumVertices());
-        std::vector<std::vector<bool>> E2(numVertices, std::vector<bool>(numVertices, 1));
+            vertexToTriangleTest(geomA, geomB, elementsA, elementsB);
 
-        for (int k = 0; k < numLines; ++k)
-        {
-            const Vec2i& nodes = lineMesh->getLineIndices(k);
-            const size_t i1    = nodes[0];
-            const size_t i2    = nodes[1];
-
-            const Vec3d P = mesh1Vertices[i1];
-            const Vec3d Q = mesh1Vertices[i2];
-
-            for (int j = 0; j < mesh2Cells.size(); ++j)
+            if (m_generateEdgeEdgeContacts)
             {
-                const Vec3i& e  = mesh2Cells[j];
-                const Vec3d  p0 = mesh2Vertices[e[0]];
-                const Vec3d  p1 = mesh2Vertices[e[1]];
-                const Vec3d  p2 = mesh2Vertices[e[2]];
-
-                if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
+                if (geomA->getTypeName() == "LineMesh")
                 {
-                    if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                        Q[0], Q[1], Q[2],
-                        p0[0], p0[1], p0[2],
-                        p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
-                    {
-                        m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[0], (uint32_t)e[1] }, 0.0 });
-                    }
-                    E2[e[0]][e[1]] = 0;
+                    lineMeshEdgeToTriangleTest(geomA, geomB, elementsA, elementsB);
                 }
-
-                if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
+                else if (geomA->getTypeName() == "SurfaceMesh")
                 {
-                    if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                        Q[0], Q[1], Q[2],
-                        p1[0], p1[1], p1[2],
-                        p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
-                    {
-                        m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[1], (uint32_t)e[2] }, 0.0 });
-                    }
-                    E2[e[1]][e[2]] = 0;
-                }
-
-                if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
-                {
-                    if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                        Q[0], Q[1], Q[2],
-                        p2[0], p2[1], p2[2],
-                        p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
-                    {
-                        m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[2], (uint32_t)e[0] }, 0.0 });
-                    }
-                    E2[e[2]][e[0]] = 0;
+                    surfMeshEdgeToTriangleTest(geomA, geomB, elementsA, elementsB);
                 }
             }
         }
     }
-    else if (m_object1->getTypeName() == "PointSet")
+}
+
+void
+MeshToMeshBruteForceCD::vertexToTriangleTest(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
+{
+    PointSetData pointSetData(std::dynamic_pointer_cast<PointSet>(geomA));
+    SurfMeshData surfMeshData(std::dynamic_pointer_cast<SurfaceMesh>(geomB));
+
+    // For every vertex
+    for (int i = 0; i < pointSetData.vertices.size(); i++)
     {
-        auto                           pointSet      = std::dynamic_pointer_cast<PointSet>(m_object1);
-        const VecDataArray<double, 3>& mesh1Vertices = *pointSet->getVertexPositions();
+        const Vec3d& p = pointSetData.vertices[i];
 
-        // brute force, use BVH or spatial grid would be much better
-        // point
-        for (int i = 0; i < pointSet->getNumVertices(); ++i)
+        int          caseType   = -1;
+        Vec3i        vertexIds  = Vec3i::Zero();
+        const double signedDist = polySignedDist(p, surfMeshData, caseType, vertexIds);
+        if (signedDist <= 0.0)
         {
-            const auto p = mesh1Vertices[i];
-
-            for (int j = 0; j < mesh2Cells.size(); ++j)
+            if (caseType == 0)
             {
-                const Vec3i& e  = mesh2Cells[j];
-                const Vec3d  p0 = mesh2Vertices[e[0]];
-                const Vec3d  p1 = mesh2Vertices[e[1]];
-                const Vec3d  p2 = mesh2Vertices[e[2]];
+                CellIndexElement elemA;
+                elemA.ids[0]   = i;
+                elemA.idCount  = 1;
+                elemA.cellType = IMSTK_VERTEX;
 
-                if (CollisionUtils::testPointToTriAABB(p[0], p[1], p[2],
-                    p0[0], p0[1], p0[2],
-                    p1[0], p1[1], p1[2],
-                    p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
-                {
-                    m_colData->VTColData.safeAppend({ static_cast<uint32_t>(i), static_cast<uint32_t>(j), 0.0 });
-                }
+                CellIndexElement elemB;
+                elemB.ids[0]   = vertexIds[0];
+                elemB.idCount  = 1;
+                elemB.cellType = IMSTK_VERTEX;
+
+                elementsA.safeAppend(elemA);
+                elementsB.safeAppend(elemB);
+                m_vertexInside[i] = true;
+            }
+            else if (caseType == 1)
+            {
+                CellIndexElement elemA;
+                elemA.ids[0]   = i;
+                elemA.idCount  = 1;
+                elemA.cellType = IMSTK_VERTEX;
+
+                CellIndexElement elemB;
+                elemB.ids[0]   = vertexIds[0];
+                elemB.ids[1]   = vertexIds[1];
+                elemB.idCount  = 2;
+                elemB.cellType = IMSTK_EDGE;
+
+                elementsA.safeAppend(elemA);
+                elementsB.safeAppend(elemB);
+                m_vertexInside[i] = true;
+            }
+            else if (caseType == 2)
+            {
+                CellIndexElement elemA;
+                elemA.ids[0]   = i;
+                elemA.idCount  = 1;
+                elemA.cellType = IMSTK_VERTEX;
+
+                CellIndexElement elemB;
+                elemB.ids[0]   = vertexIds[0];
+                elemB.ids[1]   = vertexIds[1];
+                elemB.ids[2]   = vertexIds[2];
+                elemB.idCount  = 3;
+                elemB.cellType = IMSTK_TRIANGLE;
+
+                elementsA.safeAppend(elemA);
+                elementsB.safeAppend(elemB);
+                m_vertexInside[i] = true;
             }
         }
     }
-    else if (m_object1->getTypeName() == "SurfaceMesh")
+}
+
+void
+MeshToMeshBruteForceCD::lineMeshEdgeToTriangleTest(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
+{
+    SurfMeshData surfMeshBData(std::dynamic_pointer_cast<SurfaceMesh>(geomB));
+
+    // Get geometry A data
+    std::shared_ptr<LineMesh>                lineMesh = std::dynamic_pointer_cast<LineMesh>(geomA);
+    std::shared_ptr<VecDataArray<double, 3>> meshAVerticesPtr = lineMesh->getVertexPositions();
+    const VecDataArray<double, 3>&           meshAVertices    = *meshAVerticesPtr;
+    std::shared_ptr<VecDataArray<int, 2>>    meshACellsPtr    = lineMesh->getLinesIndices();
+    VecDataArray<int, 2>&                    meshACells       = *meshACellsPtr;
+
+    const int triEdgePattern[3][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 } };
+
+    // For every edge/line segment of the line mesh
+    for (int i = 0; i < meshACells.size(); i++)
     {
-        auto                           surfMesh      = std::dynamic_pointer_cast<SurfaceMesh>(m_object1);
-        const VecDataArray<double, 3>& mesh1Vertices = *surfMesh->getVertexPositions();
-        const VecDataArray<int, 3>&    mesh1Cells    = *surfMesh->getTriangleIndices();
+        const Vec2i& edgeA = meshACells[i];
 
-        // brute force, use BVH or spatial grid would be much better
-        // point
-        for (int i = 0; i < surfMesh->getNumVertices(); ++i)
+        // Only check edges that don't exist totally inside
+        if (!m_vertexInside[edgeA[0]] && !m_vertexInside[edgeA[1]])
         {
-            const Vec3d p = mesh1Vertices[i];
+            double minSqrDist    = IMSTK_DOUBLE_MAX;
+            int    closestTriId  = -1;
+            int    closestEdgeId = -1;
 
-            for (int j = 0; j < mesh2Cells.size(); ++j)
+            // For every triangle/cell of meshB
+            for (int j = 0; j < surfMeshBData.cells.size(); j++)
             {
-                const Vec3i& e  = mesh2Cells[j];
-                const Vec3d  p0 = mesh2Vertices[e[0]];
-                const Vec3d  p1 = mesh2Vertices[e[1]];
-                const Vec3d  p2 = mesh2Vertices[e[2]];
+                const Vec3i& cellB = surfMeshBData.cells[j];
 
-                if (CollisionUtils::testPointToTriAABB(p[0], p[1], p[2],
-                    p0[0], p0[1], p0[2],
-                    p1[0], p1[1], p1[2],
-                    p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
+                // For every edge of that triangle
+                for (int k = 0; k < 3; k++)
                 {
-                    m_colData->VTColData.safeAppend({ static_cast<uint32_t>(i), static_cast<uint32_t>(j), 0.0 });
+                    const Vec2i edgeB(cellB[triEdgePattern[k][0]], cellB[triEdgePattern[k][1]]);
+
+                    // Compute the closest point on the two edges
+                    // Check the case, the edges must be within each others bounds/ranges
+                    Vec3d ptA, ptB;
+                    if (CollisionUtils::edgeToEdgeClosestPoints(
+                        meshAVertices[edgeA[0]], meshAVertices[edgeA[1]],
+                        surfMeshBData.vertices[edgeB[0]], surfMeshBData.vertices[edgeB[1]],
+                        ptA, ptB) == 0)
+                    {
+                        // Find the closest element to this point on the edge
+                        const double sqrDist = (ptB - ptA).squaredNorm();
+                        // Use the closest one only
+                        if (sqrDist < minSqrDist)
+                        {
+                            // Check if the point on the oppositie edge nearest to edgeB is inside B
+                            int          caseType   = -1;
+                            Vec3i        vIds       = Vec3i::Zero();
+                            const double signedDist = polySignedDist(ptA, surfMeshBData, caseType, vIds);
+                            if (signedDist <= 0.0)
+                            {
+                                minSqrDist    = sqrDist;
+                                closestTriId  = j;
+                                closestEdgeId = k;
+                            }
+                        }
+                    }
                 }
+            }
+
+            if (closestTriId != -1)
+            {
+                CellIndexElement elemA;
+                elemA.ids[0]   = edgeA[0];
+                elemA.ids[1]   = edgeA[1];
+                elemA.idCount  = 2;
+                elemA.cellType = IMSTK_EDGE;
+
+                CellIndexElement elemB;
+                elemB.ids[0]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][0]];
+                elemB.ids[1]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][1]];
+                elemB.idCount  = 2;
+                elemB.cellType = IMSTK_EDGE;
+
+                elementsA.safeAppend(elemA);
+                elementsB.safeAppend(elemB);
             }
         }
+    }
+}
 
-        // edge
-        // since we don't have edge structure, the following is not good
-        const auto                     nV = surfMesh->getNumVertices();
-        std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
+void
+MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
+{
+    SurfMeshData surfMeshBData(std::dynamic_pointer_cast<SurfaceMesh>(geomB));
 
-        const auto                     nV2 = mesh2->getNumVertices();
-        std::vector<std::vector<bool>> E2(nV2, std::vector<bool>(nV2, 1));
+    // Get geometry A data
+    std::shared_ptr<SurfaceMesh>             surfMeshA = std::dynamic_pointer_cast<SurfaceMesh>(geomA);
+    std::shared_ptr<VecDataArray<double, 3>> meshAVerticesPtr = surfMeshA->getVertexPositions();
+    const VecDataArray<double, 3>&           meshAVertices    = *meshAVerticesPtr;
+    std::shared_ptr<VecDataArray<int, 3>>    meshACellsPtr    = surfMeshA->getTriangleIndices();
+    VecDataArray<int, 3>&                    meshACells       = *meshACellsPtr;
 
-        for (int k = 0; k < mesh1Cells.size(); ++k)
+    const int triEdgePattern[3][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 } };
+    if (m_generateEdgeEdgeContacts)
+    {
+        // For every edge/line segment of the line mesh
+        for (int i = 0; i < meshACells.size(); i++)
         {
-            const Vec3i& tri = mesh1Cells[k];
+            const Vec3i& cellA = meshACells[i];
 
-            int i1 = tri[0];
-            int i2 = tri[1];
-
-            if (E[i1][i2] && E[i2][i1])
+            // For every edge of triangle A
+            for (int j = 0; j < 3; j++)
             {
-                const Vec3d P = mesh1Vertices[i1];
-                const Vec3d Q = mesh1Vertices[i2];
-                for (int j = 0; j < mesh2Cells.size(); ++j)
+                const Vec2i edgeA = Vec2i(cellA[triEdgePattern[j][0]], cellA[triEdgePattern[j][1]]);
+
+                // Only check edges that don't exist totally inside
+                if (!m_vertexInside[edgeA[0]] && !m_vertexInside[edgeA[1]])
                 {
-                    const Vec3i& e  = mesh2Cells[j];
-                    const Vec3d  p0 = mesh2Vertices[e[0]];
-                    const Vec3d  p1 = mesh2Vertices[e[1]];
-                    const Vec3d  p2 = mesh2Vertices[e[2]];
+                    double minSqrDist    = IMSTK_DOUBLE_MAX;
+                    int    closestTriId  = -1;
+                    int    closestEdgeId = -1;
 
-                    if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
+                    // For every triangle/cell of meshB
+                    for (int k = 0; k < surfMeshBData.cells.size(); k++)
                     {
-                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                            Q[0], Q[1], Q[2],
-                            p0[0], p0[1], p0[2],
-                            p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
+                        const Vec3i& cellB = surfMeshBData.cells[k];
+
+                        // For every edge of that triangle
+                        for (int l = 0; l < 3; l++)
                         {
-                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[0], (uint32_t)e[1] }, 0.0 });
-                            E2[e[0]][e[1]] = 0;
+                            const Vec2i edgeB(cellB[triEdgePattern[l][0]], cellB[triEdgePattern[l][1]]);
+
+                            // Compute the closest point on the two edges
+                            // Check the case, the edges must be within each others bounds/ranges
+                            Vec3d ptA, ptB;
+                            if (CollisionUtils::edgeToEdgeClosestPoints(
+                                meshAVertices[edgeA[0]], meshAVertices[edgeA[1]],
+                                surfMeshBData.vertices[edgeB[0]], surfMeshBData.vertices[edgeB[1]],
+                                ptA, ptB) == 0)
+                            {
+                                // Find the closest element to this point on the edge
+                                const double sqrDist = (ptB - ptA).squaredNorm();
+                                // Use the closest one only
+                                if (sqrDist < minSqrDist)
+                                {
+                                    // Check if the point on the oppositie edge nearest to edgeB is inside B
+                                    int          caseType   = -1;
+                                    Vec3i        vIds       = Vec3i::Zero();
+                                    const double signedDist = polySignedDist(ptA, surfMeshBData, caseType, vIds);
+                                    if (signedDist <= 0.0)
+                                    {
+                                        minSqrDist    = sqrDist;
+                                        closestTriId  = k;
+                                        closestEdgeId = l;
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
+                    if (closestTriId != -1)
                     {
-                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                            Q[0], Q[1], Q[2],
-                            p1[0], p1[1], p1[2],
-                            p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
-                        {
-                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[1], (uint32_t)e[2] }, 0.0 });
-                            E2[e[1]][e[2]] = 0;
-                        }
-                    }
+                        CellIndexElement elemA;
+                        elemA.ids[0]   = edgeA[0];
+                        elemA.ids[1]   = edgeA[1];
+                        elemA.idCount  = 2;
+                        elemA.cellType = IMSTK_EDGE;
 
-                    if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
-                    {
-                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                            Q[0], Q[1], Q[2],
-                            p2[0], p2[1], p2[2],
-                            p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
-                        {
-                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[2], (uint32_t)e[0] }, 0.0 });
-                            E2[e[2]][e[0]] = 0;
-                        }
+                        CellIndexElement elemB;
+                        elemB.ids[0]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][0]];
+                        elemB.ids[1]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][1]];
+                        elemB.idCount  = 2;
+                        elemB.cellType = IMSTK_EDGE;
+
+                        elementsA.safeAppend(elemA);
+                        elementsB.safeAppend(elemB);
                     }
                 }
-                E[i1][i2] = 0;
-            }
-
-            i1 = tri[1];
-            i2 = tri[2];
-            if (E[i1][i2] && E[i2][i1])
-            {
-                const Vec3d P = mesh1Vertices[i1];
-                const Vec3d Q = mesh1Vertices[i2];
-
-                for (int j = 0; j < mesh2Cells.size(); ++j)
-                {
-                    const Vec3i& e  = mesh2Cells[j];
-                    const Vec3d  p0 = mesh2Vertices[e[0]];
-                    const Vec3d  p1 = mesh2Vertices[e[1]];
-                    const Vec3d  p2 = mesh2Vertices[e[2]];
-
-                    if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
-                    {
-                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                            Q[0], Q[1], Q[2],
-                            p0[0], p0[1], p0[2],
-                            p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
-                        {
-                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[0], (uint32_t)e[1] }, 0.0 });
-                            E2[e[0]][e[1]] = 0;
-                        }
-                    }
-
-                    if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
-                    {
-                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                            Q[0], Q[1], Q[2],
-                            p1[0], p1[1], p1[2],
-                            p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
-                        {
-                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[1], (uint32_t)e[2] }, 0.0 });
-                            E2[e[1]][e[2]] = 0;
-                        }
-                    }
-
-                    if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
-                    {
-                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                            Q[0], Q[1], Q[2],
-                            p2[0], p2[1], p2[2],
-                            p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
-                        {
-                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[2], (uint32_t)e[0] }, 0.0 });
-                            E2[e[2]][e[0]] = 0;
-                        }
-                    }
-                }
-                E[i1][i2] = 0;
-            }
-
-            i1 = tri[2];
-            i2 = tri[0];
-            if (E[i1][i2] && E[i2][i1])
-            {
-                const Vec3d P = surfMesh->getVertexPosition(i1);
-                const Vec3d Q = surfMesh->getVertexPosition(i2);
-                for (int j = 0; j < mesh2Cells.size(); ++j)
-                {
-                    const Vec3i& e  = mesh2Cells[j];
-                    const Vec3d  p0 = mesh2Vertices[e[0]];
-                    const Vec3d  p1 = mesh2Vertices[e[1]];
-                    const Vec3d  p2 = mesh2Vertices[e[2]];
-
-                    if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
-                    {
-                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                            Q[0], Q[1], Q[2],
-                            p0[0], p0[1], p0[2],
-                            p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
-                        {
-                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[0], (uint32_t)e[1] }, 0.0 });
-                            E2[e[0]][e[1]] = 0;
-                        }
-                    }
-
-                    if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
-                    {
-                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                            Q[0], Q[1], Q[2],
-                            p1[0], p1[1], p1[2],
-                            p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
-                        {
-                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[1], (uint32_t)e[2] }, 0.0 });
-                            E2[e[1]][e[2]] = 0;
-                        }
-                    }
-
-                    if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
-                    {
-                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
-                            Q[0], Q[1], Q[2],
-                            p2[0], p2[1], p2[2],
-                            p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
-                        {
-                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[2], (uint32_t)e[0] }, 0.0 });
-                            E2[e[2]][e[0]] = 0;
-                        }
-                    }
-                }
-                E[i1][i2] = 0;
             }
         }
     }
 }
 
 bool
-MeshToMeshBruteForceCD::doBroadPhaseCollisionCheck() const
+MeshToMeshBruteForceCD::doBroadPhaseCollisionCheck(
+    std::shared_ptr<Geometry> geomA,
+    std::shared_ptr<Geometry> geomB) const
 {
-    const auto mesh1 = std::static_pointer_cast<PointSet>(m_object1);
-    const auto mesh2 = std::static_pointer_cast<PointSet>(m_object2);
+    const auto mesh1 = std::dynamic_pointer_cast<PointSet>(geomA);
+    const auto mesh2 = std::dynamic_pointer_cast<PointSet>(geomB);
+
+    // Edge Case Ex: One point vs non-manifold SurfaceMesh (like a single triangle or plane)
+    if (mesh1->getNumVertices() == 1 || mesh2->getNumVertices() == 1)
+    {
+        return true;
+    }
 
     Vec3d min1, max1;
     mesh1->computeBoundingBox(min1, max1);
@@ -380,17 +565,12 @@ MeshToMeshBruteForceCD::doBroadPhaseCollisionCheck() const
     Vec3d min2, max2;
     mesh2->computeBoundingBox(min2, max2);
 
-    return CollisionUtils::testAABBToAABB(min1[0] - m_proximityTolerance,
-                          max1[0] + m_proximityTolerance,
-                          min1[1] - m_proximityTolerance,
-                          max1[1] + m_proximityTolerance,
-                          min1[2] - m_proximityTolerance,
-                          max1[2] + m_proximityTolerance,
-                          min2[0] - m_proximityTolerance,
-                          max2[0] + m_proximityTolerance,
-                          min2[1] - m_proximityTolerance,
-                          max2[1] + m_proximityTolerance,
-                          min2[2] - m_proximityTolerance,
-                          max2[2] + m_proximityTolerance);
+    return CollisionUtils::testAABBToAABB(
+        min1[0], max1[0],
+        min1[1], max1[1],
+        min1[2], max1[2],
+        min2[0], max2[0],
+        min2[1], max2[1],
+        min2[2], max2[2]);
 }
-} // imstk
+}

@@ -36,6 +36,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
+#include "imstkPbdObjectCollision.h"
 
 using namespace imstk;
 
@@ -67,30 +68,17 @@ main()
     {
         scene->getActiveCamera()->setPosition(0.0, 15.0, 20.0);
 
-        std::shared_ptr<PbdObject>   deformableObj      = createAndAddPbdObject(scene, tetMeshFileName);
-        std::shared_ptr<SurfaceMesh> floorMeshColliding = createCollidingSurfaceMesh();
+        std::shared_ptr<PbdObject>   fluidObj  = createAndAddPbdObject(scene, tetMeshFileName);
+        std::shared_ptr<SurfaceMesh> floorMesh = createCollidingSurfaceMesh();
 
-        imstkNew<PbdObject> floorObj("Floor");
-        floorObj->setCollidingGeometry(floorMeshColliding);
-        floorObj->setVisualGeometry(floorMeshColliding);
-        floorObj->setPhysicsGeometry(floorMeshColliding);
-
-        imstkNew<PbdModel> pbdModel;
-        pbdModel->setModelGeometry(floorMeshColliding);
-
-        // Configure model
-        imstkNew<PBDModelConfig> pbdParams;
-        pbdParams->m_uniformMassValue = 0.0;
-
-        pbdModel->configure(pbdParams);
-        floorObj->setDynamicalModel(pbdModel);
-
+        imstkNew<CollidingObject> floorObj("Floor");
+        floorObj->setVisualGeometry(floorMesh);
+        floorObj->setCollidingGeometry(floorMesh);
         scene->addSceneObject(floorObj);
 
         // Collisions
-        scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floorObj,
-            InteractionType::PbdObjToPbdObjCollision,
-            CollisionDetection::Type::MeshToMeshBruteForce));
+        auto collisionInteraction = std::make_shared<PbdObjectCollision>(fluidObj, floorObj);
+        scene->getCollisionGraph()->addInteraction(collisionInteraction);
     }
 
     // Run the simulation
@@ -163,7 +151,6 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 2;
-    pbdParams->collisionParams->m_proximity = 0.01;
 
     // Set the parameters
     pbdModel->configure(pbdParams);

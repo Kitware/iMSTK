@@ -21,25 +21,23 @@
 
 #include "imstkCamera.h"
 #include "imstkCDObjectFactory.h"
-#include "imstkCollidingObject.h"
-#include "imstkCollisionData.h"
 #include "imstkCollisionGraph.h"
-#include "imstkCollisionPair.h"
+#include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPlane.h"
-#include "imstkRenderMaterial.h"
+#include "imstkRbdConstraint.h"
+#include "imstkRigidBodyModel2.h"
+#include "imstkRigidObject2.h"
+#include "imstkRigidObjectCollision.h"
+#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
 #include "imstkSphere.h"
-#include "imstkVirtualCouplingCH.h"
-#include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -54,62 +52,52 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
+    // Setup haptics manager
+    imstkNew<HapticDeviceManager>       hapticsManager;
+    const std::string                   deviceName = "";
+    std::shared_ptr<HapticDeviceClient> client     = hapticsManager->makeDeviceClient(deviceName);
+
     // Scene
     imstkNew<Scene> scene("VirtualCoupling");
 
-    // Create a plane in the scene
-    auto            planeGeom = std::make_shared<Plane>();
-    imstkNew<Plane> plane(Vec3d(0.0, -50.0, 0.0));
-    planeGeom->setWidth(400.0);
+    // Create a plane in the scene to touch
+    imstkNew<Plane> plane(Vec3d(0.0, -50.0, 0.0), Vec3d(0.0, 1.0, 0.0));
+    plane->setWidth(400.0);
     imstkNew<CollidingObject> planeObj("Plane");
-    planeObj->setVisualGeometry(planeGeom);
-    planeObj->setCollidingGeometry(planeGeom);
+    planeObj->setVisualGeometry(plane);
+    planeObj->setCollidingGeometry(plane);
     scene->addSceneObject(planeObj);
 
-    // Create the virtual coupling object controller
-
-    // Device Server
-    imstkNew<HapticDeviceManager>       server;
-    const std::string                   deviceName = "";
-    std::shared_ptr<HapticDeviceClient> client     = server->makeDeviceClient(deviceName);
-
     // Create a virtual coupling object
-    imstkNew<Sphere>          visualGeom(Vec3d(0.0, 0.0, 0.0), 20.0);
-    imstkNew<Sphere>          collidingGeom(Vec3d(0.0, 0.0, 0.0), 20.0);
-    imstkNew<CollidingObject> obj("VirtualCouplingObject");
-    obj->setCollidingGeometry(collidingGeom);
+    imstkNew<Sphere>          sphere(Vec3d(0.0, 0.0, 0.0), 20.0);
+    imstkNew<RigidObject2>    sphereObj("VirtualCouplingObject");
+    imstkNew<RigidBodyModel2> rbdModel;
+    rbdModel->getConfig()->m_dt      = 0.001;
+    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
+    sphereObj->setDynamicalModel(rbdModel);
+    sphereObj->getRigidBody()->m_mass = 1.0;
+    sphereObj->setCollidingGeometry(sphere);
+    sphereObj->setVisualGeometry(sphere);
+    sphereObj->setPhysicsGeometry(sphere);
+    scene->addSceneObject(sphereObj);
 
-    imstkNew<RenderMaterial> material;
-    imstkNew<VisualModel>    visualModel(visualGeom.get());
-    visualModel->setRenderMaterial(material);
-    obj->addVisualModel(visualModel);
-
-    // Add virtual coupling object (with visual, colliding, and physics geometry) in the scene.
-    scene->addSceneObject(obj);
-
-    // Create and add virtual coupling object controller in the scene
-    imstkNew<SceneObjectController> controller(obj, client);
+    // Create a virtual coupling controller
+    imstkNew<RigidObjectController> controller(sphereObj, client);
+    controller->setLinearKs(10000.0);
+    controller->setLinearKd(100.0);
+    controller->setAngularKs(0.0);
+    controller->setAngularKd(0.0);
+    controller->setForceScaling(0.00001);
     scene->addController(controller);
 
-    {
-        // Setup CD, and collision data
-        imstkNew<CollisionData> colData;
-
-        std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(CollisionDetection::Type::UnidirectionalPlaneToSphere,
-            planeObj->getCollidingGeometry(), obj->getCollidingGeometry(), colData);
-
-        // Setup the handler
-        imstkNew<VirtualCouplingCH> colHandler(CollisionHandling::Side::B, colData, obj);
-        colHandler->setStiffness(5e-01);
-        colHandler->setDamping(0.005);
-
-        imstkNew<CollisionPair> pair(planeObj, obj, colDetect, nullptr, colHandler);
-        scene->getCollisionGraph()->addInteraction(pair);
-    }
+    // Add interaction between the rigid object sphere and static plane
+    scene->getCollisionGraph()->addInteraction(
+        std::make_shared<RigidObjectCollision>(sphereObj, planeObj, "UnidirectionalPlaneToSphereCD"));
 
     // Camera
-    scene->getActiveCamera()->setPosition(Vec3d(200, 200, 200));
-    scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 0));
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 269.0, 295.0));
+    scene->getActiveCamera()->setFocalPoint(Vec3d(0.0, -20.0, 5.7));
+    scene->getActiveCamera()->setViewUp(Vec3d(0.0, 1.0, 0.0));
 
     // Light
     imstkNew<DirectionalLight> light;
@@ -117,7 +105,7 @@ main()
     light->setIntensity(1.0);
     scene->addLight("light0", light);
 
-    //Run the simulation
+    // Run the simulation
     {
         // Setup a viewer to render
         imstkNew<VTKViewer> viewer("Viewer 1");
@@ -126,11 +114,20 @@ main()
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager 1");
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<SimulationManager> driver;
-        driver->addModule(server);
+        driver->addModule(hapticsManager);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.001);
+
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+        {
+            // Run the rbd model in real time
+            rbdModel->getConfig()->m_dt = driver->getDt();
+            });
 
         // Add mouse and keyboard controls to the viewer
         {

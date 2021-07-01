@@ -217,23 +217,6 @@ InflatableObject::makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& 
 }
 
 void
-InflatableObject::setXZPlaneTexCoords(const double uvScale)
-{
-    Vec3d min, max;
-    m_objectSurfMesh->computeBoundingBox(min, max);
-    const Vec3d size = max - min;
-
-    imstkNew<VecDataArray<float, 2>> uvCoordsPtr(m_objectSurfMesh->getNumVertices());
-    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
-    for (int i = 0; i < m_objectSurfMesh->getNumVertices(); i++)
-    {
-        const Vec3d& vertex = m_objectSurfMesh->getVertexPosition(i);
-        uvCoords[i] = Vec2f((vertex[0] - min[0]) / size[0], (vertex[2] - min[2]) / size[2]) * uvScale;
-    }
-    m_objectSurfMesh->setVertexTCoords("tcoords", uvCoordsPtr);
-}
-
-void
 InflatableObject::setSphereTexCoords(const double uvScale)
 {
     Vec3d min, max;
@@ -318,34 +301,38 @@ InflatableObject::findAffectedConstraint(const Vec3d& toolTip, const double radi
 }
 
 void
-InflatableObject::inject(const Vec3d& toolTip, const double radius, double rate)
+InflatableObject::inject(const Vec3d& toolTip, const double radius, double dx)
 {
     if (!m_affectedAreaUpdated)
     {
         findAffectedConstraint(toolTip, radius);
     }
 
-    if (m_inlationTpye == InflationType::Exponential)
+    double de = 0.0;
+    if (m_inflationType == InflationType::Exponential)
     {
-        m_inflationRatio *= (1 + rate);
+        de = std::exp(dx);
     }
-    else if (m_inlationTpye == InflationType::Linear)
+    else if (m_inflationType == InflationType::Linear)
     {
-        m_inflationRatio += rate;
+        de = dx;
     }
 
     for (auto& id : m_constraintIDandWeight)
     {
+        const double dv = id.second * de;
+
         auto& c = (m_constraintContainer->getConstraints())[id.first];
         if (c->getType() == PbdConstraint::Type::Volume)
         {
             const auto& constraint = std::dynamic_pointer_cast<PbdInflatableVolumeConstraint>(c);
-            constraint->multiplyInitRestVolumeBy(m_inflationRatio * id.second);
+            constraint->setRestVolume(dv + constraint->getRestVolume());
         }
         else if (c->getType() == PbdConstraint::Type::Distance)
         {
-            //const auto& constraint = std::dynamic_pointer_cast<PbdInflatableDistanceConstraint>(c);
-            //constraint->multiplyInitRestLengthBy(0.1 * m_inflationRatio * id.second);
+            // If a tets volume scales by X then each of it sides grow by ?
+            /* const auto& constraint = std::dynamic_pointer_cast<PbdInflatableDistanceConstraint>(c);
+             constraint->setRestLength(dv + constraint->getRestLength());*/
         }
     }
 }
@@ -353,14 +340,14 @@ InflatableObject::inject(const Vec3d& toolTip, const double radius, double rate)
 void
 InflatableObject::switchInflationType()
 {
-    if (m_inlationTpye == InflationType::Linear)
+    if (m_inflationType == InflationType::Linear)
     {
-        m_inlationTpye = InflationType::Exponential;
+        m_inflationType = InflationType::Exponential;
         std::cout << "Inflation Type: Exponential." << std::endl;
     }
-    else if (m_inlationTpye == InflationType::Exponential)
+    else if (m_inflationType == InflationType::Exponential)
     {
-        m_inlationTpye = InflationType::Linear;
+        m_inflationType = InflationType::Linear;
         std::cout << "Inflation Type: Linear." << std::endl;
     }
 }

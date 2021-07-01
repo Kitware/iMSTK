@@ -75,12 +75,22 @@ PbdConstraintContainer::removeConstraints(std::shared_ptr<std::unordered_set<siz
     m_constraintLock.unlock();
 }
 
-void
+PbdConstraintContainer::iterator
 PbdConstraintContainer::eraseConstraint(iterator iter)
 {
     m_constraintLock.lock();
-    m_constraints.erase(iter);
+    iterator newIter = m_constraints.erase(iter);
     m_constraintLock.unlock();
+    return newIter;
+}
+
+PbdConstraintContainer::const_iterator
+PbdConstraintContainer::eraseConstraint(const_iterator iter)
+{
+    m_constraintLock.lock();
+    const_iterator newIter = m_constraints.erase(iter);
+    m_constraintLock.unlock();
+    return newIter;
 }
 
 void

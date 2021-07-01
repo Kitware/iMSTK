@@ -39,7 +39,8 @@ public:
     virtual ~PbdConstraintContainer() = default;
 
 public:
-    using iterator = std::vector<std::shared_ptr<PbdConstraint>>::iterator;
+    using iterator       = std::vector<std::shared_ptr<PbdConstraint>>::iterator;
+    using const_iterator = std::vector<std::shared_ptr<PbdConstraint>>::const_iterator;
 
 public:
     ///
@@ -60,7 +61,8 @@ public:
     ///
     /// \brief Removes a constraint from the system by iterator, thread safe
     ///
-    virtual void eraseConstraint(iterator iter);
+    virtual iterator eraseConstraint(iterator iter);
+    virtual const_iterator eraseConstraint(const_iterator iter);
 
     ///
     /// \brief Reserve an amount of constraints in the pool, if you know
@@ -78,6 +80,7 @@ public:
     /// \brief Get the underlying container
     ///
     const std::vector<std::shared_ptr<PbdConstraint>>& getConstraints() const { return m_constraints; }
+    std::vector<std::shared_ptr<PbdConstraint>>& getConstraints() { return m_constraints; }
 
     ///
     /// \brief Get the partitioned constraints

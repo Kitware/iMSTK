@@ -97,10 +97,52 @@ public:
     const Vec2i& getLineIndices(const size_t pos) const;
     Vec2i& getLineIndices(const size_t pos);
 
-private:
+// Attributes
+public:
+    ///
+    /// \brief Set a data array holding some per cell data
+    ///
+    void setCellAttribute(const std::string& arrayName, std::shared_ptr<AbstractDataArray> arr);
+
+    ///
+    /// \brief Get a specific data array. If the array name cannot be found, nullptr is returned.
+    ///
+    std::shared_ptr<AbstractDataArray> getCellAttribute(const std::string& arrayName) const;
+
+    ///
+    /// \brief Get the cell attributes map
+    ///
+    const std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& getCellAttributes() const { return m_cellAttributes; }
+
+    ///
+    /// \brief Check if a specific data array exists.
+    ///
+    bool hasCellAttribute(const std::string& arrayName) const;
+
+    ///
+    /// \brief Set the cell attributes map
+    ///
+    void setCellAttributes(std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> attributes) { m_cellAttributes = attributes; }
+
+    ///
+    /// \brief Get/Set the active scalars
+    ///
+    void setCellScalars(const std::string& arrayName, std::shared_ptr<AbstractDataArray> scalars);
+    void setCellScalars(const std::string& arrayName);
+    std::string getActiveCellScalars() const { return m_activeCellScalars; }
+    std::shared_ptr<AbstractDataArray> getCellScalars() const;
+
+protected:
+    void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
+                                const int expectedNumComponents, const ScalarType expectedScalarType);
+
+protected:
+    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;   ///> line connectivity
+
+    std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> m_cellAttributes;
+    std::string m_activeCellScalars = "";
+
     size_t m_originalNumLines = 0;
     size_t m_maxNumLines      = 0;
-
-    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;   ///> line connectivity
 };
 } // imstk

@@ -27,76 +27,64 @@
 namespace imstk
 {
 class CollidingObject;
-class PbdPointNormalCollisionConstraint;
-class PbdCollisionConstraint;
-class PbdCollisionSolver;
+class PbdPointPointConstraint;
 class PbdObject;
-struct CollisionData;
+class CollisionData;
 
 ///
 /// \class PBDPickingCH
 ///
-/// \brief Implements nodal picking for PBD object
+/// \brief Implements nodal picking for PBD object via PointPointCollisionConstraints
+/// All points inside the pickObj are constrained with PointPointConstraints constraining
+/// them to their relative position when they were picked
 ///
 class PBDPickingCH : public CollisionHandling
 {
 public:
+    PBDPickingCH();
+    ~PBDPickingCH() override = default;
 
-    ///
-    /// \brief Constructor
-    ///
-    PBDPickingCH(const Side&                          side,
-                 const std::shared_ptr<CollisionData> colData,
-                 std::shared_ptr<PbdObject>           pbdObj,
-                 std::shared_ptr<CollidingObject>     pickObj);
+    virtual const std::string getTypeName() const override { return "PBDPickingCH"; }
 
-    PBDPickingCH() = delete;
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~PBDPickingCH() override;
-
-    ///
-    /// \brief Compute forces based on collision data
-    ///
-    void processCollisionData() override;
-
+public:
     ///
     /// \brief Add picking constraints for the node that is picked
     ///
-    void addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> pickObj);
+    void addPickConstraints(const CDElementVector<CollisionElement>& elements,
+                            std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> pickObj);
 
     ///
-    /// \brief Update picking constraints for the node that is picked
+    /// \brief Remove all picking nodes and constraints
     ///
-    void updatePickConstraints();
+    void endPick() { m_isPicking = false; }
 
     ///
-    /// \brief Remove picking constraints for the node that is picked
+    /// \brief Add picking nodes nodes and constraints
     ///
-    void removePickConstraints();
-
-    ///
-    /// \brief Activate picking constraints for nodes in the collision data
-    ///
-    void activatePickConstraints();
+    void beginPick() { m_isPicking = true; }
 
     ///
     /// \brief Generate pbd constraints for tool-mesh collision
     ///
-    void generatePBDConstraints();
+    void generatePBDConstraints(const CDElementVector<CollisionElement>& elements);
 
-    std::shared_ptr<PbdCollisionSolver> getCollisionSolver() const { return m_pbdCollisionSolver; }
+protected:
+    ///
+    /// \brief Add collision constraints based off contact data
+    ///
+    void handle(
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB) override;
 
 private:
     bool m_isPicking;
-    std::map<size_t, Vec3d>             m_pickedPtIdxOffset;    ///> Map for picked nodes.
-    std::shared_ptr<PbdObject>          m_pbdObj  = nullptr;    ///> PBD object
-    std::shared_ptr<CollidingObject>    m_pickObj = nullptr;    ///> Picking tool object
-    std::shared_ptr<PbdCollisionSolver> m_pbdCollisionSolver = nullptr;
+    bool m_isPrevPicking;
 
-    std::vector<PbdCollisionConstraint*> m_PBDConstraints;              ///> List of PBD constraints
-    std::vector<PbdPointNormalCollisionConstraint*> m_ACConstraintPool; ///> PBD analytical constraints
+    std::map<size_t, Vec3d> m_pickedPtIdxOffset;    ///> Map for picked nodes.
+
+    std::list<Vec3d> constraintPts;
+    std::list<Vec3d> constraintVels;
+
+    std::vector<std::shared_ptr<PbdPointPointConstraint>> m_constraints; ///> List of PBD constraints
 };
 }

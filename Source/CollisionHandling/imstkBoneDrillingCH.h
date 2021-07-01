@@ -26,43 +26,40 @@
 
 namespace imstk
 {
+class CollisionData;
 class CollidingObject;
-struct CollisionData;
+class RigidObject2;
 
 ///
 /// \class BoneDrillingCH
 ///
 /// \brief Implements bone drilling collision handling
+/// \todo: Doesn't work right now. Tet removal needs to be fixed. I would suggest
+/// buffering setting removed elements to a dummy vertex.
 ///
 class BoneDrillingCH : public CollisionHandling
 {
 public:
-
-    ///
-    /// \brief Constructor
-    ///
-    BoneDrillingCH(const Side&                          side,
-                   const std::shared_ptr<CollisionData> colData,
-                   std::shared_ptr<CollidingObject>     bone,
-                   std::shared_ptr<CollidingObject>     drill);
-
-    BoneDrillingCH() = delete;
-
-    ///
-    /// \brief Destructor
-    ///
+    BoneDrillingCH() = default;
     virtual ~BoneDrillingCH() override = default;
 
+    virtual const std::string getTypeName() const override { return "BoneDrillingCH"; }
+
+public:
     ///
-    /// \brief Decrease the density at the nodal points and remove if the density goes below 0
+    /// \brief Set the input bone
     ///
-    void erodeBone();
+    void setInputObjectBone(std::shared_ptr<CollidingObject> boneObject) { setInputObjectA(boneObject); }
 
     ///
-    /// \brief Compute forces based on collision data
+    /// \brief Set the input drill
     ///
-    void processCollisionData() override;
+    void setInputObjectDrill(std::shared_ptr<RigidObject2> drillObject);
 
+    std::shared_ptr<CollidingObject> getBoneObj() const { return getInputObjectA(); }
+    std::shared_ptr<RigidObject2> getDrillObj() const;
+
+public:
     ///
     /// \brief Get stiffness
     ///
@@ -81,10 +78,22 @@ public:
     ///
     void setDamping(const double d) { m_damping = d; }
 
-private:
-    std::shared_ptr<CollidingObject> m_bone;    ///> bone object
-    std::shared_ptr<CollidingObject> m_drill;   ///> drill object
+protected:
+    ///
+    /// \brief Does the bone drilling
+    ///
+    virtual void handle(
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB) override;
 
+    ///
+    /// \brief Decrease the density at the nodal points and remove if the density goes below 0
+    ///
+    void erodeBone(
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB);
+
+private:
     double m_stiffness = 10e-01;                ///> Stiffness coefficient associated with virtual coupling object
     double m_damping   = 0.005;                 ///> Damping coefficient associated with virtual coupling object
 
