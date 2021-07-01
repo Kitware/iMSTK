@@ -36,7 +36,7 @@ TEST(SurfaceMeshDistanceTransformTest, FilterWithBounds)
     Vec3d lowerLeft;
     Vec3d upperRight;
     // Convert the image into SDF
-    mesh->computeBoundingBox(lowerLeft, upperRight);
+    mesh->computeBoundingBox(lowerLeft, upperRight, 5.0);
     Vec6d bounds;
     bounds << lowerLeft.x(), upperRight.x(), lowerLeft.y(), upperRight.y(), lowerLeft.z(), upperRight.z();
     auto toSdf = std::make_shared<SurfaceMeshDistanceTransform>();
@@ -70,7 +70,7 @@ TEST(SurfaceMeshDistanceTransformTest, FilterWithoutBounds)
 
     Vec3d lowerLeft;
     Vec3d upperRight;
-    mesh->computeBoundingBox(lowerLeft, upperRight, toSdf->getBoundsMargin());
+    mesh->computeBoundingBox(lowerLeft, upperRight);
     Vec6d bounds;
     bounds << lowerLeft.x(), upperRight.x(), lowerLeft.y(), upperRight.y(), lowerLeft.z(), upperRight.z();
 

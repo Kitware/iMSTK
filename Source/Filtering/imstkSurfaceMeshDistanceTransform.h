@@ -35,10 +35,8 @@ class SurfaceMesh;
 /// and pseudonormal computations. One might need to adjust the tolerance
 /// depending on dataset scale.
 /// The bounds for the image can be set in the filter, when none are set
-/// the bounding box of the mesh plus a small margin is used, the margin is
-/// necessary to prevent issues with triangles that are parallel to the major
-/// planes. When providing your own bounds a box larger than the original object
-/// might be necessary depending on shape
+/// the bounding box of the mesh is used, the margin.  When providing your own bounds a
+/// box larger than the original object might be necessary depending on shape
 class SurfaceMeshDistanceTransform : public GeometryAlgorithm
 {
 public:
@@ -73,11 +71,6 @@ public:
     ///@}
 
     ///
-    /// \brief The margin in percent, used when the bounds are not set explicitly
-    ///
-    imstkGetMacro(BoundsMargin, double);
-
-    ///
     /// \brief If on, will compute only a narrow banded transform
     ///@{
     imstkSetMacro(NarrowBanded, bool);
@@ -104,9 +97,7 @@ private:
     Vec6d  m_Bounds     = Vec6d::Zero();
     double m_Tolerance  = 1.0e-10;
 
-    int  m_DilateSize   = 4; ///< Only for narrow banded
     bool m_NarrowBanded = false;
-
-    double m_BoundsMargin = 5.0; ///< Margin in percent
+    int  m_DilateSize   = 4; ///< Only for narrow banded
 };
 }

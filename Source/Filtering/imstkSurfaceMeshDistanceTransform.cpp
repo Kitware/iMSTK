@@ -227,7 +227,7 @@ SurfaceMeshDistanceTransform::setBounds(const Vec6d& bounds)
     m_Bounds = bounds;
     if (m_Bounds.isZero())
     {
-        LOG(WARNING) << "Bounds are zero, the image bounds + " << m_BoundsMargin << "percent will be used instead.";
+        LOG(WARNING) << "Bounds are zero, the image bounds will be used instead.";
     }
 }
 
@@ -237,7 +237,7 @@ SurfaceMeshDistanceTransform::setBounds(const Vec3d& min, const Vec3d& max)
     m_Bounds << min.x(), max.x(), min.y(), max.y(), min.z(), max.z();
     if (m_Bounds.isZero())
     {
-        LOG(WARNING) << "Bounds are zero, the image bounds + " << m_BoundsMargin << "percent will be used instead.";
+        LOG(WARNING) << "Bounds are zero, the image bounds will be used instead.";
     }
 }
 
@@ -262,13 +262,10 @@ SurfaceMeshDistanceTransform::requestUpdate()
     Vec6d bounds = m_Bounds;
     if (bounds.isZero())
     {
-        // Using the exact bounding box will clip vertices/triangles that are on
-        // the boundary, if no bounds are given use 10% padding to prevent the clipping
-        Vec3d min;
-        Vec3d max;
-        inputSurfaceMesh->computeBoundingBox(min, max, m_BoundsMargin);
+        Vec3d min, max;
+        inputSurfaceMesh->computeBoundingBox(min, max, 0.0);
         bounds << min.x(), max.x(), min.y(), max.y(), min.z(), max.z();
-        LOG(WARNING) << "Bounds are zero, the image bounds + " << m_BoundsMargin << "percent will be used instead.";
+        LOG(WARNING) << "Bounds are zero, the image bounds + " << bounds.transpose() << "will be used.";
     }
 
     const Vec3d size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
