@@ -114,6 +114,7 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
         /*actorProperty->UseImageBasedLightingOn();
             actorProperty->SetEnvironmentCubeMap(getVTKTexture(cubemap));*/
 
+        actorProperty->LightingOn();
         actorProperty->SetInterpolationToPBR();
 
         // configure the basic properties
@@ -121,15 +122,22 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
     }
     else if (material->getShadingModel() == RenderMaterial::ShadingModel::Phong)
     {
+        actorProperty->LightingOn();
         actorProperty->SetInterpolationToPhong();
     }
     else if (material->getShadingModel() == RenderMaterial::ShadingModel::Gouraud)
     {
+        actorProperty->LightingOn();
         actorProperty->SetInterpolationToGouraud();
     }
-    else
+    else if (material->getShadingModel() == RenderMaterial::ShadingModel::Flat)
     {
+        actorProperty->LightingOn();
         actorProperty->SetInterpolationToFlat();
+    }
+    else if (material->getShadingModel() == RenderMaterial::ShadingModel::None)
+    {
+        actorProperty->LightingOff();
     }
 
     // Display mode
