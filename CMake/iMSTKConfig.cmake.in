@@ -57,9 +57,6 @@ if (iMSTK_USE_PHYSX)
   find_package(PhysX REQUIRED)
 endif()
 
-#SCCD
-find_package( SCCD REQUIRED )
-
 # SFML
 if(WIN32)
   find_package( SFML REQUIRED )

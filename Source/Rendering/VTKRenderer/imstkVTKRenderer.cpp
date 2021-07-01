@@ -21,7 +21,6 @@
 
 #include "imstkVTKRenderer.h"
 #include "imstkCamera.h"
-#include "imstkDebugRenderGeometry.h"
 #include "imstkDirectionalLight.h"
 #include "imstkPointLight.h"
 #include "imstkSpotLight.h"
@@ -541,27 +540,6 @@ VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
         if (sos.find(*i) == sos.end())
         {
             i = removeSceneObject(*i);
-        }
-    }
-
-    // Debug render actors
-    for (const auto& dbgVizModel : m_scene->getDebugRenderModels())
-    {
-        auto geom = std::static_pointer_cast<DebugRenderGeometry>(dbgVizModel->getDebugGeometry());
-        if (dbgVizModel && !dbgVizModel->getRenderDelegateCreated(this))
-        {
-            auto delegate = VTKRenderDelegate::makeDebugDelegate(dbgVizModel);
-            if (delegate == nullptr)
-            {
-                LOG(WARNING) << "error: Could not create render delegate for '"
-                             << geom->getName() << "'.";
-                continue;
-            }
-
-            m_debugRenderDelegates.push_back(delegate);
-            m_objectVtkActors.push_back(delegate->getVtkActor());
-            m_vtkRenderer->AddActor(delegate->getVtkActor());
-            dbgVizModel->setRenderDelegateCreated(this, true);
         }
     }
 }

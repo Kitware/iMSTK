@@ -88,7 +88,7 @@ public:
     ///
     /// \brief Get the vertex indices of the constraint
     ///
-    const std::vector<size_t>& getVertexIds() const { return m_vertexIds; }
+    std::vector<size_t>& getVertexIds() { return m_vertexIds; }
 
     ///
     /// \brief Set the tolerance used for pbd constraints

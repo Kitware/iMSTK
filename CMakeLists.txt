@@ -147,7 +147,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   if (${PROJECT_NAME}_USE_PHYSX)
     imstk_define_dependency(PhysX)
   endif()
-  imstk_define_dependency(SCCD)
   imstk_define_dependency(tbb)
   imstk_define_dependency(VegaFEM)
   imstk_define_dependency(VTK)
@@ -234,9 +233,6 @@ if (${PROJECT_NAME}_USE_PHYSX)
   set_property(CACHE PHYSX_CONFIGURATION PROPERTY STRINGS ${PHYSX_RELEASE_TYPES})
   find_package(PhysX REQUIRED)
 endif()
-
-# SCCD
-find_package( SCCD REQUIRED )
 
 # SFML
 if(APPLE OR LINUX)

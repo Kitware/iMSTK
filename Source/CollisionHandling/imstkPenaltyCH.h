@@ -26,65 +26,63 @@
 namespace imstk
 {
 class CollidingObject;
+class CollisionData;
 class FeDeformableObject;
-struct CollisionData;
+class RigidObject2;
 
 ///
 /// \class PenaltyCH
 ///
-/// \brief Implements penalty collision handling
+/// \brief Implements penalty collision handling between FEM and Rigid models
 ///
 class PenaltyCH : public CollisionHandling
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    PenaltyCH(const Side& side, const std::shared_ptr<CollisionData>& colData, const std::shared_ptr<CollidingObject>& obj);
-
-    ///
-    /// \brief Constructor
-    ///
-    PenaltyCH() = delete;
-
-    ///
-    /// \brief Destructor
-    ///
+    PenaltyCH() = default;
     virtual ~PenaltyCH() override = default;
 
-    ///
-    /// \brief Compute forces based on collision data
-    ///
-    void processCollisionData() override;
-    ///
-    /// \brief TODO
-    ///
-    void computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObject>& analyticObj);
-    ///
-    /// \brief TODO
-    ///
-    void computeContactForcesDiscreteDeformable(const std::shared_ptr<FeDeformableObject>& deformableObj);
+    virtual const std::string getTypeName() const override { return "PenaltyCH"; }
 
+public:
+    void setInputFeObject(std::shared_ptr<FeDeformableObject> feObj);
+    void setInputRbdObject(std::shared_ptr<RigidObject2> rbdObj);
+
+    std::shared_ptr<FeDeformableObject> getInputFeObject();
+    std::shared_ptr<RigidObject2> getInputRbdObject();
+
+public:
     ///
     /// \brief Set the contact stiffness
     ///
-    void setContactStiffness(const double stiffness)
-    {
-        m_stiffness = stiffness;
-    }
+    void setContactStiffness(const double stiffness) { m_stiffness = stiffness; }
 
     ///
     /// \brief Set the contact velocity damping
     ///
-    void setContactVelocityDamping(const double damping)
-    {
-        m_damping = damping;
-    }
+    void setContactVelocityDamping(const double damping) { m_damping = damping; }
 
-private:
-    std::shared_ptr<CollidingObject> m_object = nullptr; ///>
+protected:
+    void handle(
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB) override;
 
-    double m_stiffness = 5.0e5;                          ///> Stiffness of contact
-    double m_damping   = 0.5;                            ///> Damping of the contact
+    ///
+    /// \brief Given the collision data, applies contact as external force
+    /// to the rigid body (onyl supports PointDirection contacts)
+    ///
+    void computeContactForcesAnalyticRigid(
+        const CDElementVector<CollisionElement>& elements,
+        std::shared_ptr<RigidObject2>            analyticObj);
+
+    ///
+    /// \brief Given the collision data, applies nodal forces in the FEM model
+    ///
+    void computeContactForcesDiscreteDeformable(
+        const CDElementVector<CollisionElement>& elements,
+        std::shared_ptr<FeDeformableObject>      deformableObj);
+
+protected:
+    double m_stiffness = 5.0e5; ///> Stiffness of contact
+    double m_damping   = 0.5;   ///> Damping of the contact
 };
 }

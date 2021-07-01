@@ -25,39 +25,52 @@
 
 namespace imstk
 {
+class CollisionData;
 class ImplicitGeometryToPointSetCD;
-struct CollisionData;
 class SPHObject;
 
 ///
 /// \class SPHCollisionHandling
 ///
-/// \brief Supports SPH vs analytic and SPH vs Implicit Geometry
+/// \brief The SPHCollisionHandler consumes PointIndexDirection contact data
+/// to resolve positions and correct velocities of SPH particles. It does
+/// not correct pressures/densities.
 ///
 class SPHCollisionHandling : public CollisionHandling
 {
 public:
-    SPHCollisionHandling(const Side&                    side,
-                         std::shared_ptr<CollisionData> colData,
-                         std::shared_ptr<SPHObject>     obj);
-
-    SPHCollisionHandling() = delete;
-
+    SPHCollisionHandling() = default;
     virtual ~SPHCollisionHandling() override = default;
 
+    virtual const std::string getTypeName() const override { return "SPHCollisionHandling"; }
+
 public:
+    void setInputSPHObject(std::shared_ptr<SPHObject> sphObj);
+
+    ///
+    /// \brief How many times to resolve and correct position. This is useful when colliding
+    /// with multiple objects or in a corner of another object
+    ///
     void setNumberOfIterations(int iterations) { this->m_iterations = iterations; }
 
     void setDetection(std::shared_ptr<ImplicitGeometryToPointSetCD> colDetect) { this->m_colDetect = colDetect; }
 
     ///
-    /// \brief Compute forces based on collision data
+    /// \brief Resolve SPH particle positions
     ///
-    virtual void processCollisionData() override;
+    void handle(
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB) override;
+
+protected:
+    ///
+    /// \brief Solves positiona and corrects velocity of individual particle
+    ///
+    void solve(Vec3d& pos, Vec3d& velocity, const Vec3d& penetrationVector);
 
 private:
-    std::shared_ptr<SPHObject> m_SPHObject = nullptr;
     std::shared_ptr<ImplicitGeometryToPointSetCD> m_colDetect = nullptr;
-    int m_iterations = 1;
+    int    m_iterations       = 1;
+    double m_boundaryFriction = 0.0;
 };
 } // end namespace imstk

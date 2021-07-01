@@ -21,50 +21,135 @@ limitations under the License.
 
 #include "imstkImplicitGeometryToPointSetCD.h"
 #include "imstkCollisionData.h"
+#include "imstkImageData.h"
 #include "imstkImplicitGeometry.h"
 #include "imstkMath.h"
 #include "imstkPointSet.h"
-
 #include "imstkSignedDistanceField.h"
-#include "imstkImageData.h"
 
 namespace imstk
 {
-ImplicitGeometryToPointSetCD::ImplicitGeometryToPointSetCD(std::shared_ptr<ImplicitGeometry> implicitGeomA,
-                                                           std::shared_ptr<PointSet>         pointSetB,
-                                                           std::shared_ptr<CollisionData>    colData) :
-    CollisionDetection(CollisionDetection::Type::PointSetToImplicit, colData),
-    m_implicitGeomA(implicitGeomA),
-    m_pointSetB(pointSetB)
+ImplicitGeometryToPointSetCD::ImplicitGeometryToPointSetCD()
 {
-    centralGrad.setFunction(m_implicitGeomA);
-    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(m_implicitGeomA))
-    {
-        centralGrad.setDx(sdf->getImage()->getSpacing() * 0.5);
-    }
+    setRequiredInputType<ImplicitGeometry>(0);
+    setRequiredInputType<PointSet>(1);
 }
 
 void
-ImplicitGeometryToPointSetCD::computeCollisionData()
+ImplicitGeometryToPointSetCD::computeCollisionDataAB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
 {
-    m_colData->clearAll();
+    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
+    std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
 
-    const VecDataArray<double, 3>& vertices = *m_pointSetB->getVertexPositions();
+    m_centralGrad.setFunction(implicitGeom);
+    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(implicitGeom))
+    {
+        m_centralGrad.setDx(sdf->getImage()->getSpacing() * 0.5);
+    }
+
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices    = *verticesPtr;
     ParallelUtils::parallelFor(vertices.size(),
-        [&](const size_t idx)
+        [&](const int i)
         {
-            const Vec3d& pt = vertices[idx];
+            const Vec3d& pt = vertices[i];
 
-            const double signedDistance = m_implicitGeomA->getFunctionValue(pt);
+            const double signedDistance = implicitGeom->getFunctionValue(pt);
             if (signedDistance < 0.0)
             {
-                PositionDirectionCollisionDataElement elem;
-                elem.dirAtoB = -centralGrad(pt).normalized(); // Contact Normal
-                elem.nodeIdx = static_cast<uint32_t>(idx);
-                elem.penetrationDepth = std::abs(signedDistance);
-                elem.posB = pt;// +elem.dirAtoB * elem.penetrationDepth;
-                m_colData->PDColData.safeAppend(elem);
+                const Vec3d n = m_centralGrad(pt).normalized(); // Contact Normal
+
+                PointDirectionElement elemA;
+                elemA.dir = -n; // Direction to resolve SDF-based object from point
+                elemA.pt  = pt;
+                elemA.penetrationDepth = std::abs(signedDistance);
+
+                PointIndexDirectionElement elemB;
+                elemB.dir     = n; // Direction to resolve point from SDF
+                elemB.ptIndex = i;
+                elemB.penetrationDepth = std::abs(signedDistance);
+
+                elementsA.safeAppend(elemA);
+                elementsB.safeAppend(elemB);
             }
-        });
+                }, vertices.size() > 100);
+}
+
+void
+ImplicitGeometryToPointSetCD::computeCollisionDataA(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA)
+{
+    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
+    std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
+
+    m_centralGrad.setFunction(implicitGeom);
+    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(implicitGeom))
+    {
+        m_centralGrad.setDx(sdf->getImage()->getSpacing() * 0.5);
+    }
+
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+    ParallelUtils::parallelFor(vertices.size(),
+        [&](const int i)
+        {
+            const Vec3d& pt = vertices[i];
+
+            const double signedDistance = implicitGeom->getFunctionValue(pt);
+            if (signedDistance < 0.0)
+            {
+                const Vec3d n = m_centralGrad(pt).normalized(); // Contact Normal
+
+                PointDirectionElement elemA;
+                elemA.dir = -n; // Direction to resolve SDF-based object from point
+                elemA.pt  = pt;
+                elemA.penetrationDepth = std::abs(signedDistance);
+
+                elementsA.safeAppend(elemA);
+            }
+                }, vertices.size() > 100);
+}
+
+void
+ImplicitGeometryToPointSetCD::computeCollisionDataB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsB)
+{
+    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
+    std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
+
+    m_centralGrad.setFunction(implicitGeom);
+    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(implicitGeom))
+    {
+        m_centralGrad.setDx(sdf->getImage()->getSpacing() * 0.5);
+    }
+
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+    ParallelUtils::parallelFor(vertices.size(),
+        [&](const int i)
+        {
+            const Vec3d& pt = vertices[i];
+
+            const double signedDistance = implicitGeom->getFunctionValue(pt);
+            if (signedDistance < 0.0)
+            {
+                const Vec3d n = m_centralGrad(pt).normalized(); // Contact Normal
+
+                PointIndexDirectionElement elemB;
+                elemB.dir     = n; // Direction to resolve point from SDF
+                elemB.ptIndex = i;
+                elemB.penetrationDepth = std::abs(signedDistance);
+
+                elementsB.safeAppend(elemB);
+            }
+                }, vertices.size() > 100);
 }
 }

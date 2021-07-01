@@ -30,9 +30,12 @@ class RigidObject2;
 ///
 /// \class RigidObjectController
 ///
-/// \brief This class uses the provide device to control the provided rigid object via
+/// \brief This class uses the provided device to control the provided rigid object via
 /// virtual coupling. That is, it applies forces+torques to the rigid body that will
-/// help move it to desired position/orientation
+/// help move it to desired position/orientation.
+/// It has linear and angular spring scales has well as dampening
+/// You may also use force smoothening for the force applied back on the device
+/// \todo: Force smoothening currently incurs loss
 ///
 class RigidObjectController : public SceneObjectController
 {

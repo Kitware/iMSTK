@@ -56,11 +56,6 @@ public:
     static std::shared_ptr<VTKRenderDelegate> makeDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
-    /// \brief Instantiate proper debug render delegate
-    ///
-    static std::shared_ptr<VTKRenderDelegate> makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel);
-
-    ///
     /// \brief Return geometry to render
     ///
     std::shared_ptr<VisualModel> getVisualModel() const { return m_visualModel; }

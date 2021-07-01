@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
@@ -30,6 +30,7 @@
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
+#include "imstkSphObjectCollision.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
@@ -85,23 +86,10 @@ main(int argc, char* argv[])
     }
 
     // Collision between fluid and solid objects
-    std::shared_ptr<CollisionGraph> collisionGraph = scene->getCollisionGraph();
     for (auto& solid : solids)
     {
-      if (std::dynamic_pointer_cast<Plane>(solid->getCollidingGeometry()))
-      {
-        collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
-          InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToPlane));
-      }
-      else if (std::dynamic_pointer_cast<Sphere>(solid->getCollidingGeometry()))
-      {
-        collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
-          InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSphere));
-      }
-      else
-      {
-        LOG(FATAL) << "Invalid collision object";
-      }
+        scene->getCollisionGraph()->addInteraction(
+            std::make_shared<SphObjectCollision>(fluidObj, solid));
     }
 
     // configure camera
@@ -155,7 +143,7 @@ main(int argc, char* argv[])
         driver->start();
     }
 
-    //MeshIO::write(std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry()), "fluid.vtk");
+    MeshIO::write(std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry()), "fluid.vtk");
 
     return 0;
 }

@@ -286,4 +286,29 @@ baryCentric(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c)
     const double u     = 1.0 - v - w;
     return Vec3d(u, v, w);
 }
+
+///
+/// \brief Cantors pairing function, take two ints and produce a unique one
+/// The resulting numbers are close for two close A's and B's
+///
+template<typename T>
+static T
+cantor(const T a, const T b)
+{
+    return (a + b) * (a + b + 1) / 2 + b;
+}
+
+///
+/// \brief Similar to cantors pairing function but "commutative", take two ints and produce a unique one
+/// For two inputs a and b, f(a,b)==f(b,a)
+/// The resulting numbers are close for two close A's and B's
+///
+template<typename T>
+static T
+symCantor(const T a, const T b)
+{
+    const T max = std::max(a, b);
+    const T min = std::min(a, b);
+    return max * (max + 1) / 2 + min;
+}
 }

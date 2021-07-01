@@ -28,34 +28,32 @@
 
 namespace imstk
 {
-struct CollisionData;
+class CollisionData;
 class LevelSetDeformableObject;
 class RigidObject2;
 
 ///
 /// \class LevelSetCH
 ///
-/// \brief Applies impulses to the leveset given point direction constraints
+/// \brief Applies impulses to the leveset given point direction collision data
 /// propotional to the force on the rigid object
 ///
 class LevelSetCH : public CollisionHandling
 {
 public:
-    LevelSetCH(const Side&                               side,
-               const std::shared_ptr<CollisionData>      colData,
-               std::shared_ptr<LevelSetDeformableObject> lvlSetObj,
-               std::shared_ptr<RigidObject2>             rigidObj);
-
-    LevelSetCH() = delete;
-
+    LevelSetCH();
     virtual ~LevelSetCH() override;
 
-public:
-    ///
-    /// \brief Compute forces and velocities based on collision data
-    ///
-    void processCollisionData() override;
+    virtual const std::string getTypeName() const override { return "LevelSetCH"; }
 
+public:
+    void setInputLvlSetObj(std::shared_ptr<LevelSetDeformableObject> lvlSetObj);
+    void setInputRigidObj(std::shared_ptr<RigidObject2> rbdObj);
+
+    std::shared_ptr<LevelSetDeformableObject> getLvlSetObj();
+    std::shared_ptr<RigidObject2> getRigidObj();
+
+public:
     ///
     /// \brief Adds point to the mask allowing it to apply an impulse to the levelset
     ///
@@ -91,10 +89,16 @@ public:
     int getKernelSize() const { return m_kernelSize; }
     double getKernelSigma() const { return m_kernelSigma; }
 
+protected:
+    ///
+    /// \brief Compute forces and velocities based on collision data
+    ///
+    void handle(
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB) override;
+
 private:
-    std::shared_ptr<LevelSetDeformableObject> m_lvlSetObj = nullptr;
-    std::shared_ptr<RigidObject2> m_rigidObj = nullptr;
-    std::unordered_set<int>       m_ptIdMask;
+    std::unordered_set<int> m_ptIdMask;
     double  m_velocityScaling      = 0.1;
     bool    m_useProportionalForce = false;
     int     m_kernelSize    = 3;

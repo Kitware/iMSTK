@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,38 +21,52 @@
 
 #pragma once
 
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 
 namespace imstk
 {
-class PointSet;
-class Sphere;
-class Geometry;
-struct CollisionData;
-
 ///
 /// \class PointSetToSphereCD
 ///
 /// \brief PointSet to sphere collision detection
+/// Generates point-direction contact data.
+/// By default only generates contact data for the pointset.
 ///
-class PointSetToSphereCD : public CollisionDetection
+class PointSetToSphereCD : public CollisionDetectionAlgorithm
 {
 public:
+    PointSetToSphereCD();
+    virtual ~PointSetToSphereCD() override = default;
 
     ///
-    /// \brief Constructor
+    /// \brief Returns collision detection type string name
     ///
-    PointSetToSphereCD(std::shared_ptr<PointSet>      pointSet,
-                       std::shared_ptr<Sphere>        sphere,
-                       std::shared_ptr<CollisionData> colData);
+    virtual const std::string getTypeName() const override { return "PointSetToSphereCD"; }
+
+protected:
+    ///
+    /// \brief Compute collision data for AB simulatenously
+    ///
+    virtual void computeCollisionDataAB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB) override;
 
     ///
-    /// \brief Detect collision and compute collision data
+    /// \brief Compute collision data for side A
     ///
-    void computeCollisionData() override;
+    virtual void computeCollisionDataA(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA) override;
 
-private:
-    std::shared_ptr<PointSet> m_pointSet;
-    std::shared_ptr<Sphere>   m_sphere;
+    ///
+    /// \brief Compute collision data for side B
+    ///
+    virtual void computeCollisionDataB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsB) override;
 };
 }

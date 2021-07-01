@@ -20,9 +20,9 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkDebugRenderGeometry.h"
-#include "imstkKeyboardSceneControl.h"
+#include "imstkDebugGeometryObject.h"
 #include "imstkDirectionalLight.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -38,54 +38,23 @@
 
 using namespace imstk;
 
-std::shared_ptr<DebugRenderPoints>
-addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
-{
-    imstkNew<DebugRenderPoints> debugPoints("Debug Points");
-    imstkNew<RenderMaterial>    material;
-    material->setDisplayMode(RenderMaterial::DisplayMode::Points);
-    material->setPointSize(6.);
-    imstkNew<VisualModel> visualModel(debugPoints.get(), material);
-    scene->addDebugVisualModel(visualModel);
-
-    return debugPoints;
-}
-
-std::shared_ptr<DebugRenderLines>
-addLinesDebugRendering(const std::shared_ptr<Scene>& scene)
-{
-    imstkNew<DebugRenderLines> debugLines("Debug Lines");
-    imstkNew<RenderMaterial>   material;
-    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    //material->setBackFaceCulling(false);
-    material->setEdgeColor(Color::Green);
-    material->setLineWidth(4.0);
-    imstkNew<VisualModel> visualModel(debugLines.get(), material);
-    scene->addDebugVisualModel(visualModel);
-
-    return debugLines;
-}
-
-std::shared_ptr<DebugRenderTriangles>
-addTrianglesDebugRendering(const std::shared_ptr<Scene>& scene)
-{
-    imstkNew<DebugRenderTriangles> debugTriangles("Debug Triangles");
-    imstkNew<RenderMaterial>       material;
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setBackFaceCulling(false);
-    material->setColor(Color::Red);
-    imstkNew<VisualModel> visualModel(debugTriangles.get(), material);
-    scene->addDebugVisualModel(visualModel);
-
-    return debugTriangles;
-}
-
-Vec3d
+static Vec3d
 getRandomPositions(const double radius)
 {
-    return radius * Vec3d(2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0,
-                          2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0,
-                          2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0);
+    return radius * Vec3d(
+        2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0,
+        2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0,
+        2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0);
+}
+
+static Color
+getRandomColor()
+{
+    return Color(
+        static_cast<double>(rand()) / static_cast<double>(RAND_MAX),
+        static_cast<double>(rand()) / static_cast<double>(RAND_MAX),
+        static_cast<double>(rand()) / static_cast<double>(RAND_MAX),
+        1.0);
 }
 
 ///
@@ -99,6 +68,8 @@ main()
 
     // Create a scene
     imstkNew<Scene> scene("Debug rendering example");
+    scene->getConfig()->debugCamBoundingBox = false;
+    scene->getCamera("debug")->setPosition(0.0, 0.0, 50.0);
 
     // Setup a viewer to render in its own thread
     imstkNew<VTKViewer> viewer("Viewer");
@@ -106,72 +77,60 @@ main()
     viewer->setWindowTitle("Debug Rendering");
     viewer->setSize(1920, 1080);
 
+    // Seed with system time
+    srand(time(NULL));
+
     auto statusManager = viewer->getTextStatusManager();
     statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
     statusManager->setStatusFontColor(VTKTextStatusManager::StatusType::Custom, Color::Orange);
 
-    // Get VTK Renderer
-    auto renderer = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
-    LOG_IF(FATAL, (!renderer)) << "Invalid renderer: Only VTKRenderer is supported for debug rendering";
-
-    auto debugPoints    = addPointsDebugRendering(scene);
-    auto debugLines     = addLinesDebugRendering(scene);
-    auto debugTriangles = addTrianglesDebugRendering(scene);
+    imstkNew<DebugGeometryObject> debugGeometryObj;
+    scene->addSceneObject(debugGeometryObj);
 
     int mode  = 0; // 0: add point, 1: add line, 2: add triangle
     int count = 0; // The number of times cycling between modes
 
+    int  i = 0;
     auto updateFunc =
         [&](Event*)
         {
             if (count > 15)
             {
                 count = 0;
-                debugPoints->clear();
-                debugLines->clear();
-                debugTriangles->clear();
+                debugGeometryObj->clear();
             }
 
             if (mode % 3 == 0)
             {
-                debugPoints->appendVertex(getRandomPositions(15.0));
+                debugGeometryObj->addPoint(
+                    getRandomPositions(15.0),
+                    getRandomColor());
             }
             else if (mode % 3 == 1)
             {
-                auto p     = getRandomPositions(50.0);
-                auto shift = getRandomPositions(1.0);
-                debugLines->appendVertex(p + shift);
-                debugLines->appendVertex(-p + shift);
+                Vec3d p     = getRandomPositions(50.0);
+                Vec3d shift = getRandomPositions(1.0);
+                debugGeometryObj->addLine(p + shift, -p + shift, getRandomColor());
             }
             else
             {
-                auto shift = getRandomPositions(10.0);
-                debugTriangles->appendVertex(getRandomPositions(5.0) + shift);
-                debugTriangles->appendVertex(getRandomPositions(5.0) + shift);
-                debugTriangles->appendVertex(getRandomPositions(5.0) + shift);
+                Vec3d shift = getRandomPositions(10.0);
+                debugGeometryObj->addTriangle(
+                    getRandomPositions(5.0) + shift,
+                    getRandomPositions(5.0) + shift,
+                    getRandomPositions(5.0) + shift,
+                    getRandomColor());
 
                 mode = -1;
-                ++count;
+                count++;
             }
-            ++mode;
+            mode++;
 
-            debugPoints->setDataModified(true);
-            debugLines->setDataModified(true);
-            debugTriangles->setDataModified(true);
-
-            // Must call to update render data
-            for (auto& delegate : renderer->getDebugRenderDelegates())
-            {
-                delegate->processEvents();
-            }
-
-            statusManager->setCustomStatus("Primatives: " +
-                           std::to_string(debugPoints->getNumVertices()) + " (points) | " +
-                           std::to_string(debugLines->getNumVertices() / 2) + " (lines) | " +
-                           std::to_string(debugTriangles->getNumVertices() / 3) + " (triangles)"
+            statusManager->setCustomStatus("Primitives: " +
+                           std::to_string(debugGeometryObj->getNumPoints()) + " (points) | " +
+                           std::to_string(debugGeometryObj->getNumLines()) + " (lines) | " +
+                           std::to_string(debugGeometryObj->getNumTriangles()) + " (triangles)"
                 );
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         };
 
     // Set Camera configuration
@@ -183,21 +142,18 @@ main()
     light1->setIntensity(1.0);
     scene->addLight("light1", light1);
 
-    imstkNew<DirectionalLight> light2;
-    light2->setFocalPoint(Vec3d(1.0, -1.0, -1.0));
-    light2->setIntensity(1.0);
-    scene->addLight("light2", light2);
-
     // Run the simulation
     {
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         connect<Event>(sceneManager, &SceneManager::postUpdate, updateFunc);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(1.0);
 
         // Add mouse and keyboard controls to the viewer
         {

@@ -48,11 +48,6 @@ public:
     void update(const double dt) override;
 
     ///
-    /// \brief Apply forces to the haptic-capable device
-    ///
-    void applyForces() override;
-
-    ///
     /// \brief Get/Set controlled scene object
     ///
     std::shared_ptr<SceneObject> getControlledSceneObject() const { return m_sceneObject; }

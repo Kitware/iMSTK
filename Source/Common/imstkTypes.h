@@ -40,6 +40,14 @@ using ScalarType = unsigned char;
 #define IMSTK_LONG_LONG 11
 #define IMSTK_UNSIGNED_LONG_LONG 12
 
+using CellType = unsigned char;
+#define IMSTK_VERTEX 0
+#define IMSTK_EDGE 1
+#define IMSTK_TRIANGLE 2
+#define IMSTK_QUAD 3
+#define IMSTK_TETRAHEDRON 4
+#define IMSTK_HEXAHEDRON 5
+
 #define IMSTK_CHAR_MAX std::numeric_limits<char>::max()
 #define IMSTK_CHAR_MIN std::numeric_limits<char>::min()
 #define IMSTK_UNSIGNED_CHAR_MAX std::numeric_limits<unsigned char>::max()

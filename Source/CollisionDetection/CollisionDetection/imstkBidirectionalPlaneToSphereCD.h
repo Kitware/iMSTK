@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,36 +21,52 @@
 
 #pragma once
 
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 
 namespace imstk
 {
-class Plane;
-class Sphere;
-struct CollisionData;
-
 ///
 /// \class BidirectionalPlaneToSphereCD
 ///
 /// \brief Plane to sphere collision detection
+/// Generates point-direction contact data.
+/// By default only generates contact data for the sphere
 ///
-class BidirectionalPlaneToSphereCD : public CollisionDetection
+class BidirectionalPlaneToSphereCD : public CollisionDetectionAlgorithm
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    BidirectionalPlaneToSphereCD(std::shared_ptr<Plane>         planeA,
-                                 std::shared_ptr<Sphere>        sphereB,
-                                 std::shared_ptr<CollisionData> colData);
+    BidirectionalPlaneToSphereCD();
+    virtual ~BidirectionalPlaneToSphereCD() override = default;
 
     ///
-    /// \brief Detect collision and compute collision data
+    /// \brief Returns collision detection type string name
     ///
-    void computeCollisionData() override;
+    virtual const std::string getTypeName() const override { return "BidirectionalPlaneToSphereCD"; }
 
-private:
-    std::shared_ptr<Plane>  m_planeA;
-    std::shared_ptr<Sphere> m_sphereB;
+protected:
+    ///
+    /// \brief Compute collision data for AB simulatenously
+    ///
+    virtual void computeCollisionDataAB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB) override;
+
+    ///
+    /// \brief Compute collision data for side A
+    ///
+    virtual void computeCollisionDataA(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA) override;
+
+    ///
+    /// \brief Compute collision data for side B
+    ///
+    virtual void computeCollisionDataB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsB) override;
 };
-} // namespace imstk
+}

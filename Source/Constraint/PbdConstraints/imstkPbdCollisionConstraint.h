@@ -26,16 +26,11 @@
 
 namespace imstk
 {
-///
-/// \struct PbdCollisionConstraintConfig
-/// \brief Parameters for PBD collision constraints
-///
-struct PbdCollisionConstraintConfig
+struct VertexMassPair
 {
-    PbdCollisionConstraintConfig(double proximity, double stiffness) : m_proximity(proximity), m_stiffness(stiffness) { }
-
-    double m_proximity = 0.1; ///> Proximity for static collision
-    double m_stiffness = 1.0; ///> Stiffness for collision
+    Vec3d* vertex   = nullptr;
+    double invMass  = 0.0;
+    Vec3d* velocity = nullptr;
 };
 
 ///
@@ -50,9 +45,11 @@ public:
     {
         EdgeEdge,
         PointTriangle,
-        Analytical,
+        PointEdge,
+        PointPoint
     };
 
+public:
     ///
     /// \brief
     ///
@@ -63,44 +60,47 @@ public:
     ///
     virtual ~PbdCollisionConstraint() = default;
 
+public:
     ///
     /// \brief Get vertex indices of first object
     ///
-    const std::vector<size_t>& getVertexIdsFirst() const { return m_bodiesFirst; }
-    const std::vector<size_t>& getVertexIdsSecond() const { return m_bodiesSecond; }
+    const std::vector<VertexMassPair>& getVertexIdsFirst() const { return m_bodiesFirst; }
+    const std::vector<VertexMassPair>& getVertexIdsSecond() const { return m_bodiesSecond; }
 
     ///
-    /// \brief Get config
+    /// \brief Get stiffness
     ///
-    const PbdCollisionConstraintConfig& getConfigFirst() const { return *m_configA; }
-    const PbdCollisionConstraintConfig& getConfigSecond() const { return *m_configB; }
+    const double getStiffnessA() const { return m_stiffnessA; }
+    const double getStiffnessB() const { return m_stiffnessB; }
 
     ///
     /// \brief compute value and gradient of constraint function
     ///
-    /// \param[in] currVertexPositionsA current positions from object A
-    /// \param[in] currVertexPositionsA current positions from object B
     /// \param[inout] c constraint value
     /// \param[inout] dcdx constraint gradient
     ///
-    virtual bool computeValueAndGradient(const VecDataArray<double, 3>& posA,
-                                         const VecDataArray<double, 3>& posB,
-                                         double& c,
-                                         VecDataArray<double, 3>& dcdxA,
-                                         VecDataArray<double, 3>& dcdxB) const = 0;
+    virtual bool computeValueAndGradient(double&             c,
+                                         std::vector<Vec3d>& dcdxA,
+                                         std::vector<Vec3d>& dcdxB) const = 0;
 
-    virtual void projectConstraint(const DataArray<double>* invMassA,
-                                   const DataArray<double>* invMassB,
-                                   VecDataArray<double, 3>* posA,
-                                   VecDataArray<double, 3>* posB);
+    ///
+    /// \brief Solve the positions given to the constraint
+    ///
+    virtual void solvePosition();
+
+    ///
+    /// \brief Solve the velocities given to the constraint
+    ///
+    virtual void correctVelocity(const double friction, const double restitution);
 
 protected:
-    std::vector<size_t> m_bodiesFirst;                                 ///> index of points for the first object
-    std::vector<size_t> m_bodiesSecond;                                ///> index of points for the second object
+    std::vector<VertexMassPair> m_bodiesFirst;                         ///> index of points for the first object
+    std::vector<VertexMassPair> m_bodiesSecond;                        ///> index of points for the second object
 
-    std::shared_ptr<PbdCollisionConstraintConfig> m_configA = nullptr; ///> parameters of the collision constraint
-    std::shared_ptr<PbdCollisionConstraintConfig> m_configB = nullptr; ///> parameters of the collision constraint
+    double m_stiffnessA = 1.0;
+    double m_stiffnessB = 1.0;
+
+    std::vector<Vec3d> m_dcdxA;                                        ///> Constraint gradients (per vertex)
+    std::vector<Vec3d> m_dcdxB;                                        ///> Constraint gradients (per vertex)
 };
-
-using PBDCollisionConstraintVector = std::vector<PbdCollisionConstraint*>;
 }

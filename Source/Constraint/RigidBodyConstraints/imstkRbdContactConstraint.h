@@ -23,8 +23,6 @@
 
 #include "imstkRbdConstraint.h"
 
-#include <functional>
-
 namespace imstk
 {
 ///

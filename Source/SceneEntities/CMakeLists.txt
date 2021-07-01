@@ -27,7 +27,8 @@ imstk_add_library(SceneEntities
     MeshIO
     Constraints
     Devices
-    DynamicalModels)
+    DynamicalModels
+    CollisionDetection)
 
 #-----------------------------------------------------------------------------
 # Testing

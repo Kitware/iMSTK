@@ -23,78 +23,76 @@
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkRigidObject2.h"
+#include "imstkRbdConstraint.h"
 
 namespace imstk
 {
-BoneDrillingCH::BoneDrillingCH(const Side&                          side,
-                               const std::shared_ptr<CollisionData> colData,
-                               std::shared_ptr<CollidingObject>     bone,
-                               std::shared_ptr<CollidingObject>     drill) :
-    CollisionHandling(Type::BoneDrilling, side, colData),
-    m_bone(bone),
-    m_drill(drill)
+void
+BoneDrillingCH::setInputObjectDrill(std::shared_ptr<RigidObject2> drillObject)
 {
-    auto boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_bone->getCollidingGeometry());
+    setInputObjectB(drillObject);
+}
 
-    CHECK(boneMesh != nullptr) << "Error:The bone colliding geometry is not a mesh!";
-
-    // Initialize bone density values
-    m_nodalDensity.reserve(boneMesh->getNumVertices());
-    for (int i = 0; i < boneMesh->getNumVertices(); ++i)
-    {
-        m_nodalDensity.push_back(m_initialBoneDensity);
-    }
-
-    m_nodeRemovalStatus.reserve(boneMesh->getNumVertices());
-    for (int i = 0; i < boneMesh->getNumVertices(); ++i)
-    {
-        m_nodeRemovalStatus.push_back(false);
-    }
-
-    m_nodalCardinalSet.reserve(boneMesh->getNumVertices());
-    for (int i = 0; i < boneMesh->getNumVertices(); ++i)
-    {
-        std::vector<size_t> row;
-        m_nodalCardinalSet.push_back(row);
-    }
-
-    // Pre-compute the nodal cardinality set
-    for (int tetId = 0; tetId < boneMesh->getNumTetrahedra(); ++tetId)
-    {
-        const Vec4i& indices = boneMesh->getTetrahedronIndices(tetId);
-        for (int i = 0; i < 4; i++)
-        {
-            m_nodalCardinalSet[indices[i]].push_back(tetId);
-        }
-    }
+std::shared_ptr<RigidObject2>
+BoneDrillingCH::getDrillObj() const
+{
+    return std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
 }
 
 void
-BoneDrillingCH::erodeBone()
+BoneDrillingCH::erodeBone(
+    const CDElementVector<CollisionElement>& elementsA,
+    const CDElementVector<CollisionElement>& elementsB)
 {
-    auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_bone->getCollidingGeometry());
+    auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getBoneObj()->getCollidingGeometry());
 
-    ParallelUtils::parallelFor(m_colData->PColData.getSize(),
+    // BoneDrillingCH process tetra-pointdirection elements
+    ParallelUtils::parallelFor(elementsA.getSize(),
         [&](const size_t idx)
         {
-            auto& cd = m_colData->PColData[idx];
-            if (m_nodeRemovalStatus[cd.nodeIdx])
+            const CollisionElement& elementA = elementsA[idx];
+            const CollisionElement& elementB = elementsB[idx];
+
+            if ((elementB.m_type != CollisionElementType::PointDirection && elementB.m_type != CollisionElementType::PointIndexDirection)
+                || elementA.m_type != CollisionElementType::CellIndex || elementA.m_element.m_CellIndexElement.cellType != IMSTK_TETRAHEDRON)
+            {
+                return;
+            }
+            // Currently ony supports CDs that report the cell id
+            if (elementA.m_element.m_CellIndexElement.idCount != 1)
             {
                 return;
             }
 
-            m_nodalDensity[cd.nodeIdx] -= 0.001 * (m_angularSpeed / m_BoneHardness) * m_stiffness * cd.penetrationVector.norm() * 0.001;
+            const int tetIndex = elementA.m_element.m_CellIndexElement.ids[0];
+            double depth       = 0.0;
+            if (elementB.m_type == CollisionElementType::PointDirection)
+            {
+                depth = elementB.m_element.m_PointDirectionElement.penetrationDepth;
+            }
+            else if (elementB.m_type == CollisionElementType::PointIndexDirection)
+            {
+                depth = elementB.m_element.m_PointIndexDirectionElement.penetrationDepth;
+            }
 
-            if (m_nodalDensity[cd.nodeIdx] <= 0.)
+            if (m_nodeRemovalStatus[tetIndex])
+            {
+                return;
+            }
+
+            m_nodalDensity[tetIndex] -= 0.001 * (m_angularSpeed / m_BoneHardness) * m_stiffness * depth * 0.001;
+
+            if (m_nodalDensity[tetIndex] <= 0.)
             {
                 /// \todo Unused variable, maybe used in furture?
                 // lock.lock();
                 // m_erodedNodes.push_back(cd.nodeId);
                 // lock.unlock();
-                m_nodeRemovalStatus[cd.nodeIdx] = true;
+                m_nodeRemovalStatus[tetIndex] = true;
 
                 // tag the tetra that will be removed
-                for (auto& tetId : m_nodalCardinalSet[cd.nodeIdx])
+                for (auto& tetId : m_nodalCardinalSet[tetIndex])
                 {
                     boneTetMesh->setTetrahedraAsRemoved(static_cast<unsigned int>(tetId));
                 }
@@ -103,14 +101,60 @@ BoneDrillingCH::erodeBone()
 }
 
 void
-BoneDrillingCH::processCollisionData()
+BoneDrillingCH::handle(
+    const CDElementVector<CollisionElement>& elementsA,
+    const CDElementVector<CollisionElement>& elementsB)
 {
+    std::shared_ptr<CollidingObject> bone  = getBoneObj();
+    std::shared_ptr<RigidObject2>    drill = getDrillObj();
+
+    auto boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(bone->getCollidingGeometry());
+
+    if (m_nodalDensity.size() != boneMesh->getNumVertices())
+    {
+        // Initialize bone density values
+        m_nodalDensity.reserve(boneMesh->getNumVertices());
+        for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
+        {
+            m_nodalDensity.push_back(m_initialBoneDensity);
+        }
+
+        m_nodeRemovalStatus.reserve(boneMesh->getNumVertices());
+        for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
+        {
+            m_nodeRemovalStatus.push_back(false);
+        }
+
+        m_nodalCardinalSet.reserve(boneMesh->getNumVertices());
+        for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
+        {
+            std::vector<size_t> row;
+            m_nodalCardinalSet.push_back(row);
+        }
+
+        // Pre-compute the nodal cardinality set
+        for (size_t tetId = 0; tetId < boneMesh->getNumTetrahedra(); ++tetId)
+        {
+            const Vec4i& indices = boneMesh->getTetrahedronIndices(tetId);
+            for (int i = 0; i < 4; i++)
+            {
+                m_nodalCardinalSet[indices[i]].push_back(tetId);
+            }
+        }
+    }
+
+    // BoneDrillingCH uses both sides of collision data
+    if (elementsA.getSize() != elementsB.getSize())
+    {
+        return;
+    }
+
     // Check if any collisions
-    const auto devicePosition = m_drill->getCollidingGeometry()->getTranslation();
-    if (m_colData->PColData.isEmpty())
+    const auto devicePosition = drill->getCollidingGeometry()->getTranslation();
+    if (elementsA.isEmpty() && elementsB.isEmpty())
     {
         // Set the visual object position same as the colliding object position
-        m_drill->getVisualGeometry()->setTranslation(devicePosition);
+        drill->getVisualGeometry()->setTranslation(devicePosition);
         return;
     }
 
@@ -119,38 +163,65 @@ BoneDrillingCH::processCollisionData()
     // Aggregate collision data
     Vec3d  t = Vec3d::Zero();
     double maxDepthSqr = MIN_D;
-    for (size_t i = 0; i < m_colData->PColData.getSize(); ++i)
+    for (size_t i = 0; i < elementsB.getSize(); i++)
     {
-        const auto& cd = m_colData->PColData[i];
-        if (m_nodeRemovalStatus[cd.nodeIdx])
+        const CollisionElement& elementA = elementsA[i];
+        const CollisionElement& elementB = elementsB[i];
+
+        if ((elementB.m_type != CollisionElementType::PointDirection && elementB.m_type != CollisionElementType::PointIndexDirection)
+            || elementA.m_type != CollisionElementType::CellIndex || elementA.m_element.m_CellIndexElement.cellType != IMSTK_TETRAHEDRON)
+        {
+            return;
+        }
+        // Currently ony supports CDs that report the cell id
+        if (elementA.m_element.m_CellIndexElement.idCount != 1)
+        {
+            return;
+        }
+
+        const int tetIndex = elementA.m_element.m_CellIndexElement.ids[0];
+        double    depth    = 0.0;
+        Vec3d     dir      = Vec3d::Zero();
+        if (elementB.m_type == CollisionElementType::PointDirection)
+        {
+            depth = elementB.m_element.m_PointDirectionElement.penetrationDepth;
+            dir   = elementB.m_element.m_PointDirectionElement.dir;
+        }
+        else if (elementB.m_type == CollisionElementType::PointIndexDirection)
+        {
+            depth = elementB.m_element.m_PointIndexDirectionElement.penetrationDepth;
+            dir   = elementB.m_element.m_PointIndexDirectionElement.dir;
+        }
+
+        if (m_nodeRemovalStatus[tetIndex])
         {
             continue;
         }
 
-        const auto dSqr = cd.penetrationVector.squaredNorm();
+        const double dSqr = depth * depth;
         if (dSqr > maxDepthSqr)
         {
             maxDepthSqr = dSqr;
-            t = cd.penetrationVector;
+            t = dir;
         }
     }
-    m_drill->getVisualGeometry()->setTranslation(devicePosition + t);
+    drill->getVisualGeometry()->setTranslation(devicePosition + t);
 
     // Spring force
-    Vec3d force = m_stiffness * (m_drill->getVisualGeometry()->getTranslation() - devicePosition);
+    Vec3d force = m_stiffness * (drill->getVisualGeometry()->getTranslation() - devicePosition);
 
     // Damping force
     const double dt = 0.1; // Time step size to calculate the object velocity
     force += m_initialStep ? Vec3d(0.0, 0.0, 0.0) : m_damping * (devicePosition - m_prevPos) / dt;
 
-    // Update object contact force
-    m_drill->appendForce(force);
+    // Set external force on body
+    (*drill->getRigidBody()->m_force) = force;
 
     // Decrease the density at the nodal points and remove if the density goes below 0
-    this->erodeBone();
+    this->erodeBone(elementsA, elementsB);
 
     // Housekeeping
     m_initialStep = false;
     m_prevPos     = devicePosition;
 }
-}// iMSTK
+}

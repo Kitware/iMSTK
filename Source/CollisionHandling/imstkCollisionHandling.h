@@ -21,12 +21,13 @@
 
 #pragma once
 
+#include "imstkCollisionData.h"
+
 #include <memory>
+#include <vector>
 
 namespace imstk
 {
-struct CollisionData;
-
 class CollidingObject;
 class InteractionPair;
 class TaskNode;
@@ -35,61 +36,69 @@ class TaskNode;
 /// \class CollisionHandling
 ///
 /// \brief Base class for all collision handling classes
+/// \todo: Abstract both GeometryAlgorithm and this together
 ///
 class CollisionHandling
 {
-public:
-    ///
-    /// \brief Type of the collision handling
-    ///
-    enum class Type
-    {
-        None,
-        Penalty,
-        VirtualCoupling,
-        NodalPicking,
-        BoneDrilling,
-        SPH,
-        PBD,
-        PBDPicking,
-        RBD,
-        LevelSet
-    };
-
-    ///
-    /// \brief Direction of the collision handling
-    ///
-    enum class Side
-    {
-        A,
-        B,
-        AB
-    };
+protected:
+    CollisionHandling();
 
 public:
-    CollisionHandling(const Type& type, const Side& side, const std::shared_ptr<CollisionData> colData);
-    CollisionHandling() = delete;
-
     virtual ~CollisionHandling() = default;
 
+    virtual const std::string getTypeName() const = 0;
+
 public:
     ///
-    /// \brief Compute forces based on collision data (pure virtual)
+    /// \brief Set the input objects
     ///
-    virtual void processCollisionData() = 0;
+    void setInputObjectA(std::shared_ptr<CollidingObject> objectA) { m_inputObjectA = objectA; }
+    void setInputObjectB(std::shared_ptr<CollidingObject> objectB) { m_inputObjectB = objectB; }
 
     ///
-    /// \brief Returns collision handling type
+    /// \brief Get the input objects
     ///
-    const Type& getType() const { return m_type; }
-    const Side& getSide() const { return m_side; }
+    std::shared_ptr<CollidingObject> getInputObjectA() const { return m_inputObjectA; }
+    std::shared_ptr<CollidingObject> getInputObjectB() const { return m_inputObjectB; }
+
+    ///
+    /// \brief Get the geometry used for handling
+    /// defaults to the collision geometry
+    ///
+    virtual std::shared_ptr<Geometry> getHandlingGeometryA();
+    virtual std::shared_ptr<Geometry> getHandlingGeometryB();
+
+    ///
+    /// \brief Set/Get the input collision data used for handling
+    ///
+    void setInputCollisionData(std::shared_ptr<CollisionData> collisionData) { m_colData = collisionData; }
+    std::shared_ptr<const CollisionData> getInputCollisionData() const { return m_colData; }
 
     std::shared_ptr<TaskNode> getTaskNode() const { return m_taskNode; }
 
+public:
+    ///
+    /// \brief Handle the input collision data
+    ///
+    void update();
+
 protected:
-    Type m_type;                                              ///< Collision handling algorithm type
-    Side m_side;                                              ///< Direction of the collisionData
-    const std::shared_ptr<CollisionData> m_colData = nullptr; ///< Collision data
+    ///
+    /// \brief Handle the input collision data. Elements will be flipped
+    /// (if needed) such that elementsA corresponds with inputObjectA and B with inputObjectB
+    /// in the case CD is backwards from CH
+    /// \param CD elements to resolve geomA
+    /// \param CD elements to resolve geomB
+    ///
+    virtual void handle(
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB) = 0;
+
+protected:
+    std::shared_ptr<CollidingObject> m_inputObjectA;
+    std::shared_ptr<CollidingObject> m_inputObjectB;
+
+    std::shared_ptr<const CollisionData> m_colData = nullptr; ///< Collision data
     std::shared_ptr<TaskNode> m_taskNode = nullptr;
 };
 }

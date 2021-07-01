@@ -64,8 +64,24 @@ void
 RigidObject2::updatePhysicsGeometry()
 {
     // Apply the transform back to the geometry
-    m_physicsGeometry->setTranslation(m_rigidBody->getPosition());
-    m_physicsGeometry->setRotation(m_rigidBody->getOrientation());
+    // If called before body is init'd use initial pose
+    if (m_rigidBody->m_pos != nullptr)
+    {
+        m_physicsGeometry->setTranslation(m_rigidBody->getPosition());
+    }
+    else
+    {
+        m_physicsGeometry->setTranslation(m_rigidBody->m_initPos);
+    }
+    // If called before body is init'd use initial pose
+    if (m_rigidBody->m_orientation != nullptr)
+    {
+        m_physicsGeometry->setRotation(m_rigidBody->getOrientation());
+    }
+    else
+    {
+        m_physicsGeometry->setRotation(m_rigidBody->m_initOrientation);
+    }
     m_physicsGeometry->updatePostTransformData();
 
     DynamicObject::updatePhysicsGeometry();
