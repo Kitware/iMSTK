@@ -24,7 +24,7 @@
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -192,10 +192,10 @@ main()
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, -50, 0));
 
     // Light
-    imstkNew<DirectionalLight> light("light");
+    imstkNew<DirectionalLight> light;
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
-    scene->addLight(light);
+    scene->addLight("light", light);
 
     //Run the simulation
     {

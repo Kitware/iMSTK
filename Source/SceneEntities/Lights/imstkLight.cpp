@@ -36,6 +36,4 @@ Light::setFocalPoint(const float& x, const float& y, const float& z)
         LOG(WARNING) << "Directional lights can't have focal point at (0, 0, 0)";
     }
 }
-
-//---------------------------------------------------------------------------------
 } // imstk

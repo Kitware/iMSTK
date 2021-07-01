@@ -21,43 +21,44 @@
 
 #pragma once
 
-#include "imstkGeometry.h"
+#include "imstkPointLight.h"
+
+#include <string>
 
 namespace imstk
 {
 ///
-/// \class AnimationModel
+/// \class Spot light class
 ///
-/// \brief Contains geometric and animation render information
+/// \brief A spot light is a point light in a cone shape.
 ///
-class AnimationModel
+class SpotLight : public PointLight
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief Constructors
     ///
-    explicit AnimationModel(std::shared_ptr<Geometry> geometry);
-    AnimationModel() = delete;
+    SpotLight() : PointLight(LightType::Spot)
+    {
+        m_coneAngle = 10.0f;
+    }
+
+    virtual ~SpotLight() override = default;
+
+public:
+    virtual const std::string getTypeName() const { return "SpotLight"; }
 
     ///
-    /// \brief Get/set geometry
+    /// \brief Get the spotlight angle in degrees
     ///
-    std::shared_ptr<Geometry> getGeometry();
-    virtual void setGeometry(std::shared_ptr<Geometry> geometry);
+    float getSpotAngle() const { return m_spotAngle; }
 
     ///
-    /// \brief Update animation
+    /// \brief Set the spotlight angle in degrees
     ///
-    virtual void update() {};
-
-    ///
-    /// \brief Reset animation
-    ///
-    virtual void reset() {};
+    void setSpotAngle(const double& angle) { m_spotAngle = static_cast<float>(angle); }
 
 protected:
-    friend class VTKRenderer;
-
-    std::shared_ptr<Geometry> m_geometry = nullptr;
+    float m_spotAngle = 45.0f;
 };
 } // imstk

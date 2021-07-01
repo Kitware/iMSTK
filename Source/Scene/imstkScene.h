@@ -158,7 +158,7 @@ public:
 
     ///
     /// \brief Return a vector of shared pointers to the scene objects
-    /// NOTE: A separate list might be efficient as this is called runtime
+    /// \note A separate list might be efficient as this is called runtime
     ///
     const std::vector<std::shared_ptr<VisualModel>> getDebugRenderModels() const;
 
@@ -171,16 +171,6 @@ public:
     /// \brief Get SceneObject by name, returns nullptr if doesn't exist
     ///
     std::shared_ptr<SceneObject> getSceneObject(const std::string& sceneObjectName) const;
-
-    ///
-    /// \brief Returns true if SceneObject is apart of scene
-    ///
-    bool hasSceneObject(std::shared_ptr<SceneObject> sceneObject);
-
-    ///
-    /// \brief Returns true if a SceneObject with name already exists
-    ///
-    bool hasSceneObjectName(const std::string& name);
 
     ///
     /// \brief Add/remove a scene object
@@ -203,11 +193,6 @@ public:
     void addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel);
 
     ///
-    /// \brief Returns true if the light (checked against name) is registered to the scene, else false.
-    ///
-    bool isLightRegistered(const std::string& lightName) const;
-
-    ///
     /// \brief Return a vector of lights in the scene
     ///
     const std::vector<std::shared_ptr<Light>> getLights() const;
@@ -218,14 +203,14 @@ public:
     std::shared_ptr<Light> getLight(const std::string& lightName) const;
 
     ///
-    /// \brief
+    /// \brief Get and unordered map of cameras with names
     ///
     const NamedMap<Camera>& getCameras() const { return m_cameras; }
 
     ///
     /// \brief Add light from the scene
     ///
-    void addLight(std::shared_ptr<Light> newLight);
+    void addLight(const std::string& name, std::shared_ptr<Light> newLight);
 
     ///
     /// \brief Remove light with a given name from the scene
@@ -270,13 +255,18 @@ public:
     ///
     /// \brief Set the camera for the scene
     ///
-    void addCamera(std::string name, std::shared_ptr<Camera> cam) { m_cameras[name] = cam; }
+    void addCamera(const std::string& name, std::shared_ptr<Camera> cam);
 
     ///
     /// \brief Switch the active camera to the one requested by name.
     /// If the requested on doesn't exist, previous on remains
     ///
     void setActiveCamera(const std::string name);
+
+    ///
+    /// \brief Remove the camera with a given name
+    ///
+    void removeCamera(const std::string name);
 
     ///
     /// \brief Return the collision graph of the scene

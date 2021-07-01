@@ -23,7 +23,7 @@
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkObjectInteractionFactory.h"
@@ -108,10 +108,10 @@ main(int argc, char* argv[])
     scene->getActiveCamera()->setPosition(-0.475, 8.116, -6.728);
 
     // configure light (white)
-    imstkNew<DirectionalLight> whiteLight("whiteLight");
+    imstkNew<DirectionalLight> whiteLight;
     whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     whiteLight->setIntensity(1.5);
-    scene->addLight(whiteLight);
+    scene->addLight("whitelight", whiteLight);
 
     // Run the simulation
     {

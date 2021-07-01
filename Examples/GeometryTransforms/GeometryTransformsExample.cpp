@@ -19,16 +19,17 @@
 
 =========================================================================*/
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkCylinder.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOrientedBox.h"
 #include "imstkPlane.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkMeshIO.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -50,9 +51,11 @@ main()
 
     imstkNew<Scene> scene("GeometryTransforms");
 
-    auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj", "Dragon");
-
-    CHECK(sceneObj != nullptr) << "ERROR: Unable to create scene object";
+    // Create object and add to scene
+    auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
+    auto sceneObj    = std::make_shared<SceneObject>("Dragon");
+    sceneObj->setVisualGeometry(SurfaceMesh);
+    scene->addSceneObject(sceneObj);
 
     auto surfaceMesh = sceneObj->getVisualGeometry();
     surfaceMesh->scale(5.0, Geometry::TransformType::ConcatenateToTransform);
@@ -113,10 +116,10 @@ main()
     scene->getActiveCamera()->setPosition(Vec3d(0.0, 30.0, 30.0));
 
     // Light
-    imstkNew<DirectionalLight> light("light");
+    imstkNew<DirectionalLight> light;
     light->setDirection(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
-    scene->addLight(light);
+    scene->addLight("light", light);
 
     // Run the simulation
     {

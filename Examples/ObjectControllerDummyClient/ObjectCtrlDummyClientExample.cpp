@@ -22,7 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkDummyClient.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkNew.h"
 #include "imstkOrientedBox.h"
@@ -77,10 +77,10 @@ main()
     scene->getActiveCamera()->setFocalPoint(geom->getPosition());
 
     // Light
-    imstkNew<DirectionalLight> light("light");
+    imstkNew<DirectionalLight> light;
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
-    scene->addLight(light);
+    scene->addLight("light", light);
 
     // Run the simulation
     {

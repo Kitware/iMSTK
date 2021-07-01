@@ -50,10 +50,10 @@ public:
     const Outputs& getTaskNodeOutputs() const { return m_taskNodeOutputs; }
 
 public:
-    ///
-    /// \brief Modifies the computational graph
-    ///
-    void compute();
+///
+/// \brief Modifies the computational graph
+///
+//void compute();
 
 protected:
     Inputs  m_taskNodeInputs;                        ///> The interacting nodes

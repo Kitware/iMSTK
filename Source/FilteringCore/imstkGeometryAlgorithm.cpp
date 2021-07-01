@@ -34,7 +34,6 @@ GeometryAlgorithm::setInput(std::shared_ptr<Geometry> inputGeometry, size_t port
     }
 
     m_inputs[port] = inputGeometry;
-    areInputsValid();
 }
 
 void

@@ -25,7 +25,7 @@
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
@@ -88,10 +88,10 @@ main()
         InteractionType::CollidingObjToCollidingObjBoneDrilling, CollisionDetection::Type::PointSetToSphere));
 
     // Light
-    imstkNew<DirectionalLight> light("light");
+    imstkNew<DirectionalLight> light;
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
-    scene->addLight(light);
+    scene->addLight("light0", light);
 
     scene->getActiveCamera()->setPosition(Vec3d(0.0, 3.0, 25.0));
 

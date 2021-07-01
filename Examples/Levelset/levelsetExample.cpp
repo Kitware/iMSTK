@@ -23,7 +23,7 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -111,10 +111,10 @@ main()
         scene->addSceneObject(obj);
 
         // Light (white)
-        imstkNew<DirectionalLight> whiteLight("whiteLight");
+        imstkNew<DirectionalLight> whiteLight;
         whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
         whiteLight->setIntensity(1.0);
-        scene->addLight(whiteLight);
+        scene->addLight("whitelight", whiteLight);
 
         // Adjust camera
         scene->getActiveCamera()->setPosition(0.0, 10.0, -10.0);

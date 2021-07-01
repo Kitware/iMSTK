@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkNew.h"
@@ -118,10 +118,10 @@ main()
     scene->addSceneObject(tableObj);
 
     // Lights
-    imstkNew<DirectionalLight> dirLight("DirLight");
+    imstkNew<DirectionalLight> dirLight;
     dirLight->setIntensity(4);
     dirLight->setColor(Color(1.0, 0.95, 0.8));
-    scene->addLight(dirLight);
+    scene->addLight("dirlight", dirLight);
 
     {
         // Add a module to run the viewer

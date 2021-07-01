@@ -25,7 +25,7 @@
 #include "imstkDebugRenderGeometry.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOctreeBasedCD.h"
@@ -456,15 +456,15 @@ main()
     scene->getActiveCamera()->setPosition(Vec3d(0.0, 15.0, 50.0));
 
     // Light
-    imstkNew<DirectionalLight> light1("Light1");
+    imstkNew<DirectionalLight> light1;
     light1->setFocalPoint(Vec3d(-1.0, -1.0, -1.0));
     light1->setIntensity(1.0);
-    scene->addLight(light1);
+    scene->addLight("light1", light1);
 
-    imstkNew<DirectionalLight> light2("Light2");
+    imstkNew<DirectionalLight> light2;
     light2->setFocalPoint(Vec3d(1.0, -1.0, -1.0));
     light2->setIntensity(1.0);
-    scene->addLight(light2);
+    scene->addLight("light2", light2);
 
     // Run the simulation
     {

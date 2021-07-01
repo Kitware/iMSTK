@@ -19,37 +19,41 @@
 
 =========================================================================*/
 
-#include "imstkPbdInflatableDistanceConstraint.h"
+#include "imstkModule.h"
 
-#include <cfloat>
-
-namespace  imstk
+namespace imstk
 {
 void
-PbdInflatableDistanceConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                                                const size_t& pIdx0,
-                                                const size_t& pIdx1,
-                                                const double k)
+Module::update()
 {
-    PbdDistanceConstraint::initConstraint(initVertexPositions, pIdx0, pIdx1, k);
-    m_initialRestLength = m_restLength;
+    if (m_init && !m_paused)
+    {
+        if (sleepDelay != 0.0)
+        {
+            std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(sleepDelay));
+        }
+
+        if (muteUpdateEvents)
+        {
+            this->updateModule();
+        }
+        else
+        {
+            this->postEvent(Event(Module::preUpdate()));
+            this->updateModule();
+            this->postEvent(Event(Module::postUpdate()));
+        }
+    }
 }
 
 void
-PbdInflatableDistanceConstraint::multiplyRestLengthBy(const double ratio)
+Module::uninit()
 {
-    // Multiplied ratio must be positive
-    if (ratio < DBL_EPSILON)
+    // Can only uninit if, init'd
+    if (m_init)
     {
-        return;
-    }
-
-    m_restLength *= ratio;
-
-    // Modified RestLenght can't be less than initial RestLenght
-    if (m_restLength < m_initialRestLength)
-    {
-        m_restLength = m_initialRestLength;
+        uninitModule();
+        m_init = false;
     }
 }
-}
+}// imstk

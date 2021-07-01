@@ -22,7 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
@@ -209,15 +209,15 @@ main()
             InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::MeshToMeshBruteForce));
 
         // Light
-        imstkNew<DirectionalLight> light("Light1");
+        imstkNew<DirectionalLight> light;
         light->setFocalPoint(Vec3d(5.0, -8.0, 5.0));
         light->setIntensity(1.0);
-        scene->addLight(light);
+        scene->addLight("light", light);
 
-        imstkNew<DirectionalLight> light2("Light2");
+        imstkNew<DirectionalLight> light2;
         light2->setFocalPoint(-Vec3d(5, -8, 5));
         light2->setIntensity(1.2);
-        scene->addLight(light2);
+        scene->addLight("light2", light2);
     }
 
     // Run the simulation

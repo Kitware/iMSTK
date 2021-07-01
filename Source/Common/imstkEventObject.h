@@ -102,10 +102,10 @@ static void disconnect(EventObject*, EventObject*, std::string (*)());
 /// \class EventObject
 ///
 /// \brief EventObject is the base class for all objects in iMSTK that
-/// can recieve and emit events. It supports direct and queued observer functions.
-/// Direct observers recieve events immediately on the same thread
+/// can receive and emit events. It supports direct and queued observer functions.
+/// Direct observers receive events immediately on the same thread
 /// This can either be posted on an object or be a function pointer
-/// Queued observers recieve events within their queue which they can process whenever
+/// Queued observers receive events within their queue which they can process whenever
 /// they like.
 /// These can be connected with the connect/queuedConnect/disconnect functions
 /// \todo ThreadObject affinity

@@ -21,43 +21,34 @@
 
 #pragma once
 
-#include "imstkGeometry.h"
+#include "imstkLight.h"
 
 namespace imstk
 {
 ///
-/// \class AnimationModel
+/// \class DirectionalLight
 ///
-/// \brief Contains geometric and animation render information
+/// \brief Directional light class
 ///
-class AnimationModel
+/// A directional light has no position or range. The focal point is the
+/// direction.
+///
+class DirectionalLight : public Light
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit AnimationModel(std::shared_ptr<Geometry> geometry);
-    AnimationModel() = delete;
+    DirectionalLight() : Light(LightType::Directional)
+    {
+        this->setFocalPoint(-1.0f, -1.0f, -1.0f);
+    }
+
+    virtual ~DirectionalLight() override = default;
+
+    virtual const std::string getTypeName() const { return "DirectionalLight"; }
 
     ///
-    /// \brief Get/set geometry
+    /// \brief Direction of the light
     ///
-    std::shared_ptr<Geometry> getGeometry();
-    virtual void setGeometry(std::shared_ptr<Geometry> geometry);
-
-    ///
-    /// \brief Update animation
-    ///
-    virtual void update() {};
-
-    ///
-    /// \brief Reset animation
-    ///
-    virtual void reset() {};
-
-protected:
-    friend class VTKRenderer;
-
-    std::shared_ptr<Geometry> m_geometry = nullptr;
+    void setDirection(const Vec3d& dir) { setFocalPoint(dir); }
+    void setDirection(const double x, const double y, const double z) { setFocalPoint(Vec3d(x, y, z)); }
 };
 } // imstk

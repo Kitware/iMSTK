@@ -81,11 +81,7 @@ public:
     ///
     /// \brief Set/Get render material
     ///
-    void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial)
-    {
-        m_renderMaterial = renderMaterial;
-        this->postModified();
-    }
+    void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial);
 
     std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_renderMaterial; }
 
@@ -95,11 +91,7 @@ public:
     void show() { setIsVisible(true); }
     void hide() { setIsVisible(false); }
     bool isVisible() const { return m_isVisible; }
-    void setIsVisible(const bool visible)
-    {
-        m_isVisible = visible;
-        this->postModified();
-    }
+    void setIsVisible(const bool visible);
 
     ///
     /// \brief Get/Set whether the delegate has been created

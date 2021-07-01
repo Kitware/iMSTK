@@ -22,7 +22,9 @@
 #include "imstkVTKRenderer.h"
 #include "imstkCamera.h"
 #include "imstkDebugRenderGeometry.h"
-#include "imstkLight.h"
+#include "imstkDirectionalLight.h"
+#include "imstkPointLight.h"
+#include "imstkSpotLight.h"
 #include "imstkLogger.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
@@ -416,7 +418,6 @@ VTKRenderer::updateCamera()
     m_camera->SetViewUp(up[0], up[1], up[2]);
     m_camera->SetViewAngle(cam->getFieldOfView());
     m_camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
-    m_camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
 }
 
 void
@@ -536,7 +537,8 @@ VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
     // If the SceneObject is being rendered but not in the scene
     for (auto i = m_renderedObjects.begin(); i != m_renderedObjects.end(); i++)
     {
-        if (!m_scene->hasSceneObject(*i))
+        auto sos = m_scene->getSceneObjects();
+        if (sos.find(*i) == sos.end())
         {
             i = removeSceneObject(*i);
         }
