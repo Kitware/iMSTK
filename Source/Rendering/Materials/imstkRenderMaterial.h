@@ -56,6 +56,7 @@ public:
     /// surface shading model. Defaults to Phong
     enum class ShadingModel
     {
+        None,    ///< Renders without shading, no lighting
         Phong,   ///< Phong shading model (default)
         Gouraud, ///< Gouraud shading model (default)
         Flat,    ///< Flat shading model with no interpolation
