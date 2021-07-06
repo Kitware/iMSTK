@@ -198,7 +198,6 @@ makeLegs(const std::string& name)
     bounds[4] = min[2] - size[2] * 0.25;
     bounds[5] = max[2] + size[2] * 0.25;
     computeSdf->setBounds(bounds);
-    computeSdf->setUseBounds(true);
     computeSdf->update();
     LOG(INFO) << "SDF Complete";
     legsObj->setCollidingGeometry(std::make_shared<SignedDistanceField>(computeSdf->getOutputImage()));

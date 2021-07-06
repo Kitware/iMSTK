@@ -32,9 +32,11 @@ class SurfaceMesh;
 /// \class SurfaceMeshDistanceTransform
 ///
 /// \brief This filter computes exact signed distance fields using octrees
-/// and psuedonormal computations. One might need to adjust the tolerance
+/// and pseudonormal computations. One might need to adjust the tolerance
 /// depending on dataset scale.
-///
+/// The bounds for the image can be set in the filter, when none are set
+/// the bounding box of the mesh is used, the margin.  When providing your own bounds a
+/// box larger than the original object might be necessary depending on shape
 class SurfaceMeshDistanceTransform : public GeometryAlgorithm
 {
 public:
@@ -49,50 +51,53 @@ public:
 
     std::shared_ptr<ImageData> getOutputImage();
 
-    imstkGetMacro(Dimensions, const Vec3i&);
-    imstkGetMacro(Bounds, const Vec6d&);
-    imstkGetMacro(UseBounds, bool);
-    imstkGetMacro(NarrowBanded, bool);
-    imstkGetMacro(DilateSize, int);
-    imstkGetMacro(Tolerance, double);
-
     ///
     /// \brief Dimensions of distance transform to fill
-    ///
+    ///@{
     imstkSetMacro(Dimensions, const Vec3i&);
+    void setDimensions(int dimX, int dimY, int dimZ) { setDimensions(Vec3i(dimX, dimY, dimZ)); }
+    imstkGetMacro(Dimensions, const Vec3i&);
+    ///@}
 
     ///
     /// \brief Optionally one may specify bounds, if not specified
     /// bounds of the input SurfaceMesh is used
     ///
-    imstkSetMacro(Bounds, const Vec6d&);
-
-    imstkSetMacro(UseBounds, bool);
+    /// note Vec6d is be of the format [minX, maxX, minY, maxY, minZ, maxZ]
+    ///@{
+    void setBounds(const Vec3d& min, const Vec3d& max);
+    void setBounds(const Vec6d&);
+    imstkGetMacro(Bounds, const Vec6d&);
+    ///@}
 
     ///
     /// \brief If on, will compute only a narrow banded transform
-    ///
+    ///@{
     imstkSetMacro(NarrowBanded, bool);
+    imstkGetMacro(NarrowBanded, bool);
+    ///@}
 
     ///
     /// \brief Width of the band
-    ///
+    ///@{
     imstkSetMacro(DilateSize, int);
+    imstkGetMacro(DilateSize, int);
+    ///@}
 
+    ///@{
     imstkSetMacro(Tolerance, double);
-
-    void setDimensions(int dimX, int dimY, int dimZ) { setDimensions(Vec3i(dimX, dimY, dimZ)); }
+    imstkGetMacro(Tolerance, double);
+///@}
 
 protected:
     void requestUpdate() override;
 
 private:
-    Vec3i  m_Dimensions = Vec3i(0, 0, 0);
-    Vec6d  m_Bounds;
-    bool   m_UseBounds = false;
-    double m_Tolerance = 1.0e-10;
+    Vec3i  m_Dimensions = Vec3i::Zero();
+    Vec6d  m_Bounds     = Vec6d::Zero();
+    double m_Tolerance  = 1.0e-10;
 
-    int  m_DilateSize   = 4; ///> Only for narrow banded
     bool m_NarrowBanded = false;
+    int  m_DilateSize   = 4; ///< Only for narrow banded
 };
 }
