@@ -68,6 +68,7 @@ option(${PROJECT_NAME}_BUILD_CSHARP "Build iMSTK-C#" ON)
 #-----------------------------------------------------------------------------
 find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -393,7 +394,7 @@ add_subdirectory(Source/Filtering)
 add_subdirectory(Source/FilteringCore)
 
 # if (${PROJECT_NAME}_BUILD_CSHARP)
-    add_subdirectory(Source/csIMSTK)
+add_subdirectory(Source/CSWrapper)
 # endif()
 
 #--------------------------------------------------------------------------

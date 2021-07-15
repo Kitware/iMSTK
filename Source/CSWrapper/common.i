@@ -23,7 +23,7 @@
     }
 
     public static implicit operator Quatf (SWIGTYPE_p_Eigen__QuaternionT_float_t eigen_data) {
-        return modIMSTK.eigen2cs_Quatf(eigen_data);
+        return Utils.eigen2cs_Quatf(eigen_data);
     }
 %}
 
@@ -33,7 +33,7 @@
     }
 
     public static implicit operator Quatd (SWIGTYPE_p_Eigen__QuaternionT_double_t eigen_data) {
-        return modIMSTK.eigen2cs_Quatd(eigen_data);
+        return Utils.eigen2cs_Quatd(eigen_data);
     }
 %}
 
@@ -120,6 +120,28 @@ private:
 };
 
 template<typename T, int N>
+Vec<T, N> vec_add(const Vec<T, N> u, const Vec<T, N> v) 
+{
+    Vec<T, N> ret(u);
+    for (int i=0; i<N; ++i)
+    {
+        ret[i] += v[i];
+    }
+    return ret;
+}
+
+template<typename T, int N>
+Vec<T, N> vec_subtract(const Vec<T, N> u, const Vec<T, N> v) 
+{
+    Vec<T, N> ret(u);
+    for (int i=0; i<N; ++i)
+    {
+        ret[i] -= v[i];
+    }
+    return ret;
+}
+
+template<typename T, int N>
 Vec<T, N> vec_scale(const Vec<T, N> v, const T c) 
 {
     Vec<T, N> ret(v);
@@ -180,7 +202,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
 %typemap(cscode) imstk::Vec<int, 3> %{
     public int this[int i] {
         get => getValue(i);
-        set => modIMSTK.intPtr_assign(setValue(i), value);
+        set => Utils.intPtr_assign(setValue(i), value);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_int_3_1_t (Vec3i v) {
@@ -188,14 +210,14 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     }
 
     public static implicit operator Vec3i(SWIGTYPE_p_Eigen__MatrixT_int_3_1_t eigen_v) {
-        return modIMSTK.vec_from_eigen_3i(eigen_v);
+        return Utils.vec_from_eigen_3i(eigen_v);
     }
 %}
 
 %typemap(cscode) imstk::Vec<int, 4> %{
     public int this[int i] {
         get => getValue(i);
-        set => modIMSTK.intPtr_assign(setValue(i), value);
+        set => Utils.intPtr_assign(setValue(i), value);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_int_4_1_t (Vec4i v) {
@@ -203,28 +225,28 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     }
 
     public static implicit operator Vec4i(SWIGTYPE_p_Eigen__MatrixT_int_4_1_t eigen_v) {
-        return modIMSTK.vec_from_eigen_4i(eigen_v);
+        return Utils.vec_from_eigen_4i(eigen_v);
     }
 %}
 
 %typemap(cscode) imstk::Vec<float, 2> %{
     public float this[int i] {
         get => getValue(i);
-        set => modIMSTK.floatPtr_assign(setValue(i), value);
+        set => Utils.floatPtr_assign(setValue(i), value);
     }
     public static Vec2f operator * (Vec2f v, float c) {
-        return modIMSTK.vec_scale_2f(v, c);
+        return Utils.vec_scale_2f(v, c);
     }
 
     public static Vec2f operator * (float c, Vec2f v) {
-        return modIMSTK.vec_scale_2f(v, c);
+        return Utils.vec_scale_2f(v, c);
     }
     public static Vec2f operator / (Vec2f v, float c) {
-        return modIMSTK.vec_scale_2f(v, (float)1.0/c);
+        return Utils.vec_scale_2f(v, (float)1.0/c);
     }
 
     public static Vec2f operator / (float c, Vec2f v) {
-        return modIMSTK.vec_scale_2f(v, (float)1.0/c);
+        return Utils.vec_scale_2f(v, (float)1.0/c);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_float_2_1_t (Vec2f v) {
@@ -232,28 +254,28 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     }
 
     public static implicit operator Vec2f(SWIGTYPE_p_Eigen__MatrixT_float_2_1_t eigen_v) {
-        return modIMSTK.vec_from_eigen_2f(eigen_v);
+        return Utils.vec_from_eigen_2f(eigen_v);
     }
 %}
 
 %typemap(cscode) imstk::Vec<double, 2> %{
     public double this[int i] {
         get => getValue(i);
-        set => modIMSTK.doublePtr_assign(setValue(i), value);
+        set => Utils.doublePtr_assign(setValue(i), value);
     }
     public static Vec2d operator * (Vec2d v, double c) {
-        return modIMSTK.vec_scale_2d(v, c);
+        return Utils.vec_scale_2d(v, c);
     }
 
     public static Vec2d operator * (double c, Vec2d v) {
-        return modIMSTK.vec_scale_2d(v, c);
+        return Utils.vec_scale_2d(v, c);
     }
     public static Vec2d operator / (Vec2d v, double c) {
-        return modIMSTK.vec_scale_2d(v, 1.0/c);
+        return Utils.vec_scale_2d(v, 1.0/c);
     }
 
     public static Vec2d operator / (double c, Vec2d v) {
-        return modIMSTK.vec_scale_2d(v, 1.0/c);
+        return Utils.vec_scale_2d(v, 1.0/c);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_2_1_t (Vec2d v) {
@@ -261,28 +283,34 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     }
 
     public static implicit operator Vec2d(SWIGTYPE_p_Eigen__MatrixT_double_2_1_t eigen_v) {
-        return modIMSTK.vec_from_eigen_2d(eigen_v);
+        return Utils.vec_from_eigen_2d(eigen_v);
     }
 %}
 
 %typemap(cscode) imstk::Vec<double, 3> %{
     public double this[int i] {
         get => getValue(i);
-        set => modIMSTK.doublePtr_assign(setValue(i), value);
+        set => Utils.doublePtr_assign(setValue(i), value);
+    }
+    public static Vec3d operator + (Vec3d u, Vec3d v) {
+        return Utils.vec_add_3d(u, v);
+    }
+    public static Vec3d operator - (Vec3d u, Vec3d v) {
+        return Utils.vec_subtract_3d(u, v);
     }
     public static Vec3d operator * (Vec3d v, double c) {
-        return modIMSTK.vec_scale_3d(v, c);
+        return Utils.vec_scale_3d(v, c);
     }
 
     public static Vec3d operator * (double c, Vec3d v) {
-        return modIMSTK.vec_scale_3d(v, c);
+        return Utils.vec_scale_3d(v, c);
     }
     public static Vec3d operator / (Vec3d v, double c) {
-        return modIMSTK.vec_scale_3d(v, 1.0/c);
+        return Utils.vec_scale_3d(v, 1.0/c);
     }
 
     public static Vec3d operator / (double c, Vec3d v) {
-        return modIMSTK.vec_scale_3d(v, 1.0/c);
+        return Utils.vec_scale_3d(v, 1.0/c);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_3_1_t (Vec3d v) {
@@ -290,28 +318,32 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     }
 
     public static implicit operator Vec3d(SWIGTYPE_p_Eigen__MatrixT_double_3_1_t eigen_v) {
-        return modIMSTK.vec_from_eigen_3d(eigen_v);
+        return Utils.vec_from_eigen_3d(eigen_v);
+    }
+    public Vec3d normalized() {
+        double nrm= getValue(0) * getValue(0) + getValue(1) * getValue(1) + getValue(2) * getValue(2);
+        return this / System.Math.Sqrt(nrm);
     }
 %}
 
 %typemap(cscode) imstk::Vec<double, 6> %{
     public double this[int i] {
         get => getValue(i);
-        set => modIMSTK.doublePtr_assign(setValue(i), value);
+        set => Utils.doublePtr_assign(setValue(i), value);
     }
     public static Vec6d operator * (Vec6d v, double c) {
-        return modIMSTK.vec_scale_6d(v, c);
+        return Utils.vec_scale_6d(v, c);
     }
 
     public static Vec6d operator * (double c, Vec6d v) {
-        return modIMSTK.vec_scale_6d(v, c);
+        return Utils.vec_scale_6d(v, c);
     }
     public static Vec6d operator / (Vec6d v, double c) {
-        return modIMSTK.vec_scale_6d(v, 1.0/c);
+        return Utils.vec_scale_6d(v, 1.0/c);
     }
 
     public static Vec6d operator / (double c, Vec6d v) {
-        return modIMSTK.vec_scale_6d(v, 1.0/c);
+        return Utils.vec_scale_6d(v, 1.0/c);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_6_1_t (Vec6d v) {
@@ -319,7 +351,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     }
 
     public static implicit operator Vec6d(SWIGTYPE_p_Eigen__MatrixT_double_6_1_t eigen_v) {
-        return modIMSTK.vec_from_eigen_6d(eigen_v);
+        return Utils.vec_from_eigen_6d(eigen_v);
     }
 %}
 
@@ -327,7 +359,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     /* public unsigned char this[int i] { */
     public byte this[int i] {
         get => getValue(i);
-        set => modIMSTK.ucharPtr_assign(setValue(i), value);
+        set => Utils.ucharPtr_assign(setValue(i), value);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_unsigned_char_3_1_t (Vec3uc v) {
@@ -335,68 +367,68 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     }
 
     public static implicit operator Vec3uc(SWIGTYPE_p_Eigen__MatrixT_unsigned_char_3_1_t eigen_v) {
-        return modIMSTK.vec_from_eigen_3uc(eigen_v);
+        return Utils.vec_from_eigen_3uc(eigen_v);
     }
 %}
 
 %typemap(cscode) imstk::VecDataArray<int, 3> %{
     public Vec3i this[uint i] {
-        get => modIMSTK.vec_from_eigen_3i(getValue(i));
-        set => modIMSTK.vec_to_eigen_3i(setValue(i), value);
+        get => Utils.vec_from_eigen_3i(getValue(i));
+        set => Utils.vec_to_eigen_3i(setValue(i), value);
     }
     public void push_back(Vec3i v) {
-        modIMSTK.vecdataarray_push_back_3i(this, v);
+        Utils.vecdataarray_push_back_3i(this, v);
     }
 %}
 
 %typemap(cscode) imstk::VecDataArray<int, 4> %{
     public Vec4i this[uint i] {
-        get => modIMSTK.vec_from_eigen_4i(getValue(i));
-        set => modIMSTK.vec_to_eigen_4i(setValue(i), value);
+        get => Utils.vec_from_eigen_4i(getValue(i));
+        set => Utils.vec_to_eigen_4i(setValue(i), value);
     }
     public void push_back(Vec4i v) {
-        modIMSTK.vecdataarray_push_back_4i(this, v);
+        Utils.vecdataarray_push_back_4i(this, v);
     }
 
 %}
 
 %typemap(cscode) imstk::VecDataArray<float, 2> %{
     public Vec2f this[uint i] {
-        get => modIMSTK.vec_from_eigen_2f(getValue(i));
-        set => modIMSTK.vec_to_eigen_2f(setValue(i), value);
+        get => Utils.vec_from_eigen_2f(getValue(i));
+        set => Utils.vec_to_eigen_2f(setValue(i), value);
     }
     public void push_back(Vec2f v) {
-        modIMSTK.vecdataarray_push_back_2f(this, v);
+        Utils.vecdataarray_push_back_2f(this, v);
     }
 %}
 
 %typemap(cscode) imstk::VecDataArray<double, 2> %{
     public Vec2d this[uint i] {
-        get => modIMSTK.vec_from_eigen_2d(getValue(i));
-        set => modIMSTK.vec_to_eigen_2d(setValue(i), value);
+        get => Utils.vec_from_eigen_2d(getValue(i));
+        set => Utils.vec_to_eigen_2d(setValue(i), value);
     }
     public void push_back(Vec2d v) {
-        modIMSTK.vecdataarray_push_back_2d(this, v);
+        Utils.vecdataarray_push_back_2d(this, v);
     }
 %}
 
 %typemap(cscode) imstk::VecDataArray<double, 3> %{
     public Vec3d this[uint i] {
-        get => modIMSTK.vec_from_eigen_3d(getValue(i));
-        set => modIMSTK.vec_to_eigen_3d(setValue(i), value);
+        get => Utils.vec_from_eigen_3d(getValue(i));
+        set => Utils.vec_to_eigen_3d(setValue(i), value);
     }
     public void push_back(Vec3d v) {
-        modIMSTK.vecdataarray_push_back_3d(this, v);
+        Utils.vecdataarray_push_back_3d(this, v);
     }
 %}
 
 %typemap(cscode) imstk::VecDataArray<unsigned char, 3> %{
     public Vec3uc this[uint i] {
-        get => modIMSTK.vec_from_eigen_3uc(getValue(i));
-        set => modIMSTK.vec_to_eigen_3uc(setValue(i), value);
+        get => Utils.vec_from_eigen_3uc(getValue(i));
+        set => Utils.vec_to_eigen_3uc(setValue(i), value);
     }
     public void push_back(Vec3uc v) {
-        modIMSTK.vecdataarray_push_back_3uc(this, v);
+        Utils.vecdataarray_push_back_3uc(this, v);
     }
 %}
 
@@ -407,7 +439,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     }
 
     public static implicit operator Mat3d (SWIGTYPE_p_Eigen__MatrixT_double_3_3_t eigen_data) {
-        return modIMSTK.eigen2cs_Mat3d(eigen_data);
+        return Utils.eigen2cs_Mat3d(eigen_data);
     }
 %}
 
@@ -419,6 +451,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
 %include "../Common/imstkMacros.h"
 %include "../Common/imstkTypes.h";
 %include "../Common/imstkMath.h";
+%include "../Common/imstkEventObject.h";
 %include "../Common/imstkAbstractDataArray.h";
 %include "../Common/imstkDataArray.h";
 %template(DataArrayi) imstk::DataArray<int>;
@@ -436,7 +469,6 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
 %template(VecDataArray2d) imstk::VecDataArray<double, 2>;
 %template(VecDataArray3d) imstk::VecDataArray<double, 3>;
 %template(VecDataArray3uc) imstk::VecDataArray<unsigned char, 3>;
-%include "../Common/imstkEventObject.h";
 
 /*
  * Instantiation of Vec and VecDataArray
@@ -455,6 +487,18 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
 %template(vec_scale_2d) imstk::vec_scale<double, 2>;
 %template(vec_scale_3d) imstk::vec_scale<double, 3>;
 %template(vec_scale_6d) imstk::vec_scale<double, 6>;
+%template(vec_add_2i) imstk::vec_add<int, 2>;
+%template(vec_add_3i) imstk::vec_add<int, 3>;
+%template(vec_add_2f) imstk::vec_add<float, 2>;
+%template(vec_add_2d) imstk::vec_add<double, 2>;
+%template(vec_add_3d) imstk::vec_add<double, 3>;
+%template(vec_add_6d) imstk::vec_add<double, 6>;
+%template(vec_subtract_2i) imstk::vec_subtract<int, 2>;
+%template(vec_subtract_3i) imstk::vec_subtract<int, 3>;
+%template(vec_subtract_2f) imstk::vec_subtract<float, 2>;
+%template(vec_subtract_2d) imstk::vec_subtract<double, 2>;
+%template(vec_subtract_3d) imstk::vec_subtract<double, 3>;
+%template(vec_subtract_6d) imstk::vec_subtract<double, 6>;
 %template(vec_to_eigen_3i) imstk::vec_to_eigen<int, 3>;
 %template(vec_to_eigen_4i) imstk::vec_to_eigen<int, 4>;
 %template(vec_to_eigen_2f) imstk::vec_to_eigen<float, 2>;

@@ -78,6 +78,8 @@ private:
     ///
     /// \brief Phantom omni device api callback
     ///
+#define HDCALLBACK    
+    typedef unsigned int HDCallbackCode;
     static HDCallbackCode HDCALLBACK hapticCallback(void* pData);
 
     HHD     m_handle; ///< device handle

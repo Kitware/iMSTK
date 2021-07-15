@@ -18,7 +18,10 @@
 %shared_ptr(imstk::VecDataArray<double, 3>)
 %shared_ptr(imstk::VecDataArray<unsigned char, 3>)
 %shared_ptr(imstk::ModuleDriver)
+%shared_ptr(imstk::Event)
 %shared_ptr(imstk::EventObject)
+%shared_ptr(imstk::ButtonEvent)
+%shared_ptr(imstk::KeyEvent)
 
 /* 
  * Geometry 
@@ -38,6 +41,7 @@
 %shared_ptr(imstk::Plane)
 %shared_ptr(imstk::Sphere)
 %shared_ptr(imstk::Cube)
+%shared_ptr(imstk::SignedDistanceField)
 
 /* 
  * Geometry 
@@ -60,11 +64,14 @@
 %shared_ptr(imstk::AbstractDynamicalModel)
 %shared_ptr(imstk::DynamicalModel<imstk::PbdState>)
 %shared_ptr(imstk::DynamicalModel<imstk::FeDeformBodyState>)
+%shared_ptr(imstk::DynamicalModel<imstk::SPHState>)
 %shared_ptr(imstk::RigidBodyState2)
 %shared_ptr(imstk::DynamicalModel<imstk::RigidBodyState2>)
 %shared_ptr(imstk::PbdModel)
 %shared_ptr(imstk::expiremental::RigidBodyModel2Config)
 %shared_ptr(imstk::expiremental::RigidBodyModel2)
+%shared_ptr(imstk::SPHModelConfig)
+%shared_ptr(imstk::SPHModel)
 %shared_ptr(imstk::TimeIntegrator)
 %shared_ptr(imstk::BackwardEuler)
 
@@ -82,11 +89,13 @@
 /* 
  * SceneEntities
  */
+%shared_ptr(imstk::SceneEntity)
 %shared_ptr(imstk::SceneObject)
 %shared_ptr(imstk::CollidingObject)
 %shared_ptr(imstk::DynamicObject)
 %shared_ptr(imstk::PbdObject)
 %shared_ptr(imstk::FeDeformableObject)
+%shared_ptr(imstk::SPHObject)
 %shared_ptr(imstk::expiremental::RigidObject2)
 %shared_ptr(imstk::VisualModel)
 %shared_ptr(imstk::Camera)
@@ -113,6 +122,8 @@
 %shared_ptr(imstk::DeviceControl)
 %shared_ptr(imstk::MouseControl)
 %shared_ptr(imstk::KeyboardControl)
+%shared_ptr(imstk::TrackingDeviceControl)
+%shared_ptr(imstk::SceneObjectController)
 
 /*
  * Scene
@@ -121,6 +132,7 @@
 %shared_ptr(imstk::CollisionGraph)
 %shared_ptr(imstk::InteractionPair)
 %shared_ptr(imstk::ObjectInteractionPair)
+%shared_ptr(imstk::PbdObjectCuttingPair)
 
 /*
  * SimulationManager
@@ -129,6 +141,7 @@
 %shared_ptr(imstk::Viewer)
 %shared_ptr(imstk::AbstractVTKViewer)
 %shared_ptr(imstk::VTKViewer)
+%shared_ptr(imstk::VTKTextStatusManager)
 %shared_ptr(imstk::SceneManager)
 %shared_ptr(imstk::SimulationManager)
 %shared_ptr(imstk::MouseSceneControl)
@@ -139,5 +152,7 @@
  */
 %shared_ptr(imstk::DeviceClient)
 %shared_ptr(imstk::KeyboardDeviceClient)
+%shared_ptr(imstk::HapticDeviceClient)
+%shared_ptr(imstk::HapticDeviceManager)
 
 

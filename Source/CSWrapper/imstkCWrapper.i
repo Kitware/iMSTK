@@ -1,4 +1,4 @@
-%module(directors="1") modIMSTK
+%module(directors="1") Utils
 %{
 /* Common */
 #include "imstkMacros.h"
@@ -11,6 +11,12 @@
 #include "imstkModuleDriver.h"
 #include "imstkColor.h"
 #include "imstkEventObject.h"
+#include "imstkTypes.h"
+
+/*
+ * DataStructures
+ */
+#include "imstkNeighborSearch.h"
 
 /* 
  * Geometry 
@@ -31,6 +37,8 @@
 #include "imstkSphere.h"
 #include "imstkCube.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkSignedDistanceField.h"
+#include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 
 /*
  * GeometryMappers
@@ -60,15 +68,18 @@
 #include "imstkAbstractDynamicalModel.h"
 #include "imstkDynamicalModel.h"
 #include "imstkPbdModel.h"
-#include "imstkPbdConstraint.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkBackwardEuler.h"
 #include "imstkPbdFEMConstraint.h"
 #include "imstkPbdCollisionConstraint.h"
+#include "imstkSPHBoundaryConditions.h"
+#include "imstkSPHHemorrhage.h"
 #include "imstkInternalForceModelTypes.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkRigidBodyState2.h"
 #include "imstkRigidBodyModel2.h"
+#include "imstkSPHState.h"
+#include "imstkSPHModel.h"
 
 /* 
  * Rendering
@@ -79,11 +90,13 @@
 /*
  * Constraints
  */
+#include "imstkPbdConstraint.h"
 #include "imstkRbdConstraint.h"
 
 /* 
  * SceneEntities
  */
+#include "imstkSceneEntity.h"
 #include "imstkSceneObject.h"
 #include "imstkCollidingObject.h"
 #include "imstkDynamicObject.h"
@@ -93,6 +106,7 @@
 #include "imstkLight.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkRigidObject2.h"
+#include "imstkSPHObject.h"
 
 /*
  * CollisionDetection
@@ -110,6 +124,8 @@
 #include "imstkDeviceControl.h"
 #include "imstkMouseControl.h"
 #include "imstkKeyboardControl.h"
+#include "imstkTrackingDeviceControl.h"
+#include "imstkSceneObjectController.h"
 
 /*
  * Scene
@@ -122,6 +138,7 @@
 #include "imstkRigidObjectCollidingCollisionPair.h"
 #include "imstkInteractionPair.h"
 #include "imstkObjectInteractionPair.h"
+#include "imstkPbdObjectCuttingPair.h"
 
 /*
  * SimulationManager
@@ -130,6 +147,7 @@
 #include "imstkViewer.h"
 #include "imstkAbstractVTKViewer.h"
 #include "imstkVTKViewer.h"
+#include "imstkVTKTextStatusManager.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkMouseSceneControl.h"
@@ -140,9 +158,12 @@
  */
 #include "imstkDeviceClient.h"
 #include "imstkKeyboardDeviceClient.h"
+#ifdef iMSTK_USE_OpenHaptics
+#include "imstkHapticDeviceManager.h"
+#include "imstkHapticDeviceClient.h"
+#endif
 
 %} /* end of module */
-
 
 /*
  * stl
@@ -176,6 +197,7 @@ namespace std {
 %include "ignored.i"
 %include "type_cast.i"
 %include "std_function.i"
+%std_function(EventFunc, void, imstk::Event*)
 %std_function(ReceiverFunc, void, imstk::KeyEvent*)
 
 %callback("%s_cb");
@@ -183,8 +205,12 @@ namespace std {
 std::string KeyboardDeviceClient_getKeyPress();
 std::string Module_getPostUpdate();
 std::string Module_getPreUpdate();
+std::string SceneManager_getPreUpdate();
+std::string SceneManager_getPostUpdate();
 %nocallback;
 
+%rename(compute) imstk::ImplicitFunctionGradient::operator();
+%rename(compute) imstk::ImplicitFunctionCentralGradient::operator();
 
 /* namespace imstk { */
 /* %inline %{ */
@@ -199,6 +225,12 @@ std::string Module_getPostUpdate() {
 std::string Module_getPreUpdate() {
   return imstk::Module::preUpdate();
 }
+std::string SceneManager_getPostUpdate() {
+  return imstk::SceneManager::postUpdate();
+}
+std::string SceneManager_getPreUpdate() {
+  return imstk::SceneManager::preUpdate();
+}
 %}
 /* } */
 
@@ -211,6 +243,11 @@ std::string Module_getPreUpdate() {
  * Common
  */
 %include "common.i"
+
+/*
+ * DataStructures
+ */
+%include "../DataStructures/imstkNeighborSearch.h"
 
 /*
  * Geometry
@@ -230,6 +267,8 @@ std::string Module_getPreUpdate() {
 %include "../Geometry/Analytic/imstkSphere.h"
 %include "../Geometry/Analytic/imstkCube.h"
 %include "../Geometry/imstkGeometryUtilities.h"
+%include "../Geometry/Implicit/imstkSignedDistanceField.h"
+%include "../Geometry/Implicit/imstkImplicitFunctionFiniteDifferenceFunctor.h"
 
 /*
  * GeometryMap
@@ -260,6 +299,7 @@ std::string Module_getPreUpdate() {
 %include "../Constraint/PbdConstraints/imstkPbdConstraint.h"
 %include "../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
 %include "../Constraint/PbdConstraints/imstkPbdFEMConstraint.h"
+%include "../Constraint/RigidBodyConstraints/imstkRbdConstraint.h"
 
 /*
  * DynamicalModel
@@ -274,11 +314,16 @@ std::string Module_getPreUpdate() {
 %template(DynamicalModelFeDeformBodyState) imstk::DynamicalModel<imstk::FeDeformBodyState>;
 %include "../DynamicalModels/InternalForceModel/imstkInternalForceModelTypes.h"
 %include "../DynamicalModels/ObjectModels/imstkFEMDeformableBodyModel.h"
+%include "../DynamicalModels/ObjectModels/imstkSPHBoundaryConditions.h"
+%include "../DynamicalModels/ObjectModels/imstkSPHHemorrhage.h"
 %include "../DynamicalModels/TimeIntegrators/imstkTimeIntegrator.h"
 %include "../DynamicalModels/TimeIntegrators/imstkBackwardEuler.h"
 %include "../DynamicalModels/ObjectStates/imstkRigidBodyState2.h"
 %template(DynamicalModelRigidBodyState2) imstk::DynamicalModel<imstk::RigidBodyState2>;
 %include "../DynamicalModels/ObjectModels/imstkRigidBodyModel2.h"
+%include "../DynamicalModels/ObjectStates/imstkSPHState.h"
+%template(DynamicalModelSPHState) imstk::DynamicalModel<imstk::SPHState>;
+%include "../DynamicalModels/ObjectModels/imstkSPHModel.h"
 
 /* 
  * Rendering 
@@ -287,12 +332,9 @@ std::string Module_getPreUpdate() {
 %include "../Rendering/Materials/imstkTexture.h";
 
 /*
- * Constraints
- */
-%include "../Constraint/RigidBodyConstraints/imstkRbdConstraint.h"
-/*
  * SceneEntities
  */
+%include "../SceneEntities/imstkSceneEntity.h"
 %include "../SceneEntities/Objects/imstkSceneObject.h";
 %include "../SceneEntities/Objects/imstkCollidingObject.h";
 %include "../SceneEntities/Objects/imstkDynamicObject.h";
@@ -300,6 +342,7 @@ std::string Module_getPreUpdate() {
 %include "../SceneEntities/Objects/imstkVisualModel.h";
 %include "../SceneEntities/Objects/imstkFeDeformableObject.h";
 %include "../SceneEntities/Objects/imstkRigidObject2.h";
+%include "../SceneEntities/Objects/imstkSPHObject.h";
 %include "../SceneEntities/Camera/imstkCamera.h";
 %include "../SceneEntities/Lights/imstkLight.h";
 
@@ -320,18 +363,20 @@ std::string Module_getPreUpdate() {
 %include "../Controllers/imstkDeviceControl.h"
 %include "../Controllers/imstkMouseControl.h"
 %include "../Controllers/imstkKeyboardControl.h"
+%include "../Controllers/imstkTrackingDeviceControl.h"
+%include "../Controllers/imstkSceneObjectController.h"
 
 /* 
  * Scene
  */
 %include "../Scene/imstkScene.h";
 %include "../Scene/imstkCollisionGraph.h";
+%include "../Scene/imstkInteractionPair.h"
 %include "../Scene/imstkObjectInteractionPair.h";
 %include "../Scene/imstkObjectInteractionFactory.h";
 %include "../Scene/imstkCollisionPair.h";
 %include "../Scene/imstkRigidObjectCollidingCollisionPair.h";
-%include "../Scene/imstkInteractionPair.h"
-%include "../Scene/imstkObjectInteractionPair.h"
+%include "../Scene/imstkPbdObjectCuttingPair.h"
 
 /*
  * SimulationManager
@@ -339,6 +384,7 @@ std::string Module_getPreUpdate() {
 %include "../SimulationManager/imstkViewer.h";
 %include "../SimulationManager/VTKRenderer/imstkAbstractVTKViewer.h";
 %include "../SimulationManager/VTKRenderer/imstkVTKViewer.h";
+%include "../SimulationManager/VTKRenderer/imstkVTKTextStatusManager.h";
 %include "../SimulationManager/imstkSceneManager.h"
 %include "../SimulationManager/imstkSimulationManager.h"
 %include "../SimulationManager/imstkMouseSceneControl.h"
@@ -349,4 +395,8 @@ std::string Module_getPreUpdate() {
  */
 %include "../Devices/imstkDeviceClient.h"
 %include "../Devices/imstkKeyboardDeviceClient.h"
+#ifdef iMSTK_USE_OpenHaptics
+%include "../Devices/imstkHapticDeviceManager.h"
+%include "../Devices/imstkHapticDeviceClient.h"
+#endif
 
