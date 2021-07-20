@@ -15,4 +15,18 @@ if(iMSTK_USE_OpenHaptics)
 	target_compile_definitions(imstkCWrapper PRIVATE iMSTK_USE_OpenHaptics)
 endif()
 
-target_link_libraries(imstkCWrapper PUBLIC SimulationManager)
+target_link_libraries(imstkCWrapper PUBLIC SimulationManager Filtering)
+
+#-----------------------------------------------------------------------------
+# Install library
+#-----------------------------------------------------------------------------
+install( TARGETS imstkCWrapper EXPORT ${PROJECT_NAME}Targets
+    RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
+    LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
+    ARCHIVE DESTINATION lib COMPONENT Development)
+
+# Install all ".cs" files
+install(
+    DIRECTORY "${CMAKE_BINARY_DIR}/Source/CSWrapper/"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/include/iMSTKSharp/"
+    FILES_MATCHING PATTERN "${CMAKE_BINARY_DIR}/Source/CSWrapper/*.cs")

@@ -61,43 +61,43 @@ if(MSVC)
   endif()
 endif()
 
-
-option(${PROJECT_NAME}_BUILD_CSHARP "Build iMSTK-C#" ON)
-#-----------------------------------------------------------------------------
-# SWIG 
-#-----------------------------------------------------------------------------
-find_package(SWIG REQUIRED)
-include(${SWIG_USE_FILE})
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-set(CMAKE_SWIG_FLAGS "")
-set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/newton_out)
-
-
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
 
+# SWIG 
+option(${PROJECT_NAME}_WRAP_CSHARP "Build iMSTK-C# wrapper code and lib" OFF)
+if (${PROJECT_NAME}_WRAP_CSHARP)
+  find_package(SWIG REQUIRED)
+  include(${SWIG_USE_FILE})
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+  set(CMAKE_SWIG_FLAGS "")
+  set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/newton_out)
+endif()
+
+# CUDA
 option(${PROJECT_NAME}_ENABLE_CUDA_BACKEND "Enable iMSTK CUDA backend" OFF)
 if (${PROJECT_NAME}_ENABLE_CUDA_BACKEND)
-	include(CheckLanguage)
-	check_language(CUDA)
-	if (CMAKE_CUDA_COMPILER)
-		enable_language(CUDA)
-		set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
-		set(CUDA_PROPAGATE_HOST_FLAGS ON)
-		if(NOT DEFINED CMAKE_CUDA_STANDARD)
-			set(CMAKE_CUDA_STANDARD 11)
-			set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-		endif()
-	else()
-		message(STATUS "WARNING: CUDA compiler NOT FOUND; CUDA backend not enabled!")
-		set(${PROJECT_NAME}_ENABLE_CUDA_BACKEND OFF)
+  include(CheckLanguage)
+  check_language(CUDA)
+  if (CMAKE_CUDA_COMPILER)
+    enable_language(CUDA)
+	set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+	set(CUDA_PROPAGATE_HOST_FLAGS ON)
+	if(NOT DEFINED CMAKE_CUDA_STANDARD)
+	  set(CMAKE_CUDA_STANDARD 11)
+	  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 	endif()
+  else()
+	message(STATUS "WARNING: CUDA compiler NOT FOUND; CUDA backend not enabled!")
+    set(${PROJECT_NAME}_ENABLE_CUDA_BACKEND OFF)
+  endif()
 endif ()
 
+# General Options
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build iMSTK examples" ON)
 option(${PROJECT_NAME}_BUILD_TESTING "Build iMSTK tests" ON)
 set(BUILD_TESTING OFF)
@@ -393,9 +393,9 @@ add_subdirectory(Source/Testing)
 add_subdirectory(Source/Filtering)
 add_subdirectory(Source/FilteringCore)
 
-# if (${PROJECT_NAME}_BUILD_CSHARP)
-add_subdirectory(Source/CSWrapper)
-# endif()
+if (${PROJECT_NAME}_WRAP_CSHARP)
+  add_subdirectory(Source/CSWrapper)
+endif()
 
 #--------------------------------------------------------------------------
 # Add Examples subdirectories
