@@ -5,7 +5,7 @@ Derived* type_cast(Base* base) {
 }
 %}
 
-%template(castToRigidBodyCH) type_cast<imstk::CollisionHandling, imstk::expiremental::RigidBodyCH>;
+%template(castToRigidBodyCH) type_cast<imstk::CollisionHandling, imstk::RigidBodyCH>;
 %template(castToVecDataArray3uc) type_cast<imstk::AbstractDataArray, imstk::VecDataArray<unsigned char, 3>>;
 
 %template(castToPointSet) type_cast<imstk::Geometry, imstk::PointSet>;

@@ -35,7 +35,7 @@
 #include "imstkCompositeImplicitGeometry.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
-#include "imstkCube.h"
+#include "imstkOrientedBox.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkSignedDistanceField.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
@@ -73,7 +73,7 @@
 #include "imstkPbdFEMConstraint.h"
 #include "imstkPbdCollisionConstraint.h"
 #include "imstkSPHBoundaryConditions.h"
-#include "imstkSPHHemorrhage.h"
+/* #include "imstkSPHHemorrhage.h" */
 #include "imstkInternalForceModelTypes.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkRigidBodyState2.h"
@@ -104,6 +104,7 @@
 #include "imstkVisualModel.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
+#include "imstkDirectionalLight.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkRigidObject2.h"
 #include "imstkSPHObject.h"
@@ -265,7 +266,7 @@ std::string SceneManager_getPreUpdate() {
 %include "../Geometry/Analytic/imstkAnalyticalGeometry.h"
 %include "../Geometry/Analytic/imstkPlane.h"
 %include "../Geometry/Analytic/imstkSphere.h"
-%include "../Geometry/Analytic/imstkCube.h"
+%include "../Geometry/Analytic/imstkOrientedBox.h"
 %include "../Geometry/imstkGeometryUtilities.h"
 %include "../Geometry/Implicit/imstkSignedDistanceField.h"
 %include "../Geometry/Implicit/imstkImplicitFunctionFiniteDifferenceFunctor.h"
@@ -280,7 +281,7 @@ std::string SceneManager_getPreUpdate() {
 /*
  * Filtering
  */
-%include "../Filtering/imstkGeometryAlgorithm.h"
+%include "../FilteringCore/imstkGeometryAlgorithm.h"
 %include "../Filtering/imstkSurfaceMeshSubdivide.h"
 %include "../Filtering/imstkImplicitGeometryToImageData.h"
 %include "../Filtering/imstkSurfaceMeshFlyingEdges.h"
@@ -315,7 +316,7 @@ std::string SceneManager_getPreUpdate() {
 %include "../DynamicalModels/InternalForceModel/imstkInternalForceModelTypes.h"
 %include "../DynamicalModels/ObjectModels/imstkFEMDeformableBodyModel.h"
 %include "../DynamicalModels/ObjectModels/imstkSPHBoundaryConditions.h"
-%include "../DynamicalModels/ObjectModels/imstkSPHHemorrhage.h"
+/* %include "../DynamicalModels/ObjectModels/imstkSPHHemorrhage.h" */
 %include "../DynamicalModels/TimeIntegrators/imstkTimeIntegrator.h"
 %include "../DynamicalModels/TimeIntegrators/imstkBackwardEuler.h"
 %include "../DynamicalModels/ObjectStates/imstkRigidBodyState2.h"
@@ -345,6 +346,7 @@ std::string SceneManager_getPreUpdate() {
 %include "../SceneEntities/Objects/imstkSPHObject.h";
 %include "../SceneEntities/Camera/imstkCamera.h";
 %include "../SceneEntities/Lights/imstkLight.h";
+%include "../SceneEntities/Lights/imstkDirectionalLight.h";
 
 /*
  * CollisionDetection

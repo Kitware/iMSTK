@@ -43,7 +43,7 @@
 %ignore imstk::GeometryUtils::copyToPointSet();
 %ignore imstk::GeometryUtils::copyToSurfaceMesh();
 
-%ignore imstk::expiremental::RbdConstraint;
+%ignore imstk::RbdConstraint;
 %ignore imstk::CollisionHandling::getTaskNode();
 
 %ignore imstk::VTKTextStatusManager::getTextActor();

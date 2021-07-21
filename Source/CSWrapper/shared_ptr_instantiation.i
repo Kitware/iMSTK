@@ -40,7 +40,7 @@
 %shared_ptr(imstk::CompositeImplicitGeometry)
 %shared_ptr(imstk::Plane)
 %shared_ptr(imstk::Sphere)
-%shared_ptr(imstk::Cube)
+%shared_ptr(imstk::OrientedBox)
 %shared_ptr(imstk::SignedDistanceField)
 
 /* 
@@ -68,8 +68,8 @@
 %shared_ptr(imstk::RigidBodyState2)
 %shared_ptr(imstk::DynamicalModel<imstk::RigidBodyState2>)
 %shared_ptr(imstk::PbdModel)
-%shared_ptr(imstk::expiremental::RigidBodyModel2Config)
-%shared_ptr(imstk::expiremental::RigidBodyModel2)
+%shared_ptr(imstk::RigidBodyModel2Config)
+%shared_ptr(imstk::RigidBodyModel2)
 %shared_ptr(imstk::SPHModelConfig)
 %shared_ptr(imstk::SPHModel)
 %shared_ptr(imstk::TimeIntegrator)
@@ -84,7 +84,7 @@
 /*
  * Constraint
  */
-%shared_ptr(imstk::expiremental::RigidBody)
+%shared_ptr(imstk::RigidBody)
 
 /* 
  * SceneEntities
@@ -96,7 +96,7 @@
 %shared_ptr(imstk::PbdObject)
 %shared_ptr(imstk::FeDeformableObject)
 %shared_ptr(imstk::SPHObject)
-%shared_ptr(imstk::expiremental::RigidObject2)
+%shared_ptr(imstk::RigidObject2)
 %shared_ptr(imstk::VisualModel)
 %shared_ptr(imstk::Camera)
 %shared_ptr(imstk::Light)
@@ -113,8 +113,8 @@
  */
 %shared_ptr(imstk::CollisionPair)
 %shared_ptr(imstk::CollisionHandling)
-%shared_ptr(imstk::expiremental::RigidObjectCollidingCollisionPair)
-%shared_ptr(imstk::expiremental::RigidBodyCH)
+%shared_ptr(imstk::RigidObjectCollidingCollisionPair)
+%shared_ptr(imstk::RigidBodyCH)
 
 /*
  * Controller
