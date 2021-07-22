@@ -17,6 +17,37 @@
 %rename(Quatf) imstk::imstkQuatf;
 %rename(Quatd) imstk::imstkQuatd;
 
+%define %extend_VecDataArray(T, N)
+%extend imstk::VecDataArray<T, N> {
+    void setValues(const T* val)
+    {
+        /* std::copy(val, val+$self->m_vecSize * N, $self->Base::m_data); */
+        T* data = $self->DataArray<T>::getPointer();
+        std::copy(val, val + $self->size() * N, data);
+    }
+
+    void setValues(const T* val, const int n)
+    {
+        T* data = $self->DataArray<T>::getPointer();
+        CHECK($self->size()*N >= n) << "number of values are larger than the array size";
+        std::copy(val, val + n, data);
+    }
+
+    void getValues(T* val)
+    {
+        T* data = $self->DataArray<T>::getPointer();
+        std::copy(data, data+$self->size()*N, val);
+    }
+};
+%enddef
+
+%extend_VecDataArray(float, 2)
+%extend_VecDataArray(double, 2)
+%extend_VecDataArray(int, 3)
+%extend_VecDataArray(double, 3)
+%extend_VecDataArray(unsigned char, 3)
+%extend_VecDataArray(int, 4)
+
 %typemap(cscode) imstk::imstkQuatf %{
     public static implicit operator SWIGTYPE_p_Eigen__QuaternionT_float_t (Quatf cs_data) {
         return cs_data.get();

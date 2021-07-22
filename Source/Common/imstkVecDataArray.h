@@ -417,22 +417,6 @@ public:
         m_vecSize = m_vecCapacity = size;
     }
 
-    inline void setValues(const T* val)
-    {
-        std::copy(val, val+m_vecSize * N, DataArray<T>::m_data);
-    }
-
-    inline void setValues(const T* val, const int n)
-    {
-        CHECK(m_vecSize*N >= n) << "number of values are larger than the array size";
-        std::copy(val, val+n, DataArray<T>::m_data);
-    }
-
-    inline void getValues(T* val)
-    {
-        std::copy(DataArray<T>::m_data, DataArray<T>::m_data+m_vecSize*N, val);
-    }
-
     inline int getNumberOfComponents() const override { return N; }
 
 private:
