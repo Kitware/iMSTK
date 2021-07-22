@@ -30,3 +30,14 @@ Derived* type_cast(Base* base) {
   }
 %}
 
+
+/* %define %dynamic_cast(Base, Derived) */
+/*  */
+/*     %typemap(out) Base * { */
+/*         Derived* downcast = std::dynamic_cast<Derived *>($1); */
+/*         *(Derived **)&$result = downcast; */
+/*     } */
+/* %typemape(csout) Base * { */
+/*     return new Derived() */
+/* } */
+/* %enddef */

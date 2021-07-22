@@ -7,16 +7,16 @@
 
 %ignore imstk::DataArray::iterator; /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::const_iterator; /* fix the multiple-definition problem. */
-%ignore imstk::DataArray::beign(); /* fix the multiple-definition problem. */
-%ignore imstk::DataArray::cbeign(); /* fix the multiple-definition problem. */
+%ignore imstk::DataArray::begin(); /* fix the multiple-definition problem. */
+%ignore imstk::DataArray::cbegin() const; /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::end(); /* fix the multiple-definition problem. */
-%ignore imstk::DataArray::cend(); /* fix the multiple-definition problem. */
+%ignore imstk::DataArray::cend() const; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::iterator; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::const_iterator;
-%ignore imstk::VecDataArray::beign(); /* fix the multiple-definition problem. */
-%ignore imstk::VecDataArray::cbeign(); /* fix the multiple-definition problem. */
+%ignore imstk::VecDataArray::begin(); /* fix the multiple-definition problem. */
+%ignore imstk::VecDataArray::cbegin() const; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::end(); /* fix the multiple-definition problem. */
-%ignore imstk::VecDataArray::cend(); /* fix the multiple-definition problem. */
+%ignore imstk::VecDataArray::cend() const; /* fix the multiple-definition problem. */
 %ignore imstk::stdSink;
 %ignore imstk::LogManager;
 %ignore imstk::Logger::Logger();
@@ -47,3 +47,4 @@
 %ignore imstk::CollisionHandling::getTaskNode();
 
 %ignore imstk::VTKTextStatusManager::getTextActor();
+

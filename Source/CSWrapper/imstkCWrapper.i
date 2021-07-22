@@ -196,7 +196,7 @@ namespace std {
 %apply float OUTPUT[] {float * val}
 %apply double OUTPUT[] {double* val}
 %include "ignored.i"
-%include "ignored.i"
+%include "modifiers.i"
 %include "type_cast.i"
 %include "std_function.i"
 %std_function(EventFunc, void, imstk::Event*)
