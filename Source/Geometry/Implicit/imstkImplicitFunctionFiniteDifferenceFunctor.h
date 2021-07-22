@@ -32,6 +32,8 @@ namespace imstk
 struct ImplicitFunctionGradient
 {
     public:
+        virtual ~ImplicitFunctionGradient() = default;
+
         virtual Vec3d operator()(const Vec3d& pos) const = 0;
 
         virtual void setDx(const Vec3d& dx)
@@ -57,6 +59,8 @@ struct ImplicitFunctionGradient
 struct ImplicitFunctionCentralGradient : public ImplicitFunctionGradient
 {
     public:
+        virtual ~ImplicitFunctionCentralGradient() = default;
+
         Vec3d operator()(const Vec3d& pos) const override
         {
             const ImplicitGeometry& funcRef = *m_func;
@@ -122,6 +126,8 @@ struct ImplicitFunctionForwardGradient : public ImplicitFunctionGradient
 struct ImplicitFunctionBackwardGradient : public ImplicitFunctionGradient
 {
     public:
+        virtual ~ImplicitFunctionBackwardGradient() = default;
+
         Vec3d operator()(const Vec3d& pos) const override
         {
             const ImplicitGeometry& funcRef      = *m_func;
@@ -142,6 +148,8 @@ struct ImplicitFunctionBackwardGradient : public ImplicitFunctionGradient
 struct StructuredForwardGradient : public ImplicitFunctionGradient
 {
     public:
+        virtual ~StructuredForwardGradient() = default;
+
         inline Vec3d operator()(const Vec3d& pos) const override
         {
             const SignedDistanceField& funcRef      = *static_cast<SignedDistanceField*>(m_func.get());
@@ -172,6 +180,8 @@ struct StructuredForwardGradient : public ImplicitFunctionGradient
 struct StructuredBackwardGradient : public ImplicitFunctionGradient
 {
     public:
+        virtual ~StructuredBackwardGradient() = default;
+
         inline Vec3d operator()(const Vec3d& pos) const override
         {
             const SignedDistanceField& funcRef      = *static_cast<SignedDistanceField*>(m_func.get());

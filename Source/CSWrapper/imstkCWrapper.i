@@ -1,4 +1,5 @@
 %module(directors="1") Utils
+#pragma SWIG nowarn=302,314,317,401,476,501,503,505,516,844,
 %{
 /* Common */
 #include "imstkMacros.h"

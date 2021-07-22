@@ -23,6 +23,7 @@
 
 #include "imstkDataArray.h"
 #include "imstkMath.h"
+#include "imstkLogger.h"
 //#include "imstkParallelReduce.h"
 
 namespace imstk
@@ -423,6 +424,7 @@ public:
 
     inline void setValues(const T* val, const int n)
     {
+        CHECK(m_vecSize*N >= n) << "number of values are larger than the array size";
         std::copy(val, val+n, DataArray<T>::m_data);
     }
 

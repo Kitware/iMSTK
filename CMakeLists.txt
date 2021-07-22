@@ -69,7 +69,6 @@ endif()
 option(${PROJECT_NAME}_WRAP_CSHARP "Build iMSTK-C# wrapper code and lib" OFF)
 if (${PROJECT_NAME}_WRAP_CSHARP)
   find_package(SWIG REQUIRED)
-  include(${SWIG_USE_FILE})
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})

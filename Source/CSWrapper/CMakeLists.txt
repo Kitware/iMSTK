@@ -1,22 +1,22 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include(UseSWIG)
 
 set_source_files_properties(imstkCWrapper.i PROPERTIES CPLUSPLUS ON)
-set_source_files_properties(imstkCWrapper.i PROPERTIES SWIG_MODULE_NAME imstkCWrapper)
 
-swig_add_library(imstkCWrapper
+swig_add_library(iMSTKCWrapper
     TYPE SHARED
     OUTPUT_DIR "${CMAKE_BINARY_DIR}/Source/CSWrapper"
     LANGUAGE csharp
     SOURCES imstkCWrapper.i)
 
-set_target_properties(imstkCWrapper PROPERTIES SWIG_COMPILE_OPTIONS "-namespace;imstk")
+set_target_properties(iMSTKCWrapper PROPERTIES SWIG_COMPILE_OPTIONS "-namespace;imstk")
 if(iMSTK_USE_OpenHaptics)
-    set_target_properties(imstkCWrapper PROPERTIES SWIG_COMPILE_DEFINITIONS "iMSTK_USE_OpenHaptics")
-	target_compile_definitions(imstkCWrapper PRIVATE iMSTK_USE_OpenHaptics)
+    set_target_properties(iMSTKCWrapper PROPERTIES SWIG_COMPILE_DEFINITIONS "iMSTK_USE_OpenHaptics")
+	target_compile_definitions(iMSTKCWrapper PRIVATE iMSTK_USE_OpenHaptics)
 endif()
 
-target_link_libraries(imstkCWrapper PUBLIC SimulationManager Filtering)
-target_compile_options(imstkCWrapper PRIVATE
+target_link_libraries(iMSTKCWrapper PUBLIC SimulationManager Filtering)
+target_compile_options(iMSTKCWrapper PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
         -Wall -Wno-unused-function>
     $<$<CXX_COMPILER_ID:MSVC>:
@@ -26,7 +26,7 @@ target_compile_options(imstkCWrapper PRIVATE
 #-----------------------------------------------------------------------------
 # Install library
 #-----------------------------------------------------------------------------
-install( TARGETS imstkCWrapper EXPORT ${PROJECT_NAME}Targets
+install( TARGETS iMSTKCWrapper EXPORT ${PROJECT_NAME}Targets
     RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
     LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
     ARCHIVE DESTINATION lib COMPONENT Development)
