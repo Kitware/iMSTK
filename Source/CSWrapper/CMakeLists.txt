@@ -35,4 +35,4 @@ install( TARGETS iMSTKCWrapper EXPORT ${PROJECT_NAME}Targets
 install(
     DIRECTORY "${CMAKE_BINARY_DIR}/Source/CSWrapper/"
     DESTINATION "${CMAKE_INSTALL_PREFIX}/include/iMSTKSharp/"
-    FILES_MATCHING PATTERN "${CMAKE_BINARY_DIR}/Source/CSWrapper/*.cs")
+    FILES_MATCHING PATTERN "*.cs")
