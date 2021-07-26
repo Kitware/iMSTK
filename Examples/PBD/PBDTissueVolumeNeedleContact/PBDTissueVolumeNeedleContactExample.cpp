@@ -44,16 +44,11 @@
 #include "NeedleInteraction.h"
 
 #ifdef iMSTK_USE_OPENHAPTICS
-#define EXAMPLE_USE_HAPTICS
-#define USE_FEM
-
-#ifdef EXAMPLE_USE_HAPTICS
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkRigidObjectController.h"
 #else
 #include "imstkKeyboardDeviceClient.h"
-#endif
 #endif
 
 using namespace imstk;
@@ -358,7 +353,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-#ifdef EXAMPLE_USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
         imstkNew<HapticDeviceManager> hapticManager;
         hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
         std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();

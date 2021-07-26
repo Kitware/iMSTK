@@ -44,13 +44,12 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
-#ifdef iMSTK_USE_OPENHAPTICS
-#define EXAMPLE_USE_HAPTICS
-#define USE_FEM
-
 // If two-way coupling is used haptic forces can be felt when the tool
 // hits the tissue
 #define TWOWAY_COUPLING
+
+// Whether to use FEM or volume+distance constraints
+#define USE_FEM
 
 #ifdef TWOWAY_COUPLING
 #include "imstkPbdRigidObjectCollision.h"
@@ -58,11 +57,12 @@
 #include "imstkPbdObjectCollision.h"
 #endif
 
-#ifdef EXAMPLE_USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkRigidObjectController.h"
-#endif
+#else
+#include "imstkKeyboardDeviceClient.h"
 #endif
 
 using namespace imstk;
@@ -382,7 +382,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.002);
 
-#ifdef EXAMPLE_USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
         imstkNew<HapticDeviceManager> hapticManager;
         hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
         std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();

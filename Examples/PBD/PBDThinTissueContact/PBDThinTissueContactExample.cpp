@@ -41,13 +41,10 @@
 #include "imstkVTKViewer.h"
 
 #ifdef iMSTK_USE_OPENHAPTICS
-#define EXAMPLE_USE_HAPTICS
-#define USE_PBR
-
-#ifdef EXAMPLE_USE_HAPTICS
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
-#endif
+#else
+#include "imstkKeyboardDeviceClient.h"
 #endif
 
 using namespace imstk;
@@ -157,7 +154,6 @@ makeTissueObj(const std::string& name,
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
-#ifdef USE_PBR
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
@@ -166,9 +162,6 @@ makeTissueObj(const std::string& name,
     material->addTexture(std::make_shared<Texture>(normalTex, Texture::Type::Normal));
     auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshORM.jpg");
     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
-#else
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-#endif
 
     imstkNew<VisualModel> visualModel(clothMesh);
     visualModel->setRenderMaterial(material);
@@ -211,7 +204,7 @@ main()
     imstkNew<VecDataArray<int, 2>> indicesPtr(1);
     (*indicesPtr)[0] = Vec2i(0, 1);
     toolGeometry->initialize(verticesPtr, indicesPtr);
-#ifndef EXAMPLE_USE_HAPTICS
+#ifndef iMSTK_USE_OPENHAPTICS
     toolGeometry->translate(Vec3d(0.5, 2.0, 0.5));
 #endif
 
@@ -247,7 +240,7 @@ main()
         sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
-#ifdef EXAMPLE_USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
         imstkNew<HapticDeviceManager> hapticManager;
         hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
         std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
@@ -256,7 +249,7 @@ main()
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-#ifdef EXAMPLE_USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
         driver->addModule(hapticManager);
 #endif
         driver->setDesiredDt(0.005);
@@ -264,7 +257,7 @@ main()
         Mat3d rotationalOffset = Mat3d::Identity();
         connect<Event>(sceneManager, SceneManager::preUpdate, [&](Event*)
         {
-#ifdef EXAMPLE_USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
             hapticDeviceClient->update();
             const Quatd deviceOrientation = (Quatd(rotationalOffset) * hapticDeviceClient->getOrientation()).normalized();
             const Vec3d devicePosition    = (rotationalOffset * hapticDeviceClient->getPosition()) * 0.05 + Vec3d(0.0, 0.0, 0.0);
