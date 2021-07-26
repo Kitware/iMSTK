@@ -173,20 +173,6 @@ struct PointIndexDirectionElement
     double penetrationDepth;
 };
 
-#define ElementConstructorAssignment(ElementTypeName)                                                                                          \
-    CollisionElement(const ElementTypeName ## Element & element) : m_element { element }, m_type { CollisionElementType:: ## ElementTypeName } \
-    {                                                                                                                                          \
-    }                                                                                                                                          \
-    void                                                                                                                                       \
-    operator=(const ElementTypeName ## Element& element)                                                                                       \
-    {                                                                                                                                          \
-        m_element.m_ ## ElementTypeName ## Element = element;                                                                                  \
-    }
-
-#define ElementUnionConstructor(ElementTypeName)                 \
-    ElementTypeName ## Element m_ ## ElementTypeName ## Element; \
-    Element(const ElementTypeName ## Element ## & ele) : m_ ## ElementTypeName ## Element(ele) { }
-
 ///
 /// \brief Union of collision elements. We use a union to avoid polymorphism. There may be many
 /// elements and accessing them needs to be quick. Additionally the union keeps them more compact
@@ -196,11 +182,35 @@ struct CollisionElement
 {
     CollisionElement() : m_element{EmptyElement()}, m_type{CollisionElementType::Empty} { }
 
-    ElementConstructorAssignment(Empty);
-    ElementConstructorAssignment(CellVertex);
-    ElementConstructorAssignment(CellIndex);
-    ElementConstructorAssignment(PointDirection);
-    ElementConstructorAssignment(PointIndexDirection);
+    CollisionElement(const EmptyElement& element) : m_element{element}, m_type{CollisionElementType::Empty} { }
+    void operator=(const EmptyElement& element)
+    {
+        m_element.m_EmptyElement = element;
+    }
+
+    CollisionElement(const CellVertexElement& element) : m_element{element}, m_type{CollisionElementType::CellVertex} { }
+    void operator=(const CellVertexElement& element)
+    {
+        m_element.m_CellVertexElement = element;
+    }
+
+    CollisionElement(const CellIndexElement& element) : m_element{element}, m_type{CollisionElementType::CellIndex} { }
+    void operator=(const CellIndexElement& element)
+    {
+        m_element.m_CellIndexElement = element;
+    }
+
+    CollisionElement(const PointDirectionElement& element) : m_element{element}, m_type{CollisionElementType::PointDirection} { }
+    void operator=(const PointDirectionElement& element)
+    {
+        m_element.m_PointDirectionElement = element;
+    }
+
+    CollisionElement(const PointIndexDirectionElement& element) : m_element{element}, m_type{CollisionElementType::PointIndexDirection} { }
+    void operator=(const PointIndexDirectionElement& element)
+    {
+        m_element.m_PointIndexDirectionElement = element;
+    }
 
     CollisionElement(const CollisionElement& other)
     {
@@ -226,14 +236,19 @@ struct CollisionElement
 
     union Element
     {
-        Element() : m_EmptyElement(EmptyElement()) { }
+        EmptyElement m_EmptyElement;
+        CellVertexElement m_CellVertexElement;
+        CellIndexElement m_CellIndexElement;
+        PointDirectionElement m_PointDirectionElement;
+        PointIndexDirectionElement m_PointIndexDirectionElement;
 
+        Element() : m_EmptyElement(EmptyElement()) { }
         // Constructors needed here for implicit conversions+assignment between elements and parent struct
-        ElementUnionConstructor(Empty);
-        ElementUnionConstructor(CellVertex);
-        ElementUnionConstructor(CellIndex);
-        ElementUnionConstructor(PointDirection);
-        ElementUnionConstructor(PointIndexDirection);
+        Element(const EmptyElement& ele) : m_EmptyElement(ele) { }
+        Element(const CellVertexElement& ele) : m_CellVertexElement(ele) { }
+        Element(const CellIndexElement& ele) : m_CellIndexElement(ele) { }
+        Element(const PointDirectionElement& ele) : m_PointDirectionElement(ele) { }
+        Element(const PointIndexDirectionElement& ele) : m_PointIndexDirectionElement(ele) { }
     } m_element;
 
     CollisionElementType m_type;

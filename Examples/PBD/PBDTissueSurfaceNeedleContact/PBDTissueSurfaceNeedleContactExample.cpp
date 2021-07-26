@@ -46,15 +46,11 @@
 #include "NeedleInteraction.h"
 
 #ifdef iMSTK_USE_OPENHAPTICS
-#define EXAMPLE_USE_HAPTICS
-
-#ifdef EXAMPLE_USE_HAPTICS
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkRigidObjectController.h"
 #else
 #include "imstkKeyboardDeviceClient.h"
-#endif
 #endif
 
 using namespace imstk;
@@ -370,7 +366,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-#ifdef EXAMPLE_USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
         imstkNew<HapticDeviceManager> hapticManager;
         hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
         std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
@@ -423,6 +419,7 @@ main()
             toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
             //tissueObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
 
+#ifdef iMSTK_USE_OPENHAPTICS
             if (controller->getForce().norm() > 1.0)
             {
                 ghostToolObj->getVisualModel(0)->setIsVisible(true);
@@ -436,6 +433,7 @@ main()
             toolGhostMesh->setRotation(controller->getRotation());
             toolGhostMesh->updatePostTransformData();
             toolGhostMesh->postModified();
+#endif
         });
 
         // Add mouse and keyboard controls to the viewer

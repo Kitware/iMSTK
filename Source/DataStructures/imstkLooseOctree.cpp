@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkLooseOctree.h"
-#include "imstkDebugRenderGeometry.h"
 #include "imstkLogger.h"
 #include "imstkSurfaceMesh.h"
 
