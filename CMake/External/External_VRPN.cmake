@@ -19,11 +19,13 @@ if(${${PROJECT_NAME}_USE_OpenHaptics})
   if(NOT EXISTS ${OPENHAPTICS_ROOT_DIR})
     message(FATAL_ERROR "\nCan not support Phantom Omni without OpenHaptics.\nSet OPENHAPTICS_ROOT_DIR to OpenHaptics installation directory.\n\n")
   endif()
+  list(APPEND VRPN_DEPENDENCIES "OpenHaptics")
 else()
   message(STATUS "Superbuild -   VRPN => Phantom Omni support DISABLED")
   if(DEFINED OPENHAPTICS_ROOT_DIR)
     unset(OPENHAPTICS_ROOT_DIR CACHE)
   endif()
+
 endif()
 
 #-----------------------------------------------------------------------------
@@ -48,11 +50,15 @@ imstk_add_external_project( VRPN
     -DVRPN_USE_LIBUSB_1_0:BOOL=ON
     -DVRPN_USE_HID:BOOL=OFF
     -DVRPN_USE_LIBNIFALCON:BOOL=ON
-    -DVRPN_BUILD_SERVERS:BOOL=${${PROJECT_NAME}_USE_OpenHaptics}
-    -DVRPN_USE_PHANTOM_SERVER:BOOL=${${PROJECT_NAME}_USE_OpenHaptics}
-    -DVRPN_USE_HDAPI:BOOL=${${PROJECT_NAME}_USE_OpenHaptics}
-    -DOPENHAPTICS_ROOT_DIR:PATH=${OPENHAPTICS_ROOT_DIR}
+    -DVRPN_BUILD_SERVERS:BOOL=ON
+    -DVRPN_USE_PHANTOM_SERVER:BOOL=OFF
+    -DVRPN_USE_HDAPI:BOOL=OFF
+    #-DOPENHAPTICS_ROOT_DIR:PATH=${OPENHAPTICS_ROOT_DIR}
   DEPENDENCIES ${VRPN_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH ""
   #VERBOSE
 )
+
+# Note HS-2021-28-7 currently disabled openhaptics with regards to VRPN, between the imstk superbuild and the
+# VRPN cmake files the Openhaptics libraries can't be found by the VRPN build inside of the imstk superbuild
+# as we will mostly run haptics through the imstkOpenHaptics module this is not an issue for now 
