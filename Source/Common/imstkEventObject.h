@@ -382,7 +382,7 @@ connect(EventObject* sender, std::string (* senderFunc)(),
 template<class T, class RecieverType>
 static void
 connect(std::shared_ptr<EventObject> sender, std::string (* senderFunc)(),
-        std::shared_ptr<EventObject> reciever, void (RecieverType::* recieverFunc)(T*))
+        std::shared_ptr<RecieverType> reciever, void (RecieverType::* recieverFunc)(T*))
 {
     connect<T>(sender.get(), senderFunc, reciever.get(), recieverFunc);
 }
