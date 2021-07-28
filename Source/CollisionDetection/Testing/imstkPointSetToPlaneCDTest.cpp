@@ -31,7 +31,7 @@ TEST(imstkPointSetToPlaneCDTest, IntersectionTestAB)
 {
     PointSetToPlaneCD m_pointSetToPlaneCD;
 
-    auto plane      = std::make_shared<Plane>();
+    auto plane = std::make_shared<Plane>();
 
     auto pointSet    = std::make_shared<PointSet>();
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(1);
@@ -72,7 +72,7 @@ TEST(imstkPointSetToPlaneCDTest, NonIntersectionTestAB)
 {
     PointSetToPlaneCD m_pointSetToPlaneCD;
 
-    auto plane      = std::make_shared<Plane>(Vec3d(0.0, 0.0, 0.0), Vec3d(1., 1., 1.));
+    auto plane       = std::make_shared<Plane>(Vec3d(0.0, 0.0, 0.0), Vec3d(1., 1., 1.));
     auto pointSet    = std::make_shared<PointSet>();
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(1);
     (*verticesPtr)[0] = Vec3d(1.0, 1.0, 1.0);
