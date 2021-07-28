@@ -327,7 +327,7 @@ testSphereToSphere(
     sphereBContactNormal = dirAtoB;
     depth = (rA + rB) - d;
 
-    return depth < 0.0;
+    return depth > 0.0;
 }
 
 ///
