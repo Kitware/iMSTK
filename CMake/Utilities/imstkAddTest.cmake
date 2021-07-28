@@ -50,10 +50,11 @@ function(imstk_add_test_internal target kind)
   # Link test driver against current target, gtest and pthread
   target_link_libraries(${test_driver_executable}
     ${target}
+    Testing
+    Threads::Threads
     GTest::gtest
     GTest::gmock
-    GTest::gtest_main
-    Threads::Threads
+
   )
 
 if (MSVC)
