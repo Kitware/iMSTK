@@ -29,19 +29,21 @@
 #include <vrpn_Connection.h>
 #include <vrpn_MainloopContainer.h>
 
+//VRPN
+#include "imstkDeviceClient.h"
+#include "imstkVRPNDeviceClient.h"
+#include "quat.h"
+
 namespace imstk
 {
 ///
 /// \brief Enumeration for device types
 ///
-enum class DeviceType
+enum class VRPNDeviceType
 {
-    SpaceExplorer3DConnexion,
-    Navigator3DConnexion,
-    NovintFalcon,
-    PhantomOmni,
-    OSVR_HDK,
-    Arduino
+    Analog,
+    Button,
+    Tracker
 };
 
 ///
@@ -75,6 +77,11 @@ public:
     ///
     void addSerialDevice(const std::string& deviceName, DeviceType deviceType, const std::string& port = "COM6", int baudRate = 57600, int id = 0);
 
+    ///
+    /// \bried Add device client
+    ///
+    void addDeviceClient(std::shared_ptr<VRPNDeviceClient> client, const std::string& deviceName, VRPNDeviceType deviceType, int id);
+
 protected:
     ///
     /// \brief Initialize the server module
@@ -106,9 +113,11 @@ private:
     const std::string m_machine;                                       ///< machine name or IP
     const int m_port;                                                  ///< connection port
 
-    std::map<std::string, std::pair<DeviceType, int>> m_deviceInfoMap; ///< list of iMSTK client info
+    std::map<std::string, std::pair<VRPNDeviceType, int>> m_deviceInfoMap; ///< list of iMSTK client info
     std::map<std::string, SerialInfo> m_SerialInfoMap;
     vrpn_Connection* m_serverConnection = nullptr;                     ///< VRPN server connection
     vrpn_MainloopContainer* m_deviceConnections = nullptr;             ///< VRPN device connections
+    
+    std::vector<std::shared_ptr<VRPNDeviceClient>> m_deviceClients2;
 };
 } // imstk

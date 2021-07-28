@@ -31,6 +31,11 @@
 #include <vrpn_ForceDevice.h>
 #include <unordered_map>
 
+//
+#include <vector>
+#include "quat.h"
+
+
 namespace imstk
 {
 ///
@@ -45,7 +50,7 @@ public:
     /// \brief Constructor
     ///
     VRPNDeviceClient(const std::string& deviceName, const std::string& ip) : Module(),
-        DeviceClient(deviceName, ip)
+        DeviceClient(deviceName, "localhost")
     {}
 
     ///
@@ -69,7 +74,7 @@ protected:
     ///
     void uninitModule() override;
 
-private:
+public:
 
     ///
     /// \brief VRPN call back for position and orientation data
@@ -106,14 +111,6 @@ private:
     ///
     static void VRPN_CALLBACK buttonChangeHandler(void* userData, const _vrpn_BUTTONCB b);
 
-    ///
-    /// \brief VRPN call back for force data
-    /// \param userData Pointer to this to allow updating
-    /// internal data
-    /// \param f VRPN callback structure containing new force data
-    ///
-    static void VRPN_CALLBACK forceChangeHandler(void* userData, const _vrpn_FORCECB f);
-
     std::shared_ptr<vrpn_Tracker_Remote>     m_vrpnTracker;     //!< VRPN position/orientation interface
     std::shared_ptr<vrpn_Analog_Remote>      m_vrpnAnalog;      //!< VRPN position/orientation interface
     std::shared_ptr<vrpn_Button_Remote>      m_vrpnButton;      //!< VRPN button interface
@@ -121,5 +118,6 @@ private:
 
 public:
     std::unordered_map<int, bool> m_buttons;
+    std::unordered_map<int, double> m_buttonStates;
 };
 }
