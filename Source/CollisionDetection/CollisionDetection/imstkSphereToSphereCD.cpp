@@ -43,10 +43,10 @@ SphereToSphereCD::computeCollisionDataAB(
     std::shared_ptr<Sphere> sphereB = std::dynamic_pointer_cast<Sphere>(geomB);
 
     // Get geometry properties
-    Vec3d  sphereAPos = sphereA->getPosition();
-    double rA = sphereA->getRadius();
-    Vec3d  sphereBPos = sphereB->getPosition();
-    double rB = sphereB->getRadius();
+    const Vec3d  sphereAPos = sphereA->getPosition();
+    const double rA = sphereA->getRadius();
+    const Vec3d  sphereBPos = sphereB->getPosition();
+    const double rB = sphereB->getRadius();
 
     Vec3d  sphereAContactPt, sphereBContactPt;
     Vec3d  sphereAContactNormal, sphereBContactNormal;
@@ -68,72 +68,6 @@ SphereToSphereCD::computeCollisionDataAB(
         elemB.penetrationDepth = depth;
 
         elementsA.unsafeAppend(elemA);
-        elementsB.unsafeAppend(elemB);
-    }
-}
-
-void
-SphereToSphereCD::computeCollisionDataA(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA)
-{
-    std::shared_ptr<Sphere> sphereA = std::dynamic_pointer_cast<Sphere>(geomA);
-    std::shared_ptr<Sphere> sphereB = std::dynamic_pointer_cast<Sphere>(geomB);
-
-    // Get geometry properties
-    Vec3d  sphereAPos = sphereA->getPosition();
-    double rA = sphereA->getRadius();
-    Vec3d  sphereBPos = sphereB->getPosition();
-    double rB = sphereB->getRadius();
-
-    Vec3d  sphereAContactPt, sphereBContactPt;
-    Vec3d  sphereAContactNormal, sphereBContactNormal;
-    double depth;
-    if (CollisionUtils::testSphereToSphere(
-        sphereAPos, rA, sphereBPos, rB,
-        sphereAContactPt, sphereAContactNormal,
-        sphereBContactPt, sphereBContactNormal,
-        depth))
-    {
-        PointDirectionElement elemA;
-        elemA.dir = sphereAContactNormal; // Direction to resolve sphereA
-        elemA.pt  = sphereAContactPt;
-        elemA.penetrationDepth = depth;
-
-        elementsA.unsafeAppend(elemA);
-    }
-}
-
-void
-SphereToSphereCD::computeCollisionDataB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsB)
-{
-    std::shared_ptr<Sphere> sphereA = std::dynamic_pointer_cast<Sphere>(geomA);
-    std::shared_ptr<Sphere> sphereB = std::dynamic_pointer_cast<Sphere>(geomB);
-
-    // Get geometry properties
-    Vec3d  sphereAPos = sphereA->getPosition();
-    double rA = sphereA->getRadius();
-    Vec3d  sphereBPos = sphereB->getPosition();
-    double rB = sphereB->getRadius();
-
-    Vec3d  sphereAContactPt, sphereBContactPt;
-    Vec3d  sphereAContactNormal, sphereBContactNormal;
-    double depth;
-    if (CollisionUtils::testSphereToSphere(
-        sphereAPos, rA, sphereBPos, rB,
-        sphereAContactPt, sphereAContactNormal,
-        sphereBContactPt, sphereBContactNormal,
-        depth))
-    {
-        PointDirectionElement elemB;
-        elemB.dir = sphereBContactNormal; // Direction to resolve sphereB
-        elemB.pt  = sphereBContactPt;
-        elemB.penetrationDepth = depth;
-
         elementsB.unsafeAppend(elemB);
     }
 }

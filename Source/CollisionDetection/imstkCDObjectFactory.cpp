@@ -71,6 +71,7 @@ std::unordered_map<std::string, std::function<std::shared_ptr<CollisionDetection
     //IMSTK_MAKE_CD_CASE(PointSetToSpherePickingCD, Plane, Sphere),
     //IMSTK_MAKE_CD_CASE(PointSetToSurfaceMeshCD, PointSet, SurfaceMesh),
     IMSTK_MAKE_CD_CASE(SphereToCylinderCD, Sphere, Cylinder),
+    IMSTK_MAKE_CD_CASE(SphereToSphereCD, Sphere, Sphere),
     //IMSTK_MAKE_CD_CASE(SurfaceMeshToSurfaceMeshCCD, SurfaceMesh, SurfaceMesh),
     IMSTK_MAKE_CD_CASE(SurfaceMeshToSurfaceMeshCD, SurfaceMesh, SurfaceMesh),
     IMSTK_MAKE_CD_CASE(SurfaceMeshToSphereCD, SurfaceMesh, Sphere),

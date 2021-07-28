@@ -29,6 +29,7 @@
 #include "imstkObjectInteractionFactory.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectCollision.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -36,87 +37,17 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkPbdObjectCollision.h"
 
 using namespace imstk;
-
-///
-/// \brief create a PbdObject for fluids
-///
-std::shared_ptr<PbdObject> createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                                                 const std::string&     tetMeshName);
-
-///
-/// \brief Create a box mesh to hold the fluid
-///
-std::shared_ptr<SurfaceMesh> createCollidingSurfaceMesh();
 
 // mesh file name
 const std::string tetMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
 
 ///
-/// \brief This example demonstrates the fluids simulation
-/// using Position based dynamics
+/// \brief create a PbdObject for fluids
 ///
-int
-main()
-{
-    // Setup logger (write to file and stdout)
-    Logger::startLogger();
-
-    imstkNew<Scene> scene("PBDFluid");
-    {
-        scene->getActiveCamera()->setPosition(0.0, 15.0, 20.0);
-
-        std::shared_ptr<PbdObject>   fluidObj  = createAndAddPbdObject(scene, tetMeshFileName);
-        std::shared_ptr<SurfaceMesh> floorMesh = createCollidingSurfaceMesh();
-
-        imstkNew<CollidingObject> floorObj("Floor");
-        floorObj->setVisualGeometry(floorMesh);
-        floorObj->setCollidingGeometry(floorMesh);
-        scene->addSceneObject(floorObj);
-
-        // Collisions
-        auto collisionInteraction = std::make_shared<PbdObjectCollision>(fluidObj, floorObj);
-        scene->getCollisionGraph()->addInteraction(collisionInteraction);
-    }
-
-    // Run the simulation
-    {
-        // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
-        viewer->setActiveScene(scene);
-
-        // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
-        sceneManager->setActiveScene(scene);
-        sceneManager->pause(); // Start simulation paused
-
-        imstkNew<SimulationManager> driver;
-        driver->addModule(viewer);
-        driver->addModule(sceneManager);
-
-        // Add mouse and keyboard controls to the viewer
-        {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
-
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
-        }
-
-        driver->start();
-    }
-
-    return 0;
-}
-
 std::shared_ptr<PbdObject>
-createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                      const std::string&     tetMeshName)
+createPbdFluid(const std::string& tetMeshName)
 {
     // Load a sample mesh
     std::shared_ptr<PointSet> tetMesh = MeshIO::read(tetMeshName);
@@ -157,11 +88,12 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     pbdModel->setTimeStepSizeType(TimeSteppingType::Fixed);
     deformableObj->setDynamicalModel(pbdModel);
 
-    scene->addSceneObject(deformableObj);
-
     return deformableObj;
 }
 
+///
+/// \brief Create a box mesh to hold the fluid
+///
 std::shared_ptr<SurfaceMesh>
 createCollidingSurfaceMesh()
 {
@@ -263,4 +195,65 @@ createCollidingSurfaceMesh()
     imstkNew<SurfaceMesh> floorMeshColliding;
     floorMeshColliding->initialize(verticesPtr, trianglesPtr);
     return floorMeshColliding;
+}
+
+///
+/// \brief This example demonstrates the fluids simulation
+/// using Position based dynamics
+///
+int
+main()
+{
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<Scene> scene("PBDFluid");
+    {
+        scene->getActiveCamera()->setPosition(0.0, 15.0, 20.0);
+
+        std::shared_ptr<PbdObject> fluidObj = createPbdFluid(tetMeshFileName);
+        scene->addSceneObject(fluidObj);
+
+        imstkNew<CollidingObject>    floorObj("Floor");
+        std::shared_ptr<SurfaceMesh> floorMesh = createCollidingSurfaceMesh();
+        floorObj->setVisualGeometry(floorMesh);
+        floorObj->setCollidingGeometry(floorMesh);
+        scene->addSceneObject(floorObj);
+
+        // Collisions
+        auto collisionInteraction = std::make_shared<PbdObjectCollision>(fluidObj, floorObj);
+        scene->getCollisionGraph()->addInteraction(collisionInteraction);
+    }
+
+    // Run the simulation
+    {
+        // Setup a viewer to render
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        sceneManager->pause(); // Start simulation paused
+
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setModuleDriver(driver);
+            viewer->addControl(keyControl);
+        }
+
+        driver->start();
+    }
+
+    return 0;
 }
