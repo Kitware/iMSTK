@@ -288,7 +288,7 @@ testBidirectionalPlaneToSphere(
     }
 
     pentrationDepth = r - std::abs(d);
-    return pentrationDepth < 0.0;
+    return pentrationDepth > 0.0;
 }
 
 ///
