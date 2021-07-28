@@ -681,6 +681,14 @@ testSegmentTriangle(
 }
 
 ///
+/// \brief Returns the closest position to point on segment a-b and the case
+/// type=0: x1 is the closest point
+/// type=1: x2 is the closest point
+/// type=2: closest point is on x1-x2
+///
+Vec3d closestPointOnSegment(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, int& caseType);
+
+///
 /// \brief Returns the position closest to triangle a-b-c and the case
 /// type=0: a is the closest point
 /// type=1: b is the closest point
