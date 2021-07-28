@@ -19,42 +19,24 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
-#include <memory>
+#include "imstkSetupRenderTest.h"
 
 #include "imstkCamera.h"
 #include "imstkColorFunction.h"
 #include "imstkEventObject.h"
-#include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
-#include "imstkMouseSceneControl.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
-#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkVTKViewer.h"
 #include "imstkVecDataArray.h"
 #include "imstkVisualModel.h"
 
-using namespace imstk;
+class MeshRenderTest : public RenderTest {};
 
 namespace
 {
-void
-run_for(SimulationManager* driver, int i)
-{
-    std::thread t(&SimulationManager::start, driver);
-
-    std::this_thread::sleep_for(std::chrono::seconds(i));
-
-    driver->requestStatus(ModuleDriverStopped);
-    t.join();
-}
-
 std::shared_ptr<RenderMaterial>
 makeMaterial()
 {
@@ -73,7 +55,7 @@ makeMaterial()
 }
 
 std::shared_ptr<SceneObject>
-createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
+createAndAddMeshSceneObject(std::shared_ptr<Scene> scene,
                               const std::string&     fileName,
                               const std::string&     objectName)
 {
@@ -93,56 +75,18 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
 }
 }
 
-class RenderTest : public testing::Test
+TEST_F(RenderTest, plainMesh)
 {
-public:
-
-    void SetUp() override
-    {
-        scene  = std::make_shared<Scene>("Render Test Scene");
-        viewer = std::make_shared<VTKViewer>("Viewer");
-        viewer->setActiveScene(scene);
-
-        // Setup a scene manager to advance the scene in its own thread
-        sceneManager = std::make_shared<SceneManager>("Scene Manager");
-        sceneManager->setActiveScene(scene);
-
-        driver = std::make_shared<SimulationManager>();
-        driver->addModule(viewer);
-        driver->addModule(sceneManager);
-
-        mouseControl = std::make_shared<MouseSceneControl>(viewer->getMouseDevice());
-        mouseControl->setSceneManager(sceneManager);
-        viewer->addControl(mouseControl);
-
-        keyControl = std::make_shared<KeyboardSceneControl>(viewer->getKeyboardDevice());
-        keyControl->setSceneManager(sceneManager);
-        keyControl->setModuleDriver(driver);
-        viewer->addControl(keyControl);
-
-        driver->requestStatus(ModuleDriverRunning);
-    }
-
-    std::shared_ptr<Scene>                scene;
-    std::shared_ptr<VTKViewer>            viewer;
-    std::shared_ptr<SceneManager>         sceneManager;
-    std::shared_ptr<SimulationManager>    driver;
-    std::shared_ptr<MouseSceneControl>    mouseControl;
-    std::shared_ptr<KeyboardSceneControl> keyControl;
-};
-
-TEST_F(RenderTest, plain_mesh)
-{
-    auto sceneObj = createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/textured_organs/heart.obj", "Heart");
+    auto sceneObj = createAndAddMeshSceneObject(scene, iMSTK_DATA_ROOT "/textured_organs/heart.obj", "Heart");
 
     ASSERT_TRUE(sceneObj != nullptr) << "ERROR: Unable to create scene object";
 
     run_for(driver.get(), 2);
 }
 
-TEST_F(RenderTest, mesh_material)
+TEST_F(MeshRenderTest, meshMaterial)
 {
-    auto sceneObj = createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/textured_organs/heart.obj", "Heart");
+    auto sceneObj = createAndAddMeshSceneObject(scene, iMSTK_DATA_ROOT "/textured_organs/heart.obj", "Heart");
 
     std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
@@ -155,7 +99,7 @@ TEST_F(RenderTest, mesh_material)
     run_for(driver.get(), 2);
 }
 
-TEST_F(RenderTest, material_color_function_vertices)
+TEST_F(MeshRenderTest, materialColorFunctionVertices)
 {
     imstk::VecDataArray<double, 3> points;
     auto                           scalars = std::make_shared<imstk::DataArray<float>>();
@@ -218,7 +162,7 @@ TEST_F(RenderTest, material_color_function_vertices)
     run_for(driver.get(), 2);
 }
 
-TEST_F(RenderTest, material_color_function_cells)
+TEST_F(MeshRenderTest, materialColorFunctionCells)
 {
     imstk::VecDataArray<double, 3> points;
     auto                           scalars = std::make_shared<imstk::DataArray<float>>();
@@ -277,7 +221,7 @@ TEST_F(RenderTest, material_color_function_cells)
     run_for(driver.get(), 2);
 }
 
-TEST_F(RenderTest, material_color_function_dynamic_vertices)
+TEST_F(MeshRenderTest, materialColorFunctionDynamicVertices)
 {
     auto mesh    = std::make_shared<imstk::SurfaceMesh>();
     auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
@@ -332,7 +276,7 @@ TEST_F(RenderTest, material_color_function_dynamic_vertices)
     run_for(driver.get(), 2);
 }
 
-TEST_F(RenderTest, material_color_function_dynamic_cells)
+TEST_F(MeshRenderTest, materialColorFunctionDynamicCells)
 {
     auto mesh    = std::make_shared<imstk::SurfaceMesh>();
     auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
