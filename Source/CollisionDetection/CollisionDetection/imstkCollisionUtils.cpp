@@ -240,29 +240,6 @@ closestPointOnTriangle(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec
     return a + ab * v + ac * w; // = u*a + v*b + w*c, u = va * denom = 1.0f-v-w
 }
 
-void
-closestPointOnTriangleLine(
-    const Vec3d& a, const Vec3d& b, const Vec3d& c,
-    const Vec3d& p, const Vec3d& q,
-    Vec3d& triangleClosestPt, Vec3d& lineClosestPt)
-{
-    // First compute plane point intersection point
-    const Vec3d triangleN = (b - a).cross(c - a);
-    Vec3d       iPt;
-    if (testPlaneLine(p, q, a, triangleN, iPt))
-    {
-        // Test if inside the triangle
-        const Vec3d bCoords = baryCentric(a, b, c, iPt);
-        if (bCoords[0] >= 0.0 && bCoords[1] >= 0.0 && bCoords[2] >= 0.0)
-        {
-            // If we are inside the triangle return that point
-            lineClosestPt = triangleClosestPt = iPt;
-            return;
-        }
-    }
-    // triangle and line are parallel
-}
-
 int
 triangleToTriangle(
     const Vec3i& tri_a, const Vec3i& tri_b,

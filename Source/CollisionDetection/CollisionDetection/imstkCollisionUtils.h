@@ -693,14 +693,6 @@ testSegmentTriangle(
 Vec3d closestPointOnTriangle(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c, int& caseType);
 
 ///
-/// \brief Returns the closest point pair on the triangle and line
-///
-void closestPointOnTriangleLine(
-    const Vec3d& a, const Vec3d& b, const Vec3d& c,
-    const Vec3d& p, const Vec3d& q,
-    Vec3d& triangleClosestPt, Vec3d& lineClosestPt);
-
-///
 /// \brief Check if sphere and triangle intersect, with point direction contact info
 /// \return true if intersecting, false if not
 ///
