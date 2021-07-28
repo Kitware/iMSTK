@@ -170,6 +170,7 @@
 /*
  * stl
  */
+%include <stdint.i>
 %include <std_vector.i>
 namespace std {
 %template(VectorInt) vector<int>; 

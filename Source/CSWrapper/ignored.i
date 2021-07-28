@@ -34,17 +34,28 @@
 %ignore imstk::CollisionGraph::getInteractionPairMap();
 
 %ignore imstk::FeDeformableObject::getFEMModel();
-
-%ignore imstk::GeometryUtils::coupleVtkDataArray();
-%ignore imstk::GeometryUtils::coupleVtkImageData();
-%ignore imstk::GeometryUtils::copyToVtkDataArray();
-%ignore imstk::GeometryUtils::copyToVtkImageData();
-%ignore imstk::GeometryUtils::copyToImageData();
-%ignore imstk::GeometryUtils::copyToPointSet();
-%ignore imstk::GeometryUtils::copyToSurfaceMesh();
+%ignore imstk::FEMDeformableBodyModel::initializeEigenMatrixFromVegaMatrix;
 
 %ignore imstk::RbdConstraint;
 %ignore imstk::CollisionHandling::getTaskNode();
 
 %ignore imstk::VTKTextStatusManager::getTextActor();
+%ignore imstk::AbstractVTKViewer::getVtkRenderWindow() const;
 
+%ignore imstk::GeometryUtils::coupleVtkDataArray;
+%ignore imstk::GeometryUtils::coupleVtkImageData;
+%ignore imstk::GeometryUtils::copyToVtkDataArray;
+%ignore imstk::GeometryUtils::copyToVtkImageData;
+%ignore imstk::GeometryUtils::copyToPointSet;
+%ignore imstk::GeometryUtils::copyToSurfaceMesh;
+%ignore imstk::GeometryUtils::copyToLineMesh;
+%ignore imstk::GeometryUtils::copyToVolumetricMesh;
+%ignore imstk::GeometryUtils::copyToVtkPointSet;
+%ignore imstk::GeometryUtils::copyToVtkPolyData;
+%ignore imstk::GeometryUtils::copyToVtkUnstructuredGrid;
+%ignore imstk::GeometryUtils::copyToVtkVecDataArray;
+%ignore imstk::GeometryUtils::copyToVtkPoints;
+%ignore imstk::GeometryUtils::copyToVtkCellArray;
+%ignore imstk::GeometryUtils::copyToDataArray;
+%ignore imstk::GeometryUtils::copyToVecDataArray;
+%ignore imstk::GeometryUtils::copyToImageData;
