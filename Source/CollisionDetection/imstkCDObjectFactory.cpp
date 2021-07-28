@@ -37,6 +37,7 @@ limitations under the License.
 #include "imstkSphereToCylinderCD.h"
 #include "imstkSphereToSphereCD.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkSurfaceMeshToCapsuleCD.h"
 #include "imstkSurfaceMeshToSphereCD.h"
 #include "imstkSurfaceMeshToSurfaceMeshCCD.h"
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
@@ -74,6 +75,7 @@ std::unordered_map<std::string, std::function<std::shared_ptr<CollisionDetection
     IMSTK_MAKE_CD_CASE(SphereToSphereCD, Sphere, Sphere),
     //IMSTK_MAKE_CD_CASE(SurfaceMeshToSurfaceMeshCCD, SurfaceMesh, SurfaceMesh),
     IMSTK_MAKE_CD_CASE(SurfaceMeshToSurfaceMeshCD, SurfaceMesh, SurfaceMesh),
+    IMSTK_MAKE_CD_CASE(SurfaceMeshToCapsuleCD, SurfaceMesh, Capsule),
     IMSTK_MAKE_CD_CASE(SurfaceMeshToSphereCD, SurfaceMesh, Sphere),
     IMSTK_MAKE_CD_CASE(TetraToPointSetCD, TetrahedralMesh, PointSet),
     IMSTK_MAKE_CD_CASE(UnidirectionalPlaneToSphereCD, Plane, Sphere)

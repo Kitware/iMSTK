@@ -172,6 +172,37 @@ pointTriangleClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x
 }
 
 Vec3d
+closestPointOnSegment(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, int& caseType)
+{
+    Vec3d  dx = x2 - x1;
+    double m2 = dx.squaredNorm();
+    if (m2 < Real(1e-20))
+    {
+        caseType = 0;
+        return x1;
+    }
+
+    // find parameter value of closest point on segment
+    double s12 = dx.dot(x2 - point) / m2;
+
+    if (s12 < 0)
+    {
+        s12      = 0;
+        caseType = 1;
+    }
+    else if (s12 > 1.0)
+    {
+        s12      = 1.0;
+        caseType = 0;
+    }
+    else
+    {
+        caseType = 2;
+    }
+    return (s12 * x1 + (1.0 - s12) * x2).eval();
+}
+
+Vec3d
 closestPointOnTriangle(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c, int& caseType)
 {
     const Vec3d ab = b - a;

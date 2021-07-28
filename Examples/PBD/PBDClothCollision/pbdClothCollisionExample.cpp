@@ -42,6 +42,7 @@
 #include "imstkSimulationManager.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkSurfaceMeshToCapsuleCD.h"
 #include "imstkSurfaceMeshToSphereCD.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
@@ -342,6 +343,25 @@ main()
                 sphereCD->setInputGeometryB(sphere);
                 pbdInteraction->setCollisionDetection(sphereCD);
                 pbdInteraction->getCollisionHandlingA()->setInputCollisionData(sphereCD->getCollisionData());
+
+                scene->buildTaskGraph();
+                scene->reset();
+            }
+            // Switch to sphere vs surface and reset
+            else if (e->m_key == '6')
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    collisionObj->getVisualModel(i)->hide();
+                }
+                collisionObj->getVisualModel(0)->show();
+                collisionObj->setCollidingGeometry(capsule);
+
+                auto capsuleCD = std::make_shared<SurfaceMeshToCapsuleCD>();
+                capsuleCD->setInputGeometryA(clothObj->getCollidingGeometry());
+                capsuleCD->setInputGeometryB(capsule);
+                pbdInteraction->setCollisionDetection(capsuleCD);
+                pbdInteraction->getCollisionHandlingA()->setInputCollisionData(capsuleCD->getCollisionData());
 
                 scene->buildTaskGraph();
                 scene->reset();
