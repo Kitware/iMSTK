@@ -25,10 +25,17 @@
 
 #include <memory>
 
+#include "imstkCamera.h"
+#include "imstkDirectionalLight.h"
+#include "imstkGeometry.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSceneObject.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -75,6 +82,32 @@ public:
         viewer->addControl(keyControl);
 
         driver->requestStatus(ModuleDriverRunning);
+    }
+
+    void addGeometry(std::shared_ptr<Geometry> geom, Color color)
+    {
+      scene->getActiveCamera()->setPosition(Vec3d(3.0, 5.0, 3.0));
+      auto light = std::make_shared<DirectionalLight>();
+      light->setDirection(Vec3d(5.0, -8.0, -5.0));
+      light->setIntensity(1.0);
+      scene->addLight("light", light);
+
+      geom->scale(0.5, Geometry::TransformType::ConcatenateToTransform);
+      geom->rotate(Vec3d(0.0, 1.0, 0), PI_2, Geometry::TransformType::ConcatenateToTransform);
+      geom->translate(Vec3d(0.0, 0.0, 0.0), Geometry::TransformType::ConcatenateToTransform);
+
+      auto renderMaterial = std::make_shared<RenderMaterial>();
+      renderMaterial->setColor(color);
+      renderMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+      renderMaterial->setPointSize(6.0);
+      renderMaterial->setLineWidth(4.0);
+
+      auto visualModel = std::make_shared<VisualModel>(geom);
+      visualModel->setRenderMaterial(renderMaterial);
+
+      auto sceneObj = std::make_shared<SceneObject>("SceneObject");
+      sceneObj->addVisualModel(visualModel);
+      scene->addSceneObject(sceneObj);
     }
 
     std::shared_ptr<Scene>                scene;

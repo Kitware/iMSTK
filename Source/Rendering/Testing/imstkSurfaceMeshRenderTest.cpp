@@ -21,17 +21,12 @@
 
 #include "imstkSetupRenderTest.h"
 
-#include "imstkCamera.h"
 #include "imstkColorFunction.h"
 #include "imstkEventObject.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
-#include "imstkRenderMaterial.h"
-#include "imstkScene.h"
-#include "imstkSceneObject.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVecDataArray.h"
-#include "imstkVisualModel.h"
 
 class MeshRenderTest : public RenderTest {};
 
