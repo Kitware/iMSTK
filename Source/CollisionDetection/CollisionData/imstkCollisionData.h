@@ -186,30 +186,35 @@ struct CollisionElement
     void operator=(const EmptyElement& element)
     {
         m_element.m_EmptyElement = element;
+        m_type = CollisionElementType::Empty;
     }
 
     CollisionElement(const CellVertexElement& element) : m_element{element}, m_type{CollisionElementType::CellVertex} { }
     void operator=(const CellVertexElement& element)
     {
         m_element.m_CellVertexElement = element;
+        m_type = CollisionElementType::CellVertex;
     }
 
     CollisionElement(const CellIndexElement& element) : m_element{element}, m_type{CollisionElementType::CellIndex} { }
     void operator=(const CellIndexElement& element)
     {
         m_element.m_CellIndexElement = element;
+        m_type = CollisionElementType::CellIndex;
     }
 
     CollisionElement(const PointDirectionElement& element) : m_element{element}, m_type{CollisionElementType::PointDirection} { }
     void operator=(const PointDirectionElement& element)
     {
         m_element.m_PointDirectionElement = element;
+        m_type = CollisionElementType::PointDirection;
     }
 
     CollisionElement(const PointIndexDirectionElement& element) : m_element{element}, m_type{CollisionElementType::PointIndexDirection} { }
     void operator=(const PointIndexDirectionElement& element)
     {
         m_element.m_PointIndexDirectionElement = element;
+        m_type = CollisionElementType::PointIndexDirection;
     }
 
     CollisionElement(const CollisionElement& other)
