@@ -30,7 +30,6 @@ namespace imstk
 ///
 /// \brief SurfaceMesh to Capsule collision detection
 /// Generates vertex-triangle, point-edge, and point-point CD data
-/// By default only generates contact data for the pointset.
 ///
 class SurfaceMeshToCapsuleCD : public CollisionDetectionAlgorithm
 {

@@ -21,11 +21,8 @@
 
 #include "imstkSurfaceMeshToCapsuleCD.h"
 #include "imstkCapsule.h"
-#include "imstkCollisionData.h"
 #include "imstkCollisionUtils.h"
 #include "imstkSurfaceMesh.h"
-
-#include <stdio.h>
 
 namespace imstk
 {
@@ -58,127 +55,126 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
     const VecDataArray<double, 3>&           vertices    = *verticesPtr;
 
     // \todo: Doesn't remove duplicate contacts (shared edges), refer to SurfaceMeshCD for easy method to do so
-    ParallelUtils::parallelFor(indices.size(),
-        [&](const int i)
+    for (int i = 0; i < indices.size(); i++)
+    {
+        const Vec3i& cell = indices[i];
+        const Vec3d& x1   = vertices[cell[0]];
+        const Vec3d& x2   = vertices[cell[1]];
+        const Vec3d& x3   = vertices[cell[2]];
+
+        // Choose the closest point on capsule axis to create a virtual sphere for CD
+        int         unusedCaseType = 0;
+        const Vec3d trianglePointA = CollisionUtils::closestPointOnTriangle(capsulePosA, x1, x2, x3, unusedCaseType);
+        const Vec3d trianglePointB = CollisionUtils::closestPointOnTriangle(capsulePosB, x1, x2, x3, unusedCaseType);
+        const auto  segmentPointA  = CollisionUtils::closestPointOnSegment(trianglePointA, capsulePosA, capsulePosB, unusedCaseType);
+        const auto  segmentPointB  = CollisionUtils::closestPointOnSegment(trianglePointB, capsulePosA, capsulePosB, unusedCaseType);
+        const auto  distanceA      = (segmentPointA - trianglePointA).norm();
+        const auto  distanceB      = (segmentPointB - trianglePointB).norm();
+
+        const double sphereRadius = capsuleRadius;
+        Vec3d        spherePos(0, 0, 0);
+        if (distanceA < distanceB)
         {
-            const Vec3i& cell = indices[i];
-            const Vec3d& x1   = vertices[cell[0]];
-            const Vec3d& x2   = vertices[cell[1]];
-            const Vec3d& x3   = vertices[cell[2]];
+            spherePos = segmentPointA;
+        }
+        else if (distanceA > distanceB)
+        {
+            spherePos = segmentPointB;
+        }
+        else // parallel
+        {
+            spherePos = (segmentPointA + segmentPointB) / 2;
+        }
 
-            // Choose the closest point on capsule axis to create a virtual sphere for CD
-            int unusedCaseType = 0;
-            const Vec3d trianglePointA = CollisionUtils::closestPointOnTriangle(capsulePosA, x1, x2, x3, unusedCaseType);
-            const Vec3d trianglePointB = CollisionUtils::closestPointOnTriangle(capsulePosB, x1, x2, x3, unusedCaseType);
-            const auto segmentPointA   = CollisionUtils::closestPointOnSegment(trianglePointA, capsulePosA, capsulePosB, unusedCaseType);
-            const auto segmentPointB   = CollisionUtils::closestPointOnSegment(trianglePointB, capsulePosA, capsulePosB, unusedCaseType);
-            const auto distanceA       = (segmentPointA - trianglePointA).norm();
-            const auto distanceB       = (segmentPointB - trianglePointB).norm();
+        // This approach does a built in sphere sweep
+        // \todo: Spatial accelerators need to be abstracted
+        const Vec3d centroid = (x1 + x2 + x3) / 3.0;
 
-            const double sphereRadius = capsuleRadius;
-            Vec3d spherePos(0, 0, 0);
-            if (distanceA < distanceB)
+        // Find the maximal point from centroid for radius
+        const double rSqr1 = (centroid - x1).squaredNorm();
+        const double rSqr2 = (centroid - x2).squaredNorm();
+        const double rSqr3 = (centroid - x3).squaredNorm();
+        const double triangleBoundingRadius = std::sqrt(std::max(rSqr1, std::max(rSqr2, rSqr3)));
+
+        const double distSqr = (centroid - spherePos).squaredNorm();
+        const double rSum    = triangleBoundingRadius + sphereRadius;
+        if (distSqr < rSum * rSum)
+        {
+            Vec3d triangleContactPt;
+            Vec2i edgeContact;
+            int   pointContact;
+            int   caseType = CollisionUtils::testSphereToTriangle(
+                spherePos, sphereRadius,
+                cell, x1, x2, x3,
+                triangleContactPt,
+                edgeContact, pointContact);
+            if (caseType == 1) // Edge vs point on sphere
             {
-                spherePos = segmentPointA;
+                // Edge contact
+                CellIndexElement elemA;
+                elemA.ids[0]   = edgeContact[0];
+                elemA.ids[1]   = edgeContact[1];
+                elemA.idCount  = 2;
+                elemA.cellType = IMSTK_EDGE;
+
+                Vec3d        contactNormal = (spherePos - triangleContactPt);
+                const double dist = contactNormal.norm();
+                const double penetrationDepth = sphereRadius - dist;
+                contactNormal /= dist;
+
+                PointDirectionElement elemB;
+                elemB.dir = contactNormal;                            // Direction to resolve sphere
+                elemB.pt  = spherePos - sphereRadius * contactNormal; // Contact point on sphere
+                elemB.penetrationDepth = penetrationDepth;
+
+                elementsA.unsafeAppend(elemA);
+                elementsB.unsafeAppend(elemB);
             }
-            else if (distanceA > distanceB)
+            else if (caseType == 2) // Triangle vs point on sphere
             {
-                spherePos = segmentPointB;
+                // Face contact
+                CellIndexElement elemA;
+                elemA.ids[0]   = cell[0];
+                elemA.ids[1]   = cell[1];
+                elemA.ids[2]   = cell[2];
+                elemA.idCount  = 3;
+                elemA.cellType = IMSTK_TRIANGLE;
+
+                Vec3d        contactNormal = (spherePos - triangleContactPt);
+                const double dist = contactNormal.norm();
+                const double penetrationDepth = sphereRadius - dist;
+                contactNormal /= dist;
+
+                PointDirectionElement elemB;
+                elemB.dir = contactNormal;                            // Direction to resolve sphere
+                elemB.pt  = spherePos - sphereRadius * contactNormal; // Contact point on sphere
+                elemB.penetrationDepth = penetrationDepth;
+
+                elementsA.unsafeAppend(elemA);
+                elementsB.unsafeAppend(elemB);
             }
-            else // parallel
+            else if (caseType == 3)
             {
-                spherePos = (segmentPointA + segmentPointB) / 2;
+                Vec3d        contactNormal = (spherePos - triangleContactPt);
+                const double dist = contactNormal.norm();
+                const double penetrationDepth = sphereRadius - dist;
+                contactNormal /= dist;
+
+                // Point contact
+                PointIndexDirectionElement elemA;
+                elemA.ptIndex = pointContact;
+                elemA.dir     = -contactNormal; // Direction to resolve point
+                elemA.penetrationDepth = penetrationDepth;
+
+                PointDirectionElement elemB;
+                elemB.pt  = triangleContactPt; // Point on sphere
+                elemB.dir = contactNormal;     // Direction to resolve point
+                elemB.penetrationDepth = penetrationDepth;
+
+                elementsA.unsafeAppend(elemA);
+                elementsB.unsafeAppend(elemB);
             }
-
-            // This approach does a built in sphere sweep
-            // \todo: Spatial accelerators need to be abstracted
-            const Vec3d centroid = (x1 + x2 + x3) / 3.0;
-
-            // Find the maximal point from centroid for radius
-            const double rSqr1 = (centroid - x1).squaredNorm();
-            const double rSqr2 = (centroid - x2).squaredNorm();
-            const double rSqr3 = (centroid - x3).squaredNorm();
-            const double triangleBoundingRadius = std::sqrt(std::max(rSqr1, std::max(rSqr2, rSqr3)));
-
-            const double distSqr = (centroid - spherePos).squaredNorm();
-            const double rSum    = triangleBoundingRadius + sphereRadius;
-            if (distSqr < rSum * rSum)
-            {
-                Vec3d triangleContactPt;
-                Vec2i edgeContact;
-                int pointContact;
-                int caseType = CollisionUtils::testSphereToTriangle(
-                    spherePos, sphereRadius,
-                    cell, x1, x2, x3,
-                    triangleContactPt,
-                    edgeContact, pointContact);
-                if (caseType == 1) // Edge vs point on sphere
-                {
-                                   // Edge contact
-                    CellIndexElement elemA;
-                    elemA.ids[0]   = edgeContact[0];
-                    elemA.ids[1]   = edgeContact[1];
-                    elemA.idCount  = 2;
-                    elemA.cellType = IMSTK_EDGE;
-
-                    Vec3d contactNormal = (spherePos - triangleContactPt);
-                    const double dist   = contactNormal.norm();
-                    const double penetrationDepth = sphereRadius - dist;
-                    contactNormal /= dist;
-
-                    PointDirectionElement elemB;
-                    elemB.dir = contactNormal;                            // Direction to resolve sphere
-                    elemB.pt  = spherePos - sphereRadius * contactNormal; // Contact point on sphere
-                    elemB.penetrationDepth = penetrationDepth;
-
-                    elementsA.safeAppend(elemA);
-                    elementsB.safeAppend(elemB);
-                }
-                else if (caseType == 2) // Triangle vs point on sphere
-                {
-                                        // Face contact
-                    CellIndexElement elemA;
-                    elemA.ids[0]   = cell[0];
-                    elemA.ids[1]   = cell[1];
-                    elemA.ids[2]   = cell[2];
-                    elemA.idCount  = 3;
-                    elemA.cellType = IMSTK_TRIANGLE;
-
-                    Vec3d contactNormal = (spherePos - triangleContactPt);
-                    const double dist   = contactNormal.norm();
-                    const double penetrationDepth = sphereRadius - dist;
-                    contactNormal /= dist;
-
-                    PointDirectionElement elemB;
-                    elemB.dir = contactNormal;                            // Direction to resolve sphere
-                    elemB.pt  = spherePos - sphereRadius * contactNormal; // Contact point on sphere
-                    elemB.penetrationDepth = penetrationDepth;
-
-                    elementsA.safeAppend(elemA);
-                    elementsB.safeAppend(elemB);
-                }
-                else if (caseType == 3)
-                {
-                    Vec3d contactNormal = (spherePos - triangleContactPt);
-                    const double dist   = contactNormal.norm();
-                    const double penetrationDepth = sphereRadius - dist;
-                    contactNormal /= dist;
-
-                    // Point contact
-                    PointIndexDirectionElement elemA;
-                    elemA.ptIndex = pointContact;
-                    elemA.dir     = -contactNormal; // Direction to resolve point
-                    elemA.penetrationDepth = penetrationDepth;
-
-                    PointDirectionElement elemB;
-                    elemB.pt  = triangleContactPt; // Point on sphere
-                    elemB.dir = contactNormal;     // Direction to resolve point
-                    elemB.penetrationDepth = penetrationDepth;
-
-                    elementsA.safeAppend(elemA);
-                    elementsB.safeAppend(elemB);
-                }
-            }
-        }, vertices.size() > 1000);
+        }
+    }
 }
 }

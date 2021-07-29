@@ -117,13 +117,14 @@ makeClothObj(const std::string& name,
 
     // Setup the Parameters
     imstkNew<PBDModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1000.0);
-    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 10.0);
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 4000.0);
+    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 100.0);
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
     pbdParams->m_uniformMassValue = width * height / ((double)nRows * (double)nCols);
-    pbdParams->m_gravity    = Vec3d(0.0, -20.0, 0.0);
+    pbdParams->m_gravity    = Vec3d(0.0, -140.0, 0.0);
     pbdParams->m_dt         = 0.01;
-    pbdParams->m_iterations = 4;
+    pbdParams->m_iterations = 5;
+    pbdParams->m_viscousDampingCoeff = 0.01;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
@@ -202,7 +203,7 @@ main()
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 31, 31);
+    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 15, 15);
     scene->addSceneObject(clothObj);
 
     // Create and add virtual coupling object controller in the scene
@@ -211,8 +212,8 @@ main()
     scene->addController(controller);
 
     // Add collision for both jaws of the tool
-    auto upperJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objUpperJaw, "PointSetToCapsuleCD");
-    auto lowerJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objLowerJaw, "PointSetToCapsuleCD");
+    auto upperJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objUpperJaw, "SurfaceMeshToCapsuleCD");
+    auto lowerJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objLowerJaw, "SurfaceMeshToCapsuleCD");
     scene->getCollisionGraph()->addInteraction(upperJawCollision);
     scene->getCollisionGraph()->addInteraction(lowerJawCollision);
 
@@ -248,7 +249,7 @@ main()
         driver->addModule(server);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(0.008);
+        driver->setDesiredDt(0.005);
 
         // Add mouse and keyboard controls to the viewer
         {
