@@ -1,7 +1,11 @@
 %inline %{
+/* template <typename Base, typename Derived> */
+/* Derived* type_cast(Base* base) { */
+/*     return dynamic_cast<Derived*>(base); */
+/* } */
 template <typename Base, typename Derived>
-Derived* type_cast(Base* base) {
-    return dynamic_cast<Derived*>(base);
+std::shared_ptr<Derived> type_cast(std::shared_ptr<Base> base) {
+    return std::dynamic_pointer_cast<Derived>(base);
 }
 %}
 
@@ -9,10 +13,15 @@ Derived* type_cast(Base* base) {
 %template(castToVecDataArray3uc) type_cast<imstk::AbstractDataArray, imstk::VecDataArray<unsigned char, 3>>;
 
 %template(castToPointSet) type_cast<imstk::Geometry, imstk::PointSet>;
+%template(castToLineMesh) type_cast<imstk::Geometry, imstk::LineMesh>;
 %template(castToLineMesh) type_cast<imstk::PointSet, imstk::LineMesh>;
+%template(castToSurfaceMesh) type_cast<imstk::Geometry, imstk::SurfaceMesh>;
 %template(castToSurfaceMesh) type_cast<imstk::PointSet, imstk::SurfaceMesh>;
+%template(castToTetrahedralMesh) type_cast<imstk::Geometry, imstk::TetrahedralMesh>;
 %template(castToTetrahedralMesh) type_cast<imstk::PointSet, imstk::TetrahedralMesh>;
+%template(castToHexahedral) type_cast<imstk::Geometry, imstk::HexahedralMesh>;
 %template(castToHexahedral) type_cast<imstk::PointSet, imstk::HexahedralMesh>;
+%template(castToImageData) type_cast<imstk::Geometry, imstk::ImageData>;
 %template(castToImageData) type_cast<imstk::PointSet, imstk::ImageData>;
 
 %pragma(csharp) modulecode=%{
@@ -29,15 +38,3 @@ Derived* type_cast(Base* base) {
       );
   }
 %}
-
-
-/* %define %dynamic_cast(Base, Derived) */
-/*  */
-/*     %typemap(out) Base * { */
-/*         Derived* downcast = std::dynamic_cast<Derived *>($1); */
-/*         *(Derived **)&$result = downcast; */
-/*     } */
-/* %typemape(csout) Base * { */
-/*     return new Derived() */
-/* } */
-/* %enddef */
