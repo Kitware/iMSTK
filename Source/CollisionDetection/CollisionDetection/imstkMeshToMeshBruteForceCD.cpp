@@ -26,6 +26,79 @@
 #include "imstkSurfaceMesh.h"
 
 #include <stdint.h>
+#include <unordered_set>
+
+namespace imstk
+{
+///
+/// \brief Hash together a pair of edges
+///
+struct EdgePair
+{
+    EdgePair(uint32_t a1, uint32_t a2, uint32_t b1, uint32_t b2)
+    {
+        edgeA[0] = a1;
+        edgeA[1] = a2;
+        edgeB[0] = b1;
+        edgeB[1] = b2;
+
+        edgeAId = getIdA();
+        edgeBId = getIdB();
+    }
+
+    ///
+    /// \brief Reversible edges are equivalent, reversible vertices in the edges are equivalent as well
+    /// EdgePair(0,1,5,2)==EdgePair(1,0,5,2)==EdgePair(1,0,2,5)==...
+    ///
+    bool operator==(const EdgePair& other) const
+    {
+        return (edgeAId == other.edgeAId && edgeBId == other.edgeBId)
+               || (edgeAId == other.edgeBId && edgeBId == other.edgeAId);
+    }
+
+    // These functions return a unique int for an edge, order doesn't matter
+    // ie: f(vertexId1, vertexId2)=f(vertexId2, vertexId1)
+    const uint32_t getIdA() const
+    {
+        const uint32_t max = std::max(edgeA[0], edgeA[1]);
+        const uint32_t min = std::min(edgeA[0], edgeA[1]);
+        return max * (max + 1) / 2 + min;
+    }
+
+    const uint32_t getIdB() const
+    {
+        const uint32_t max = std::max(edgeB[0], edgeB[1]);
+        const uint32_t min = std::min(edgeB[0], edgeB[1]);
+        return max * (max + 1) / 2 + min;
+    }
+
+    uint32_t edgeA[2];
+    uint32_t edgeAId;
+    uint32_t edgeB[2];
+    uint32_t edgeBId;
+};
+}
+
+namespace std
+{
+template<>
+struct hash<imstk::EdgePair>
+{
+    // EdgePair has 4 uints to hash, they bound the same range, 0 to max vertices of a mesh
+    // A complete unique hash split into 4, would limit us to 256 max vertices so we will have
+    // collisions but they will be unlikely given small portions of the mesh are in contact at
+    // any one time
+    std::size_t operator()(const imstk::EdgePair& k) const
+    {
+        // Shift by 8 each time, there will be overlap every 256 ints
+        //return ((k.edgeA[0] ^ (k.edgeA[1] << 8)) ^ (k.edgeB[0] << 16)) ^ (k.edgeB[1] << 24);
+
+        // The edge ids are more compact since f(1,0)=f(0,1) there are fewer permutations,
+        // This should allow up to ~360 max vertices..., not that much better
+        return (k.edgeAId ^ (k.edgeBId << 16));
+    }
+};
+}
 
 namespace imstk
 {
@@ -464,6 +537,8 @@ MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
     std::shared_ptr<VecDataArray<int, 3>>    meshACellsPtr    = surfMeshA->getTriangleIndices();
     VecDataArray<int, 3>&                    meshACells       = *meshACellsPtr;
 
+    std::unordered_set<EdgePair> hashedEdges;
+
     const int triEdgePattern[3][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 } };
     if (m_generateEdgeEdgeContacts)
     {
@@ -524,20 +599,30 @@ MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
 
                     if (closestTriId != -1)
                     {
-                        CellIndexElement elemA;
-                        elemA.ids[0]   = edgeA[0];
-                        elemA.ids[1]   = edgeA[1];
-                        elemA.idCount  = 2;
-                        elemA.cellType = IMSTK_EDGE;
+                        // Before inserting check if it already exists
+                        EdgePair edgePair(
+                            edgeA[0], edgeA[1],
+                            surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][0]],
+                            surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][1]]);
+                        if (hashedEdges.count(edgePair) == 0)
+                        {
+                            CellIndexElement elemA;
+                            elemA.ids[0]   = edgeA[0];
+                            elemA.ids[1]   = edgeA[1];
+                            elemA.idCount  = 2;
+                            elemA.cellType = IMSTK_EDGE;
 
-                        CellIndexElement elemB;
-                        elemB.ids[0]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][0]];
-                        elemB.ids[1]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][1]];
-                        elemB.idCount  = 2;
-                        elemB.cellType = IMSTK_EDGE;
+                            CellIndexElement elemB;
+                            elemB.ids[0]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][0]];
+                            elemB.ids[1]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][1]];
+                            elemB.idCount  = 2;
+                            elemB.cellType = IMSTK_EDGE;
 
-                        elementsA.safeAppend(elemA);
-                        elementsB.safeAppend(elemB);
+                            elementsA.safeAppend(elemA);
+                            elementsB.safeAppend(elemB);
+
+                            hashedEdges.insert(edgePair);
+                        }
                     }
                 }
             }
