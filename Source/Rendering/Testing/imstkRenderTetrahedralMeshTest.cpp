@@ -19,18 +19,16 @@
 
 =========================================================================*/
 
-#include "imstkSetupRenderTest.h"
+#include "imstkRenderTest.h"
 
 #include "imstkTetrahedralMesh.h"
 #include "imstkVecDataArray.h"
 
-class TetrahedralMeshRenderTest : public RenderTest { };
-
-TEST_F(TetrahedralMeshRenderTest, createTetrahedralMesh)
+class TetrahedralMeshRenderTest : public RenderTest
 {
-    ASSERT_TRUE(scene != nullptr) << "ERROR: Unable to create scene object";
-
-    auto geom = std::make_shared<TetrahedralMesh>();
+  void createGeometry() override
+  {
+    geom = std::make_shared<TetrahedralMesh>();
 
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
     auto indicesPtr = std::make_shared<VecDataArray<int, 4>>(1);
@@ -38,16 +36,17 @@ TEST_F(TetrahedralMeshRenderTest, createTetrahedralMesh)
     VecDataArray<double, 3>& vertices = *verticesPtr;
     VecDataArray<int, 4>& indices = *indicesPtr;
 
-    vertices[0] = Vec3d(0.5, 0.5, -0.5);
-    vertices[1] = Vec3d(0.5, -0.5, -0.5);
-    vertices[2] = Vec3d(-0.5, -0.5, -0.5);
-    vertices[3] = Vec3d(0.5, -0.5, 0.5);
+    vertices[0] = Vec3d(-0.5, 0.0, -0.5);
+    vertices[1] = Vec3d(0.5, 0.0, -0.5);
+    vertices[2] = Vec3d(0.0, 0.0, 0.75);
+    vertices[3] = Vec3d(0.0, 0.5, 0.0);
 
     indices[0] = Vec4i(0, 1, 2, 3);
 
-    geom->initialize(verticesPtr, indicesPtr);
-
-    addGeometry(geom, Color::Blood);
-
-    run_for(driver.get(), 2);
+    std::dynamic_pointer_cast<TetrahedralMesh>(geom)->initialize(verticesPtr, indicesPtr);
+  }
+};
+TEST_F(TetrahedralMeshRenderTest, createTetrahedralMesh)
+{
+  runAllMaterials();
 }
