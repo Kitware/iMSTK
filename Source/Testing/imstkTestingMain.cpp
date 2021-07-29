@@ -28,7 +28,7 @@
 int
 main(int argc, char** argv)
 {
-    bool removeLog = true;
+    bool removeLog = false;
     for (int i = 0; i < argc; ++i)
     {
         if (std::string(argv[i]) == "--imstk_keep_log")
