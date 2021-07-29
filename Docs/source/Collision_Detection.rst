@@ -496,6 +496,28 @@ TetraToPointSetCD
 
 * This CD, at the moment, uses a built in spatial hashing for intersection tests.
 
+SurfaceMeshToCapsuleCD
+--------------------------------
+
+* Static Collision Method
+
+**Method**
+
+* Works just like SurfaceMeshToSphereCD but computes the nearest point on the axes of the capsule to the triangle and creates a "virtual sphere" to then do CD with.
+
+.. image:: media/Collision_Detection/capsuleToTriangle.png
+    :width: 300
+    :alt: Alternative text
+    :align: center
+
+* It does this by first computing the nearest points on the triangle to the two vertices of the segment (purple dotted lines). Then computing the nearest point on the segment to the nearest point on the triangle (orange dotted line). Choosing the closest gives us the closest point on edge to triangle. If this point is within the bounds of the capsule height we can treat CD as sphere-triangle at that point with the capsule's radius.
+
+**Additional Notes**
+
+* Completely embedded triangles aren't handle well.
+* Only one PointDirection contact is currently generated at the center of the triangle edge, when that edge is parallel with the capsule.
+
+
 References & Resources
 --------------------------------
 
