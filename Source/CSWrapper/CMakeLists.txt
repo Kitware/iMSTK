@@ -22,7 +22,6 @@ target_compile_options(iMSTKCWrapper PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:
         -W4 -MP -wd4505 /bigobj>)
 
-
 #-----------------------------------------------------------------------------
 # Install library
 #-----------------------------------------------------------------------------
@@ -30,6 +29,10 @@ install( TARGETS iMSTKCWrapper EXPORT ${PROJECT_NAME}Targets
     RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
     LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
     ARCHIVE DESTINATION lib COMPONENT Development)
+
+if (LINUX)
+    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink iMSTKCWrapper.so ${CMAKE_INSTALL_PREFIX}/lib/libiMSTKCWrapper.so)")
+endif()
 
 # Install all ".cs" files
 install(
