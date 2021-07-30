@@ -186,16 +186,32 @@ namespace std {
 %template(ModuleDriverWeakPtr) std::weak_ptr<imstk::ModuleDriver>;
 %template(SimulationManagerWeakPtr) std::weak_ptr<imstk::SimulationManager>;
 
+#ifdef SWIG_PINNED_ARRAY
+  %csmethodmodifiers imstk::VecDataArray::setValues "public unsafe";
+  %csmethodmodifiers imstk::VecDataArray::getValues "public unsafe";
+#endif
+
 %include "cpointer.i"
 %include "arrays_csharp.i"
-%apply unsigned char INPUT[] {const unsigned char* val}
-%apply int INPUT[] {const int* val}
-%apply float INPUT[] {const float * val}
-%apply double INPUT[] {const double* val}
-%apply unsigned char OUTPUT[] {unsigned char* val}
-%apply int OUTPUT[] {int* val}
-%apply float OUTPUT[] {float * val}
-%apply double OUTPUT[] {double* val}
+#ifdef SWIG_PINNED_ARRAY
+  %apply unsigned char FIXED[] {unsigned char* val}
+  %apply unsigned char FIXED[] {const unsigned char* val}
+  %apply int FIXED[] {int* val}
+  %apply int FIXED[] {const int* val}
+  %apply float FIXED[] {float * val}
+  %apply float FIXED[] {const float * val}
+  %apply double FIXED[] {double* val}
+  %apply double FIXED[] {const double* val}
+#else
+  %apply unsigned char INPUT[] {const unsigned char* val}
+  %apply unsigned char OUTPUT[] {unsigned char* val}
+  %apply int INPUT[] {const int* val}
+  %apply int OUTPUT[] {int* val}
+  %apply float INPUT[] {const float * val}
+  %apply float OUTPUT[] {float * val}
+  %apply double INPUT[] {const double* val}
+  %apply double OUTPUT[] {double* val}
+#endif
 %include "ignored.i"
 %include "modifiers.i"
 %include "type_cast.i"

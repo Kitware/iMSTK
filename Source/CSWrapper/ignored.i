@@ -17,6 +17,7 @@
 %ignore imstk::VecDataArray::cbegin() const; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::end(); /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::cend() const; /* fix the multiple-definition problem. */
+%ignore imstk::VecDataArray::setData();
 %ignore imstk::stdSink;
 %ignore imstk::LogManager;
 %ignore imstk::Logger::Logger();

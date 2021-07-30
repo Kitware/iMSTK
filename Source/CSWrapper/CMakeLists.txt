@@ -10,6 +10,9 @@ swig_add_library(iMSTKCWrapper
     SOURCES imstkCWrapper.i)
 
 set_target_properties(iMSTKCWrapper PROPERTIES SWIG_COMPILE_OPTIONS "-namespace;imstk")
+if(iMSTK_SWIG_PINNED_ARRAY)
+    set_target_properties(iMSTKCWrapper PROPERTIES SWIG_COMPILE_DEFINITIONS "SWIG_PINNED_ARRAY")
+endif()
 if(iMSTK_USE_OpenHaptics)
     set_target_properties(iMSTKCWrapper PROPERTIES SWIG_COMPILE_DEFINITIONS "iMSTK_USE_OpenHaptics")
 	target_compile_definitions(iMSTKCWrapper PRIVATE iMSTK_USE_OpenHaptics)

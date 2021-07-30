@@ -67,14 +67,15 @@ endif()
 
 # SWIG 
 option(${PROJECT_NAME}_WRAP_CSHARP "Build iMSTK-C# wrapper code and lib" OFF)
+option(${PROJECT_NAME}_SWIG_PINNED_ARRAY "Managed C# arrays using pinning" ON)
+mark_as_advanced(${PROJECT_NAME}_SWIG_PINNED_ARRAY)
 if (${PROJECT_NAME}_WRAP_CSHARP)
   find_package(SWIG REQUIRED)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-  set(CMAKE_SWIG_FLAGS "")
-  set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/newton_out)
+  set(cmAKE_SWIG_FLAGS "")
 endif()
 
 # CUDA
