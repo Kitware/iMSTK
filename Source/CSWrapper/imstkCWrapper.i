@@ -171,87 +171,23 @@
  * stl
  */
 %include <stdint.i>
+%include <std_string.i>
 %include <std_vector.i>
 namespace std {
-%template(VectorInt) vector<int>; 
-%template(VectorSizet) vector<std::size_t>; 
+  %template(VectorInt) vector<int>; 
+  %template(VectorSizet) vector<std::size_t>; 
 }
-%include <std_string.i>
 
 %include "shared_ptr_instantiation.i"
-
-// Instantiation of std::weak_ptr
-%import "weak_ptr.i"
-%template(SceneManagerWeakPtr) std::weak_ptr<imstk::SceneManager>;
-%template(ModuleDriverWeakPtr) std::weak_ptr<imstk::ModuleDriver>;
-%template(SimulationManagerWeakPtr) std::weak_ptr<imstk::SimulationManager>;
-
-#ifdef SWIG_PINNED_ARRAY
-  %csmethodmodifiers imstk::VecDataArray::setValues "public unsafe";
-  %csmethodmodifiers imstk::VecDataArray::getValues "public unsafe";
-#endif
-
-%include "cpointer.i"
-%include "arrays_csharp.i"
-#ifdef SWIG_PINNED_ARRAY
-  %apply unsigned char FIXED[] {unsigned char* val}
-  %apply unsigned char FIXED[] {const unsigned char* val}
-  %apply int FIXED[] {int* val}
-  %apply int FIXED[] {const int* val}
-  %apply float FIXED[] {float * val}
-  %apply float FIXED[] {const float * val}
-  %apply double FIXED[] {double* val}
-  %apply double FIXED[] {const double* val}
-#else
-  %apply unsigned char INPUT[] {const unsigned char* val}
-  %apply unsigned char OUTPUT[] {unsigned char* val}
-  %apply int INPUT[] {const int* val}
-  %apply int OUTPUT[] {int* val}
-  %apply float INPUT[] {const float * val}
-  %apply float OUTPUT[] {float * val}
-  %apply double INPUT[] {const double* val}
-  %apply double OUTPUT[] {double* val}
-#endif
+%include "weak_ptr.i"
 %include "ignored.i"
 %include "modifiers.i"
 %include "type_cast.i"
 %include "std_function.i"
-%std_function(EventFunc, void, imstk::Event*)
-%std_function(ReceiverFunc, void, imstk::KeyEvent*)
-
-%callback("%s_cb");
-/* std::string imstk::KeyboardDeviceClient::keyPress(); */
-std::string KeyboardDeviceClient_getKeyPress();
-std::string Module_getPostUpdate();
-std::string Module_getPreUpdate();
-std::string SceneManager_getPreUpdate();
-std::string SceneManager_getPostUpdate();
-%nocallback;
+%include "callback.i"
 
 %rename(compute) imstk::ImplicitFunctionGradient::operator();
 %rename(compute) imstk::ImplicitFunctionCentralGradient::operator();
-
-/* namespace imstk { */
-/* %inline %{ */
-%{
-std::string KeyboardDeviceClient_getKeyPress() {
-  return imstk::KeyboardDeviceClient::keyPress();
-}
-
-std::string Module_getPostUpdate() {
-  return imstk::Module::postUpdate();
-}
-std::string Module_getPreUpdate() {
-  return imstk::Module::preUpdate();
-}
-std::string SceneManager_getPostUpdate() {
-  return imstk::SceneManager::postUpdate();
-}
-std::string SceneManager_getPreUpdate() {
-  return imstk::SceneManager::preUpdate();
-}
-%}
-/* } */
 
 /*
  * * * * * * * * * * * * * * * *

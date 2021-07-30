@@ -23,3 +23,6 @@ public:
 } /* end of namespace std */
 
 
+%template(SceneManagerWeakPtr) std::weak_ptr<imstk::SceneManager>;
+%template(ModuleDriverWeakPtr) std::weak_ptr<imstk::ModuleDriver>;
+%template(SimulationManagerWeakPtr) std::weak_ptr<imstk::SimulationManager>;

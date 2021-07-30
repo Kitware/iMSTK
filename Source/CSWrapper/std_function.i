@@ -105,3 +105,6 @@ namespace std {
 }
 
 %enddef
+
+%std_function(EventFunc, void, imstk::Event*)
+%std_function(ReceiverFunc, void, imstk::KeyEvent*)

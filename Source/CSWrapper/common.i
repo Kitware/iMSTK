@@ -1,3 +1,31 @@
+%include <cpointer.i>
+%include <arrays_csharp.i>
+
+#ifdef SWIG_PINNED_ARRAY
+  %csmethodmodifiers imstk::VecDataArray::setValues "public unsafe";
+  %csmethodmodifiers imstk::VecDataArray::getValues "public unsafe";
+#endif
+
+#ifdef SWIG_PINNED_ARRAY
+  %apply unsigned char FIXED[] {unsigned char* val}
+  %apply unsigned char FIXED[] {const unsigned char* val}
+  %apply int FIXED[] {int* val}
+  %apply int FIXED[] {const int* val}
+  %apply float FIXED[] {float * val}
+  %apply float FIXED[] {const float * val}
+  %apply double FIXED[] {double* val}
+  %apply double FIXED[] {const double* val}
+#else
+  %apply unsigned char INPUT[] {const unsigned char* val}
+  %apply unsigned char OUTPUT[] {unsigned char* val}
+  %apply int INPUT[] {const int* val}
+  %apply int OUTPUT[] {int* val}
+  %apply float INPUT[] {const float * val}
+  %apply float OUTPUT[] {float * val}
+  %apply double INPUT[] {const double* val}
+  %apply double OUTPUT[] {double* val}
+#endif
+
 /*
  * TODO: use %define to simplify the process of wrapping Eigen types.
  */
@@ -151,7 +179,7 @@ private:
 };
 
 template<typename T, int N>
-Vec<T, N> vec_add(const Vec<T, N> u, const Vec<T, N> v) 
+Vec<T, N> vec_add(const Vec<T, N>& u, const Vec<T, N>& v) 
 {
     Vec<T, N> ret(u);
     for (int i=0; i<N; ++i)
@@ -162,7 +190,7 @@ Vec<T, N> vec_add(const Vec<T, N> u, const Vec<T, N> v)
 }
 
 template<typename T, int N>
-Vec<T, N> vec_subtract(const Vec<T, N> u, const Vec<T, N> v) 
+Vec<T, N> vec_subtract(const Vec<T, N>& u, const Vec<T, N>& v) 
 {
     Vec<T, N> ret(u);
     for (int i=0; i<N; ++i)
@@ -173,7 +201,7 @@ Vec<T, N> vec_subtract(const Vec<T, N> u, const Vec<T, N> v)
 }
 
 template<typename T, int N>
-Vec<T, N> vec_scale(const Vec<T, N> v, const T c) 
+Vec<T, N> vec_scale(const Vec<T, N>& v, const T c) 
 {
     Vec<T, N> ret(v);
     for (int i=0; i<N; ++i)
