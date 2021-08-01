@@ -23,6 +23,7 @@
 
 #include "imstkMath.h"
 #include "imstkTypes.h"
+#include "imstkGeometryUtilities.h"
 
 #include <algorithm>
 #include <array>
@@ -775,9 +776,26 @@ testSphereToTriangle(const Vec3d& spherePt, const double sphereRadius,
     }
 }
 
+inline bool
+testPointInsideTet(const std::array<Vec3d, 4>& inputTetVerts, const Vec3d& p)
+{
+    std::array<double, 4> bCoord;
+    GeometryUtils::computePointBarycentricCoordinates(inputTetVerts, p, bCoord);
+
+    constexpr const double eps = VERY_SMALL_EPSILON;
+    if (bCoord[0] >= -eps
+        && bCoord[1] >= -eps
+        && bCoord[2] >= -eps
+        && bCoord[3] >= -eps)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 ///
 /// \brief Tests if the segment intersects any of the triangle faces of the tet
-/// does not cover line completely inside tet case
 /// \todo: Could be faster with SAT directly applied here
 ///
 inline bool
@@ -793,6 +811,13 @@ testTetToSegment(
             return true;
         }
     }
+
+    // test if both points lie inside the tetrahedron
+    if (testPointInsideTet(inputTetVerts, x1) && testPointInsideTet(inputTetVerts, x2))
+    {
+        return true;
+    }
+
     return false;
 }
 
