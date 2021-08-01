@@ -27,24 +27,30 @@
 
 using namespace imstk;
 
-TEST(imstkTetraToPointSetCDTest, IntersectionTestAB)
+std::shared_ptr<TetrahedralMesh>
+makeUnitTetrahedron_()
 {
     // Create tetrahedron
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
     auto indicesPtr  = std::make_shared<VecDataArray<int, 4>>(1);
 
-    VecDataArray<double, 3>& vertices = *verticesPtr;
-    VecDataArray<int, 4>&    indices  = *indicesPtr;
+    (*verticesPtr)[0] = Vec3d(0.0, 0.0, 0.0);
+    (*verticesPtr)[1] = Vec3d(1.0, 0.0, 0.0);
+    (*verticesPtr)[2] = Vec3d(0.0, 1.0, 0.0);
+    (*verticesPtr)[3] = Vec3d(0.0, 0.0, 1.0);
 
-    vertices[0] = Vec3d(0.0, 0.0, 0.0);
-    vertices[1] = Vec3d(1.0, 0.0, 0.0);
-    vertices[2] = Vec3d(0.0, 1.0, 0.0);
-    vertices[3] = Vec3d(0.0, 0.0, 1.0);
-
-    indices[0] = Vec4i(0, 1, 2, 3);
+    (*indicesPtr)[0] = Vec4i(0, 1, 2, 3);
 
     auto tetMesh = std::make_shared<TetrahedralMesh>();
     tetMesh->initialize(verticesPtr, indicesPtr);
+
+    return tetMesh;
+}
+
+TEST(imstkTetraToPointSetCDTest, IntersectionTestAB)
+{
+    // Create tetrahedron
+    auto tetMesh = makeUnitTetrahedron_();
 
     // Create point set
     auto pointSet = std::make_shared<PointSet>();
@@ -53,14 +59,12 @@ TEST(imstkTetraToPointSetCDTest, IntersectionTestAB)
     double baryCoord[4] = { 0.2, 0.3, 0.1, 0.4 };// All non-negative and should sum to 1
 
     // Create a point inside the tetrahedron from the barycentric coordinates
-    for (int i = 0; i < 4; ++i)
+    for (size_t i = 0; i < 4; ++i)
     {
-        (*verxPtr)[0] += baryCoord[i] * vertices[i];
-                                                                               }
+        (*verxPtr)[0] += baryCoord[i] * tetMesh->getVertexPosition(i);
+    }
 
     pointSet->initialize(verxPtr);
-
-    std::cout << (*verxPtr)[0];
 
     // create collision
     TetraToPointSetCD m_tetraToPointSetCD;
@@ -92,26 +96,12 @@ TEST(imstkTetraToPointSetCDTest, IntersectionTestAB)
 TEST(imstkTetraToPointSetCDTest, NonIntersectionTestAB)
 {
     // Create tetrahedron
-    auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
-    auto indicesPtr  = std::make_shared<VecDataArray<int, 4>>(1);
-
-    VecDataArray<double, 3>& vertices = *verticesPtr;
-    VecDataArray<int, 4>&    indices  = *indicesPtr;
-
-    vertices[0] = Vec3d(0.0, 0.0, 0.0);
-    vertices[1] = Vec3d(1.0, 0.0, 0.0);
-    vertices[2] = Vec3d(0.0, 1.0, 0.0);
-    vertices[3] = Vec3d(0.0, 0.0, 1.0);
-
-    indices[0] = Vec4i(0, 1, 2, 3);
-
-    auto tetMesh = std::make_shared<TetrahedralMesh>();
-    tetMesh->initialize(verticesPtr, indicesPtr);
+    auto tetMesh = makeUnitTetrahedron_();
 
     // Create point set
     auto pointSet = std::make_shared<PointSet>();
     auto verxPtr  = std::make_shared<VecDataArray<double, 3>>(1);
-    (*verxPtr)[0] = Vec3d(1.0, 1.0, 1.0);
+    (*verxPtr)[0] = Vec3d(1.0, 1.0, 1.0);// some point outside
     pointSet->initialize(verxPtr);
 
     // create collision

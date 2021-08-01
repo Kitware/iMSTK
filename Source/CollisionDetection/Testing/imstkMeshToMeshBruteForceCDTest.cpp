@@ -28,16 +28,7 @@
 
 using namespace imstk;
 
-///
-/// \brief TODO
-///
-class imstkMeshToMeshBruteForceCDTest : public ::testing::Test
-{
-protected:
-    MeshToMeshBruteForceCD m_meshToMeshBruteForceCD;
-};
-
-TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_EdgeToEdge)
+TEST(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_EdgeToEdge)
 {
     // Create two cubes
     auto box1 = std::make_shared<OrientedBox>(Vec3d::Zero(), Vec3d(0.5, 0.5, 0.5), Quatd::Identity());
@@ -50,6 +41,7 @@ TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_EdgeToEdge)
     box2Mesh->translate(Vec3d(0.0, 0.8, 0.8));
     box2Mesh->updatePostTransformData();
 
+    MeshToMeshBruteForceCD m_meshToMeshBruteForceCD;
     m_meshToMeshBruteForceCD.setInput(box1Mesh, 0);
     m_meshToMeshBruteForceCD.setInput(box2Mesh, 1);
     m_meshToMeshBruteForceCD.setGenerateCD(true, true); // Generate both A and B
@@ -72,7 +64,7 @@ TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_EdgeToEdge)
     EXPECT_EQ(colData->elementsB[0].m_element.m_CellIndexElement.idCount, 2);
 }
 
-TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToTriangle)
+TEST(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToTriangle)
 {
     // Create triangle on z plane
     auto triMesh = std::make_shared<SurfaceMesh>();
@@ -94,6 +86,7 @@ TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToTriangle)
         vertexMesh->initialize(verticesPtr);
     }
 
+    MeshToMeshBruteForceCD m_meshToMeshBruteForceCD;
     m_meshToMeshBruteForceCD.setInput(triMesh, 0);
     m_meshToMeshBruteForceCD.setInput(vertexMesh, 1);
     m_meshToMeshBruteForceCD.setGenerateCD(true, true); // Generate both A and B
@@ -116,7 +109,7 @@ TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToTriangle)
     EXPECT_EQ(colData->elementsB[0].m_element.m_CellIndexElement.idCount, 1);
 }
 
-TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToVertex)
+TEST(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToVertex)
 {
     // Create triangle on z plane
     auto triMesh = std::make_shared<SurfaceMesh>();
@@ -138,6 +131,7 @@ TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToVertex)
         vertexMesh->initialize(verticesPtr);
     }
 
+    MeshToMeshBruteForceCD m_meshToMeshBruteForceCD;
     m_meshToMeshBruteForceCD.setInput(triMesh, 0);
     m_meshToMeshBruteForceCD.setInput(vertexMesh, 1);
     m_meshToMeshBruteForceCD.setGenerateCD(true, true); // Generate both A and B
@@ -160,7 +154,7 @@ TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToVertex)
     EXPECT_EQ(colData->elementsB[0].m_element.m_CellIndexElement.idCount, 1);
 }
 
-TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToEdge)
+TEST(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToEdge)
 {
     // Create triangle on z plane
     auto triMesh = std::make_shared<SurfaceMesh>();
@@ -182,6 +176,7 @@ TEST_F(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToEdge)
         vertexMesh->initialize(verticesPtr);
     }
 
+    MeshToMeshBruteForceCD m_meshToMeshBruteForceCD;
     m_meshToMeshBruteForceCD.setInput(triMesh, 0);
     m_meshToMeshBruteForceCD.setInput(vertexMesh, 1);
     m_meshToMeshBruteForceCD.setGenerateCD(true, true); // Generate both A and B

@@ -29,11 +29,10 @@ using namespace imstk;
 
 TEST(imstkSphereToCylinderCDTest, IntersectionTestAB)
 {
-    SphereToCylinderCD m_sphereToCylinderCD;
-
     auto sphere   = std::make_shared<Sphere>(Vec3d(0.0, 1.0, 0.0), 0.75);
     auto cylinder = std::make_shared<Cylinder>();
 
+    SphereToCylinderCD m_sphereToCylinderCD;
     m_sphereToCylinderCD.setInput(sphere, 0);
     m_sphereToCylinderCD.setInput(cylinder, 1);
     m_sphereToCylinderCD.setGenerateCD(true, true); // Generate both A and B
@@ -64,11 +63,10 @@ TEST(imstkSphereToCylinderCDTest, IntersectionTestAB)
 
 TEST(imstkSphereToCylinderCDTest, NonIntersectionTestAB)
 {
-    SphereToCylinderCD m_sphereToCylinderCD;
-
     auto sphere   = std::make_shared<Sphere>(Vec3d(0.0, 1.0, 0.0), 0.4);
     auto cylinder = std::make_shared<Cylinder>();
 
+    SphereToCylinderCD m_sphereToCylinderCD;
     m_sphereToCylinderCD.setInput(sphere, 0);
     m_sphereToCylinderCD.setInput(cylinder, 1);
     m_sphereToCylinderCD.setGenerateCD(true, true); // Generate both A and B

@@ -26,23 +26,12 @@
 
 using namespace imstk;
 
-///
-/// \brief TODO
-///
-class imstkSphereToSphereCDTest : public ::testing::Test
-{
-protected:
-    SphereToSphereCD m_sphereToSphereCD;
-};
-
-///
-/// \brief TODO
-///
-TEST_F(imstkSphereToSphereCDTest, IntersectionTestAB)
+TEST(imstkSphereToSphereCDTest, IntersectionTestAB)
 {
     auto sphere1 = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.5);
     auto sphere2 = std::make_shared<Sphere>(Vec3d(0.0, 0.5, 0.0), 0.5);
 
+    SphereToSphereCD m_sphereToSphereCD;
     m_sphereToSphereCD.setInput(sphere1, 0);
     m_sphereToSphereCD.setInput(sphere2, 1);
     m_sphereToSphereCD.setGenerateCD(true, true); // Generate both A and B
@@ -71,14 +60,12 @@ TEST_F(imstkSphereToSphereCDTest, IntersectionTestAB)
     EXPECT_EQ(Vec3d(0.0, 0.0, 0.0), colData->elementsB[0].m_element.m_PointDirectionElement.pt);
 }
 
-///
-/// \brief TODO
-///
-TEST_F(imstkSphereToSphereCDTest, NonIntersectionTestAB)
+TEST(imstkSphereToSphereCDTest, NonIntersectionTestAB)
 {
     auto sphere1 = std::make_shared<Sphere>(Vec3d(-1.0, 0.0, 0.0), 0.5);
     auto sphere2 = std::make_shared<Sphere>(Vec3d(1.0, 0.0, 0.0), 0.5);
 
+    SphereToSphereCD m_sphereToSphereCD;
     m_sphereToSphereCD.setInput(sphere1, 0);
     m_sphereToSphereCD.setInput(sphere2, 1);
     m_sphereToSphereCD.setGenerateCD(true, true); // Generate both A and B
@@ -91,9 +78,6 @@ TEST_F(imstkSphereToSphereCDTest, NonIntersectionTestAB)
     EXPECT_EQ(0, colData->elementsB.getSize());
 }
 
-///
-/// \brief TODO
-///
 int
 imstkSphereToSphereCDTest(int argc, char* argv[])
 {
