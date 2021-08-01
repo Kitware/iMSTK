@@ -27,16 +27,7 @@
 
 using namespace imstk;
 
-///
-/// \brief TODO
-///
-class imstkPointSetToSphereCDTest : public ::testing::Test
-{
-protected:
-    PointSetToSphereCD m_pointSetToSphereCD;
-};
-
-TEST_F(imstkPointSetToSphereCDTest, IntersectionTestAB)
+TEST(imstkPointSetToSphereCDTest, IntersectionTestAB)
 {
     auto sphere      = std::make_shared<Sphere>(Vec3d(0.0, -2.0, 0.0), 2.1);
     auto pointSet    = std::make_shared<PointSet>();
@@ -44,6 +35,7 @@ TEST_F(imstkPointSetToSphereCDTest, IntersectionTestAB)
     (*verticesPtr)[0] = Vec3d(0.0, 0.0, 0.0);
     pointSet->initialize(verticesPtr);
 
+    PointSetToSphereCD m_pointSetToSphereCD;
     m_pointSetToSphereCD.setInput(pointSet, 0);
     m_pointSetToSphereCD.setInput(sphere, 1);
     m_pointSetToSphereCD.setGenerateCD(true, true); // Generate both A and B
@@ -73,10 +65,7 @@ TEST_F(imstkPointSetToSphereCDTest, IntersectionTestAB)
     EXPECT_NEAR(0.1, colData->elementsB[0].m_element.m_PointDirectionElement.pt[1], 0.00001);
 }
 
-///
-/// \brief TODO
-///
-TEST_F(imstkPointSetToSphereCDTest, NonIntersectionTestAB)
+TEST(imstkPointSetToSphereCDTest, NonIntersectionTestAB)
 {
     auto sphere      = std::make_shared<Sphere>(Vec3d(0.0, -8.0, 0.0), 2.1);
     auto pointSet    = std::make_shared<PointSet>();
@@ -84,6 +73,7 @@ TEST_F(imstkPointSetToSphereCDTest, NonIntersectionTestAB)
     (*verticesPtr)[0] = Vec3d(0.0, 0.0, 0.0);
     pointSet->initialize(verticesPtr);
 
+    PointSetToSphereCD m_pointSetToSphereCD;
     m_pointSetToSphereCD.setInput(pointSet, 0);
     m_pointSetToSphereCD.setInput(sphere, 1);
     m_pointSetToSphereCD.setGenerateCD(true, true); // Generate both A and B
@@ -96,9 +86,6 @@ TEST_F(imstkPointSetToSphereCDTest, NonIntersectionTestAB)
     EXPECT_EQ(0, colData->elementsB.getSize());
 }
 
-///
-/// \brief TODO
-///
 int
 imstkPointSetToSphereCDTest(int argc, char* argv[])
 {

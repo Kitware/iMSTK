@@ -29,8 +29,6 @@ using namespace imstk;
 
 TEST(imstkPointSetToPlaneCDTest, IntersectionTestAB)
 {
-    PointSetToPlaneCD m_pointSetToPlaneCD;
-
     auto plane = std::make_shared<Plane>();
 
     auto pointSet    = std::make_shared<PointSet>();
@@ -38,6 +36,7 @@ TEST(imstkPointSetToPlaneCDTest, IntersectionTestAB)
     (*verticesPtr)[0] = Vec3d(0.0, -0.5, 0.0);
     pointSet->initialize(verticesPtr);
 
+    PointSetToPlaneCD m_pointSetToPlaneCD;
     m_pointSetToPlaneCD.setInput(pointSet, 0);
     m_pointSetToPlaneCD.setInput(plane, 1);
     m_pointSetToPlaneCD.setGenerateCD(true, true);
@@ -70,14 +69,13 @@ TEST(imstkPointSetToPlaneCDTest, IntersectionTestAB)
 
 TEST(imstkPointSetToPlaneCDTest, NonIntersectionTestAB)
 {
-    PointSetToPlaneCD m_pointSetToPlaneCD;
-
     auto plane       = std::make_shared<Plane>(Vec3d(0.0, 0.0, 0.0), Vec3d(1., 1., 1.));
     auto pointSet    = std::make_shared<PointSet>();
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(1);
     (*verticesPtr)[0] = Vec3d(1.0, 1.0, 1.0);
     pointSet->initialize(verticesPtr);
 
+    PointSetToPlaneCD m_pointSetToPlaneCD;
     m_pointSetToPlaneCD.setInput(pointSet, 0);
     m_pointSetToPlaneCD.setInput(plane, 1);
     m_pointSetToPlaneCD.setGenerateCD(true, true);

@@ -27,16 +27,7 @@
 
 using namespace imstk;
 
-///
-/// \brief TODO
-///
-class imstkPointSetToOrientedBoxCDTest : public ::testing::Test
-{
-protected:
-    PointSetToOrientedBoxCD m_pointSetToOrientedBoxCD;
-};
-
-TEST_F(imstkPointSetToOrientedBoxCDTest, IntersectionTestAB)
+TEST(imstkPointSetToOrientedBoxCDTest, IntersectionTestAB)
 {
     // Cube with width 2 (max y is 1)
     auto cube        = std::make_shared<OrientedBox>(Vec3d(0.0, 0.0, 0.0), Vec3d(1.0, 1.0, 1.0));
@@ -45,6 +36,7 @@ TEST_F(imstkPointSetToOrientedBoxCDTest, IntersectionTestAB)
     (*verticesPtr)[0] = Vec3d(0.0, 0.9, 0.0);
     pointSet->initialize(verticesPtr);
 
+    PointSetToOrientedBoxCD m_pointSetToOrientedBoxCD;
     m_pointSetToOrientedBoxCD.setInput(pointSet, 0);
     m_pointSetToOrientedBoxCD.setInput(cube, 1);
     m_pointSetToOrientedBoxCD.setGenerateCD(true, true); // Generate both A and B
@@ -74,7 +66,7 @@ TEST_F(imstkPointSetToOrientedBoxCDTest, IntersectionTestAB)
     EXPECT_NEAR(1.0, colData->elementsB[0].m_element.m_PointDirectionElement.pt[1], 0.00001);
 }
 
-TEST_F(imstkPointSetToOrientedBoxCDTest, NonIntersectionTestAB)
+TEST(imstkPointSetToOrientedBoxCDTest, NonIntersectionTestAB)
 {
     // Cube with width 2 (max y is 1)
     auto cube        = std::make_shared<OrientedBox>(Vec3d(0.0, 0.0, 0.0), Vec3d(1.0, 1.0, 1.0));
@@ -83,6 +75,7 @@ TEST_F(imstkPointSetToOrientedBoxCDTest, NonIntersectionTestAB)
     (*verticesPtr)[0] = Vec3d(0.0, 1.1, 0.0);
     pointSet->initialize(verticesPtr);
 
+    PointSetToOrientedBoxCD m_pointSetToOrientedBoxCD;
     m_pointSetToOrientedBoxCD.setInput(pointSet, 0);
     m_pointSetToOrientedBoxCD.setInput(cube, 1);
     m_pointSetToOrientedBoxCD.setGenerateCD(true, true); // Generate both A and B
@@ -95,9 +88,6 @@ TEST_F(imstkPointSetToOrientedBoxCDTest, NonIntersectionTestAB)
     EXPECT_EQ(0, colData->elementsB.getSize());
 }
 
-///
-/// \brief TODO
-///
 int
 imstkPointSetToOrientedBoxCDTest(int argc, char* argv[])
 {

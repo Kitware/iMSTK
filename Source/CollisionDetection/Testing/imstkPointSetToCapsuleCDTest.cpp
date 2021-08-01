@@ -29,8 +29,6 @@ using namespace imstk;
 
 TEST(imstkPointSetToCapsuleCDTest, IntersectionTestAB)
 {
-    PointSetToCapsuleCD m_pointSetToCapsuleCD;
-
     auto capsule = std::make_shared<Capsule>();
 
     auto pointSet    = std::make_shared<PointSet>();
@@ -38,6 +36,7 @@ TEST(imstkPointSetToCapsuleCDTest, IntersectionTestAB)
     (*verticesPtr)[0] = Vec3d(0.25, 0.0, 0.0);
     pointSet->initialize(verticesPtr);
 
+    PointSetToCapsuleCD m_pointSetToCapsuleCD;
     m_pointSetToCapsuleCD.setInput(pointSet, 0);
     m_pointSetToCapsuleCD.setInput(capsule, 1);
     m_pointSetToCapsuleCD.setGenerateCD(true, true);
@@ -69,14 +68,13 @@ TEST(imstkPointSetToCapsuleCDTest, IntersectionTestAB)
 
 TEST(imstkPointSetToCapsuleCDTest, NonIntersectionTestAB)
 {
-    PointSetToCapsuleCD m_pointSetToCapsuleCD;
-
     auto capsule     = std::make_shared<Capsule>();
     auto pointSet    = std::make_shared<PointSet>();
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(1);
     (*verticesPtr)[0] = Vec3d(5.0, 5.0, 5.0);
     pointSet->initialize(verticesPtr);
 
+    PointSetToCapsuleCD m_pointSetToCapsuleCD;
     m_pointSetToCapsuleCD.setInput(pointSet, 0);
     m_pointSetToCapsuleCD.setInput(capsule, 1);
     m_pointSetToCapsuleCD.setGenerateCD(true, true);
