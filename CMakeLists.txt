@@ -67,6 +67,7 @@ endif()
 
 # SWIG 
 option(${PROJECT_NAME}_WRAP_CSHARP "Build iMSTK-C# wrapper code and lib" OFF)
+# SWIG will generate managed array using pinning if this option is ON. Otherwise using P/Invoke default array marshalling.
 option(${PROJECT_NAME}_SWIG_PINNED_ARRAY "Managed C# arrays using pinning" ON)
 mark_as_advanced(${PROJECT_NAME}_SWIG_PINNED_ARRAY)
 if (${PROJECT_NAME}_WRAP_CSHARP)

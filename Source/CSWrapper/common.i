@@ -120,6 +120,14 @@ class Vec {
         m_data[2] = t2;
         m_data[3] = t3;
     }
+    Vec(const T t0, const T t1, const T t2, const T t3, const T t4, const T t5) {
+        m_data[0] = t0;
+        m_data[1] = t1;
+        m_data[2] = t2;
+        m_data[3] = t3;
+        m_data[4] = t4;
+        m_data[5] = t5;
+    }
     // Vec(int i0, int i1, int i2, int i3)
     Vec(const EigenData& other) { m_data = other; }
     inline T& operator[](const int pos) { return m_data[pos]; }
@@ -304,10 +312,6 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
         return Utils.vec_scale_2f(v, (float)1.0/c);
     }
 
-    public static Vec2f operator / (float c, Vec2f v) {
-        return Utils.vec_scale_2f(v, (float)1.0/c);
-    }
-
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_float_2_1_t (Vec2f v) {
         return v.get(); 
     }
@@ -329,11 +333,8 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
     public static Vec2d operator * (double c, Vec2d v) {
         return Utils.vec_scale_2d(v, c);
     }
-    public static Vec2d operator / (Vec2d v, double c) {
-        return Utils.vec_scale_2d(v, 1.0/c);
-    }
 
-    public static Vec2d operator / (double c, Vec2d v) {
+    public static Vec2d operator / (Vec2d v, double c) {
         return Utils.vec_scale_2d(v, 1.0/c);
     }
 
@@ -398,10 +399,6 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
         return Utils.vec_scale_6d(v, c);
     }
     public static Vec6d operator / (Vec6d v, double c) {
-        return Utils.vec_scale_6d(v, 1.0/c);
-    }
-
-    public static Vec6d operator / (double c, Vec6d v) {
         return Utils.vec_scale_6d(v, 1.0/c);
     }
 
