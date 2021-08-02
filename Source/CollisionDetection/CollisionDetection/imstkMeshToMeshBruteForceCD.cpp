@@ -20,12 +20,10 @@
 =========================================================================*/
 
 #include "imstkMeshToMeshBruteForceCD.h"
-#include "imstkCollisionData.h"
 #include "imstkCollisionUtils.h"
 #include "imstkLineMesh.h"
 #include "imstkSurfaceMesh.h"
 
-#include <stdint.h>
 #include <unordered_set>
 
 namespace imstk
@@ -233,15 +231,15 @@ polySignedDist(const Vec3d& pos, const SurfMeshData& surfMeshData,
         const Vec3d& x2   = surfMeshData.vertices[cell[1]];
         const Vec3d& x3   = surfMeshData.vertices[cell[2]];
 
-        int          caseType;
-        const Vec3d  closestPtOnTri = CollisionUtils::closestPointOnTriangle(pos, x1, x2, x3, caseType);
+        int          ptOnTriangleCaseType;
+        const Vec3d  closestPtOnTri = CollisionUtils::closestPointOnTriangle(pos, x1, x2, x3, ptOnTriangleCaseType);
         const double sqrDist = (closestPtOnTri - pos).squaredNorm();
         if (sqrDist < minSqrDist)
         {
             minSqrDist      = sqrDist;
             closestPt       = closestPtOnTri;
             closestCell     = j;
-            closestCellCase = caseType;
+            closestCellCase = ptOnTriangleCaseType;
         }
     }
 
@@ -321,6 +319,7 @@ MeshToMeshBruteForceCD::computeCollisionDataAB(
     // Broad phase collision
     if (doBroadPhaseCollisionCheck(geomA, geomB))
     {
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
         auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(geomB);
         surfMesh->computeTrianglesNormals();
         surfMesh->computeVertexNeighborTriangles();
@@ -328,9 +327,9 @@ MeshToMeshBruteForceCD::computeCollisionDataAB(
         // Narrow phase
         if (m_generateVertexTriangleContacts)
         {
-            if (m_vertexInside.size() < surfMesh->getNumVertices())
+            if (m_vertexInside.size() < pointSet->getNumVertices())
             {
-                m_vertexInside = std::vector<bool>(surfMesh->getNumVertices(), false);
+                m_vertexInside = std::vector<bool>(pointSet->getNumVertices(), false);
             }
             else
             {
@@ -389,8 +388,8 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
                 elemB.idCount  = 1;
                 elemB.cellType = IMSTK_VERTEX;
 
-                elementsA.safeAppend(elemA);
-                elementsB.safeAppend(elemB);
+                elementsA.unsafeAppend(elemA);
+                elementsB.unsafeAppend(elemB);
                 m_vertexInside[i] = true;
             }
             else if (caseType == 1)
@@ -406,8 +405,8 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
                 elemB.idCount  = 2;
                 elemB.cellType = IMSTK_EDGE;
 
-                elementsA.safeAppend(elemA);
-                elementsB.safeAppend(elemB);
+                elementsA.unsafeAppend(elemA);
+                elementsB.unsafeAppend(elemB);
                 m_vertexInside[i] = true;
             }
             else if (caseType == 2)
@@ -424,8 +423,8 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
                 elemB.idCount  = 3;
                 elemB.cellType = IMSTK_TRIANGLE;
 
-                elementsA.safeAppend(elemA);
-                elementsB.safeAppend(elemB);
+                elementsA.unsafeAppend(elemA);
+                elementsB.unsafeAppend(elemB);
                 m_vertexInside[i] = true;
             }
         }
@@ -514,8 +513,8 @@ MeshToMeshBruteForceCD::lineMeshEdgeToTriangleTest(
                 elemB.idCount  = 2;
                 elemB.cellType = IMSTK_EDGE;
 
-                elementsA.safeAppend(elemA);
-                elementsB.safeAppend(elemB);
+                elementsA.unsafeAppend(elemA);
+                elementsB.unsafeAppend(elemB);
             }
         }
     }
@@ -618,8 +617,8 @@ MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
                             elemB.idCount  = 2;
                             elemB.cellType = IMSTK_EDGE;
 
-                            elementsA.safeAppend(elemA);
-                            elementsB.safeAppend(elemB);
+                            elementsA.unsafeAppend(elemA);
+                            elementsB.unsafeAppend(elemB);
 
                             hashedEdges.insert(edgePair);
                         }
@@ -649,6 +648,12 @@ MeshToMeshBruteForceCD::doBroadPhaseCollisionCheck(
 
     Vec3d min2, max2;
     mesh2->computeBoundingBox(min2, max2);
+
+    // Padding here helps with thin vs thin geometry
+    min1 -= m_padding;
+    max1 += m_padding;
+    min2 -= m_padding;
+    max2 += m_padding;
 
     return CollisionUtils::testAABBToAABB(
         min1[0], max1[0],

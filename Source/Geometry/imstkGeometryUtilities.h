@@ -242,23 +242,6 @@ std::shared_ptr<TetrahedralMesh> createUniformMesh(const Vec3d& aabbMin, const V
 ///
 std::shared_ptr<TetrahedralMesh> createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh, const int nx, const int ny, int nz);
 
-inline void
-computePointBarycentricCoordinates(const std::array<Vec3d, 4>& v, const Vec3d& p, std::array<double, 4>& weights)
-{
-    Mat4d A;
-    A << v[0][0], v[0][1], v[0][2], 1, v[1][0], v[1][1], v[1][2], 1, v[2][0], v[2][1], v[2][2], 1, v[3][0], v[3][1], v[3][2], 1;
-
-    double det = A.determinant();
-    for (int i = 0; i < 4; ++i)
-    {
-        Mat4d B = A;
-        B(i, 0)    = p[0];
-        B(i, 1)    = p[1];
-        B(i, 2)    = p[2];
-        weights[i] = B.determinant() / det;
-    }
-}
-
 ///
 /// \brief Enumeration for reordering method
 ///

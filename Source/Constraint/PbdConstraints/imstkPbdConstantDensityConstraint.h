@@ -30,7 +30,8 @@ namespace imstk
 ///
 /// \class PbdConstantDensityConstraint
 ///
-/// \brief Implements the constant density constraint to simulate fluids
+/// \brief Implements the constant density constraint to simulate fluids.
+/// This constraint is global and applied to all vertices passed in during projection
 ///
 class PbdConstantDensityConstraint : public PbdConstraint
 {
@@ -80,12 +81,7 @@ private:
     double wPoly6(const Vec3d& pi, const Vec3d& pj);
 
     ///
-    /// \brief Smoothing kernel Spiky for gradient calculation
-    ///
-    double wSpiky(const Vec3d& pi, const Vec3d& pj);
-
-    ///
-    /// \brief
+    /// \brief Gradient of density kernel
     ///
     Vec3d gradSpiky(const Vec3d& pi, const Vec3d& pj);
 

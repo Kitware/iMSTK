@@ -1597,7 +1597,7 @@ GeometryUtils::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh,
                                  const int tetId0 = numDiv * hexId;
                                  const int tetId1 = tetId0 + numDiv;
 
-                                 static TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
+                                 static Vec4d weights = Vec4d::Zero();
 
                                  // loop over the tets to find the enclosing tets
                                  for (int id = tetId0; id < tetId1; ++id)
@@ -1606,7 +1606,7 @@ GeometryUtils::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh,
                                      {
                                          continue;
                                      }
-                                     uniformMesh->computeBarycentricWeights(id, xyz, weights);
+                                     weights = uniformMesh->computeBarycentricWeights(id, xyz);
 
                                      if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
                                      {

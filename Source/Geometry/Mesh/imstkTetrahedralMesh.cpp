@@ -236,18 +236,16 @@ TetrahedralMesh::extractSurfaceMesh()
     return surfMesh;
 }
 
-void
-TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos,
-                                           WeightsArray& weights) const
+Vec4d
+TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos) const
 {
-    const Vec4i&         tetIndices = (*m_tetrahedraIndices)[tetId];
-    std::array<Vec3d, 4> v;
-    for (size_t i = 0; i < 4; ++i)
-    {
-        v[i] = getVertexPosition(tetIndices[i]);
-    }
-
-    GeometryUtils::computePointBarycentricCoordinates(v, pos, weights);
+    const VecDataArray<double, 3>& vertices     = *m_vertexPositions;
+    const VecDataArray<int, 4>&    tetraIndices = *m_tetrahedraIndices;
+    return baryCentric(pos,
+        vertices[tetraIndices[tetId][0]],
+        vertices[tetraIndices[tetId][1]],
+        vertices[tetraIndices[tetId][2]],
+        vertices[tetraIndices[tetId][3]]);
 }
 
 void
