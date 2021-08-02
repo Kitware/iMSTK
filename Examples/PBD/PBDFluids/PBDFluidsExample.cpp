@@ -38,6 +38,8 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
+#include "imstkPlane.h"
+
 using namespace imstk;
 
 // mesh file name
@@ -215,9 +217,9 @@ main()
         scene->addSceneObject(fluidObj);
 
         imstkNew<CollidingObject>    floorObj("Floor");
-        std::shared_ptr<SurfaceMesh> floorMesh = createCollidingSurfaceMesh();
-        floorObj->setVisualGeometry(floorMesh);
-        floorObj->setCollidingGeometry(floorMesh);
+        std::shared_ptr<SurfaceMesh> floorGeom = createCollidingSurfaceMesh();
+        floorObj->setVisualGeometry(floorGeom);
+        floorObj->setCollidingGeometry(floorGeom);
         scene->addSceneObject(floorObj);
 
         // Collisions

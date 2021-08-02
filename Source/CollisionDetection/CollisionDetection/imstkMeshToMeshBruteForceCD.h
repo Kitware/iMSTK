@@ -78,6 +78,12 @@ public:
     ///
     void setGenerateVertexTriangleContacts(bool genVertexTriangleContacts) { m_generateVertexTriangleContacts = genVertexTriangleContacts; }
 
+    ///
+    /// \brief Set padding to the broad phase
+    ///
+    void setPadding(const Vec3d& padding) { m_padding = padding; }
+    const Vec3d& getPadding() const { return m_padding; }
+
 protected:
     ///
     /// \brief Compute collision data for AB simulatenously
@@ -119,5 +125,6 @@ private:
     bool m_generateVertexTriangleContacts = true;
 
     std::vector<bool> m_vertexInside;
+    Vec3d m_padding = Vec3d(0.001, 0.001, 0.001);
 };
 }

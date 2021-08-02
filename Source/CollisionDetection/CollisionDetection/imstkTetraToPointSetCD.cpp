@@ -68,8 +68,7 @@ TetraToPointSetCD::computeCollisionDataAB(
                 Vec3d vPos = verticesMeshB[vertexIdB];
 
                 // Now compute if the point is actually within the tet
-                TetrahedralMesh::WeightsArray bCoord; // Barycentric coordinates of the vertex in tetrahedron
-                tetMesh->computeBarycentricWeights(tetIdA, vPos, bCoord);
+                const Vec4d bCoord = tetMesh->computeBarycentricWeights(tetIdA, vPos);
                 if (bCoord[0] >= -eps
                     && bCoord[1] >= -eps
                     && bCoord[2] >= -eps
@@ -131,8 +130,7 @@ TetraToPointSetCD::computeCollisionDataA(
                 Vec3d vPos = verticesMeshB[vertexIdB];
 
                 // Now compute if the point is actually within the tet
-                TetrahedralMesh::WeightsArray bCoord; // Barycentric coordinates of the vertex in tetrahedron
-                tetMesh->computeBarycentricWeights(tetIdA, vPos, bCoord);
+                const Vec4d bCoord = tetMesh->computeBarycentricWeights(tetIdA, vPos);
                 if (bCoord[0] >= -eps
                     && bCoord[1] >= -eps
                     && bCoord[2] >= -eps
@@ -188,8 +186,7 @@ TetraToPointSetCD::computeCollisionDataB(
                 Vec3d vPos = verticesMeshB[vertexIdB];
 
                 // Now compute if the point is actually within the tet
-                TetrahedralMesh::WeightsArray bCoord; // Barycentric coordinates of the vertex in tetrahedron
-                tetMesh->computeBarycentricWeights(tetIdA, vPos, bCoord);
+                const Vec4d bCoord = tetMesh->computeBarycentricWeights(tetIdA, vPos);
                 if (bCoord[0] >= -eps
                     && bCoord[1] >= -eps
                     && bCoord[2] >= -eps

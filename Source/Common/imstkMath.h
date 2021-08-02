@@ -267,7 +267,7 @@ baryCentric(const Vec2d& p, const Vec2d& a, const Vec2d& b, const Vec2d& c)
 }
 
 ///
-/// \brief Compute bary centric coordinates (u,v,w) given triangle in 3d space (and point p on triangle)
+/// \brief Compute bary centric coordinates (u,v,w) of point p, given 3 points in 3d space (a,b,c)
 ///
 static Vec3d
 baryCentric(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c)
@@ -285,6 +285,31 @@ baryCentric(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c)
     const double w     = (d00 * d21 - d01 * d20) / denom;
     const double u     = 1.0 - v - w;
     return Vec3d(u, v, w);
+}
+
+///
+/// \brief Compute bary centric coordinates (u,v,w,x) of point p, given 4 points in 3d space (a,b,c,d)
+///
+static Vec4d
+baryCentric(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c, const Vec3d& d)
+{
+    Mat4d A;
+    A << a[0], a[1], a[2], 1.0,
+        b[0], b[1], b[2], 1.0,
+        c[0], c[1], c[2], 1.0,
+        d[0], d[1], d[2], 1.0;
+
+    Vec4d  weights;
+    double det = A.determinant(); // Signed volume
+    for (int i = 0; i < 4; ++i)
+    {
+        Mat4d B = A;
+        B(i, 0)    = p[0];
+        B(i, 1)    = p[1];
+        B(i, 2)    = p[2];
+        weights[i] = B.determinant() / det;
+    }
+    return weights;
 }
 
 ///

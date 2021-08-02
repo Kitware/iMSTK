@@ -23,7 +23,6 @@
 
 #include "imstkMath.h"
 #include "imstkTypes.h"
-#include "imstkGeometryUtilities.h"
 
 #include <algorithm>
 #include <array>
@@ -776,13 +775,15 @@ testSphereToTriangle(const Vec3d& spherePt, const double sphereRadius,
     }
 }
 
+///
+/// \brief Tests if a point is inside a tetrahedron
+///
 inline bool
-testPointInsideTet(const std::array<Vec3d, 4>& inputTetVerts, const Vec3d& p)
+testPointToTetrahedron(const std::array<Vec3d, 4>& inputTetVerts, const Vec3d& p)
 {
-    std::array<double, 4> bCoord;
-    GeometryUtils::computePointBarycentricCoordinates(inputTetVerts, p, bCoord);
+    const Vec4d bCoord = baryCentric(p, inputTetVerts[0], inputTetVerts[1], inputTetVerts[2], inputTetVerts[3]);
 
-    constexpr const double eps = VERY_SMALL_EPSILON;
+    constexpr const double eps = IMSTK_DOUBLE_EPS;
     if (bCoord[0] >= -eps
         && bCoord[1] >= -eps
         && bCoord[2] >= -eps
@@ -795,8 +796,7 @@ testPointInsideTet(const std::array<Vec3d, 4>& inputTetVerts, const Vec3d& p)
 }
 
 ///
-/// \brief Tests if the segment intersects any of the triangle faces of the tet
-/// \todo: Could be faster with SAT directly applied here
+/// \brief Tests if the segment intersects any of the triangle faces of the tet (GJK)
 ///
 inline bool
 testTetToSegment(
@@ -812,8 +812,8 @@ testTetToSegment(
         }
     }
 
-    // test if both points lie inside the tetrahedron
-    if (testPointInsideTet(inputTetVerts, x1) && testPointInsideTet(inputTetVerts, x2))
+    // If either point lies inside the tetrahedron (handles completely inside case)
+    if (testPointToTetrahedron(inputTetVerts, x1) || testPointToTetrahedron(inputTetVerts, x2))
     {
         return true;
     }
@@ -860,6 +860,45 @@ testTetToSegment(
         }
     }
     return firstFound;
+}
+
+///
+/// \brief ray OBB intersection with intersection point
+/// \param ray origin
+/// \param ray direction
+/// \param box to world
+/// \param world to box
+/// \param half length/extents
+/// \param intersection points (first component gives entry point, second gives exit)
+///
+inline bool
+testRayToObb(const Vec3d& rayOrigin, const Vec3d& rayDir,
+             const Mat4d& worldToBox, Vec3d extents,
+             Vec2d& iPt)
+{
+    // convert from world to box space
+    const Vec3d rd = (worldToBox * Vec4d(rayDir[0], rayDir[1], rayDir[2], 0.0)).head<3>();
+    const Vec3d ro = (worldToBox * Vec4d(rayOrigin[0], rayOrigin[1], rayOrigin[2], 1.0)).head<3>();
+
+    // ray-box intersection in box space
+    const Vec3d m = Vec3d(1.0, 1.0, 1.0).cwiseQuotient(rd);
+    const Vec3d s = Vec3d((rd[0] < 0.0) ? 1.0 : -1.0,
+        (rd[1] < 0.0) ? 1.0 : -1.0,
+        (rd[2] < 0.0) ? 1.0 : -1.0);
+    const Vec3d t1 = m.cwiseProduct(-ro + s.cwiseProduct(extents));
+    const Vec3d t2 = m.cwiseProduct(-ro - s.cwiseProduct(extents));
+
+    const double tN = std::max(std::max(t1[0], t1[1]), t1[2]);
+    const double tF = std::min(std::min(t2[0], t2[1]), t2[2]);
+
+    // Does not enter
+    if (tN > tF || tF < 0.0)
+    {
+        return false;
+    }
+    iPt = Vec2d(tN, tF); // Parameterized along the ray
+
+    return true;
 }
 
 ///

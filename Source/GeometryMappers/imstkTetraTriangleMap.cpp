@@ -72,8 +72,7 @@ TetraTriangleMap::compute()
             }
 
             // Compute the weights
-            TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
-            tetMesh->computeBarycentricWeights(closestTetId, surfVertPos, weights);
+            const Vec4d weights = tetMesh->computeBarycentricWeights(closestTetId, surfVertPos);
 
             m_verticesEnclosingTetraId[vertexIdx] = closestTetId; // store nearest tetrahedron
             m_verticesWeights[vertexIdx] = weights;               // store weights
@@ -215,9 +214,8 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 size_t
 TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 {
-    const auto                    tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
-    TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
-    size_t                        enclosingTetrahedron = std::numeric_limits<size_t>::max();
+    const auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
+    size_t     enclosingTetrahedron = std::numeric_limits<size_t>::max();
 
     for (int idx = 0; idx < tetMesh->getNumTetrahedra(); ++idx)
     {
@@ -232,7 +230,7 @@ TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
             continue;
         }
 
-        tetMesh->computeBarycentricWeights(idx, pos, weights);
+        const Vec4d weights = tetMesh->computeBarycentricWeights(idx, pos);
 
         if (weights[0] >= 0 && weights[1] >= 0 && weights[2] >= 0 && weights[3] >= 0)
         {
