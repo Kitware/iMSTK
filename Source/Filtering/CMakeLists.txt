@@ -13,3 +13,10 @@ imstk_add_library( Filtering
   DEPENDS
     FilteringCore
     ${VTK_LIBRARIES})
+
+#-----------------------------------------------------------------------------
+# Testing
+#-----------------------------------------------------------------------------
+if( ${PROJECT_NAME}_BUILD_TESTING )
+  add_subdirectory(Testing)
+endif()

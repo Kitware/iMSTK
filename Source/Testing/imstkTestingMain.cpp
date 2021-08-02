@@ -19,38 +19,33 @@
 
 =========================================================================*/
 
-#include "imstkDecal.h"
+#include <vtksys/SystemTools.hxx>
+
+#include <gtest/gtest.h>
+
 #include "imstkLogger.h"
 
-namespace imstk
+int
+main(int argc, char** argv)
 {
-Decal::Decal(const std::string& name) : AnalyticalGeometry(name),
-    m_dimensions(Vec3d(1.0, 1.0, 1.0))
-{
-}
+    bool removeLog = false;
+    for (int i = 0; i < argc; ++i)
+    {
+        if (std::string(argv[i]) == "--imstk_keep_log")
+        {
+            removeLog = true;
+        }
+    }
 
-void
-Decal::print() const
-{
-    Geometry::print();
-    LOG(INFO) << "Dimensions: " << m_dimensions[0]
-              << ", " << m_dimensions[1]
-              << ", " << m_dimensions[2];
-}
+    if (removeLog)
+    {
+        vtksys::SystemTools::RemoveADirectory("testlog");
+        vtksys::SystemTools::MakeDirectory("testlog");
+    }
 
-void
-Decal::applyTransform(const Mat4d& m)
-{
-    const Vec3d s = Vec3d(
-        m.block<3, 1>(0, 0).norm(),
-        m.block<3, 1>(0, 1).norm(),
-        m.block<3, 1>(0, 2).norm());
-    m_dimensions = m_dimensions.cwiseProduct(s);
-}
+    auto& logger = imstk::Logger::getInstance();
+    logger.addFileSink("test", "testlog");
 
-void
-Decal::updateDecal(Mat4d& imstkNotUsed(viewMatrix))
-{
-    m_inverse = m_transform.inverse();
-}
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
