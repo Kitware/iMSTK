@@ -28,23 +28,24 @@
 int
 main(int argc, char** argv)
 {
-    bool removeLog = false;
+    bool removeLog = true;
     for (int i = 0; i < argc; ++i)
     {
         if (std::string(argv[i]) == "--imstk_keep_log")
         {
-            removeLog = true;
+            removeLog = false;
         }
     }
 
     if (removeLog)
     {
-        vtksys::SystemTools::RemoveADirectory("testlog");
-        vtksys::SystemTools::MakeDirectory("testlog");
+        vtksys::SystemTools::RemoveADirectory("log");
     }
 
+    vtksys::SystemTools::MakeDirectory("log");
+
     auto& logger = imstk::Logger::getInstance();
-    logger.addFileSink("test", "testlog");
+    logger.addFileSink("test", "log");
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
