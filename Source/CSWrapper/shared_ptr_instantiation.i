@@ -41,14 +41,23 @@
 %shared_ptr(imstk::Plane)
 %shared_ptr(imstk::Sphere)
 %shared_ptr(imstk::OrientedBox)
+%shared_ptr(imstk::Capsule)
 %shared_ptr(imstk::SignedDistanceField)
 
 /* 
- * Geometry 
+ * GeometryMap
  */
 %shared_ptr(imstk::GeometryMap)
 %shared_ptr(imstk::OneToOneMap)
 %shared_ptr(imstk::TetraTriangleMap)
+
+/*
+ * FilteringCore
+ */
+%shared_ptr(imstk::GeometryAlgorithm)
+%shared_ptr(imstk::SurfaceMeshSubdivide)
+%shared_ptr(imstk::ImplicitGeometryToImageData)
+%shared_ptr(imstk::SurfaceMeshFlyingEdges)
 
 /* 
  * DynamicalModel 
@@ -107,6 +116,23 @@
 /*
  * CollisionDetection
  */
+%shared_ptr(imstk::CollisionDetectionAlgorithm)
+%shared_ptr(imstk::BidirectionalPlaneToSphereCD)
+%shared_ptr(imstk::ImplicitGeometryToPointSetCCD)
+%shared_ptr(imstk::ImplicitGeometryToPointSetCD)
+%shared_ptr(imstk::MeshToMeshBruteForceCD)
+%shared_ptr(imstk::PointSetToCapsuleCD)
+%shared_ptr(imstk::PointSetToOrientedBoxCD)
+%shared_ptr(imstk::PointSetToSphereCD)
+%shared_ptr(imstk::PointSetToPlaneCD)
+%shared_ptr(imstk::SphereToCylinderCD)
+%shared_ptr(imstk::SphereToSphereCD)
+%shared_ptr(imstk::SurfaceMeshToCapsuleCD)
+%shared_ptr(imstk::SurfaceMeshToSphereCD)
+%shared_ptr(imstk::SurfaceMeshToSurfaceMeshCD)
+%shared_ptr(imstk::TetraToLineMeshCD)
+%shared_ptr(imstk::TetraToPointSetCD)
+%shared_ptr(imstk::UnidirectionalPlaneToSphereCD)
 
 /*
  * CollisionHandling
@@ -133,6 +159,7 @@
 %shared_ptr(imstk::InteractionPair)
 %shared_ptr(imstk::ObjectInteractionPair)
 %shared_ptr(imstk::PbdObjectCuttingPair)
+%shared_ptr(imstk::PbdObjectCollision)
 
 /*
  * SimulationManager

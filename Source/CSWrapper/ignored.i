@@ -60,3 +60,7 @@
 %ignore imstk::GeometryUtils::copyToDataArray;
 %ignore imstk::GeometryUtils::copyToVecDataArray;
 %ignore imstk::GeometryUtils::copyToImageData;
+
+%ignore imstk::CollisionData::m_element;
+%ignore imstk::CollisionData::elementsA;
+%ignore imstk::CollisionData::elementsB;

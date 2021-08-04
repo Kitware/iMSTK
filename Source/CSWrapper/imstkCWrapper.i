@@ -37,6 +37,7 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkOrientedBox.h"
+#include "imstkCapsule.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkSignedDistanceField.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
@@ -113,7 +114,28 @@
 /*
  * CollisionDetection
  */
-#include "imstkCollisionDetection.h"
+/* #include "imstkCollisionDetection.h" */
+#include "imstkCollisionData.h"
+#include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkBidirectionalPlaneToSphereCD.h"
+#include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkCollisionUtils.h"
+#include "imstkImplicitGeometryToPointSetCCD.h"
+#include "imstkImplicitGeometryToPointSetCD.h"
+#include "imstkMeshToMeshBruteForceCD.h"
+#include "imstkPointSetToCapsuleCD.h"
+#include "imstkPointSetToOrientedBoxCD.h"
+#include "imstkPointSetToPlaneCD.h"
+#include "imstkPointSetToSphereCD.h"
+#include "imstkSphereToCylinderCD.h"
+#include "imstkSphereToSphereCD.h"
+#include "imstkSurfaceMeshToCapsuleCD.h"
+#include "imstkSurfaceMeshToSphereCD.h"
+#include "imstkSurfaceMeshToSurfaceMeshCD.h"
+#include "imstkTetraToLineMeshCD.h"
+#include "imstkTetraToPointSetCD.h"
+#include "imstkUnidirectionalPlaneToSphereCD.h"
+
 
 /*
  * CollisionHandling
@@ -137,10 +159,11 @@
 #include "imstkObjectInteractionPair.h"
 #include "imstkObjectInteractionFactory.h"
 #include "imstkCollisionPair.h"
-#include "imstkRigidObjectCollidingCollisionPair.h"
+/* #include "imstkRigidObjectCollidingCollisionPair.h" */
 #include "imstkInteractionPair.h"
 #include "imstkObjectInteractionPair.h"
 #include "imstkPbdObjectCuttingPair.h"
+#include "imstkPbdObjectCollision.h"
 
 /*
  * SimulationManager
@@ -221,6 +244,7 @@ namespace std {
 %include "../Geometry/Analytic/imstkPlane.h"
 %include "../Geometry/Analytic/imstkSphere.h"
 %include "../Geometry/Analytic/imstkOrientedBox.h"
+%include "../Geometry/Analytic/imstkCapsule.h"
 %include "../Geometry/imstkGeometryUtilities.h"
 %include "../Geometry/Implicit/imstkSignedDistanceField.h"
 %include "../Geometry/Implicit/imstkImplicitFunctionFiniteDifferenceFunctor.h"
@@ -305,7 +329,28 @@ namespace std {
 /*
  * CollisionDetection
  */
-%include "../CollisionDetection/CollisionDetection/imstkCollisionDetection.h";
+/* %include "../CollisionDetection/CollisionDetection/imstkCollisionDetection.h"; */
+%include "../CollisionDetection/CollisionData/imstkCollisionData.h";
+%include "../CollisionDetection/CollisionDetection/imstkCollisionDetectionAlgorithm.h"
+%include "../CollisionDetection/CollisionDetection/imstkBidirectionalPlaneToSphereCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkCollisionUtils.h"
+%include "../CollisionDetection/CollisionDetection/imstkImplicitGeometryToPointSetCCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkImplicitGeometryToPointSetCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkMeshToMeshBruteForceCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkPointSetToCapsuleCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkPointSetToOrientedBoxCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkPointSetToPlaneCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkPointSetToSphereCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkSphereToCylinderCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkSphereToSphereCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkSurfaceMeshToCapsuleCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkSurfaceMeshToSphereCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkSurfaceMeshToSurfaceMeshCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkTetraToLineMeshCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkTetraToPointSetCD.h"
+%include "../CollisionDetection/CollisionDetection/imstkUnidirectionalPlaneToSphereCD.h"
+
+
 
 /*
  * CollisionHandling
@@ -331,8 +376,8 @@ namespace std {
 %include "../Scene/imstkObjectInteractionPair.h";
 %include "../Scene/imstkObjectInteractionFactory.h";
 %include "../Scene/imstkCollisionPair.h";
-%include "../Scene/imstkRigidObjectCollidingCollisionPair.h";
 %include "../Scene/imstkPbdObjectCuttingPair.h"
+%include "../Scene/imstkPbdObjectCollision.h"
 
 /*
  * SimulationManager
