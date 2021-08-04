@@ -133,17 +133,9 @@ To resolve collision I would classify approaches into two categories.
   * If we resolve all contacts later we may find that we resolve one such that we create another. For example, stacked cubes A, B, & C. Resolving A-B might move B into C. This would normally require another collision detection pass (likely next step of the simulation). But if you noticed, Ex1 may not require another CD iteration as it does CD while resolving. Given the correct order of CD testing, they would actually resolve.
 
 * Matrix: These approaches assemble matrices to resolve them all in a semi-implicit or implicit manner.
-
-   * Semi-Implicit:
-
-     * Identical to the matrix-free explicit solutions. ex1 was one iteration of gauss seidel, ex2 was one iteration of jacobi.
-     * Non-penetration equations are solved in iterative manners, solutions being plugged into latter iterations.
-     * Order of assembly matters.
-
-   * Implicit:
-
-     * All non-penetration equations solved simulatenously.
-     * Order of assembly will produce same solution.
+  
+     * Non-penetration equations are solved in iterative manners
+     * Often "constraint" based
 
 Collision Constraints
 --------------------------------

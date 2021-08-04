@@ -101,7 +101,8 @@ makePbdTriangle(const std::string& name)
 
 ///
 /// \brief This example demonstrates the collision with an infinitely
-/// stiff triangle, serves as a test case for jitter
+/// stiff triangle, serves as a test case for jitter. The point should
+/// be able to rest on the triangle without either moving
 ///
 int
 main()
@@ -111,7 +112,6 @@ main()
 
     // Setup the scene
     imstkNew<Scene> scene("PBDTriangleContact");
-    scene->getConfig()->taskParallelizationEnabled = false;
     scene->getActiveCamera()->setPosition(0.12, 4.51, 16.51);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);

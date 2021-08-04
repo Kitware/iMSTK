@@ -177,8 +177,8 @@ makeTissueObj(const std::string& name,
 }
 
 ///
-/// \brief This example demonstrates the collision interaction
-/// using Position based dynamics
+/// \brief This example demonstrates collision interaction with a 2d pbd
+/// simulated tissue/membrane/cloth
 ///
 int
 main()

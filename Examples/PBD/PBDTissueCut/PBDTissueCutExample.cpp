@@ -282,8 +282,9 @@ makeToolObj()
 }
 
 ///
-/// \brief This example demonstrates the collision interaction
-/// using Position based dynamics
+/// \brief This example demonstrates tetrahedral removal of a pbd simulated mesh
+/// using a haptic device. Hold the button the device whilst moving it over elements
+/// to remove
 ///
 int
 main()

@@ -44,7 +44,7 @@ using namespace imstk;
 
 ///
 /// \brief This examples demonstrates rigid body interaction between
-/// two primitives
+/// primitives
 ///
 int
 main()

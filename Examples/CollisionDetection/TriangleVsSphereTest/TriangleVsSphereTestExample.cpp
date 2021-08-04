@@ -40,6 +40,12 @@
 
 using namespace imstk;
 
+///
+/// \brief This examples is used to demonstrate Triangle Vs Sphere collision
+/// of the SurfaceMeshToSphereCD method
+/// It displays the collision data, and allows users to investigate various cases
+/// by moving the geometry around with keyboard controls i,j,k,l,o,u
+///
 int
 main()
 {

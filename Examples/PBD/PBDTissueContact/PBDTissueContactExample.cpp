@@ -320,8 +320,8 @@ makeToolObj()
 }
 
 ///
-/// \brief This example demonstrates the collision interaction
-/// using Position based dynamics
+/// \brief This example demonstrates collision interaction with a 3d pbd
+/// simulated tissue (tetrahedral)
 ///
 int
 main()

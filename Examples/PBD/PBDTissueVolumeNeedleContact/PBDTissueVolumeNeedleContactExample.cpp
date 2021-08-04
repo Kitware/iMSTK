@@ -300,8 +300,8 @@ makeToolObj()
 }
 
 ///
-/// \brief This example demonstrates the tissue needle contact with a 2d surface mesh
-/// The needle is constrained at the location on the surface of the 2d mesh.
+/// \brief This example demonstrates two-way tissue needle contact with a tetrahedral mesh.
+/// Constraints are used at the tetrahedrons faces of intersection
 ///
 int
 main()
