@@ -377,7 +377,7 @@ testSphereToCylinder(
     }
     else
     {
-        // \todo: Does not return closest points, returns no points when no collision
+        // \todo Does not return closest points, returns no points when no collision
         // slight math change needed (also add SDF function to cylinder)
         //    __           __
         //  _(__)_    ____(__)
@@ -460,7 +460,7 @@ testCapsuleToPoint(
     Vec3d& capsuleContactPt, Vec3d& capsuleContactNormal, Vec3d& pointContactNormal, double& depth)
 {
     // Get position of end points of the capsule
-    // TODO: Fix this issue of extra computation in future
+    // \todo Fix this issue of extra computation in future
     const Vec3d  mid   = capsulePos;
     const Vec3d  p1    = mid + 0.5 * capsuleAxis * capsuleLength;
     const Vec3d  p0    = 2.0 * mid - p1;
@@ -583,8 +583,11 @@ testPlaneLine(const Vec3d& p, const Vec3d& q,
     return true;
 }
 
+///
+/// \brief Computes scalar triple product of three vectors
+///
 static double
-scalarTriple(const Vec3d& u, const Vec3d& v, const Vec3d& w)
+scalarTripleProduct(const Vec3d& u, const Vec3d& v, const Vec3d& w)
 {
     return u.cross(v).dot(w);
 }
@@ -604,24 +607,26 @@ testSegmentTriangle(
     const Vec3d pa = a - p;
     const Vec3d pb = b - p;
     const Vec3d pc = c - p;
+
     // Test if pq is inside the edges bc, ca and ab. Done by testing
     // that the signed tetrahedral volumes, computed using scalar triple
     // products, are all positive
-    uvw[0] = scalarTriple(pq, pc, pb);
+    uvw[0] = scalarTripleProduct(pq, pc, pb);
     if (uvw[0] < 0.0)
     {
         return false;
     }
-    uvw[1] = scalarTriple(pq, pa, pc);
+    uvw[1] = scalarTripleProduct(pq, pa, pc);
     if (uvw[1] < 0.0)
     {
         return false;
     }
-    uvw[2] = scalarTriple(pq, pb, pa);
+    uvw[2] = scalarTripleProduct(pq, pb, pa);
     if (uvw[2] < 0.0)
     {
         return false;
     }
+
     // Compute the barycentric coordinates (u, v, w) determining the
     // intersection point r, r = u*a + v*b + w*c
     double denom = 1.0 / (uvw[0] + uvw[1] + uvw[2]);
@@ -646,6 +651,7 @@ testSegmentTriangle(
     static const double EPSILON = 1e-8;
     Vec3d               dirAB   = pB - pA;
     const double        lAB     = dirAB.norm();
+
     if (lAB < 1e-8)
     {
         return false;
@@ -796,7 +802,8 @@ testPointToTetrahedron(const std::array<Vec3d, 4>& inputTetVerts, const Vec3d& p
 }
 
 ///
-/// \brief Tests if the segment intersects any of the triangle faces of the tet (GJK)
+/// \brief Tests if the segment intersects any of the triangle faces of the tet
+/// \todo Could be faster with SAT directly applied here
 ///
 inline bool
 testTetToSegment(
@@ -914,7 +921,7 @@ Real pointTriangleClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec
 ///
 /// \brief Given two triangles and their ids produce the vertex ids for edge-edge and
 /// vertex-triangle contacts. eeContact data is always a-b ordered, vt data is a-b, but tv data is b-a.
-/// \todo: There is one edge case where the point of a triangle lies incident on the plane, ee should be
+/// \todo There is one edge case where the point of a triangle lies incident on the plane, ee should be
 /// produced but fails. This may be too expensive to resolve?
 /// \return int denoting which contact type it is -1=none, 0=ee, 1=vt, 2=tv
 ///

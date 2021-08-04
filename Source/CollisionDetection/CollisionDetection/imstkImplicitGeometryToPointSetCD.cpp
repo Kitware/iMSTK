@@ -42,8 +42,8 @@ ImplicitGeometryToPointSetCD::computeCollisionDataAB(
     CDElementVector<CollisionElement>& elementsA,
     CDElementVector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
-    std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
+    auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
+    auto pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
 
     m_centralGrad.setFunction(implicitGeom);
     if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(implicitGeom))
@@ -85,8 +85,8 @@ ImplicitGeometryToPointSetCD::computeCollisionDataA(
     std::shared_ptr<Geometry>          geomB,
     CDElementVector<CollisionElement>& elementsA)
 {
-    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
-    std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
+    auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
+    auto pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
 
     m_centralGrad.setFunction(implicitGeom);
     if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(implicitGeom))
@@ -122,8 +122,8 @@ ImplicitGeometryToPointSetCD::computeCollisionDataB(
     std::shared_ptr<Geometry>          geomB,
     CDElementVector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
-    std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
+    auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
+    auto pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
 
     m_centralGrad.setFunction(implicitGeom);
     if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(implicitGeom))
