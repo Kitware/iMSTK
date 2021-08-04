@@ -74,7 +74,7 @@ SPHCollisionHandling::handle(
                 if (colElem.m_type == CollisionElementType::PointIndexDirection)
                 {
                     const int particleIndex = colElem.m_element.m_PointIndexDirectionElement.ptIndex;
-                    const Vec3d& n     = colElem.m_element.m_PointIndexDirectionElement.dir;
+                    const Vec3d& n     = -colElem.m_element.m_PointIndexDirectionElement.dir;
                     const double depth = colElem.m_element.m_PointIndexDirectionElement.penetrationDepth;
                     solve(positions[particleIndex], velocities[particleIndex], n * depth);
                 }
