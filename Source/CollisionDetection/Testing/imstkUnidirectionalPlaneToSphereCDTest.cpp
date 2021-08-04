@@ -80,13 +80,3 @@ TEST(imstkUnidirectionalPlaneToSphereCDTest, NonIntersectionTestAB)
     EXPECT_EQ(0, colData->elementsA.getSize());
     EXPECT_EQ(0, colData->elementsB.getSize());
 }
-
-int
-imstkUnidirectionalPlaneToSphereCDTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
-}

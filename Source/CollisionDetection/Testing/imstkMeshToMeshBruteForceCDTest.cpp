@@ -198,13 +198,3 @@ TEST(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToEdge)
     EXPECT_EQ(colData->elementsA[0].m_element.m_CellIndexElement.idCount, 2);
     EXPECT_EQ(colData->elementsB[0].m_element.m_CellIndexElement.idCount, 1);
 }
-
-int
-imstkMeshToMeshBruteForceCDTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
-}
