@@ -65,7 +65,7 @@ CollisionDetectionAlgorithm::areInputsValid()
     }
     else
     {
-        LOG(WARNING) << "CollisionDetectionAlgorithm invalid input types. Recieved: ("
+        LOG(WARNING) << "CollisionDetectionAlgorithm invalid input types. Received: ("
                      << getInput(0)->getTypeName() << ", " << getInput(1)->getTypeName() << ")";
         /* LOG(WARNING) << "CollisionDetectionAlgorithm invalid input types. Required: (" <<
              inputPortReqs.at(0).validGeomName() << ", " << inputPortReqs.at(1).validGeomName() << ") but " <<
