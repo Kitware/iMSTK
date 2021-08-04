@@ -137,7 +137,7 @@ struct EmptyElement { };
 struct CellVertexElement
 {
     Vec3d pts[4] = { Vec3d::Zero(), Vec3d::Zero(), Vec3d::Zero(), Vec3d::Zero() };
-    int size = 0;
+    int size     = 0;
 };
 ///
 /// \brief Represents a cell by its single cell id OR by its N vertex ids
@@ -147,8 +147,8 @@ struct CellVertexElement
 ///
 struct CellIndexElement
 {
-    int ids[4] = { -1, -1, -1, -1 };
-    int idCount = 0;
+    int ids[4]        = { -1, -1, -1, -1 };
+    int idCount       = 0;
     CellType cellType = IMSTK_VERTEX;
 };
 
@@ -169,7 +169,7 @@ struct PointDirectionElement
 struct PointIndexDirectionElement
 {
     int ptIndex = 0;
-    Vec3d dir = Vec3d::Zero();
+    Vec3d dir   = Vec3d::Zero();
     double penetrationDepth = 0.0;
 };
 
