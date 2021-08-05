@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkDeviceClient.h"
+#include "imstkParallelUtils.h"
 
 #include <HD/hd.h>
 

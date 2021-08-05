@@ -20,16 +20,10 @@
 =========================================================================*/
 
 #include "imstkVTKRenderDelegate.h"
-#include "imstkDebugRenderGeometry.h"
 #include "imstkLogger.h"
 #include "imstkPointSet.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
-
-// Debug render delegates
-#include "imstkVTKdebugLinesRenderDelegate.h"
-#include "imstkVTKdebugPointsRenderDelegate.h"
-#include "imstkVTKdebugTrianglesRenderDelegate.h"
 
 // VTK render delegates
 #include "imstkVTKCapsuleRenderDelegate.h"
@@ -149,31 +143,6 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
     }
     LOG(FATAL) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
     return nullptr;
-}
-
-std::shared_ptr<VTKRenderDelegate>
-VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
-{
-    switch (dbgVizModel->getDebugGeometry()->getType())
-    {
-    case DebugRenderGeometry::Type::Points:
-    {
-        return std::make_shared<VTKdbgPointsRenderDelegate>(dbgVizModel);
-    }
-    case DebugRenderGeometry::Type::Lines:
-    {
-        return std::make_shared<VTKdbgLinesRenderDelegate>(dbgVizModel);
-    }
-    case DebugRenderGeometry::Type::Triangles:
-    {
-        return std::make_shared<VTKdbgTrianglesRenderDelegate>(dbgVizModel);
-    }
-    default:
-    {
-        LOG(FATAL) << "RenderDelegate::makeDebugDelegate error: Geometry type incorrect.";
-        return nullptr; // will never be reached
-    }
-    }
 }
 
 void

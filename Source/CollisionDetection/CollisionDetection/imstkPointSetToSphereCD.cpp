@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,30 +21,130 @@
 
 #include "imstkPointSetToSphereCD.h"
 #include "imstkCollisionData.h"
-#include "imstkNarrowPhaseCD.h"
+#include "imstkCollisionUtils.h"
 #include "imstkPointSet.h"
+#include "imstkSphere.h"
 
 namespace imstk
 {
-PointSetToSphereCD::PointSetToSphereCD(std::shared_ptr<PointSet>      pointSet,
-                                       std::shared_ptr<Sphere>        sphere,
-                                       std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::PointSetToSphere, colData),
-    m_pointSet(pointSet),
-    m_sphere(sphere)
+PointSetToSphereCD::PointSetToSphereCD()
 {
+    setRequiredInputType<PointSet>(0);
+    setRequiredInputType<Sphere>(1);
 }
 
 void
-PointSetToSphereCD::computeCollisionData()
+PointSetToSphereCD::computeCollisionDataAB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
 {
-    m_colData->clearAll();
-    std::shared_ptr<VecDataArray<double, 3>> vertexData = m_pointSet->getVertexPositions();
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
+    std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomB);
+
+    const Vec3d& spherePos = sphere->getPosition();
+    const double r    = sphere->getRadius();
+    const double rSqr = r * r;
+
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
-    ParallelUtils::parallelFor(static_cast<unsigned int>(vertices.size()),
-        [&](const unsigned int idx)
+
+    ParallelUtils::parallelFor(vertices.size(),
+        [&](const int idx)
         {
-            NarrowPhaseCD::pointToSphere(vertices[idx], idx, m_sphere.get(), m_colData);
-        });
+            Vec3d sphereContactPt, sphereContactNormal;
+            double depth;
+
+            if (CollisionUtils::testSphereToPoint(
+                                spherePos, r, vertices[idx],
+                                sphereContactPt, sphereContactNormal, depth))
+            {
+                PointIndexDirectionElement elemA;
+                elemA.dir     = sphereContactNormal;             // Direction to resolve pointset point
+                elemA.ptIndex = idx;
+                elemA.penetrationDepth = depth;
+
+                PointDirectionElement elemB;
+                elemB.dir = -sphereContactNormal;                 // Direction to resolve sphere
+                elemB.pt  = sphereContactPt;
+                elemB.penetrationDepth = depth;
+
+                elementsA.safeAppend(elemA);
+                elementsB.safeAppend(elemB);
+            }
+                }, vertices.size() > 100);
 }
-} // imstk
+
+void
+PointSetToSphereCD::computeCollisionDataA(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA)
+{
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
+    std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomB);
+
+    const Vec3d& spherePos = sphere->getPosition();
+    const double r    = sphere->getRadius();
+    const double rSqr = r * r;
+
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices   = *vertexData;
+
+    ParallelUtils::parallelFor(vertices.size(),
+        [&](const int idx)
+        {
+            Vec3d sphereContactPt, sphereContactNormal;
+            double depth;
+
+            if (CollisionUtils::testSphereToPoint(
+                                spherePos, r, vertices[idx],
+                                sphereContactPt, sphereContactNormal, depth))
+            {
+                PointIndexDirectionElement elemA;
+                elemA.dir     = sphereContactNormal;             // Direction to resolve pointset point
+                elemA.ptIndex = idx;
+                elemA.penetrationDepth = depth;
+
+                elementsA.safeAppend(elemA);
+            }
+                }, vertices.size() > 100);
+}
+
+void
+PointSetToSphereCD::computeCollisionDataB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsB)
+{
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
+    std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomB);
+
+    const Vec3d& spherePos = sphere->getPosition();
+    const double r    = sphere->getRadius();
+    const double rSqr = r * r;
+
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices   = *vertexData;
+
+    ParallelUtils::parallelFor(vertices.size(),
+        [&](const int idx)
+        {
+            Vec3d sphereContactPt, sphereContactNormal;
+            double depth;
+
+            if (CollisionUtils::testSphereToPoint(
+                                spherePos, r, vertices[idx],
+                                sphereContactPt, sphereContactNormal, depth))
+            {
+                PointDirectionElement elemB;
+                elemB.dir = -sphereContactNormal;                 // Direction to resolve sphere
+                elemB.pt  = sphereContactPt;
+                elemB.penetrationDepth = depth;
+
+                elementsB.safeAppend(elemB);
+            }
+                }, vertices.size() > 100);
+}
+}

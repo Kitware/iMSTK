@@ -21,31 +21,131 @@
 
 #include "imstkPointSetToPlaneCD.h"
 #include "imstkCollisionData.h"
-#include "imstkNarrowPhaseCD.h"
 #include "imstkPointSet.h"
 #include "imstkVecDataArray.h"
+#include "imstkPlane.h"
+#include "imstkCollisionUtils.h"
 
 namespace imstk
 {
-PointSetToPlaneCD::PointSetToPlaneCD(std::shared_ptr<PointSet>      pointSet,
-                                     std::shared_ptr<Plane>         plane,
-                                     std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::PointSetToSphere, colData),
-    m_pointSet(pointSet),
-    m_plane(plane)
+PointSetToPlaneCD::PointSetToPlaneCD()
 {
+    setRequiredInputType<PointSet>(0);
+    setRequiredInputType<Plane>(1);
+
+    // By default plane cd is not generated
+    setGenerateCD(true, false);
 }
 
 void
-PointSetToPlaneCD::computeCollisionData()
+PointSetToPlaneCD::computeCollisionDataAB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
 {
-    m_colData->clearAll();
-    std::shared_ptr<VecDataArray<double, 3>> vertexData = m_pointSet->getVertexPositions();
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
+    std::shared_ptr<Plane>    plane    = std::dynamic_pointer_cast<Plane>(geomB);
+
+    const Vec3d planePt     = plane->getPosition();
+    const Vec3d planeNormal = plane->getNormal();
+
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
+
     ParallelUtils::parallelFor(static_cast<unsigned int>(vertices.size()),
         [&](const unsigned int idx)
         {
-            NarrowPhaseCD::pointToPlane(vertices[idx], idx, m_plane.get(), m_colData);
-        });
+            Vec3d contactPt, contactNormal;
+            double depth;
+
+            if (CollisionUtils::testPlaneToPoint(
+                planePt, planeNormal, vertices[idx],
+                contactPt, contactNormal, depth))
+            {
+                PointIndexDirectionElement elemA;
+                elemA.dir     = planeNormal; // Direction to resolve pointset point
+                elemA.ptIndex = idx;
+                elemA.penetrationDepth = depth;
+
+                PointDirectionElement elemB;
+                elemB.dir = -planeNormal; // Direction to resolve plane
+                elemB.pt  = vertices[idx];
+                elemB.penetrationDepth = depth;
+
+                elementsA.safeAppend(elemA);
+                elementsB.safeAppend(elemB);
+            }
+        }, vertices.size() > 100);
 }
-} // imstk
+
+void
+PointSetToPlaneCD::computeCollisionDataA(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA)
+{
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
+    std::shared_ptr<Plane>    plane    = std::dynamic_pointer_cast<Plane>(geomB);
+
+    const Vec3d planePt     = plane->getPosition();
+    const Vec3d planeNormal = plane->getNormal();
+
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices   = *vertexData;
+
+    ParallelUtils::parallelFor(static_cast<unsigned int>(vertices.size()),
+        [&](const unsigned int idx)
+        {
+            Vec3d contactPt, contactNormal;
+            double depth;
+
+            if (CollisionUtils::testPlaneToPoint(
+                planePt, planeNormal, vertices[idx],
+                contactPt, contactNormal, depth))
+            {
+                PointIndexDirectionElement elemA;
+                elemA.dir     = planeNormal; // Direction to resolve pointset point
+                elemA.ptIndex = idx;
+                elemA.penetrationDepth = depth;
+
+                elementsA.safeAppend(elemA);
+            }
+        }, vertices.size() > 100);
+}
+
+void
+PointSetToPlaneCD::computeCollisionDataB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsB)
+{
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
+    std::shared_ptr<Plane>    plane    = std::dynamic_pointer_cast<Plane>(geomB);
+
+    const Vec3d planePt     = plane->getPosition();
+    const Vec3d planeNormal = plane->getNormal();
+
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices   = *vertexData;
+
+    ParallelUtils::parallelFor(static_cast<unsigned int>(vertices.size()),
+        [&](const unsigned int idx)
+        {
+            Vec3d contactPt, contactNormal;
+            double depth;
+
+            if (CollisionUtils::testPlaneToPoint(
+                planePt, planeNormal, vertices[idx],
+                contactPt, contactNormal, depth))
+            {
+                PointDirectionElement elemB;
+                elemB.dir = -planeNormal; // Direction to resolve plane
+                elemB.pt  = vertices[idx];
+                elemB.penetrationDepth = depth;
+
+                elementsB.safeAppend(elemB);
+            }
+        }, vertices.size() > 100);
+}
+}

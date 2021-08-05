@@ -4,11 +4,8 @@
 include(imstkAddLibrary)
 imstk_add_library( CollisionDetection
   DEPENDS
-    Common
-    DataStructures
-    Geometry
-    MeshIO #TODO: remove this dependency
-    SCCD    
+    FilteringCore
+    #fcl
   )
 
 #-----------------------------------------------------------------------------

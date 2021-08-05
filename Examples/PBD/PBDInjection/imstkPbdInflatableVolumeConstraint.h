@@ -35,25 +35,25 @@ public:
     ///
     /// \brief constructor
     ///
-    PbdInflatableVolumeConstraint() : PbdVolumeConstraint() {}
+    PbdInflatableVolumeConstraint() : PbdVolumeConstraint() { }
 
     ///
     /// \brief Initializes the inflatable volume constraint
     ///
     void initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                        const size_t& pIdx1, const size_t& pIdx2,
-                        const size_t& pIdx3, const size_t& pIdx4,
-                        const double k = 2.0);
+                        const size_t& pIdx0, const size_t& pIdx1,
+                        const size_t& pIdx2, const size_t& pIdx3,
+                        const double k = 2.0)
+    {
+        PbdVolumeConstraint::initConstraint(initVertexPositions, pIdx0, pIdx1, pIdx2, pIdx3, k);
+        m_initialRestVolume = m_restVolume;
+    }
 
-    ///
-    /// \brief Soften or strengthen constraint by multiplying current restVolume by a ratio
-    ///
-    void multiplyRestVolumeBy(const double ratio);
+    const double getRestVolume() const { return m_restVolume; }
+    const double getInitRestVolume() const { return m_initialRestVolume; }
 
-    ///
-    /// \brief Soften or strengthen constraint by multiplying initial restVolume by a ratio
-    ///
-    void multiplyInitRestVolumeBy(const double ratio) { m_restVolume = ratio * m_initialRestVolume; }
+    void setRestVolume(const double restVolume) { m_restVolume = restVolume; }
+    void setInitRestVolume(const double initRestVolume) { m_initialRestVolume = initRestVolume; }
 
     ///
     /// \brief Reset constraint rest volume
@@ -64,7 +64,7 @@ protected:
     double m_initialRestVolume = 0.0; ///> Rest measurement(length, area, volume, etc.)
 };
 
-struct  PbdInflatableVolumeConstraintFunctor : public PbdVolumeConstraintFunctor
+struct PbdInflatableVolumeConstraintFunctor : public PbdVolumeConstraintFunctor
 {
     PbdInflatableVolumeConstraintFunctor() : PbdVolumeConstraintFunctor() {}
     ~PbdInflatableVolumeConstraintFunctor() override = default;

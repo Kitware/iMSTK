@@ -147,7 +147,7 @@ protected:
     /// \brief Check inputs are correct
     /// \return true if all inputs match the requirements, false if not
     ///
-    virtual bool areInputsValid() const;
+    virtual bool areInputsValid();
 
     using GeometryCheck      = std::function<bool (Geometry*)>;
     using TypeCheckContainer = std::unordered_map<size_t, GeometryCheck>;

@@ -64,13 +64,4 @@ SceneObjectController::update(const double dt)
     m_sceneObject->getMasterGeometry()->setRotation(getRotation());
     m_sceneObject->getMasterGeometry()->postModified();
 }
-
-void
-SceneObjectController::applyForces()
-{
-    if (auto collidingObject = dynamic_cast<CollidingObject*>(m_sceneObject.get()))
-    {
-        m_deviceClient->setForce(collidingObject->getForce());
-    }
-}
 }

@@ -70,30 +70,6 @@ CollidingObject::setCollidingToVisualMap(std::shared_ptr<GeometryMap> map)
     m_collidingToVisualMap = map;
 }
 
-const Vec3d&
-CollidingObject::getForce() const
-{
-    return m_force;
-}
-
-void
-CollidingObject::setForce(Vec3d force)
-{
-    m_force = force;
-}
-
-void
-CollidingObject::resetForce()
-{
-    m_force.setConstant(0.0);
-}
-
-void
-CollidingObject::appendForce(Vec3d force)
-{
-    m_force += force;
-}
-
 void
 CollidingObject::updateGeometries()
 {

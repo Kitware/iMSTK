@@ -27,11 +27,11 @@
 
 namespace imstk
 {
-struct CollisionData;
+class CollisionData;
 class RigidObject2;
 
 ///
-/// \class RigidBodyContactHandler
+/// \class RigidBodyCH
 ///
 /// \brief Creates rigid body contact and frictional constraints given
 /// collision data then adds them to the rigid body model, if rigid
@@ -41,37 +41,95 @@ class RigidObject2;
 class RigidBodyCH : public CollisionHandling
 {
 public:
-    RigidBodyCH(const Side&                          side,
-                const std::shared_ptr<CollisionData> colData,
-                std::shared_ptr<RigidObject2>        rbdObjectA,
-                std::shared_ptr<RigidObject2>        rbdObjectB = nullptr,
-                const double                         stiffness = 0.0,
-                const double                         frictionalCoefficient = 0.8);
-
-    RigidBodyCH() = delete;
-
+    RigidBodyCH() = default;
     virtual ~RigidBodyCH() override = default;
+
+    virtual const std::string getTypeName() const override { return "RigidBodyCH"; }
+
+public:
+    void setInputRigidObjectA(std::shared_ptr<RigidObject2> rbdObjA);
+
+    ///
+    /// \brief Second input rigid object is optional
+    ///
+    void setInputRigidObjectB(std::shared_ptr<RigidObject2> rbdObjB);
+
+    ///
+    /// \brief Second input colliding object is optional
+    ///
+    void setInputCollidingObjectB(std::shared_ptr<CollidingObject> colObjB);
+
+    std::shared_ptr<RigidObject2> getRigidObjA();
+    std::shared_ptr<RigidObject2> getRigidObjB();
 
 public:
     ///
-    /// \brief Compute forces based on collision data
+    /// \brief Baumgarte stabilization term, scales the constraint scalars
+    /// The higher it is, the faster constraint violations are dealt with
+    /// (bigger steps), but could introduce erroneous velocity
     ///
-    void processCollisionData() override;
+    void setBeta(double beta) { m_beta = beta; }
+    const double getBeta() const { return m_beta; }
 
-    void setStiffness(double stiffness) { m_stiffness = stiffness; }
-    void setFriction(double frictionalCoefficient) { m_frictionalCoefficient = frictionalCoefficient; }
+    void setFriction(double frictionalCoefficient)
+    {
+        m_frictionalCoefficient = frictionalCoefficient;
+        m_useFriction = (m_frictionalCoefficient != 0.0);
+    }
+
+    const double getFriction() const { return m_frictionalCoefficient; }
+
     void setUseFriction(bool useFriction) { m_useFriction = useFriction; }
+    const double getUseFriction() const { return m_useFriction; }
 
 protected:
-    void processA();
-    void processB();
-    void processAB();
+    ///
+    /// \brief Add rigid body constraints according to contacts
+    ///
+    virtual void handle(
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB) override;
 
-private:
-    std::shared_ptr<RigidObject2> m_rbdObjectA = nullptr;
-    std::shared_ptr<RigidObject2> m_rbdObjectB = nullptr;
-    double m_stiffness = 0.0;
-    double m_frictionalCoefficient = 0.8;
-    bool   m_useFriction = true;
+    ///
+    /// \brief Handle rigid vs rigid two-way
+    /// edge-edge, vertex-triangle, etc
+    ///
+    void handleRbdRbdTwoWay(
+        std::shared_ptr<RigidObject2>            rbdObjA,
+        std::shared_ptr<RigidObject2>            rbdObjB,
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB);
+
+    ///
+    /// \brief Handle rigid vs static one-way
+    /// edge-edge, vertex-triangle, etc
+    ///
+    void handleRbdStaticOneWay(
+        std::shared_ptr<RigidObject2>            rbdObj,
+        std::shared_ptr<CollidingObject>         colObj,
+        const CDElementVector<CollisionElement>& elementsA,
+        const CDElementVector<CollisionElement>& elementsB);
+
+    ///
+    /// \brief Add constraint for the rigid body given contact
+    ///
+    virtual void addConstraint(
+        std::shared_ptr<RigidObject2> rbdObj,
+        const Vec3d& contactPt, const Vec3d& contactNormal,
+        const double contactDepth);
+
+    ///
+    /// \brief Add two-way constraint for the rigid bodies given contact
+    ///
+    virtual void addConstraint(
+        std::shared_ptr<RigidObject2> rbdObjA,
+        std::shared_ptr<RigidObject2> rbdObjB,
+        const Vec3d& contactPt, const Vec3d& contactNormal,
+        const double contactDepth);
+
+protected:
+    double m_beta = 0.0;
+    double m_frictionalCoefficient = 2.0;
+    bool   m_useFriction = false;
 };
 }

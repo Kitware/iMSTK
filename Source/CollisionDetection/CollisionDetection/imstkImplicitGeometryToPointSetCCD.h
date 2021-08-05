@@ -21,7 +21,7 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 
 namespace imstk
@@ -41,35 +41,51 @@ class PointSet;
 /// to avoid sampling the implicit geometry anywhere but at the surface (it will also
 /// work for SDFs, though better alterations/modifications of this exist for SDFs)
 ///
-class ImplicitGeometryToPointSetCCD : public CollisionDetection
+class ImplicitGeometryToPointSetCCD : public CollisionDetectionAlgorithm
 {
 public:
-    ///
-    /// \brief
-    /// \param ImplicitGeometry
-    /// \param PointSet to test collision with
-    /// \param CollisionData to write too
-    ///
-    ImplicitGeometryToPointSetCCD(std::shared_ptr<ImplicitGeometry> implicitGeomA,
-                                  std::shared_ptr<PointSet>         pointSetB,
-                                  std::shared_ptr<CollisionData>    colData);
+    ImplicitGeometryToPointSetCCD();
     virtual ~ImplicitGeometryToPointSetCCD() override = default;
 
-public:
     ///
-    /// \brief Detect collision and compute collision data
+    /// \brief Returns collision detection type string name
     ///
-    void computeCollisionData() override;
+    virtual const std::string getTypeName() const override { return "ImplicitGeometryToPointSetCCD"; }
+
+protected:
+    void setupFunctions(std::shared_ptr<ImplicitGeometry> implicitGeom, std::shared_ptr<PointSet> pointSet);
+
+    ///
+    /// \brief Compute collision data for AB simulatenously
+    ///
+    virtual void computeCollisionDataAB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB) override;
+
+    ///
+    /// \brief Compute collision data for side A
+    ///
+    virtual void computeCollisionDataA(
+        std::shared_ptr<Geometry> geomA,
+        std::shared_ptr<Geometry> geomB, CDElementVector<CollisionElement>& elementsA) override;
+
+    ///
+    /// \brief Compute collision data for side B
+    ///
+    virtual void computeCollisionDataB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsB) override;
 
 private:
-    std::shared_ptr<ImplicitGeometry> m_implicitGeomA;
-    std::shared_ptr<PointSet>       m_pointSetB;
-    ImplicitFunctionCentralGradient centralGrad;
+    ImplicitFunctionCentralGradient m_centralGrad;
 
-    std::shared_ptr<VecDataArray<double, 3>> displacementsPtr;
+    std::shared_ptr<VecDataArray<double, 3>> m_displacementsPtr;
 
-    std::unordered_map<int, Vec3d> prevOuterElement;
-    std::unordered_map<int, int>   prevOuterElementCounter;
+    std::unordered_map<int, Vec3d> m_prevOuterElement;
+    std::unordered_map<int, int>   m_prevOuterElementCounter;
 
     // Penetration depths are clamped to this ratio * displacement of the vertex
     double m_depthRatioLimit = 0.3;

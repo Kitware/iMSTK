@@ -22,10 +22,9 @@
 #include "imstkScene.h"
 #include "imstkCamera.h"
 #include "imstkCameraController.h"
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkCollisionGraph.h"
 #include "imstkCollisionPair.h"
-#include "imstkDebugRenderGeometry.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkLight.h"
@@ -288,23 +287,6 @@ Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 }
 
 void
-Scene::addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel)
-{
-    const std::string name = dbgRenderModel->getDebugGeometry()->getName();
-
-    if (m_DebugRenderModelMap.find(name) != m_DebugRenderModelMap.end())
-    {
-        LOG(WARNING) << "Can not add debug render model: '" << name
-                     << "' is already registered in this scene.";
-        return;
-    }
-
-    m_DebugRenderModelMap[name] = dbgRenderModel;
-    this->postEvent(Event(modified()));
-    LOG(INFO) << name << " debug model added to " << m_name;
-}
-
-void
 Scene::removeSceneObject(const std::string& name)
 {
     std::shared_ptr<SceneObject> obj = getSceneObject(name);
@@ -502,10 +484,6 @@ Scene::advance(const double dt)
         {
             defObj->getFEMModel()->getContactForce().setConstant(0.0);
         }
-        else if (auto collidingObj = std::dynamic_pointer_cast<CollidingObject>(obj))
-        {
-            collidingObj->resetForce();
-        }
     }
 
     // Update objects controlled by the device controllers
@@ -513,8 +491,6 @@ Scene::advance(const double dt)
     {
         controller->update(dt);
     }
-
-    CollisionDetection::updateInternalOctreeAndDetectCollision();
 
     // Execute the computational graph
     if (m_taskGraphController != nullptr)

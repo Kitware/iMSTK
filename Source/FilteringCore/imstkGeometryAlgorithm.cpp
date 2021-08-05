@@ -75,7 +75,7 @@ GeometryAlgorithm::setNumberOfOutputPorts(size_t numPorts)
 }
 
 bool
-GeometryAlgorithm::areInputsValid() const
+GeometryAlgorithm::areInputsValid()
 {
     // Check input types
     for (const auto& port : m_inputs)

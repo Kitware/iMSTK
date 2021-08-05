@@ -21,36 +21,39 @@
 
 #pragma once
 
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 
 namespace imstk
 {
+class CollisionData;
 class Sphere;
-struct CollisionData;
 
 ///
 /// \class SphereToSphereCD
 ///
 /// \brief Sphere to sphere collision detection
+/// Generates point-direction contact data.
+/// By default generates contact data for both sides.
 ///
-class SphereToSphereCD : public CollisionDetection
+class SphereToSphereCD : public CollisionDetectionAlgorithm
 {
 public:
+    SphereToSphereCD();
+    virtual ~SphereToSphereCD() override = default;
 
     ///
-    /// \brief Constructor
+    /// \brief Returns collision detection type string name
     ///
-    SphereToSphereCD(std::shared_ptr<Sphere>        sphereA,
-                     std::shared_ptr<Sphere>        sphereB,
-                     std::shared_ptr<CollisionData> colData);
+    virtual const std::string getTypeName() const override { return "SphereToSphereCD"; }
 
+protected:
     ///
-    /// \brief Detect collision and compute collision data
+    /// \brief Compute collision data for AB simulatenously
     ///
-    void computeCollisionData() override;
-
-private:
-    std::shared_ptr<Sphere> m_sphereA;
-    std::shared_ptr<Sphere> m_sphereB;
+    virtual void computeCollisionDataAB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB) override;
 };
 }

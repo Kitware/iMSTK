@@ -22,6 +22,7 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkSurfaceMesh.h"
 
 namespace imstk
@@ -235,33 +236,16 @@ TetrahedralMesh::extractSurfaceMesh()
     return surfMesh;
 }
 
-void
-TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos,
-                                           WeightsArray& weights) const
+Vec4d
+TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos) const
 {
-    const Vec4i& tetIndices = (*m_tetrahedraIndices)[tetId];
-    Vec3d        v[4];
-    double       det;
-
-    const VecDataArray<double, 3>& vertices = *m_vertexPositions;
-    for (int i = 0; i < 4; ++i)
-    {
-        v[i] = vertices[tetIndices[i]];
-    }
-
-    Mat4d A;
-    A << v[0][0], v[0][1], v[0][2], 1, v[1][0], v[1][1], v[1][2], 1, v[2][0], v[2][1], v[2][2], 1, v[3][0], v[3][1], v[3][2], 1;
-
-    det = A.determinant();
-
-    for (int i = 0; i < 4; ++i)
-    {
-        Mat4d B = A;
-        B(i, 0)    = pos[0];
-        B(i, 1)    = pos[1];
-        B(i, 2)    = pos[2];
-        weights[i] = B.determinant() / det;
-    }
+    const VecDataArray<double, 3>& vertices     = *m_vertexPositions;
+    const VecDataArray<int, 4>&    tetraIndices = *m_tetrahedraIndices;
+    return baryCentric(pos,
+        vertices[tetraIndices[tetId][0]],
+        vertices[tetraIndices[tetId][1]],
+        vertices[tetraIndices[tetId][2]],
+        vertices[tetraIndices[tetId][3]]);
 }
 
 void

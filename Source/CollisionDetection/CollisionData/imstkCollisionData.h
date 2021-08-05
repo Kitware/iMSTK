@@ -25,12 +25,12 @@
 #include "imstkMath.h"
 #include "imstkParallelUtils.h"
 
-#include <array>
-
 namespace imstk
 {
+class Geometry;
+
 template<class DataElement>
-class CollisionDataBase
+class CDElementVector
 {
 public:
     ///
@@ -95,149 +95,186 @@ public:
     ///
     void clear() { m_Data.resize(0); }
 
-private:
+protected:
     std::vector<DataElement> m_Data;
     ParallelUtils::SpinLock  m_Lock;
 };
 
-///
-/// \struct PositionDirectionCollisionData
-///
-/// \brief Point-penetration depth collision data
-///
-struct PositionDirectionCollisionDataElement
+enum class CollisionElementType
 {
-    Vec3d posA;
-    Vec3d posB;
-    Vec3d dirAtoB;
-    uint32_t nodeIdx;
-    double penetrationDepth;
+    Empty,
+    CellVertex,
+    CellIndex,
+    PointDirection,
+    PointIndexDirection,
 };
-class PositionDirectionCollisionData : public CollisionDataBase<PositionDirectionCollisionDataElement>
+
+// iMSTK collision data (not contacts) are broken down into the following:
+// 1.) Intersecting cells which can be used for contact generation
+// 2.) Direct (point, normal, depth) which can be used for contacts
+//   - \todo: Consider interpreting PointDirection and Index as CellVertex and CellIndex
+//   but give CellVertex and Index a cache-all void* clientData or something for direction, and depth
+//
+// There are then 3 ways to report a cell:
+// 1.) Provide via a single cell id (CellIndexElement)
+//    - Not always possible. Some elements don't have ids
+// 2.) Provide via a set of vertex ids (CellIndexElement)
+//    - Avoids requiring an id for the cell but requires ids for vertices
+//    - Useful for cells of cells that may not have ids.
+//      ie: edges of triangle, tetrahedron, or face of tet
+// 3.) Provide the cell by vertex value (CellVertexElement)
+//    - Useful for implicit geometry (cells and verts aren't explicit given in any form)
+//
+// \todo: Inline initialization can't be used on basic primitive types in a union?
+//
+struct EmptyElement { };
+
+///
+/// \brief Represents a cell by its vertex values
+/// Possibly cells may be: point, edge, triangle, quad, or tetrahedron
+/// Maximum 4 vertices (tetrahedron is maximum cell it could represent)
+///
+struct CellVertexElement
 {
+    Vec3d pts[4] = { Vec3d::Zero(), Vec3d::Zero(), Vec3d::Zero(), Vec3d::Zero() };
+    int size     = 0;
+};
+///
+/// \brief Represents a cell by its single cell id OR by its N vertex ids
+/// which case can be determined by the idCount
+/// Possibly cells may be: point, edge, triangle, quad, or tetrahedron
+/// maximum 4 ids (tetrahedron by vertex ids is maximum cell it could represent)
+///
+struct CellIndexElement
+{
+    int ids[4]        = { -1, -1, -1, -1 };
+    int idCount       = 0;
+    CellType cellType = IMSTK_VERTEX;
 };
 
 ///
-/// \struct MeshToAnalyticalCollisionData
+/// \brief Direclty gives a point-direction contact
+/// as its collision data
 ///
-/// \brief Mesh to analytical point-penetration depth collision data
-///
-struct PenetrationCollisionDataElement
+struct PointDirectionElement
 {
-    uint32_t nodeIdx;
-    Vec3d penetrationVector;
+    Vec3d pt  = Vec3d::Zero();
+    Vec3d dir = Vec3d::Zero();
+    double penetrationDepth = 0.0;
 };
-class PenetrationCollisionData : public CollisionDataBase<PenetrationCollisionDataElement>
-{
-};
-
 ///
-/// \struct VertexTriangleCollisionData
+/// \brief Direclty gives a point-direction contact
+/// as its collision data, point given by index
 ///
-/// \brief Vertex-triangle collision data
-///
-struct VertexTriangleCollisionDataElement
+struct PointIndexDirectionElement
 {
-    uint32_t vertexIdx;
-    uint32_t triIdx;
-    double closestDistance;
-};
-class VertexTriangleCollisionData : public CollisionDataBase<VertexTriangleCollisionDataElement>
-{
+    int ptIndex = 0;
+    Vec3d dir   = Vec3d::Zero();
+    double penetrationDepth = 0.0;
 };
 
 ///
-/// \struct TriangleVertexCollisionData
+/// \brief Union of collision elements. We use a union to avoid polymorphism. There may be many
+/// elements and accessing them needs to be quick. Additionally the union keeps them more compact
+/// and allows one to keep them on the stack.
 ///
-/// \brief Triangle-vertex collision data
-///
-struct TriangleVertexCollisionDataElement
+struct CollisionElement
 {
-    uint32_t triIdx;
-    uint32_t vertexIdx;
-    double closestDistance;
-};
-class TriangleVertexCollisionData : public CollisionDataBase<TriangleVertexCollisionDataElement>
-{
-};
+    CollisionElement() : m_element{EmptyElement()}, m_type{CollisionElementType::Empty} { }
 
-///
-/// \struct EdgeEdgeCollisionData
-///
-/// \brief Edge-Edge collision data
-///
-struct EdgeEdgeCollisionDataElement
-{
-    std::pair<uint32_t, uint32_t> edgeIdA;
-    std::pair<uint32_t, uint32_t> edgeIdB;
-    float time;
-};
-class EdgeEdgeCollisionData : public CollisionDataBase<EdgeEdgeCollisionDataElement>
-{
-};
-
-///
-/// \struct PointTetrahedronCollisionData
-///
-/// \brief Point-tetrahedron collision data
-///
-struct PointTetrahedronCollisionDataElement
-{
-    enum CollisionType
+    CollisionElement(const EmptyElement& element) : m_element{element}, m_type{CollisionElementType::Empty} { }
+    void operator=(const EmptyElement& element)
     {
-        aPenetratingA = 0, // A self-penetration
-        aPenetratingB = 1, // vertex is from mesh A, tetrahedron is from mesh B
-        bPenetratingA = 2, // vertex is from mesh B, tetrahedron is from mesh A
-        bPenetratingB = 3  // B self-penetration
-    } collisionType;
-
-    uint32_t vertexIdx;
-    uint32_t tetreahedronIdx;
-    using WeightsArray = std::array<double, 4>;
-    WeightsArray BarycentricCoordinates;
-};
-class PointTetrahedronCollisionData : public CollisionDataBase<PointTetrahedronCollisionDataElement>
-{
-};
-
-///
-/// \brief The PickingCollisionData struct
-///
-struct PickingCollisionDataElement
-{
-    // map of node and point position
-    Vec3d ptPos;
-    uint32_t nodeIdx;
-    bool touchStatus;
-};
-class PickingCollisionData : public CollisionDataBase<PickingCollisionDataElement>
-{
-};
-
-///
-/// \struct CollisionData
-///
-/// \brief Class that is the holder of all types of collision data
-///
-struct CollisionData
-{
-    void clearAll()
-    {
-        PDColData.clear();
-        VTColData.clear();
-        TVColData.clear();
-        EEColData.clear();
-        PColData.clear();
-        PTColData.clear();
-        NodePickData.clear();
+        m_element.m_EmptyElement = element;
+        m_type = CollisionElementType::Empty;
     }
 
-    PositionDirectionCollisionData PDColData; ///< Position Direction collision data
-    PenetrationCollisionData PColData;        ///< Penetration vector collision data
-    VertexTriangleCollisionData VTColData;    ///< Vertex Triangle collision data
-    TriangleVertexCollisionData TVColData;    ///< Triangle Vertex collision data
-    EdgeEdgeCollisionData EEColData;          ///< Edge Edge collision data
-    PointTetrahedronCollisionData PTColData;  ///< Point Tetrahedron collision data
-    PickingCollisionData NodePickData;        ///< List of points that are picked
+    CollisionElement(const CellVertexElement& element) : m_element{element}, m_type{CollisionElementType::CellVertex} { }
+    void operator=(const CellVertexElement& element)
+    {
+        m_element.m_CellVertexElement = element;
+        m_type = CollisionElementType::CellVertex;
+    }
+
+    CollisionElement(const CellIndexElement& element) : m_element{element}, m_type{CollisionElementType::CellIndex} { }
+    void operator=(const CellIndexElement& element)
+    {
+        m_element.m_CellIndexElement = element;
+        m_type = CollisionElementType::CellIndex;
+    }
+
+    CollisionElement(const PointDirectionElement& element) : m_element{element}, m_type{CollisionElementType::PointDirection} { }
+    void operator=(const PointDirectionElement& element)
+    {
+        m_element.m_PointDirectionElement = element;
+        m_type = CollisionElementType::PointDirection;
+    }
+
+    CollisionElement(const PointIndexDirectionElement& element) : m_element{element}, m_type{CollisionElementType::PointIndexDirection} { }
+    void operator=(const PointIndexDirectionElement& element)
+    {
+        m_element.m_PointIndexDirectionElement = element;
+        m_type = CollisionElementType::PointIndexDirection;
+    }
+
+    CollisionElement(const CollisionElement& other)
+    {
+        m_type = other.m_type;
+        switch (m_type)
+        {
+        case CollisionElementType::Empty:
+            break;
+        case CollisionElementType::CellVertex:
+            m_element.m_CellVertexElement = other.m_element.m_CellVertexElement;
+            break;
+        case CollisionElementType::CellIndex:
+            m_element.m_CellIndexElement = other.m_element.m_CellIndexElement;
+            break;
+        case CollisionElementType::PointDirection:
+            m_element.m_PointDirectionElement = other.m_element.m_PointDirectionElement;
+            break;
+        case CollisionElementType::PointIndexDirection:
+            m_element.m_PointIndexDirectionElement = other.m_element.m_PointIndexDirectionElement;
+            break;
+        }
+    }
+
+    union Element
+    {
+        EmptyElement m_EmptyElement;
+        CellVertexElement m_CellVertexElement;
+        CellIndexElement m_CellIndexElement;
+        PointDirectionElement m_PointDirectionElement;
+        PointIndexDirectionElement m_PointIndexDirectionElement;
+
+        Element() : m_EmptyElement(EmptyElement()) { }
+        // Constructors needed here for implicit conversions+assignment between elements and parent struct
+        Element(const EmptyElement& ele) : m_EmptyElement(ele) { }
+        Element(const CellVertexElement& ele) : m_CellVertexElement(ele) { }
+        Element(const CellIndexElement& ele) : m_CellIndexElement(ele) { }
+        Element(const PointDirectionElement& ele) : m_PointDirectionElement(ele) { }
+        Element(const PointIndexDirectionElement& ele) : m_PointIndexDirectionElement(ele) { }
+    } m_element;
+
+    CollisionElementType m_type;
+};
+
+///
+/// \brief Describes the contact manifold between two geometries
+///
+class CollisionData
+{
+public:
+    void clearAll()
+    {
+        elementsA.resize(0);
+        elementsB.resize(0);
+    }
+
+public:
+    CDElementVector<CollisionElement> elementsA;
+    CDElementVector<CollisionElement> elementsB;
+    std::shared_ptr<Geometry> geomA;
+    std::shared_ptr<Geometry> geomB;
 };
 }

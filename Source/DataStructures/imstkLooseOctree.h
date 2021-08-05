@@ -279,13 +279,8 @@ public:
                && lowerCorner[2] <= m_UpperExtendedBound[2];
     }
 
-    ///
-    /// \brief Recursively update debug geometry by adding lines drawing bounding boxes of the active nodes
-    /// \return True if debug lines have been added to visualize the bounding box of the current node
-    ///
-    bool updateDebugGeometry();
-
-private:
+// \todo: Make private or protected once a proper public element iteration structure is implemented
+public:
     LooseOctree*     m_pTree;               ///> Pointer to the octree, used to request children from memory pool during splitting node
     OctreeNode*      m_pParent;             ///> Pointer to the parent node
     OctreeNodeBlock* m_pChildren = nullptr; ///> Pointer to a memory block containing 8 children nodes
@@ -450,17 +445,6 @@ public:
     ///
     void update();
 
-    ///
-    /// \brief Generate the debug geometry for debug rendering (a bounding box for each node)
-    /// \param maxLevel The tree will be visualized up to maxLevel levels
-    ///
-    std::shared_ptr<DebugRenderGeometry> getDebugGeometry(const uint32_t maxLevel, bool bDrawNonEmptyParent = true);
-
-    ///
-    /// \brief Update the debug geometry (bounding boxes) after updated tree (debug geometry must be previously initialized by getDebugGeometry())
-    ///
-    void updateDebugGeometry();
-
 protected:
     ///
     /// \brief Add geometry to the internal geometry list to check for duplication
@@ -578,9 +562,6 @@ protected:
 
     bool m_bAlwaysRebuild = false;                        ///> If true, the octree is always be rebuit from scratch every time calling to update()
     bool m_bCompleteBuild = false;                        ///> This is set to true after tree has been built, otherwise false
-
-    std::shared_ptr<DebugRenderGeometry> m_DebugGeometry; ///> Debug geometry, for debug rendering only
-    uint32_t m_MaxLevelDebugRender;                       ///> Maximum level of nodes that will be rendered during debug rendering
 
     /// If true, all non-empty nodes are rendered during debug rendering (including nodes containing primitives and all other non-leaf nodes)
     /// otherwise only nodes containing primitives are rendered

@@ -114,5 +114,5 @@ protected:
     double m_inflationRatio = 1.0;
     double m_sigma = 1.0;
 
-    InflationType m_inlationTpye = InflationType::Linear;
+    InflationType m_inflationType = InflationType::Linear;
 };

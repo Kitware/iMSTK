@@ -8,7 +8,6 @@ imstk_add_library( Constraints
     RigidBodyConstraints
   DEPENDS
     Common
-    CollisionDetection
     DataStructures
     Geometry
   )
@@ -16,6 +15,6 @@ imstk_add_library( Constraints
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-#if( ${PROJECT_NAME}_BUILD_TESTING )
-#  add_subdirectory( Testing )
-#endif()
+if( ${PROJECT_NAME}_BUILD_TESTING )
+  add_subdirectory(Testing)
+endif()

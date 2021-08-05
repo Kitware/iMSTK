@@ -55,7 +55,7 @@ public:
     void setPosition(const double x, const double y, const double z);
 
     ///
-    /// \brief Get the local or globa orientation (post transformed)
+    /// \brief Get the local or global orientation (post transformed)
     ///
     Quatd getOrientation(DataType type = DataType::PostTransform);
 

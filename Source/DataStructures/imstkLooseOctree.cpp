@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkLooseOctree.h"
-#include "imstkDebugRenderGeometry.h"
 #include "imstkLogger.h"
 #include "imstkSurfaceMesh.h"
 
@@ -277,100 +276,6 @@ OctreeNode::insertNonPointPrimitive(OctreePrimitive* const pPrimitive, const Oct
 
     // Insert the primitive to the child node that loosely contains it
     m_pChildren->m_Nodes[childIdx].insertNonPointPrimitive(pPrimitive, type);
-}
-
-bool
-OctreeNode::updateDebugGeometry()
-{
-    if (m_Depth > m_pTree->m_MaxLevelDebugRender)
-    {
-        return false;
-    }
-
-    int   renderCount = 0;
-    Vec3r vertices[8];
-    bool  rendered[8] { false, false, false, false,
-                        false, false, false, false };
-
-    // Also call add lines recursively
-    for (uint32_t i = 0; i < 8; i++)
-    {
-        vertices[i]     = m_Center;
-        vertices[i][0] += (i & 1) ? m_HalfWidth : -m_HalfWidth;
-        vertices[i][1] += (i & 2) ? m_HalfWidth : -m_HalfWidth;
-        vertices[i][2] += (i & 4) ? m_HalfWidth : -m_HalfWidth;
-
-        if (!isLeaf())
-        {
-            rendered[i] = m_pChildren->m_Nodes[i].updateDebugGeometry();
-            if (rendered[i])
-            {
-                ++renderCount;
-            }
-        }
-    }
-
-    //--------------------------------------------------------
-    //
-    //           6-------7
-    //          /|      /|
-    //         2-+-----3 |
-    //         | |     | |   y
-    //         | 4-----+-5   | z
-    //         |/      |/    |/
-    //         0-------1     +--x
-    //
-    //         0   =>   0, 0, 0
-    //         1   =>   0, 0, 1
-    //         2   =>   0, 1, 0
-    //         3   =>   0, 1, 1
-    //         4   =>   1, 0, 0
-    //         5   =>   1, 0, 1
-    //         6   =>   1, 1, 0
-    //         7   =>   1, 1, 1
-    //
-    //--------------------------------------------------------
-
-    // No primitive in this node
-    if (m_PrimitiveCounts[OctreePrimitiveType::Point] == 0
-        && m_PrimitiveCounts[OctreePrimitiveType::Triangle] == 0
-        && m_PrimitiveCounts[OctreePrimitiveType::Analytical] == 0)
-    {
-        if (!m_pTree->m_bDrawNonEmptyParent)
-        {
-            return (renderCount > 0);
-        }
-
-        if (renderCount == 0                  // Children did not render
-            && m_pTree->m_pRootNode != this)  // Not root node, and no data in this node)
-        {
-            return false;
-        }
-    }
-
-    if (renderCount < 8)  // If renderCount == 8 then no need to render this node
-    {
-        const auto& debugLines = m_pTree->m_DebugGeometry;
-        for (int i = 0; i < 8; ++i)
-        {
-            if ((i & 1) && (!rendered[i] || !rendered[i - 1]))
-            {
-                debugLines->appendVertex(vertices[i]);
-                debugLines->appendVertex(vertices[i - 1]);
-            }
-            if ((i & 2) && (!rendered[i] || !rendered[i - 2]))
-            {
-                debugLines->appendVertex(vertices[i]);
-                debugLines->appendVertex(vertices[i - 2]);
-            }
-            if ((i & 4) && (!rendered[i] || !rendered[i - 4]))
-            {
-                debugLines->appendVertex(vertices[i]);
-                debugLines->appendVertex(vertices[i - 4]);
-            }
-        }
-    }
-    return true;
 }
 
 LooseOctree::LooseOctree(const Vec3r& center, const Real width, const Real minWidth,
@@ -1009,34 +914,5 @@ LooseOctree::deallocateMemoryPool()
     m_pNodeBigBlocks.resize(0);
     m_NumAllocatedNodes       = 1u; // root node still remains
     m_NumAvaiableBlocksInPool = 0u;
-}
-
-std::shared_ptr<DebugRenderGeometry>
-LooseOctree::getDebugGeometry(const uint32_t maxLevel, bool bDrawNonEmptyParent /*= true*/)
-{
-    m_MaxLevelDebugRender = maxLevel;
-    m_bDrawNonEmptyParent = bDrawNonEmptyParent;
-    if (!m_DebugGeometry)
-    {
-        m_DebugGeometry.reset();
-    }
-
-    // Create debug geometry and set default rendering mateirial
-    m_DebugGeometry = std::make_shared<DebugRenderLines>("OctreeDebugRendering");
-
-    // Update debug rendering data (if any)
-    m_pRootNode->updateDebugGeometry();
-    m_DebugGeometry->setDataModified(true);
-
-    return std::static_pointer_cast<DebugRenderGeometry>(m_DebugGeometry);
-}
-
-void
-LooseOctree::updateDebugGeometry()
-{
-    LOG_IF(FATAL, (!m_DebugGeometry)) << "Debug geometry has not been created";
-    m_DebugGeometry->clear();
-    m_pRootNode->updateDebugGeometry();
-    m_DebugGeometry->setDataModified(true);
 }
 } // end namespace imstk

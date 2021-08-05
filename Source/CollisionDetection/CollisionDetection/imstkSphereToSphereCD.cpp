@@ -21,23 +21,54 @@
 
 #include "imstkSphereToSphereCD.h"
 #include "imstkCollisionData.h"
-#include "imstkNarrowPhaseCD.h"
+#include "imstkCollisionUtils.h"
+#include "imstkSphere.h"
 
 namespace imstk
 {
-SphereToSphereCD::SphereToSphereCD(std::shared_ptr<Sphere>        sphereA,
-                                   std::shared_ptr<Sphere>        sphereB,
-                                   std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::SphereToSphere, colData),
-    m_sphereA(sphereA),
-    m_sphereB(sphereB)
+SphereToSphereCD::SphereToSphereCD() : CollisionDetectionAlgorithm()
 {
+    setRequiredInputType<Sphere>(0);
+    setRequiredInputType<Sphere>(1);
 }
 
 void
-SphereToSphereCD::computeCollisionData()
+SphereToSphereCD::computeCollisionDataAB(
+    std::shared_ptr<Geometry>          geomA,
+    std::shared_ptr<Geometry>          geomB,
+    CDElementVector<CollisionElement>& elementsA,
+    CDElementVector<CollisionElement>& elementsB)
 {
-    m_colData->clearAll();
-    NarrowPhaseCD::sphereToSphere(m_sphereA.get(), m_sphereB.get(), m_colData);
+    std::shared_ptr<Sphere> sphereA = std::dynamic_pointer_cast<Sphere>(geomA);
+    std::shared_ptr<Sphere> sphereB = std::dynamic_pointer_cast<Sphere>(geomB);
+
+    // Get geometry properties
+    const Vec3d  sphereAPos = sphereA->getPosition();
+    const double rA = sphereA->getRadius();
+    const Vec3d  sphereBPos = sphereB->getPosition();
+    const double rB = sphereB->getRadius();
+
+    Vec3d  sphereAContactPt, sphereBContactPt;
+    Vec3d  sphereAContactNormal, sphereBContactNormal;
+    double depth;
+    if (CollisionUtils::testSphereToSphere(
+        sphereAPos, rA, sphereBPos, rB,
+        sphereAContactPt, sphereAContactNormal,
+        sphereBContactPt, sphereBContactNormal,
+        depth))
+    {
+        PointDirectionElement elemA;
+        elemA.dir = sphereAContactNormal; // Direction to resolve sphereA
+        elemA.pt  = sphereAContactPt;     // Contact point on sphereA
+        elemA.penetrationDepth = depth;
+
+        PointDirectionElement elemB;
+        elemB.dir = sphereBContactNormal; // Direction to resolve sphereB
+        elemB.pt  = sphereBContactPt;     // Contact point on sphereB
+        elemB.penetrationDepth = depth;
+
+        elementsA.unsafeAppend(elemA);
+        elementsB.unsafeAppend(elemB);
+    }
 }
 }

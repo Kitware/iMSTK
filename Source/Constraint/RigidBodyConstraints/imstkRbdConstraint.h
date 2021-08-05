@@ -49,12 +49,12 @@ struct RigidBody
 
         // Vec3d m_externalForce;
         //RigidBodyState2* m_state; // A RigidBody can only belong to one state
-        Vec3d* m_pos;
-        Quatd* m_orientation;
-        Vec3d* m_velocity;
-        Vec3d* m_angularVelocity;
-        Vec3d* m_force;
-        Vec3d* m_torque;
+        Vec3d* m_pos = nullptr;
+        Quatd* m_orientation     = nullptr;
+        Vec3d* m_velocity        = nullptr;
+        Vec3d* m_angularVelocity = nullptr;
+        Vec3d* m_force  = nullptr;
+        Vec3d* m_torque = nullptr;
 
     public:
         const Vec3d& getPosition() const { return *m_pos; }
@@ -106,13 +106,16 @@ public:
 public:
     // Jacobian
     Eigen::Matrix<double, 3, 4> J = Eigen::Matrix<double, 3, 4>::Zero();
-    double vu       = 0.0;
+    double vu = 0.0;
+    // Range of the constraint force (for projection step during solve)
+    // by default (0, inf) so bodies may only be pushed apart
     double range[2] = { 0.0, std::numeric_limits<double>::max() };
 
     // Objects involved
     std::shared_ptr<RigidBody> m_obj1 = nullptr;
     std::shared_ptr<RigidBody> m_obj2 = nullptr;
 
+    // Which object to solve for
     Side m_side = Side::AB;
 };
 }

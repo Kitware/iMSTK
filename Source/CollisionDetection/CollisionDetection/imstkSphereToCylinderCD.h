@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,37 +21,36 @@
 
 #pragma once
 
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 
 namespace imstk
 {
-class Sphere;
-class Cylinder;
-struct CollisionData;
-
 ///
 /// \class SphereToCylinderCD
 ///
 /// \brief Sphere-Cylinder collision detection
+/// Generates point-direction contact data.
+/// By default generates contact data for both sides.
 ///
-class SphereToCylinderCD : public CollisionDetection
+class SphereToCylinderCD : public CollisionDetectionAlgorithm
 {
 public:
+    SphereToCylinderCD();
+    virtual ~SphereToCylinderCD() override = default;
 
     ///
-    /// \brief Constructor
+    /// \brief Returns collision detection type string name
     ///
-    SphereToCylinderCD(std::shared_ptr<Sphere>        sphere,
-                       std::shared_ptr<Cylinder>      cylinder,
-                       std::shared_ptr<CollisionData> colData);
+    virtual const std::string getTypeName() const override { return "SphereToCylinderCD"; }
 
+protected:
     ///
-    /// \brief Detect collision and compute collision data
+    /// \brief Compute collision data for AB simulatenously
     ///
-    void computeCollisionData() override;
-
-private:
-    std::shared_ptr<Cylinder> m_cylinder;
-    std::shared_ptr<Sphere>   m_sphere;
+    virtual void computeCollisionDataAB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB) override;
 };
 }

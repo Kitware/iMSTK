@@ -21,8 +21,9 @@ limitations under the License.
 
 #include "imstkCollisionPair.h"
 #include "imstkCollidingObject.h"
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkCollisionHandling.h"
+#include "imstkDynamicObject.h"
 #include "imstkTaskGraph.h"
 
 namespace imstk
@@ -30,14 +31,21 @@ namespace imstk
 CollisionPair::CollisionPair(std::shared_ptr<CollidingObject> objA,
                              std::shared_ptr<CollidingObject> objB) : ObjectInteractionPair(objA, objB)
 {
+    // Setup a step to update geometries before detecting collision
+    m_collisionGeometryUpdateNode = std::make_shared<TaskNode>(std::bind(&CollisionPair::updateCollisionGeometry, this),
+        objA->getName() + "_vs_" + objB->getName() + "_GeometryUpdate", true);
 }
 
-CollisionPair::CollisionPair(std::shared_ptr<CollidingObject>    objA,
-                             std::shared_ptr<CollidingObject>    objB,
-                             std::shared_ptr<CollisionDetection> cd,
-                             std::shared_ptr<CollisionHandling>  chA,
-                             std::shared_ptr<CollisionHandling>  chB) : ObjectInteractionPair(objA, objB)
+CollisionPair::CollisionPair(std::shared_ptr<CollidingObject>             objA,
+                             std::shared_ptr<CollidingObject>             objB,
+                             std::shared_ptr<CollisionDetectionAlgorithm> cd,
+                             std::shared_ptr<CollisionHandling>           chA,
+                             std::shared_ptr<CollisionHandling>           chB) : ObjectInteractionPair(objA, objB)
 {
+    // Setup a step to update geometries before detecting collision
+    m_collisionGeometryUpdateNode = std::make_shared<TaskNode>(std::bind(&CollisionPair::updateCollisionGeometry, this),
+        objA->getName() + "_vs_" + objB->getName() + "_GeometryUpdate", true);
+
     setCollisionDetection(cd);
 
     if (chA != nullptr)
@@ -51,9 +59,13 @@ CollisionPair::CollisionPair(std::shared_ptr<CollidingObject>    objA,
 }
 
 CollisionPair::CollisionPair(std::shared_ptr<CollidingObject> objA, std::shared_ptr<CollidingObject> objB,
-                             std::shared_ptr<CollisionDetection> cd,
+                             std::shared_ptr<CollisionDetectionAlgorithm> cd,
                              std::shared_ptr<CollisionHandling> chAB) : ObjectInteractionPair(objA, objB)
 {
+    // Setup a step to update geometries before detecting collision
+    m_collisionGeometryUpdateNode = std::make_shared<TaskNode>(std::bind(&CollisionPair::updateCollisionGeometry, this),
+        "CollisionPairGeometryUpdate", true);
+
     setCollisionDetection(cd);
 
     if (chAB != nullptr)
@@ -63,12 +75,11 @@ CollisionPair::CollisionPair(std::shared_ptr<CollidingObject> objA, std::shared_
 }
 
 void
-CollisionPair::setCollisionDetection(std::shared_ptr<CollisionDetection> colDetect)
+CollisionPair::setCollisionDetection(std::shared_ptr<CollisionDetectionAlgorithm> colDetect)
 {
     m_colDetect = colDetect;
     m_collisionDetectionNode = m_interactionFunction = m_colDetect->getTaskNode();
     m_collisionDetectionNode->m_name = getObjectsPair().first->getName() + "_" + getObjectsPair().second->getName() + "_CollisionDetection";
-    m_colData = m_colDetect->getCollisionData();
 }
 
 void
@@ -122,7 +133,9 @@ CollisionPair::apply()
     }
 
     // Add all the nodes to the graph
+    computeGraphA->addNode(m_collisionGeometryUpdateNode);
     computeGraphA->addNode(m_collisionDetectionNode);
+    computeGraphB->addNode(m_collisionGeometryUpdateNode);
     computeGraphB->addNode(m_collisionDetectionNode);
     if (m_collisionHandleANode != nullptr)
     {
@@ -135,17 +148,20 @@ CollisionPair::apply()
 
     // Add the edges
     {
-        // Connect inputA's->CD
+        // Connect inputA's->CD_Update
         for (size_t i = 0; i < m_taskNodeInputs.first.size(); i++)
         {
-            computeGraphA->addEdge(m_taskNodeInputs.first[i], m_collisionDetectionNode);
+            computeGraphA->addEdge(m_taskNodeInputs.first[i], m_collisionGeometryUpdateNode);
         }
+        // Connect CD_Update->CD
+        computeGraphA->addEdge(m_collisionGeometryUpdateNode, m_collisionDetectionNode);
 
         // Connect inputB's->CD
         for (size_t i = 0; i < m_taskNodeInputs.second.size(); i++)
         {
-            computeGraphB->addEdge(m_taskNodeInputs.second[i], m_collisionDetectionNode);
+            computeGraphB->addEdge(m_taskNodeInputs.second[i], m_collisionGeometryUpdateNode);
         }
+        computeGraphB->addEdge(m_collisionGeometryUpdateNode, m_collisionDetectionNode);
     }
 
     // Now connect CD to CHA/CHB/CHAB
@@ -184,6 +200,25 @@ CollisionPair::apply()
         {
             computeGraphB->addEdge(m_collisionDetectionNode, m_taskNodeOutputs.second[i]);
         }
+    }
+}
+
+void
+CollisionPair::updateCollisionGeometry()
+{
+    std::shared_ptr<SceneObject> obj1 = m_objects.first;
+    std::shared_ptr<SceneObject> obj2 = m_objects.second;
+
+    // Ensure the collision geometry is updatedbefore checking collision
+    // this could involve a geometry map or something, ex: simulated
+    // tet mesh mapped to a collision surface mesh
+    if (auto dynObj1 = std::dynamic_pointer_cast<DynamicObject>(obj1))
+    {
+        dynObj1->updateGeometries();
+    }
+    if (auto dynObj2 = std::dynamic_pointer_cast<DynamicObject>(obj2))
+    {
+        dynObj2->updateGeometries();
     }
 }
 }

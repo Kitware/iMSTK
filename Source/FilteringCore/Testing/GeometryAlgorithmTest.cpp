@@ -32,7 +32,7 @@ class MockAlgorithm : public GeometryAlgorithm
 {
 public:
 
-    bool areInputsValid() const override
+    bool areInputsValid() override
     {
         return GeometryAlgorithm::areInputsValid();
     }

@@ -33,7 +33,7 @@
 #include "imstkSimulationManager.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
-#include "imstkSphObjectCollisionPair.h"
+#include "imstkSphObjectCollision.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshDistanceTransform.h"
 #include "imstkViewer.h"
@@ -178,8 +178,8 @@ main()
         scene->addSceneObject(sphFluidBox);
 
         // Interaction
-        imstkNew<SphObjectCollisionPair> interaction(sphFluidBox, dragonObj);
-        scene->getCollisionGraph()->addInteraction(interaction);
+        scene->getCollisionGraph()->addInteraction(
+            std::make_shared<SphObjectCollision>(sphFluidBox, dragonObj));
 
         // Light
         imstkNew<DirectionalLight> light;
@@ -191,7 +191,7 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer 1");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setBackgroundColors(Color(0.3285, 0.3285, 0.6525), Color(0.13836, 0.13836, 0.2748), true);
 

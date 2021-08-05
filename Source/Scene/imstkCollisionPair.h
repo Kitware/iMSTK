@@ -25,10 +25,10 @@ limitations under the License.
 
 namespace imstk
 {
-struct CollisionData;
-class CollidingObject;
-class CollisionDetection;
+class CollisionData;
+class CollisionDetectionAlgorithm;
 class CollisionHandling;
+class CollidingObject;
 
 ///
 /// \class CollisionPair
@@ -47,7 +47,7 @@ public:
     /// \brief Specifies a CollisionPair with two handles (one or both can be nullptr)
     ///
     CollisionPair(std::shared_ptr<CollidingObject> objA, std::shared_ptr<CollidingObject> objB,
-                  std::shared_ptr<CollisionDetection> cd,
+                  std::shared_ptr<CollisionDetectionAlgorithm> cd,
                   std::shared_ptr<CollisionHandling> chA,
                   std::shared_ptr<CollisionHandling> chB);
 
@@ -55,20 +55,20 @@ public:
     /// \brief Specifies CollisionPair with an AB handler
     ///
     CollisionPair(std::shared_ptr<CollidingObject> objA, std::shared_ptr<CollidingObject> objB,
-                  std::shared_ptr<CollisionDetection> cd,
+                  std::shared_ptr<CollisionDetectionAlgorithm> cd,
                   std::shared_ptr<CollisionHandling> chAB);
 
     virtual ~CollisionPair() override = default;
 
 public:
     /// \brief TODO
-    void setCollisionDetection(std::shared_ptr<CollisionDetection> colDetect);
+    void setCollisionDetection(std::shared_ptr<CollisionDetectionAlgorithm> colDetect);
     void setCollisionHandlingA(std::shared_ptr<CollisionHandling> colHandlingA);
     void setCollisionHandlingB(std::shared_ptr<CollisionHandling> colHandlingB);
     void setCollisionHandlingAB(std::shared_ptr<CollisionHandling> colHandlingAB);
 
     /// \brief TODO
-    std::shared_ptr<CollisionDetection> getCollisionDetection() const { return m_colDetect; }
+    std::shared_ptr<CollisionDetectionAlgorithm> getCollisionDetection() const { return m_colDetect; }
     std::shared_ptr<CollisionHandling> getCollisionHandlingA() const { return m_colHandlingA; }
     std::shared_ptr<CollisionHandling> getCollisionHandlingB() const { return m_colHandlingB; }
 
@@ -76,17 +76,19 @@ public:
     std::shared_ptr<TaskNode> getCollisionHandlingANode() const { return m_collisionHandleANode; }
     std::shared_ptr<TaskNode> getCollisionHandlingBNode() const { return m_collisionHandleBNode; }
 
+    void updateCollisionGeometry();
+
 public:
     virtual void apply() override;
 
 protected:
-    std::shared_ptr<CollisionDetection> m_colDetect    = nullptr; ///< Collision detection algorithm
-    std::shared_ptr<CollisionData>      m_colData      = nullptr; ///< Common Collision Data
-    std::shared_ptr<CollisionHandling>  m_colHandlingA = nullptr;
-    std::shared_ptr<CollisionHandling>  m_colHandlingB = nullptr;
+    std::shared_ptr<CollisionDetectionAlgorithm> m_colDetect = nullptr;    ///< Collision detection algorithm
+    std::shared_ptr<CollisionHandling> m_colHandlingA = nullptr;
+    std::shared_ptr<CollisionHandling> m_colHandlingB = nullptr;
 
-    std::shared_ptr<TaskNode> m_collisionDetectionNode = nullptr;
-    std::shared_ptr<TaskNode> m_collisionHandleANode   = nullptr;
-    std::shared_ptr<TaskNode> m_collisionHandleBNode   = nullptr;
+    std::shared_ptr<TaskNode> m_collisionDetectionNode      = nullptr;
+    std::shared_ptr<TaskNode> m_collisionHandleANode        = nullptr;
+    std::shared_ptr<TaskNode> m_collisionHandleBNode        = nullptr;
+    std::shared_ptr<TaskNode> m_collisionGeometryUpdateNode = nullptr;
 };
 }

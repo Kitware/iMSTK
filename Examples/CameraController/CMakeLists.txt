@@ -33,11 +33,4 @@ if(iMSTK_USE_OpenHaptics)
     # Link libraries to executable
     #-----------------------------------------------------------------------------
     target_link_libraries(${PROJECT_NAME} SimulationManager)
-
-    #-----------------------------------------------------------------------------
-    # Associate external data
-    #-----------------------------------------------------------------------------
-    list(APPEND FILE_LIST
-        asianDragon/,REGEX:.*)
-    imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 endif()

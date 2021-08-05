@@ -1,0 +1,142 @@
+/*=========================================================================
+
+   Library: iMSTK
+
+   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+=========================================================================*/
+
+#pragma once
+
+#include "imstkCollisionData.h"
+#include "imstkGeometryAlgorithm.h"
+
+#include <memory>
+
+namespace imstk
+{
+class Geometry;
+class TaskNode;
+
+///
+/// \class CollisionDetectionAlgorithm
+///
+/// \brief Base class for all collision detection classes. CollisionDetection
+/// classes produce CollisionData between two geometries A and B. CollisionData
+/// has two sides. That is, the contact information to resolve collision for
+/// geometry A and the contact info to resolve geometry B.
+///
+/// Subclassed algorithms may produce A, B, or both. To implement, one should
+/// implement computeCollisionDataAB, or computeCollisionDataA and
+/// computeCollisionDataB. If A or B is not implemented, AB will be called. If AB
+/// is not implemented, A and B will be called.
+///
+/// CollisionDetection::setGenerateCD(bool, bool) can be used to request sides.
+/// CD subclasses can provide defaults for this as well and not expect the user
+/// to touch it.
+///
+class CollisionDetectionAlgorithm : public GeometryAlgorithm
+{
+protected:
+    CollisionDetectionAlgorithm();
+
+public:
+    virtual ~CollisionDetectionAlgorithm() = default;
+
+    ///
+    /// \brief Returns collision detection type string name
+    ///
+    virtual const std::string getTypeName() const = 0;
+
+public:
+    ///
+    /// \brief Returns output collision data
+    ///
+    const std::shared_ptr<CollisionData> getCollisionData() const { return m_colData; }
+
+    ///
+    /// \brief Returns computational node
+    ///
+    std::shared_ptr<TaskNode> getTaskNode() const { return m_taskNode; }
+
+    ///
+    /// \brief If generateA is false, CD data will not be generated for input0,A
+    /// Similarly, if generateB is false, CD data will not be generated for input1,B
+    ///
+    void setGenerateCD(const bool generateA, const bool generateB)
+    {
+        m_generateCD_A = generateA;
+        m_generateCD_B = generateB;
+    }
+
+    void setInputGeometryA(std::shared_ptr<Geometry> geometryA) { setInput(geometryA, 0); }
+
+    void setInputGeometryB(std::shared_ptr<Geometry> geometryB) { setInput(geometryB, 1); }
+
+protected:
+    ///
+    /// \brief Check inputs are correct (always works reversibly)
+    /// \return true if all inputs match the requirements, false if not
+    ///
+    virtual bool areInputsValid() override;
+
+    ///
+    /// \brief Compute the collision data
+    ///
+    virtual void requestUpdate() override;
+
+    ///
+    /// \brief Compute collision data for both sides at once, default implementation
+    /// just calls computeCollisionDataA and computeCollisionDataB
+    ///
+    virtual void computeCollisionDataAB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB)
+    {
+        computeCollisionDataA(geomA, geomB, elementsA);
+        computeCollisionDataB(geomA, geomB, elementsB);
+    }
+
+    ///
+    /// \brief Compute collision data for side A (implement as if flip=true)
+    ///
+    virtual void computeCollisionDataA(
+        std::shared_ptr<Geometry>          imstkNotUsed(geomA),
+        std::shared_ptr<Geometry>          imstkNotUsed(geomB),
+        CDElementVector<CollisionElement>& imstkNotUsed(elementsA)) { m_computeColDataAImplemented = false; }
+
+    ///
+    /// \brief Compute collision data for side B (implement as if flip=true)
+    ///
+    virtual void computeCollisionDataB(
+        std::shared_ptr<Geometry>          imstkNotUsed(geomA),
+        std::shared_ptr<Geometry>          imstkNotUsed(geomB),
+        CDElementVector<CollisionElement>& imstkNotUsed(elementsB)) { m_computeColDataBImplemented = false; }
+
+protected:
+    std::shared_ptr<CollisionData> m_colData  = nullptr;    ///> Collision data
+    std::shared_ptr<TaskNode>      m_taskNode = nullptr;    ///> Computational node to execute the detection
+
+    bool m_flipOutput   = false;
+    bool m_generateCD_A = true;
+    bool m_generateCD_B = true;
+
+    bool m_computeColDataAImplemented = true;
+    bool m_computeColDataBImplemented = true;
+};
+}

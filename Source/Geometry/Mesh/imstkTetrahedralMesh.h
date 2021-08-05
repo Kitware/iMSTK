@@ -37,9 +37,6 @@ class SurfaceMesh;
 class TetrahedralMesh : public VolumetricMesh
 {
 public:
-    using WeightsArray = std::array<double, 4>;
-
-public:
     ///
     /// \brief Constructor
     ///
@@ -81,7 +78,7 @@ public:
     ///
     /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra
     ///
-    void computeBarycentricWeights(const size_t& tetId, const Vec3d& pos, WeightsArray& weights) const;
+    Vec4d computeBarycentricWeights(const size_t& tetId, const Vec3d& pos) const;
 
     ///
     /// \brief Compute the bounding box of a given tetrahedron

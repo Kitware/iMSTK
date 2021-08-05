@@ -21,34 +21,44 @@
 
 #pragma once
 
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 
 namespace imstk
 {
-class Geometry;
 class SurfaceMesh;
-struct CollisionData;
 
 ///
 /// \class SurfaceMeshToSurfaceMeshCD
 ///
+/// \brief Collision detection for surface meshes
 ///
-class SurfaceMeshToSurfaceMeshCD : public CollisionDetection
+class SurfaceMeshToSurfaceMeshCD : public CollisionDetectionAlgorithm
 {
 public:
+    SurfaceMeshToSurfaceMeshCD();
+    virtual ~SurfaceMeshToSurfaceMeshCD() override = default;
 
     ///
-    /// \brief Constructor
+    /// \brief Returns collision detection type string name
     ///
-    SurfaceMeshToSurfaceMeshCD(const std::shared_ptr<SurfaceMesh>&   meshA,
-                               const std::shared_ptr<SurfaceMesh>&   meshB,
-                               const std::shared_ptr<CollisionData>& colData);
+    virtual const std::string getTypeName() const override { return "SurfaceMeshToSurfaceMeshCD"; }
 
+public:
+    void setMaxNumContacts(const int maxNumContacts) { m_maxNumContacts = maxNumContacts; }
+    const int getMaxNumContacts() const { return m_maxNumContacts; }
+
+protected:
     ///
-    /// \brief Detect collision and compute collision data
-    /// Do nothing here, as the collision detection is performed by a static octree,
-    /// which is a static member of CollisionDetection class
+    /// \brief Compute collision data for AB simulatenously
     ///
-    void computeCollisionData() override {}
+    virtual void computeCollisionDataAB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB) override;
+
+protected:
+    std::vector<std::pair<int, int>> m_intersectingPairs;
+    int m_maxNumContacts = 1000;
 };
 }

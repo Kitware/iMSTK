@@ -78,18 +78,18 @@ LaparoscopicToolController::update(const double dt)
     if (m_deviceClient->getButton(0))
     {
         m_jawAngle += m_change;
-        m_jawAngle  = (m_jawAngle > m_maxJawAngle) ? m_maxJawAngle : m_jawAngle;
     }
     if (m_deviceClient->getButton(1))
     {
         m_jawAngle -= m_change;
-        m_jawAngle  = (m_jawAngle < 0.0) ? 0.0 : m_jawAngle;
     }
 
+    // Clamp
+    m_jawAngle = std::max(std::min(m_jawAngle, m_maxJawAngle), 0.0);
+
+    // Update transforms
     m_upperJawLocalTransform = mat4dRotation(Rotd(m_jawAngle, m_jawRotationAxis));
     m_lowerJawLocalTransform = mat4dRotation(Rotd(-m_jawAngle, m_jawRotationAxis));
-
-    // TRS decompose and set upper/lower jaw geometries
     {
         const Mat4d upperWorldTransform = m_controllerWorldTransform * m_upperJawLocalTransform;
         m_upperJaw->getVisualGeometry()->setTransform(upperWorldTransform * m_upperJawVisualTransform);
@@ -100,32 +100,22 @@ LaparoscopicToolController::update(const double dt)
         m_lowerJaw->getVisualGeometry()->setTransform(lowerWorldTransform * m_upperJawVisualTransform);
         m_lowerJaw->getCollidingGeometry()->setTransform(lowerWorldTransform * m_lowerJawCollidingTransform);
     }
-
     m_shaft->getVisualGeometry()->postModified();
     m_lowerJaw->getVisualGeometry()->postModified();
     m_upperJaw->getVisualGeometry()->postModified();
-}
 
-void
-LaparoscopicToolController::applyForces()
-{
-    Vec3d force(0, 0, 0);
-
-    if (auto collidingObject = dynamic_cast<CollidingObject*>(m_shaft.get()))
+    // Check for transition closed/open
+    if (m_jawState == JawState::Open && m_jawAngle <= 0.0)
     {
-        force += collidingObject->getForce();
+        m_jawState = JawState::Closed;
+        this->postEvent(Event(JawClosed()));
     }
-
-    if (auto collidingObject = dynamic_cast<CollidingObject*>(m_upperJaw.get()))
+    // When the jaw angle surpasses this degree it is considered open
+    const double openingDegree = 5.0;
+    if (m_jawState == JawState::Closed && m_jawAngle >= openingDegree * PI / 180.0)
     {
-        force += collidingObject->getForce();
+        m_jawState = JawState::Open;
+        this->postEvent(Event(JawOpened()));
     }
-
-    if (auto collidingObject = dynamic_cast<CollidingObject*>(m_lowerJaw.get()))
-    {
-        force += collidingObject->getForce();
-    }
-
-    m_deviceClient->setForce(force);
 }
 } // imstk

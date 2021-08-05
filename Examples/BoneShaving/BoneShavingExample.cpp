@@ -20,20 +20,20 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollidingObject.h"
 #include "imstkCollisionGraph.h"
+#include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkObjectInteractionFactory.h"
+#include "imstkRigidBodyModel2.h"
+#include "imstkRigidObject2.h"
+#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
 #include "imstkSphere.h"
 #include "imstkTetrahedralMesh.h"
@@ -62,6 +62,7 @@ main()
     // Create bone scene object
     // Load the mesh
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    tetMesh->translate(Vec3d(0.0, -10.0, 0.0));
     if (!tetMesh)
     {
         LOG(FATAL) << "Could not read mesh from file.";
@@ -73,19 +74,30 @@ main()
     scene->addSceneObject(bone);
 
     // Create a virtual coupling object: Drill
-    imstkNew<Sphere>          drillGeom(Vec3d(0.0, 0.0, 0.0), 3.0);
-    imstkNew<CollidingObject> drill("Drill");
+    imstkNew<Sphere>       drillGeom(Vec3d(0.0, 0.0, 0.0), 3.0);
+    imstkNew<RigidObject2> drill("Drill");
     drill->setCollidingGeometry(drillGeom);
     drill->setVisualGeometry(drillGeom);
+    drill->setPhysicsGeometry(drillGeom);
+    imstkNew<RigidBodyModel2> rbdModel;
+    rbdModel->getConfig()->m_gravity = Vec3d(0.0, 0.0, 0.0);
+    rbdModel->getConfig()->m_dt      = 0.01;
+    drill->setDynamicalModel(rbdModel);
     scene->addSceneObject(drill);
 
     // Create and add virtual coupling object controller in the scene
-    imstkNew<SceneObjectController> controller(drill, client);
+    imstkNew<RigidObjectController> controller(drill, client);
+    controller->setLinearKs(100.0);
+    controller->setLinearKd(10.0);
+    controller->setAngularKs(0.0);
+    controller->setAngularKd(0.0);
     scene->addController(controller);
 
     // Add interaction
     scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(bone, drill,
-        InteractionType::CollidingObjToCollidingObjBoneDrilling, CollisionDetection::Type::PointSetToSphere));
+        InteractionType::RbdObjCollision, "PointSetToSphereCD"));
+    /*scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(bone, drill,
+        InteractionType::BoneDrilling, "PointSetToSphereCD"));*/
 
     // Light
     imstkNew<DirectionalLight> light;
