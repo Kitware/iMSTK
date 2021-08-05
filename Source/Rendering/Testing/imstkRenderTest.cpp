@@ -67,7 +67,7 @@ RenderTest::SetUp()
 }
 
 void
-RenderTest::runFor(int seconds)
+RenderTest::runFor(const int seconds)
 {
     std::thread t(&SimulationManager::start, driver);
     std::this_thread::sleep_for(std::chrono::seconds(seconds));
@@ -106,9 +106,9 @@ RenderTest::runAllMaterials()
 }
 
 void
-RenderTest::applyColorFunction()
+RenderTest::applyColor()
 {
-    std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
+    auto colorFunc = std::make_shared<ColorFunction>();
     colorFunc->setNumberOfColors(3);
     colorFunc->setColor(0, imstk::Color::Green);
     colorFunc->setColor(1, imstk::Color::Blue);

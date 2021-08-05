@@ -96,7 +96,7 @@ public:
 
         connect<Event>(viewer, VTKViewer::preUpdate, onPreUpdate);
         onPreUpdate(nullptr);
-        applyColorFunction();
+        applyColor();
 
         scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
         scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
@@ -158,7 +158,7 @@ public:
 
         connect<Event>(viewer, VTKViewer::preUpdate, onPreUpdate);
         onPreUpdate(nullptr);
-        applyColorFunction();
+        applyColor();
 
         scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
         scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
@@ -214,7 +214,7 @@ public:
 
         connect<Event>(viewer, VTKViewer::preUpdate, updateMesh);
         updateMesh(nullptr);
-        applyColorFunction();
+        applyColor();
 
         scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
         scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
@@ -270,7 +270,7 @@ public:
 
         connect<Event>(viewer, viewer->preUpdate, updateMesh);
         updateMesh(nullptr);
-        applyColorFunction();
+        applyColor();
 
         scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
         scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));

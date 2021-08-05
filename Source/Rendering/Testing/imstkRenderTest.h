@@ -43,7 +43,7 @@ using namespace imstk;
 class RenderTest : public testing::Test
 {
 public:
-    void runFor(int seconds);
+    void runFor(const int seconds);
     void runAllMaterials();
 protected:
 
@@ -53,7 +53,7 @@ protected:
 
     void updateMaterial();
 
-    void applyColorFunction();
+    void applyColor();
 
     // Render Frame
     std::shared_ptr<Scene>                scene;
