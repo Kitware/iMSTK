@@ -76,7 +76,7 @@ if (${PROJECT_NAME}_WRAP_CSHARP)
 
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-  set(cmAKE_SWIG_FLAGS "")
+  set(CMAKE_SWIG_FLAGS "")
 endif()
 
 # CUDA
@@ -395,7 +395,7 @@ add_subdirectory(Source/Filtering)
 add_subdirectory(Source/FilteringCore)
 
 if (${PROJECT_NAME}_WRAP_CSHARP)
-  add_subdirectory(Source/CSWrapper)
+  add_subdirectory(Source/Wrappers)
 endif()
 
 #--------------------------------------------------------------------------

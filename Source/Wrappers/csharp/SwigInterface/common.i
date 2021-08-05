@@ -504,21 +504,21 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
 
 #endif /* end of #ifdef SWIGCSHARP */
 
-%include "../Common/imstkMacros.h"
-%include "../Common/imstkTypes.h";
-%include "../Common/imstkMath.h";
-%include "../Common/imstkEventObject.h";
-%include "../Common/imstkAbstractDataArray.h";
-%include "../Common/imstkDataArray.h";
+%include "../../Common/imstkMacros.h"
+%include "../../Common/imstkTypes.h";
+%include "../../Common/imstkMath.h";
+%include "../../Common/imstkEventObject.h";
+%include "../../Common/imstkAbstractDataArray.h";
+%include "../../Common/imstkDataArray.h";
 %template(DataArrayi) imstk::DataArray<int>;
 %template(DataArrayf) imstk::DataArray<float>;
 %template(DataArrayd) imstk::DataArray<double>;
 %template(DataArrayuc) imstk::DataArray<unsigned char>;
-%include "../Common/imstkLogger.h";
-%include "../Common/imstkModule.h";
-%include "../Common/imstkModuleDriver.h";
-%include "../Common/imstkColor.h";
-%include "../Common/imstkVecDataArray.h";
+%include "../../Common/imstkLogger.h";
+%include "../../Common/imstkModule.h";
+%include "../../Common/imstkModuleDriver.h";
+%include "../../Common/imstkColor.h";
+%include "../../Common/imstkVecDataArray.h";
 %template(VecDataArray3i) imstk::VecDataArray<int, 3>;
 %template(VecDataArray4i) imstk::VecDataArray<int, 4>;
 %template(VecDataArray2f) imstk::VecDataArray<float, 2>;

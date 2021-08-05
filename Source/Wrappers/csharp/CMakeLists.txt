@@ -1,13 +1,13 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include(UseSWIG)
 
-set_source_files_properties(imstkCWrapper.i PROPERTIES CPLUSPLUS ON)
+set_source_files_properties(SwigInterface/imstkCWrapper.i PROPERTIES CPLUSPLUS ON)
 
 swig_add_library(iMSTKCWrapper
     TYPE SHARED
-    OUTPUT_DIR "${CMAKE_BINARY_DIR}/Source/CSWrapper"
+    OUTPUT_DIR "${CMAKE_BINARY_DIR}/Source/Wrappers/csharp"
     LANGUAGE csharp
-    SOURCES imstkCWrapper.i)
+    SOURCES SwigInterface/imstkCWrapper.i)
 
 set_target_properties(iMSTKCWrapper PROPERTIES SWIG_COMPILE_OPTIONS "-namespace;imstk")
 if(iMSTK_SWIG_PINNED_ARRAY)
@@ -39,6 +39,6 @@ endif()
 
 # Install all ".cs" files
 install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/Source/CSWrapper/"
+    DIRECTORY "${CMAKE_BINARY_DIR}/Source/Wrappers/csharp/"
     DESTINATION "${CMAKE_INSTALL_PREFIX}/include/iMSTKSharp/"
     FILES_MATCHING PATTERN "*.cs")
