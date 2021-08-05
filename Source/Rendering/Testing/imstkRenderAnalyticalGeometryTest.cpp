@@ -23,7 +23,6 @@
 
 #include "imstkCapsule.h"
 #include "imstkCylinder.h"
-#include "imstkDecal.h"
 #include "imstkOrientedBox.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
