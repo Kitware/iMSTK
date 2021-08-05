@@ -26,15 +26,15 @@
 
 class TetrahedralMeshRenderTest : public RenderTest
 {
-  void createGeometry() override
-  {
+void createGeometry() override
+{
     geom = std::make_shared<TetrahedralMesh>();
 
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
-    auto indicesPtr = std::make_shared<VecDataArray<int, 4>>(1);
+    auto indicesPtr  = std::make_shared<VecDataArray<int, 4>>(1);
 
     VecDataArray<double, 3>& vertices = *verticesPtr;
-    VecDataArray<int, 4>& indices = *indicesPtr;
+    VecDataArray<int, 4>&    indices  = *indicesPtr;
 
     vertices[0] = Vec3d(-0.5, 0.0, -0.5);
     vertices[1] = Vec3d(0.5, 0.0, -0.5);
@@ -44,7 +44,7 @@ class TetrahedralMeshRenderTest : public RenderTest
     indices[0] = Vec4i(0, 1, 2, 3);
 
     std::dynamic_pointer_cast<TetrahedralMesh>(geom)->initialize(verticesPtr, indicesPtr);
-  }
+}
 };
 TEST_F(TetrahedralMeshRenderTest, createTetrahedralMesh)
 {

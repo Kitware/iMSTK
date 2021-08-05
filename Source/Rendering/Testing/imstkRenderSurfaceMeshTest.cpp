@@ -31,11 +31,11 @@ class MeshFileRenderTest : public RenderTest
 {
 public:
 
-  void createGeometry() override
-  {
-      geom = MeshIO::read(iMSTK_DATA_ROOT "/textured_organs/heart.obj");
-      geom->scale(0.15, Geometry::TransformType::ConcatenateToTransform);
-  }
+    void createGeometry() override
+    {
+        geom = MeshIO::read(iMSTK_DATA_ROOT "/textured_organs/heart.obj");
+        geom->scale(0.15, Geometry::TransformType::ConcatenateToTransform);
+    }
 };
 TEST_F(MeshFileRenderTest, meshFile)
 {
@@ -46,124 +46,123 @@ class MeshColorFunctionVerticesRenderTest : public RenderTest
 {
 public:
 
-  float val = 0.0;
-  void createGeometry() override
-  {
-    imstk::VecDataArray<double, 3> points;
-    auto scalars = std::make_shared<imstk::DataArray<float>>();
-
-    for (int i = 0; i < 6; ++i)
+    float val = 0.0;
+    void createGeometry() override
     {
-      points.push_back({ 0, 0, static_cast<double>(i) });
-      scalars->push_back(i);
-      points.push_back({ 1, 0, static_cast<double>(i) });
-      scalars->push_back(i);
+        imstk::VecDataArray<double, 3> points;
+        auto                           scalars = std::make_shared<imstk::DataArray<float>>();
+
+        for (int i = 0; i < 6; ++i)
+        {
+            points.push_back({ 0, 0, static_cast<double>(i) });
+            scalars->push_back(i);
+            points.push_back({ 1, 0, static_cast<double>(i) });
+            scalars->push_back(i);
+        }
+
+        auto mesh = std::make_shared<imstk::SurfaceMesh>();
+        geom = mesh;
+
+        imstk::VecDataArray<int, 3> tris;
+        for (int i = 0; i < 5; ++i)
+        {
+            int j = i * 2;
+            tris.push_back({ j + 2, j + 1, j });
+            tris.push_back({ j + 3, j + 1, j + 2 });
+        }
+
+        mesh->initialize(std::make_shared<VecDataArray<double, 3>>(points), std::make_shared<VecDataArray<int, 3>>(tris));
+        mesh->setVertexAttribute("scalars", scalars);
+        mesh->setVertexScalars("scalars");
+
+        std::shared_ptr<imstk::AbstractDataArray> abstracScalars = scalars;
+
+        auto onPreUpdate = [this, scalars, abstracScalars](Event*)
+                           {
+                               if (val < 6.0)
+                               {
+                                   val += 0.05;
+                               }
+                               else
+                               {
+                                   val = 0.0;
+                               }
+                               (*scalars)[0] = val;
+                               (*scalars)[1] = val;
+                               (*scalars)[2] = val;
+                               (*scalars)[3] = val;
+                               abstracScalars->postModified();
+                           };
+
+        connect<Event>(viewer, VTKViewer::preUpdate, onPreUpdate);
+        onPreUpdate(nullptr);
+        applyColorFunction();
+
+        scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
+        scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
     }
-
-    auto mesh = std::make_shared<imstk::SurfaceMesh>();
-    geom = mesh;
-
-    imstk::VecDataArray<int, 3> tris;
-    for (int i = 0; i < 5; ++i)
-    {
-      int j = i * 2;
-      tris.push_back({ j + 2, j + 1, j });
-      tris.push_back({ j + 3, j + 1, j + 2 });
-    }
-
-    mesh->initialize(std::make_shared<VecDataArray<double, 3>>(points), std::make_shared<VecDataArray<int, 3>>(tris));
-    mesh->setVertexAttribute("scalars", scalars);
-    mesh->setVertexScalars("scalars");
-
-    std::shared_ptr<imstk::AbstractDataArray> abstracScalars = scalars;
-
-    auto  onPreUpdate = [this, scalars, abstracScalars](Event*)
-    {
-      if (val < 6.0)
-      {
-        val += 0.05;
-      }
-      else
-      {
-        val = 0.0;
-      }
-      (*scalars)[0] = val;
-      (*scalars)[1] = val;
-      (*scalars)[2] = val;
-      (*scalars)[3] = val;
-      abstracScalars->postModified();
-    };
-
-    connect<Event>(viewer, VTKViewer::preUpdate, onPreUpdate);
-    onPreUpdate(nullptr);
-    applyColorFunction();
-
-    scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
-    scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
-  }
 };
 TEST_F(MeshColorFunctionVerticesRenderTest, meshColorFunctionVertices)
 {
     runFor(2);
 }
 
-
 class MeshColorFunctionCellsRenderTest : public RenderTest
 {
 public:
 
-  float val = 0.0;
-  void createGeometry() override
-  {
-    imstk::VecDataArray<double, 3> points;
-    auto                           scalars = std::make_shared<imstk::DataArray<float>>();
-
-    for (int i = 0; i < 6; ++i)
+    float val = 0.0;
+    void createGeometry() override
     {
-      points.push_back({ 0, 0, static_cast<double>(i) });
-      points.push_back({ 1, 0, static_cast<double>(i) });
+        imstk::VecDataArray<double, 3> points;
+        auto                           scalars = std::make_shared<imstk::DataArray<float>>();
+
+        for (int i = 0; i < 6; ++i)
+        {
+            points.push_back({ 0, 0, static_cast<double>(i) });
+            points.push_back({ 1, 0, static_cast<double>(i) });
+        }
+
+        imstk::VecDataArray<int, 3> tris;
+        for (int i = 0; i < 5; ++i)
+        {
+            int j = i * 2;
+            tris.push_back({ j + 2, j + 1, j });
+            scalars->push_back(i);
+            tris.push_back({ j + 3, j + 1, j + 2 });
+            scalars->push_back(i);
+        }
+
+        auto mesh = std::make_shared<imstk::SurfaceMesh>();
+        mesh->initialize(std::make_shared<VecDataArray<double, 3>>(points), std::make_shared<VecDataArray<int, 3>>(tris));
+        mesh->setCellAttribute("scalars", scalars);
+        mesh->setCellScalars("scalars");
+        geom = mesh;
+
+        auto onPreUpdate = [this, scalars](Event*)
+                           {
+                               if (val < 6.0)
+                               {
+                                   val += 0.05;
+                               }
+                               else
+                               {
+                                   val = 0.0;
+                               }
+                               (*scalars)[0] = val;
+                               (*scalars)[1] = val;
+                               (*scalars)[2] = val;
+                               (*scalars)[3] = val;
+                               scalars->postModified();
+                           };
+
+        connect<Event>(viewer, VTKViewer::preUpdate, onPreUpdate);
+        onPreUpdate(nullptr);
+        applyColorFunction();
+
+        scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
+        scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
     }
-
-    imstk::VecDataArray<int, 3> tris;
-    for (int i = 0; i < 5; ++i)
-    {
-      int j = i * 2;
-      tris.push_back({ j + 2, j + 1, j });
-      scalars->push_back(i);
-      tris.push_back({ j + 3, j + 1, j + 2 });
-      scalars->push_back(i);
-    }
-
-    auto mesh = std::make_shared<imstk::SurfaceMesh>();
-    mesh->initialize(std::make_shared<VecDataArray<double, 3>>(points), std::make_shared<VecDataArray<int, 3>>(tris));
-    mesh->setCellAttribute("scalars", scalars);
-    mesh->setCellScalars("scalars");
-    geom = mesh;
-
-    auto  onPreUpdate = [this, scalars](Event*)
-    {
-      if (val < 6.0)
-      {
-        val += 0.05;
-      }
-      else
-      {
-        val = 0.0;
-      }
-      (*scalars)[0] = val;
-      (*scalars)[1] = val;
-      (*scalars)[2] = val;
-      (*scalars)[3] = val;
-      scalars->postModified();
-    };
-
-    connect<Event>(viewer, VTKViewer::preUpdate, onPreUpdate);
-    onPreUpdate(nullptr);
-    applyColorFunction();
-
-    scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
-    scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
-  }
 };
 TEST_F(MeshColorFunctionCellsRenderTest, meshColorFunctionCells)
 {
@@ -174,52 +173,52 @@ class MeshColorFunctionDynamicVerticesRenderTest : public RenderTest
 {
 public:
 
-  double scale = 1.0;
-  void createGeometry() override
-  {
-    auto mesh = std::make_shared<imstk::SurfaceMesh>();
-    auto points = std::make_shared<imstk::VecDataArray<double, 3>>();
-    auto tris = std::make_shared<imstk::VecDataArray<int, 3>>();
-    auto scalars = std::make_shared<imstk::DataArray<float>>();
-    mesh->initialize(points, tris);
-    geom = mesh;
-
-    auto   updateMesh = [this, mesh](Event*)
+    double scale = 1.0;
+    void createGeometry() override
     {
-      scale += 0.01;
-      auto points = std::make_shared<imstk::VecDataArray<double, 3>>();
-      auto tris = std::make_shared<imstk::VecDataArray<int, 3>>();
-      auto scalars = std::make_shared<imstk::DataArray<float>>();
-      mesh->clear();
-      for (int i = 0; i < 6; ++i)
-      {
-        points->push_back({ 0, 0, static_cast<double>(i) });
-        scalars->push_back(i);
-        points->push_back({ 1 * scale, 0, static_cast<double>(i) });
-        scalars->push_back(i);
-      }
+        auto mesh    = std::make_shared<imstk::SurfaceMesh>();
+        auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
+        auto tris    = std::make_shared<imstk::VecDataArray<int, 3>>();
+        auto scalars = std::make_shared<imstk::DataArray<float>>();
+        mesh->initialize(points, tris);
+        geom = mesh;
 
-      for (int i = 0; i < 5; ++i)
-      {
-        int j = i * 2;
-        tris->push_back({ j + 2, j + 1, j });
-        tris->push_back({ j + 3, j + 1, j + 2 });
-      }
+        auto updateMesh = [this, mesh](Event*)
+                          {
+                              scale += 0.01;
+                              auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
+                              auto tris    = std::make_shared<imstk::VecDataArray<int, 3>>();
+                              auto scalars = std::make_shared<imstk::DataArray<float>>();
+                              mesh->clear();
+                              for (int i = 0; i < 6; ++i)
+                              {
+                                  points->push_back({ 0, 0, static_cast<double>(i) });
+                                  scalars->push_back(i);
+                                  points->push_back({ 1 * scale, 0, static_cast<double>(i) });
+                                  scalars->push_back(i);
+                              }
 
-      mesh->initialize(points, tris);
-      mesh->setVertexAttribute("scalars", scalars);
-      mesh->setVertexScalars("scalars");
-      mesh->computeVertexNormals();
-      mesh->postModified();
-    };
+                              for (int i = 0; i < 5; ++i)
+                              {
+                                  int j = i * 2;
+                                  tris->push_back({ j + 2, j + 1, j });
+                                  tris->push_back({ j + 3, j + 1, j + 2 });
+                              }
 
-    connect<Event>(viewer, VTKViewer::preUpdate, updateMesh);
-    updateMesh(nullptr);
-    applyColorFunction();
+                              mesh->initialize(points, tris);
+                              mesh->setVertexAttribute("scalars", scalars);
+                              mesh->setVertexScalars("scalars");
+                              mesh->computeVertexNormals();
+                              mesh->postModified();
+                          };
 
-    scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
-    scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
-  }
+        connect<Event>(viewer, VTKViewer::preUpdate, updateMesh);
+        updateMesh(nullptr);
+        applyColorFunction();
+
+        scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
+        scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
+    }
 };
 TEST_F(MeshColorFunctionDynamicVerticesRenderTest, meshColorFunctionDynamicVertices)
 {
@@ -230,52 +229,52 @@ class MeshColorFunctionDynamicCellsRenderTest : public RenderTest
 {
 public:
 
-  double scale = 1.0;
-  void createGeometry() override
-  {
-    auto mesh    = std::make_shared<imstk::SurfaceMesh>();
-    auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
-    auto tris    = std::make_shared<imstk::VecDataArray<int, 3>>();
-    auto scalars = std::make_shared<imstk::DataArray<float>>();
-    mesh->initialize(points, tris);
-    geom = mesh;
-
-    auto   updateMesh = [this, mesh](Event*)
+    double scale = 1.0;
+    void createGeometry() override
     {
-        scale += 0.01;
+        auto mesh    = std::make_shared<imstk::SurfaceMesh>();
         auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
         auto tris    = std::make_shared<imstk::VecDataArray<int, 3>>();
         auto scalars = std::make_shared<imstk::DataArray<float>>();
-        mesh->clear();
-        for (int i = 0; i < 6; ++i)
-        {
-            points->push_back({ 0, 0, static_cast<double>(i) });
-            points->push_back({ 1*scale, 0, static_cast<double>(i) });
-        }
-
-        for (int i = 0; i < 5; ++i)
-        {
-            int j = i * 2;
-            tris->push_back({ j + 2, j + 1, j });
-            scalars->push_back(i);
-            tris->push_back({ j + 3, j + 1, j + 2 });
-            scalars->push_back(i);
-        }
-
         mesh->initialize(points, tris);
-        mesh->setCellAttribute("scalars", scalars);
-        mesh->setCellScalars("scalars");
-        mesh->computeVertexNormals();
-        mesh->postModified();
-    };
+        geom = mesh;
 
-    connect<Event>(viewer, viewer->preUpdate, updateMesh);
-    updateMesh(nullptr);
-    applyColorFunction();
+        auto updateMesh = [this, mesh](Event*)
+                          {
+                              scale += 0.01;
+                              auto points  = std::make_shared<imstk::VecDataArray<double, 3>>();
+                              auto tris    = std::make_shared<imstk::VecDataArray<int, 3>>();
+                              auto scalars = std::make_shared<imstk::DataArray<float>>();
+                              mesh->clear();
+                              for (int i = 0; i < 6; ++i)
+                              {
+                                  points->push_back({ 0, 0, static_cast<double>(i) });
+                                  points->push_back({ 1 * scale, 0, static_cast<double>(i) });
+                              }
 
-    scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
-    scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
-  }
+                              for (int i = 0; i < 5; ++i)
+                              {
+                                  int j = i * 2;
+                                  tris->push_back({ j + 2, j + 1, j });
+                                  scalars->push_back(i);
+                                  tris->push_back({ j + 3, j + 1, j + 2 });
+                                  scalars->push_back(i);
+                              }
+
+                              mesh->initialize(points, tris);
+                              mesh->setCellAttribute("scalars", scalars);
+                              mesh->setCellScalars("scalars");
+                              mesh->computeVertexNormals();
+                              mesh->postModified();
+                          };
+
+        connect<Event>(viewer, viewer->preUpdate, updateMesh);
+        updateMesh(nullptr);
+        applyColorFunction();
+
+        scene->getActiveCamera()->setPosition(Vec3d(0, 12, 3));
+        scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 3.01));
+    }
 };
 TEST_F(MeshColorFunctionDynamicCellsRenderTest, meshColorFunctionDynamicCells)
 {

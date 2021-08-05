@@ -49,7 +49,7 @@ protected:
 
     void SetUp() override;
 
-    virtual void createGeometry()=0;
+    virtual void createGeometry() = 0;
 
     void updateMaterial();
 
@@ -65,16 +65,16 @@ protected:
     std::shared_ptr<DirectionalLight>     light;
 
     // Render Contents
-    std::shared_ptr<Geometry>             geom;
-    std::shared_ptr<RenderMaterial>       renderMaterial;
-    std::shared_ptr<VisualModel>          visualModel;
-    std::shared_ptr<SceneObject>          sceneObj;
+    std::shared_ptr<Geometry>       geom;
+    std::shared_ptr<RenderMaterial> renderMaterial;
+    std::shared_ptr<VisualModel>    visualModel;
+    std::shared_ptr<SceneObject>    sceneObj;
 
-    double elapsedTime = 0;
-    bool   complete=false;
-    int    displayMode;
-    int    color;
-    int    shadingModel;
-    int    blendMode;
+    double      elapsedTime = 0;
+    bool        complete    = false;
+    int         displayMode;
+    int         color;
+    int         shadingModel;
+    int         blendMode;
     std::string dm, c, sm, bm;
 };

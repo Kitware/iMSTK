@@ -30,10 +30,10 @@
 
 class CapsuleRenderTest : public RenderTest
 {
-  void createGeometry() override
-  {
+void createGeometry() override
+{
     geom = std::make_shared<Capsule>();
-  }
+}
 };
 TEST_F(CapsuleRenderTest, createCapsule)
 {
@@ -42,10 +42,10 @@ TEST_F(CapsuleRenderTest, createCapsule)
 
 class CylinderRenderTest : public RenderTest
 {
-  void createGeometry() override
-  {
+void createGeometry() override
+{
     geom = std::make_shared<Cylinder>();
-  }
+}
 };
 TEST_F(CylinderRenderTest, createCylinder)
 {
@@ -54,10 +54,10 @@ TEST_F(CylinderRenderTest, createCylinder)
 
 class OrientedBoxRenderTest : public RenderTest
 {
-  void createGeometry() override
-  {
+void createGeometry() override
+{
     geom = std::make_shared<OrientedBox>();
-  }
+}
 };
 TEST_F(OrientedBoxRenderTest, createOrientedBox)
 {
@@ -66,10 +66,10 @@ TEST_F(OrientedBoxRenderTest, createOrientedBox)
 
 class PlaneRenderTest : public RenderTest
 {
-  void createGeometry() override
-  {
+void createGeometry() override
+{
     geom = std::make_shared<Plane>();
-  }
+}
 };
 TEST_F(PlaneRenderTest, createPlane)
 {
@@ -78,10 +78,10 @@ TEST_F(PlaneRenderTest, createPlane)
 
 class SphereRenderTest : public RenderTest
 {
-  void createGeometry() override
-  {
+void createGeometry() override
+{
     geom = std::make_shared<Sphere>();
-  }
+}
 };
 TEST_F(SphereRenderTest, createSphere)
 {
