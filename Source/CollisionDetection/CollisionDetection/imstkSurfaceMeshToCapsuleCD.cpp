@@ -46,7 +46,7 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
     const double capsuleRadius      = capsule->getRadius();
     const double capsuleLength      = capsule->getLength();
     const Quatd& capsuleOrientation = capsule->getOrientation();
-    const Vec3d& capsulePosA        = capsulePos - 0.5 * capsuleLength * capsuleOrientation.toRotationMatrix().transpose().col(1);
+    const Vec3d& capsulePosA        = capsulePos - 0.5 * capsuleLength * capsuleOrientation.toRotationMatrix().col(1);
     const Vec3d& capsulePosB        = capsulePos + (capsulePos - capsulePosA);
 
     std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = surfMesh->getTriangleIndices();
