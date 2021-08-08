@@ -300,7 +300,7 @@ VTKLineMeshRenderDelegate::setVertexScalarBuffer(std::shared_ptr<AbstractDataArr
     }
     m_mappedVertexScalarArray->SetNumberOfComponents(m_vertexScalars->getNumberOfComponents());
     m_mappedVertexScalarArray->SetVoidArray(m_vertexScalars->getVoidPointer(),
-        static_cast<vtkIdType>(m_vertexScalars->size() * m_vertexScalars->getNumberOfComponents()), 1);
+        static_cast<vtkIdType>(m_vertexScalars->size()), 1);
     m_mappedVertexScalarArray->Modified();
 }
 
@@ -325,7 +325,7 @@ VTKLineMeshRenderDelegate::setCellScalarBuffer(std::shared_ptr<AbstractDataArray
 
     m_mappedCellScalarArray->SetNumberOfComponents(m_cellScalars->getNumberOfComponents());
     m_mappedCellScalarArray->SetVoidArray(m_cellScalars->getVoidPointer(),
-        static_cast<vtkIdType>(m_cellScalars->size() * m_cellScalars->getNumberOfComponents()), 1);
+        static_cast<vtkIdType>(m_cellScalars->size()), 1);
     m_mappedCellScalarArray->Modified();
 }
 } // imstk
