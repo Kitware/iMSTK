@@ -90,11 +90,10 @@ main()
     int mode  = 0; // 0: add point, 1: add line, 2: add triangle
     int count = 0; // The number of times cycling between modes
 
-    int  i = 0;
     auto updateFunc =
         [&](Event*)
         {
-            if (count > 15)
+            if (count > 100)
             {
                 count = 0;
                 debugGeometryObj->clear();
@@ -153,7 +152,7 @@ main()
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(1.0);
+        driver->setDesiredDt(0.1);
 
         // Add mouse and keyboard controls to the viewer
         {

@@ -121,7 +121,7 @@ public:
                                  std::vector<Vec3d>& dcdxA,
                                  std::vector<Vec3d>& dcdxB) const override
     {
-        const Vec3d& x0 = *m_bodiesFirst[0].vertex;
+        //const Vec3d& x0 = *m_bodiesFirst[0].vertex;
         const Vec3d& x1 = *m_bodiesSecond[0].vertex;
         const Vec3d& x2 = *m_bodiesSecond[1].vertex;
         const Vec3d& x3 = *m_bodiesSecond[2].vertex;

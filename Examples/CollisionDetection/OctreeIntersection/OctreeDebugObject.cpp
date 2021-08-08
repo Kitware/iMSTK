@@ -27,7 +27,7 @@ namespace imstk
 bool
 OctreeDebugObject::updateGeom(OctreeNode* node)
 {
-    if (node->m_Depth > m_maxDisplayDepth)
+    if (node->m_Depth > static_cast<uint32_t>(m_maxDisplayDepth))
     {
         return false;
     }
