@@ -132,7 +132,6 @@ RigidBodyCH::handleRbdRbdTwoWay(
     for (size_t i = 0; i < elementsA.getSize(); i++)
     {
         const CollisionElement& colElemA = elementsA[i];
-        const CollisionElement& colElemB = elementsB[i];
         if (colElemA.m_type == CollisionElementType::PointDirection)
         {
             const Vec3d& contactPt = colElemA.m_element.m_PointDirectionElement.pt;
