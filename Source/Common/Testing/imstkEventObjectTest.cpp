@@ -30,9 +30,11 @@ using testing::ElementsAre;
 class MockSender : public imstk::EventObject
 {
 public:
+    /* *INDENT-OFF* */
     SIGNAL(MockSender,SignalOne);
 
     SIGNAL(MockSender,SignalTwo);
+    /* *INDENT-ON* */
 
     void postOne()
     {
