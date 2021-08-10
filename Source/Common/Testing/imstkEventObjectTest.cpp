@@ -30,9 +30,11 @@ using testing::ElementsAre;
 class MockSender : public imstk::EventObject
 {
 public:
+    /* *INDENT-OFF* */
     SIGNAL(MockSender,SignalOne);
 
     SIGNAL(MockSender,SignalTwo);
+    /* *INDENT-ON* */
 
     void postOne()
     {
@@ -45,7 +47,7 @@ public:
     }
 };
 
-class MockReceiver: public imstk::EventObject
+class MockReceiver : public imstk::EventObject
 {
 public:
 
@@ -62,134 +64,134 @@ public:
     std::vector<int> items;
 };
 
-TEST(imstkEventObjectTest,PointerImmediate)
+TEST(imstkEventObjectTest, PointerImmediate)
 {
     MockSender   m;
     MockReceiver r;
 
-    connect(&m,MockSender::SignalOne,&r,&MockReceiver::receiverOne);
-    connect(&m,MockSender::SignalTwo,&r,&MockReceiver::receiverTwo);
+    connect(&m, MockSender::SignalOne, &r, &MockReceiver::receiverOne);
+    connect(&m, MockSender::SignalTwo, &r, &MockReceiver::receiverTwo);
 
     m.postOne();
 
-    EXPECT_THAT(r.items,ElementsAre(1));
+    EXPECT_THAT(r.items, ElementsAre(1));
     m.postTwo();
-    EXPECT_THAT(r.items,ElementsAre(1,2));
+    EXPECT_THAT(r.items, ElementsAre(1, 2));
 
-    disconnect(&m,&r,MockSender::SignalTwo);
+    disconnect(&m, &r, MockSender::SignalTwo);
 
     m.postOne();
-    EXPECT_THAT(r.items,ElementsAre(1,2,1));
+    EXPECT_THAT(r.items, ElementsAre(1, 2, 1));
 
     m.postTwo();
-    EXPECT_THAT(r.items,ElementsAre(1,2,1));
+    EXPECT_THAT(r.items, ElementsAre(1, 2, 1));
 }
 
-TEST(imstkEventObjectTest,SharedPointerImmediate)
+TEST(imstkEventObjectTest, SharedPointerImmediate)
 {
     auto m = std::make_shared<MockSender>();
     auto r = std::make_shared<MockReceiver>();
 
-    connect(m,MockSender::SignalOne,r,&MockReceiver::receiverOne);
-    connect(m,MockSender::SignalTwo,r,&MockReceiver::receiverTwo);
+    connect(m, MockSender::SignalOne, r, &MockReceiver::receiverOne);
+    connect(m, MockSender::SignalTwo, r, &MockReceiver::receiverTwo);
 
     m->postOne();
 
-    EXPECT_THAT(r->items,ElementsAre(1));
+    EXPECT_THAT(r->items, ElementsAre(1));
     m->postTwo();
-    EXPECT_THAT(r->items,ElementsAre(1,2));
+    EXPECT_THAT(r->items, ElementsAre(1, 2));
 
-    disconnect(m,r,MockSender::SignalTwo);
+    disconnect(m, r, MockSender::SignalTwo);
 
     m->postOne();
-    EXPECT_THAT(r->items,ElementsAre(1,2,1));
+    EXPECT_THAT(r->items, ElementsAre(1, 2, 1));
 
     m->postTwo();
-    EXPECT_THAT(r->items,ElementsAre(1,2,1));
+    EXPECT_THAT(r->items, ElementsAre(1, 2, 1));
 }
 
-TEST(imstkEventObjectTest,LambdaImmediate)
+TEST(imstkEventObjectTest, LambdaImmediate)
 {
     MockSender   m;
     MockReceiver r;
     int          callCount = 0;
 
-    imstk::connect<Event>(&m,MockSender::SignalOne,[&](imstk::Event*) { ++callCount; });
+    imstk::connect<Event>(&m, MockSender::SignalOne, [&](imstk::Event*) { ++callCount; });
 
-    EXPECT_EQ(0,callCount);
+    EXPECT_EQ(0, callCount);
     m.postOne();
 
-    EXPECT_EQ(1,callCount);
+    EXPECT_EQ(1, callCount);
 }
 
-TEST(imstkEventObjectTest,PointerQueued)
+TEST(imstkEventObjectTest, PointerQueued)
 {
     MockSender   m;
     MockReceiver r;
 
-    queueConnect(&m,MockSender::SignalOne,&r,&MockReceiver::receiverOne);
-    queueConnect(&m,MockSender::SignalTwo,&r,&MockReceiver::receiverTwo);
+    queueConnect(&m, MockSender::SignalOne, &r, &MockReceiver::receiverOne);
+    queueConnect(&m, MockSender::SignalTwo, &r, &MockReceiver::receiverTwo);
 
     m.postOne();
     m.postTwo();
-    EXPECT_THAT(r.items,ElementsAre());
+    EXPECT_THAT(r.items, ElementsAre());
 
     r.doAllEvents();
-    EXPECT_THAT(r.items,ElementsAre(1,2));
+    EXPECT_THAT(r.items, ElementsAre(1, 2));
 
     m.postOne();
     m.postTwo();
-    EXPECT_THAT(r.items,ElementsAre(1,2));
+    EXPECT_THAT(r.items, ElementsAre(1, 2));
 
     r.doEvent();
-    EXPECT_THAT(r.items,ElementsAre(1,2,1));
+    EXPECT_THAT(r.items, ElementsAre(1, 2, 1));
 
     r.doEvent();
-    EXPECT_THAT(r.items,ElementsAre(1,2,1,2));
+    EXPECT_THAT(r.items, ElementsAre(1, 2, 1, 2));
 
-    disconnect(&m,&r,MockSender::SignalTwo);
+    disconnect(&m, &r, MockSender::SignalTwo);
 
     m.postOne();
     m.postTwo();
 
     r.doAllEvents();
-    EXPECT_THAT(r.items,ElementsAre(1,2,1,2,1));
+    EXPECT_THAT(r.items, ElementsAre(1, 2, 1, 2, 1));
 
-    disconnect(&m,&r,MockSender::SignalOne);
+    disconnect(&m, &r, MockSender::SignalOne);
     m.postOne();
     m.postTwo();
     r.doAllEvents();
-    EXPECT_THAT(r.items,ElementsAre(1,2,1,2,1));
+    EXPECT_THAT(r.items, ElementsAre(1, 2, 1, 2, 1));
 }
 
-TEST(imstkEventObjectTest,PointerQueuedForeach)
+TEST(imstkEventObjectTest, PointerQueuedForeach)
 {
     MockSender   m;
     MockReceiver r;
 
-    queueConnect(&m,MockSender::SignalOne,&r,&MockReceiver::receiverOne);
-    queueConnect(&m,MockSender::SignalTwo,&r,&MockReceiver::receiverTwo);
+    queueConnect(&m, MockSender::SignalOne, &r, &MockReceiver::receiverOne);
+    queueConnect(&m, MockSender::SignalTwo, &r, &MockReceiver::receiverTwo);
 
     m.postOne();
     m.postTwo();
 
     r.foreachEvent([&](Command c) { c.invoke(); });
 
-    EXPECT_THAT(r.items,ElementsAre(1,2));
+    EXPECT_THAT(r.items, ElementsAre(1, 2));
 }
 
-TEST(imstkEventObjectTest,PointerQueuedForeachBackwards)
+TEST(imstkEventObjectTest, PointerQueuedForeachBackwards)
 {
     MockSender   m;
     MockReceiver r;
 
-    queueConnect(&m,MockSender::SignalOne,&r,&MockReceiver::receiverOne);
-    queueConnect(&m,MockSender::SignalTwo,&r,&MockReceiver::receiverTwo);
+    queueConnect(&m, MockSender::SignalOne, &r, &MockReceiver::receiverOne);
+    queueConnect(&m, MockSender::SignalTwo, &r, &MockReceiver::receiverTwo);
 
     m.postOne();
     m.postTwo();
 
     r.rforeachEvent([&](Command c) { c.invoke(); });
 
-    EXPECT_THAT(r.items,ElementsAre(2,1));
+    EXPECT_THAT(r.items, ElementsAre(2, 1));
 }
