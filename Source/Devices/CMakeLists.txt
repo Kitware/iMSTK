@@ -26,7 +26,9 @@ if(NOT iMSTK_USE_VRPN)
     imstkVRPNArduinoDeviceClient.h
     imstkVRPNArduinoDeviceClient.cpp
     imstkVRPNDeviceClient.h
-    imstkVRPNDeviceClient.cpp)
+    imstkVRPNDeviceClient.cpp
+    imstkVRPN3DConnexionDeviceClient.h
+    imstkVRPN3DConnexionDeviceClient.cpp)
 endif()
 
 include(imstkAddLibrary)

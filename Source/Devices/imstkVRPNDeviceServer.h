@@ -31,20 +31,17 @@
 
 //VRPN
 #include "imstkDeviceClient.h"
-#include "imstkVRPNDeviceClient.h"
 #include "quat.h"
 
 namespace imstk
 {
-///
-/// \brief Enumeration for device types
-///
-enum class VRPNDeviceType
-{
-    Analog,
-    Button,
-    Tracker
-};
+class VRPNDeviceClient;
+
+using VRPNDeviceType = int;
+const VRPNDeviceType VRPNAnalog  = 0x1;
+const VRPNDeviceType VRPNButton  = 0x2;
+const VRPNDeviceType VRPNTracker = 0x4;
+const VRPNDeviceType VRPNForce   = 0x8;
 
 ///
 /// \class VRPNDeviceServer
@@ -57,10 +54,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VRPNDeviceServer(const std::string& machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO) : Module(),
-        m_machine(machine),
-        m_port(port)
-    {}
+    VRPNDeviceServer(const std::string& machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO);
 
     ///
     /// \brief Destructor
@@ -80,7 +74,9 @@ public:
     ///
     /// \bried Add device client
     ///
-    void addDeviceClient(std::shared_ptr<VRPNDeviceClient> client, const std::string& deviceName, VRPNDeviceType deviceType, int id);
+    void addDeviceClient(std::shared_ptr<VRPNDeviceClient> client);
+
+    std::shared_ptr<DeviceClient> getClient(const std::string& deviceName, VRPNDeviceType deviceType);
 
 protected:
     ///
@@ -113,11 +109,15 @@ private:
     const std::string m_machine;                                       ///< machine name or IP
     const int m_port;                                                  ///< connection port
 
-    std::map<std::string, std::pair<VRPNDeviceType, int>> m_deviceInfoMap; ///< list of iMSTK client info
-    std::map<std::string, SerialInfo> m_SerialInfoMap;
-    vrpn_Connection* m_serverConnection = nullptr;                     ///< VRPN server connection
-    vrpn_MainloopContainer* m_deviceConnections = nullptr;             ///< VRPN device connections
-    
-    std::vector<std::shared_ptr<VRPNDeviceClient>> m_deviceClients2;
+    struct Client
+    {
+        std::shared_ptr<VRPNDeviceClient> client;
+        VRPNDeviceType type;
+        int id;
+    };
+
+    std::map<std::string, Client>           m_deviceInfoMap;     ///< list of iMSTK client info
+    std::map<std::string, SerialInfo>       m_SerialInfoMap;
+    std::unique_ptr<vrpn_MainloopContainer> m_deviceConnections; ///< VRPN device connections
 };
 } // imstk

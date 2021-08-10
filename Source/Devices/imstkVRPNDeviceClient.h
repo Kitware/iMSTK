@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkDeviceClient.h"
+#include "imstkVRPNDeviceServer.h"
 #include "imstkModule.h"
 
 #include <vrpn_Configure.h>
@@ -35,46 +36,25 @@
 #include <vector>
 #include "quat.h"
 
-
 namespace imstk
 {
 ///
 /// \class VRPNDeviceClient
 /// \brief Subclass of DeviceClient using VRPN
 ///
-class VRPNDeviceClient : public DeviceClient, public Module
+class VRPNDeviceClient : public DeviceClient
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    VRPNDeviceClient(const std::string& deviceName, const std::string& ip) : Module(),
-        DeviceClient(deviceName, "localhost")
-    {}
+    VRPNDeviceClient(const std::string& deviceName, VRPNDeviceType type, const std::string& ip = "localhost");
 
     ///
     /// \brief Destructor
     ///
     virtual ~VRPNDeviceClient() override = default;
-
-protected:
-    ///
-    /// \brief Initialize device client module
-    ///
-    bool initModule() override;
-
-    ///
-    /// \brief Run the device client
-    ///
-    void updateModule() override;
-
-    ///
-    /// \brief Clean the device client
-    ///
-    void uninitModule() override;
-
-public:
 
     ///
     /// \brief VRPN call back for position and orientation data
@@ -111,13 +91,9 @@ public:
     ///
     static void VRPN_CALLBACK buttonChangeHandler(void* userData, const _vrpn_BUTTONCB b);
 
-    std::shared_ptr<vrpn_Tracker_Remote>     m_vrpnTracker;     //!< VRPN position/orientation interface
-    std::shared_ptr<vrpn_Analog_Remote>      m_vrpnAnalog;      //!< VRPN position/orientation interface
-    std::shared_ptr<vrpn_Button_Remote>      m_vrpnButton;      //!< VRPN button interface
-    std::shared_ptr<vrpn_ForceDevice_Remote> m_vrpnForceDevice; //!< VRPN force interface
+    VRPNDeviceType getType() const;
 
-public:
-    std::unordered_map<int, bool> m_buttons;
-    std::unordered_map<int, double> m_buttonStates;
+private:
+    VRPNDeviceType m_type;
 };
 }

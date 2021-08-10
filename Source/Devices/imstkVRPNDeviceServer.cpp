@@ -40,65 +40,69 @@
 
 namespace imstk
 {
-    void
-    VRPNDeviceServer::addDeviceClient(std::shared_ptr<VRPNDeviceClient> client, const std::string& deviceName, VRPNDeviceType deviceType, int id)
+VRPNDeviceServer::VRPNDeviceServer(const std::string& machine /*= "localhost"*/, int port /*= vrpn_DEFAULT_LISTEN_PORT_NO*/) : Module(),
+    m_machine(machine),
+    m_port(port),
+    m_deviceConnections(new vrpn_MainloopContainer())
+{
+    setSleepDelay(1000 / 60);
+}
+
+void
+VRPNDeviceServer::addDeviceClient(std::shared_ptr<VRPNDeviceClient> client)
+{
+    std::string name   = client->getDeviceName();
+    void*       handle = client.get();
+
+    std::string address  = name + "@" + m_machine;
+    const char* _address = address.c_str();
+
+    int type = client->getType();
+
+    if ( (type & VRPNAnalog) != 0)
     {
-        m_deviceClients2.push_back(client);
-        //m_deviceClient1 = client;
-        m_deviceInfoMap[deviceName] = std::make_pair(deviceType, id);
+        LOG(INFO) << "Analog: " << name;
+        SerialInfo          connectionSettings = m_SerialInfoMap[name];
+        vrpn_Analog_Remote* vrpnAnalog = new vrpn_Analog_Remote(_address);
+        m_deviceConnections->add(vrpnAnalog);
 
+        vrpnAnalog->register_change_handler(handle, VRPNDeviceClient::analogChangeHandler);
     }
+    if ( (type & VRPNTracker) != 0)
+    {
+        LOG(INFO) << "Tracker: " << name;
+        vrpn_Tracker_Remote* vrpnTracker = new vrpn_Tracker_Remote(_address);
+        m_deviceConnections->add(vrpnTracker);
 
+        vrpnTracker->register_change_handler(handle, VRPNDeviceClient::trackerChangeHandler);
+    }
+    if ( (type & VRPNButton) != 0)
+    {
+        LOG(INFO) << "Button: " << name;
+        vrpn_Button_Remote* vrpnButton = new vrpn_Button_Remote(_address);
+        m_deviceConnections->add(vrpnButton);
+
+        vrpnButton->register_change_handler(handle, VRPNDeviceClient::buttonChangeHandler);
+    }
+}
+
+std::shared_ptr<imstk::DeviceClient>
+VRPNDeviceServer::getClient(const std::string& deviceName, VRPNDeviceType deviceType)
+{
+    auto client = std::make_shared<VRPNDeviceClient>(deviceName, deviceType, m_machine);
+    addDeviceClient(client);
+    return client;
+}
 
 bool
 VRPNDeviceServer::initModule()
 {
-    std::string ip = m_machine + ":" + std::to_string(m_port);
-    m_serverConnection = vrpn_create_server_connection(ip.c_str());
-
-    m_deviceConnections = new vrpn_MainloopContainer();
-
-    for (const auto& device : m_deviceInfoMap)
-    {
-        std::string name = device.first;
-        VRPNDeviceType  type = device.second.first;
-        auto        id   = device.second.second;
-
-        std::string address = name + "@" + m_machine;
-        const char* _address = address.c_str();
-
-        switch (type)
-        {
-        case VRPNDeviceType::Analog:
-        {
-            std::cout << "ANALOG" << std::endl;
-            SerialInfo connectionSettings = m_SerialInfoMap[name];
-            vrpn_Analog_Remote* vrpnAnalog = new vrpn_Analog_Remote(_address);
-            m_deviceConnections->add(vrpnAnalog);
-
-            vrpnAnalog->register_change_handler(this, VRPNDeviceClient::analogChangeHandler);
-
-
-        } break;
-        case VRPNDeviceType::Tracker:
-        {
-            std::cout << "TRACKER" << std::endl;
-            SerialInfo connectionSettings = m_SerialInfoMap[name];
-            //vrpn_Analog_Remote* vrpnAnalog = new vrpn_Analog_Remote(_address);
-            vrpn_Tracker_Remote* vrpnTracker = new vrpn_Tracker_Remote(_address);
-            m_deviceConnections->add(vrpnTracker);
-
-            vrpnTracker->register_change_handler(this, VRPNDeviceClient::trackerChangeHandler);
-        } break;
-        }
-    }
     return true;
 }
 
 void
 VRPNDeviceServer::updateModule()
 {
-    m_serverConnection->mainloop();
     m_deviceConnections->mainloop();
 }
 
@@ -106,9 +110,5 @@ void
 VRPNDeviceServer::uninitModule()
 {
     m_deviceConnections->clear();
-    delete(m_deviceConnections);
-
-    m_serverConnection->removeReference();
-    //delete(m_connection);
 }
 } // imstk
