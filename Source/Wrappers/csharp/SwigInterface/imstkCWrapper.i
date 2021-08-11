@@ -159,11 +159,12 @@
 #include "imstkObjectInteractionPair.h"
 #include "imstkObjectInteractionFactory.h"
 #include "imstkCollisionPair.h"
-/* #include "imstkRigidObjectCollidingCollisionPair.h" */
+#include "imstkRigidObjectCollision.h"
 #include "imstkInteractionPair.h"
 #include "imstkObjectInteractionPair.h"
 #include "imstkPbdObjectCuttingPair.h"
 #include "imstkPbdObjectCollision.h"
+#include "imstkSphObjectCollision.h"
 
 /*
  * SimulationManager
@@ -376,8 +377,10 @@ namespace std {
 %include "../../../Scene/imstkObjectInteractionPair.h";
 %include "../../../Scene/imstkObjectInteractionFactory.h";
 %include "../../../Scene/imstkCollisionPair.h";
+%include "../../../Scene/imstkRigidObjectCollision.h";
 %include "../../../Scene/imstkPbdObjectCuttingPair.h"
 %include "../../../Scene/imstkPbdObjectCollision.h"
+%include "../../../Scene/imstkSphObjectCollision.h"
 
 /*
  * SimulationManager
