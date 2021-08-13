@@ -20,11 +20,10 @@
 =========================================================================*/
 
 #include "imstkVRPNDeviceClient.h"
-#include "imstkLogger.h"
 
-//VRPN
-#include "imstkVRPNDeviceServer.h"
 #include "quat.h"
+
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -38,7 +37,7 @@ VRPNDeviceClient::VRPNDeviceClient(const std::string& deviceName, VRPNDeviceType
 }
 
 void VRPN_CALLBACK
-VRPNDeviceClient::trackerChangeHandler(void* userData, const _vrpn_TRACKERCB t)
+VRPNDeviceClient::trackerPositionChangeHandler(void* userData, const _vrpn_TRACKERCB t)
 {
     auto deviceClient = static_cast<VRPNDeviceClient*>(userData);
 
@@ -58,18 +57,26 @@ void VRPN_CALLBACK
 VRPNDeviceClient::analogChangeHandler(void* userData, const _vrpn_ANALOGCB a)
 {
     auto deviceClient = static_cast<VRPNDeviceClient*>(userData);
-
+    deviceClient->m_dataLock.lock();
     for (int i = 0; i < a.num_channel; i++)
     {
-        deviceClient->m_analogData[i] = a.channel[i];
+        deviceClient->m_analogChannels[i] = a.channel[i];
     }
+    deviceClient->m_dataLock.unlock();
 }
 
 void VRPN_CALLBACK
-VRPNDeviceClient::velocityChangeHandler(void* userData, const _vrpn_TRACKERVELCB v)
+VRPNDeviceClient::trackerVelocityChangeHandler(void* userData, const _vrpn_TRACKERVELCB v)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
+    Quatd quat(v.vel_quat[1], v.vel_quat[2], v.vel_quat[3], v.vel_quat[0]);
+
+    deviceClient->m_transformLock.lock();
     deviceClient->m_velocity << v.vel[0], v.vel[1], v.vel[2];
+    // \todo translate velocity quaternion to imstk 
+    // deviceClient->m_angularVelocity = quat;
+    //
+    deviceClient->m_transformLock.unlock();
 }
 
 void VRPN_CALLBACK

@@ -34,16 +34,20 @@
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
 #include "imstkVTKViewer.h"
-#include <imstkVRPNArduinoDeviceClient.h>
 #include <imstkVRPNDeviceClient.h>
-#include <imstkVRPNDeviceServer.h>
+#include <imstkVRPNDeviceManager.h>
 
 using namespace imstk;
 
 ///
 /// \brief This example demonstrates controlling the object
-/// using external device. NOTE: Requires GeoMagic Touch device
+/// using external device. 
+/// 
+/// You should see a rectangular object that can be controlled with
+/// whatever device you configured as the designated tracker
 ///
+/// Expects vrpn_server to be running and listening to the default port
+/// and have a tracker to configured as the "Tracker0" device in it `vrpn.cfg`
 int
 main()
 {
@@ -60,11 +64,10 @@ main()
     const int serverPort = 38833;
 
     // Device Client
-    // auto client = std::make_shared<VRPNDeviceClient>("Tracker0", VRPNTracker, serverIP);
 
     //VRPN Server
-    auto server = std::make_shared<VRPNDeviceServer>(serverIP, 38833);
-    auto client = server->getClient("Tracker0", VRPNTracker);
+    auto server = std::make_shared<VRPNDeviceManager>(serverIP, 38833);
+    auto client = server->createDeviceClient("Tracker0", VRPNTracker);
 
 //     //Device 1:
 //     server->addDeviceClient(client);

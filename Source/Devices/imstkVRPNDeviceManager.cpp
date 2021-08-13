@@ -19,28 +19,19 @@
 
 =========================================================================*/
 
-#include "imstkVRPNDeviceServer.h"
-#include "imstkLogger.h"
+#include "imstkVRPNDeviceManager.h"
 
-#include <vrpn_3DConnexion.h>
-#include <vrpn_Streaming_Arduino.h>
-#include <vrpn_Tracker_NovintFalcon.h>
-#include <vrpn_Tracker_OSVRHackerDevKit.h>
+#include "vrpn_Analog.h"
+#include "vrpn_Button.h"
+#include "vrpn_Tracker.h"
 
-//VRPN
 #include "imstkDeviceClient.h"
+#include "imstkLogger.h"
 #include "imstkVRPNDeviceClient.h"
-#include <vrpn_Analog.h>
-#include <vrpn_Tracker.h>
-#include "quat.h"
-
-#ifdef VRPN_USE_PHANTOM_SERVER
-#include <vrpn_Phantom.h>
-#endif
 
 namespace imstk
 {
-VRPNDeviceServer::VRPNDeviceServer(const std::string& machine /*= "localhost"*/, int port /*= vrpn_DEFAULT_LISTEN_PORT_NO*/) : Module(),
+VRPNDeviceManager::VRPNDeviceManager(const std::string& machine /*= "localhost"*/, int port /*= vrpn_DEFAULT_LISTEN_PORT_NO*/) : Module(),
     m_machine(machine),
     m_port(port),
     m_deviceConnections(new vrpn_MainloopContainer())
@@ -49,7 +40,7 @@ VRPNDeviceServer::VRPNDeviceServer(const std::string& machine /*= "localhost"*/,
 }
 
 void
-VRPNDeviceServer::addDeviceClient(std::shared_ptr<VRPNDeviceClient> client)
+VRPNDeviceManager::addDeviceClient(std::shared_ptr<VRPNDeviceClient> client)
 {
     std::string name   = client->getDeviceName();
     void*       handle = client.get();
@@ -61,33 +52,30 @@ VRPNDeviceServer::addDeviceClient(std::shared_ptr<VRPNDeviceClient> client)
 
     if ( (type & VRPNAnalog) != 0)
     {
-        LOG(INFO) << "Analog: " << name;
-        SerialInfo          connectionSettings = m_SerialInfoMap[name];
+        LOG(INFO) << "Adding Analog Device: " << name;
         vrpn_Analog_Remote* vrpnAnalog = new vrpn_Analog_Remote(_address);
         m_deviceConnections->add(vrpnAnalog);
-
         vrpnAnalog->register_change_handler(handle, VRPNDeviceClient::analogChangeHandler);
     }
     if ( (type & VRPNTracker) != 0)
     {
-        LOG(INFO) << "Tracker: " << name;
+        LOG(INFO) << "Adding Tracker Device: " << name;
         vrpn_Tracker_Remote* vrpnTracker = new vrpn_Tracker_Remote(_address);
         m_deviceConnections->add(vrpnTracker);
-
-        vrpnTracker->register_change_handler(handle, VRPNDeviceClient::trackerChangeHandler);
+        vrpnTracker->register_change_handler(handle, VRPNDeviceClient::trackerPositionChangeHandler);
+        vrpnTracker->register_change_handler(handle, VRPNDeviceClient::trackerVelocityChangeHandler);
     }
     if ( (type & VRPNButton) != 0)
     {
-        LOG(INFO) << "Button: " << name;
+        LOG(INFO) << "Adding Button Device: " << name;
         vrpn_Button_Remote* vrpnButton = new vrpn_Button_Remote(_address);
         m_deviceConnections->add(vrpnButton);
-
         vrpnButton->register_change_handler(handle, VRPNDeviceClient::buttonChangeHandler);
     }
 }
 
 std::shared_ptr<imstk::DeviceClient>
-VRPNDeviceServer::getClient(const std::string& deviceName, VRPNDeviceType deviceType)
+VRPNDeviceManager::createDeviceClient(const std::string& deviceName, VRPNDeviceType deviceType)
 {
     auto client = std::make_shared<VRPNDeviceClient>(deviceName, deviceType, m_machine);
     addDeviceClient(client);
@@ -95,19 +83,19 @@ VRPNDeviceServer::getClient(const std::string& deviceName, VRPNDeviceType device
 }
 
 bool
-VRPNDeviceServer::initModule()
+VRPNDeviceManager::initModule()
 {
     return true;
 }
 
 void
-VRPNDeviceServer::updateModule()
+VRPNDeviceManager::updateModule()
 {
     m_deviceConnections->mainloop();
 }
 
 void
-VRPNDeviceServer::uninitModule()
+VRPNDeviceManager::uninitModule()
 {
     m_deviceConnections->clear();
 }

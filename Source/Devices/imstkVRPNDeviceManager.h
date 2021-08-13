@@ -44,39 +44,41 @@ const VRPNDeviceType VRPNTracker = 0x4;
 const VRPNDeviceType VRPNForce   = 0x8;
 
 ///
-/// \class VRPNDeviceServer
-/// \brief Devices server using VRPN
-///
-class VRPNDeviceServer : public Module
+/// \class VRPNDeviceManager
+/// 
+/// \brief connects to the vrpn.exe server and lets iMSTK attach devices to the server
+/// 
+/// This module enables communication with VRPN and lets us map VRPN devices to the
+/// imstk DeviceClient interface. The VRPN server is external to iMSTK and needs to
+/// be run from the command line `vrpn_server`, when using the default vrpn.cfg file needs to be 
+/// edited represent the projects requirements.
+/// For more information on VRPN see the wiki https://github.com/vrpn/vrpn/wiki
+/// 
+class VRPNDeviceManager : public Module
 {
 public:
 
     ///
     /// \brief Constructor
-    ///
-    VRPNDeviceServer(const std::string& machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO);
+    /// \param machine The ip address of the machine where the vrpn server is running, "localhost" and "loopback" 
+    ///                are also options
+    /// \param port The port that the vrpn server is listening to (can set on the command line)
+    /// 
+    VRPNDeviceManager(const std::string& machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO);
 
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VRPNDeviceServer() override = default;
+    virtual ~VRPNDeviceManager() override = default;
 
-    ///
-    /// \brief Add device
-    ///
-    void addDevice(const std::string& deviceName, DeviceType deviceType, int id = 0);
-
-    ///
-    /// \brief Add serial device
-    ///
-    void addSerialDevice(const std::string& deviceName, DeviceType deviceType, const std::string& port = "COM6", int baudRate = 57600, int id = 0);
-
-    ///
-    /// \bried Add device client
-    ///
     void addDeviceClient(std::shared_ptr<VRPNDeviceClient> client);
 
-    std::shared_ptr<DeviceClient> getClient(const std::string& deviceName, VRPNDeviceType deviceType);
+    /// 
+    /// \brief Creates a client from the given parameters
+    /// \param deviceName The name of the device that you want, it must match (case-sensitive) with the 
+    ///                   name in the selected `vrpn.cfg` file
+    /// \param deviceType A binary combination of the parameters that should be updated. Note that this
+    ///                   is a request, if the server doesn't supply the requested updates no changes 
+    ///                   will be observable
+    /// 
+    std::shared_ptr<DeviceClient> createDeviceClient(const std::string& deviceName, VRPNDeviceType deviceType);
 
 protected:
     ///
@@ -96,16 +98,6 @@ protected:
 
 private:
 
-    ///
-    /// \struct
-    /// \brief TODO
-    ///
-    struct SerialInfo
-    {
-        int baudRate;
-        std::string port;
-    };
-
     const std::string m_machine;                                       ///< machine name or IP
     const int m_port;                                                  ///< connection port
 
@@ -113,11 +105,9 @@ private:
     {
         std::shared_ptr<VRPNDeviceClient> client;
         VRPNDeviceType type;
-        int id;
     };
 
     std::map<std::string, Client>           m_deviceInfoMap;     ///< list of iMSTK client info
-    std::map<std::string, SerialInfo>       m_SerialInfoMap;
     std::unique_ptr<vrpn_MainloopContainer> m_deviceConnections; ///< VRPN device connections
 };
 } // imstk
