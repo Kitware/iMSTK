@@ -78,8 +78,9 @@ public:
     ///
     Real W(const Real r) const
     {
-        const auto r2 = r * r;
-        return (r2 <= m_radius2) ? std::pow(m_radius2 - r2, 3) * m_k : Real(0);
+        const auto   r2 = r * r;
+        const double rd = m_radius2 - r2;
+        return (r2 <= m_radius2) ? rd * rd * rd * m_k : Real(0);
     }
 
     ///
@@ -88,8 +89,9 @@ public:
     ///
     Real W(const VecXr& r) const
     {
-        const auto r2 = r.squaredNorm();
-        return (r2 <= m_radius2) ? std::pow(m_radius2 - r2, 3) * m_k : Real(0);
+        const auto   r2 = r.squaredNorm();
+        const double rd = m_radius2 - r2;
+        return (r2 <= m_radius2) ? rd * rd * rd * m_k : Real(0);
     }
 
     ///
@@ -190,7 +192,11 @@ public:
     /// \brief Compute weight value
     /// W(r,h) = 15/(PI*h^6) * (h-r)^3
     ///
-    Real W(const Real r) const { return (r <= m_radius) ? std::pow(m_radius - r, 3) * m_k : Real(0); }
+    Real W(const Real r) const
+    {
+        const double rd = m_radius - r;
+        return (r <= m_radius) ? rd * rd * rd * m_k : Real(0);
+    }
 
     ///
     /// \brief Compute weight value
@@ -198,8 +204,9 @@ public:
     ///
     Real W(const VecXr& r) const
     {
-        const auto r2 = r.squaredNorm();
-        return (r2 <= m_radius2) ? std::pow(m_radius - std::sqrt(r2), 3) * m_k : Real(0);
+        const double r2 = r.squaredNorm();
+        const double rd = m_radius - std::sqrt(r2);
+        return (r2 <= m_radius2) ? rd * rd * rd * m_k : Real(0);
     }
 
     ///
@@ -285,11 +292,13 @@ public:
             const auto r3 = r2 * r1;
             if (r1 > Real(0.5) * m_radius)
             {
-                res = m_k * std::pow(m_radius - r1, 3) * r3;
+                const double rd = m_radius - r1;
+                res = m_k * rd * rd * rd * r3;
             }
             else
             {
-                res = m_k * Real(2.0) * std::pow(m_radius - r1, 3) * r3 - m_c;
+                const double rd = m_radius - r1;
+                res = m_k * Real(2.0) * rd * rd * rd * r3 - m_c;
             }
         }
         return res;
@@ -309,11 +318,13 @@ public:
             const auto r3 = r2 * r1;
             if (r1 > Real(0.5) * m_radius)
             {
-                res = m_k * std::pow(m_radius - r1, 3) * r3;
+                const double rd = m_radius - r1;
+                res = m_k * rd * rd * rd * r3;
             }
             else
             {
-                res = m_k * Real(2.0) * std::pow(m_radius - r1, 3) * r3 - m_c;
+                const double rd = m_radius - r1;
+                res = m_k * Real(2.0) * rd * rd * rd * r3 - m_c;
             }
         }
         return res;
