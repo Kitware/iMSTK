@@ -238,6 +238,7 @@ VTKViewer::updateModule()
     // Update render delegates
     ren->updateRenderDelegates();
 
+    // Automatically determine near and far planes (not used atm)
     //ren->getVtkRenderer()->ResetCameraClippingRange();
 
     // If fps status is on, measure it
