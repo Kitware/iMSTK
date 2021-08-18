@@ -68,12 +68,12 @@ VRPNDeviceClient::analogChangeHandler(void* userData, const _vrpn_ANALOGCB a)
 void VRPN_CALLBACK
 VRPNDeviceClient::trackerVelocityChangeHandler(void* userData, const _vrpn_TRACKERVELCB v)
 {
-    auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
+    auto  deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
     Quatd quat(v.vel_quat[1], v.vel_quat[2], v.vel_quat[3], v.vel_quat[0]);
 
     deviceClient->m_transformLock.lock();
     deviceClient->m_velocity << v.vel[0], v.vel[1], v.vel[2];
-    // \todo translate velocity quaternion to imstk 
+    // \todo translate velocity quaternion to imstk
     // deviceClient->m_angularVelocity = quat;
     //
     deviceClient->m_transformLock.unlock();

@@ -183,12 +183,12 @@ protected:
     Vec3d m_force;                                    ///< Force vector
     Vec3d m_endEffectorOffset = Vec3d(0.0, 0.0, 0.0); ///< Offset from origin
 
-    std::unordered_map<int, int>    m_buttons;
+    std::unordered_map<int, int> m_buttons;
     std::vector<double> m_analogChannels;
 
-    ParallelUtils::SpinLock m_transformLock; /// > Used for devices filling data from other threads
-    ParallelUtils::SpinLock m_forceLock;     /// > Used for devices filling data from other threads
-    mutable ParallelUtils::SpinLock m_dataLock;      /// > Used for button and analog data
+    ParallelUtils::SpinLock m_transformLock;    /// > Used for devices filling data from other threads
+    ParallelUtils::SpinLock m_forceLock;        /// > Used for devices filling data from other threads
+    mutable ParallelUtils::SpinLock m_dataLock; /// > Used for button and analog data
 private:
 };
 }

@@ -92,20 +92,19 @@ DeviceClient::setForce(Vec3d force)
     m_forceLock.unlock();
 }
 
-const std::unordered_map<int, int>& DeviceClient::getButtons() const
+const std::unordered_map<int, int>&
+DeviceClient::getButtons() const
 {
     return m_buttons;
 }
 
-
-const std::vector<double> DeviceClient::getAnalog() const
+const std::vector<double>
+DeviceClient::getAnalog() const
 {
     std::vector<double> result;
     m_dataLock.lock();
     result = m_analogChannels;
     m_dataLock.unlock();
     return result;
-
 }
-
 } // imstk

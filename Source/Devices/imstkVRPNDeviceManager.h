@@ -45,39 +45,39 @@ const VRPNDeviceType VRPNForce   = 0x8;
 
 ///
 /// \class VRPNDeviceManager
-/// 
+///
 /// \brief connects to the vrpn.exe server and lets iMSTK attach devices to the server
-/// 
+///
 /// This module enables communication with VRPN and lets us map VRPN devices to the
 /// imstk DeviceClient interface. The VRPN server is external to iMSTK and needs to
-/// be run from the command line `vrpn_server`, when using the default vrpn.cfg file needs to be 
+/// be run from the command line `vrpn_server`, when using the default vrpn.cfg file needs to be
 /// edited represent the projects requirements.
 /// For more information on VRPN see the wiki https://github.com/vrpn/vrpn/wiki
-/// 
+///
 class VRPNDeviceManager : public Module
 {
 public:
 
     ///
     /// \brief Constructor
-    /// \param machine The ip address of the machine where the vrpn server is running, "localhost" and "loopback" 
+    /// \param machine The ip address of the machine where the vrpn server is running, "localhost" and "loopback"
     ///                are also options
     /// \param port The port that the vrpn server is listening to (can set on the command line)
-    /// 
+    ///
     VRPNDeviceManager(const std::string& machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO);
 
     virtual ~VRPNDeviceManager() override = default;
 
     void addDeviceClient(std::shared_ptr<VRPNDeviceClient> client);
 
-    /// 
+    ///
     /// \brief Creates a client from the given parameters
-    /// \param deviceName The name of the device that you want, it must match (case-sensitive) with the 
+    /// \param deviceName The name of the device that you want, it must match (case-sensitive) with the
     ///                   name in the selected `vrpn.cfg` file
     /// \param deviceType A binary combination of the parameters that should be updated. Note that this
-    ///                   is a request, if the server doesn't supply the requested updates no changes 
+    ///                   is a request, if the server doesn't supply the requested updates no changes
     ///                   will be observable
-    /// 
+    ///
     std::shared_ptr<DeviceClient> createDeviceClient(const std::string& deviceName, VRPNDeviceType deviceType);
 
 protected:
@@ -107,7 +107,7 @@ private:
         VRPNDeviceType type;
     };
 
-    std::map<std::string, Client>           m_deviceInfoMap;     ///< list of iMSTK client info
+    std::map<std::string, Client> m_deviceInfoMap;               ///< list of iMSTK client info
     std::unique_ptr<vrpn_MainloopContainer> m_deviceConnections; ///< VRPN device connections
 };
 } // imstk

@@ -41,8 +41,8 @@ using namespace imstk;
 
 ///
 /// \brief This example demonstrates controlling the object
-/// using external device. 
-/// 
+/// using external device.
+///
 /// You should see a rectangular object that can be controlled with
 /// whatever device you configured as the designated tracker
 ///
