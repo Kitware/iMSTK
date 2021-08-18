@@ -44,13 +44,6 @@ public:
         return m_Data[idx];
     }
 
-    CDElementVector& operator=(const CDElementVector& other)
-    {
-        m_Data = other.m_Data;
-        m_Lock = other.m_Lock;
-        return *this;
-    }
-
     ///
     /// \brief Thread-safe append a data element
     ///
@@ -254,16 +247,6 @@ struct CollisionElement
         PointDirectionElement m_PointDirectionElement;
         PointIndexDirectionElement m_PointIndexDirectionElement;
 
-        Element& operator=(const Element& other)
-        {
-            m_EmptyElement = other.m_EmptyElement;
-            m_CellIndexElement = other.m_CellIndexElement;
-            m_CellIndexElement = other.m_CellIndexElement;
-            m_PointDirectionElement = other.m_PointDirectionElement;
-            m_PointIndexDirectionElement = other.m_PointIndexDirectionElement;
-            return *this;
-        }
-
         Element() : m_EmptyElement(EmptyElement()) { }
         // Constructors needed here for implicit conversions+assignment between elements and parent struct
         Element(const EmptyElement& ele) : m_EmptyElement(ele) { }
@@ -271,9 +254,7 @@ struct CollisionElement
         Element(const CellIndexElement& ele) : m_CellIndexElement(ele) { }
         Element(const PointDirectionElement& ele) : m_PointDirectionElement(ele) { }
         Element(const PointIndexDirectionElement& ele) : m_PointIndexDirectionElement(ele) { }
-    // };
     } m_element;
-    // Element m_element;
 
     CollisionElementType m_type;
 };
