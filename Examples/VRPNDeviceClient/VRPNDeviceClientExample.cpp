@@ -60,17 +60,13 @@ main()
     /// \ IP address of the server.
     const std::string serverIP = "localhost";
 
-    /// \ the default VRPN port 3883
+    /// \ the default VRPN port 38833
     const int serverPort = 38833;
-
-    // Device Client
 
     //VRPN Server
     auto server = std::make_shared<VRPNDeviceManager>(serverIP, 38833);
-    auto client = server->createDeviceClient("Tracker0", VRPNTracker);
 
-//     //Device 1:
-//     server->addDeviceClient(client);
+    auto client = server->createDeviceClient("Tracker0", VRPNTracker);
 
     std::shared_ptr<AnalyticalGeometry> geometries[] = {
         std::make_shared<OrientedBox>(Vec3d::Zero(), Vec3d(1.0, 5.0, 1.0)),

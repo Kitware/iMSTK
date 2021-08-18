@@ -48,8 +48,8 @@ imstk_add_external_project( VRPN
     -DVRPN_BUILD_PYTHON:BOOL=OFF
     -DVRPN_USE_GPM_MOUSE:BOOL=OFF
     -DVRPN_USE_LIBUSB_1_0:BOOL=ON
-    -DVRPN_USE_HID:BOOL=OFF
-    -DVRPN_USE_LIBNIFALCON:BOOL=ON
+    -DVRPN_USE_HID:BOOL=ON
+    -DVRPN_USE_LIBNIFALCON:BOOL=OFF
     -DVRPN_BUILD_SERVERS:BOOL=ON
     -DVRPN_USE_PHANTOM_SERVER:BOOL=OFF
     -DVRPN_USE_HDAPI:BOOL=OFF
@@ -59,6 +59,8 @@ imstk_add_external_project( VRPN
   #VERBOSE
 )
 
-# Note HS-2021-28-7 currently disabled openhaptics with regards to VRPN, between the imstk superbuild and the
-# VRPN cmake files the Openhaptics libraries can't be found by the VRPN build inside of the imstk superbuild
-# as we will mostly run haptics through the imstkOpenHaptics module this is not an issue for now 
+# Note HS-2021-28-7 currently disabled openhaptics with regards to VRPN, 
+# between the imstk superbuild and the VRPN cmake files the Openhaptics 
+# libraries can't be found by the VRPN build inside of the imstk superbuild
+# as we will mostly run haptics through the imstkOpenHaptics module this is 
+# not an issue for now 
