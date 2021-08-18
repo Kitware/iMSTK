@@ -23,33 +23,28 @@
 
 #include "imstkRbdConstraint.h"
 
-#include <functional>
-
 using namespace imstk;
 
 ///
-/// \class RbdLinearNeedleLockingConstraint
+/// \class RbdAxesLockingConstraint
 ///
-/// \brief Constrains the body to specified orientation
-/// and only allows linear movement along the inital axes
+/// \brief Constrains the body center of mass to a fixed axes
 ///
-class RbdLinearNeedleLockingConstraint : public RbdConstraint
+class RbdAxesLockingConstraint : public RbdConstraint
 {
 public:
-    RbdLinearNeedleLockingConstraint(
+    RbdAxesLockingConstraint(
         std::shared_ptr<RigidBody> obj,
-        const Vec3d&               initNeedleAxesPt,
-        const Vec3d&               initNeedleAxes,
-        //const Quatd& initNeedleOrientation,
+        const Vec3d&               axesPt,
+        const Vec3d&               axesDir,
         const double               beta = 0.05) : RbdConstraint(obj, nullptr, Side::A),
-        m_initNeedleAxesPt(initNeedleAxesPt),
-        m_initNeedleAxes(initNeedleAxes),
-        //m_initNeedleOrientation(initNeedleOrientation),
+        m_axesPt(axesPt),
+        m_axesDir(axesDir),
         m_beta(beta)
     {
     }
 
-    ~RbdLinearNeedleLockingConstraint() override = default;
+    ~RbdAxesLockingConstraint() override = default;
 
 public:
     void compute(double dt) override
@@ -58,9 +53,9 @@ public:
         J = Eigen::Matrix<double, 3, 4>::Zero();
         if ((m_side == Side::AB || m_side == Side::A) && !m_obj1->m_isStatic)
         {
-            // Displacement to needle Axes
-            const Vec3d  diff = m_obj1->getPosition() - m_initNeedleAxesPt;
-            const Vec3d  perpDisplacement = diff - m_initNeedleAxes.dot(diff) * m_initNeedleAxes;
+            // Displacement to needle Axes, constrain it to the axes
+            const Vec3d  diff = m_obj1->getPosition() - m_axesPt;
+            const Vec3d  perpDisplacement = diff - m_axesDir.dot(diff) * m_axesDir;
             const double displacement     = perpDisplacement.norm();
             if (displacement != 0)
             {
@@ -80,7 +75,7 @@ public:
     }
 
 private:
-    Vec3d  m_initNeedleAxesPt; ///> Point on the axes to constrain too
-    Vec3d  m_initNeedleAxes;   //> Axes to constrain too
+    Vec3d  m_axesPt;  ///> Point on the axes to constrain too
+    Vec3d  m_axesDir; //> Axes to constrain too
     double m_beta = 0.05;
 };

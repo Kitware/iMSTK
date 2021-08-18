@@ -143,6 +143,8 @@ struct Color
     static Color Bone;
     static Color YellowBone;
     static Color Blood;
+    static Color LightSkin;
+    static Color DarkSkin;
 };
 #ifdef WIN32
 #pragma warning(default : 4201)

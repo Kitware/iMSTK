@@ -322,6 +322,7 @@ main()
     scene->addSceneObject(tissueObj);
 
     std::shared_ptr<NeedleObject> toolObj = makeToolObj();
+    toolObj->setForceThreshold(250.0);
     scene->addSceneObject(toolObj);
 
     // Setup a ghost tool object to show off virtual coupling
@@ -338,7 +339,6 @@ main()
     scene->addSceneObject(ghostToolObj);
 
     auto interaction = std::make_shared<NeedleInteraction>(tissueObj, toolObj);
-    interaction->setForceThreshold(250.0);
     scene->getCollisionGraph()->addInteraction(interaction);
 
     // Light
@@ -420,14 +420,8 @@ main()
             //tissueObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
 
 #ifdef iMSTK_USE_OPENHAPTICS
-            if (controller->getForce().norm() > 1.0)
-            {
-                ghostToolObj->getVisualModel(0)->setIsVisible(true);
-            }
-            else
-            {
-                ghostToolObj->getVisualModel(0)->setIsVisible(false);
-            }
+            ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 15.0));
+
             // Also apply controller transform to ghost geometry
             toolGhostMesh->setTranslation(controller->getPosition());
             toolGhostMesh->setRotation(controller->getRotation());

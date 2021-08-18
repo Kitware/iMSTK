@@ -16,19 +16,20 @@
 #
 ###########################################################################
 
-project(Example-PBDTissueSurfaceNeedleContact)
+project(Example-PBDStaticSuture)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
 imstk_add_executable(${PROJECT_NAME}
-    PBDTissueSurfaceNeedleContactExample.cpp
-    NeedleRigidBodyCH.h
-    NeedlePbdCH.h
+    pbdStaticSutureExample.cpp
+    NeedleInteraction.h
+    NeedleInteraction.cpp
     NeedleObject.h
-    RbdAngularLockingConstraint.h
-    RbdAxesLockingConstraint.h
-    NeedleInteraction.h)
+    NeedleObject.cpp
+    NeedleRigidBodyCH.h
+    NeedleRigidBodyCH.cpp
+    RbdPointToArcConstraint.h)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

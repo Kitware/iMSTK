@@ -61,16 +61,4 @@ public:
     }
 
     ~NeedleInteraction() override = default;
-
-public:
-    ///
-    /// \brief Set the force threshold for the needle
-    ///
-    void setForceThreshold(const double forceThreshold)
-    {
-        if (auto needleRbdCh = std::dynamic_pointer_cast<NeedleRigidBodyCH>(getCollisionHandlingB()))
-        {
-            needleRbdCh->setNeedleForceThreshold(forceThreshold);
-        }
-    }
 };

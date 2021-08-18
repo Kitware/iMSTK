@@ -97,7 +97,6 @@ main()
     Logger::startLogger();
 
     imstkNew<Scene> scene("FemurCut");
-    scene->getConfig()->taskParallelizationEnabled = false;
 
     imstkNew<FemurObject> femurObj;
     scene->addSceneObject(femurObj);

@@ -104,7 +104,6 @@ main()
     Logger::startLogger();
 
     imstkNew<Scene> scene("RbdMeshMeshCollision");
-    scene->getConfig()->taskParallelizationEnabled = false;
 
     // This model is shared among interacting rigid bodies
     imstkNew<RigidBodyModel2> rbdModel;

@@ -54,9 +54,9 @@ public:
     ///
     /// \brief Returns the current axes of the needle (tip-tail)
     ///
-    const Vec3d getNeedleAxes() const
+    const Vec3d getAxes() const
     {
-        return (-getCollidingGeometry()->getRotation().col(1)).normalized();
+        return (-getCollidingGeometry()->getRotation().col(2)).normalized();
     }
 
 protected:
