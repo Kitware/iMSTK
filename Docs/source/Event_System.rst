@@ -17,7 +17,7 @@ The "connect" function is used to add a receiver/observer to a sender. There are
 
 Consider a KeyboardDeviceClient. It may emit a KeyEvent.
 
-::
+.. code:: c++
 
     std::shared_ptr<KeyboardDeviceClient> myKeyboardDevice = ...
     connect<KeyEvent>(myKeyboardDevice, &KeyboardDeviceClient::keyPress, [&](KeyEvent* e)

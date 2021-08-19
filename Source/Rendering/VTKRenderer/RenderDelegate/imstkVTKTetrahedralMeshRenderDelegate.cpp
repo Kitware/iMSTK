@@ -87,42 +87,42 @@ VTKTetrahedralMeshRenderDelegate::processEvents()
     std::shared_ptr<VecDataArray<int, 4>>    indices  = geom->getTetrahedraIndices();
 
     // Only use the most recent event from respective sender
-    std::list<Command> cmds;
-    bool               contains[4] = { false, false, false, false };
+    std::array<Command, 5> cmds;
+    std::array<bool, 5>    contains = { false, false, false, false, false };
     rforeachEvent([&](Command cmd)
         {
             if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
             {
-                cmds.push_back(cmd);
+                cmds[0]     = cmd;
                 contains[0] = true;
             }
             else if (cmd.m_event->m_sender == m_material.get() && !contains[1])
             {
-                cmds.push_back(cmd);
+                cmds[1]     = cmd;
                 contains[1] = true;
             }
             else if (cmd.m_event->m_sender == geom.get() && !contains[2])
             {
-                cmds.push_back(cmd);
+                cmds[2]     = cmd;
                 contains[2] = true;
             }
             else if (cmd.m_event->m_sender == vertices.get() && !contains[3])
             {
-                cmds.push_back(cmd);
+                cmds[3]     = cmd;
                 contains[3] = true;
             }
-            else if (cmd.m_event->m_sender == indices.get() && !contains[3])
+            else if (cmd.m_event->m_sender == indices.get() && !contains[4])
             {
-                cmds.push_back(cmd);
-                contains[3] = true;
+                cmds[4]     = cmd;
+                contains[4] = true;
             }
         });
 
-    // Now do each event in order recieved
-    for (std::list<Command>::reverse_iterator i = cmds.rbegin(); i != cmds.rend(); i++)
-    {
-        i->invoke();
-    }
+    cmds[0].invoke();
+    cmds[1].invoke();
+    cmds[3].invoke();
+    cmds[4].invoke();
+    cmds[2].invoke(); // Process geometry changes last
 }
 
 void
@@ -212,6 +212,7 @@ VTKTetrahedralMeshRenderDelegate::setIndexBuffer(std::shared_ptr<VecDataArray<in
         }
         m_cellArray->InsertNextCell(4, cell);
     }
+    m_mesh->SetCells(VTK_TETRA, m_cellArray);
     m_cellArray->Modified();
     m_mesh->Modified();
 }

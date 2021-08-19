@@ -53,7 +53,7 @@ Designed more specifically for developers, the issue tracker allows developers t
 ##### On Linux:
 
 ```bash
-sudo apt-get install build-essentials libgl1-mesa-dev libxt-dev libusb-1.0-0-dev git-lfs
+sudo apt-get install build-essential libgl1-mesa-dev libxt-dev libusb-1.0-0-dev git-lfs
 ```
 
 ## Getting started with iMSTK

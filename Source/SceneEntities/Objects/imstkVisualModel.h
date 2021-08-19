@@ -48,9 +48,6 @@ public:
     VisualModel(std::shared_ptr<Geometry> geometry);
     VisualModel(std::shared_ptr<Geometry>       geometry,
                 std::shared_ptr<RenderMaterial> renderMaterial);
-    VisualModel(std::shared_ptr<DebugRenderGeometry> geometry);
-    VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
-                std::shared_ptr<RenderMaterial>      renderMaterial);
     VisualModel();
     virtual ~VisualModel() override = default;
 
@@ -71,12 +68,6 @@ public:
     ///
     const std::string& getName() { return m_name; }
     void setName(std::string name) { m_name = name; }
-
-    ///
-    /// \brief Get/set geometry
-    ///
-    std::shared_ptr<DebugRenderGeometry> getDebugGeometry() const { return m_DbgGeometry; }
-    void setDebugGeometry(std::shared_ptr<DebugRenderGeometry> geometry) { m_DbgGeometry = geometry; }
 
     ///
     /// \brief Set/Get render material
@@ -106,9 +97,8 @@ protected:
 
     std::string m_name = "";
 
-    std::shared_ptr<Geometry> m_geometry = nullptr;
-    std::shared_ptr<DebugRenderGeometry> m_DbgGeometry = nullptr;
-    std::shared_ptr<RenderMaterial>      m_renderMaterial;
+    std::shared_ptr<Geometry>       m_geometry = nullptr;
+    std::shared_ptr<RenderMaterial> m_renderMaterial;
 
     bool m_isVisible = true;              ///< true if mesh is shown, false if mesh is hidden
     std::unordered_map<Renderer*, bool> m_renderDelegateCreated;

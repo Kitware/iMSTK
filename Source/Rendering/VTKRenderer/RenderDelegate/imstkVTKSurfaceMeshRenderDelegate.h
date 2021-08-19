@@ -31,9 +31,9 @@ class vtkPolyData;
 
 namespace imstk
 {
+class AbstractDataArray;
 class SurfaceMesh;
 template<typename T, int N> class VecDataArray;
-class AbstractDataArray;
 
 ///
 /// \class VTKSurfaceMeshRenderDelegate
@@ -43,14 +43,7 @@ class AbstractDataArray;
 class VTKSurfaceMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
     virtual ~VTKSurfaceMeshRenderDelegate() override = default;
 
     ///

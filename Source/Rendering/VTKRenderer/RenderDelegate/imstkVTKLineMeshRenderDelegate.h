@@ -32,6 +32,7 @@ namespace imstk
 {
 class LineMesh;
 template<typename T, int N> class VecDataArray;
+class AbstractDataArray;
 
 ///
 /// \class VTKLineMeshRenderDelegate
@@ -41,11 +42,7 @@ template<typename T, int N> class VecDataArray;
 class VTKLineMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
     virtual ~VTKLineMeshRenderDelegate() override = default;
 
     ///
@@ -53,11 +50,17 @@ public:
     ///
     void processEvents() override;
 
+// Callbacks for modifications, when an element changes the user or API must post the modified event
+// to inform that this happened, if the actual buffer on the geometry is swapped then geometry
+// modified would instead be called
 protected:
     ///
-    /// \brief Callback when vertices change
+    /// \brief Callback for when vertex values are modified
     ///
     void vertexDataModified(Event* e);
+    void indexDataModified(Event* e);
+    void vertexScalarsModified(Event* e);
+    void cellScalarsModified(Event* e);
 
     ///
     /// \brief Callback when geometry changes
@@ -65,13 +68,23 @@ protected:
     void geometryModified(Event* e);
 
 protected:
+    void setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices);
+    void setIndexBuffer(std::shared_ptr<VecDataArray<int, 2>> indices);
+    void setVertexScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
+    void setCellScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
+
+protected:
+    std::shared_ptr<LineMesh> m_geometry;
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
     std::shared_ptr<VecDataArray<int, 2>>    m_indices;
+    std::shared_ptr<AbstractDataArray>       m_vertexScalars;
+    std::shared_ptr<AbstractDataArray>       m_cellScalars;
 
     vtkSmartPointer<vtkPolyData> m_polydata;
 
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
     vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
+    vtkSmartPointer<vtkDataArray>   m_mappedCellScalarArray;   ///> Mapped array of scalars
     vtkSmartPointer<vtkCellArray>   m_cellArray;               ///> Array of cells
 };
 }

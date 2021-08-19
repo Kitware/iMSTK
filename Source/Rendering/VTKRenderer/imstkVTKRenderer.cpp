@@ -21,7 +21,6 @@
 
 #include "imstkVTKRenderer.h"
 #include "imstkCamera.h"
-#include "imstkDebugRenderGeometry.h"
 #include "imstkDirectionalLight.h"
 #include "imstkPointLight.h"
 #include "imstkSpotLight.h"
@@ -85,74 +84,67 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     // Lights and light actors
     for (const auto& light : scene->getLights())
     {
-        // Create lights specified in the scene
-        switch (light->getType())
+        std::string name = light->getTypeName();
+        if (name == "DirectionalLight")
         {
-        case imstk::LightType::Directional:
-        {
-            auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
-            m_vtkLight->SetPositional(false);
-            auto color = light->getColor();
-            m_vtkLight->SetColor(color.r, color.g, color.b);
-            m_vtkLight->SetIntensity(light->getIntensity());
-            m_vtkLight->SetFocalPoint(light->getFocalPoint().data());
+            auto lightVtk = vtkSmartPointer<vtkLight>::New();
+            lightVtk->SetPositional(false);
+            const Color& color = light->getColor();
+            lightVtk->SetColor(color.r, color.g, color.b);
+            lightVtk->SetIntensity(light->getIntensity());
+            lightVtk->SetFocalPoint(light->getFocalPoint().data());
+            lightVtk->SetAttenuationValues(light->getAttenuationValues().data());
 
-            m_vtkLights.push_back(m_vtkLight);
+            m_vtkLights.push_back(VtkLightPair(light, lightVtk));
         }
-        break;
-
-        case imstk::LightType::Spot:
+        else if (name == "SpotLight")
         {
-            auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
-            m_vtkLight->SetPositional(true);
-            auto color = light->getColor();
-            m_vtkLight->SetColor(color.r, color.g, color.b);
-            m_vtkLight->SetIntensity(light->getIntensity());
-            m_vtkLight->SetFocalPoint(light->getFocalPoint().data());
+            auto lightVtk = vtkSmartPointer<vtkLight>::New();
+            lightVtk->SetPositional(true);
+            const Color& color = light->getColor();
+            lightVtk->SetColor(color.r, color.g, color.b);
+            lightVtk->SetIntensity(light->getIntensity());
+            lightVtk->SetFocalPoint(light->getFocalPoint().data());
 
             auto spotLight = std::dynamic_pointer_cast<SpotLight>(light);
-            m_vtkLight->SetConeAngle(spotLight->getConeAngle());
-            m_vtkLight->SetPosition(spotLight->getPosition().data());
-            m_vtkLight->SetConeAngle(spotLight->getSpotAngle());
+            lightVtk->SetPosition(spotLight->getPosition().data());
+            lightVtk->SetConeAngle(spotLight->getSpotAngle());
+            lightVtk->SetAttenuationValues(light->getAttenuationValues().data());
 
-            m_vtkLights.push_back(m_vtkLight);
+            m_vtkLights.push_back(VtkLightPair(light, lightVtk));
 
             auto lightActorSpot = vtkSmartPointer<vtkLightActor>::New();
-            lightActorSpot->SetLight(m_vtkLight);
+            lightActorSpot->SetLight(lightVtk);
             m_debugVtkActors.push_back(lightActorSpot);
         }
-        break;
-
-        case imstk::LightType::Point:
+        else if (name == "PointLight")
         {
-            auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
-            m_vtkLight->SetPositional(true);
-            auto color = light->getColor();
-            m_vtkLight->SetColor(color.r, color.g, color.b);
-            m_vtkLight->SetIntensity(light->getIntensity());
-            m_vtkLight->SetFocalPoint(light->getFocalPoint().data());
+            auto lightVtk = vtkSmartPointer<vtkLight>::New();
+            lightVtk->SetPositional(true);
+            const Color& color = light->getColor();
+            lightVtk->SetColor(color.r, color.g, color.b);
+            lightVtk->SetIntensity(light->getIntensity());
+            lightVtk->SetFocalPoint(light->getFocalPoint().data());
+            lightVtk->SetAttenuationValues(light->getAttenuationValues().data());
 
             auto pointLight = std::dynamic_pointer_cast<PointLight>(light);
-            m_vtkLight->SetConeAngle(pointLight->getConeAngle());
-            m_vtkLight->SetPosition(pointLight->getPosition().data());
+            lightVtk->SetPosition(pointLight->getPosition().data());
 
-            m_vtkLights.push_back(m_vtkLight);
+            m_vtkLights.push_back(VtkLightPair(light, lightVtk));
 
             auto lightActorPoint = vtkSmartPointer<vtkLightActor>::New();
-            lightActorPoint->SetLight(m_vtkLight);
+            lightActorPoint->SetLight(lightVtk);
             m_debugVtkActors.push_back(lightActorPoint);
         }
-        break;
-
-        default:
-
+        else
+        {
             LOG(WARNING) << "Light type undefined!";
         }
     }
 
     for (const auto& light : m_vtkLights)
     {
-        m_vtkRenderer->AddLight(light);
+        m_vtkRenderer->AddLight(light.second);
     }
 
     // Global Axis
@@ -269,7 +261,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             this->addActors(m_objectVtkActors);
             for (const auto& light : m_vtkLights)
             {
-                m_vtkRenderer->AddLight(light);
+                m_vtkRenderer->AddLight(light.second);
             }
         }
     }
@@ -280,7 +272,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             this->addActors(m_objectVtkActors);
             for (const auto& light : m_vtkLights)
             {
-                m_vtkRenderer->AddLight(light);
+                m_vtkRenderer->AddLight(light.second);
             }
         }
         else if (m_currentMode == Mode::Debug)
@@ -435,6 +427,46 @@ VTKRenderer::updateRenderDelegates()
     {
         delegate->update();
     }
+
+    // Update all lights (we don't use render delegates for these as there usually aren't
+    // all that many lights)
+    for (auto light : m_vtkLights)
+    {
+        std::shared_ptr<Light>    lightImstk = light.first;
+        vtkSmartPointer<vtkLight> lightVtk   = light.second;
+        std::string               lightName  = lightImstk->getTypeName();
+        if (lightName == "DirectionalLight")
+        {
+            const Color& color = lightImstk->getColor();
+            lightVtk->SetColor(color.r, color.g, color.b);
+            lightVtk->SetIntensity(lightImstk->getIntensity());
+            lightVtk->SetFocalPoint(lightImstk->getFocalPoint().data());
+            lightVtk->SetAttenuationValues(lightImstk->getAttenuationValues().data());
+        }
+        else if (lightName == "SpotLight")
+        {
+            const Color& color = lightImstk->getColor();
+            lightVtk->SetColor(color.r, color.g, color.b);
+            lightVtk->SetIntensity(lightImstk->getIntensity());
+            lightVtk->SetFocalPoint(lightImstk->getFocalPoint().data());
+
+            auto spotLight = std::dynamic_pointer_cast<SpotLight>(lightImstk);
+            lightVtk->SetPosition(spotLight->getPosition().data());
+            lightVtk->SetConeAngle(spotLight->getSpotAngle());
+            lightVtk->SetAttenuationValues(lightImstk->getAttenuationValues().data());
+        }
+        else if (lightName == "PointLight")
+        {
+            const Color& color = lightImstk->getColor();
+            lightVtk->SetColor(color.r, color.g, color.b);
+            lightVtk->SetIntensity(lightImstk->getIntensity());
+            lightVtk->SetFocalPoint(lightImstk->getFocalPoint().data());
+            lightVtk->SetAttenuationValues(lightImstk->getAttenuationValues().data());
+
+            auto pointLight = std::dynamic_pointer_cast<PointLight>(lightImstk);
+            lightVtk->SetPosition(pointLight->getPosition().data());
+        }
+    }
 }
 
 void
@@ -541,27 +573,6 @@ VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
         if (sos.find(*i) == sos.end())
         {
             i = removeSceneObject(*i);
-        }
-    }
-
-    // Debug render actors
-    for (const auto& dbgVizModel : m_scene->getDebugRenderModels())
-    {
-        auto geom = std::static_pointer_cast<DebugRenderGeometry>(dbgVizModel->getDebugGeometry());
-        if (dbgVizModel && !dbgVizModel->getRenderDelegateCreated(this))
-        {
-            auto delegate = VTKRenderDelegate::makeDebugDelegate(dbgVizModel);
-            if (delegate == nullptr)
-            {
-                LOG(WARNING) << "error: Could not create render delegate for '"
-                             << geom->getName() << "'.";
-                continue;
-            }
-
-            m_debugRenderDelegates.push_back(delegate);
-            m_objectVtkActors.push_back(delegate->getVtkActor());
-            m_vtkRenderer->AddActor(delegate->getVtkActor());
-            dbgVizModel->setRenderDelegateCreated(this, true);
         }
     }
 }

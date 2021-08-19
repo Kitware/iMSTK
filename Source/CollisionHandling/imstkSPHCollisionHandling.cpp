@@ -27,104 +27,98 @@
 
 namespace imstk
 {
-SPHCollisionHandling::SPHCollisionHandling(const CollisionHandling::Side& side,
-                                           std::shared_ptr<CollisionData> colData,
-                                           std::shared_ptr<SPHObject>     obj) :
-    CollisionHandling(Type::SPH, side, colData), m_SPHObject(obj)
+void
+SPHCollisionHandling::setInputSPHObject(std::shared_ptr<SPHObject> sphObj)
 {
-    LOG_IF(FATAL, (!m_SPHObject)) << "Invalid SPH object";
+    setInputObjectA(sphObj);
 }
 
 void
-SPHCollisionHandling::processCollisionData()
+SPHCollisionHandling::handle(
+    const CDElementVector<CollisionElement>& elementsA,
+    const CDElementVector<CollisionElement>& elementsB)
 {
-    const auto& SPHModel = m_SPHObject->getSPHModel();
+    std::shared_ptr<SPHObject> obj      = std::dynamic_pointer_cast<SPHObject>(getInputObjectA());
+    std::shared_ptr<SPHModel>  sphModel = obj->getSPHModel();
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (!SPHModel)) << "SPH model was not initialized";
+    LOG_IF(FATAL, (!sphModel)) << "SPH model was not initialized";
 #endif
 
-    const auto boundaryFriction = m_SPHObject->getSPHModel()->getParameters()->m_frictionBoundary;
+    m_boundaryFriction = sphModel->getParameters()->m_frictionBoundary;
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (boundaryFriction<0.0 || boundaryFriction>1.0))
+    LOG_IF(FATAL, (m_boundaryFriction<0.0 || m_boundaryFriction>1.0))
         << "Invalid boundary friction coefficient (value must be in [0, 1])";
 #endif
 
-    SPHState&                             state = *SPHModel->getCurrentState();
-    VecDataArray<double, 3>&              positions = *state.getPositions();
-    VecDataArray<double, 3>&              velocities = *state.getVelocities();
-    std::function<void(uint32_t, Vec3d&)> solve =
-        [&](const uint32_t pidx, const Vec3d& penetrationVector)
-        {
-            // Correct particle position
-            positions[pidx] -= penetrationVector;
-
-            const auto nLengthSqr = penetrationVector.squaredNorm();
-            if (nLengthSqr < Real(1e-20)) // Normalize n
-            {
-                return;                   // Too little penetration: ignore
-            }
-            const Vec3d n = penetrationVector / std::sqrt(nLengthSqr);
-
-            // Correct particle velocity: slip boundary condition with friction
-            const Vec3d& oldVel = velocities[pidx];
-            const double vn     = oldVel.dot(n);
-
-            // If particle is escaping the boundary, ignore it
-            if (vn > 0)
-            {
-                Vec3r correctedVel = oldVel - vn * n; // From now, vel is parallel with the solid surface
-
-                if (boundaryFriction > Real(1e-20))
-                {
-                    const auto velLength      = correctedVel.norm();
-                    const auto frictionLength = vn * boundaryFriction; // This is always positive
-                    if (frictionLength < velLength && velLength > Real(1e-10))
-                    {
-                        correctedVel -= (correctedVel / velLength) * frictionLength; // Subtract a friction from velocity, which is proportional to the amount of penetration
-                    }
-                    else
-                    {
-                        correctedVel = Vec3r::Zero();
-                    }
-                }
-
-                velocities[pidx] = correctedVel;
-            }
-        };
+    std::shared_ptr<SPHState>                state = sphModel->getCurrentState();
+    std::shared_ptr<VecDataArray<double, 3>> positionsPtr  = state->getPositions();
+    std::shared_ptr<VecDataArray<double, 3>> velocitiesPtr = state->getVelocities();
+    VecDataArray<double, 3>&                 positions     = *positionsPtr;
+    VecDataArray<double, 3>&                 velocities    = *velocitiesPtr;
 
     // Solve analytical collision
-    for (int iter = 0; iter < m_iterations; iter++)
+    for (int i = 0; i < m_iterations; i++)
     {
         // Coming into this CH, CD has already been computed
-        if (iter != 0)
+        if (i != 0 && m_colDetect != nullptr)
         {
             // Update the collision geometry
-            m_SPHObject->updateGeometries();
+            obj->updateGeometries();
             // Compute collision again
-            m_colDetect->computeCollisionData();
+            m_colDetect->update();
         }
 
-        ParallelUtils::parallelFor(m_colData->PColData.getSize(),
-            [&](const size_t idx)
+        ParallelUtils::parallelFor(elementsA.getSize(), [&](const size_t j)
             {
-                // Because of const, make some extra copies
-                const PenetrationCollisionDataElement& cd = m_colData->PColData[idx];
-                const uint32_t pidx     = cd.nodeIdx;           // Fluid particle index
-                Vec3d penetrationVector = cd.penetrationVector; // This vector should point into solid object
-
-                solve(pidx, penetrationVector);
+                const CollisionElement& colElem = elementsA[j];
+                if (colElem.m_type == CollisionElementType::PointIndexDirection)
+                {
+                    const int particleIndex = colElem.m_element.m_PointIndexDirectionElement.ptIndex;
+                    const Vec3d& n     = -colElem.m_element.m_PointIndexDirectionElement.dir;
+                    const double depth = colElem.m_element.m_PointIndexDirectionElement.penetrationDepth;
+                    solve(positions[particleIndex], velocities[particleIndex], n * depth);
+                }
             });
-        // Solve point/direction based collision
-        ParallelUtils::parallelFor(m_colData->PDColData.getSize(),
-            [&](const size_t idx)
+    }
+}
+
+void
+SPHCollisionHandling::solve(Vec3d& pos, Vec3d& velocity, const Vec3d& penetrationVector)
+{
+    // Correct particle position
+    pos -= penetrationVector;
+
+    const auto nLengthSqr = penetrationVector.squaredNorm();
+    if (nLengthSqr < 1.0e-20) // Normalize n
+    {
+        return;               // Too little penetration: ignore
+    }
+    const Vec3d n = penetrationVector / std::sqrt(nLengthSqr);
+
+    // Correct particle velocity: slip boundary condition with friction
+    const Vec3d  oldVel = velocity;
+    const double vn     = oldVel.dot(n);
+
+    // If particle is escaping the boundary, ignore it
+    if (vn > 0)
+    {
+        Vec3d correctedVel = oldVel - vn * n; // From now, vel is parallel with the solid surface
+
+        if (m_boundaryFriction > 1.0e-20)
+        {
+            const double velLength      = correctedVel.norm();
+            const double frictionLength = vn * m_boundaryFriction; // This is always positive
+            if (frictionLength < velLength && velLength > 1.0e-10)
             {
-                // Because of const, make some extra copies
-                const PositionDirectionCollisionDataElement& cd = m_colData->PDColData[idx];
-                const uint32_t pidx     = cd.nodeIdx;                       // Fluid particle index
-                Vec3d penetrationVector = cd.dirAtoB * cd.penetrationDepth; // This vector should point into solid object
+                correctedVel -= (correctedVel / velLength) * frictionLength; // Subtract a friction from velocity, which is proportional to the amount of penetration
+            }
+            else
+            {
+                correctedVel = Vec3d::Zero();
+            }
+        }
 
-                solve(pidx, penetrationVector);
-            });
+        velocity = correctedVel;
     }
 }
 } // end namespace imstk

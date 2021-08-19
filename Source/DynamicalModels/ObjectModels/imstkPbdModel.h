@@ -42,23 +42,15 @@ class PbdSolver;
 ///
 struct PBDModelConfig
 {
-    double m_uniformMassValue    = 1.0;  ///> Mass properties
-    double m_viscousDampingCoeff = 0.01; ///> Viscous damping coefficient [0, 1]
+    double m_uniformMassValue    = 1.0;       ///> Mass properties
+    double m_viscousDampingCoeff = 0.01;      ///> Viscous damping coefficient [0, 1]
+    double m_contactStiffness    = 1.0;       ///> Stiffness for contact
+    unsigned int m_iterations    = 10;        ///> Pbd iterations
+    double m_dt = 0.0;                        ///> Time step size
+    bool m_doPartitioning = true;             ///> Does graph coloring to solve in parallel
 
-    std::shared_ptr<PbdCollisionConstraintConfig> collisionParams =
-        std::make_shared<PbdCollisionConstraintConfig>(PbdCollisionConstraintConfig
-        {
-            0.1,                             // Proximity
-            1.0                              // Contact stiffness
-        });                                  ///> Info shared between the collision constraints
-
-    unsigned int m_iterations = 10;          ///> Pbd iterations
-    double m_dt = 0.0;                       ///> Time step size
-
-    bool m_doPartitioning = true;
-
-    std::vector<std::size_t> m_fixedNodeIds; ///> Nodal IDs of the nodes that are fixed
-    Vec3d m_gravity = Vec3d(0, -9.81, 0);    ///> Gravity
+    std::vector<std::size_t> m_fixedNodeIds;  ///> Nodal IDs of the nodes that are fixed
+    Vec3d m_gravity = Vec3d(0.0, -9.81, 0.0); ///> Gravity
 
     std::shared_ptr<PbdFEMConstraintConfig> m_femParams =
         std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
@@ -208,8 +200,6 @@ public:
 
     std::shared_ptr<TaskNode> getIntegratePositionNode() const { return m_integrationPositionNode; }
 
-    std::shared_ptr<TaskNode> getUpdateCollisionGeometryNode() const { return m_updateCollisionGeometryNode; }
-
     std::shared_ptr<TaskNode> getSolveNode() const { return m_solveConstraintsNode; }
 
     std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
@@ -237,9 +227,8 @@ protected:
 
 protected:
     // Computational Nodes
-    std::shared_ptr<TaskNode> m_integrationPositionNode     = nullptr;
-    std::shared_ptr<TaskNode> m_updateCollisionGeometryNode = nullptr;
-    std::shared_ptr<TaskNode> m_solveConstraintsNode = nullptr;
-    std::shared_ptr<TaskNode> m_updateVelocityNode   = nullptr;
+    std::shared_ptr<TaskNode> m_integrationPositionNode = nullptr;
+    std::shared_ptr<TaskNode> m_solveConstraintsNode    = nullptr;
+    std::shared_ptr<TaskNode> m_updateVelocityNode      = nullptr;
 };
 } // imstk

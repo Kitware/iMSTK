@@ -29,6 +29,7 @@ class vtkPolyData;
 
 namespace imstk
 {
+class AbstractDataArray;
 class PointSet;
 template<typename T, int N> class VecDataArray;
 
@@ -41,14 +42,7 @@ template<typename T, int N> class VecDataArray;
 class VTKPointSetRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
+    VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel);
     virtual ~VTKPointSetRenderDelegate() override = default;
 
     ///
@@ -56,11 +50,15 @@ public:
     ///
     void processEvents() override;
 
+// Callbacks for modifications, when an element changes the user or API must post the modified event
+// to inform that this happened, if the actual buffer on the geometry is swapped then geometry
+// modified would instead be called
 protected:
     ///
     /// \brief Callback for when vertex data changes
     ///
     void vertexDataModified(Event* e);
+    void vertexScalarsModified(Event* e);
 
     ///
     /// \brief Callback for when geometry changes
@@ -68,11 +66,17 @@ protected:
     void geometryModified(Event* e);
 
 protected:
+    void setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices);
+    void setVertexScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
+
+protected:
+    std::shared_ptr<PointSet> m_geometry;
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
+    std::shared_ptr<AbstractDataArray>       m_vertexScalars;
 
     vtkSmartPointer<vtkPolyData> m_polydata;
 
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexScalarArray; ///> Mapped array of scalars
+    vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
 };
 }

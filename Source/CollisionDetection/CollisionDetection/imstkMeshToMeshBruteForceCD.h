@@ -21,43 +21,110 @@
 
 #pragma once
 
-#include "imstkCollisionDetection.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 
 namespace imstk
 {
-class Geometry;
+class CollisionData;
+class PointSet;
 class SurfaceMesh;
-struct CollisionData;
 
 ///
 /// \class MeshToMeshBruteForceCD
 ///
-/// \brief Mesh to mesh collision with brute force strategy
+/// \brief Mesh to mesh collision with brute force strategy.
+/// It can handle SurfaceMesh vs PointSet, LineMesh, & SurfaceMesh.
 ///
-class MeshToMeshBruteForceCD : public CollisionDetection
+/// It does not work with self-intersections. It performs static CD
+/// to exactly find the neareset elements to resolve. It can handle
+/// deep penetrations as well. Designed for closed and manifold meshes
+/// but will work for open meshes so long as there is an "inside"/"outside"
+/// such as a triangle quad or plane
+///
+/// It produces edge-edge, vertex-triangle, vertex-edge, vertex-vertex data.
+/// Edge-edge is off by default due to cost and effectiveness
+///
+/// It's exact implementation follows roughly along with Pierre Terdiman's
+/// "Contact Generation for Meshes" but further described in with GJK instead
+/// of brute force closest point determination in "Game Physics Pearls"
+///
+/// \todo: Test computing normal of each triangle first when computing signed
+/// distances and backface culling
+/// \todo: To greatly speed up edge-edge and reduce potential for bad contacts
+/// we can use maximum distance parameter which is dealt with during the first
+/// pass
+///
+class MeshToMeshBruteForceCD : public CollisionDetectionAlgorithm
 {
 public:
+    MeshToMeshBruteForceCD();
+    virtual ~MeshToMeshBruteForceCD() override = default;
 
     ///
-    /// \brief Constructor
+    /// \brief Returns collision detection type string name
     ///
-    MeshToMeshBruteForceCD(std::shared_ptr<Geometry>      obj1,
-                           std::shared_ptr<SurfaceMesh>   obj2,
-                           std::shared_ptr<CollisionData> colData);
+    virtual const std::string getTypeName() const override { return "MeshToMeshBruteForceCD"; }
+
+public:
+    ///
+    /// \brief If true, edge to edge contacts will be generated
+    /// default true
+    ///
+    void setGenerateEdgeEdgeContacts(bool genEdgeEdgeContacts) { m_generateEdgeEdgeContacts = genEdgeEdgeContacts; }
 
     ///
-    /// \brief Detect collision and compute collision data
+    /// \brief If true, vertex to triangle contacts will be generated
+    /// default true
     ///
-    void computeCollisionData() override;
+    void setGenerateVertexTriangleContacts(bool genVertexTriangleContacts) { m_generateVertexTriangleContacts = genVertexTriangleContacts; }
+
+    ///
+    /// \brief Set padding to the broad phase
+    ///
+    void setPadding(const Vec3d& padding) { m_padding = padding; }
+    const Vec3d& getPadding() const { return m_padding; }
+
+protected:
+    ///
+    /// \brief Compute collision data for AB simulatenously
+    ///
+    virtual void computeCollisionDataAB(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB) override;
+
+    void vertexToTriangleTest(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB);
+
+    void lineMeshEdgeToTriangleTest(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB);
+
+    void surfMeshEdgeToTriangleTest(
+        std::shared_ptr<Geometry>          geomA,
+        std::shared_ptr<Geometry>          geomB,
+        CDElementVector<CollisionElement>& elementsA,
+        CDElementVector<CollisionElement>& elementsB);
 
 private:
     ///
     /// \brief Do a broad phase collision check using AABB
+    /// \todo: Abstract and make changeable
     ///
-    bool doBroadPhaseCollisionCheck() const;
+    bool doBroadPhaseCollisionCheck(
+        std::shared_ptr<Geometry> geomA,
+        std::shared_ptr<Geometry> geomB) const;
 
-    double m_proximityTolerance = 0.1;        ///> proximity tolerance used for collision
-    std::shared_ptr<Geometry>    m_object1;   ///> object 1
-    std::shared_ptr<SurfaceMesh> m_object2;   ///> object 2
+    bool m_generateEdgeEdgeContacts       = false;
+    bool m_generateVertexTriangleContacts = true;
+
+    std::vector<bool> m_vertexInside;
+    Vec3d m_padding = Vec3d(0.001, 0.001, 0.001);
 };
 }

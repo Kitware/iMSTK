@@ -46,20 +46,11 @@ class VisualModel;
 
 namespace ParallelUtils { class SpinLock; }
 
-enum class TimeSteppingPolicy
-{
-    AsFastAsPossible,
-    FixedFrameRate,
-    RealTime
-};
-
 struct SceneConfig
 {
     // Initializes the scene only when it needs to frame
     // Note: May cause delays to run the first frame of the scene due to scene initialization
     bool lazyInitialization = false;
-
-    TimeSteppingPolicy timeStepping = TimeSteppingPolicy::AsFastAsPossible;
 
     // Keep track of the fps for the scene
     bool trackFPS = false;
@@ -186,11 +177,6 @@ public:
     /// \brief Remove scene object
     ///
     void removeSceneObject(std::shared_ptr<SceneObject> sceneObject);
-
-    ///
-    /// \brief Add a debug visual model object
-    ///
-    void addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel);
 
     ///
     /// \brief Return a vector of lights in the scene

@@ -36,7 +36,7 @@ class VolumetricMesh : public PointSet
 {
 public:
     ///
-    /// \brief Deconstructor
+    /// \brief Destructor
     ///
     virtual ~VolumetricMesh() override = default;
 

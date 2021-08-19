@@ -35,7 +35,8 @@ function(imstk_add_test_internal target kind)
   set(test_driver_executable "${target}${kind}")
   
   # Get all source files
-  file(GLOB test_files "${CMAKE_CURRENT_SOURCE_DIR}/*Test.cpp")
+  file(GLOB test_files "${CMAKE_CURRENT_SOURCE_DIR}/*Test.h"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/*Test.cpp")
 
   # Get all source file names
   set(test_file_names "")
@@ -50,10 +51,11 @@ function(imstk_add_test_internal target kind)
   # Link test driver against current target, gtest and pthread
   target_link_libraries(${test_driver_executable}
     ${target}
+    Testing
+    Threads::Threads
     GTest::gtest
     GTest::gmock
-    GTest::gtest_main
-    Threads::Threads
+
   )
 
 if (MSVC)

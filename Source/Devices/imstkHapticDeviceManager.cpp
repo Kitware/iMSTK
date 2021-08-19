@@ -49,6 +49,7 @@ HapticDeviceManager::initModule()
 void
 HapticDeviceManager::uninitModule()
 {
+    // \todo: Other threads could be mid update call here
     hdStopScheduler();
     for (const auto& client : m_deviceClients)
     {

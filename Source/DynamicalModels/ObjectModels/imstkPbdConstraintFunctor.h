@@ -41,7 +41,8 @@
 namespace imstk
 {
 ///
-/// \brief PbdConstraintFunctor take input geometry and produce constraints
+/// \brief PbdConstraintFunctor take input geometry and produce constraints.
+/// It exists to allow extensible constraint generation
 ///
 struct PbdConstraintFunctor
 {

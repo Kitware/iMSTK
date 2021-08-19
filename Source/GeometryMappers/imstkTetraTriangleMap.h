@@ -23,8 +23,6 @@
 
 #include "imstkGeometryMap.h"
 
-#include <array>
-
 namespace imstk
 {
 template<typename T, int N> class VecDataArray;
@@ -106,9 +104,9 @@ protected:
     ///
     size_t findClosestTetrahedron(const Vec3d& pos) const;
 
-    std::vector<std::array<double, 4>> m_verticesWeights; ///> weights
+    std::vector<Vec4d> m_verticesWeights;           ///> weights
 
-    std::vector<size_t> m_verticesEnclosingTetraId;       ///> Enclosing tetrahedra to interpolate the weights upon
+    std::vector<size_t> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
 
     std::vector<Vec3d> m_bBoxMin;
     std::vector<Vec3d> m_bBoxMax;

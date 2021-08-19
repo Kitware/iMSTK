@@ -38,18 +38,32 @@ class CollidingObject;
 class LaparoscopicToolController : public TrackingDeviceControl
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
+    enum class JawState
+    {
+        Closed,
+        Open
+    };
+
+public:
     LaparoscopicToolController(
         std::shared_ptr<CollidingObject> shaft,
         std::shared_ptr<CollidingObject> upperJaw,
         std::shared_ptr<CollidingObject> lowerJaw,
         std::shared_ptr<DeviceClient>    trackingDevice);
-
-    LaparoscopicToolController() = delete; //not allowed for now
-
     ~LaparoscopicToolController() override = default;
+
+public:
+    // *INDENT-OFF*
+    ///
+    /// \brief Fired once when the jaw transitions to closed state
+    /// 
+    SIGNAL(LaparoscopicToolController, JawClosed);
+
+    ///
+    /// \brief Fired once when the jaw transitions to open state
+    /// 
+    SIGNAL(LaparoscopicToolController, JawOpened);
+    // *INDENT-ON*
 
 public:
     ///
@@ -58,43 +72,45 @@ public:
     void update(const double dt) override;
 
     ///
-    /// \brief Apply forces to the haptic device
-    ///
-    void applyForces() override;
-
-    ///
     /// \brief Set the maximum jaw angle
     ///
-    inline void setMaxJawAngle(const double maxAngle) { m_maxJawAngle = maxAngle; }
+    void setMaxJawAngle(const double maxAngle) { m_maxJawAngle = maxAngle; }
 
     ///
     /// \brief Set the increment
     ///
-    inline void setJawAngleChange(const double dAngle) { m_change = dAngle; }
+    void setJawAngleChange(const double dAngle) { m_change = dAngle; }
 
     ///
     /// \brief Set the jaw rotation axis
     ///
-    inline void setJawRotationAxis(const Vec3d& axis) { m_jawRotationAxis = axis; }
+    void setJawRotationAxis(const Vec3d& axis) { m_jawRotationAxis = axis; }
 
     ///
     /// \brief Get the current jaw angle
     ///
-    inline double getJawAngle() const { return m_jawAngle; }
+    double getJawAngle() const { return m_jawAngle; }
 
     ///
     /// \brief Get the max jaw angle
     ///
-    inline double getMaxJawAngle() const { return m_maxJawAngle; }
+    double getMaxJawAngle() const { return m_maxJawAngle; }
+
+    ///
+    /// \brief Get the state of the jaw
+    /// whether it is open or closed
+    ///
+    JawState getJawState() const { return m_jawState; }
 
 protected:
     std::shared_ptr<CollidingObject> m_shaft;               ///< Tool shaft
     std::shared_ptr<CollidingObject> m_upperJaw;            ///< Tool upper jaw
     std::shared_ptr<CollidingObject> m_lowerJaw;            ///< Tool lower jaw
 
-    double m_jawAngle    = PI / 6.0;                        ///< Angle of the jaws
-    double m_change      = 6.0e-5;                          ///< Amount of change in jaw angle per frame
-    double m_maxJawAngle = PI / 6.0;                        ///< Maximum angle of the jaws
+    double   m_jawAngle    = PI / 6.0;                      ///< Angle of the jaws
+    double   m_change      = 6.0e-5;                        ///< Amount of change in jaw angle per frame
+    double   m_maxJawAngle = PI / 6.0;                      ///< Maximum angle of the jaws
+    JawState m_jawState    = JawState::Open;
 
     Vec3d m_jawRotationAxis;                                ///< Angle of the jaws
 

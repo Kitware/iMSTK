@@ -23,8 +23,6 @@
 
 #include "imstkPointLight.h"
 
-#include <string>
-
 namespace imstk
 {
 ///
@@ -35,30 +33,23 @@ namespace imstk
 class SpotLight : public PointLight
 {
 public:
-    ///
-    /// \brief Constructors
-    ///
-    SpotLight() : PointLight(LightType::Spot)
-    {
-        m_coneAngle = 10.0f;
-    }
-
+    SpotLight() : m_spotAngle(10.0) { }
     virtual ~SpotLight() override = default;
 
 public:
-    virtual const std::string getTypeName() const { return "SpotLight"; }
+    const std::string getTypeName() const override { return "SpotLight"; }
 
     ///
     /// \brief Get the spotlight angle in degrees
     ///
-    float getSpotAngle() const { return m_spotAngle; }
+    double getSpotAngle() const { return m_spotAngle; }
 
     ///
     /// \brief Set the spotlight angle in degrees
     ///
-    void setSpotAngle(const double& angle) { m_spotAngle = static_cast<float>(angle); }
+    void setSpotAngle(const double angle) { m_spotAngle = angle; }
 
 protected:
-    float m_spotAngle = 45.0f;
+    double m_spotAngle = 45.0;
 };
 } // imstk

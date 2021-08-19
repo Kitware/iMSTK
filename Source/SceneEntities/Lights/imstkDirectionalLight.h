@@ -36,14 +36,15 @@ namespace imstk
 class DirectionalLight : public Light
 {
 public:
-    DirectionalLight() : Light(LightType::Directional)
+    DirectionalLight()
     {
-        this->setFocalPoint(-1.0f, -1.0f, -1.0f);
+        this->setFocalPoint(-1.0, -1.0, -1.0);
     }
 
     virtual ~DirectionalLight() override = default;
 
-    virtual const std::string getTypeName() const { return "DirectionalLight"; }
+public:
+    const std::string getTypeName() const override { return "DirectionalLight"; }
 
     ///
     /// \brief Direction of the light

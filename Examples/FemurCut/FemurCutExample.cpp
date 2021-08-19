@@ -19,6 +19,7 @@
 
 =========================================================================*/
 
+#include "FemurObject.h"
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 #include "imstkHapticDeviceClient.h"
@@ -36,7 +37,7 @@
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"
-#include "imstkRigidObjectLevelSetCollisionPair.h"
+#include "imstkRigidObjectLevelSetCollision.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -44,7 +45,6 @@
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVTKViewer.h"
-#include "FemurObject.h"
 
 using namespace imstk;
 
@@ -114,11 +114,11 @@ main()
     rbdGhostObj->getVisualModel(0)->setRenderMaterial(ghostMat);
     scene->addSceneObject(rbdGhostObj);
 
-    imstkNew<RigidObjectLevelSetCollisionPair> interaction(rbdObj, femurObj);
+    imstkNew<RigidObjectLevelSetCollision> interaction(rbdObj, femurObj);
     {
         auto colHandlerA = std::dynamic_pointer_cast<RigidBodyCH>(interaction->getCollisionHandlingA());
         colHandlerA->setUseFriction(false);
-        colHandlerA->setStiffness(0.05); // inelastic collision
+        colHandlerA->setBeta(0.05); // inelastic collision
 
         auto colHandlerB = std::dynamic_pointer_cast<LevelSetCH>(interaction->getCollisionHandlingB());
         colHandlerB->setLevelSetVelocityScaling(0.01);
@@ -126,13 +126,13 @@ main()
         //colHandlerB->setLevelSetVelocityScaling(0.0); // Can't push the levelset
         colHandlerB->setUseProportionalVelocity(true);
     }
-    std::shared_ptr<CollisionDetection> cd = interaction->getCollisionDetection();
+    std::shared_ptr<CollisionDetectionAlgorithm> cd = interaction->getCollisionDetection();
 
     scene->getCollisionGraph()->addInteraction(interaction);
 
     // Light (white)
     imstkNew<DirectionalLight> whiteLight;
-    whiteLight->setDirection(Vec3d(0.0, -8.0, 5.0));
+    whiteLight->setDirection(Vec3d(0.0, -8.0, -5.0));
     whiteLight->setIntensity(1.0);
     scene->addLight("whiteLight", whiteLight);
 
@@ -158,7 +158,7 @@ main()
         imstkNew<RigidObjectController> controller(rbdObj, hapticDeviceClient);
         {
             controller->setLinearKd(1000.0);
-            controller->setLinearKs(200000.0);
+            controller->setLinearKs(100000.0);
             controller->setAngularKs(300000000.0);
             controller->setAngularKd(400000.0);
             controller->setForceScaling(0.001);

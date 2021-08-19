@@ -46,11 +46,12 @@ class vtkTable;
 
 namespace imstk
 {
+class Camera;
+class Light;
 class Scene;
 class SceneObject;
-class Camera;
-class VTKRenderDelegate;
 class VisualModel;
+class VTKRenderDelegate;
 
 ///
 /// \class VTKRenderer
@@ -195,7 +196,8 @@ protected:
     vtkSmartPointer<vtkCamera> m_camera;
 
     // lights
-    std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
+    using VtkLightPair = std::pair<std::shared_ptr<Light>, vtkSmartPointer<vtkLight>>;
+    std::vector<VtkLightPair> m_vtkLights;
 
     // Props to be rendered
     std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;

@@ -318,7 +318,7 @@ GeometryUtils::copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
 
     // Cell Data
     std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> cellDataMap;
-    copyToDataMap(vtkMesh->GetPointData(), cellDataMap);
+    copyToDataMap(vtkMesh->GetCellData(), cellDataMap);
     if (!cellDataMap.empty())
     {
         mesh->setCellAttributes(cellDataMap);
@@ -395,6 +395,20 @@ GeometryUtils::copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
         if (tangents != nullptr)
         {
             mesh->setVertexTangents(std::string(tangents->GetName()));
+        }
+    }
+
+    // Cell Data
+    std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> cellDataMap;
+    copyToDataMap(vtkMesh->GetCellData(), cellDataMap);
+    if (!cellDataMap.empty())
+    {
+        mesh->setCellAttributes(cellDataMap);
+        vtkCellData*  cellData = vtkMesh->GetCellData();
+        vtkDataArray* scalars  = cellData->GetScalars();
+        if (scalars != nullptr)
+        {
+            mesh->setCellScalars(std::string(scalars->GetName()));
         }
     }
 
@@ -515,6 +529,7 @@ GeometryUtils::copyToVtkPolyData(std::shared_ptr<LineMesh> imstkMesh)
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
 
+    // Copy vertex attributes
     copyToVtkDataAttributes(polydata->GetPointData(), imstkMesh->getVertexAttributes());
     if (imstkMesh->getActiveVertexNormals() != "")
     {
@@ -533,7 +548,12 @@ GeometryUtils::copyToVtkPolyData(std::shared_ptr<LineMesh> imstkMesh)
         polydata->GetPointData()->SetActiveTCoords(imstkMesh->getActiveVertexTCoords().c_str());
     }
 
-    // \todo: LineMeshes don't have cell attributes yet
+    // Copy cell attributes
+    copyToVtkDataAttributes(polydata->GetCellData(), imstkMesh->getCellAttributes());
+    if (imstkMesh->getActiveCellScalars() != "")
+    {
+        polydata->GetCellData()->SetActiveScalars(imstkMesh->getActiveCellScalars().c_str());
+    }
 
     return polydata;
 }
@@ -548,6 +568,7 @@ GeometryUtils::copyToVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh)
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
 
+    // Copy vertex attributes
     copyToVtkDataAttributes(polydata->GetPointData(), imstkMesh->getVertexAttributes());
     if (imstkMesh->getActiveVertexNormals() != "")
     {
@@ -566,22 +587,19 @@ GeometryUtils::copyToVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh)
         polydata->GetPointData()->SetActiveTCoords(imstkMesh->getActiveVertexTCoords().c_str());
     }
 
+    // Copy cell attributes
     copyToVtkDataAttributes(polydata->GetCellData(), imstkMesh->getCellAttributes());
-    if (imstkMesh->getActiveVertexNormals() != "")
+    if (imstkMesh->getActiveCellNormals() != "")
     {
-        polydata->GetCellData()->SetActiveNormals(imstkMesh->getActiveVertexNormals().c_str());
+        polydata->GetCellData()->SetActiveNormals(imstkMesh->getActiveCellNormals().c_str());
     }
-    if (imstkMesh->getActiveVertexScalars() != "")
+    if (imstkMesh->getActiveCellScalars() != "")
     {
-        polydata->GetCellData()->SetActiveScalars(imstkMesh->getActiveVertexScalars().c_str());
+        polydata->GetCellData()->SetActiveScalars(imstkMesh->getActiveCellScalars().c_str());
     }
-    if (imstkMesh->getActiveVertexTangents() != "")
+    if (imstkMesh->getActiveCellTangents() != "")
     {
-        polydata->GetCellData()->SetActiveTangents(imstkMesh->getActiveVertexTangents().c_str());
-    }
-    if (imstkMesh->getActiveVertexTCoords() != "")
-    {
-        polydata->GetCellData()->SetActiveTCoords(imstkMesh->getActiveVertexTCoords().c_str());
+        polydata->GetCellData()->SetActiveTangents(imstkMesh->getActiveCellTangents().c_str());
     }
 
     return polydata;
@@ -827,23 +845,25 @@ GeometryUtils::toSurfaceMesh(std::shared_ptr<AnalyticalGeometry> geom)
     else if (auto orientedBox = std::dynamic_pointer_cast<OrientedBox>(geom))
     {
         vtkNew<vtkCubeSource> cubeSource;
-        cubeSource->SetCenter(orientedBox->getPosition(Geometry::DataType::PreTransform).data());
-        Vec3d extents = orientedBox->getExtents();
+        Vec3d                 extents = orientedBox->getExtents(Geometry::DataType::PreTransform);
+        cubeSource->SetCenter(0.0, 0.0, 0.0);
         cubeSource->SetXLength(extents[0] * 2.0);
         cubeSource->SetYLength(extents[1] * 2.0);
         cubeSource->SetZLength(extents[2] * 2.0);
         cubeSource->Update();
 
-        Mat4d mat;
-        mat.setIdentity();
-        mat.block<3, 3>(0, 0) = orientedBox->getRotation();
+        AffineTransform3d T = AffineTransform3d::Identity();
+        T.translate(orientedBox->getPosition(Geometry::DataType::PostTransform));
+        T.rotate(orientedBox->getOrientation(Geometry::DataType::PostTransform));
+        T.scale(orientedBox->getScaling());
+        T.matrix().transposeInPlace();
 
-        vtkNew<vtkTransform> transform;
-        transform->SetMatrix(mat.data());
+        vtkNew<vtkTransform> transformVtk;
+        transformVtk->SetMatrix(T.data());
 
         vtkNew<vtkTransformFilter> transformCube;
         transformCube->SetInputData(cubeSource->GetOutput());
-        transformCube->SetTransform(transform);
+        transformCube->SetTransform(transformVtk);
         transformCube->Update();
         results = transformCube->GetOutput();
     }
@@ -1577,7 +1597,7 @@ GeometryUtils::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh,
                                  const int tetId0 = numDiv * hexId;
                                  const int tetId1 = tetId0 + numDiv;
 
-                                 static TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
+                                 static Vec4d weights = Vec4d::Zero();
 
                                  // loop over the tets to find the enclosing tets
                                  for (int id = tetId0; id < tetId1; ++id)
@@ -1586,7 +1606,7 @@ GeometryUtils::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh,
                                      {
                                          continue;
                                      }
-                                     uniformMesh->computeBarycentricWeights(id, xyz, weights);
+                                     weights = uniformMesh->computeBarycentricWeights(id, xyz);
 
                                      if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
                                      {
