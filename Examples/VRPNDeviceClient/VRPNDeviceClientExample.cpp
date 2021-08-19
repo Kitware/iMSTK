@@ -18,24 +18,22 @@
    limitations under the License.
 
 =========================================================================*/
-#include "imstkSimulationManager.h"
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkDirectionalLight.h"
-#include "imstkOrientedBox.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkOrientedBox.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
+#include "imstkSimulationManager.h"
+#include "imstkVRPNDeviceClient.h"
+#include "imstkVRPNDeviceManager.h"
 #include "imstkVTKViewer.h"
-#include <imstkVRPNDeviceClient.h>
-#include <imstkVRPNDeviceManager.h>
 
 using namespace imstk;
 
@@ -64,7 +62,7 @@ main()
     const int serverPort = 38833;
 
     //VRPN Server
-    auto server = std::make_shared<VRPNDeviceManager>(serverIP, 38833);
+    auto server = std::make_shared<VRPNDeviceManager>(serverIP, serverPort);
 
     auto client = server->createDeviceClient("Tracker0", VRPNTracker);
 

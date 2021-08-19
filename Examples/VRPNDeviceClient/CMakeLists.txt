@@ -16,6 +16,8 @@
 #
 ###########################################################################
 
+if(iMSTK_USE_VRPN)
+
 project(Example-VRPNDeviceClient)
 
 #-----------------------------------------------------------------------------
@@ -33,3 +35,4 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 #-----------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME} SimulationManager Devices)
 
+endif()

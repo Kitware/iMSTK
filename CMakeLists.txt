@@ -99,7 +99,7 @@ if (UNIX)
     set(CMAKE_BUILD_TYPE "DEBUG")
   endif()  
 endif()
-option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
+option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" ON)
 option(${PROJECT_NAME}_USE_PHYSX "Build with Physx support" OFF)
 
 #-----------------------------------------------------------------------------

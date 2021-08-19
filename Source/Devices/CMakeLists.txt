@@ -21,14 +21,10 @@ if(NOT iMSTK_USE_OpenHaptics)
 endif()
 if(NOT iMSTK_USE_VRPN)
   list(APPEND ExclusionFiles
-    imstkVRPNDeviceServer.h
-    imstkVRPNDeviceServer.cpp
-    imstkVRPNArduinoDeviceClient.h
-    imstkVRPNArduinoDeviceClient.cpp
+    imstkVRPNDeviceManager.h
+    imstkVRPNDeviceManager.cpp
     imstkVRPNDeviceClient.h
-    imstkVRPNDeviceClient.cpp
-    imstkVRPN3DConnexionDeviceClient.h
-    imstkVRPN3DConnexionDeviceClient.cpp)
+    imstkVRPNDeviceClient.cpp)
 endif()
 
 include(imstkAddLibrary)
