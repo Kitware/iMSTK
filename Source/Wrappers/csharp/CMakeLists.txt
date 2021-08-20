@@ -25,6 +25,14 @@ target_compile_options(iMSTKCWrapper PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:
         -W4 -MP -wd4505 /bigobj>)
 
+# Under MSVC we can generate a project for the examples
+if (MSVC)
+  add_subdirectory(iMSTKCSharp)
+  if (${IMSTK_WRAPPER_BUILT})
+    add_subdirectory(Examples)
+  endif()
+endif()
+
 #-----------------------------------------------------------------------------
 # Install library
 #-----------------------------------------------------------------------------
