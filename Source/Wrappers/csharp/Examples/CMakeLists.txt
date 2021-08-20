@@ -4,26 +4,26 @@ project(CSharpExamples LANGUAGES CSharp)
 # https://stackoverflow.com/questions/55713475/correct-use-of-vs-debugger-working-directory-etc
 
 function(add_example example_name sources)
-
-add_executable(${example_name} ${sources})
-
-set_property(TARGET ${example_name} PROPERTY VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.1")
-set_property(TARGET ${example_name} PROPERTY VS_DOTNET_REFERENCES "System;iMSTKCSharp")
-
-# Neither of these actually work, has to be set in the project explicitely 
-set_property(TARGET ${example_name} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin")
-set_property(TARGET ${example_name} PROPERTY VS_DEBUGGER_ENVIRONMENT "PATH=${CMAKE_INSTALL_PREFIX}/bin;%PATH%")
-
-add_custom_command(TARGET ${example_name} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${example_name}> ${CMAKE_INSTALL_PREFIX}/bin)
-
-add_dependencies(${example_name} iMSTKCSharp)
-
-target_link_libraries(${example_name} iMSTKCWrapper)
-SET_TARGET_PROPERTIES (${example_name} PROPERTIES FOLDER Examples/CSharp)
+  
+  set(target "Example-${example_name}-CSharp")
+  add_executable(${target} ${sources})
+  set_property(TARGET ${target} PROPERTY VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.1")
+  set_property(TARGET ${target} PROPERTY VS_DOTNET_REFERENCES "System;iMSTKCSharp")
+  set_property(TARGET ${target} PROPERTY FOLDER Examples/CSharp)
+  
+  # Neither of these actually work, has to be set in the project explicitely 
+  set_property(TARGET ${target} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin")
+  set_property(TARGET ${target} PROPERTY VS_DEBUGGER_ENVIRONMENT "PATH=${CMAKE_INSTALL_PREFIX}/bin;%PATH%")
+  
+  add_custom_command(TARGET ${target} POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${CMAKE_INSTALL_PREFIX}/bin)
+  
+  add_dependencies(${target} iMSTKCSharp)
+  
+  target_link_libraries(${target} iMSTKCWrapper)
 endfunction()
 
-message (WARNING "Adding CSharp Examples, please note to run the examples you need to set the working directory in the debug project properties to ${CMAKE_INSTALL_PREFIX}/bin")
+message (WARNING "Adding CSharp Examples, please note to run the examples from visual studio you need to set the working directory in the debug project properties to ${CMAKE_INSTALL_PREFIX}/bin")
 
 add_example(FemDeformable femDeformable.cs)
 add_example(PBDCloth pbdCloth.cs)

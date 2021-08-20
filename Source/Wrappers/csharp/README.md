@@ -11,6 +11,12 @@
     - Build imstk with `iMSTK_WRAP_CSHARP=ON` (cmake can find swig without any issue on my system).
 
 # How ro run C# examples on Windows 
+## Via Visual Studio
+- The superbuild needs to be run twice for the C# Examples to be run from the install folder
+- If you are looking at the inner build, after building `iMSTKCWrapper`, you will need to run CMake "Configure" and "Generate" again to load the example projects.
+- When running from visual studio make sure that the "Working Directory" under each examples project settings is set to the install folder
+
+## Via Mono 
 - Install mono. See [https://www.mono-project.com/docs/getting-started/install/windows/](https://www.mono-project.com/docs/getting-started/install/windows/)
 - The C# examples run without building iMSTK csharp wrappers, but needs iMSTK built with OpenHaptics.
     - clone the repository [git@gitlab.kitware.com](mailto:git@gitlab.kitware.com):jianfeng.yan/imstk_csharp.git
@@ -24,6 +30,8 @@
     - copy `imstkCWrapperCSHARP_wrap.cxx` and `imstkCWrapperCSHARP_wrap.h` to imstk_csharp/imstkCWrapper
 
     and then build imstkCWrapper and run examples as described above.
+
+
 
 # How to compile SWIG generated C# code into a dll, and run examples with it?
 - open a terminal, cd to imstk_csharp

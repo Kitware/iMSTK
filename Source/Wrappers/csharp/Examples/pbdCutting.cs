@@ -148,7 +148,7 @@ public class PbdCutting
         DirectionalLight light = new DirectionalLight();
         light.setFocalPoint(new Vec3d(5.0, -8.0, -5.0));
         light.setIntensity(1.0);
-        scene.addLight("light". light);
+        scene.addLight("light", light);
 
         // Run the simulation
         {
