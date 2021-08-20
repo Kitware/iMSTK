@@ -146,16 +146,14 @@ public:
     ///
     const int getButton(const int buttonId)
     {
+        int result = 0;
         m_dataLock.lock();
         if (m_buttons.find(buttonId) != m_buttons.end())
         {
-            return m_buttons.at(buttonId);
+            result = m_buttons.at(buttonId);
         }
-        else
-        {
-            return 0;
-        }
-        m_dataLock.lock();
+        m_dataLock.unlock();
+        return result;
     }
 
     const std::vector<double> getAnalog() const;
