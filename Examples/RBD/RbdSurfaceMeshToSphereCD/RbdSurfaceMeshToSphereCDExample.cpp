@@ -21,13 +21,14 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
+#include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
-#include "imstkImplicitGeometryToImageData.h"
-#include "imstkKeyboardDeviceClient.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkLogger.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
@@ -37,12 +38,60 @@
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSphere.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkMouseDeviceClient.h"
-#include "imstkCollisionUtils.h"
 
 using namespace imstk;
+
+std::shared_ptr<SurfaceMesh>
+createBowlMesh()
+{
+    imstkNew<Sphere> sphere(Vec3d::Zero(), 8.0);
+
+    std::shared_ptr<SurfaceMesh> sphereMesh = GeometryUtils::toUVSphereSurfaceMesh(sphere, 10, 10);
+    auto                         sphereVerticesPtr = sphereMesh->getVertexPositions();
+    auto                         sphereIndicesPtr  = sphereMesh->getTriangleIndices();
+
+    // Cut off the upper half of the sphere
+    auto bowlVerticesPtr = std::make_shared<VecDataArray<double, 3>>();
+    auto bowlIndicesPtr  = std::make_shared<VecDataArray<int, 3>>();
+
+    std::unordered_map<int, int> sphereVertexToBowlVertex;
+    for (int i = 0; i < sphereVerticesPtr->size(); i++)
+    {
+        const Vec3d sphereVertex = (*sphereVerticesPtr)[i];
+        if (sphereVertex[1] < 1.0)
+        {
+            const int vertexId = bowlVerticesPtr->size();
+            sphereVertexToBowlVertex[i] = vertexId;
+            bowlVerticesPtr->push_back(sphereVertex);
+        }
+    }
+
+    // Add back all triangles with all verts present
+    for (int i = 0; i < sphereIndicesPtr->size(); i++)
+    {
+        const Vec3i& tri = (*sphereIndicesPtr)[i];
+        // If all triangle vertices still present, add triangle
+        if (sphereVertexToBowlVertex.count(tri[0]) != 0
+            && sphereVertexToBowlVertex.count(tri[1]) != 0
+            && sphereVertexToBowlVertex.count(tri[2]) != 0)
+        {
+            Vec3i newTri = Vec3i(
+                sphereVertexToBowlVertex[tri[0]],
+                sphereVertexToBowlVertex[tri[1]],
+                sphereVertexToBowlVertex[tri[2]]);
+            std::swap(newTri[0], newTri[1]);
+            bowlIndicesPtr->push_back(newTri);
+        }
+    }
+    auto results = std::make_shared<SurfaceMesh>();
+    results->initialize(bowlVerticesPtr, bowlIndicesPtr);
+    results->scale(Vec3d(1.0, 0.5, 1.0), Geometry::TransformType::ApplyToData);
+    results->translate(Vec3d(0.0, 0.0, 0.0), Geometry::TransformType::ApplyToData);
+    return results;
+}
 
 ///
 /// \brief This examples demonstrates rigid body interaction between
@@ -63,24 +112,32 @@ main()
     rbdModel->getConfig()->m_maxNumIterations = 10;
 
     // Create the first rbd, plane floor
-    imstkNew<CollidingObject> planeObj("Plane");
+    imstkNew<CollidingObject> floorObj("Plane");
     {
-        imstkNew<Plane> plane(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 1.0, 0.0));
-        plane->setWidth(10.0);
+        std::shared_ptr<SurfaceMesh> bowlMesh = createBowlMesh();
 
         // Create the object
-        planeObj->setVisualGeometry(plane);
-        planeObj->setCollidingGeometry(plane);
-        planeObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+        floorObj->setVisualGeometry(bowlMesh);
+        floorObj->setCollidingGeometry(bowlMesh);
 
-        scene->addSceneObject(planeObj);
+        auto material = std::make_shared<RenderMaterial>();
+        material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+        material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        material->setDiffuseColor(Color(1.0, 0.8, 0.74));
+        material->setRoughness(0.5);
+        material->setMetalness(0.1);
+        floorObj->getVisualModel(0)->setRenderMaterial(material);
+
+        scene->addSceneObject(floorObj);
     }
 
-    std::shared_ptr<RigidObject2> rigidObjects[] = { nullptr, nullptr, nullptr, nullptr };
-    for (int i = 0; i < 4; i++)
+    std::array<std::shared_ptr<RigidObject2>, 6> rigidObjects;
+    const int                                    rbdObjCount = static_cast<int>(rigidObjects.size());
+    for (int i = 0; i < rbdObjCount; i++)
     {
         rigidObjects[i] = std::make_shared<RigidObject2>("RbdObject" + std::to_string(i));
-        imstkNew<Sphere> sphere(Vec3d::Zero(), 0.8);
+        const double     radius = 0.8;
+        imstkNew<Sphere> sphere(Vec3d::Zero(), radius);
 
         // Create the cube rigid object
         rigidObjects[i]->setDynamicalModel(rbdModel);
@@ -88,27 +145,33 @@ main()
         rigidObjects[i]->setCollidingGeometry(sphere);
         rigidObjects[i]->setVisualGeometry(sphere);
         rigidObjects[i]->getRigidBody()->m_mass = 1.0;
-        const double t = static_cast<double>(i) / 4.0;
-        rigidObjects[i]->getRigidBody()->m_initPos = Vec3d(t * 8.0 - 3.0, 1.0, 0.0);
+        const double t = static_cast<double>(i) / (rbdObjCount - 1);
+        rigidObjects[i]->getRigidBody()->m_initPos = Vec3d((t - 0.5) * rbdObjCount * radius * 2.0, 1.0, 0.0);
         rigidObjects[i]->getRigidBody()->m_intertiaTensor = Mat3d::Identity();
-        rigidObjects[i]->getVisualModel(0)->getRenderMaterial()->setColor(Color::lerpRgb(Color::Red, Color::Blue, t));
+
+        auto material = std::make_shared<RenderMaterial>();
+        material->setDiffuseColor(Color::lerpRgb(Color(1.0, 0.333, 0.259), Color(0.427, 1.0, 0.58), t));
+        material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        material->setRoughness(0.5);
+        material->setMetalness(0.5);
+        rigidObjects[i]->getVisualModel(0)->setRenderMaterial(material);
 
         scene->addSceneObject(rigidObjects[i]);
     }
 
     // Collision Interaction between rigid objects
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < rbdObjCount; i++)
         {
-            auto rbdInteraction = std::make_shared<RigidObjectCollision>(rigidObjects[i], planeObj, "UnidirectionalPlaneToSphereCD");
+            auto rbdInteraction = std::make_shared<RigidObjectCollision>(rigidObjects[i], floorObj, "SurfaceMeshToSphereCD");
             rbdInteraction->setFriction(0.0);
             rbdInteraction->setStiffness(0.0001);
             scene->getCollisionGraph()->addInteraction(rbdInteraction);
         }
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < rbdObjCount; i++)
         {
-            for (int j = i + 1; j < 4; j++)
+            for (int j = i + 1; j < rbdObjCount; j++)
             {
                 auto rbdInteraction = std::make_shared<RigidObjectCollision>(rigidObjects[i], rigidObjects[j], "SphereToSphereCD");
                 rbdInteraction->setFriction(0.0);
@@ -120,7 +183,7 @@ main()
 
     // Camera
     scene->getActiveCamera()->setPosition(0.0252374, 2.85008, 17.0338);
-    scene->getActiveCamera()->setFocalPoint(0.30457, 2.99155, 0.24512);
+    scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0016057, 0.999996, 0.00220191);
 
     // Light
@@ -180,15 +243,21 @@ main()
                         Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
                 const Vec3d rayStart = scene->getActiveCamera()->getPosition();
 
-                for (int i = 0; i < 4; i++)
+                double minDist = IMSTK_DOUBLE_MAX; // Use the closest picked sphere
+                for (int i = 0; i < rbdObjCount; i++)
                 {
                     auto sphere = std::dynamic_pointer_cast<Sphere>(rigidObjects[i]->getPhysicsGeometry());
                     Vec3d iPt;
                     if (CollisionUtils::testRayToSphere(rayStart, rayDir,
                             sphere->getCenter(), sphere->getRadius(), iPt))
                     {
-                        sphereSelected = i;
-                        planePos       = sphere->getCenter();
+                        const double dist = (iPt - rayStart).norm();
+                        if (dist < minDist)
+                        {
+                            minDist = dist;
+                            sphereSelected = i;
+                            planePos       = sphere->getCenter();
+                        }
                     }
                 }
             }
