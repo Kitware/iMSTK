@@ -211,7 +211,7 @@ public:
     ///
     /// \brief Get the forward/look direction of the view
     ///
-    const Vec3d& getForward() const { return m_view.col(2).head<3>(); }
+    const Vec3d getForward() const { return m_view.col(2).head<3>(); }
 
     ///
     /// \brief Compute ray emanating from the camera position that travels

@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Example-RbdPlaneToSphereCD)
+project(Example-RbdSurfaceMeshToSphereCD)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} RbdPlaneToSphereCDExample.cpp)
+imstk_add_executable(${PROJECT_NAME} RbdSurfaceMeshToSphereCDExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
