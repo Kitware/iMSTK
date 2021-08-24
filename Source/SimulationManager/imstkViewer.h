@@ -81,6 +81,9 @@ public:
     /// \brief Set the render window size
     ///
     virtual void setSize(int, int) { }
+    void setSize(Vec2i size) { setSize(size[0], size[1]); }
+
+    virtual const Vec2i getSize() const { return Vec2i::Zero(); }
 
     ///
     /// \brief Get the current renderer's mode
