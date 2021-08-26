@@ -126,7 +126,10 @@ TEST(imstkDataArrayTest, Resize)
     EXPECT_EQ(8, a.size());
     EXPECT_EQ(16, a.getCapacity());
 
-    for (int i = 0; i < 4; ++i) EXPECT_EQ(i, a[i]);
+    for (int i = 0; i < 4; ++i)
+    {
+        EXPECT_EQ(i, a[i]);
+}
 }
 
 TEST(imstkDataArrayTest, Reserve)
@@ -138,12 +141,18 @@ TEST(imstkDataArrayTest, Reserve)
     a.reserve(100);
     EXPECT_EQ(256, a.getCapacity());
     EXPECT_EQ(4, a.size());
-    for (int i = 0; i < 4; ++i) EXPECT_EQ(i+1, a[i]);
+    for (int i = 0; i < 4; ++i)
+    {
+        EXPECT_EQ(i + 1, a[i]);
+}
 
     a.squeeze();
     EXPECT_EQ(4, a.getCapacity());
     EXPECT_EQ(4, a.size());
-    for (int i = 0; i < 4; ++i) EXPECT_EQ(i+1, a[i]);
+    for (int i = 0; i < 4; ++i)
+    {
+        EXPECT_EQ(i + 1, a[i]);
+}
 }
 
 TEST(imstkDataArrayTest, Iterators)

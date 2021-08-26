@@ -228,8 +228,8 @@ public:
         else
         {
             DataArray<T>::resize(size * N);
-            m_dataCast = reinterpret_cast<VecType*>(DataArray<T>::m_data);
-            m_vecSize = size;
+            m_dataCast    = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+            m_vecSize     = size;
             m_vecCapacity = DataArray<T>::m_capacity / N;
         }
     }
@@ -238,9 +238,10 @@ public:
 
     inline int size() const { return m_vecSize; }
 
-    inline void squeeze() override { 
+    inline void squeeze() override
+    {
         DataArray<T>::squeeze();
-        m_dataCast = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+        m_dataCast    = reinterpret_cast<VecType*>(DataArray<T>::m_data);
         m_vecCapacity = DataArray<T>::m_capacity / N;
     }
 

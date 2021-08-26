@@ -201,9 +201,10 @@ public:
         else
         {
             const T* oldData = m_data;
-            m_size = m_capacity = size;
             m_data = new T[size];
-            std::copy_n(oldData, size, m_data);
+            std::copy_n(oldData, m_size, m_data);
+            delete[] oldData;
+            m_size = m_capacity = size;
         }
     }
 
@@ -215,7 +216,8 @@ public:
     ///
     /// \brief Resize to current size
     ///
-    virtual inline void squeeze() { 
+    virtual inline void squeeze()
+    {
         const T* oldData = m_data;
         m_data = new T[m_size];
         std::copy_n(oldData, m_size, m_data);
@@ -252,7 +254,7 @@ public:
         }
 
         const int newSize = m_size + 1;
-        if (newSize > m_capacity)   // If the new size exceeds capacity
+        if (newSize > m_capacity)    // If the new size exceeds capacity
         {
             reserve(m_capacity * 2); // Conservative/copies values
         }
