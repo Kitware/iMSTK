@@ -194,35 +194,16 @@ public:
             return;
         }
 
-        if (size == m_capacity)
+        if (size <= m_capacity)
         {
-            m_size = m_capacity;
-            return;
-        }
-
-        if (size == 0)
-        {
-            delete[] m_data;
-            m_data     = new T[1];
-            m_size     = 0;
-            m_capacity = 1;
+            m_size = size;
         }
         else
         {
-            const T*  oldData = m_data;
-            const int oldSize = m_size;
-
-            m_data = new T[size];
-            if (oldSize <= size) // If old vector is smaller than new, it will fit
-            {
-                std::copy_n(oldData, oldSize, m_data);
-            }
-            else // If old vector is larger than new, chop it off, only copy up to new size
-            {
-                std::copy_n(oldData, size, m_data);
-            }
-            delete[] oldData;
+            const T* oldData = m_data;
             m_size = m_capacity = size;
+            m_data = new T[size];
+            std::copy_n(oldData, size, m_data);
         }
     }
 
@@ -234,7 +215,13 @@ public:
     ///
     /// \brief Resize to current size
     ///
-    virtual inline void squeeze() { resize(m_size); }
+    virtual inline void squeeze() { 
+        const T* oldData = m_data;
+        m_data = new T[m_size];
+        std::copy_n(oldData, m_size, m_data);
+        delete[] oldData;
+        m_capacity = m_size;
+    }
 
     ///
     /// \brief Append the data array to hold the new value, resizes if neccesary
@@ -267,7 +254,7 @@ public:
         const int newSize = m_size + 1;
         if (newSize > m_capacity)   // If the new size exceeds capacity
         {
-            resize(m_capacity * 2); // Conservative/copies values
+            reserve(m_capacity * 2); // Conservative/copies values
         }
         m_size = newSize;
         m_data[newSize - 1] = val;
@@ -286,11 +273,7 @@ public:
     ///
     inline void reserve(const int capacity) override
     {
-        if (m_mapped)
-        {
-            return;
-        }
-
+        if (m_mapped) { return; }
         if (capacity <= m_capacity) { return; }
 
         const int currSize = m_size;

@@ -99,44 +99,51 @@ TEST(imstkDataArrayTest, Mapping)
 
 TEST(imstkDataArrayTest, CapacityManagement)
 {
+    DataArray<int> a;
+    EXPECT_EQ(0, a.size());
+    EXPECT_EQ(1, a.getCapacity());
+    a.push_back(0);
+    EXPECT_EQ(1, a.size());
+    EXPECT_EQ(1, a.getCapacity());
+    for (int i = 1; i < 10; ++i)
     {
-        DataArray<int> a;
-        EXPECT_EQ(0, a.size());
-        EXPECT_EQ(1, a.getCapacity());
-        a.push_back(0);
-        EXPECT_EQ(1, a.size());
-        EXPECT_EQ(1, a.getCapacity());
-        for (int i = 1; i < 10; ++i)
-        {
-            a.push_back(i);
-            EXPECT_EQ(i + 1, a.size());
-        }
-        EXPECT_TRUE(isEqualTo(a, { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
+        a.push_back(i);
+        EXPECT_EQ(i + 1, a.size());
     }
-    {
-        DataArray<int> a;
-        a.resize(100);
-        EXPECT_EQ(100, a.size());
-        EXPECT_EQ(100, a.getCapacity());
-        a.resize(50);
-        EXPECT_EQ(50, a.size());
-        EXPECT_EQ(50, a.getCapacity());
-        a.resize(0);
-        EXPECT_EQ(0, a.size());
-        EXPECT_EQ(1, a.getCapacity());
-    }
-    {
-        DataArray<int> a{ 1, 2, 3, 4 };
-        a.reserve(256);
-        EXPECT_EQ(4, a.size());
-        EXPECT_EQ(256, a.getCapacity());
-        a.reserve(100);
-        EXPECT_EQ(256, a.getCapacity());
-        EXPECT_EQ(4, a.size());
-        a.squeeze();
-        EXPECT_EQ(4, a.getCapacity());
-        EXPECT_EQ(4, a.size());
-    }
+    EXPECT_TRUE(isEqualTo(a, { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
+}
+
+TEST(imstkDataArrayTest, Resize)
+{
+    DataArray<int> a{ 0, 1, 2, 3 };
+    a.resize(8);
+    EXPECT_EQ(8, a.getCapacity());
+    EXPECT_EQ(8, a.size());
+    a.resize(16);
+    EXPECT_EQ(16, a.size());
+    EXPECT_EQ(16, a.getCapacity());
+    a.resize(8);
+    EXPECT_EQ(8, a.size());
+    EXPECT_EQ(16, a.getCapacity());
+
+    for (int i = 0; i < 4; ++i) EXPECT_EQ(i, a[i]);
+}
+
+TEST(imstkDataArrayTest, Reserve)
+{
+    DataArray<int> a{ 1, 2, 3, 4 };
+    a.reserve(256);
+    EXPECT_EQ(4, a.size());
+    EXPECT_EQ(256, a.getCapacity());
+    a.reserve(100);
+    EXPECT_EQ(256, a.getCapacity());
+    EXPECT_EQ(4, a.size());
+    for (int i = 0; i < 4; ++i) EXPECT_EQ(i+1, a[i]);
+
+    a.squeeze();
+    EXPECT_EQ(4, a.getCapacity());
+    EXPECT_EQ(4, a.size());
+    for (int i = 0; i < 4; ++i) EXPECT_EQ(i+1, a[i]);
 }
 
 TEST(imstkDataArrayTest, Iterators)
