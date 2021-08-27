@@ -94,13 +94,14 @@ CollisionDetectionAlgorithm::requestUpdate()
         }
     }
 
-    m_colData->clearAll();
-
     std::shared_ptr<Geometry> geomA = m_colData->geomA = getInput(0);
     std::shared_ptr<Geometry> geomB = m_colData->geomB = getInput(1);
 
-    CDElementVector<CollisionElement>* a = &m_colData->elementsA;
-    CDElementVector<CollisionElement>* b = &m_colData->elementsB;
+    std::vector<CollisionElement>* a = &m_colData->elementsA;
+    std::vector<CollisionElement>* b = &m_colData->elementsB;
+
+    a->resize(0);
+    b->resize(0);
 
     bool genA = m_generateCD_A;
     bool genB = m_generateCD_B;

@@ -104,8 +104,8 @@ TEST_P(imstkPointSetToSphereCDIntersectionTests, IntersectionTestAB)
     std::shared_ptr<CollisionData> colData = m_pointSetToSphereCD.getCollisionData();
 
     // Should be one element on side A, 0 on side B (default CD data is not generated for the sphere)
-    EXPECT_EQ(valData.sizeA, colData->elementsA.getSize());
-    EXPECT_EQ(valData.sizeB, colData->elementsB.getSize());
+    EXPECT_EQ(valData.sizeA, colData->elementsA.size());
+    EXPECT_EQ(valData.sizeB, colData->elementsB.size());
 
     // That element should be a point directional element
     EXPECT_EQ(valData.elementTypeA, colData->elementsA[0].m_type);
@@ -155,8 +155,8 @@ TEST_P(imstkPointSetToSphereCDNonIntersectionTests, NonIntersectionTestAB)
     std::shared_ptr<CollisionData> colData = m_pointSetToSphereCD.getCollisionData();
 
     // Should be no elements
-    EXPECT_EQ(0, colData->elementsA.getSize());
-    EXPECT_EQ(0, colData->elementsB.getSize());
+    EXPECT_EQ(0, colData->elementsA.size());
+    EXPECT_EQ(0, colData->elementsB.size());
 }
 
 INSTANTIATE_TEST_SUITE_P(PointSetToSphereCDTests, imstkPointSetToSphereCDNonIntersectionTests,

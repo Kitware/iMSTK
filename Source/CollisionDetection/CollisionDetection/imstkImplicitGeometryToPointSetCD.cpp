@@ -37,10 +37,10 @@ ImplicitGeometryToPointSetCD::ImplicitGeometryToPointSetCD()
 
 void
 ImplicitGeometryToPointSetCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
     auto pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
@@ -53,6 +53,7 @@ ImplicitGeometryToPointSetCD::computeCollisionDataAB(
 
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+    ParallelUtils::SpinLock                  lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int i)
         {
@@ -73,17 +74,19 @@ ImplicitGeometryToPointSetCD::computeCollisionDataAB(
                 elemB.ptIndex = i;
                 elemB.penetrationDepth = std::abs(signedDistance);
 
-                elementsA.safeAppend(elemA);
-                elementsB.safeAppend(elemB);
+                lock.lock();
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
+                lock.unlock();
             }
-                }, vertices.size() > 100);
+        }, vertices.size() > 100);
 }
 
 void
 ImplicitGeometryToPointSetCD::computeCollisionDataA(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA)
 {
     auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
     auto pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
@@ -96,6 +99,7 @@ ImplicitGeometryToPointSetCD::computeCollisionDataA(
 
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+    ParallelUtils::SpinLock                  lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int i)
         {
@@ -111,16 +115,18 @@ ImplicitGeometryToPointSetCD::computeCollisionDataA(
                 elemA.pt  = pt;
                 elemA.penetrationDepth = std::abs(signedDistance);
 
-                elementsA.safeAppend(elemA);
+                lock.lock();
+                elementsA.push_back(elemA);
+                lock.unlock();
             }
-                }, vertices.size() > 100);
+        }, vertices.size() > 100);
 }
 
 void
 ImplicitGeometryToPointSetCD::computeCollisionDataB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsB)
 {
     auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
     auto pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
@@ -133,6 +139,7 @@ ImplicitGeometryToPointSetCD::computeCollisionDataB(
 
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+    ParallelUtils::SpinLock                  lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int i)
         {
@@ -148,8 +155,10 @@ ImplicitGeometryToPointSetCD::computeCollisionDataB(
                 elemB.ptIndex = i;
                 elemB.penetrationDepth = std::abs(signedDistance);
 
-                elementsB.safeAppend(elemB);
+                lock.lock();
+                elementsB.push_back(elemB);
+                lock.unlock();
             }
-                }, vertices.size() > 100);
+        }, vertices.size() > 100);
 }
 }

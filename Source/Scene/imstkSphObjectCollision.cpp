@@ -44,6 +44,7 @@ SphObjectCollision::SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::sha
     std::shared_ptr<SPHCollisionHandling> ch = std::make_shared<SPHCollisionHandling>();
     ch->setInputObjectA(obj1);
     ch->setInputCollisionData(cd->getCollisionData());
+    ch->setDetection(cd);
     setCollisionHandlingA(ch);
 
     // Collision should happen after positions and velocities are computed

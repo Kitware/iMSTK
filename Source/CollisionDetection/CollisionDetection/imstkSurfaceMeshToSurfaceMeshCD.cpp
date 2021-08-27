@@ -103,10 +103,10 @@ SurfaceMeshToSurfaceMeshCD::SurfaceMeshToSurfaceMeshCD()
 
 void
 SurfaceMeshToSurfaceMeshCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<SurfaceMesh>             surfMeshA    = std::dynamic_pointer_cast<SurfaceMesh>(geomA);
     std::shared_ptr<VecDataArray<double, 3>> verticesAPtr = surfMeshA->getVertexPositions();
@@ -169,8 +169,8 @@ SurfaceMeshToSurfaceMeshCD::computeCollisionDataAB(
                 elemB.ids[1]   = vtContact.second[1];
                 elemB.ids[2]   = vtContact.second[2];
 
-                elementsA.unsafeAppend(elemA);
-                elementsB.unsafeAppend(elemB);
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
             }
             // Type 0, edge-edge contact
             else if (contactType == 0)
@@ -196,8 +196,8 @@ SurfaceMeshToSurfaceMeshCD::computeCollisionDataAB(
                     elemB.ids[0]   = eeContact.second[0];
                     elemB.ids[1]   = eeContact.second[1];
 
-                    elementsA.unsafeAppend(elemA);
-                    elementsB.unsafeAppend(elemB);
+                    elementsA.push_back(elemA);
+                    elementsB.push_back(elemB);
                     edges.insert(edgePair);
                 }
             }
@@ -216,8 +216,8 @@ SurfaceMeshToSurfaceMeshCD::computeCollisionDataAB(
                 elemB.cellType = IMSTK_VERTEX;
                 elemB.ids[0]   = tvContact.second;
 
-                elementsA.unsafeAppend(elemA);
-                elementsB.unsafeAppend(elemB);
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
             }
             //else
             //{

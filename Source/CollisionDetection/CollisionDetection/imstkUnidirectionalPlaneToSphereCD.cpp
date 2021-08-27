@@ -35,10 +35,10 @@ UnidirectionalPlaneToSphereCD::UnidirectionalPlaneToSphereCD()
 
 void
 UnidirectionalPlaneToSphereCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<Plane>  plane  = std::dynamic_pointer_cast<Plane>(geomA);
     std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(geomB);
@@ -69,16 +69,16 @@ UnidirectionalPlaneToSphereCD::computeCollisionDataAB(
         elemB.pt  = sphereContactPt;
         elemB.penetrationDepth = depth;
 
-        elementsA.unsafeAppend(elemA);
-        elementsB.unsafeAppend(elemB);
+        elementsA.push_back(elemA);
+        elementsB.push_back(elemB);
     }
 }
 
 void
 UnidirectionalPlaneToSphereCD::computeCollisionDataA(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA)
 {
     std::shared_ptr<Plane>  plane  = std::dynamic_pointer_cast<Plane>(geomA);
     std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(geomB);
@@ -104,15 +104,15 @@ UnidirectionalPlaneToSphereCD::computeCollisionDataA(
         elemA.pt  = planeContactPt;
         elemA.penetrationDepth = depth;
 
-        elementsA.unsafeAppend(elemA);
+        elementsA.push_back(elemA);
     }
 }
 
 void
 UnidirectionalPlaneToSphereCD::computeCollisionDataB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<Plane>  plane  = std::dynamic_pointer_cast<Plane>(geomA);
     std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(geomB);
@@ -138,7 +138,7 @@ UnidirectionalPlaneToSphereCD::computeCollisionDataB(
         elemB.pt  = sphereContactPt;
         elemB.penetrationDepth = depth;
 
-        elementsB.unsafeAppend(elemB);
+        elementsB.push_back(elemB);
     }
 }
 }

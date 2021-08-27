@@ -176,15 +176,15 @@ CollisionDataDebugObject::debugUpdate()
 
     if (m_printContacts)
     {
-        printf("# A Contacts: %d\n", static_cast<int>(m_cdData->elementsA.getSize()));
-        printf("# B Contacts: %d\n", static_cast<int>(m_cdData->elementsB.getSize()));
+        printf("# A Contacts: %d\n", static_cast<int>(m_cdData->elementsA.size()));
+        printf("# B Contacts: %d\n", static_cast<int>(m_cdData->elementsB.size()));
     }
 
     // Clear the debug object geometry
     clear();
 
     std::shared_ptr<PointSet> pointSetA = std::dynamic_pointer_cast<PointSet>(m_cdData->geomA);
-    for (int i = 0; i < static_cast<int>(m_cdData->elementsA.getSize()); i++)
+    for (int i = 0; i < static_cast<int>(m_cdData->elementsA.size()); i++)
     {
         const CollisionElement& elem = m_cdData->elementsA[i];
         addCollisionElement(pointSetA, elem);
@@ -195,7 +195,7 @@ CollisionDataDebugObject::debugUpdate()
         }
     }
     std::shared_ptr<PointSet> pointSetB = std::dynamic_pointer_cast<PointSet>(m_cdData->geomB);
-    for (int i = 0; i < static_cast<int>(m_cdData->elementsB.getSize()); i++)
+    for (int i = 0; i < static_cast<int>(m_cdData->elementsB.size()); i++)
     {
         const CollisionElement& elem = m_cdData->elementsB[i];
         addCollisionElement(pointSetB, elem);

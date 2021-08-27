@@ -69,22 +69,22 @@ protected:
     /// \brief Add collision constraints based off contact data
     ///
     void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override;
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
 
     ///
     /// \brief Generates constraints in the pools between a mesh and non mesh
     ///
     void generateMeshNonMeshConstraints(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB);
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB);
 
     ///
     /// \brief Generates constraints in the pools between two meshes
     ///
     void generateMeshMeshConstraints(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB);
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB);
 
 protected:
     ///

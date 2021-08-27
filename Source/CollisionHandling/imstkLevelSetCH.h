@@ -94,8 +94,8 @@ protected:
     /// \brief Compute forces and velocities based on collision data
     ///
     void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override;
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
 
 private:
     std::unordered_set<int> m_ptIdMask;
