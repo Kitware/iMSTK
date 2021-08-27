@@ -29,77 +29,6 @@ namespace imstk
 {
 class Geometry;
 
-template<class DataElement>
-class CDElementVector
-{
-public:
-    ///
-    /// \brief operator [] (const accessor)
-    ///
-    const DataElement& operator[](const size_t idx) const
-    {
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-        LOG_IF(FATAL, (idx >= m_Data.size())) << "Invalid index";
-#endif
-        return m_Data[idx];
-    }
-
-    ///
-    /// \brief Thread-safe append a data element
-    ///
-    void safeAppend(const DataElement& data)
-    {
-        m_Lock.lock();
-        m_Data.push_back(data);
-        m_Lock.unlock();
-    }
-
-    ///
-    /// \brief Append a data element, this is a non thread-safe operation
-    ///
-    void unsafeAppend(const DataElement& data) { m_Data.push_back(data); }
-
-    ///
-    /// \brief Overwrite a data element, this is a non thread-safe operation
-    ///
-    void setElement(size_t idx, const DataElement& data)
-    {
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-        LOG_IF(FATAL, (idx >= m_Data.size())) << "Invalid index";
-#endif
-        m_Data[idx] = data;
-    }
-
-    ///
-    /// \brief Sort the collision data using the provided compare function
-    template<class Comp>
-    void sort(Comp&& comp) { std::sort(m_Data.begin(), m_Data.end(), comp); }
-
-    ///
-    /// \brief Check if the data array is emtpy
-    ///
-    bool isEmpty() const { return m_Data.empty(); }
-
-    ///
-    /// \brief Get the size of the data
-    ///
-    size_t getSize() const { return m_Data.size(); }
-
-    ///
-    /// \brief Resize the data array
-    ///
-    void resize(size_t newSize) { m_Data.resize(newSize); }
-
-    ///
-    /// \brief Clear all data
-    ///
-    void clear() { m_Data.resize(0); }
-
-protected:
-    std::vector<DataElement> m_Data;
-    ParallelUtils::SpinLock  m_Lock;
-};
-
 enum class CollisionElementType
 {
     Empty,
@@ -265,16 +194,9 @@ struct CollisionElement
 class CollisionData
 {
 public:
-    void clearAll()
-    {
-        elementsA.resize(0);
-        elementsB.resize(0);
-    }
-
-public:
-    CDElementVector<CollisionElement> elementsA;
-    CDElementVector<CollisionElement> elementsB;
-    std::shared_ptr<Geometry> geomA;
-    std::shared_ptr<Geometry> geomB;
+    std::vector<CollisionElement> elementsA;
+    std::vector<CollisionElement> elementsB;
+    std::shared_ptr<Geometry>     geomA;
+    std::shared_ptr<Geometry>     geomB;
 };
 }

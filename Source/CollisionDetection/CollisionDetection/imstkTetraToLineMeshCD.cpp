@@ -35,10 +35,10 @@ TetraToLineMeshCD::TetraToLineMeshCD()
 
 void
 TetraToLineMeshCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<TetrahedralMesh> tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(geomA);
     std::shared_ptr<LineMesh>        lineMesh = std::dynamic_pointer_cast<LineMesh>(geomB);
@@ -54,33 +54,36 @@ TetraToLineMeshCD::computeCollisionDataAB(
     const VecDataArray<double, 3>&           lineVerts   = *verticesPtr;
 
     // Brute force
-    std::array<Vec3d, 4> tet;
-    for (int i = 0; i < lines.size(); i++)
-    {
-        const Vec3d& x0 = lineVerts[lines[i][0]];
-        const Vec3d& x1 = lineVerts[lines[i][1]];
-        for (int j = 0; j < tets.size(); j++)
+    ParallelUtils::SpinLock lock;
+    ParallelUtils::parallelFor(lines.size(), [&](int i)
         {
-            tet[0] = tetVerts[tets[j][0]];
-            tet[1] = tetVerts[tets[j][1]];
-            tet[2] = tetVerts[tets[j][2]];
-            tet[3] = tetVerts[tets[j][3]];
-            if (CollisionUtils::testTetToSegment(tet, x0, x1))
+            const Vec3d& x0 = lineVerts[lines[i][0]];
+            const Vec3d& x1 = lineVerts[lines[i][1]];
+            for (int j = 0; j < tets.size(); j++)
             {
-                CellIndexElement elemA;
-                elemA.ids[0]   = j;
-                elemA.idCount  = 1;
-                elemA.cellType = IMSTK_TETRAHEDRON;
+                std::array<Vec3d, 4> tet;
+                tet[0] = tetVerts[tets[j][0]];
+                tet[1] = tetVerts[tets[j][1]];
+                tet[2] = tetVerts[tets[j][2]];
+                tet[3] = tetVerts[tets[j][3]];
+                if (CollisionUtils::testTetToSegment(tet, x0, x1))
+                {
+                    CellIndexElement elemA;
+                    elemA.ids[0]   = j;
+                    elemA.idCount  = 1;
+                    elemA.cellType = IMSTK_TETRAHEDRON;
 
-                CellIndexElement elemB;
-                elemB.ids[0]   = i;
-                elemB.idCount  = 1;
-                elemB.cellType = IMSTK_EDGE;
+                    CellIndexElement elemB;
+                    elemB.ids[0]   = i;
+                    elemB.idCount  = 1;
+                    elemB.cellType = IMSTK_EDGE;
 
-                elementsA.safeAppend(elemA);
-                elementsB.safeAppend(elemB);
+                    lock.lock();
+                    elementsA.push_back(elemA);
+                    elementsB.push_back(elemB);
+                    lock.unlock();
+                }
             }
-        }
-    }
+        });
 }
 }

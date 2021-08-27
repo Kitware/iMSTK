@@ -311,10 +311,10 @@ MeshToMeshBruteForceCD::MeshToMeshBruteForceCD()
 
 void
 MeshToMeshBruteForceCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     // Broad phase collision
     if (doBroadPhaseCollisionCheck(geomA, geomB))
@@ -358,10 +358,10 @@ MeshToMeshBruteForceCD::computeCollisionDataAB(
 
 void
 MeshToMeshBruteForceCD::vertexToTriangleTest(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     PointSetData pointSetData(std::dynamic_pointer_cast<PointSet>(geomA));
     SurfMeshData surfMeshData(std::dynamic_pointer_cast<SurfaceMesh>(geomB));
@@ -388,8 +388,8 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
                 elemB.idCount  = 1;
                 elemB.cellType = IMSTK_VERTEX;
 
-                elementsA.unsafeAppend(elemA);
-                elementsB.unsafeAppend(elemB);
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
                 m_vertexInside[i] = true;
             }
             else if (caseType == 1)
@@ -405,8 +405,8 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
                 elemB.idCount  = 2;
                 elemB.cellType = IMSTK_EDGE;
 
-                elementsA.unsafeAppend(elemA);
-                elementsB.unsafeAppend(elemB);
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
                 m_vertexInside[i] = true;
             }
             else if (caseType == 2)
@@ -423,8 +423,8 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
                 elemB.idCount  = 3;
                 elemB.cellType = IMSTK_TRIANGLE;
 
-                elementsA.unsafeAppend(elemA);
-                elementsB.unsafeAppend(elemB);
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
                 m_vertexInside[i] = true;
             }
         }
@@ -433,10 +433,10 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
 
 void
 MeshToMeshBruteForceCD::lineMeshEdgeToTriangleTest(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     SurfMeshData surfMeshBData(std::dynamic_pointer_cast<SurfaceMesh>(geomB));
 
@@ -513,8 +513,8 @@ MeshToMeshBruteForceCD::lineMeshEdgeToTriangleTest(
                 elemB.idCount  = 2;
                 elemB.cellType = IMSTK_EDGE;
 
-                elementsA.unsafeAppend(elemA);
-                elementsB.unsafeAppend(elemB);
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
             }
         }
     }
@@ -522,10 +522,10 @@ MeshToMeshBruteForceCD::lineMeshEdgeToTriangleTest(
 
 void
 MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     SurfMeshData surfMeshBData(std::dynamic_pointer_cast<SurfaceMesh>(geomB));
 
@@ -617,8 +617,8 @@ MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
                             elemB.idCount  = 2;
                             elemB.cellType = IMSTK_EDGE;
 
-                            elementsA.unsafeAppend(elemA);
-                            elementsB.unsafeAppend(elemB);
+                            elementsA.push_back(elemA);
+                            elementsB.push_back(elemB);
 
                             hashedEdges.insert(edgePair);
                         }

@@ -91,8 +91,8 @@ protected:
     /// \param CD elements to resolve geomB
     ///
     virtual void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) = 0;
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) = 0;
 
 protected:
     std::shared_ptr<CollidingObject> m_inputObjectA;
