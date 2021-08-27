@@ -164,13 +164,13 @@ protected:
     Quatd  m_effectorRotationOffset = Quatd::Identity();   ///< Rotation prefixed to the device rotation
     unsigned char m_invertFlags     = 0x00;                ///< Invert flags to be masked with DeviceTracker::InvertFlag
 
-    Vec3d m_currentPos;
-    Quatd m_currentOrientation;
-    Vec3d m_currentVelocity;
-    Vec3d m_currentAngularVelocity;
+    Vec3d m_currentPos = Vec3d::Zero();
+    Quatd m_currentOrientation     = Quatd::Identity();
+    Vec3d m_currentVelocity        = Vec3d::Zero();
+    Vec3d m_currentAngularVelocity = Vec3d::Zero();
 
-    Vec3d m_currentDisplacement;
-    Quatd m_currentRotation;
+    Vec3d m_currentDisplacement = Vec3d::Zero();
+    Quatd m_currentRotation     = Quatd::Identity();
 
     bool m_trackingDataUptoDate = false;
     /// If true, will use current and previous positions to produce velocity, if off, will ask device for velocity
