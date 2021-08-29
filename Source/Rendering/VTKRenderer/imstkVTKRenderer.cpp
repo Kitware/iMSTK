@@ -93,6 +93,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
             lightVtk->SetColor(color.r, color.g, color.b);
             lightVtk->SetIntensity(light->getIntensity());
             lightVtk->SetFocalPoint(light->getFocalPoint().data());
+            lightVtk->SetPosition(0.0, 0.0, 0.0);
             lightVtk->SetAttenuationValues(light->getAttenuationValues().data());
 
             m_vtkLights.push_back(VtkLightPair(light, lightVtk));
@@ -451,6 +452,7 @@ VTKRenderer::updateRenderDelegates()
             lightVtk->SetColor(color.r, color.g, color.b);
             lightVtk->SetIntensity(lightImstk->getIntensity());
             lightVtk->SetFocalPoint(lightImstk->getFocalPoint().data());
+            lightVtk->SetPosition(0.0, 0.0, 0.0);
             lightVtk->SetAttenuationValues(lightImstk->getAttenuationValues().data());
         }
         else if (lightName == "SpotLight")
