@@ -426,9 +426,6 @@ VTKRenderer::updateCamera()
 void
 VTKRenderer::updateRenderDelegates()
 {
-    // Call visual update on every scene object
-    m_scene->updateVisuals();
-
     // Update their render delegates
     for (auto delegate : m_renderDelegates)
     {
