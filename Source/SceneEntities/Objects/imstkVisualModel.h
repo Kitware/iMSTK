@@ -31,7 +31,6 @@ namespace imstk
 {
 class Geometry;
 class RenderMaterial;
-class DebugRenderGeometry;
 class Renderer;
 
 ///

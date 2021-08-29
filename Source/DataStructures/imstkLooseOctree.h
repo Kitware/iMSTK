@@ -37,7 +37,6 @@ class LooseOctree;
 class Geometry;
 class PointSet;
 class SurfaceMesh;
-class DebugRenderGeometry;
 
 ///
 /// \brief The OctreePrimitiveType enum

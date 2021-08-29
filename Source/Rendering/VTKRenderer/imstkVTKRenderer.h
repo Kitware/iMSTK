@@ -117,11 +117,6 @@ public:
     void updateRenderDelegates();
 
     ///
-    /// \brief Get the render delegates
-    ///
-    const std::vector<std::shared_ptr<VTKRenderDelegate>>& getDebugRenderDelegates() const { return m_debugRenderDelegates; }
-
-    ///
     /// \brief Returns VTK renderer
     ///
     vtkSmartPointer<vtkRenderer> getVtkRenderer() const { return m_vtkRenderer; }
@@ -213,7 +208,6 @@ protected:
 
     // Render Delegates
     std::unordered_map<std::shared_ptr<VisualModel>, std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
-    std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
 
     // TextureManager is used to share textures among differing delegates
     std::shared_ptr<TextureManager<VTKTextureDelegate>> m_textureManager;

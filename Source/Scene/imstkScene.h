@@ -148,12 +148,6 @@ public:
     const std::unordered_set<std::shared_ptr<SceneObject>>& getSceneObjects() const { return m_sceneObjects; }
 
     ///
-    /// \brief Return a vector of shared pointers to the scene objects
-    /// \note A separate list might be efficient as this is called runtime
-    ///
-    const std::vector<std::shared_ptr<VisualModel>> getDebugRenderModels() const;
-
-    ///
     /// \brief Get the scene object controllers
     ///
     const std::vector<std::shared_ptr<TrackingDeviceControl>> getControllers() const { return m_trackingControllers; }
@@ -294,8 +288,7 @@ protected:
 
     std::string m_name; ///> Name of the scene
     std::unordered_set<std::shared_ptr<SceneObject>> m_sceneObjects;
-    NamedMap<VisualModel>     m_DebugRenderModelMap;
-    NamedMap<Light>           m_lightsMap;
+    NamedMap<Light> m_lightsMap;
     std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
 
     NamedMap<Camera> m_cameras;

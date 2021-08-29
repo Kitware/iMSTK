@@ -256,19 +256,6 @@ Scene::getSceneObject(const std::string& name) const
     return (iter == m_sceneObjects.end()) ? nullptr : *iter;
 }
 
-const std::vector<std::shared_ptr<VisualModel>>
-Scene::getDebugRenderModels() const
-{
-    std::vector<std::shared_ptr<VisualModel>> v;
-
-    for (auto it : m_DebugRenderModelMap)
-    {
-        v.push_back(it.second);
-    }
-
-    return v;
-}
-
 void
 Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 {

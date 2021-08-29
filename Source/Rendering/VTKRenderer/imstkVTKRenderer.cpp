@@ -434,10 +434,6 @@ VTKRenderer::updateRenderDelegates()
     {
         delegate.second->update();
     }
-    for (auto delegate : m_debugRenderDelegates)
-    {
-        delegate->update();
-    }
 
     // Update all lights (we don't use render delegates for these as there usually aren't
     // all that many lights)
