@@ -65,6 +65,8 @@ SurfaceMeshFlyingEdges::requestUpdate()
     filter->SetInputData(GeometryUtils::coupleVtkImageData(inputImage));
     filter->SetValue(0, m_IsoValue);
     filter->ComputeNormalsOff();
+    filter->ComputeScalarsOff();
+    filter->ComputeGradientsOff();
     filter->Update();
 
     std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0))->deepCopy(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));
