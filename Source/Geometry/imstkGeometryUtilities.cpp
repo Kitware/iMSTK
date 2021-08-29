@@ -285,7 +285,7 @@ GeometryUtils::copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
     std::shared_ptr<VecDataArray<int, 3>>    cells    = copyToVecDataArray<3>(vtkMesh->GetPolys());
 
     auto mesh = std::make_unique<SurfaceMesh>();
-    mesh->initialize(vertices, cells, true);
+    mesh->initialize(vertices, cells);
 
     // Point Data
     std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> vertexDataMap;
