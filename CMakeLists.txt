@@ -326,8 +326,14 @@ endif(Uncrustify_EXECUTABLE)
 # Data
 #----------------------------------------------------------------------
 if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
-  add_definitions( -DiMSTK_DATA_ROOT=\"${CMAKE_INSTALL_PREFIX}/data\")
+  add_definitions( -DiMSTK_DATA_ROOT=\"${CMAKE_INSTALL_PREFIX}/data/\")
 endif()
+
+add_custom_target(CopyDataFiles ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${iMSTKData_SOURCE}/Data
+    ${CMAKE_INSTALL_PREFIX}/data
+    )
 
 #-----------------------------------------------------------------------------
 # Testing
