@@ -42,13 +42,13 @@ BoneDrillingCH::getDrillObj() const
 
 void
 BoneDrillingCH::erodeBone(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getBoneObj()->getCollidingGeometry());
 
     // BoneDrillingCH process tetra-pointdirection elements
-    ParallelUtils::parallelFor(elementsA.getSize(),
+    ParallelUtils::parallelFor(elementsA.size(),
         [&](const size_t idx)
         {
             const CollisionElement& elementA = elementsA[idx];
@@ -102,8 +102,8 @@ BoneDrillingCH::erodeBone(
 
 void
 BoneDrillingCH::handle(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<CollidingObject> bone  = getBoneObj();
     std::shared_ptr<RigidObject2>    drill = getDrillObj();
@@ -144,14 +144,14 @@ BoneDrillingCH::handle(
     }
 
     // BoneDrillingCH uses both sides of collision data
-    if (elementsA.getSize() != elementsB.getSize())
+    if (elementsA.size() != elementsB.size())
     {
         return;
     }
 
     // Check if any collisions
     const auto devicePosition = drill->getCollidingGeometry()->getTranslation();
-    if (elementsA.isEmpty() && elementsB.isEmpty())
+    if (elementsA.empty() && elementsB.empty())
     {
         // Set the visual object position same as the colliding object position
         drill->getVisualGeometry()->setTranslation(devicePosition);
@@ -163,7 +163,7 @@ BoneDrillingCH::handle(
     // Aggregate collision data
     Vec3d  t = Vec3d::Zero();
     double maxDepthSqr = MIN_D;
-    for (size_t i = 0; i < elementsB.getSize(); i++)
+    for (size_t i = 0; i < elementsB.size(); i++)
     {
         const CollisionElement& elementA = elementsA[i];
         const CollisionElement& elementB = elementsB[i];

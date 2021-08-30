@@ -87,10 +87,10 @@ ImplicitGeometryToPointSetCCD::setupFunctions(std::shared_ptr<ImplicitGeometry> 
 
 void
 ImplicitGeometryToPointSetCCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
     std::shared_ptr<PointSet>         pointSet     = std::dynamic_pointer_cast<PointSet>(geomB);
@@ -148,8 +148,8 @@ ImplicitGeometryToPointSetCCD::computeCollisionDataAB(
                         elemB.ptIndex = i;
                         elemB.penetrationDepth = depth;
 
-                        elementsA.unsafeAppend(elemA);
-                        elementsB.unsafeAppend(elemB);
+                        elementsA.push_back(elemA);
+                        elementsB.push_back(elemB);
                     }
                 }
             }
@@ -177,8 +177,8 @@ ImplicitGeometryToPointSetCCD::computeCollisionDataAB(
                     elemB.ptIndex = i;
                     elemB.penetrationDepth = depth;
 
-                    elementsA.unsafeAppend(elemA);
-                    elementsB.unsafeAppend(elemB);
+                    elementsA.push_back(elemA);
+                    elementsB.push_back(elemB);
                 }
                 m_prevOuterElementCounter[i] = 1;
                 // Store the previous exterior point
@@ -198,9 +198,9 @@ ImplicitGeometryToPointSetCCD::computeCollisionDataAB(
 
 void
 ImplicitGeometryToPointSetCCD::computeCollisionDataA(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA)
 {
     // Note: Duplicate of AB, but does not add one side to avoid inner loop branching
     std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
@@ -250,7 +250,7 @@ ImplicitGeometryToPointSetCCD::computeCollisionDataA(
                         elemA.pt  = pt;
                         elemA.penetrationDepth = depth;
 
-                        elementsA.unsafeAppend(elemA);
+                        elementsA.push_back(elemA);
                     }
                 }
             }
@@ -273,7 +273,7 @@ ImplicitGeometryToPointSetCCD::computeCollisionDataA(
                     elemA.pt  = pt;
                     elemA.penetrationDepth = depth;
 
-                    elementsA.unsafeAppend(elemA);
+                    elementsA.push_back(elemA);
                 }
                 m_prevOuterElementCounter[i] = 1;
                 // Store the previous exterior point
@@ -293,9 +293,9 @@ ImplicitGeometryToPointSetCCD::computeCollisionDataA(
 
 void
 ImplicitGeometryToPointSetCCD::computeCollisionDataB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsB)
 {
     // Note: Duplicate of AB, but does not add one side to avoid inner loop branching
     std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomA);
@@ -345,7 +345,7 @@ ImplicitGeometryToPointSetCCD::computeCollisionDataB(
                         elemB.ptIndex = i;
                         elemB.penetrationDepth = depth;
 
-                        elementsB.unsafeAppend(elemB);
+                        elementsB.push_back(elemB);
                     }
                 }
             }
@@ -368,7 +368,7 @@ ImplicitGeometryToPointSetCCD::computeCollisionDataB(
                     elemB.ptIndex = i;
                     elemB.penetrationDepth = depth;
 
-                    elementsB.unsafeAppend(elemB);
+                    elementsB.push_back(elemB);
                 }
                 m_prevOuterElementCounter[i] = 1;
                 // Store the previous exterior point

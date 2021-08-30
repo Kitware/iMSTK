@@ -21,7 +21,7 @@
 
 #include "imstkSPHCollisionHandling.h"
 #include "imstkCollisionData.h"
-#include "imstkImplicitGeometryToPointSetCD.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 
@@ -35,8 +35,8 @@ SPHCollisionHandling::setInputSPHObject(std::shared_ptr<SPHObject> sphObj)
 
 void
 SPHCollisionHandling::handle(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<SPHObject> obj      = std::dynamic_pointer_cast<SPHObject>(getInputObjectA());
     std::shared_ptr<SPHModel>  sphModel = obj->getSPHModel();
@@ -68,7 +68,7 @@ SPHCollisionHandling::handle(
             m_colDetect->update();
         }
 
-        ParallelUtils::parallelFor(elementsA.getSize(), [&](const size_t j)
+        ParallelUtils::parallelFor(elementsA.size(), [&](const size_t j)
             {
                 const CollisionElement& colElem = elementsA[j];
                 if (colElem.m_type == CollisionElementType::PointIndexDirection)

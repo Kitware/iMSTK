@@ -139,8 +139,8 @@ protected:
     /// \brief Add embedding constraints based off contact data
     ///
     void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override
     {
         auto tissueObj = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
         auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
@@ -211,7 +211,7 @@ protected:
         // If needle has been inserted
         if (needleObj->getInserted())
         {
-            if (elementsA.getSize() != elementsB.getSize())
+            if (elementsA.size() != elementsB.size())
             {
                 return;
             }
@@ -220,7 +220,7 @@ protected:
             static int faces[4][3] = { { 0, 1, 2 }, { 1, 2, 3 }, { 0, 2, 3 }, { 0, 1, 3 } };
 
             // For every intersected element
-            for (int i = 0; i < elementsA.getSize(); i++)
+            for (int i = 0; i < elementsA.size(); i++)
             {
                 const CollisionElement& colElemA = elementsA[i];
                 const CollisionElement& colElemB = elementsB[i];

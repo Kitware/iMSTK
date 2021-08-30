@@ -41,8 +41,8 @@ TEST(imstkSphereToCylinderCDTest, IntersectionTestAB)
     std::shared_ptr<CollisionData> colData = m_sphereToCylinderCD.getCollisionData();
 
     // Should be one element per side
-    EXPECT_EQ(1, colData->elementsA.getSize());
-    EXPECT_EQ(1, colData->elementsB.getSize());
+    EXPECT_EQ(1, colData->elementsA.size());
+    EXPECT_EQ(1, colData->elementsB.size());
 
     // That element should be a point directional element
     EXPECT_EQ(CollisionElementType::PointDirection, colData->elementsA[0].m_type);
@@ -75,6 +75,6 @@ TEST(imstkSphereToCylinderCDTest, NonIntersectionTestAB)
     std::shared_ptr<CollisionData> colData = m_sphereToCylinderCD.getCollisionData();
 
     // Should be no elements
-    EXPECT_EQ(0, colData->elementsA.getSize());
-    EXPECT_EQ(0, colData->elementsB.getSize());
+    EXPECT_EQ(0, colData->elementsA.size());
+    EXPECT_EQ(0, colData->elementsB.size());
 }

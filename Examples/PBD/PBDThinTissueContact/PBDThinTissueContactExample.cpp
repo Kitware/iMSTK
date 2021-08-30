@@ -44,7 +44,7 @@
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
 #else
-#include "imstkKeyboardDeviceClient.h"
+#include "imstkMouseDeviceClient.h"
 #endif
 
 using namespace imstk;
@@ -240,63 +240,39 @@ main()
         sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
-#ifdef iMSTK_USE_OPENHAPTICS
-        imstkNew<HapticDeviceManager> hapticManager;
-        hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
-#endif
-
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 #ifdef iMSTK_USE_OPENHAPTICS
+        imstkNew<HapticDeviceManager> hapticManager;
+        hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
+        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 #endif
         driver->setDesiredDt(0.005);
 
         Mat3d rotationalOffset = Mat3d::Identity();
+
+#ifdef iMSTK_USE_OPENHAPTICS
         connect<Event>(sceneManager, SceneManager::preUpdate, [&](Event*)
         {
-#ifdef iMSTK_USE_OPENHAPTICS
             hapticDeviceClient->update();
             const Quatd deviceOrientation = (Quatd(rotationalOffset) * hapticDeviceClient->getOrientation()).normalized();
             const Vec3d devicePosition    = (rotationalOffset * hapticDeviceClient->getPosition()) * 0.05 + Vec3d(0.0, 0.0, 0.0);
             toolGeometry->setRotation(deviceOrientation);
             toolGeometry->setTranslation(devicePosition);
             toolGeometry->postModified();
+        });
 #else
-            if (viewer->getKeyboardDevice()->getButton('i') == KEY_PRESS)
-            {
-                toolGeometry->translate(Vec3d(0.0, 0.01, 0.0));
-                toolGeometry->postModified();
-            }
-            else if (viewer->getKeyboardDevice()->getButton('k') == KEY_PRESS)
-            {
-                toolGeometry->translate(Vec3d(0.0, -0.01, 0.0));
-                toolGeometry->postModified();
-            }
-            else if (viewer->getKeyboardDevice()->getButton('j') == KEY_PRESS)
-            {
-                toolGeometry->translate(Vec3d(-0.01, 0.0, 0.0));
-                toolGeometry->postModified();
-            }
-            else if (viewer->getKeyboardDevice()->getButton('l') == KEY_PRESS)
-            {
-                toolGeometry->translate(Vec3d(0.01, 0.0, 0.0));
-                toolGeometry->postModified();
-            }
-            else if (viewer->getKeyboardDevice()->getButton('u') == KEY_PRESS)
-            {
-                toolGeometry->translate(Vec3d(0.0, 0.0, 0.01));
-                toolGeometry->postModified();
-            }
-            else if (viewer->getKeyboardDevice()->getButton('o') == KEY_PRESS)
-            {
-                toolGeometry->translate(Vec3d(0.0, 0.0, -0.01));
-                toolGeometry->postModified();
-            }
-#endif
+        connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
+        {
+            const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+            const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
+
+            toolGeometry->setTranslation(worldPos);
+            toolGeometry->postModified();
             });
+#endif
 
         // Add mouse and keyboard controls to the viewer
         {

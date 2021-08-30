@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0.txt
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -75,8 +75,8 @@ testPointToTriAABB(const double x1, const double y1, const double z1,
     const auto max_z = std::max({ z2, z3, z4 });
 
     return testAABBToAABB(x1 - prox1, x1 + prox1, y1 - prox1, y1 + prox1,
-                z1 - prox1, z1 + prox1, min_x - prox2, max_x + prox2,
-                min_y - prox2, max_y + prox2, min_z - prox2, max_z + prox2);
+        z1 - prox1, z1 + prox1, min_x - prox2, max_x + prox2,
+        min_y - prox2, max_y + prox2, min_z - prox2, max_z + prox2);
 }
 
 ///
@@ -113,10 +113,10 @@ testLineToLineAABB(const Vec3r& p1A, const Vec3r& p1B,
     const Real* p2Aptr = &p2A[0];
     const Real* p2Bptr = &p2B[0];
     return testLineToLineAABB(p1Aptr[0], p1Aptr[1], p1Aptr[2],
-                p1Bptr[0], p1Bptr[1], p1Bptr[2],
-                p2Aptr[0], p2Aptr[1], p2Aptr[2],
-                p2Bptr[0], p2Bptr[1], p2Bptr[2],
-                prox1, prox2);
+        p1Bptr[0], p1Bptr[1], p1Bptr[2],
+        p2Aptr[0], p2Aptr[1], p2Aptr[2],
+        p2Bptr[0], p2Bptr[1], p2Bptr[2],
+        prox1, prox2);
 }
 
 ///
@@ -905,6 +905,56 @@ testRayToObb(const Vec3d& rayOrigin, const Vec3d& rayDir,
     }
     iPt = Vec2d(tN, tF); // Parameterized along the ray
 
+    return true;
+}
+
+///
+/// \brief ray sphere intersection with intersection point
+/// Real time collision detection 2004
+///
+inline bool
+testRayToSphere(const Vec3d& rayOrigin, const Vec3d& rayDir,
+                const Vec3d& spherePos, const double radius,
+                Vec3d& iPt)
+{
+    const Vec3d m = rayOrigin - spherePos;
+    double      b = m.dot(rayDir);
+    double      c = m.dot(m) - radius * radius;
+
+    // Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0)
+    if (c > 0.0 && b > 0.0)
+    {
+        return false;
+    }
+    double discr = b * b - c;
+    // A negative discriminant corresponds to ray missing sphere
+    if (discr < 0.0)
+    {
+        return false;
+    }
+    // Ray now found to intersect sphere, compute smallest t value of intersection
+    // If t is negative, ray started inside sphere so clamp t to zero
+    double t = std::max(0.0, -b - std::sqrt(discr));
+    iPt = rayOrigin + t * rayDir;
+    return true;
+}
+
+///
+/// \brief Ray plane intersection with intersection point
+///
+inline bool
+testRayToPlane(const Vec3d& rayOrigin, const Vec3d& rayDir,
+               const Vec3d& planePos, const Vec3d& planeNormal,
+               Vec3d& iPt)
+{
+    const double denom = rayDir.dot(planeNormal);
+    // Plane and ray are parallel
+    if (std::abs(denom) < IMSTK_DOUBLE_EPS)
+    {
+        return false;
+    }
+    const double t = (planePos - rayOrigin).dot(planeNormal) / denom;
+    iPt = rayOrigin + t * rayDir;
     return true;
 }
 

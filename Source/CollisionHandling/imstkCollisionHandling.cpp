@@ -39,8 +39,8 @@ CollisionHandling::update()
     }
 
     // Get the geometry and elements
-    const CDElementVector<CollisionElement>* a = &m_colData->elementsA;
-    const CDElementVector<CollisionElement>* b = &m_colData->elementsB;
+    const std::vector<CollisionElement>* a = &m_colData->elementsA;
+    const std::vector<CollisionElement>* b = &m_colData->elementsB;
 
     std::shared_ptr<Geometry> handleGeomA = getHandlingGeometryA();
     std::shared_ptr<Geometry> handleGeomB = getHandlingGeometryB();

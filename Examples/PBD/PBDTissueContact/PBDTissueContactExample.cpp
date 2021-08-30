@@ -62,7 +62,7 @@
 #include "imstkHapticDeviceClient.h"
 #include "imstkRigidObjectController.h"
 #else
-#include "imstkKeyboardDeviceClient.h"
+#include "imstkMouseDeviceClient.h"
 #endif
 
 using namespace imstk;
@@ -398,33 +398,15 @@ main()
         controller->setUseForceSmoothening(true);
         scene->addController(controller);
 #else
-        // Use keyboard controls
-        connect<Event>(sceneManager, SceneManager::preUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
-            if (viewer->getKeyboardDevice()->getButton('k') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, -0.01, 0.0);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('i') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, 0.01, 0.0);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('j') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(-0.01, 0.0, 0.0);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('l') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.01, 0.0, 0.0);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('u') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, 0.0, -0.01);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('o') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, 0.0, 0.01);
-            }
+            const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+            const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
+
+            const Vec3d fS = (worldPos - toolObj->getRigidBody()->getPosition()) * 1000.0; // Spring force
+            const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;              // Spring damping
+
+            (*toolObj->getRigidBody()->m_force) += (fS + fD);
             });
 #endif
 

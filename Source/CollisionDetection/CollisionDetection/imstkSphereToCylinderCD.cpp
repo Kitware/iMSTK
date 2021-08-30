@@ -35,10 +35,10 @@ SphereToCylinderCD::SphereToCylinderCD()
 
 void
 SphereToCylinderCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomA);
     std::shared_ptr<Cylinder> cylinder = std::dynamic_pointer_cast<Cylinder>(geomB);
@@ -72,8 +72,8 @@ SphereToCylinderCD::computeCollisionDataAB(
         elemB.pt  = cylinderContactPt;
         elemB.penetrationDepth = depth;
 
-        elementsA.unsafeAppend(elemA);
-        elementsB.unsafeAppend(elemB);
+        elementsA.push_back(elemA);
+        elementsB.push_back(elemB);
     }
 }
 }

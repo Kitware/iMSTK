@@ -63,23 +63,23 @@ public:
 
 protected:
     void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override;
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
 
     ///
     /// \brief Given the collision data, applies contact as external force
     /// to the rigid body (onyl supports PointDirection contacts)
     ///
     void computeContactForcesAnalyticRigid(
-        const CDElementVector<CollisionElement>& elements,
-        std::shared_ptr<RigidObject2>            analyticObj);
+        const std::vector<CollisionElement>& elements,
+        std::shared_ptr<RigidObject2>        analyticObj);
 
     ///
     /// \brief Given the collision data, applies nodal forces in the FEM model
     ///
     void computeContactForcesDiscreteDeformable(
-        const CDElementVector<CollisionElement>& elements,
-        std::shared_ptr<FeDeformableObject>      deformableObj);
+        const std::vector<CollisionElement>& elements,
+        std::shared_ptr<FeDeformableObject>  deformableObj);
 
 protected:
     double m_stiffness = 5.0e5; ///> Stiffness of contact

@@ -49,8 +49,8 @@ TEST(imstkSurfaceMeshToSphereCDTest, IntersectionTestAB_Vertex)
 
     std::shared_ptr<CollisionData> colData = m_colDetect.getCollisionData();
 
-    EXPECT_EQ(1, colData->elementsA.getSize());
-    EXPECT_EQ(1, colData->elementsB.getSize());
+    EXPECT_EQ(1, colData->elementsA.size());
+    EXPECT_EQ(1, colData->elementsB.size());
 
     EXPECT_EQ(CollisionElementType::PointIndexDirection, colData->elementsA[0].m_type);
     EXPECT_EQ(CollisionElementType::PointDirection, colData->elementsB[0].m_type);
@@ -78,8 +78,8 @@ TEST(imstkSurfaceMeshToSphereCDTest, IntersectionTestAB_Edge)
 
     std::shared_ptr<CollisionData> colData = m_colDetect.getCollisionData();
 
-    EXPECT_EQ(1, colData->elementsA.getSize());
-    EXPECT_EQ(1, colData->elementsB.getSize());
+    EXPECT_EQ(1, colData->elementsA.size());
+    EXPECT_EQ(1, colData->elementsB.size());
 
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsA[0].m_type);
     EXPECT_EQ(CollisionElementType::PointDirection, colData->elementsB[0].m_type);
@@ -109,8 +109,8 @@ TEST(imstkSurfaceMeshToSphereCDTest, IntersectionTestAB_Face)
 
     std::shared_ptr<CollisionData> colData = m_colDetect.getCollisionData();
 
-    EXPECT_EQ(1, colData->elementsA.getSize());
-    EXPECT_EQ(1, colData->elementsB.getSize());
+    EXPECT_EQ(1, colData->elementsA.size());
+    EXPECT_EQ(1, colData->elementsB.size());
 
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsA[0].m_type);
     EXPECT_EQ(CollisionElementType::PointDirection, colData->elementsB[0].m_type);
@@ -140,6 +140,6 @@ TEST(imstkSurfaceMeshToSphereCDTest, NonIntersectionTestAB)
 
     std::shared_ptr<CollisionData> colData = m_colDetect.getCollisionData();
 
-    EXPECT_EQ(0, colData->elementsA.getSize());
-    EXPECT_EQ(0, colData->elementsB.getSize());
+    EXPECT_EQ(0, colData->elementsA.size());
+    EXPECT_EQ(0, colData->elementsB.size());
 }

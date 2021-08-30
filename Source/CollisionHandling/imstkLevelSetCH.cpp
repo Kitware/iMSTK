@@ -101,8 +101,8 @@ LevelSetCH::setKernel(const int size, const double sigma)
 
 void
 LevelSetCH::handle(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<LevelSetDeformableObject> lvlSetObj = getLvlSetObj();
     std::shared_ptr<RigidObject2>             rbdObj    = getRigidObj();
@@ -126,7 +126,7 @@ LevelSetCH::handle(
     const Vec3d& origin     = grid->getOrigin();
 
     // LevelSetCH requires both sides
-    if (elementsA.getSize() != elementsB.getSize())
+    if (elementsA.size() != elementsB.size())
     {
         return;
     }
@@ -134,7 +134,7 @@ LevelSetCH::handle(
     if (m_useProportionalForce)
     {
         // Apply impulses at points of contacts
-        for (size_t i = 0; i < elementsA.getSize(); i++)
+        for (size_t i = 0; i < elementsA.size(); i++)
         {
             const CollisionElement& lsmContactElement = elementsA[i];
             const CollisionElement& rbdContactElement = elementsB[i];
@@ -175,7 +175,7 @@ LevelSetCH::handle(
     else
     {
         // Apply impulses at points of contacts
-        for (size_t i = 0; i < elementsA.getSize(); i++)
+        for (size_t i = 0; i < elementsA.size(); i++)
         {
             const CollisionElement& lsmContactElement = elementsA[i];
             const CollisionElement& rbdContactElement = elementsB[i];
