@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-=========================================================================*/
+   =========================================================================*/
 
 #include "imstkTrackingDeviceControl.h"
 #include "imstkDeviceClient.h"
@@ -93,7 +93,7 @@ TrackingDeviceControl::updateTrackingData(const double dt)
 
     // Apply Offsets
     m_currentPos = m_rotationOffset * m_currentPos * m_scaling + m_translationOffset;
-    m_currentOrientation = m_rotationOffset * m_currentOrientation;
+    m_currentOrientation = m_effectorRotationOffset * m_rotationOffset * m_currentOrientation;
 
     // With simulation substeps this may produce 0 deltas, but its fine
     // Another option is to divide velocity by number of substeps and then
@@ -108,12 +108,107 @@ TrackingDeviceControl::updateTrackingData(const double dt)
     {
         m_currentRotation = prevOrientation * m_currentOrientation.inverse();
         /* Rotd r = Rotd(m_currentRotation);
-         r.angle() /= timestepInfo.m_dt;*/
+           r.angle() /= timestepInfo.m_dt;*/
         m_currentAngularVelocity = m_currentRotation.toRotationMatrix().eulerAngles(0, 1, 2) /= dt;
     }
 
     m_trackingDataUptoDate = true;
     return true;
+}
+
+void
+TrackingDeviceControl::applyForces()
+{
+}
+
+void
+TrackingDeviceControl::setTrackerToOutOfDate()
+{
+    m_trackingDataUptoDate = false;
+}
+
+void
+TrackingDeviceControl::setTrackerToUpToDate()
+{
+    m_trackingDataUptoDate = true;
+}
+
+bool
+TrackingDeviceControl::isTrackerUpToDate() const
+{
+    return m_trackingDataUptoDate;
+}
+
+const imstk::Vec3d&
+TrackingDeviceControl::getPosition() const
+{
+    return m_currentPos;
+}
+
+void
+TrackingDeviceControl::setPosition(const Vec3d& pos)
+{
+    this->m_currentPos = pos;
+}
+
+const imstk::Quatd&
+TrackingDeviceControl::getRotation() const
+{
+    return m_currentOrientation;
+}
+
+void
+TrackingDeviceControl::setRotation(const Quatd& orientation)
+{
+    this->m_currentOrientation = orientation;
+}
+
+void
+TrackingDeviceControl::setComputeVelocity(const bool computeVelocity)
+{
+    m_computeVelocity = computeVelocity;
+}
+
+bool
+TrackingDeviceControl::getComputeVelocity() const
+{
+    return m_computeVelocity;
+}
+
+void
+TrackingDeviceControl::setComputeAngularVelocity(const bool computeAngularVelocity)
+{
+    m_computeAngularVelocity = computeAngularVelocity;
+}
+
+bool
+TrackingDeviceControl::getComputeAngularVelocity() const
+{
+    return m_computeAngularVelocity;
+}
+
+const imstk::Vec3d&
+TrackingDeviceControl::getAngularVelocity() const
+{
+    return m_currentAngularVelocity;
+}
+
+void
+TrackingDeviceControl::setAngularVelocity(const Vec3d& angularVelocity)
+{
+    m_currentAngularVelocity = angularVelocity;
+}
+
+const imstk::Vec3d&
+TrackingDeviceControl::getVelocity() const
+{
+    return m_currentVelocity;
+}
+
+void
+TrackingDeviceControl::setVelocity(const Vec3d& velocity)
+{
+    m_currentVelocity = velocity;
 }
 
 double
@@ -150,6 +245,18 @@ void
 TrackingDeviceControl::setRotationOffset(const Quatd& r)
 {
     m_rotationOffset = r;
+}
+
+const imstk::Quatd&
+TrackingDeviceControl::getEffectorRotationOffset()
+{
+    return m_effectorRotationOffset;
+}
+
+void
+TrackingDeviceControl::setEffectorRotationOffset(const Quatd& r)
+{
+    m_effectorRotationOffset = r;
 }
 
 unsigned char

@@ -12,6 +12,6 @@ imstk_add_library( Controllers
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-#if( ${PROJECT_NAME}_BUILD_TESTING )
-#  add_subdirectory( Testing )
-#endif()
+if( ${PROJECT_NAME}_BUILD_TESTING )
+  add_subdirectory( Testing )
+endif()
