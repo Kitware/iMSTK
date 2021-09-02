@@ -2,7 +2,6 @@
 # Add External Project
 #-----------------------------------------------------------------------------
 set(iMSTKData_PREFIX ${CMAKE_BINARY_DIR}/External/iMSTKData)
-set(iMSTKData_SOURCE ${iMSTKData_PREFIX}/src/Data CACHE INTERNAL "")
 
 find_package(GitLFS QUIET)
 if (NOT GitLFS_FOUND)
