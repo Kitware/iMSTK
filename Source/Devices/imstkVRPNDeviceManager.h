@@ -78,7 +78,7 @@ public:
     ///                   is a request, if the server doesn't supply the requested updates no changes
     ///                   will be observable
     ///
-    std::shared_ptr<DeviceClient> createDeviceClient(const std::string& deviceName, VRPNDeviceType deviceType);
+    std::shared_ptr<DeviceClient> makeDeviceClient(const std::string& deviceName, VRPNDeviceType deviceType);
 
 protected:
     ///

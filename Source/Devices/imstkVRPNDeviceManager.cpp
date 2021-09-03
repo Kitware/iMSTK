@@ -75,7 +75,7 @@ VRPNDeviceManager::addDeviceClient(std::shared_ptr<VRPNDeviceClient> client)
 }
 
 std::shared_ptr<imstk::DeviceClient>
-VRPNDeviceManager::createDeviceClient(const std::string& deviceName, VRPNDeviceType deviceType)
+VRPNDeviceManager::makeDeviceClient(const std::string& deviceName, VRPNDeviceType deviceType)
 {
     auto client = std::make_shared<VRPNDeviceClient>(deviceName, deviceType, m_machine);
     addDeviceClient(client);
