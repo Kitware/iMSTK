@@ -64,8 +64,8 @@ RigidBodyCH::getRigidObjB()
 
 void
 RigidBodyCH::handle(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<RigidObject2>    rbdObjA = getRigidObjA();
     std::shared_ptr<RigidObject2>    rbdObjB = getRigidObjB();
@@ -75,7 +75,7 @@ RigidBodyCH::handle(
     if (rbdObjA != nullptr && rbdObjB != nullptr)
     {
         // If we only have elements of A, process one-sided rigid
-        if (elementsB.getSize() == 0 && elementsA.getSize() != 0)
+        if (elementsB.size() == 0 && elementsA.size() != 0)
         {
             handleRbdStaticOneWay(rbdObjA, colObjB, elementsA, elementsB);
         }
@@ -115,12 +115,12 @@ RigidBodyCH::handle(
 
 void
 RigidBodyCH::handleRbdRbdTwoWay(
-    std::shared_ptr<RigidObject2>            rbdObjA,
-    std::shared_ptr<RigidObject2>            rbdObjB,
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<RigidObject2>        rbdObjA,
+    std::shared_ptr<RigidObject2>        rbdObjB,
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
-    if (elementsA.getSize() != elementsB.getSize())
+    if (elementsA.size() != elementsB.size())
     {
         return;
     }
@@ -129,7 +129,7 @@ RigidBodyCH::handleRbdRbdTwoWay(
 
     // Generate one two-way constraint
     std::shared_ptr<RigidBodyModel2> rbdModelAB = rbdObjA->getRigidBodyModel2();
-    for (size_t i = 0; i < elementsA.getSize(); i++)
+    for (size_t i = 0; i < elementsA.size(); i++)
     {
         const CollisionElement& colElemA = elementsA[i];
         if (colElemA.m_type == CollisionElementType::PointDirection)
@@ -154,13 +154,13 @@ RigidBodyCH::handleRbdRbdTwoWay(
 
 void
 RigidBodyCH::handleRbdStaticOneWay(
-    std::shared_ptr<RigidObject2>            rbdObj,
-    std::shared_ptr<CollidingObject>         colObj,
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<RigidObject2>        rbdObj,
+    std::shared_ptr<CollidingObject>     colObj,
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     // First handle one-way point-direction constraints
-    for (size_t i = 0; i < elementsA.getSize(); i++)
+    for (size_t i = 0; i < elementsA.size(); i++)
     {
         const CollisionElement& colElem = elementsA[i];
         if (colElem.m_type == CollisionElementType::PointDirection)
@@ -184,7 +184,7 @@ RigidBodyCH::handleRbdStaticOneWay(
     }
 
     // So long as both sides were filled we may have two-way
-    if (elementsA.getSize() != elementsB.getSize() || colObj == nullptr)
+    if (elementsA.size() != elementsB.size() || colObj == nullptr)
     {
         return;
     }
@@ -204,7 +204,7 @@ RigidBodyCH::handleRbdStaticOneWay(
 
     // Generate one two-way constraint
     std::shared_ptr<RigidBodyModel2> rbdModelA = rbdObj->getRigidBodyModel2();
-    for (size_t i = 0; i < elementsA.getSize(); i++)
+    for (size_t i = 0; i < elementsA.size(); i++)
     {
         const CollisionElement& colElemA = elementsA[i];
         const CollisionElement& colElemB = elementsB[i];

@@ -533,7 +533,8 @@ SPHModel::computeViscosity()
                 //diffuseFluid       += (Real(1.0) / qdensity) * m_kernels.W(r) * (qvel - pvel);
             }
             //diffuseFluid *= m_modelParameters->m_dynamicViscosityCoeff / getState().getDensities()[p];
-            particleShifts     *= 4 / 3 * PI * std::pow(m_modelParameters->m_particleRadius, 3) * 0.5 * m_modelParameters->m_kernelRadius * halfStepVelocities[p].norm();
+            const double particleRadius = m_modelParameters->m_particleRadius;
+            particleShifts     *= 4 / 3 * PI * particleRadius * particleRadius * particleRadius * 0.5 * m_modelParameters->m_kernelRadius * halfStepVelocities[p].norm();
             diffuseFluid       *= m_modelParameters->m_dynamicViscosityCoeff * m_modelParameters->m_particleMass;
             neighborVelContr[p] = neighborVelContributionsNumerator * m_modelParameters->m_eta / neighborVelContributionsDenominator;
             particleShift[p]    = -particleShifts;
@@ -769,7 +770,10 @@ SPHModel::moveParticles(const Real timestep)
 Real
 SPHModel::particlePressure(const double density)
 {
-    const Real error = m_modelParameters->m_pressureStiffness * (std::pow(density / m_modelParameters->m_restDensity, 7) - Real(1));
+    const double d     = density / m_modelParameters->m_restDensity;
+    const double d2    = d * d;
+    const double d4    = d2 * d2;
+    const Real   error = m_modelParameters->m_pressureStiffness * (d4 * d2 * d - Real(1.0));
     // clamp pressure error to zero to maintain stability
     return error > Real(0) ? error : Real(0);
 }

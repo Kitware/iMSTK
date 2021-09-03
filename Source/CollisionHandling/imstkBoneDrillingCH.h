@@ -83,15 +83,15 @@ protected:
     /// \brief Does the bone drilling
     ///
     virtual void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override;
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
 
     ///
     /// \brief Decrease the density at the nodal points and remove if the density goes below 0
     ///
     void erodeBone(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB);
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB);
 
 private:
     double m_stiffness = 10e-01;                ///> Stiffness coefficient associated with virtual coupling object

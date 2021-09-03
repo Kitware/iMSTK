@@ -26,7 +26,7 @@
 namespace imstk
 {
 class CollisionData;
-class ImplicitGeometryToPointSetCD;
+class CollisionDetectionAlgorithm;
 class SPHObject;
 
 ///
@@ -53,14 +53,17 @@ public:
     ///
     void setNumberOfIterations(int iterations) { this->m_iterations = iterations; }
 
-    void setDetection(std::shared_ptr<ImplicitGeometryToPointSetCD> colDetect) { this->m_colDetect = colDetect; }
+    ///
+    /// \brief Sets detection object for iteration handling+detection
+    ///
+    void setDetection(std::shared_ptr<CollisionDetectionAlgorithm> colDetect) { this->m_colDetect = colDetect; }
 
     ///
     /// \brief Resolve SPH particle positions
     ///
     void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override;
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
 
 protected:
     ///
@@ -69,7 +72,7 @@ protected:
     void solve(Vec3d& pos, Vec3d& velocity, const Vec3d& penetrationVector);
 
 private:
-    std::shared_ptr<ImplicitGeometryToPointSetCD> m_colDetect = nullptr;
+    std::shared_ptr<CollisionDetectionAlgorithm> m_colDetect = nullptr;
     int    m_iterations       = 1;
     double m_boundaryFriction = 0.0;
 };

@@ -235,9 +235,12 @@ VTKViewer::updateModule()
     // Update Camera
     ren->updateCamera();
 
-    // Update render delegates
+    // Call visual update on every scene object
+    getActiveScene()->updateVisuals();
+    // Update all the rendering delegates
     ren->updateRenderDelegates();
 
+    // Automatically determine near and far planes (not used atm)
     //ren->getVtkRenderer()->ResetCameraClippingRange();
 
     // If fps status is on, measure it

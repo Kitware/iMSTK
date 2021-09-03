@@ -134,7 +134,12 @@ if(${PROJECT_NAME}_SUPERBUILD)
 
   option(${PROJECT_NAME}_USE_Uncrustify "Use Uncrustify as a code style beautifier." ON)
   if(${PROJECT_NAME}_USE_Uncrustify)
-    imstk_define_dependency(Uncrustify)
+    find_package (Python COMPONENTS Interpreter)
+    if(Python_Interpreter_FOUND)
+      imstk_define_dependency(Uncrustify)
+    else()
+      message(WARN "Uncrustify requires a python interpreter, please install python and rerun configure")
+    endif()
   endif()
 
   option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
@@ -182,6 +187,10 @@ if(${PROJECT_NAME}_SUPERBUILD)
     set_directory_properties(PROPERTIES TEST_INCLUDE_FILE
       "${CMAKE_CURRENT_BINARY_DIR}/imstkCTestAddInnerbuild.cmake"
     )
+  endif()
+
+  if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
+    imstk_define_dependency(iMSTKData)
   endif()
 
   #-----------------------------------------------------------------------------
@@ -289,6 +298,7 @@ list(APPEND VTK_DEPENDENCIES
   RenderingContext2D
   RenderingContextOpenGL2
   RenderingCore
+  RenderingExternal
   RenderingOpenGL2
   RenderingOpenVR
   RenderingVolume
@@ -312,6 +322,21 @@ else(Uncrustify_EXECUTABLE)
   message(WARNING "uncrustify not found! Cannot run code-style test.")
 endif(Uncrustify_EXECUTABLE)
 
+
+#-----------------------------------------------------------------------------
+# Data
+#----------------------------------------------------------------------
+if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
+  add_definitions( -DiMSTK_DATA_ROOT=\"${CMAKE_INSTALL_PREFIX}/data/\")
+endif()
+
+# Note if the target name or data name changes this has to be changed as well
+add_custom_target(CopyDataFiles ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_BINARY_DIR}/../External/iMSTKData/src/Data
+    ${CMAKE_INSTALL_PREFIX}/data
+    )
+
 #-----------------------------------------------------------------------------
 # Testing
 #----------------------------------------------------------------------
@@ -332,21 +357,6 @@ if(${PROJECT_NAME}_COVERAGE)
     EXECUTABLE ctest -E "(CodeFormatTest|RenderTest.*)"
     EXCLUDE "${CMAKE_BINARY_DIR}/../install/include/*" "/usr/*" "*/Testing/*"
   )
-endif()
-
-#-----------------------------------------------------------------------------
-# Download the external data needed for both testing and examples
-#-----------------------------------------------------------------------------
-if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
-  include(imstkExternalData)
-  include(imstkExternalDataDownloadTest)
-  # Create a target for all the data files
-  file(GLOB_RECURSE FILE_LIST
-    LIST_DIRECTORIES FALSE
-    RELATIVE "${CMAKE_SOURCE_DIR}/Data/"
-    "${CMAKE_SOURCE_DIR}/Data/*")
-  string(REGEX REPLACE "\.sha512" "" FILE_LIST "${FILE_LIST}")
-  imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 endif()
 
 # Folder name to put our headers/cmake config files under

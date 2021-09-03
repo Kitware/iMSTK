@@ -46,20 +46,11 @@ class VisualModel;
 
 namespace ParallelUtils { class SpinLock; }
 
-enum class TimeSteppingPolicy
-{
-    AsFastAsPossible,
-    FixedFrameRate,
-    RealTime
-};
-
 struct SceneConfig
 {
     // Initializes the scene only when it needs to frame
     // Note: May cause delays to run the first frame of the scene due to scene initialization
     bool lazyInitialization = false;
-
-    TimeSteppingPolicy timeStepping = TimeSteppingPolicy::AsFastAsPossible;
 
     // Keep track of the fps for the scene
     bool trackFPS = false;
@@ -155,12 +146,6 @@ public:
     /// \brief Return the SceneObjects of the scene
     ///
     const std::unordered_set<std::shared_ptr<SceneObject>>& getSceneObjects() const { return m_sceneObjects; }
-
-    ///
-    /// \brief Return a vector of shared pointers to the scene objects
-    /// \note A separate list might be efficient as this is called runtime
-    ///
-    const std::vector<std::shared_ptr<VisualModel>> getDebugRenderModels() const;
 
     ///
     /// \brief Get the scene object controllers
@@ -303,8 +288,7 @@ protected:
 
     std::string m_name; ///> Name of the scene
     std::unordered_set<std::shared_ptr<SceneObject>> m_sceneObjects;
-    NamedMap<VisualModel>     m_DebugRenderModelMap;
-    NamedMap<Light>           m_lightsMap;
+    NamedMap<Light> m_lightsMap;
     std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
 
     NamedMap<Camera> m_cameras;

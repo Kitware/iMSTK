@@ -51,8 +51,8 @@ TEST(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_EdgeToEdge)
     std::shared_ptr<CollisionData> colData = m_meshToMeshBruteForceCD.getCollisionData();
 
     // Check for a single edge vs edge
-    ASSERT_EQ(1, colData->elementsA.getSize());
-    ASSERT_EQ(1, colData->elementsB.getSize());
+    ASSERT_EQ(1, colData->elementsA.size());
+    ASSERT_EQ(1, colData->elementsB.size());
 
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsA[0].m_type);
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsB[0].m_type);
@@ -96,8 +96,8 @@ TEST(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToTriangle)
     std::shared_ptr<CollisionData> colData = m_meshToMeshBruteForceCD.getCollisionData();
 
     // Check for a single vertex-triangle case
-    ASSERT_EQ(1, colData->elementsA.getSize());
-    ASSERT_EQ(1, colData->elementsB.getSize());
+    ASSERT_EQ(1, colData->elementsA.size());
+    ASSERT_EQ(1, colData->elementsB.size());
 
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsA[0].m_type);
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsB[0].m_type);
@@ -141,8 +141,8 @@ TEST(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToVertex)
     std::shared_ptr<CollisionData> colData = m_meshToMeshBruteForceCD.getCollisionData();
 
     // Check for a single vertex-triangle case
-    ASSERT_EQ(1, colData->elementsA.getSize());
-    ASSERT_EQ(1, colData->elementsB.getSize());
+    ASSERT_EQ(1, colData->elementsA.size());
+    ASSERT_EQ(1, colData->elementsB.size());
 
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsA[0].m_type);
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsB[0].m_type);
@@ -186,8 +186,8 @@ TEST(imstkMeshToMeshBruteForceCDTest, IntersectionTestAB_VertexToEdge)
     std::shared_ptr<CollisionData> colData = m_meshToMeshBruteForceCD.getCollisionData();
 
     // Check for a single vertex-triangle case
-    ASSERT_EQ(1, colData->elementsA.getSize());
-    ASSERT_EQ(1, colData->elementsB.getSize());
+    ASSERT_EQ(1, colData->elementsA.size());
+    ASSERT_EQ(1, colData->elementsB.size());
 
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsA[0].m_type);
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsB[0].m_type);

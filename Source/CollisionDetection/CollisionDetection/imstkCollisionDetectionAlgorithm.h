@@ -103,10 +103,10 @@ protected:
     /// just calls computeCollisionDataA and computeCollisionDataB
     ///
     virtual void computeCollisionDataAB(
-        std::shared_ptr<Geometry>          geomA,
-        std::shared_ptr<Geometry>          geomB,
-        CDElementVector<CollisionElement>& elementsA,
-        CDElementVector<CollisionElement>& elementsB)
+        std::shared_ptr<Geometry>      geomA,
+        std::shared_ptr<Geometry>      geomB,
+        std::vector<CollisionElement>& elementsA,
+        std::vector<CollisionElement>& elementsB)
     {
         computeCollisionDataA(geomA, geomB, elementsA);
         computeCollisionDataB(geomA, geomB, elementsB);
@@ -116,17 +116,17 @@ protected:
     /// \brief Compute collision data for side A (implement as if flip=true)
     ///
     virtual void computeCollisionDataA(
-        std::shared_ptr<Geometry>          imstkNotUsed(geomA),
-        std::shared_ptr<Geometry>          imstkNotUsed(geomB),
-        CDElementVector<CollisionElement>& imstkNotUsed(elementsA)) { m_computeColDataAImplemented = false; }
+        std::shared_ptr<Geometry>      imstkNotUsed(geomA),
+        std::shared_ptr<Geometry>      imstkNotUsed(geomB),
+        std::vector<CollisionElement>& imstkNotUsed(elementsA)) { m_computeColDataAImplemented = false; }
 
     ///
     /// \brief Compute collision data for side B (implement as if flip=true)
     ///
     virtual void computeCollisionDataB(
-        std::shared_ptr<Geometry>          imstkNotUsed(geomA),
-        std::shared_ptr<Geometry>          imstkNotUsed(geomB),
-        CDElementVector<CollisionElement>& imstkNotUsed(elementsB)) { m_computeColDataBImplemented = false; }
+        std::shared_ptr<Geometry>      imstkNotUsed(geomA),
+        std::shared_ptr<Geometry>      imstkNotUsed(geomB),
+        std::vector<CollisionElement>& imstkNotUsed(elementsB)) { m_computeColDataBImplemented = false; }
 
 protected:
     std::shared_ptr<CollisionData> m_colData  = nullptr;    ///> Collision data

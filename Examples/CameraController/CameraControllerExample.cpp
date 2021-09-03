@@ -24,7 +24,6 @@
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
@@ -36,12 +35,14 @@
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVTKViewer.h"
+#include "imstkSpotLight.h"
 
 using namespace imstk;
 
 ///
-/// \brief This example demonstrates controlling the camera
-/// using external device. NOTE: Requires GeoMagic Touch device
+/// \brief This example demonstrates controlling the camera using external
+/// device. Attached is a spotlight. One could use RigidBodyController with
+/// virtual coupling if they wanted damping/smoothness
 ///
 int
 main()
@@ -53,8 +54,9 @@ main()
     imstkNew<Scene> scene("CameraController");
 
     // Device Server
-    imstkNew<HapticDeviceManager>       server;
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
+    imstkNew<HapticDeviceManager> server;
+    server->setSleepDelay(1.0);
+    std::shared_ptr<HapticDeviceClient> deviceClient = server->makeDeviceClient();
 
     // Load Mesh
     auto                  mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
@@ -71,26 +73,31 @@ main()
     // Update Camera position
     scene->getActiveCamera()->setPosition(Vec3d(0.0, 0.0, 10.0));
 
-    imstkNew<CameraController> camController(scene->getActiveCamera(), client);
-    //camController->setTranslationScaling(100);
-    //LOG(INFO) << camController->getTranslationOffset(); // should be the same than initial cam position
+    imstkNew<CameraController> camController(scene->getActiveCamera(), deviceClient);
+    camController->setTranslationScaling(0.5);
     scene->addController(camController);
 
     // Light
-    imstkNew<DirectionalLight> light;
-    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    imstkNew<SpotLight> light;
+    light->setFocalPoint(Vec3d(0.0, 0.0, 0.0));
+    light->setPosition(Vec3d(0.0, 10.0, 0.0));
     light->setIntensity(1.0);
+    light->setSpotAngle(10.0);
+    //light->setAttenuationValues(0.0, 0.0, 1.0); // Constant
+    //light->setAttenuationValues(0.0, 0.5, 0.0); // Linear falloff
+    light->setAttenuationValues(0.01, 0.0, 0.0); // Quadratic
     scene->addLight("light0", light);
 
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer 1");
+        imstkNew<VTKViewer> viewer("Viewer");
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         // attach the camera controller to the viewer
         viewer->addControl(camController);
@@ -99,6 +106,7 @@ main()
         driver->addModule(server);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.001);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -111,6 +119,34 @@ main()
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
+
+        // Change the spot angle when haptic button is pressed
+        connect<ButtonEvent>(deviceClient, &HapticDeviceClient::buttonStateChanged,
+            [&](ButtonEvent* e)
+        {
+            if (e->m_buttonState == BUTTON_PRESSED)
+            {
+                if (e->m_button == 0)
+                {
+                    light->setSpotAngle(light->getSpotAngle() + 5.0);
+                }
+                else if (e->m_button == 1)
+                {
+                    light->setSpotAngle(light->getSpotAngle() - 5.0);
+                }
+            }
+            });
+
+        // Manually make the light follow the camera controller
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+        {
+            const Vec3d pos = camController->getPosition();
+            const Quatd orientation = camController->getRotation();
+
+            light->setPosition(pos);
+            light->setFocalPoint(pos - orientation.toRotationMatrix().col(2));
+            });
 
         driver->start();
     }

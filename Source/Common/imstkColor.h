@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "imstkMath.h"
+
 #include <iostream>
 
 /// \todo remove nameless union/struct in the future
@@ -64,6 +66,22 @@ struct Color
     /// \brief Equality operator
     ///
     Color& operator=(const Color& p_color);
+
+    operator Eigen::Matrix<unsigned char, 3, 1>()
+    {
+        return Eigen::Matrix<unsigned char, 3, 1>(
+            static_cast<unsigned char>(r * 255.0),
+            static_cast<unsigned char>(g * 255.0),
+            static_cast<unsigned char>(b * 255.0));
+    }
+    operator Eigen::Matrix<unsigned char, 4, 1>()
+    {
+        return Eigen::Matrix<unsigned char, 4, 1>(
+            static_cast<unsigned char>(r * 255.0),
+            static_cast<unsigned char>(g * 255.0),
+            static_cast<unsigned char>(b * 255.0),
+            static_cast<unsigned char>(a * 255.0));
+    }
 
     ///
     /// \brief Bitwise operator

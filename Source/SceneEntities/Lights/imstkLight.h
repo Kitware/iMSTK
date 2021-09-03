@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,42 +30,25 @@
 namespace imstk
 {
 ///
-/// \brief Enumeration for the type of light
-///
-enum class LightType
-{
-    Directional,
-    Point,
-    Spot
-};
-
-///
 /// \class Light
 ///
 /// \brief Abstract base class for lights
 ///
 class Light : public SceneEntity
 {
+protected:
+    Light() = default;
+
 public:
     virtual ~Light() override = default;
 
 public:
     ///
-    /// \brief Returns the type of light (see imstk::LightType)
-    ///
-    LightType getType() const { return m_type; }
-
-    ///
-    /// \brief Set the type of the light
-    ///
-    void setType(const LightType& type) { m_type = type; }
-
-    ///
     /// \brief Set the light focal point
     ///
-    virtual void setFocalPoint(const Vec3d& p) { this->setFocalPoint((float)p[0], (float)p[1], (float)p[2]); }
-    virtual void setFocalPoint(const float& x, const float& y, const float& z);
-    const Vec3f getFocalPoint() const { return m_focalPoint; }
+    void setFocalPoint(const Vec3d& p) { m_focalPoint = p; }
+    void setFocalPoint(const double x, const double y, const double z) { setFocalPoint(Vec3d(x, y, z)); }
+    const Vec3d& getFocalPoint() const { return m_focalPoint; }
 
     ///
     /// \brief Get the status (On/off) of the light
@@ -85,7 +68,7 @@ public:
     ///
     /// \brief Get the light color
     ///
-    const Color getColor() const { return m_color; }
+    const Color& getColor() const { return m_color; }
 
     ///
     /// \brief Set the light color
@@ -95,22 +78,32 @@ public:
     ///
     /// \brief Get the light intensity
     ///
-    float getIntensity() const { return m_intensity; }
+    double getIntensity() const { return m_intensity; }
 
     ///
     /// \brief Set the light intensity. This value is unbounded.
     ///
-    void setIntensity(const double intensity) { m_intensity = (float)intensity; }
+    void setIntensity(const double intensity) { m_intensity = intensity; }
+
+    ///
+    /// \brief Sets the attenuation values. Quadratic, linear, and constant c (ax^2+bx+c)
+    /// (a,b,c) = {0,0,1} would be constant lighting, multiplied with intensity
+    ///
+    void setAttenuationValues(const double a, const double b, const double c)
+    {
+        m_attenuation[0] = c;
+        m_attenuation[1] = b;
+        m_attenuation[2] = a;
+    }
+
+    const Vec3d& getAttenuationValues() const { return m_attenuation; }
 
 protected:
-    Light(const LightType& type) : SceneEntity(), m_type(type) { }
-
     // properties with defaults
-    float m_intensity   = 1.;
-    Color m_color       = Color::White;
-    bool  m_switchState = true;
-    Vec3f m_focalPoint  = Vec3f(0, 0, 0);
-
-    LightType m_type;
+    double m_intensity   = 1.0;
+    Color  m_color       = Color::White;
+    bool   m_switchState = true;
+    Vec3d  m_focalPoint  = Vec3d::Zero();
+    Vec3d  m_attenuation = Vec3d(1.0, 0.0, 0.0); ///> c, b, a (ax^2+bx+c)
 };
 } // imstk

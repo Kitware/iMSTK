@@ -50,7 +50,7 @@ public:
     ///
     /// \brief Add picking constraints for the node that is picked
     ///
-    void addPickConstraints(const CDElementVector<CollisionElement>& elements,
+    void addPickConstraints(const std::vector<CollisionElement>& elements,
                             std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> pickObj);
 
     ///
@@ -66,15 +66,15 @@ public:
     ///
     /// \brief Generate pbd constraints for tool-mesh collision
     ///
-    void generatePBDConstraints(const CDElementVector<CollisionElement>& elements);
+    void generatePBDConstraints(const std::vector<CollisionElement>& elements);
 
 protected:
     ///
     /// \brief Add collision constraints based off contact data
     ///
     void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override;
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
 
 private:
     bool m_isPicking;

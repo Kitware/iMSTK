@@ -54,8 +54,8 @@ PenaltyCH::getInputRbdObject()
 
 void
 PenaltyCH::handle(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     auto deformableObj = std::dynamic_pointer_cast<FeDeformableObject>(getInputObjectA());
     auto rbdObj = std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
@@ -77,17 +77,17 @@ PenaltyCH::handle(
 
 void
 PenaltyCH::computeContactForcesAnalyticRigid(
-    const CDElementVector<CollisionElement>& elements,
-    std::shared_ptr<RigidObject2>            analyticObj)
+    const std::vector<CollisionElement>& elements,
+    std::shared_ptr<RigidObject2>        analyticObj)
 {
-    if (elements.isEmpty())
+    if (elements.empty())
     {
         return;
     }
 
     // Sum forces (only supports PointDirection contacts)
     Vec3d force = Vec3d::Zero();
-    for (size_t i = 0; i < elements.getSize(); i++)
+    for (size_t i = 0; i < elements.size(); i++)
     {
         const CollisionElement& elem = elements[i];
         if (elem.m_type == CollisionElementType::PointDirection)
@@ -104,10 +104,10 @@ PenaltyCH::computeContactForcesAnalyticRigid(
 
 void
 PenaltyCH::computeContactForcesDiscreteDeformable(
-    const CDElementVector<CollisionElement>& elements,
-    std::shared_ptr<FeDeformableObject>      deformableObj)
+    const std::vector<CollisionElement>& elements,
+    std::shared_ptr<FeDeformableObject>  deformableObj)
 {
-    if (elements.isEmpty())
+    if (elements.empty())
     {
         return;
     }
@@ -119,7 +119,7 @@ PenaltyCH::computeContactForcesDiscreteDeformable(
 
     // If collision data, append forces
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(elements.getSize(),
+    ParallelUtils::parallelFor(elements.size(),
         [&](const size_t i)
         {
             const CollisionElement& elem = elements[i];

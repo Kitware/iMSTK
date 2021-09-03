@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-=========================================================================*/
+   =========================================================================*/
 
 #pragma once
 
@@ -56,88 +56,101 @@ public:
     ///
     /// \brief Apply forces to the haptic device
     ///
-    virtual void applyForces() {}
+    virtual void applyForces();
 
     ///
     /// \brief Sets the tracking data to be out of date or up to date
-    ///
-    void setTrackerToOutOfDate() { m_trackingDataUptoDate = false; }
-    void setTrackerToUpToDate() { m_trackingDataUptoDate = true; }
+    ///@{
+    void setTrackerToOutOfDate();
+    void setTrackerToUpToDate();
+    ///@}
 
     ///
     /// \brief Returns true if the tracking data is already updated in current frame. Else, false.
     ///
-    bool isTrackerUpToDate() const { return m_trackingDataUptoDate; }
+    bool isTrackerUpToDate() const;
 
     ///
-    /// \brief Get the latest position
-    ///
-    const Vec3d& getPosition() const { return m_currentPos; };
+    /// \brief Set/Get the position of the tracker
+    ///@{
+    const Vec3d& getPosition() const;
+    void setPosition(const Vec3d& pos);
+    ///@}
 
     ///
-    /// \brief Set the position of the tracker
-    ///
-    void setPosition(const Vec3d& pos) { this->m_currentPos = pos; }
-
-    ///
-    /// \brief Get the latest rotation
-    ///
-    const Quatd& getRotation() const { return m_currentOrientation; };
-
-    ///
-    /// \brief Set the orientation of the tracker
-    ///
-    void setRotation(const Quatd& orientation) { this->m_currentOrientation = orientation; }
+    /// \brief Set/Get the orientation of the tracker
+    ///@{
+    const Quatd& getRotation() const;;
+    void setRotation(const Quatd& orientation);
+    ///@}
 
     ///
     /// \brief Set/Get whether to compute the velocity from previous and current samples
     /// Useful if a device does not provide the quantity
-    ///
-    void setComputeVelocity(const bool computeVelocity) { m_computeVelocity = computeVelocity; }
-    bool getComputeVelocity() const { return m_computeVelocity; }
+    ///@{
+    void setComputeVelocity(const bool computeVelocity);
+    bool getComputeVelocity() const;
+    ///@}
 
     ///
     /// \brief Set/Get whether to compute the anular velocity from previous and current samples
     /// Useful if the device does not provide the quantity
-    ///
-    void setComputeAngularVelocity(const bool computeAngularVelocity) { m_computeAngularVelocity = computeAngularVelocity; }
-    bool getComputeAngularVelocity() const { return m_computeAngularVelocity; }
+    /// @{
+    void setComputeAngularVelocity(const bool computeAngularVelocity);
+    bool getComputeAngularVelocity() const;
+    /// @}
 
     ///
     /// \brief Get/Set the angular velocity
-    ///
-    const Vec3d& getAngularVelocity() const { return m_currentAngularVelocity; }
-    void setAngularVelocity(const Vec3d& angularVelocity) { m_currentAngularVelocity = angularVelocity; }
+    ///@{
+    const Vec3d& getAngularVelocity() const;
+    void setAngularVelocity(const Vec3d& angularVelocity);
+    ///@}
 
     ///
     /// \brief Get/Set the linear velocity
-    ///
-    const Vec3d& getVelocity() const { return m_currentVelocity; }
-    void setVelocity(const Vec3d& velocity) { m_currentVelocity = velocity; }
+    ///@{
+    const Vec3d& getVelocity() const;
+    void setVelocity(const Vec3d& velocity);
+    ///@}
 
     ///
     /// \brief Get/Set the current scaling factor
-    ///
+    ///@{
     double getTranslationScaling() const;
     void setTranslationScaling(const double scaling);
+    ///@}
 
     ///
     /// \brief Get/Set the translation offset
-    ///
+    ///@{
     const Vec3d& getTranslationOffset() const;
     void setTranslationOffset(const Vec3d& t);
+    ///@}
 
     ///
-    /// \brief Get/Set the rotation offset
-    ///
+    /// \brief Get/Set the rotation offset, this rotation is applied to the overall
+    /// device coordinate system
+    ///@{
     const Quatd& getRotationOffset();
     void setRotationOffset(const Quatd& r);
+    ///@}
 
     ///
-    /// \brief Get/Set the inversion flags
+    /// \brief Get/Set the roation applied to the end effector, this can be used to
+    /// register the device in virtual space with regard to the users point of view
+    ///@}
+    const Quatd& getEffectorRotationOffset();
+    void setEffectorRotationOffset(const Quatd& r);
+    ///@}
+
     ///
+    /// \brief Get/Set the inversion flags, when set the corresponding axis coordinates
+    /// or rotation angle will be negated
+    ///@{
     unsigned char getInversionFlags();
     void setInversionFlags(const unsigned char f);
+    ///@}
 
     ///
     /// \brief Update tracking data
@@ -146,22 +159,23 @@ public:
 
 protected:
     double m_scaling = 1.0;                                ///< Scaling factor for physical to virtual translations
-    Vec3d  m_translationOffset;                            ///< Translation concatenated to the device translation
-    Quatd  m_rotationOffset;                               ///< Rotation concatenated to the device rotation
-    unsigned char m_invertFlags = 0x00;                    ///< Invert flags to be masked with DeviceTracker::InvertFlag
+    Vec3d  m_translationOffset      = Vec3d::Zero();       ///< Translation concatenated to the device translation
+    Quatd  m_rotationOffset         = Quatd::Identity();   ///< Rotation concatenated to the device rotation
+    Quatd  m_effectorRotationOffset = Quatd::Identity();   ///< Rotation prefixed to the device rotation
+    unsigned char m_invertFlags     = 0x00;                ///< Invert flags to be masked with DeviceTracker::InvertFlag
 
-    Vec3d m_currentPos;
-    Quatd m_currentOrientation;
-    Vec3d m_currentVelocity;
-    Vec3d m_currentAngularVelocity;
+    Vec3d m_currentPos = Vec3d::Zero();
+    Quatd m_currentOrientation     = Quatd::Identity();
+    Vec3d m_currentVelocity        = Vec3d::Zero();
+    Vec3d m_currentAngularVelocity = Vec3d::Zero();
 
-    Vec3d m_currentDisplacement;
-    Quatd m_currentRotation;
+    Vec3d m_currentDisplacement = Vec3d::Zero();
+    Quatd m_currentRotation     = Quatd::Identity();
 
     bool m_trackingDataUptoDate = false;
-    // If on, will use current and previous positions to produce velocity, if off, will ask device for velocity
+    /// If true, will use current and previous positions to produce velocity, if off, will ask device for velocity
     bool m_computeVelocity = false;
-    // If on, will use current and previous rotations to produce angular velocity, if off, will ask device for angular velocity
+    /// If true, will use current and previous rotations to produce angular velocity, if off, will ask device for angular velocity
     bool m_computeAngularVelocity = false;
 };
 } // imstk

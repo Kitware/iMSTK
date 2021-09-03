@@ -116,6 +116,7 @@ find_dependency(VTK COMPONENTS
   RenderingContext2D
   RenderingContextOpenGL2
   RenderingCore
+  RenderingExternal
   RenderingOpenGL2
   RenderingOpenVR
   RenderingVolume

@@ -36,48 +36,20 @@ namespace imstk
 class PointLight : public Light
 {
 public:
-    ///
-    /// \brief Constructors
-    ///
-    PointLight(const LightType& type = LightType::Point) : Light(type) { }
-
+    PointLight() = default;
     virtual ~PointLight() override = default;
 
 public:
-    virtual const std::string getTypeName() const { return "PointLight"; }
+    const std::string getTypeName() const override { return "PointLight"; }
 
-    ///
-    /// \brief Get the cone angle
-    ///
-    const float getConeAngle() const { return m_coneAngle; }
-
-    ///
-    /// \brief Get the light position
-    ///
-    void setConeAngle(const double angle) { m_coneAngle = (float)angle; }
-
-    ///
-    /// \brief Get the light position
-    ///
-    const Vec3f getPosition() const { return m_position; }
-
-    ///
-    /// \brief Set the light position
-    ///
-    void setPosition(const Vec3d& p)
-    {
-        m_position = Vec3f(
-            static_cast<float>(p[0]),
-            static_cast<float>(p[1]),
-            static_cast<float>(p[2]));
-    };
-    void setPosition(const double& x, const double& y, const double& z)
+    const Vec3d getPosition() const { return m_position; }
+    void setPosition(const Vec3d& p) { m_position = p; }
+    void setPosition(const double x, const double y, const double z)
     {
         this->setPosition(Vec3d(x, y, z));
     }
 
 protected:
-    Vec3f m_position  = Vec3f(0.0f, 0.0f, 0.0f);
-    float m_coneAngle = 179.0f;
+    Vec3d m_position = Vec3d::Zero();
 };
 } // imstk
