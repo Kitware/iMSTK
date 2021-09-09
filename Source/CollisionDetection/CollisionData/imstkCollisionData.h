@@ -168,6 +168,29 @@ struct CollisionElement
         }
     }
 
+    CollisionElement& operator=(const CollisionElement& other)
+    {
+        m_type = other.m_type;
+        switch (m_type)
+        {
+        case CollisionElementType::Empty:
+            break;
+        case CollisionElementType::CellVertex:
+            m_element.m_CellVertexElement = other.m_element.m_CellVertexElement;
+            break;
+        case CollisionElementType::CellIndex:
+            m_element.m_CellIndexElement = other.m_element.m_CellIndexElement;
+            break;
+        case CollisionElementType::PointDirection:
+            m_element.m_PointDirectionElement = other.m_element.m_PointDirectionElement;
+            break;
+        case CollisionElementType::PointIndexDirection:
+            m_element.m_PointIndexDirectionElement = other.m_element.m_PointIndexDirectionElement;
+            break;
+        }
+        return *this;
+    }
+
     union Element
     {
         EmptyElement m_EmptyElement;

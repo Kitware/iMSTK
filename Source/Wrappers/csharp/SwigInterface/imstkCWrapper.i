@@ -199,7 +199,8 @@
 %include <std_vector.i>
 namespace std {
   %template(VectorInt) vector<int>; 
-  %template(VectorSizet) vector<std::size_t>; 
+  %template(VectorSizet) vector<std::size_t>;
+  %template(VectorCollisionData) vector<imstk::CollisionElement>;
 }
 
 %include "shared_ptr_instantiation.i"
