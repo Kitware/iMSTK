@@ -40,8 +40,8 @@ PBDPickingCH::PBDPickingCH() :
 
 void
 PBDPickingCH::handle(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& imstkNotUsed(elementsB))
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& imstkNotUsed(elementsB))
 {
     std::shared_ptr<PbdObject>       pbdObj  = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
     std::shared_ptr<CollidingObject> pickObj = getInputObjectB();
@@ -103,7 +103,7 @@ PBDPickingCH::handle(
 }
 
 void
-PBDPickingCH::addPickConstraints(const CDElementVector<CollisionElement>& elements,
+PBDPickingCH::addPickConstraints(const std::vector<CollisionElement>& elements,
                                  std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> pickObj)
 {
     CHECK(pbdObj != nullptr && pickObj != nullptr)
@@ -119,7 +119,7 @@ PBDPickingCH::addPickConstraints(const CDElementVector<CollisionElement>& elemen
 
     // For every collision element record the offsets and fix the points in the PbdModel
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(elements.getSize(),
+    ParallelUtils::parallelFor(elements.size(),
         [&](const size_t idx)
         {
             const CollisionElement& elem = elements[idx];
@@ -144,7 +144,7 @@ PBDPickingCH::addPickConstraints(const CDElementVector<CollisionElement>& elemen
 }
 
 void
-PBDPickingCH::generatePBDConstraints(const CDElementVector<CollisionElement>& elements)
+PBDPickingCH::generatePBDConstraints(const std::vector<CollisionElement>& elements)
 {
     // Only constraint when picking is on
     if (m_isPicking)
@@ -157,7 +157,7 @@ PBDPickingCH::generatePBDConstraints(const CDElementVector<CollisionElement>& el
             << "no pdb object or colliding object.";
 
         m_constraints.resize(0);
-        m_constraints.reserve(elements.getSize());
+        m_constraints.reserve(elements.size());
 
         constraintPts.clear();
         constraintVels.clear();
@@ -173,27 +173,26 @@ PBDPickingCH::generatePBDConstraints(const CDElementVector<CollisionElement>& el
         VecDataArray<double, 3>& velocities = *velocitiesPtr;
         const DataArray<double>& invMasses  = *invMassesPtr;
 
-        ParallelUtils::parallelFor(elements.getSize(),
-            [&](const size_t idx)
+        for (size_t i = 0; i < elements.size(); i++)
+        {
+            const CollisionElement& elem = elements[i];
+            if (elem.m_type == CollisionElementType::PointIndexDirection)
             {
-                const CollisionElement& elem = elements[idx];
-                if (elem.m_type == CollisionElementType::PointIndexDirection)
-                {
-                    const PointIndexDirectionElement& pdElem = elem.m_element.m_PointIndexDirectionElement;
-                    const Vec3d& initPos = vertices[pdElem.ptIndex];
-                    const Vec3d penetrationVector = -pdElem.dir * pdElem.penetrationDepth; // Vector to resolve
+                const PointIndexDirectionElement& pdElem  = elem.m_element.m_PointIndexDirectionElement;
+                const Vec3d&                      initPos = vertices[pdElem.ptIndex];
+                const Vec3d                       penetrationVector = -pdElem.dir * pdElem.penetrationDepth; // Vector to resolve
 
-                    constraintPts.push_back(initPos - penetrationVector);
-                    constraintVels.push_back(Vec3d::Zero());
+                constraintPts.push_back(initPos - penetrationVector);
+                constraintVels.push_back(Vec3d::Zero());
 
-                    // Mapped indices not supported
-                    m_constraints.push_back(std::make_shared<PbdPointPointConstraint>());
-                    m_constraints[idx]->initConstraint(
-                        { &vertices[pdElem.ptIndex], invMasses[pdElem.ptIndex], &velocities[pdElem.ptIndex] },
-                        { &constraintPts.back(), 0.0, &constraintVels.back() },
-                        1.0, 0.0);
-                }
-            });
+                // Mapped indices not supported
+                m_constraints.push_back(std::make_shared<PbdPointPointConstraint>());
+                m_constraints[i]->initConstraint(
+                    { &vertices[pdElem.ptIndex], invMasses[pdElem.ptIndex], &velocities[pdElem.ptIndex] },
+                    { &constraintPts.back(), 0.0, &constraintVels.back() },
+                    1.0, 0.0);
+            }
+        }
     }
 }
 }

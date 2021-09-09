@@ -87,28 +87,28 @@ protected:
     /// \brief Add rigid body constraints according to contacts
     ///
     virtual void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override;
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
 
     ///
     /// \brief Handle rigid vs rigid two-way
     /// edge-edge, vertex-triangle, etc
     ///
     void handleRbdRbdTwoWay(
-        std::shared_ptr<RigidObject2>            rbdObjA,
-        std::shared_ptr<RigidObject2>            rbdObjB,
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB);
+        std::shared_ptr<RigidObject2>        rbdObjA,
+        std::shared_ptr<RigidObject2>        rbdObjB,
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB);
 
     ///
     /// \brief Handle rigid vs static one-way
     /// edge-edge, vertex-triangle, etc
     ///
     void handleRbdStaticOneWay(
-        std::shared_ptr<RigidObject2>            rbdObj,
-        std::shared_ptr<CollidingObject>         colObj,
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB);
+        std::shared_ptr<RigidObject2>        rbdObj,
+        std::shared_ptr<CollidingObject>     colObj,
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB);
 
     ///
     /// \brief Add constraint for the rigid body given contact

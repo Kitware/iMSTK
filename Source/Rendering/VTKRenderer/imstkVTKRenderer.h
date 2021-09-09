@@ -46,11 +46,12 @@ class vtkTable;
 
 namespace imstk
 {
+class Camera;
+class Light;
 class Scene;
 class SceneObject;
-class Camera;
-class VTKRenderDelegate;
 class VisualModel;
+class VTKRenderDelegate;
 
 ///
 /// \class VTKRenderer
@@ -114,11 +115,6 @@ public:
     /// \brief Updates the render delegates
     ///
     void updateRenderDelegates();
-
-    ///
-    /// \brief Get the render delegates
-    ///
-    const std::vector<std::shared_ptr<VTKRenderDelegate>>& getDebugRenderDelegates() const { return m_debugRenderDelegates; }
 
     ///
     /// \brief Returns VTK renderer
@@ -195,7 +191,8 @@ protected:
     vtkSmartPointer<vtkCamera> m_camera;
 
     // lights
-    std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
+    using VtkLightPair = std::pair<std::shared_ptr<Light>, vtkSmartPointer<vtkLight>>;
+    std::vector<VtkLightPair> m_vtkLights;
 
     // Props to be rendered
     std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;
@@ -211,7 +208,6 @@ protected:
 
     // Render Delegates
     std::unordered_map<std::shared_ptr<VisualModel>, std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
-    std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
 
     // TextureManager is used to share textures among differing delegates
     std::shared_ptr<TextureManager<VTKTextureDelegate>> m_textureManager;

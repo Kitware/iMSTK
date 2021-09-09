@@ -46,9 +46,9 @@ public:
     /// \brief Compute collision data for both sides simultaneously
     ///
     virtual void computeCollisionDataAB(
-        std::shared_ptr<Geometry>          geomA,
-        std::shared_ptr<Geometry>          geomB,
-        CDElementVector<CollisionElement>& elementsA,
-        CDElementVector<CollisionElement>& elementsB) override;
+        std::shared_ptr<Geometry>      geomA,
+        std::shared_ptr<Geometry>      geomB,
+        std::vector<CollisionElement>& elementsA,
+        std::vector<CollisionElement>& elementsB) override;
 };
 }

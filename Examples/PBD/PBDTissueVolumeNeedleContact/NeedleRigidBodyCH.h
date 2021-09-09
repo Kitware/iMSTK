@@ -47,14 +47,14 @@ protected:
     /// \brief Handle the collision/contact data
     ///
     virtual void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override
     {
         // Do it the normal way
         RigidBodyCH::handle(elementsA, elementsB);
 
         // If no collision, needle must be removed
-        if (elementsA.getSize() == 0)
+        if (elementsA.size() == 0)
         {
             auto needleObject = std::dynamic_pointer_cast<NeedleObject>(getInputObjectA());
             needleObject->setInserted(false);

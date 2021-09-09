@@ -198,7 +198,9 @@ VTKOpenVRViewer::updateModule()
     // \todo: No programmatic control over VR camera currently
     //renderer->updateSceneCamera(getActiveScene()->getCamera());
 
-    // Update render delegates
+    // Call visual update on every scene object
+    getActiveScene()->updateVisuals();
+    // Update all the rendering delegates
     ren->updateRenderDelegates();
 
     // Render

@@ -35,10 +35,10 @@ PointSetToSphereCD::PointSetToSphereCD()
 
 void
 PointSetToSphereCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
     std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomB);
@@ -49,7 +49,7 @@ PointSetToSphereCD::computeCollisionDataAB(
 
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
-
+    ParallelUtils::SpinLock                  lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int idx)
         {
@@ -61,26 +61,28 @@ PointSetToSphereCD::computeCollisionDataAB(
                                 sphereContactPt, sphereContactNormal, depth))
             {
                 PointIndexDirectionElement elemA;
-                elemA.dir     = sphereContactNormal;             // Direction to resolve pointset point
+                elemA.dir     = sphereContactNormal; // Direction to resolve pointset point
                 elemA.ptIndex = idx;
                 elemA.penetrationDepth = depth;
 
                 PointDirectionElement elemB;
-                elemB.dir = -sphereContactNormal;                 // Direction to resolve sphere
+                elemB.dir = -sphereContactNormal; // Direction to resolve sphere
                 elemB.pt  = sphereContactPt;
                 elemB.penetrationDepth = depth;
 
-                elementsA.safeAppend(elemA);
-                elementsB.safeAppend(elemB);
+                lock.lock();
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
+                lock.unlock();
             }
                 }, vertices.size() > 100);
 }
 
 void
 PointSetToSphereCD::computeCollisionDataA(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA)
 {
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
     std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomB);
@@ -91,7 +93,7 @@ PointSetToSphereCD::computeCollisionDataA(
 
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
-
+    ParallelUtils::SpinLock                  lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int idx)
         {
@@ -107,16 +109,18 @@ PointSetToSphereCD::computeCollisionDataA(
                 elemA.ptIndex = idx;
                 elemA.penetrationDepth = depth;
 
-                elementsA.safeAppend(elemA);
+                lock.lock();
+                elementsA.push_back(elemA);
+                lock.unlock();
             }
                 }, vertices.size() > 100);
 }
 
 void
 PointSetToSphereCD::computeCollisionDataB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
     std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomB);
@@ -127,7 +131,7 @@ PointSetToSphereCD::computeCollisionDataB(
 
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
-
+    ParallelUtils::SpinLock                  lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int idx)
         {
@@ -143,7 +147,9 @@ PointSetToSphereCD::computeCollisionDataB(
                 elemB.pt  = sphereContactPt;
                 elemB.penetrationDepth = depth;
 
-                elementsB.safeAppend(elemB);
+                lock.lock();
+                elementsB.push_back(elemB);
+                lock.unlock();
             }
                 }, vertices.size() > 100);
 }

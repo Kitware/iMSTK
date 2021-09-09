@@ -53,7 +53,6 @@ public:
 
     virtual ~ButtonEvent() override = default;
 
-public:
     ButtonStateType m_buttonState;
     const int       m_button = -1;
 };
@@ -64,7 +63,7 @@ public:
 /// \brief The device client's represents the device and provides
 /// an interface to acquire data from a device.
 /// It posts events the device may have as well as provides the state
-/// \todo HAVE AN ABSTRACK BASE CLASS FOR THE DEVICE CLIENT
+/// \todo Abstract base class for device client
 ///
 class DeviceClient : public EventObject
 {
@@ -74,12 +73,10 @@ public:
     ///
     virtual ~DeviceClient() = default;
 
-public:
     // *INDENT-OFF*
     SIGNAL(DeviceClient,buttonStateChanged);
     // *INDENT-ON*
 
-public:
     ///
     /// \brief Get/Set the device IP
     ///

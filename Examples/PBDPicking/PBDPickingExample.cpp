@@ -179,7 +179,7 @@ main()
     geomShaft->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 10.0));
     imstkNew<CollidingObject> objShaft("ShaftObject");
-    objShaft->setVisualGeometry(geomShaft);
+    objShaft->setVisualGeometry(pivotSurfMesh);
     objShaft->setCollidingGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
@@ -189,7 +189,7 @@ main()
     geomUpperJaw->setRadius(2.0);
     geomUpperJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
-    objUpperJaw->setVisualGeometry(geomUpperJaw);
+    objUpperJaw->setVisualGeometry(upperSurfMesh);
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
     scene->addSceneObject(objUpperJaw);
 
@@ -199,7 +199,7 @@ main()
     geomLowerJaw->setRadius(2.0);
     geomLowerJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
-    objLowerJaw->setVisualGeometry(geomLowerJaw);
+    objLowerJaw->setVisualGeometry(lowerSurfMesh);
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
