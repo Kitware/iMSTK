@@ -152,6 +152,56 @@ RigidBodyModel2::initialize()
 }
 
 void
+RigidBodyModel2::updateMass()
+{
+    // Compute the initial state
+    std::shared_ptr<RigidBodyState2> state = m_currentState;
+
+    StdVectorOfReal&  invMasses = state->getInvMasses();
+    StdVectorOfMat3d& invInteriaTensors = state->getInvIntertiaTensors();
+
+    m_Minv = Eigen::SparseMatrix<double>(m_bodies.size() * 6, m_bodies.size() * 6);
+    std::vector<Eigen::Triplet<double>> mInvTriplets;
+    mInvTriplets.reserve((9 + 3) * m_bodies.size());
+    for (size_t i = 0; i < m_bodies.size(); i++)
+    {
+        RigidBody& body = *m_bodies[i];
+
+        invMasses[i] = (body.m_mass == 0.0) ? 0.0 : 1.0 / body.m_mass;
+        if (body.m_intertiaTensor.determinant() == 0.0)
+        {
+            LOG(WARNING) << "Inertia tensor provided is not invertible, check that it makes sense";
+        }
+        else
+        {
+            invInteriaTensors[i] = body.m_intertiaTensor.inverse();
+        }
+
+        if (!body.m_isStatic)
+        {
+            // invMass expanded to 3x3 matrix
+            const double invMass     = invMasses[i];
+            const Mat3d& invInvertia = invInteriaTensors[i];
+            int          index       = static_cast<int>(i * 6);
+            mInvTriplets.push_back(Eigen::Triplet<double>(index, index, invMass));
+            index++;
+            mInvTriplets.push_back(Eigen::Triplet<double>(index, index, invMass));
+            index++;
+            mInvTriplets.push_back(Eigen::Triplet<double>(index, index, invMass));
+            index++;
+            for (unsigned int c = 0; c < 3; c++)
+            {
+                for (unsigned int r = 0; r < 3; r++)
+                {
+                    mInvTriplets.push_back(Eigen::Triplet<double>(index + r, index + c, invInvertia(c, r)));
+                }
+            }
+        }
+    }
+    m_Minv.setFromTriplets(mInvTriplets.begin(), mInvTriplets.end());
+}
+
+void
 RigidBodyModel2::configure(std::shared_ptr<RigidBodyModel2Config> config)
 {
     m_config = config;
