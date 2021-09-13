@@ -27,7 +27,7 @@
 
 namespace imstk
 {
-NeighborSearch::NeighborSearch(NeighborSearch::Method searchMethod, Real searchRadius /*= 0*/) :
+NeighborSearch::NeighborSearch(NeighborSearch::Method searchMethod, double searchRadius /*= 0*/) :
     m_Method(searchMethod), m_SearchRadius(searchRadius)
 {
     if (m_Method == Method::UniformGridBasedSearch)
@@ -43,7 +43,7 @@ NeighborSearch::NeighborSearch(NeighborSearch::Method searchMethod, Real searchR
 }
 
 void
-NeighborSearch::setSearchRadius(const Real searchRadius)
+NeighborSearch::setSearchRadius(const double searchRadius)
 {
     m_SearchRadius = searchRadius;
     if (m_Method == Method::UniformGridBasedSearch)

@@ -25,7 +25,7 @@
 namespace imstk
 {
 void
-GridBasedNeighborSearch::setSearchRadius(const Real radius)
+GridBasedNeighborSearch::setSearchRadius(const double radius)
 {
     m_SearchRadius    = radius;
     m_SearchRadiusSqr = radius * radius;
@@ -48,15 +48,15 @@ GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, 
 void
 GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const VecDataArray<double, 3>& setA, const VecDataArray<double, 3>& setB)
 {
-    LOG_IF(FATAL, (std::abs(m_SearchRadius) < Real(1e-8))) << "Neighbor search radius is zero";
+    LOG_IF(FATAL, (std::abs(m_SearchRadius) < 1e-8)) << "Neighbor search radius is zero";
 
     // firstly compute the bounding box of points in setB
-    Vec3r lowerCorner;
-    Vec3r upperCorner;
+    Vec3d lowerCorner;
+    Vec3d upperCorner;
     ParallelUtils::findAABB(setB, lowerCorner, upperCorner);
 
     // the upper corner need to be expanded a bit, to avoid round-off error during computation
-    upperCorner += Vec3d(m_SearchRadius, m_SearchRadius, m_SearchRadius) * Real(0.1);
+    upperCorner += Vec3d(m_SearchRadius, m_SearchRadius, m_SearchRadius) * 0.1;
 
     // resize grid to fit the bounding box covering setB
     m_Grid.initialize(lowerCorner, upperCorner, m_SearchRadius);
@@ -117,7 +117,7 @@ GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, 
                         for (auto q : m_Grid.getCellData(cellX, cellY, cellZ).particleIndices)
                         {
                             const auto qpos  = setB[q];
-                            const Vec3r diff = ppos - qpos;
+                            const Vec3d diff = ppos - qpos;
                             const auto d2    = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2];
                             if (d2 < m_SearchRadiusSqr)
                             {

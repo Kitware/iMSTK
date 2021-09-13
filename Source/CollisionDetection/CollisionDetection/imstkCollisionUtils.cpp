@@ -112,7 +112,7 @@ pointSegmentClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2
 {
     Vec3d  dx = x2 - x1;
     double m2 = dx.squaredNorm();
-    if (m2 < Real(1e-20))
+    if (m2 < 1e-20)
     {
         return (point - x1).norm();
     }
@@ -176,7 +176,7 @@ closestPointOnSegment(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, int&
 {
     Vec3d  dx = x2 - x1;
     double m2 = dx.squaredNorm();
-    if (m2 < Real(1e-20))
+    if (m2 < 1e-20)
     {
         caseType = 0;
         return x1;

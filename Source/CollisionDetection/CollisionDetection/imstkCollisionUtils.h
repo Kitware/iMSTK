@@ -104,14 +104,14 @@ bool testLineToLineAABB(const double x1, const double y1, const double z1,
 /// \param prox2 Round-off precision for the test
 ///
 inline bool
-testLineToLineAABB(const Vec3r& p1A, const Vec3r& p1B,
-                   const Vec3r& p2A, const Vec3r& p2B,
+testLineToLineAABB(const Vec3d& p1A, const Vec3d& p1B,
+                   const Vec3d& p2A, const Vec3d& p2B,
                    const double prox1 = VERY_SMALL_EPSILON_D, const double prox2 = VERY_SMALL_EPSILON_D)
 {
-    const Real* p1Aptr = &p1A[0];
-    const Real* p1Bptr = &p1B[0];
-    const Real* p2Aptr = &p2A[0];
-    const Real* p2Bptr = &p2B[0];
+    const double* p1Aptr = &p1A[0];
+    const double* p1Bptr = &p1B[0];
+    const double* p2Aptr = &p2A[0];
+    const double* p2Bptr = &p2B[0];
     return testLineToLineAABB(p1Aptr[0], p1Aptr[1], p1Aptr[2],
         p1Bptr[0], p1Bptr[1], p1Bptr[2],
         p2Aptr[0], p2Aptr[1], p2Aptr[2],
@@ -961,12 +961,12 @@ testRayToPlane(const Vec3d& rayOrigin, const Vec3d& rayDir,
 ///
 /// \brief Compute closest distance from a point to a segment x1-x2
 ///
-Real pointSegmentClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2);
+double pointSegmentClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2);
 
 ///
 /// \brief Compute closest distance from a point to a triangle x1-x2-x3
 ///
-Real pointTriangleClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, const Vec3d& x3);
+double pointTriangleClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, const Vec3d& x3);
 
 ///
 /// \brief Given two triangles and their ids produce the vertex ids for edge-edge and

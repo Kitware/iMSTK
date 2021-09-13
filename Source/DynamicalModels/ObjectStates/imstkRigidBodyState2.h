@@ -53,8 +53,8 @@ public:
     const std::vector<bool>& getIsStatic() const { return m_isStatic; }
     std::vector<bool>& getIsStatic() { return m_isStatic; }
 
-    const StdVectorOfReal& getInvMasses() const { return m_invMasses; }
-    StdVectorOfReal& getInvMasses() { return m_invMasses; }
+    const std::vector<double>& getInvMasses() const { return m_invMasses; }
+    std::vector<double>& getInvMasses() { return m_invMasses; }
     const StdVectorOfMat3d& getInvIntertiaTensors() const { return m_invIntertiaTensors; }
     StdVectorOfMat3d& getInvIntertiaTensors() { return m_invIntertiaTensors; }
 
@@ -97,8 +97,8 @@ public:
     }
 
 private:
-    StdVectorOfReal  m_invMasses;
-    StdVectorOfMat3d m_invIntertiaTensors;
+    std::vector<double> m_invMasses;
+    StdVectorOfMat3d    m_invIntertiaTensors;
 
     StdVectorOfVec3d m_positions;
     StdVectorOfQuatd m_orientations;
