@@ -41,11 +41,7 @@ public:
     ///
     PbdConstantDensityConstraint() : PbdConstraint()
     {
-        // constraint parameters
-        // Refer: Miller, et al 2003 "Particle-Based Fluid Simulation for Interactive Applications."
-        /// \todo Check if these numbers can be variable
-        m_wPoly6Coeff = 315.0 / (64.0 * PI * pow(m_maxDist, 9));
-        m_wSpikyCoeff = 15.0 / (PI * pow(m_maxDist, 6));
+        setMaxNeighborDistance(m_maxDist);
     }
 
     ///
@@ -78,12 +74,36 @@ private:
     ///
     /// \brief Smoothing kernel WPoly6 for density estimation
     ///
-    double wPoly6(const Vec3d& pi, const Vec3d& pj);
+    inline double wPoly6(const Vec3d& pi, const Vec3d& pj) const
+    {
+        const double rLengthSqr = (Vec3d(pi - pj)).squaredNorm();
+        if (rLengthSqr > m_maxDistSqr || rLengthSqr < 1e-20)
+        {
+            return 0.0;
+        }
+        else
+        {
+            const double maxDiff = m_maxDistSqr - rLengthSqr;
+            return m_wPoly6Coeff * maxDiff * maxDiff * maxDiff;
+        }
+    }
 
     ///
     /// \brief Gradient of density kernel
     ///
-    Vec3d gradSpiky(const Vec3d& pi, const Vec3d& pj);
+    inline Vec3d gradSpiky(const Vec3d& pi, const Vec3d& pj) const
+    {
+        const Vec3d  r = pi - pj;
+        const double rLengthSqr = r.squaredNorm();
+
+        if (rLengthSqr > m_maxDistSqr || rLengthSqr < 1e-20)
+        {
+            return Vec3d::Zero();
+        }
+
+        const double rLength = std::sqrt(rLengthSqr);
+        return r * (m_wSpikyCoeff * (m_maxDist - rLength) * (m_maxDist - rLength));
+    }
 
     ///
     /// \brief
@@ -104,22 +124,21 @@ private:
     /// \brief Set/Get rest density
     ///
     void setDensity(const double density) { m_restDensity = density; }
-    double getDensity() { return m_restDensity; }
+    double getDensity() const { return m_restDensity; }
 
     ///
     /// \brief Set/Get max. neighbor distance
     ///
     void setMaxNeighborDistance(const double dist);
-    double getMaxNeighborDistance() { return m_maxDist; }
+    double getMaxNeighborDistance() const { return m_maxDist; }
 
     ///
     /// \brief Set/Get neighbor search method
     ///
     void setNeighborSearchMethod(NeighborSearch::Method method) { m_NeighborSearchMethod = method; }
-    NeighborSearch::Method getNeighborSearchMethod() { return m_NeighborSearchMethod; }
+    NeighborSearch::Method getNeighborSearchMethod() const { return m_NeighborSearchMethod; }
 
 private:
-
     double m_wPoly6Coeff;
     double m_wSpikyCoeff;
 
