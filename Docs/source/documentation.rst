@@ -140,31 +140,23 @@ The following diagram gives a high level view of iMSTK architecture. Most of the
   :width: 700
   :alt: iMSTK architecture
 
-Geometry
---------
-
+:doc:`Geometry <../Geometry>`
+-------------------
 
 Geometries are used throughout iMSTK. The geometries themselves can be used standalone though. We have analytical, implicit, surface, volumetric, and image geometries.
 
-Read more about iMSTK geometry :doc:`here <../Geometry>`.
-
-
-Dynamical Models
-----------------
+:doc:`Dynamical Models <../Dynamical_Models>`
+-------------------
 
 Geometries are great. But you're likely going to want to do something with it. The primary use case is to advance it in time via some dynamical model. In iMSTK we provide models for dynamic and static deformable/soft bodies, fluids, & rigid bodies. We include PBD, SPH, FEM, and Rigid Bodies.
 
-Read more about dynamical models :doc:`here <../Dynamical_Models>`.
-
-Geometric Filtering
+:doc:`Geometric Filtering <../Filtering>`
 -------------------
 
 What else can you do with geometries? Filtering! Our filtering library provides a set of geometry algorithms we have found useful for surgical simulations.
 
-Read more about filtering :doc:`here <../Filtering>`.
-
-Devices
---------
+:doc:`Devices <../Devices>`
+-------------------
 
 Devices are an important part to iMSTK. This is an the interactive surgical simulation toolkit after all. 
 
@@ -173,82 +165,54 @@ Devices are an important part to iMSTK. This is an the interactive surgical simu
 -  OpenHaptics: Allows one to use haptic tracking devices such as the Phantom Omni, these provide force feedback, under the right models we can stop your hand from moving when touching something, or give slight resistance.
 -  Coming Soon: VRPN, Bluetooth, Arduino ...
 
-
-Read more about iMSTK's device support :doc:`here <../Devices>`.
-
-
-Controllers
------------
+:doc:`Controllers <../Controllers>`.
+-------------------
 
 Controllers implement the controls of a device. We provide a couple of abstract base classes such as MouseControl, KeyboardControl, TrackingDeviceControl. As well as a few subclasses such as KeyboardSceneControl and MouseSceneControl which have some default behaviors such as stopping, starting, pausing a scene. But it's heavily encouraged you to subclass your own. You may also use lambdas on the devices for fast prototyping.
 
-Read more about controllers :doc:`here <../Controllers>`.
-
-
-Collision Detection
+:doc:`Collision Detection <../Collision_Detection>`
 -------------------
 
 Collision detection can be standalone in iMSTK but often finds it use through Interactions, later described in Scene. Put simply, its the act of computing "CollisionData" from two geometries. Most of the time these are "contacts" such as point normal contacts which give a point, a normal, and penetration depth. Often these are then later given to constraints to be added to a dynamical model.
 
-Read more about iMSTK's collision detection support :doc:`here <../Collision_Detection>`.
-
-
-Collision Handling
+:doc:`Collision Handling <../Collision_Handling>`
 ------------------
 
 Collision handling implements how to consume collision data. For this reason it takes input CollisionData which is generally shared with CollisionDetection. iMSTK provides a number of handling methods, generally these call upon the functions of a DynamicalModel to immediately respond (explicit solve) or add something (such as a constraint) to later implicitly solve.
 
-Read more about iMSTK's collision handling support :doc:`here <../Collision_Handling>`.
-
-
-Scene
---------
+:doc:`Scene <../Scene>`
+-------------------
 A scene contains a flat collection of SceneObjects and can fully represent the virtual environment. These SceneObjects may be something like an OR table, a tissue, a leg, a light, or even non-visual objects. Additionally a scene contains a set of interactions via it's InteractionGraph. A number of predefined InteractionPairs are available for iMSTK physics.
 
-Read more about iMSTK scene :doc:`here <../Scene>`.
+:doc:`Mesh IO <../Mesh_IO>`
+-------------------
+Geometries are great. But to fully leverage them you need to be able to import from other tools which are much better at creating them. Read more about the files types supported by iMSTK. Additionally about Scene and SceneObject at the link above.
 
-
-Mesh IO
---------
-Geometries are great. But to fully leverage them you need to be able to import from other tools which are much better at creating them.
-
-Read more about the geometry file types supported in iMSTK. Additionally about Scene and SceneObject importing :doc:`here <../Mesh_IO>`.
-
-
-SimulationManager & Modules
----------------------------
+:doc:`SimulationManager & Modules <../SimManager_Modules>`
+-------------------
 
 Whilst scene's define the virtual environment and how to update it. They don't define how to drive it. You can certainly just call advance on the scene in a loop. That will get you decently far, but there's a bit more too it than that.
 
 Modules in iMSTK define something that can be init'd, update'd, and uninit'd and added to a ModuleDriver. In every iMSTK example you can simply add modules to our concrete ModuleDriver called the SimulationManager to run them. It defines a special way of updating them.
 
-Read more about the SimulationManager in iMSTK with code samples :doc:`here <../SimManager_Modules>`.
-
-Rendering
----------
+:doc:`Rendering <../Rendering>`
+-------------------
 Rendering in iMSTK is done through delegation to support multiple backends. This means we setup delegate classes for each thing we want to render. And map what we want to render to what the backend allows us to render. Primarily we use VTK.
-
-Read more about Rendering in iMSTK with code samples :doc:`here <../Rendering>`.
 
 Miscellaneous Topics
 ====================
 
-Parallelism
------------
-Visit :doc:`Parallelism page <../Parallelism>` which goes over loop, task, and module parallelism in iMSTK.
+:doc:`Parallelism <../Parallelism>`
+-------------------
+Goes over loop, task, and module parallelism in iMSTK.
 
+:doc:`Events <../Event_System>`
+-------------------
+Goes over events. Direct and message queues.
 
-Events
-------
-Visit :doc:`iMSTK events Page <../Event_System>` which goes over events. Direct and message queues.
-
-
-Computational Flow
-------------------
-Visit :doc:`Computational Flow Page <../Computational_Flow>` which goes over the flow of the advancement of a scene.
-
-
-  
+:doc:`Computational Flow <../Computational_Flow>` 
+-------------------
+Goes over the flow/advancement of a scene.
 
 .. |image0| image:: media/logo.png
    :width: 3.5in
