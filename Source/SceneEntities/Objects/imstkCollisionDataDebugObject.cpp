@@ -181,7 +181,11 @@ CollisionDataDebugObject::debugUpdate()
     }
 
     // Clear the debug object geometry
-    clear();
+    if (m_frameCounter >= m_clearRate)
+    {
+        clear();
+        m_frameCounter = 0;
+    }
 
     std::shared_ptr<PointSet> pointSetA = std::dynamic_pointer_cast<PointSet>(m_cdData->geomA);
     for (int i = 0; i < static_cast<int>(m_cdData->elementsA.size()); i++)
@@ -203,6 +207,18 @@ CollisionDataDebugObject::debugUpdate()
         {
             printf("Contact B %d\n", i);
             printContactInfo(elem);
+        }
+    }
+
+    if (m_countEmptyFrames)
+    {
+        m_frameCounter++;
+    }
+    else
+    {
+        if ((m_cdData->elementsA.size() > 0 || m_cdData->elementsB.size() > 0))
+        {
+            m_frameCounter++;
         }
     }
 }
