@@ -19,13 +19,11 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
-#include <memory>
-
 #include "imstkImageData.h"
 #include "imstkVecDataArray.h"
-#include "imstkMath.h"
+
+#include <gtest/gtest.h>
+#include <memory>
 
 using namespace imstk;
 namespace

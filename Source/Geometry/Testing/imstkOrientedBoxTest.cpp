@@ -25,41 +25,38 @@
 
 using namespace imstk;
 
-class imstkOrientedBoxTest : public ::testing::Test
+TEST(imstkOrientedBoxTest, SetGetWidth)
 {
-protected:
-    OrientedBox m_box;
-};
-
-TEST_F(imstkOrientedBoxTest, SetGetWidth)
-{
-    m_box.setExtents(1.0, 1.0, 1.0);
-    const Vec3d extents = m_box.getExtents();
+    OrientedBox box;
+    box.setExtents(1.0, 1.0, 1.0);
+    const Vec3d extents = box.getExtents();
     EXPECT_DOUBLE_EQ(1.0, extents[0]);
     EXPECT_DOUBLE_EQ(1.0, extents[1]);
     EXPECT_DOUBLE_EQ(1.0, extents[2]);
 }
 
-TEST_F(imstkOrientedBoxTest, GetVolume)
+TEST(imstkOrientedBoxTest, GetVolume)
 {
-    m_box.setExtents(1.0, 1.0, 1.0);
-    EXPECT_DOUBLE_EQ(8, m_box.getVolume());
+    OrientedBox box;
+    box.setExtents(1.0, 1.0, 1.0);
+    EXPECT_DOUBLE_EQ(8, box.getVolume());
 }
 
-TEST_F(imstkOrientedBoxTest, GetFunctionValue)
+TEST(imstkOrientedBoxTest, GetFunctionValue)
 {
-    m_box.setExtents(1.0, 1.0, 2.0);
-    m_box.updatePostTransformData();
+    OrientedBox box;
+    box.setExtents(1.0, 1.0, 2.0);
+    box.updatePostTransformData();
 
-    EXPECT_DOUBLE_EQ(-1., m_box.getFunctionValue(Vec3d(0.0, 0.0, 0.0)));
-    EXPECT_DOUBLE_EQ(-0.5, m_box.getFunctionValue(Vec3d(0.5, 0.0, 0.0)));
-    EXPECT_DOUBLE_EQ(0.0, m_box.getFunctionValue(Vec3d(1.0, 1.0, 2.0)));
-    EXPECT_DOUBLE_EQ(9.0, m_box.getFunctionValue(Vec3d(0.0, -10.0, 0.0)));
+    EXPECT_DOUBLE_EQ(-1., box.getFunctionValue(Vec3d(0.0, 0.0, 0.0)));
+    EXPECT_DOUBLE_EQ(-0.5, box.getFunctionValue(Vec3d(0.5, 0.0, 0.0)));
+    EXPECT_DOUBLE_EQ(0.0, box.getFunctionValue(Vec3d(1.0, 1.0, 2.0)));
+    EXPECT_DOUBLE_EQ(9.0, box.getFunctionValue(Vec3d(0.0, -10.0, 0.0)));
 
-    m_box.rotate(Vec3d(1.0, 0.0, 0.0), 0.5 * PI);
-    m_box.updatePostTransformData();
+    box.rotate(Vec3d(1.0, 0.0, 0.0), 0.5 * PI);
+    box.updatePostTransformData();
 
-    EXPECT_DOUBLE_EQ(-1.0, m_box.getFunctionValue(Vec3d(0.0, 0.0, 0.0)));
-    EXPECT_DOUBLE_EQ(-0.5, m_box.getFunctionValue(Vec3d(0.5, 0.0, 0.0)));
-    EXPECT_DOUBLE_EQ(-0.5, m_box.getFunctionValue(Vec3d(0.0, -1.5, 0.0)));
+    EXPECT_DOUBLE_EQ(-1.0, box.getFunctionValue(Vec3d(0.0, 0.0, 0.0)));
+    EXPECT_DOUBLE_EQ(-0.5, box.getFunctionValue(Vec3d(0.5, 0.0, 0.0)));
+    EXPECT_DOUBLE_EQ(-0.5, box.getFunctionValue(Vec3d(0.0, -1.5, 0.0)));
 }
