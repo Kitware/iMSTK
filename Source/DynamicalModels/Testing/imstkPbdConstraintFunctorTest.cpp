@@ -247,7 +247,7 @@ TEST(imstkPbdConstraintFunctorTest, TestVolumeConstraintGeneration)
 TEST(imstkPbdConstraintFunctorTest, TestAreaConstraintGeneration)
 {
     auto surfMesh = std::make_shared<SurfaceMesh>();
-    auto vertices = std::make_shared<VecDataArray<double, 3>>(3);
+    auto vertices = std::make_shared<VecDataArray<double, 3>>(4);
     (*vertices)[0] = Vec3d(0.0, 0.0, 0.0);
     (*vertices)[1] = Vec3d(1.0, 0.0, 0.0);
     (*vertices)[2] = Vec3d(0.0, 1.0, 0.0);
@@ -287,7 +287,7 @@ TEST(imstkPbdConstraintFunctorTest, TestAreaConstraintGeneration)
 TEST(imstkPbdConstraintFunctorTest, TestConstDensityConstraintGeneration)
 {
     auto points   = std::make_shared<PointSet>();
-    auto vertices = std::make_shared<VecDataArray<double, 3>>(3);
+    auto vertices = std::make_shared<VecDataArray<double, 3>>(4);
     (*vertices)[0] = Vec3d(0.0, 0.0, 0.0);
     (*vertices)[1] = Vec3d(1.0, 0.0, 0.0);
     (*vertices)[2] = Vec3d(0.0, 1.0, 0.0);
