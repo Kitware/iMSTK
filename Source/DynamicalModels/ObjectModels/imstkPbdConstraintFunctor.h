@@ -50,6 +50,7 @@ struct PbdConstraintFunctor
         PbdConstraintFunctor() = default;
         virtual ~PbdConstraintFunctor() = default;
 
+    public:
         ///
         /// \brief Appends a set of constraint to the container given a geometry
         ///
@@ -58,7 +59,7 @@ struct PbdConstraintFunctor
         void setGeometry(std::shared_ptr<PointSet> geom) { m_geom = geom; }
 
     public:
-        std::shared_ptr<PointSet> m_geom;
+        std::shared_ptr<PointSet> m_geom = nullptr;
 };
 
 struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
@@ -67,10 +68,12 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
         PbdDistanceConstraintFunctor() = default;
         ~PbdDistanceConstraintFunctor() override = default;
 
+    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
-            const VecDataArray<double, 3>& vertices = *m_geom->getVertexPositions();
-            auto                           addDistConstraint =
+            std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
+            const VecDataArray<double, 3>&           vertices = *verticesPtr;
+            auto                                     addDistConstraint =
                 [&](std::vector<std::vector<bool>>& E, size_t i1, size_t i2)
                 {
                     if (i1 > i2) // Make sure i1 is always smaller than i2
@@ -134,10 +137,10 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
             }
         }
 
-        void setStiffness(double stiffness) { m_stiffness = stiffness; }
+        void setStiffness(const double stiffness) { m_stiffness = stiffness; }
 
     protected:
-        double m_stiffness;
+        double m_stiffness = 0.0;
 };
 
 struct PbdFemConstraintFunctor : public PbdConstraintFunctor
@@ -146,6 +149,7 @@ struct PbdFemConstraintFunctor : public PbdConstraintFunctor
         PbdFemConstraintFunctor() = default;
         ~PbdFemConstraintFunctor() override = default;
 
+    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // Check if constraint type matches the mesh type
@@ -153,9 +157,11 @@ struct PbdFemConstraintFunctor : public PbdConstraintFunctor
                 << "FEM Tetrahedral constraint should come with tetrahedral mesh";
 
             // Create constraints
-            auto                           tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
-            const VecDataArray<double, 3>& vertices = *m_geom->getVertexPositions();
-            const VecDataArray<int, 4>&    elements = *tetMesh->getTetrahedraIndices();
+            auto                                     tetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
+            std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
+            const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+            std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getTetrahedraIndices();
+            const VecDataArray<int, 4>&              elements    = *elementsPtr;
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
@@ -168,12 +174,12 @@ struct PbdFemConstraintFunctor : public PbdConstraintFunctor
             }, elements.size() > 100);
         }
 
-        void setMaterialType(PbdFEMTetConstraint::MaterialType materialType) { m_matType = materialType; }
+        void setMaterialType(const PbdFEMTetConstraint::MaterialType materialType) { m_matType = materialType; }
         void setFemConfig(std::shared_ptr<PbdFEMConstraintConfig> femConfig) { m_femConfig = femConfig; }
 
     protected:
-        PbdFEMTetConstraint::MaterialType m_matType;
-        std::shared_ptr<PbdFEMConstraintConfig> m_femConfig;
+        PbdFEMTetConstraint::MaterialType m_matType = PbdFEMTetConstraint::MaterialType::StVK;
+        std::shared_ptr<PbdFEMConstraintConfig> m_femConfig = nullptr;
 };
 
 struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
@@ -182,6 +188,7 @@ struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
         PbdVolumeConstraintFunctor() = default;
         ~PbdVolumeConstraintFunctor() override = default;
 
+    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // Check if constraint type matches the mesh type
@@ -189,9 +196,11 @@ struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
                 << "Volume constraint should come with volumetric mesh";
 
             // Create constraints
-            auto                           tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
-            const VecDataArray<double, 3>& vertices = *m_geom->getVertexPositions();
-            const VecDataArray<int, 4>&    elements = *tetMesh->getTetrahedraIndices();
+            auto                                     tetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
+            std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
+            const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+            std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getTetrahedraIndices();
+            const VecDataArray<int, 4>&              elements    = *elementsPtr;
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
@@ -204,10 +213,10 @@ struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
             });
         }
 
-        void setStiffness(double stiffness) { m_stiffness = stiffness; }
+        void setStiffness(const double stiffness) { m_stiffness = stiffness; }
 
     protected:
-        double m_stiffness;
+        double m_stiffness = 0.0;
 };
 
 struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
@@ -216,6 +225,7 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
         PbdAreaConstraintFunctor() = default;
         ~PbdAreaConstraintFunctor() override = default;
 
+    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // check if constraint type matches the mesh type
@@ -223,9 +233,11 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
                 << "Area constraint should come with a triangular mesh";
 
             // ok, now create constraints
-            auto                           triMesh  = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
-            const VecDataArray<double, 3>& vertices = *m_geom->getVertexPositions();
-            const VecDataArray<int, 3>&    elements = *triMesh->getTriangleIndices();
+            auto                                     triMesh     = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
+            std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
+            const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+            std::shared_ptr<VecDataArray<int, 3>>    elemenstPtr = triMesh->getTriangleIndices();
+            const VecDataArray<int, 3>&              elements    = *elemenstPtr;
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
@@ -237,10 +249,10 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
             });
         }
 
-        void setStiffness(double stiffness) { m_stiffness = stiffness; }
+        void setStiffness(const double stiffness) { m_stiffness = stiffness; }
 
     protected:
-        double m_stiffness;
+        double m_stiffness = 0.0;
 };
 
 struct PbdBendConstraintFunctor : public PbdConstraintFunctor
@@ -249,14 +261,17 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
         PbdBendConstraintFunctor() = default;
         ~PbdBendConstraintFunctor() override = default;
 
+    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             CHECK(m_geom->getTypeName() == "LineMesh")
                 << "Bend constraint should come with a line mesh";
 
-            auto                           lineMesh = std::dynamic_pointer_cast<LineMesh>(m_geom);
-            const VecDataArray<double, 3>& vertices = *m_geom->getVertexPositions();
-            const VecDataArray<int, 2>&    elements = *lineMesh->getLinesIndices();
+            auto                                     lineMesh    = std::dynamic_pointer_cast<LineMesh>(m_geom);
+            std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
+            const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+            /*std::shared_ptr< VecDataArray<int, 2>> indicesPtr = lineMesh->getLinesIndices();
+            const VecDataArray<int, 2>& indices = *indicesPtr*/
 
             auto addBendConstraint =
                 [&](const double k, size_t i1, size_t i2, size_t i3)
@@ -277,24 +292,23 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
                     constraints.addConstraint(c);
                 };
 
-            // Iterate sets of two segments
-            for (int k = 0; k < elements.size() - 1; k++)
+            // Iterate sets of stride # of segments
+            for (int k = 0; k < vertices.size() - m_stride * 2; k += m_stride)
             {
-                auto& seg1 = elements[k];
-                auto& seg2 = elements[k + 1];
-                int   i3   = seg2[0];
-                if (i3 == seg1[0] || i3 == seg1[1])
-                {
-                    i3 = seg2[1];
-                }
-                addBendConstraint(m_stiffness, seg1[0], seg1[1], i3);
+                addBendConstraint(m_stiffness, k, k + m_stride, k + 2 * m_stride);
             }
         }
 
-        void setStiffness(double stiffness) { m_stiffness = stiffness; }
+        void setStiffness(const double stiffness) { m_stiffness = stiffness; }
+        void setStride(const int stride)
+        {
+            CHECK(m_stride > 1) << "Stride should be at least 1.";
+            m_stride = stride;
+        }
 
     protected:
-        double m_stiffness;
+        double m_stiffness = 0.0;
+        int m_stride       = 3;
 };
 
 struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
@@ -303,17 +317,20 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
         PbdDihedralConstraintFunctor() = default;
         ~PbdDihedralConstraintFunctor() override = default;
 
+    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             CHECK(m_geom->getTypeName() == "SurfaceMesh")
                 << "Dihedral constraint should come with a triangular mesh";
 
             // Create constraints
-            auto                           triMesh  = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
-            const VecDataArray<double, 3>& vertices = *triMesh->getVertexPositions();
-            const VecDataArray<int, 3>&    elements = *triMesh->getTriangleIndices();
-            const int                      nV       = triMesh->getNumVertices();
-            std::vector<std::vector<int>>  vertIdsToTriangleIds(nV);
+            auto                                     triMesh     = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
+            std::shared_ptr<VecDataArray<double, 3>> verticesPtr = triMesh->getVertexPositions();
+            const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr = triMesh->getTriangleIndices();
+            const VecDataArray<int, 3>&              elements    = *elementsPtr;
+            const int                                nV = triMesh->getNumVertices();
+            std::vector<std::vector<int>>            vertIdsToTriangleIds(nV);
 
             for (int k = 0; k < elements.size(); ++k)
             {
@@ -389,10 +406,10 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
             }
         }
 
-        void setStiffness(double stiffness) { m_stiffness = stiffness; }
+        void setStiffness(const double stiffness) { m_stiffness = stiffness; }
 
     protected:
-        double m_stiffness;
+        double m_stiffness = 0.0;
 };
 
 struct PbdConstantDensityConstraintFunctor : public PbdConstraintFunctor
@@ -401,6 +418,7 @@ struct PbdConstantDensityConstraintFunctor : public PbdConstraintFunctor
         PbdConstantDensityConstraintFunctor() = default;
         ~PbdConstantDensityConstraintFunctor() override = default;
 
+    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // check if constraint type matches the mesh type
@@ -412,9 +430,9 @@ struct PbdConstantDensityConstraintFunctor : public PbdConstraintFunctor
             constraints.addConstraint(c);
         }
 
-        void setStiffness(double stiffness) { m_stiffness = stiffness; }
+        void setStiffness(const double stiffness) { m_stiffness = stiffness; }
 
     protected:
-        double m_stiffness;
+        double m_stiffness = 0.0;
 };
 }
