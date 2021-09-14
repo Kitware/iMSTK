@@ -134,18 +134,18 @@ RigidBodyCH::handleRbdRbdTwoWay(
         const CollisionElement& colElemA = elementsA[i];
         if (colElemA.m_type == CollisionElementType::PointDirection)
         {
-            const Vec3d& contactPt = colElemA.m_element.m_PointDirectionElement.pt;
             const Vec3d& dir       = colElemA.m_element.m_PointDirectionElement.dir;
             const double depth     = colElemA.m_element.m_PointDirectionElement.penetrationDepth;
+            const Vec3d& contactPt = colElemA.m_element.m_PointDirectionElement.pt + dir * depth;
 
             addConstraint(rbdObjA, rbdObjB, contactPt, dir, depth);
         }
         else if (colElemA.m_type == CollisionElementType::PointIndexDirection)
         {
             // Doesn't support mapping yet
-            const Vec3d& contactPt = (*geom->getVertexPositions())[colElemA.m_element.m_PointIndexDirectionElement.ptIndex];
             const Vec3d& dir       = colElemA.m_element.m_PointIndexDirectionElement.dir;
             const double depth     = colElemA.m_element.m_PointIndexDirectionElement.penetrationDepth;
+            const Vec3d& contactPt = (*geom->getVertexPositions())[colElemA.m_element.m_PointIndexDirectionElement.ptIndex] + dir * depth;
 
             addConstraint(rbdObjA, rbdObjB, contactPt, dir, depth);
         }
@@ -165,9 +165,9 @@ RigidBodyCH::handleRbdStaticOneWay(
         const CollisionElement& colElem = elementsA[i];
         if (colElem.m_type == CollisionElementType::PointDirection)
         {
-            const Vec3d& contactPt = colElem.m_element.m_PointDirectionElement.pt;
             const Vec3d& dir       = colElem.m_element.m_PointDirectionElement.dir;
             const double depth     = colElem.m_element.m_PointDirectionElement.penetrationDepth;
+            const Vec3d& contactPt = colElem.m_element.m_PointDirectionElement.pt + dir * depth;
 
             addConstraint(rbdObj, contactPt, dir, depth);
         }
@@ -175,9 +175,9 @@ RigidBodyCH::handleRbdStaticOneWay(
         {
             // Doesn't support mapping yet
             auto         geom      = std::dynamic_pointer_cast<PointSet>(rbdObj->getCollidingGeometry());
-            const Vec3d& contactPt = (*geom->getVertexPositions())[colElem.m_element.m_PointIndexDirectionElement.ptIndex];
             const Vec3d& dir       = colElem.m_element.m_PointIndexDirectionElement.dir;
             const double depth     = colElem.m_element.m_PointIndexDirectionElement.penetrationDepth;
+            const Vec3d& contactPt = (*geom->getVertexPositions())[colElem.m_element.m_PointIndexDirectionElement.ptIndex] + dir * depth;
 
             addConstraint(rbdObj, contactPt, dir, depth);
         }
