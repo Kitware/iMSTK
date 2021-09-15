@@ -61,7 +61,7 @@ std::shared_ptr<PointSet>
 MeshIO::read(const std::string& filePath)
 {
     bool isDirectory = false;
-    bool exists = fileExists(filePath, isDirectory);
+    bool exists      = fileExists(filePath, isDirectory);
 
     CHECK(exists && !isDirectory) << "File " << filePath << " doesn't exist or is a directory.";
 

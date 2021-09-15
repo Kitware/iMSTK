@@ -29,5 +29,5 @@ using namespace imstk;
 
 TEST(imstkMeshIODeathTest, FailOnMissingFile)
 {
-    EXPECT_DEATH(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "doesntexist.obj"),"doesntexist.obj doesn't exist");
+    EXPECT_DEATH(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "doesntexist.obj"), "doesntexist.obj doesn't exist");
 }
