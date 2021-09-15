@@ -26,43 +26,23 @@
 using namespace imstk;
 
 ///
-/// \brief TODO
-///
-class imstkPbdPointPointConstraintTest : public ::testing::Test
-{
-protected:
-    PbdPointPointConstraint m_constraint;
-};
-
-///
 /// \brief Test that two points meet
 ///
-TEST_F(imstkPbdPointPointConstraintTest, TestConvergence1)
+TEST(imstkPbdPointPointConstraintTest, TestConvergence1)
 {
+    PbdPointPointConstraint constraint;
+
     Vec3d a = Vec3d(0.0, 0.0, 0.0);
     Vec3d b = Vec3d(0.0, -1.0, 0.0);
 
-    m_constraint.initConstraint(
+    constraint.initConstraint(
         { &a, 1.0, nullptr },
         { &b, 1.0, nullptr },
         1.0, 1.0);
     for (int i = 0; i < 3; i++)
     {
-        m_constraint.solvePosition();
+        constraint.solvePosition();
     }
 
     ASSERT_EQ(a[1], b[1]);
-}
-
-///
-/// \brief TODO
-///
-int
-imstkPbdPointPointConstraintTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

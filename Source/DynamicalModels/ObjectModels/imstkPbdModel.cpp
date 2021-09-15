@@ -65,6 +65,13 @@ PBDModelConfig::enableConstraint(PbdConstraint::Type type, double stiffness)
 }
 
 void
+PBDModelConfig::enableBendConstraint(const double stiffness, const int stride)
+{
+    m_regularConstraints.push_back({ PbdConstraint::Type::Bend, stiffness });
+    m_constraintStrides[m_regularConstraints.size() - 1] = stride;
+}
+
+void
 PBDModelConfig::enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material)
 {
     LOG_IF(FATAL, (type != PbdConstraint::Type::FEMTet && type != PbdConstraint::Type::FEMHex))
@@ -115,6 +122,7 @@ PbdModel::initialize()
             functor->setMaterialType(constraintType.second);
             m_functors.push_back(functor);
         }
+        int i = 0;
         for (auto constraintType : m_parameters->m_regularConstraints)
         {
             if (constraintType.first == PbdConstraint::Type::Area)
@@ -125,8 +133,15 @@ PbdModel::initialize()
             }
             else if (constraintType.first == PbdConstraint::Type::Bend)
             {
+                // If bend constraint requested but no stride provided use 1
+                int stride = 1;
+                if (m_parameters->m_constraintStrides.count(i) > 0)
+                {
+                    stride = m_parameters->m_constraintStrides[i];
+                }
                 auto functor = std::make_shared<PbdBendConstraintFunctor>();
                 functor->setStiffness(constraintType.second);
+                functor->setStride(stride);
                 m_functors.push_back(functor);
             }
             else if (constraintType.first == PbdConstraint::Type::ConstantDensity)
@@ -165,6 +180,7 @@ PbdModel::initialize()
                 functor->setStiffness(constraintType.second);
                 m_functors.push_back(functor);
             }
+            i++;
         }
 
         for (auto functorPtr : m_functors)
