@@ -58,6 +58,7 @@ VRPNDeviceClient::analogChangeHandler(void* userData, const _vrpn_ANALOGCB a)
 {
     auto deviceClient = static_cast<VRPNDeviceClient*>(userData);
     deviceClient->m_dataLock.lock();
+    deviceClient->m_analogChannels.resize(a.num_channel);
     for (int i = 0; i < a.num_channel; i++)
     {
         deviceClient->m_analogChannels[i] = a.channel[i];

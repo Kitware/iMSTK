@@ -107,7 +107,7 @@ private:
         VRPNDeviceType type;
     };
 
-    std::map<std::string, Client> m_deviceInfoMap;               ///< list of iMSTK client info
-    std::unique_ptr<vrpn_MainloopContainer> m_deviceConnections; ///< VRPN device connections
+    std::map<VRPNDeviceType, std::vector<std::shared_ptr<VRPNDeviceClient>>> m_deviceMap; ///< keeping track of clients
+    std::unique_ptr<vrpn_MainloopContainer> m_deviceConnections;                          ///< VRPN device connections
 };
 } // imstk

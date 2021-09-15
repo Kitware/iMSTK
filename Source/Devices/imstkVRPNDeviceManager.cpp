@@ -56,6 +56,7 @@ VRPNDeviceManager::addDeviceClient(std::shared_ptr<VRPNDeviceClient> client)
         vrpn_Analog_Remote* vrpnAnalog = new vrpn_Analog_Remote(_address);
         m_deviceConnections->add(vrpnAnalog);
         vrpnAnalog->register_change_handler(handle, VRPNDeviceClient::analogChangeHandler);
+        m_deviceMap[VRPNAnalog].push_back(client);
     }
     if ( (type & VRPNTracker) != 0)
     {
@@ -64,6 +65,7 @@ VRPNDeviceManager::addDeviceClient(std::shared_ptr<VRPNDeviceClient> client)
         m_deviceConnections->add(vrpnTracker);
         vrpnTracker->register_change_handler(handle, VRPNDeviceClient::trackerPositionChangeHandler);
         vrpnTracker->register_change_handler(handle, VRPNDeviceClient::trackerVelocityChangeHandler);
+        m_deviceMap[VRPNTracker].push_back(client);
     }
     if ( (type & VRPNButton) != 0)
     {
@@ -71,6 +73,7 @@ VRPNDeviceManager::addDeviceClient(std::shared_ptr<VRPNDeviceClient> client)
         vrpn_Button_Remote* vrpnButton = new vrpn_Button_Remote(_address);
         m_deviceConnections->add(vrpnButton);
         vrpnButton->register_change_handler(handle, VRPNDeviceClient::buttonChangeHandler);
+        m_deviceMap[VRPNButton].push_back(client);
     }
 }
 
