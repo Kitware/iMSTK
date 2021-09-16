@@ -157,8 +157,8 @@ RigidBodyModel2::updateMass()
     // Compute the initial state
     std::shared_ptr<RigidBodyState2> state = m_currentState;
 
-    StdVectorOfReal&  invMasses = state->getInvMasses();
-    StdVectorOfMat3d& invInteriaTensors = state->getInvIntertiaTensors();
+    std::vector<double>& invMasses = state->getInvMasses();
+    StdVectorOfMat3d&    invInteriaTensors = state->getInvIntertiaTensors();
 
     m_Minv = Eigen::SparseMatrix<double>(m_bodies.size() * 6, m_bodies.size() * 6);
     std::vector<Eigen::Triplet<double>> mInvTriplets;
