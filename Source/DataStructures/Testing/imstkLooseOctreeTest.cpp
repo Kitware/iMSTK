@@ -29,9 +29,9 @@ using namespace imstk;
 
 #define BOUND           10.0
 
-#define SPHERE_RADIUS   Real(10)
-#define SPHERE_CENTER   Vec3r(0, 0, 0)
-#define PARTICLE_RADIUS Real(2)
+#define SPHERE_RADIUS   10.0
+#define SPHERE_CENTER   Vec3d::Zero()
+#define PARTICLE_RADIUS 2.0
 #define ITERATIONS      10
 
 ///
@@ -40,15 +40,15 @@ using namespace imstk;
 std::shared_ptr<PointSet>
 generatePointSet()
 {
-    const Vec3r sphereCenter    = SPHERE_CENTER;
+    const Vec3d sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
-    const auto  spacing = Real(2) * PARTICLE_RADIUS;
+    const auto  spacing = 2.0 * PARTICLE_RADIUS;
     const int   N       = int(2 * SPHERE_RADIUS / spacing);
 
     std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
     VecDataArray<double, 3>&                 vertices  = *particles;
     vertices.reserve(N * N * N);
-    const Vec3r corner = sphereCenter - Vec3r(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
+    const Vec3d corner = sphereCenter - Vec3d(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
 
     for (int i = 0; i < N; ++i)
     {
@@ -56,8 +56,8 @@ generatePointSet()
         {
             for (int k = 0; k < N; ++k)
             {
-                const Vec3r ppos = corner + Vec3r(spacing * Real(i), spacing * Real(j), spacing * Real(k));
-                const Vec3r d    = ppos - sphereCenter;
+                const Vec3d ppos = corner + Vec3d(spacing * static_cast<double>(i), spacing * static_cast<double>(j), spacing * static_cast<double>(k));
+                const Vec3d d    = ppos - sphereCenter;
                 if (d.squaredNorm() < sphereRadiusSqr)
                 {
                     vertices.push_back(ppos);
@@ -106,10 +106,10 @@ randomizePositions(const std::shared_ptr<PointSet>& pointset)
 {
     for (int i = 0; i < pointset->getNumVertices(); ++i)
     {
-        pointset->setVertexPosition(i, Vec3r(
-            (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
-            (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
-            (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND
+        pointset->setVertexPosition(i, Vec3d(
+            (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND,
+            (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND,
+            (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND
             ));
     }
     pointset->postModified();
@@ -123,10 +123,10 @@ randomizePositions(const std::shared_ptr<SurfaceMesh>& mesh)
 {
     for (int i = 0; i < mesh->getNumTriangles(); ++i)
     {
-        const auto translation = Vec3r(
-            (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
-            (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
-            (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND
+        const auto translation = Vec3d(
+            (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND,
+            (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND,
+            (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND
             );
         const Vec3i& face = (*mesh->getTriangleIndices())[i];
         for (unsigned int j = 0; j < 3; ++j)

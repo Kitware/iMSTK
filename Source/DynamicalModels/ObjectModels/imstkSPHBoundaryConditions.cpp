@@ -26,11 +26,11 @@ limitations under the License.
 namespace imstk
 {
 SPHBoundaryConditions::SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,
-                                             const Vec3d& inletNormal, const StdVectorOfVec3d&, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
+                                             const Vec3d& inletNormal, const StdVectorOfVec3d&, const double inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
                                              StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions) :
     m_inletDomain(inletCoords), m_outletDomain(outletCoords),
     m_fluidDomain(fluidCoords),
-    m_bufferCoord(Vec3d(100, 0, 0)),
+    m_bufferCoord(Vec3d(100.0, 0.0, 0.0)),
     m_inletCenterPoint(inletCenterPt),
     m_inletRadius(inletRadius),
     m_inletNormal(inletNormal.normalized()),
@@ -114,20 +114,20 @@ SPHBoundaryConditions::setParticleTypes(const StdVectorOfVec3d& mainParticlePosi
     std::iota(std::begin(m_bufferIndices), std::end(m_bufferIndices), m_particleTypes.size() - m_numBufferParticles);
 }
 
-Vec3r
+Vec3d
 SPHBoundaryConditions::computeParabolicInletVelocity(const Vec3d& particlePosition)
 {
     // compute distance of point
-    const Vec3d  inletRegionCenterPoint = (Vec3d(1, 1, 1) + m_inletNormal).array() * m_inletCenterPoint.array() + particlePosition.dot(m_inletNormal) * m_inletNormal.array();
+    const Vec3d  inletRegionCenterPoint = (Vec3d(1.0, 1.0, 1.0) + m_inletNormal).array() * m_inletCenterPoint.array() + particlePosition.dot(m_inletNormal) * m_inletNormal.array();
     const double distance = (particlePosition - inletRegionCenterPoint).norm();
     Vec3d        inletParabolicVelocity;
     if (distance > m_inletRadius)
     {
-        inletParabolicVelocity = Vec3d(0, 0, 0);
+        inletParabolicVelocity = Vec3d::Zero();
     }
     else
     {
-        inletParabolicVelocity = m_inletVelocity * (1 - (distance / m_inletRadius) * (distance / m_inletRadius));
+        inletParabolicVelocity = m_inletVelocity * (1.0 - (distance / m_inletRadius) * (distance / m_inletRadius));
     }
     return inletParabolicVelocity;
 }
@@ -136,19 +136,19 @@ void
 SPHBoundaryConditions::addBoundaryParticles(StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions)
 {
     mainParticlePositions.insert(mainParticlePositions.end(), wallParticlePositions.begin(), wallParticlePositions.end());
-    mainParticlePositions.insert(mainParticlePositions.end(), m_numBufferParticles, Vec3d(100, 0, 0));
+    mainParticlePositions.insert(mainParticlePositions.end(), m_numBufferParticles, Vec3d(100.0, 0.0, 0.0));
 }
 
 void
-SPHBoundaryConditions::setInletVelocity(const Real flowRate)
+SPHBoundaryConditions::setInletVelocity(const double flowRate)
 {
-    m_inletVelocity = -m_inletNormal * (flowRate / m_inletCrossSectionalArea * 2);
+    m_inletVelocity = -m_inletNormal * (flowRate / m_inletCrossSectionalArea * 2.0);
 }
 
 Vec3d
 SPHBoundaryConditions::placeParticleAtInlet(const Vec3d& position)
 {
-    const Vec3d inletPosition = (Vec3d(1, 1, 1) + m_inletNormal).cwiseProduct(position) - m_inletCenterPoint.cwiseProduct(m_inletNormal);
+    const Vec3d inletPosition = (Vec3d(1.0, 1.0, 1.0) + m_inletNormal).cwiseProduct(position) - m_inletCenterPoint.cwiseProduct(m_inletNormal);
     return inletPosition;
 }
 } // end namespace imstk

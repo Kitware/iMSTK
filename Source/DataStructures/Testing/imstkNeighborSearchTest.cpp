@@ -27,11 +27,11 @@
 
 using namespace imstk;
 
-#define SPHERE_RADIUS   Real(1)
-#define SPHERE_CENTER   Vec3r(0, 0, 0)
-#define PARTICLE_RADIUS Real(0.08)
+#define SPHERE_RADIUS   1.0
+#define SPHERE_CENTER   Vec3d::Zero()
+#define PARTICLE_RADIUS 0.08
 #define ITERATIONS      5
-#define STEP            Real(1.1)
+#define STEP            1.1
 
 ///
 /// \brief Advance particle positions
@@ -41,8 +41,8 @@ advancePositions(VecDataArray<double, 3>& particles)
 {
     for (auto& pos: particles)
     {
-        Vec3r pc  = pos - SPHERE_CENTER;
-        Real  mag = pc.norm() * STEP;
+        Vec3d  pc  = pos - SPHERE_CENTER;
+        double mag = pc.norm() * STEP;
         pos = SPHERE_CENTER + pc.normalized() * mag;
     }
 }
@@ -54,8 +54,8 @@ void
 neighborSearchBruteForce(VecDataArray<double, 3>& particles, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(particles.size());
-    const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
-    const Real radiusSqr = radius * radius;
+    const double radius    = 4.000000000000001 * PARTICLE_RADIUS;
+    const double radiusSqr = radius * radius;
 
     for (int p = 0; p < particles.size(); ++p)
     {
@@ -71,7 +71,7 @@ neighborSearchBruteForce(VecDataArray<double, 3>& particles, std::vector<std::ve
             }
 
             const auto qpos = particles[q];
-            const auto d2   = (Vec3r(ppos - qpos)).squaredNorm();
+            const auto d2   = (Vec3d(ppos - qpos)).squaredNorm();
             if (d2 < radiusSqr)
             {
                 pneighbors.push_back(q);
@@ -87,7 +87,7 @@ void
 neighborSearchGridBased(VecDataArray<double, 3>& particles, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(particles.size());
-    const Real                     radius = Real(4.000000000000001) * PARTICLE_RADIUS;
+    const double                   radius = 4.000000000000001 * PARTICLE_RADIUS;
     static GridBasedNeighborSearch gridSearch;
     gridSearch.setSearchRadius(radius);
     gridSearch.getNeighbors(neighbors, particles);
@@ -105,7 +105,7 @@ neighborSearchSpatialHashing(VecDataArray<double, 3>& particles, std::vector<std
         list.resize(0);
     }
 
-    const Real                              radius = Real(4.000000000000001) * PARTICLE_RADIUS;
+    const double                            radius = 4.000000000000001 * PARTICLE_RADIUS;
     static SpatialHashTableSeparateChaining hashTable;
 
     hashTable.clear();
@@ -126,8 +126,8 @@ void
 neighborSearchBruteForce(VecDataArray<double, 3>& setA, VecDataArray<double, 3>& setB, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(setA.size());
-    const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
-    const Real radiusSqr = radius * radius;
+    const double radius    = 4.000000000000001 * PARTICLE_RADIUS;
+    const double radiusSqr = radius * radius;
 
     for (int p = 0; p < setA.size(); ++p)
     {
@@ -138,7 +138,7 @@ neighborSearchBruteForce(VecDataArray<double, 3>& setA, VecDataArray<double, 3>&
         for (int q = 0; q < setB.size(); ++q)
         {
             const auto qpos = setB[q];
-            const auto d2   = (Vec3r(ppos - qpos)).squaredNorm();
+            const auto d2   = (Vec3d(ppos - qpos)).squaredNorm();
             if (d2 < radiusSqr)
             {
                 pneighbors.push_back(q);
@@ -154,7 +154,7 @@ void
 neighborSearchGridBased(VecDataArray<double, 3>& setA, VecDataArray<double, 3>& setB, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(setA.size());
-    const Real                     radius = Real(4.000000000000001) * PARTICLE_RADIUS;
+    const double                   radius = 4.000000000000001 * PARTICLE_RADIUS;
     static GridBasedNeighborSearch gridSearch;
     gridSearch.setSearchRadius(radius);
     gridSearch.getNeighbors(neighbors, setA, setB);
@@ -203,14 +203,14 @@ verify(std::vector<std::vector<size_t>>& neighbors1, std::vector<std::vector<siz
 ///
 TEST(imstkNeighborSearchTest, CompareGridSearchAndSpatialHashing)
 {
-    const Vec3r sphereCenter    = SPHERE_CENTER;
+    const Vec3d sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
-    const auto  spacing = Real(2) * PARTICLE_RADIUS;
+    const auto  spacing = 2.0 * PARTICLE_RADIUS;
     const int   N       = int(2 * SPHERE_RADIUS / spacing);
 
     VecDataArray<double, 3> particles;
     particles.reserve(N * N * N);
-    const Vec3r corner = sphereCenter - Vec3r(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
+    const Vec3d corner = sphereCenter - Vec3d(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
 
     for (int i = 0; i < N; ++i)
     {
@@ -218,8 +218,8 @@ TEST(imstkNeighborSearchTest, CompareGridSearchAndSpatialHashing)
         {
             for (int k = 0; k < N; ++k)
             {
-                const Vec3r ppos = corner + Vec3r(spacing * Real(i), spacing * Real(j), spacing * Real(k));
-                const Vec3r d    = ppos - sphereCenter;
+                const Vec3d ppos = corner + Vec3d(spacing * static_cast<double>(i), spacing * static_cast<double>(j), spacing * static_cast<double>(k));
+                const Vec3d d    = ppos - sphereCenter;
                 if (d.squaredNorm() < sphereRadiusSqr)
                 {
                     particles.push_back(ppos);
@@ -249,14 +249,14 @@ TEST(imstkNeighborSearchTest, CompareGridSearchAndSpatialHashing)
 ///
 TEST(imstkNeighborSearchTest, TestGridSearchFromDifferentPointSet)
 {
-    const Vec3r sphereCenter    = SPHERE_CENTER;
+    const Vec3d sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
-    const auto  spacing = Real(2) * PARTICLE_RADIUS;
+    const auto  spacing = 2.0 * PARTICLE_RADIUS;
     const int   N       = int(2 * SPHERE_RADIUS / spacing);
 
-    StdVectorOfVec3r particles;
+    StdVectorOfVec3d particles;
     particles.reserve(N * N * N);
-    const Vec3r corner = sphereCenter - Vec3r(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
+    const Vec3d corner = sphereCenter - Vec3d(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
 
     for (int i = 0; i < N; ++i)
     {
@@ -264,8 +264,8 @@ TEST(imstkNeighborSearchTest, TestGridSearchFromDifferentPointSet)
         {
             for (int k = 0; k < N; ++k)
             {
-                const Vec3r ppos = corner + Vec3r(spacing * Real(i), spacing * Real(j), spacing * Real(k));
-                const Vec3r d    = ppos - sphereCenter;
+                const Vec3d ppos = corner + Vec3d(spacing * static_cast<double>(i), spacing * static_cast<double>(j), spacing * static_cast<double>(k));
+                const Vec3d d    = ppos - sphereCenter;
                 if (d.squaredNorm() < sphereRadiusSqr)
                 {
                     particles.push_back(ppos);

@@ -25,15 +25,15 @@
 
 namespace imstk
 {
-OctreeNode::OctreeNode(LooseOctree* const tree, OctreeNode* const pParent, const Vec3r& nodeCenter,
-                       const Real halfWidth, const uint32_t depth) :
+OctreeNode::OctreeNode(LooseOctree* const tree, OctreeNode* const pParent, const Vec3d& nodeCenter,
+                       const double halfWidth, const uint32_t depth) :
     m_pTree(tree),
     m_pParent(pParent),
     m_Center(nodeCenter),
-    m_LowerBound(nodeCenter - Vec3r(halfWidth, halfWidth, halfWidth)),
-    m_UpperBound(nodeCenter + Vec3r(halfWidth, halfWidth, halfWidth)),
-    m_LowerExtendedBound(nodeCenter - 2.0 * Vec3r(halfWidth, halfWidth, halfWidth)),
-    m_UpperExtendedBound(nodeCenter + 2.0 * Vec3r(halfWidth, halfWidth, halfWidth)),
+    m_LowerBound(nodeCenter - Vec3d(halfWidth, halfWidth, halfWidth)),
+    m_UpperBound(nodeCenter + Vec3d(halfWidth, halfWidth, halfWidth)),
+    m_LowerExtendedBound(nodeCenter - 2.0 * Vec3d(halfWidth, halfWidth, halfWidth)),
+    m_UpperExtendedBound(nodeCenter + 2.0 * Vec3d(halfWidth, halfWidth, halfWidth)),
     m_HalfWidth(halfWidth),
     m_Depth(depth),
     m_MaxDepth(tree->m_MaxDepth),
@@ -104,7 +104,7 @@ OctreeNode::split()
 
         m_pChildren = m_pTree->requestChildrenFromPool();
 
-        const auto childHalfWidth = m_HalfWidth * static_cast<Real>(0.5);
+        const auto childHalfWidth = m_HalfWidth * static_cast<double>(0.5);
         for (uint32_t childIdx = 0; childIdx < 8u; ++childIdx)
         {
             auto newCenter = m_Center;
@@ -219,7 +219,7 @@ OctreeNode::insertNonPointPrimitive(OctreePrimitive* const pPrimitive, const Oct
 {
     const auto  lowerCorner = pPrimitive->m_LowerCorner;
     const auto  upperCorner = pPrimitive->m_UpperCorner;
-    const Vec3r priCenter(
+    const Vec3d priCenter(
         (lowerCorner[0] + upperCorner[0]) * 0.5,
         (lowerCorner[1] + upperCorner[1]) * 0.5,
         (lowerCorner[2] + upperCorner[2]) * 0.5);
@@ -278,14 +278,14 @@ OctreeNode::insertNonPointPrimitive(OctreePrimitive* const pPrimitive, const Oct
     m_pChildren->m_Nodes[childIdx].insertNonPointPrimitive(pPrimitive, type);
 }
 
-LooseOctree::LooseOctree(const Vec3r& center, const Real width, const Real minWidth,
-                         const Real minWidthRatio /*= 1.0*/, const std::string name /*= "LooseOctree"*/) :
+LooseOctree::LooseOctree(const Vec3d& center, const double width, const double minWidth,
+                         const double minWidthRatio /*= 1.0*/, const std::string name /*= "LooseOctree"*/) :
     m_Name(name),
     m_Center(center),
     m_Width(width),
     m_MinWidthRatio(minWidthRatio),
     m_MinWidth(minWidth),
-    m_pRootNode(new OctreeNode(this, nullptr, center, width * static_cast<Real>(0.5), 1u)),
+    m_pRootNode(new OctreeNode(this, nullptr, center, width * static_cast<double>(0.5), 1u)),
     m_NumAllocatedNodes(1u)
 {
 }
@@ -479,7 +479,7 @@ LooseOctree::build()
         && (m_vPrimitivePtrs[OctreePrimitiveType::Triangle].size() > 0
             || m_vPrimitivePtrs[OctreePrimitiveType::Analytical].size() > 0))
     {
-        Real minWidth = MAX_REAL;
+        double minWidth = IMSTK_DOUBLE_MAX;
         for (int type = OctreePrimitiveType::Triangle; type <= OctreePrimitiveType::Analytical; ++type)
         {
             const auto& vPrimitivePtrs = m_vPrimitivePtrs[type];
@@ -488,14 +488,14 @@ LooseOctree::build()
                 continue;
             }
             const auto primitiveMinWidth = tbb::parallel_reduce(tbb::blocked_range<size_t>(0, vPrimitivePtrs.size()),
-                                                                MAX_REAL,
-                [&](const tbb::blocked_range<size_t>& r, Real prevResult) -> Real {
+                                                                IMSTK_DOUBLE_MAX,
+                [&](const tbb::blocked_range<size_t>& r, double prevResult) -> double {
                     for (auto i = r.begin(), iEnd = r.end(); i != iEnd; ++i)
                     {
                         const auto pPrimitive = vPrimitivePtrs[i];
                         computePrimitiveBoundingBox(pPrimitive, static_cast<OctreePrimitiveType>(type));
 
-                        Vec3r widths;
+                        Vec3d widths;
                         for (uint32_t dim = 0; dim < 3; ++dim)
                         {
                             widths[dim] = pPrimitive->m_UpperCorner[dim] - pPrimitive->m_LowerCorner[dim];
@@ -507,7 +507,7 @@ LooseOctree::build()
                     }
                     return prevResult;
                 },
-                [](const Real x, const Real y) -> Real {
+                [](const double x, const double y) -> double {
                     return x < y ? x : y;
                 });
 
@@ -528,13 +528,13 @@ LooseOctree::build()
     m_MaxDepth = 1u;
     uint32_t numLevelNodes   = 1u;
     uint32_t maxNumTreeNodes = 1u;
-    Real     nodeWidth       = m_Width;
+    double   nodeWidth       = m_Width;
 
-    while (nodeWidth * static_cast<Real>(0.5) > m_MinWidth) {
+    while (nodeWidth * 0.5 > m_MinWidth) {
         ++m_MaxDepth;
         numLevelNodes   *= 8u;
         maxNumTreeNodes += numLevelNodes;
-        nodeWidth       *= static_cast<Real>(0.5);
+        nodeWidth       *= 0.5;
     }
     m_pRootNode->m_MaxDepth = m_MaxDepth;
     rebuild();
@@ -680,7 +680,7 @@ LooseOctree::updateBoundingBoxAndCheckValidity(const OctreePrimitiveType type)
             computePrimitiveBoundingBox(pPrimitive, type);
             const auto lowerCorner = pPrimitive->m_LowerCorner;
             const auto upperCorner = pPrimitive->m_UpperCorner;
-            const Vec3r center(
+            const Vec3d center(
                 (lowerCorner[0] + upperCorner[0]) * 0.5,
                 (lowerCorner[1] + upperCorner[1]) * 0.5,
                 (lowerCorner[2] + upperCorner[2]) * 0.5);
@@ -821,8 +821,8 @@ LooseOctree::computePrimitiveBoundingBox(OctreePrimitive* const pPrimitive, cons
         << "Cannot compute bounding box for point primitive";
 #endif
 
-    Vec3r lowerCorner;
-    Vec3r upperCorner;
+    Vec3d lowerCorner;
+    Vec3d upperCorner;
 
     if (type == OctreePrimitiveType::Triangle)
     {
@@ -832,7 +832,7 @@ LooseOctree::computePrimitiveBoundingBox(OctreePrimitive* const pPrimitive, cons
         lowerCorner = surfMesh->getVertexPosition(face[0]);
         upperCorner = lowerCorner;
 
-        const Vec3r verts12[2] = {
+        const Vec3d verts12[2] = {
             surfMesh->getVertexPosition(face[1]),
             surfMesh->getVertexPosition(face[2])
         };
