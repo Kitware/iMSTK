@@ -1,58 +1,58 @@
-# iMSTK Maintainance
+# iMSTK Maintenance
 
-The following document describes various iMSTK maintancence tasks
+The following sections describe various iMSTK maintenance tasks
 
-# Adding a new Dependency to iMSTK
+# Adding a new iMSTK Dependency
 
 For clarity the new library will be called `NewLib`. Depending on the use case some of the following steps may be skipped, but that is unlikely.
 
 ### Superbuild
 
-Its the superbuilds job to download all the noted dependency, build and install them. Once that is done it will configure and build the Innerbuild.
-
-While a lot of projects at kitware use a superbuild architecture there are slight differences between various implementations, very likely most or all of the following steps are applicable to other setups but they may or may not happen in the same plce as iMSTK
+iMSTK's CMake-based build process proceeds in two stages. The first stage downloads, builds and installs all of iMSTK's dependencies. This stage is called 'Superbuild'. Superbuild allows developers to build iMSTK and its dependencies in one go. When a new dependency needs to be added, the dependency list needs to be updated so that the superbuild builds and installs it for iMSTK to use. This is described in sections below.
 
 ### Innerbuild
 
-The innerbuild is the actual `iMSTK` code, it expects all dependencies to be built, installed, and findable.
+iMSTK's code gets build in the second stage of the build process called 'Innerbuild'. The innerbuild follows the superbuild and expects all dependencies to be built, installed, and findable.
 
-## CMakeLists.txt
+## Updating the CMakeLists.txt
 
 In the `CMakeLists.txt` in the root directory. While we are using `${PROJECT_NAME}` to reflect the `iMSTK` project in this file, everywhere else `iMSTK` will be more appropriate.
 
----
 
-Add a Setting `${PROJECT_NAME}_USE_NewLib` e.g.
-	
-    option(${PROJECT_NAME}_USE_NewLib "Build with NewLib support" OFF)
-	
-The state of the option (`ON`/`OFF`) should reflect whether the new library is should be built by default. When adding a new required dependency the option may be omitted, in that case omit the `if()` check for all the other steps
-
-This enables us to control and check for the availability of the library, any section that is only to be performed when `NewLib` is being built should be checked via `if(${PROJECT_NAME}_USE_NewLib)` or `if(iMSTK_USE_NewLIb)`
+**Step 1:** Define the external library as a iMSTK dependency
 
 ---
-
-Define `NewLib` as a dependency 
-
     if (${PROJECT_NAME}_USE_NewLib)
       imstk_define_dependency(NewLib)
     endif()
 
-This tells the superbuild architecture that `iMSTK` depends on `NewLib` and will trigger all the other processes.
+This tells the superbuild that `iMSTK` depends on `NewLib` and will trigger all the other processes namely building, installing, finding and linking to it.
 
----
 
-Add `find_package` with the appropriate options for this library 
+**Step 2:** Add `find_package` with the appropriate options for this library
+
+--- 
 
     if (${PROJECT_NAME}_USE_VRPN)
       find_package( NewLib REQUIRED )
     endif()
 
-This is actually executed in the innerbuild of `iMSTK` it will enable the innerbuild to find the components of the library. Please note that `find_package` should executed is the local `FindNewLib.cmake` that will be created in a later step, and not the Cmake global script or the find scripts of the library that is being built.
+This is executed in the innerbuild of `iMSTK`. It will enable the innerbuild to find the components of the library. Please note that `find_package` should be executed in the local `FindNewLib.cmake` that will be created in a later step, and not the CMake top-level script or the find scripts of the library that is being built.
 
-## CMake\External\CMakeLists.txt
+**Step 3:** Add an option to turn the building of dependency ON/OFF (Optional)
 
-This file adds the project that makes up the innerbuild to the superbuild, any variables that need to be passed from the superbuild to the innerbuild need to be set here. This means you will probably want to add 
+---
+Add a Setting `${PROJECT_NAME}_USE_NewLib` as
+	
+    option(${PROJECT_NAME}_USE_NewLib "Build with NewLib support" OFF)
+	
+The state of the option (`ON`/`OFF`) should reflect whether the new library should be built by default or not. If a dependency is a required one, one may omit this. If the dependency is optional, one can conditionally execute other steps in the CMake build process by surrounding the statements with `if(${PROJECT_NAME}_USE_NewLib)` or `if(iMSTK_USE_NewLIb)`.
+
+**Step 4:** Edit CMake\External\CMakeLists.txt
+
+---
+
+This CMake script adds the project that makes up the innerbuild to the superbuild, any variables that need to be passed from the superbuild to the innerbuild need to be set here. This means you will probably want to add 
 
     -D${PROJECT_NAME}_USE_NewLib:BOOL=${${PROJECT_NAME}_USE_NewLib} 
 
@@ -62,9 +62,9 @@ Additionally to enable CMake to find the library correctly _if_ the library alre
 
     -DNewLib_DIR:PATH=${NewLib_DIR}  
 
-## `CMake/External/External_NewLib.cmake`
+**Step 5:** Add `CMake/External/External_NewLib.cmake`
 
-You will need to create this file, this is what describes what files to download and how to build them to support your new library to the superbuild. In general this will mean customizing `imstk_add_external_project`.
+You will need to create this file which describes what files to download from where and how to build them to support your new library in the superbuild. In general this will mean customizing `imstk_add_external_project`.
 
     include(imstkAddExternalProject)
 	imstk_add_external_project(NewLib
@@ -77,7 +77,7 @@ and customizing the build options for the new library by passing them via the `C
 
 There are quite a few examples for this in `iMSTK` now, best is to start simple and extend depending on the needs of the new library.  `imstk_add_external_project` can be found in `CMake/Utilities/imstkAddExternalProject.cmake`
 
-## `CMake/FindNewLib.cmake`
+**Step 6:** `CMake/FindNewLib.cmake`
 
 In case `NewLib` _does not_ provide a cmake `NewLibConfig.cmake` or its own find you will need to create `FindNewLib.cmake` in the `CMake` directory, this will be used during the innerbuild configuration step to initialize the include directories and library files related to the new library. The general pattern is like this. `imstkFind` can be found in `CMake/Utilities`
 
@@ -91,13 +91,13 @@ In case `NewLib` _does not_ provide a cmake `NewLibConfig.cmake` or its own find
 	# Finish the process
     imstk_find_package(NewLib)
 
-## `CMake/iMSTKConfig.cmake.in`
+**Step 7:** Edit `CMake/iMSTKConfig.cmake.in`
 
 To expose the state of any variables that you set in the superbuild to project that depend on `iMSTK` you need to store the state inside this file. At installation time, this will be written out and is used to correctly restore the state at build time. e.g. 
 
     set(iMSTK_USE_NewLib @iMSTK_USE_NewLib@)
 
-any `find_package` commands issued in the main file have to be replicated here are well, so that users of `iMSTK` can access all of `iMSTK`s dependencies.
+Any `find_package` commands issued in the main file have to be replicated here are well so that users of `iMSTK` can access all of its dependencies.
 
 # Updating a Dependency in iMSTK
 
@@ -123,12 +123,12 @@ After updating your fork you can proceed with the beginning of this guide on how
 
 # Adding data to the data repository
 
-iMSTKs data sits in a separate repository https://gitlab.kitware.com/iMSTK/imstk-data it is downloaded by the superbuild when testing or the examples are enabled, to add a resource to the repository two steps are necessary
+iMSTKs data sits in a separate repository https://gitlab.kitware.com/iMSTK/imstk-data. It is downloaded by iMSTK's superbuild when either the testing or the examples is enabled. To add new data to the repository two steps are necessary
 
-## Add Data to repository
+**1. Add Data to repository**
 
-The repository is checked out in your build directory as `External\iMSTKData\src`, data can be added to the structure here and directly commited and pushed. 
+The repository is already checked out as an external dependency in your build directory (if using superbuild) as `<build_dir>\External\iMSTKData\src\Data`, data can be added to the folder here and directly commited and pushed. 
 
-## Update SHA in ExternalData.cmake
+**2. Update SHA in ExternalData.cmake**
 
 The file that controls the downloading of the data is `CMake/External/External_iMSTKData.cmake` after commiting and pushing a change in the iMSTKData repository, the SHA to checkout needs to be updated to the SHA matching your latest commit.
