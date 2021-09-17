@@ -66,8 +66,8 @@ public:
     Vec2d getRange() const { return Vec2d(m_Min, m_Max); }
 
 private:
-    Real m_Min = std::numeric_limits<Real>::max();
-    Real m_Max = std::numeric_limits<Real>::min();
+    double m_Min = IMSTK_DOUBLE_MAX;
+    double m_Max = IMSTK_DOUBLE_MIN;
     const ContainerType& m_Data;
 };
 
@@ -89,16 +89,16 @@ public:
     {
         for (size_t i = r.begin(); i != r.end(); ++i)
         {
-            Real mag2 = m_Data[i].squaredNorm();
+            double mag2 = m_Data[i].squaredNorm();
             m_Result = m_Result > mag2 ? m_Result : mag2;
         }
     }
 
     void join(MaxL2NormFunctor& pObj) { m_Result = m_Result > pObj.m_Result ? m_Result : pObj.m_Result; }
-    Real getResult() const { return std::sqrt(m_Result); }
+    double getResult() const { return std::sqrt(m_Result); }
 
 private:
-    Real m_Result = 0;
+    double m_Result = 0.0;
     const VecDataArray<double, 3>& m_Data;
 };
 
@@ -147,26 +147,26 @@ public:
     ///
     /// \brief Get the lower corner
     ///
-    const Vec3r& getLowerCorner() const { return m_LowerCorner; }
+    const Vec3d& getLowerCorner() const { return m_LowerCorner; }
     ///
     /// \brief Get the upper corner
     ///
-    const Vec3r& getUpperCorner() const { return m_UpperCorner; }
+    const Vec3d& getUpperCorner() const { return m_UpperCorner; }
 
 private:
-    Vec3r m_LowerCorner = Vec3r(std::numeric_limits<Real>::max(),
-                                std::numeric_limits<Real>::max(),
-                                std::numeric_limits<Real>::max());
-    Vec3r m_UpperCorner = Vec3r(-std::numeric_limits<Real>::max(),
-                                -std::numeric_limits<Real>::max(),
-                                -std::numeric_limits<Real>::max());
+    Vec3d m_LowerCorner = Vec3d(std::numeric_limits<double>::max(),
+                                std::numeric_limits<double>::max(),
+                                std::numeric_limits<double>::max());
+    Vec3d m_UpperCorner = Vec3d(-std::numeric_limits<double>::max(),
+                                -std::numeric_limits<double>::max(),
+                                -std::numeric_limits<double>::max());
     const VecDataArray<double, 3>& m_Data;
 };
 
 ///
 /// \brief Find the maximum value of L2 norm from the input data array
 ///
-inline Real
+inline double
 findMaxL2Norm(const VecDataArray<double, 3>& data)
 {
     MaxL2NormFunctor pObj(data);
@@ -178,7 +178,7 @@ findMaxL2Norm(const VecDataArray<double, 3>& data)
 /// \brief Find the bounding box of a point set
 ///
 inline void
-findAABB(const VecDataArray<double, 3>& points, Vec3r& lowerCorner, Vec3r& upperCorner)
+findAABB(const VecDataArray<double, 3>& points, Vec3d& lowerCorner, Vec3d& upperCorner)
 {
     AABBFunctor pObj(points);
     tbb::parallel_reduce(tbb::blocked_range<size_t>(0, points.size()), pObj);

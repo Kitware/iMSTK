@@ -68,7 +68,7 @@ getVertex(const CollisionElement& elem, const MeshSide& side)
     {
         if (side.m_mapPtr && side.m_mapPtr->getType() == GeometryMap::Type::OneToOne)
         {
-            ptId = side.m_mapPtr->getMapIdx(ptId);
+            ptId = side.m_mapPtr->getMapIdx(static_cast<size_t>(ptId));
         }
         results[0] = { &side.m_vertices[ptId], side.m_invMasses[ptId], &side.m_velocities[ptId] };
     }

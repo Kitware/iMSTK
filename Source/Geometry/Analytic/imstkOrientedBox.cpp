@@ -92,9 +92,8 @@ OrientedBox::getFunctionValue(const Vec3d& pos) const
     const Mat3d  rot     = m_orientationPostTransform.toRotationMatrix();
     const Vec3d& extents = m_extentsPostTransform;
 
-    const Vec3d diff   = (pos - m_positionPostTransform);
-    const Mat3d rotInv = rot.transpose();
-    const Vec3d proj   = rotInv * diff; // dot product/project onto each axes
+    const Vec3d diff = (pos - m_positionPostTransform);
+    const Vec3d proj = rot * diff; // dot product/project onto each axes
 
     bool inside[3] =
     {

@@ -65,7 +65,7 @@ public:
     ///
     /// \brief Set the time step size
     ///
-    virtual void setTimeStep(const Real timeStep) override { m_config->m_dt = timeStep; }
+    virtual void setTimeStep(const double timeStep) override { m_config->m_dt = timeStep; }
 
     ///
     /// \brief Returns the time step size

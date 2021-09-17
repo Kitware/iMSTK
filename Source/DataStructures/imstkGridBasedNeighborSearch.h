@@ -39,18 +39,18 @@ public:
     /// \brief Construct class with search radius
     /// \param radius The search radius
     ///
-    explicit GridBasedNeighborSearch(const Real radius) : m_SearchRadius(radius), m_SearchRadiusSqr(radius * radius) {}
+    explicit GridBasedNeighborSearch(const double radius) : m_SearchRadius(radius), m_SearchRadiusSqr(radius * radius) {}
 
     ///
     /// \brief Set the search radius
     /// \param radius The search radius
     ///
-    void setSearchRadius(const Real radius);
+    void setSearchRadius(const double radius);
 
     ///
     /// \brief Get the search radius
     ///
-    Real getSearchRadius() const { return m_SearchRadius; }
+    double getSearchRadius() const { return m_SearchRadius; }
 
     ///
     /// \brief Search neighbors for each points within the search radius
@@ -75,8 +75,8 @@ public:
     void getNeighbors(std::vector<std::vector<size_t>>& result, const VecDataArray<double, 3>& setA, const VecDataArray<double, 3>& setB);
 
 private:
-    Real m_SearchRadius    = 0.;
-    Real m_SearchRadiusSqr = 0.;
+    double m_SearchRadius    = 0.0;
+    double m_SearchRadiusSqr = 0.0;
 
     // Data store in each grid cell
     // This entire struct can be replaced by tbb::concurrent_vector<size_t>, however, with lower performance
