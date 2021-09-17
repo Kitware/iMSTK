@@ -19,15 +19,12 @@
 
 =========================================================================*/
 
-#include "imstkOrientedBox.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkMath.h"
-#include "imstkPointSet.h"
+#include "imstkOrientedBox.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkVecDataArray.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+
 using namespace imstk;
 
 namespace

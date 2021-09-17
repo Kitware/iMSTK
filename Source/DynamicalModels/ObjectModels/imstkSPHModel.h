@@ -41,48 +41,48 @@ private:
     void initialize();
 
 public:
-    explicit SPHModelConfig(const Real particleRadius);
-    explicit SPHModelConfig(const Real particleRadius, const Real speedOfSound, const Real restDensity);
+    explicit SPHModelConfig(const double particleRadius);
+    explicit SPHModelConfig(const double particleRadius, const double speedOfSound, const double restDensity);
 
     /// \todo Move this to solver or time integrator in the future
-    Real m_minTimestep = Real(1e-6);
-    Real m_maxTimestep = Real(1e-3);
-    Real m_CFLFactor   = Real(1.0);
+    double m_minTimestep = 1.0e-6;
+    double m_maxTimestep = 1.0e-3;
+    double m_CFLFactor   = 1.0;
 
     // particle parameters
-    Real m_particleRadius    = Real(0);
-    Real m_particleRadiusSqr = Real(0); ///> \note derived quantity
+    double m_particleRadius    = 0.0;
+    double m_particleRadiusSqr = 0.0; ///> \note derived quantity
 
     // material parameters
-    Real m_restDensity       = Real(1000);
-    Real m_restDensitySqr    = Real(1000000.0);    ///> \note derived quantity
-    Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
-    Real m_particleMass      = Real(1);
-    Real m_particleMassScale = Real(1.0);          ///> scale particle mass to a smaller value to maintain stability
-    Real m_eta = Real(0.5);                        ///> proportion of position change due to neighbors velocity (XSPH method)
+    double m_restDensity       = 1000.0;
+    double m_restDensitySqr    = 1000000.0;    ///> \note derived quantity
+    double m_restDensityInv    = 1.0 / 1000.0; ///> \note derived quantity
+    double m_particleMass      = 1.0;
+    double m_particleMassScale = 1.0;          ///> scale particle mass to a smaller value to maintain stability
+    double m_eta = 0.5;                        ///> proportion of position change due to neighbors velocity (XSPH method)
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
 
     // pressure
-    Real m_pressureStiffness = Real(50000.0);
+    double m_pressureStiffness = 50000.0;
 
     // viscosity and surface tension/cohesion
-    Real m_dynamicViscosityCoeff   = Real(1e-2);
-    Real m_viscosityBoundary       = Real(1e-5);
-    Real m_surfaceTensionStiffness = Real(1);
-    Real m_frictionBoundary = Real(0.1);
+    double m_dynamicViscosityCoeff   = 1.0e-2;
+    double m_viscosityBoundary       = 1.0e-5;
+    double m_surfaceTensionStiffness = 1.0;
+    double m_frictionBoundary = 0.1;
 
     // kernel properties
-    Real m_kernelOverParticleRadiusRatio = Real(4.0);
-    Real m_kernelRadius;    ///> \note derived quantity
-    Real m_kernelRadiusSqr; ///> \note derived quantity
+    double m_kernelOverParticleRadiusRatio = 4.0;
+    double m_kernelRadius;    ///> \note derived quantity
+    double m_kernelRadiusSqr; ///> \note derived quantity
 
     // gravity
-    Vec3r m_gravity = Vec3r(0, -9.81, 0);
+    Vec3d m_gravity = Vec3d(0.0, -9.81, 0.0);
 
     // sound speed
-    Real m_speedOfSound = 18.7;
+    double m_speedOfSound = 18.7;
 
     // neighbor search
     NeighborSearch::Method m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
@@ -160,7 +160,7 @@ public:
     void setBoundaryConditions(std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
     std::shared_ptr<SPHBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }
 
-    void setRestDensity(const Real restDensity) { m_modelParameters->m_restDensity = restDensity; }
+    void setRestDensity(const double restDensity) { m_modelParameters->m_restDensity = restDensity; }
 
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
@@ -188,7 +188,7 @@ private:
     ///
     /// \brief Compute time step size based on CFL condition
     ///
-    Real computeCFLTimeStepSize();
+    double computeCFLTimeStepSize();
 
     ///
     /// \brief Find the neighbors for each particle
@@ -229,7 +229,7 @@ private:
     ///
     /// \brief Update particle velocities due to pressure, viscous, and surface tension forces
     ///
-    void updateVelocity(const Real timestep);
+    void updateVelocity(const double timestep);
 
     ///
     /// \brief Compute viscosity
@@ -246,7 +246,7 @@ private:
     ///
     /// \brief Move particles
     ///
-    void moveParticles(const Real timestep);
+    void moveParticles(const double timestep);
 
 //void computePressureOutlet();
 

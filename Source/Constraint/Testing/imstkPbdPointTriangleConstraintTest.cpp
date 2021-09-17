@@ -26,19 +26,12 @@
 using namespace imstk;
 
 ///
-/// \brief TODO
-///
-class imstkPbdPointTriangleConstraintTest : public ::testing::Test
-{
-protected:
-    PbdPointTriangleConstraint m_constraint;
-};
-
-///
 /// \brief Test that a point below a triangle, and the triangle, meet on y axes
 ///
-TEST_F(imstkPbdPointTriangleConstraintTest, TestConvergence1)
+TEST(imstkPbdPointTriangleConstraintTest, TestConvergence1)
 {
+    PbdPointTriangleConstraint constraint;
+
     Vec3d a = Vec3d(0.5, 0.0, -0.5);
     Vec3d b = Vec3d(-0.5, 0.0, -0.5);
     Vec3d c = Vec3d(0.0, 0.0, 0.5);
@@ -47,7 +40,7 @@ TEST_F(imstkPbdPointTriangleConstraintTest, TestConvergence1)
     x[1] -= 1.0;
 
      Vec3d zeroVelocity = Vec3d::Zero();
-     m_constraint.initConstraint(
+     constraint.initConstraint(
         { &x, 1.0, &zeroVelocity },
         { &a, 1.0, &zeroVelocity },
         { &b, 1.0, &zeroVelocity },
@@ -55,7 +48,7 @@ TEST_F(imstkPbdPointTriangleConstraintTest, TestConvergence1)
          1.0, 1.0);
      for (int i = 0; i < 3; i++)
     {
-        m_constraint.solvePosition();
+        constraint.solvePosition();
      }
 
      EXPECT_NEAR(x[1], a[1], 0.00000001);
@@ -66,8 +59,10 @@ TEST_F(imstkPbdPointTriangleConstraintTest, TestConvergence1)
 ///
 /// \brief Test that a point above a triangle, and the triangle, meet on y axes
 ///
-TEST_F(imstkPbdPointTriangleConstraintTest, TestConvergence2)
+TEST(imstkPbdPointTriangleConstraintTest, TestConvergence2)
 {
+    PbdPointTriangleConstraint constraint;
+
     Vec3d a = Vec3d(0.5, 0.0, -0.5);
     Vec3d b = Vec3d(-0.5, 0.0, -0.5);
     Vec3d c = Vec3d(0.0, 0.0, 0.5);
@@ -76,7 +71,7 @@ TEST_F(imstkPbdPointTriangleConstraintTest, TestConvergence2)
     x[1] += 1.0;
 
     Vec3d zeroVelocity = Vec3d::Zero();
-    m_constraint.initConstraint(
+    constraint.initConstraint(
         { &x, 1.0, &zeroVelocity },
         { &a, 1.0, &zeroVelocity },
         { &b, 1.0, &zeroVelocity },
@@ -84,7 +79,7 @@ TEST_F(imstkPbdPointTriangleConstraintTest, TestConvergence2)
         1.0, 1.0);
     for (int i = 0; i < 3; i++)
     {
-        m_constraint.solvePosition();
+        constraint.solvePosition();
     }
 
     EXPECT_NEAR(x[1], a[1], 0.00000001);
@@ -95,8 +90,10 @@ TEST_F(imstkPbdPointTriangleConstraintTest, TestConvergence2)
 ///
 /// \brief Test that a point not within the triangle does not move at all
 ///
-TEST_F(imstkPbdPointTriangleConstraintTest, TestNoConvergence1)
+TEST(imstkPbdPointTriangleConstraintTest, TestNoConvergence1)
 {
+    PbdPointTriangleConstraint constraint;
+
     Vec3d       a     = Vec3d(0.5, 0.0, -0.5);
     const Vec3d aInit = a;
     Vec3d       b     = Vec3d(-0.5, 0.0, -0.5);
@@ -120,7 +117,7 @@ TEST_F(imstkPbdPointTriangleConstraintTest, TestNoConvergence1)
         c = cInit;
 
         Vec3d zeroVelocity = Vec3d::Zero();
-        m_constraint.initConstraint(
+        constraint.initConstraint(
             { &testPts[i], 1.0, &zeroVelocity },
             { &a, 1.0, &zeroVelocity },
             { &b, 1.0, &zeroVelocity },
@@ -128,7 +125,7 @@ TEST_F(imstkPbdPointTriangleConstraintTest, TestNoConvergence1)
             1.0, 1.0);
         for (int j = 0; j < 3; j++)
         {
-            m_constraint.solvePosition();
+            constraint.solvePosition();
         }
 
         // Test they haven't moved
@@ -148,17 +145,4 @@ TEST_F(imstkPbdPointTriangleConstraintTest, TestNoConvergence1)
         EXPECT_EQ(cInit[1], c[1]);
         EXPECT_EQ(cInit[2], c[2]);
     }
-}
-
-///
-/// \brief TODO
-///
-int
-imstkPbdPointTriangleConstraintTest(int argc, char* argv[])
-{
-    // Init Google Test & Mock
-    ::testing::InitGoogleTest(&argc, argv);
-
-    // Run tests with gtest
-    return RUN_ALL_TESTS();
 }

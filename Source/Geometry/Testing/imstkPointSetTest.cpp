@@ -19,12 +19,11 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
-
 #include "imstkPointSet.h"
 #include "imstkVecDataArray.h"
-#include "imstkMath.h"
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 using namespace imstk;
 
