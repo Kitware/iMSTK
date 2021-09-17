@@ -5,13 +5,41 @@
 using namespace imstk;
 
 namespace {
-    CellVertexElement cv{ {{1,2,3},{2,3,4},{3,4,5}}, 10 };
-    CellIndexElement ci{ {7,8,9,10}, 11, IMSTK_VERTEX };
-    PointDirectionElement pd{ {2,3,4}, {4,5,6}, 12.0 };
-    PointIndexDirectionElement pi{ 13, {3,4,5}, 2.0 };
 }
 
-TEST(imstkCollisionElementTest, Constructor)
+struct imstkCollisionElementTest : public ::testing::Test
+{
+    imstkCollisionElementTest()
+    {
+        cv.pts[0] = Vec3d{ 1,2,3 };
+        cv.pts[1] = Vec3d{ 2,3,4 };
+        cv.pts[2] = Vec3d{ 3,4,5 };
+        cv.pts[3] = Vec3d{ 4,5,6 };
+        cv.size = 10;
+
+        ci.ids[0] = 7;
+        ci.ids[1] = 8;
+        ci.ids[2] = 9;
+        ci.ids[3] = 10;
+        ci.idCount = 11;
+        ci.cellType = IMSTK_VERTEX;
+
+        pd.pt = Vec3d{ 2,3,4 };
+        pd.dir = Vec3d{ 4,5,6 };
+        pd.penetrationDepth = 12.0;
+
+        pi.ptIndex = 13;
+        pi.dir = Vec3d{ 3,4,5 };
+        pi.penetrationDepth = 2.0;
+    };
+
+    CellVertexElement cv;
+    CellIndexElement ci;
+    PointDirectionElement pd;
+    PointIndexDirectionElement pi;
+};
+
+TEST_F(imstkCollisionElementTest, Constructor)
 {
     {
         CollisionElement e;
@@ -43,7 +71,7 @@ TEST(imstkCollisionElementTest, Constructor)
     }
 }
 
-TEST(imstkCollisionElementTest, CopyConstructor)
+TEST_F(imstkCollisionElementTest, CopyConstructor)
 {
     {
         CollisionElement old;
@@ -80,7 +108,7 @@ TEST(imstkCollisionElementTest, CopyConstructor)
     }
 }
 
-TEST(imstkCollisionElementTest, DataAssignment)
+TEST_F(imstkCollisionElementTest, DataAssignment)
 {
         CollisionElement e;
         e = cv;
@@ -104,7 +132,7 @@ TEST(imstkCollisionElementTest, DataAssignment)
         EXPECT_EQ(pi.ptIndex, e.m_element.m_PointIndexDirectionElement.ptIndex);
 }
 
-TEST(imstkCollisionElementTest, Assignment)
+TEST_F(imstkCollisionElementTest, Assignment)
 {
     {
         CollisionElement old;
