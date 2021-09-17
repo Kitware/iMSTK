@@ -101,7 +101,7 @@ Any `find_package` commands issued in the main file have to be replicated here a
 
 # Updating a Dependency in iMSTK
 
-To update a dependency in imstk one needs to:
+## Updating a dependency in imstk
 
  - Swap the url in ` /CMake/External/<DependencyLibraryName>.cmake` to a different url.
     -  Ex: `https://gitlab.kitware.com/iMSTK/assimp/-/archive/fixCompilationError/assimp-fixCompilationError.zip`. Pulling zips prevents git history with it which can be sizeable.
@@ -112,10 +112,10 @@ To update a dependency in imstk one needs to:
 
 ## Updating a Remote Fork
 
-Most dependencies in iMSTK are forked. This way we don't depend on the remote repository as it could change (rebased/amended/etc). A few forks also contain our own diffs in the rare case something like a cmake fix is introduced. To update a fork:
+Most dependencies in iMSTK are forked. This way we don't depend on the remote repository as it could change (rebased/amended/moved/deleted). A few forks also contain our own diffs in the rare case something like a CMake fix is introduced. To update a fork:
  - Clone the fork locally: `git clone <git url of fork>` (all forks found in iMSTK group here: https://gitlab.kitware.com/iMSTK)
  - Add upstream `git remote add upstream <url of actual repo/repo forked off>` (the description of the fork normally provides what it was forked from)
-    - Tip: `git remote -v` to list all remotes
+    - Tip: Issue `git remote -v` to list all remotes
  - Merge upstream (or rebase): `git merge upstream/<branch to update from>`
  - Push your changes
 
@@ -129,6 +129,6 @@ iMSTKs data sits in a separate repository https://gitlab.kitware.com/iMSTK/imstk
 
 The repository is already checked out as an external dependency in your build directory (if using superbuild) as `<build_dir>\External\iMSTKData\src\Data`, data can be added to the folder here and directly commited and pushed. 
 
-**2. Update SHA in ExternalData.cmake**
+**2. Update SHA in `ExternalData.cmake`**
 
-The file that controls the downloading of the data is `CMake/External/External_iMSTKData.cmake` after commiting and pushing a change in the iMSTKData repository, the SHA to checkout needs to be updated to the SHA matching your latest commit.
+The file that controls the downloading of the data is `CMake/External/External_iMSTKData.cmake`. After commiting and pushing a change in the `iMSTKData` repository, the SHA to checkout needs to be updated to the SHA matching the latest commit.
