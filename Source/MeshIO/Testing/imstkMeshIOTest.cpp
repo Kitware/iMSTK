@@ -21,28 +21,13 @@
 
 #include "gtest/gtest.h"
 
-#include "imstkPbdPointPointConstraint.h"
+#include "imstkMeshIO.h"
+#include "imstkGeometryUtilities.h"
+#include "imstkSurfaceMesh.h"
 
 using namespace imstk;
 
-///
-/// \brief Test that two points meet
-///
-TEST(imstkPbdPointPointConstraintTest, TestConvergence1)
+TEST(imstkMeshIODeathTest, FailOnMissingFile)
 {
-    PbdPointPointConstraint constraint;
-
-    Vec3d a = Vec3d(0.0, 0.0, 0.0);
-    Vec3d b = Vec3d(0.0, -1.0, 0.0);
-
-    constraint.initConstraint(
-        { &a, 1.0, nullptr },
-        { &b, 1.0, nullptr },
-        1.0, 1.0);
-    for (int i = 0; i < 3; i++)
-    {
-        constraint.solvePosition();
-    }
-
-    ASSERT_EQ(a[1], b[1]);
+    EXPECT_DEATH(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "doesntexist.obj"), "doesntexist.obj doesn't exist");
 }

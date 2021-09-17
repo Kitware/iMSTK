@@ -73,17 +73,17 @@ RigidBodyModel2::initialize()
     // Compute the initial state
     std::shared_ptr<RigidBodyState2> state = std::make_shared<RigidBodyState2>();
     state->resize(m_bodies.size());
-    std::vector<bool>& isStatic  = state->getIsStatic();
-    StdVectorOfReal&   invMasses = state->getInvMasses();
-    StdVectorOfMat3d&  invInteriaTensors = state->getInvIntertiaTensors();
-    StdVectorOfVec3d&  positions           = state->getPositions();
-    StdVectorOfQuatd&  orientations        = state->getOrientations();
-    StdVectorOfVec3d&  velocities          = state->getVelocities();
-    StdVectorOfVec3d&  angularVelocities   = state->getAngularVelocities();
-    StdVectorOfVec3d&  tentativeVelocities = state->getTentatveVelocities();
-    StdVectorOfVec3d&  tentativeAngularVelocities = state->getTentativeAngularVelocities();
-    StdVectorOfVec3d&  forces  = state->getForces();
-    StdVectorOfVec3d&  torques = state->getTorques();
+    std::vector<bool>&   isStatic  = state->getIsStatic();
+    std::vector<double>& invMasses = state->getInvMasses();
+    StdVectorOfMat3d&    invInteriaTensors = state->getInvIntertiaTensors();
+    StdVectorOfVec3d&    positions           = state->getPositions();
+    StdVectorOfQuatd&    orientations        = state->getOrientations();
+    StdVectorOfVec3d&    velocities          = state->getVelocities();
+    StdVectorOfVec3d&    angularVelocities   = state->getAngularVelocities();
+    StdVectorOfVec3d&    tentativeVelocities = state->getTentatveVelocities();
+    StdVectorOfVec3d&    tentativeAngularVelocities = state->getTentativeAngularVelocities();
+    StdVectorOfVec3d&    forces  = state->getForces();
+    StdVectorOfVec3d&    torques = state->getTorques();
 
     m_Minv = Eigen::SparseMatrix<double>(m_bodies.size() * 6, m_bodies.size() * 6);
     std::vector<Eigen::Triplet<double>> mInvTriplets;
@@ -152,6 +152,56 @@ RigidBodyModel2::initialize()
 }
 
 void
+RigidBodyModel2::updateMass()
+{
+    // Compute the initial state
+    std::shared_ptr<RigidBodyState2> state = m_currentState;
+
+    std::vector<double>& invMasses = state->getInvMasses();
+    StdVectorOfMat3d&    invInteriaTensors = state->getInvIntertiaTensors();
+
+    m_Minv = Eigen::SparseMatrix<double>(m_bodies.size() * 6, m_bodies.size() * 6);
+    std::vector<Eigen::Triplet<double>> mInvTriplets;
+    mInvTriplets.reserve((9 + 3) * m_bodies.size());
+    for (size_t i = 0; i < m_bodies.size(); i++)
+    {
+        RigidBody& body = *m_bodies[i];
+
+        invMasses[i] = (body.m_mass == 0.0) ? 0.0 : 1.0 / body.m_mass;
+        if (body.m_intertiaTensor.determinant() == 0.0)
+        {
+            LOG(WARNING) << "Inertia tensor provided is not invertible, check that it makes sense";
+        }
+        else
+        {
+            invInteriaTensors[i] = body.m_intertiaTensor.inverse();
+        }
+
+        if (!body.m_isStatic)
+        {
+            // invMass expanded to 3x3 matrix
+            const double invMass     = invMasses[i];
+            const Mat3d& invInvertia = invInteriaTensors[i];
+            int          index       = static_cast<int>(i * 6);
+            mInvTriplets.push_back(Eigen::Triplet<double>(index, index, invMass));
+            index++;
+            mInvTriplets.push_back(Eigen::Triplet<double>(index, index, invMass));
+            index++;
+            mInvTriplets.push_back(Eigen::Triplet<double>(index, index, invMass));
+            index++;
+            for (unsigned int c = 0; c < 3; c++)
+            {
+                for (unsigned int r = 0; r < 3; r++)
+                {
+                    mInvTriplets.push_back(Eigen::Triplet<double>(index + r, index + c, invInvertia(c, r)));
+                }
+            }
+        }
+    }
+    m_Minv.setFromTriplets(mInvTriplets.begin(), mInvTriplets.end());
+}
+
+void
 RigidBodyModel2::configure(std::shared_ptr<RigidBodyModel2Config> config)
 {
     m_config = config;
@@ -160,14 +210,14 @@ RigidBodyModel2::configure(std::shared_ptr<RigidBodyModel2Config> config)
 void
 RigidBodyModel2::computeTentativeVelocities()
 {
-    const double            dt = m_config->m_dt;
-    const StdVectorOfReal&  invMasses = getCurrentState()->getInvMasses();
-    const StdVectorOfMat3d& invInteriaTensors   = getCurrentState()->getInvIntertiaTensors();
-    StdVectorOfVec3d&       tentativeVelocities = getCurrentState()->getTentatveVelocities();
-    StdVectorOfVec3d&       tentativeAngularVelocities = getCurrentState()->getTentativeAngularVelocities();
-    StdVectorOfVec3d&       forces  = getCurrentState()->getForces();
-    StdVectorOfVec3d&       torques = getCurrentState()->getTorques();
-    const Vec3d&            fG      = m_config->m_gravity;
+    const double               dt = m_config->m_dt;
+    const std::vector<double>& invMasses = getCurrentState()->getInvMasses();
+    const StdVectorOfMat3d&    invInteriaTensors   = getCurrentState()->getInvIntertiaTensors();
+    StdVectorOfVec3d&          tentativeVelocities = getCurrentState()->getTentatveVelocities();
+    StdVectorOfVec3d&          tentativeAngularVelocities = getCurrentState()->getTentativeAngularVelocities();
+    StdVectorOfVec3d&          forces  = getCurrentState()->getForces();
+    StdVectorOfVec3d&          torques = getCurrentState()->getTorques();
+    const Vec3d&               fG      = m_config->m_gravity;
 
     // Sum gravity to the forces
     ParallelUtils::parallelFor(forces.size(), [&forces, &fG](const size_t& i)
@@ -343,8 +393,8 @@ RigidBodyModel2::integrate()
 
     const std::vector<bool>& isStatic = getCurrentState()->getIsStatic();
 
-    const StdVectorOfReal&  invMasses = getCurrentState()->getInvMasses();
-    const StdVectorOfMat3d& invInteriaTensors = getCurrentState()->getInvIntertiaTensors();
+    const std::vector<double>& invMasses = getCurrentState()->getInvMasses();
+    const StdVectorOfMat3d&    invInteriaTensors = getCurrentState()->getInvIntertiaTensors();
 
     StdVectorOfVec3d& positions    = getCurrentState()->getPositions();
     StdVectorOfQuatd& orientations = getCurrentState()->getOrientations();

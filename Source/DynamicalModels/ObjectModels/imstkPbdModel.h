@@ -62,6 +62,7 @@ struct PBDModelConfig
         });                                                                                       ///> Info shared between the fem constraints
 
     std::vector<std::pair<PbdConstraint::Type, double>> m_regularConstraints;                     ///> Constraints except FEM
+    std::unordered_map<int, int> m_constraintStrides;                                             ///> Extra parameter for bend constraints
     std::vector<std::pair<PbdConstraint::Type, PbdFEMConstraint::MaterialType>> m_FEMConstraints; ///> Constraints except FEM
 
     ///
@@ -69,6 +70,12 @@ struct PBDModelConfig
     /// with a given constraint stiffness
     ///
     void enableConstraint(PbdConstraint::Type type, double stiffness);
+
+    ///
+    /// \brief Enables a bend constraint with given stride (stride=1 connects every neighbor vertex
+    /// so a constraint is formed every 3 verts, stride=2 forms between 5 verts)
+    ///
+    void enableBendConstraint(const double stiffness, const int stride);
 
     ///
     /// \brief Enable a FEM constraint with mu, lambda

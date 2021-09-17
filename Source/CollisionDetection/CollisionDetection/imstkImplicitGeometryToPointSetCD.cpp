@@ -33,6 +33,7 @@ ImplicitGeometryToPointSetCD::ImplicitGeometryToPointSetCD()
 {
     setRequiredInputType<ImplicitGeometry>(0);
     setRequiredInputType<PointSet>(1);
+    m_centralGrad.setDx(Vec3d(0.001, 0.001, 0.001));
 }
 
 void

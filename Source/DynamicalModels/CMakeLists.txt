@@ -57,6 +57,6 @@ imstk_add_library(DynamicalModels
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-#if( ${PROJECT_NAME}_BUILD_TESTING )
-#  add_subdirectory( Testing )
-#endif()
+if( ${PROJECT_NAME}_BUILD_TESTING )
+  add_subdirectory(Testing)
+endif()

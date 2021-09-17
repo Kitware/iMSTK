@@ -6,85 +6,10 @@ Overview
 ========
 Dynamical Models, model dynamical systems which describe a function in time. Generally, this is given via some dynamical equation (usually a PDE) that can be discretized for various geometries. Commonly used geometries include tetrahedral, hexahedral, triangle meshes, pointsets, and implicit geometries.
 
-Position Based Dynamics (PBD)
+:doc:`Position Based Dynamics (PBD) <../PbdModel>`.
 =============================
-The first is position based dynamics which is fast and stable constraint based simulation method [pbd]_. It's fast and stable because it directly solves for positions. That is, each constraint is formulated with the positions. For example, a distance constraint may try to maintain a scalar distance L between two positions. While some models may compute a velocity that would converge the position to L. PBD directly computes the position to converge to L. For a single constraint this has a very simple solution. But when multiple constraints are involved, they may begin to conflict with each other, so we reproject the constraints to quantify how satisfied a constraint is. In PBD velocities are then computed aftewards given the resulting positions. The full list of PBD constraints may be found here.
 
-xPBD
-=====
-With original PBD, constraints become very stiff as the timestep decreases. Extended PBD (xPBD) alleviates this by removing that dependency. xPBD is the default in iMSTKs PbdModel.
-
-Usage
-=====
-Position based dynamics is very flexible. If you can come up with a constraint for it, you can simulate it. This includes things such as fluids, deformables, solids. This allows:
-
-- Blood (pointsets)
-
-.. image:: media/blood.png
-  :width: 400
-  :alt: Alternative text
-  :align: center
-
-
-- 2d/thin tissues and cloth (triangle meshes)
-
-.. image:: media/cloth1.png
-  :width: 400
-  :alt: Cloth simulation
-  :align: center
-
-.. image:: media/cloth2.png
-  :width: 400
-  :alt: Cloth cutting
-  :align: center  
-
-- Soft tissues and organs (tetrahedral meshes)
-
-.. image:: media/heart2.png
-  :width: 400
-  :alt: Tetrahedral mesh heart
-  :align: center  
-
-
-.. image:: media/vess.gif
-  :width: 400
-  :alt: VESS
-  :align: center  
-
-- String (linemeshes, useful for suturing)
-
-.. image:: media/strings.png
-  :width: 400
-  :alt: Strings
-  :align: center  
-
-
-Code
-====
-To setup a PbdModel we do:
-
-::
-
-    // Setup the config
-    imstkNew<PBDModelConfig> pbdConfig;
-
-    // Constraints
-    pbdConfig->enableConstraint(PbdConstraint::Type::Distance, 1e2);
-    pbdConfig->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
-    pbdConfig->m_fixedNodeIds = { 0, 1 };
-
-    // Other parameters
-    pbdConfig->m_uniformMassValue = 1.0;
-    pbdConfig->m_gravity   = Vec3d(0, -9.8, 0);
-    pbdConfig->m_defaultDt = 0.005;
-    pbdConfig->m_iterations = 10;
-
-    // Setup the model
-    imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(surfMesh);
-    pbdModel->configure(pbdConfig);
-
-This can be given to a PbdObject for usage in the scene.
+PBD is probably the most common model used in iMSTK, it may be used for cloths, thin tissues, volumetric/tetrahedral tissues, fluids (both liquids and gasses), and threads/strings. Read more about it at the link above.
 
 Smoothed Particle Hydrodynamics (SPH)
 =====================================
@@ -336,14 +261,6 @@ Bibliography
 .. [mcg] Uri M. Ascher and Eddy Boxerman. 2003. On the modified
    conjugate gradient method in cloth simulation. Vis. Comput. 19, 7-8
    (December 2003), 526-531.
-
-.. [pbd] Matthias Müller, Bruno Heidelberger, Marcus Hennix, and John
-   Ratcliff. 2007. Position based dynamics. J. Vis. Comun. Image
-   Represent. 18, 2 (April 2007), 109-118.
-
-.. [xpbd] Miles Macklin, Matthias Müller, and Nuttapong Chentanez
-    2016. XPBD: position-based simulation of compliant constrained dynamics.
-    In Proc. of Motion in Games. 49–54
 
 .. [vrpn] Russell M. Taylor, II, Thomas C. Hudson, Adam Seeger, Hans Weber,
     Jeffrey Juliano, and Aron T. Helser. 2001. VRPN: a device-independent,

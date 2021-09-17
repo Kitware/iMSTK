@@ -71,7 +71,7 @@ public:
     ///
     /// \brief Set the time step size
     ///
-    virtual void setTimeStep(const Real timeStep) override { m_config->m_dt = timeStep; }
+    virtual void setTimeStep(const double timeStep) override { m_config->m_dt = timeStep; }
 
     ///
     /// \brief Returns the time step size
@@ -99,9 +99,16 @@ public:
     void removeRigidBody(std::shared_ptr<RigidBody> body);
 
     ///
-    /// \brief Initialize the RigidBody model
+    /// \brief Initialize the RigidBody model to the initial state
     ///
     bool initialize() override;
+
+    ///
+    /// \brief Updates mass and inertia matrices to those provided
+    /// by the bodies. Not often needed unless mass/inertia is changing
+    /// at runtime.
+    ///
+    void updateMass();
 
     ///
     /// \brief Configure the model

@@ -26,17 +26,13 @@
 
 using namespace imstk;
 
-class imstkPGSSolverTest : public ::testing::Test
+///
+/// \brief Tests PGS solving of a diagonal 5x5 matrix
+///
+TEST(imstkPGSSolverTest, Solve5x5)
 {
-protected:
-    ProjectedGaussSeidelSolver<double> m_solver;
-};
+    ProjectedGaussSeidelSolver<double> solver;
 
-///
-/// \brief TODO
-///
-TEST_F(imstkPGSSolverTest, Solve5x5)
-{
     // Testing Ax=b
     Eigen::MatrixXd Ad(5, 5);
     Ad <<
@@ -61,12 +57,12 @@ TEST_F(imstkPGSSolverTest, Solve5x5)
         cu(i, 1) = IMSTK_DOUBLE_MAX;
     }
 
-    m_solver.setA(&A);
-    m_solver.setMaxIterations(1000);
-    m_solver.setRelaxation(0.05);
-    m_solver.setEpsilon(1.0e-8);
+    solver.setA(&A);
+    solver.setMaxIterations(1000);
+    solver.setRelaxation(0.05);
+    solver.setEpsilon(1.0e-8);
 
-    Eigen::VectorXd x = m_solver.solve(b, cu);
+    Eigen::VectorXd x = solver.solve(b, cu);
 
     // Check that Ax now equals b
     // Test this way in case multiple solutions exist, here we are only

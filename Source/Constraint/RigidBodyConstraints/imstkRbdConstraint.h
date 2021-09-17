@@ -47,8 +47,6 @@ struct RigidBody
 
         Vec3d m_prevForce = Vec3d(0.0, 0.0, 0.0);
 
-        // Vec3d m_externalForce;
-        //RigidBodyState2* m_state; // A RigidBody can only belong to one state
         Vec3d* m_pos = nullptr;
         Quatd* m_orientation     = nullptr;
         Vec3d* m_velocity        = nullptr;

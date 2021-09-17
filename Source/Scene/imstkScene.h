@@ -56,7 +56,7 @@ struct SceneConfig
     bool trackFPS = false;
 
     // If off, tasks will run sequentially
-    bool taskParallelizationEnabled = true;
+    bool taskParallelizationEnabled = false;
 
     // If on, elapsed times for computational steps will be reported in map
     bool taskTimingEnabled = false;

@@ -140,7 +140,7 @@ PBDPickingCH::addPickConstraints(const std::vector<CollisionElement>& elements,
                     lock.unlock();
                 }
             }
-        }, 100);
+        }, elements.size() > 100);
 }
 
 void

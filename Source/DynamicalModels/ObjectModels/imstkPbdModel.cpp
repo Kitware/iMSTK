@@ -65,6 +65,13 @@ PBDModelConfig::enableConstraint(PbdConstraint::Type type, double stiffness)
 }
 
 void
+PBDModelConfig::enableBendConstraint(const double stiffness, const int stride)
+{
+    m_regularConstraints.push_back({ PbdConstraint::Type::Bend, stiffness });
+    m_constraintStrides[m_regularConstraints.size() - 1] = stride;
+}
+
+void
 PBDModelConfig::enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material)
 {
     LOG_IF(FATAL, (type != PbdConstraint::Type::FEMTet && type != PbdConstraint::Type::FEMHex))
@@ -115,6 +122,7 @@ PbdModel::initialize()
             functor->setMaterialType(constraintType.second);
             m_functors.push_back(functor);
         }
+        int i = 0;
         for (auto constraintType : m_parameters->m_regularConstraints)
         {
             if (constraintType.first == PbdConstraint::Type::Area)
@@ -125,8 +133,15 @@ PbdModel::initialize()
             }
             else if (constraintType.first == PbdConstraint::Type::Bend)
             {
+                // If bend constraint requested but no stride provided use 1
+                int stride = 1;
+                if (m_parameters->m_constraintStrides.count(i) > 0)
+                {
+                    stride = m_parameters->m_constraintStrides[i];
+                }
                 auto functor = std::make_shared<PbdBendConstraintFunctor>();
                 functor->setStiffness(constraintType.second);
+                functor->setStride(stride);
                 m_functors.push_back(functor);
             }
             else if (constraintType.first == PbdConstraint::Type::ConstantDensity)
@@ -165,6 +180,7 @@ PbdModel::initialize()
                 functor->setStiffness(constraintType.second);
                 m_functors.push_back(functor);
             }
+            i++;
         }
 
         for (auto functorPtr : m_functors)
@@ -177,7 +193,7 @@ PbdModel::initialize()
         // Partition constraints for parallel computation
         if (m_parameters->m_doPartitioning)
         {
-            m_constraints->partitionConstraints(m_partitionThreshold);
+            m_constraints->partitionConstraints(static_cast<int>(m_partitionThreshold));
         }
         else
         {
@@ -286,20 +302,20 @@ PbdModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
 void
 PbdModel::computeElasticConstants()
 {
-    if (std::abs(m_parameters->m_femParams->m_mu) < MIN_REAL
-        && std::abs(m_parameters->m_femParams->m_lambda) < MIN_REAL)
+    if (std::abs(m_parameters->m_femParams->m_mu) < std::numeric_limits<double>::min()
+        && std::abs(m_parameters->m_femParams->m_lambda) < std::numeric_limits<double>::min())
     {
-        const auto E  = m_parameters->m_femParams->m_YoungModulus;
-        const auto nu = m_parameters->m_femParams->m_PoissonRatio;
-        m_parameters->m_femParams->m_mu     = E / Real(2.0) / (Real(1.0) + nu);
-        m_parameters->m_femParams->m_lambda = E * nu / ((Real(1.0) + nu) * (Real(1.0) - Real(2.0) * nu));
+        const double E  = m_parameters->m_femParams->m_YoungModulus;
+        const double nu = m_parameters->m_femParams->m_PoissonRatio;
+        m_parameters->m_femParams->m_mu     = E / 2.0 / (1.0 + nu);
+        m_parameters->m_femParams->m_lambda = E * nu / ((1.0 + nu) * (1.0 - 2.0 * nu));
     }
     else
     {
-        const auto mu     = m_parameters->m_femParams->m_mu;
-        const auto lambda = m_parameters->m_femParams->m_lambda;
-        m_parameters->m_femParams->m_YoungModulus = mu * (Real(3.0) * lambda + Real(2.0) * mu) / (lambda + mu);
-        m_parameters->m_femParams->m_PoissonRatio = lambda / Real(2.0) / (lambda + mu);
+        const double mu     = m_parameters->m_femParams->m_mu;
+        const double lambda = m_parameters->m_femParams->m_lambda;
+        m_parameters->m_femParams->m_YoungModulus = mu * (3.0 * lambda + 2.0 * mu) / (lambda + mu);
+        m_parameters->m_femParams->m_PoissonRatio = lambda / 2.0 / (lambda + mu);
     }
 }
 

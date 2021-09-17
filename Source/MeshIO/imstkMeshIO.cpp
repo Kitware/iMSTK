@@ -60,13 +60,10 @@ static std::unordered_map<std::string, MeshFileType> extToType =
 std::shared_ptr<PointSet>
 MeshIO::read(const std::string& filePath)
 {
-    bool isDir = false;
+    bool isDirectory = false;
+    bool exists      = fileExists(filePath, isDirectory);
 
-    if (isDir)
-    {
-        // Assume that the directory is a collection of DICOM files
-        return VTKMeshIO::read(filePath, MeshFileType::DCM);
-    }
+    CHECK(exists && !isDirectory) << "File " << filePath << " doesn't exist or is a directory.";
 
     MeshFileType meshType = MeshIO::getFileType(filePath);
     switch (meshType)
