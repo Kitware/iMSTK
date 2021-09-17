@@ -362,8 +362,9 @@ Scene::removeLight(const std::string& lightName)
 std::string
 Scene::getCameraName(const std::shared_ptr<Camera> cam) const
 {
+    using MapType = std::unordered_map<std::string, std::shared_ptr<Camera>>;
     auto i = std::find_if(m_cameras.begin(), m_cameras.end(),
-        [&cam](const NamedMap<Camera>::value_type& j) { return j.second == cam; });
+        [&cam](const MapType::value_type& j) { return j.second == cam; });
     if (i != m_cameras.end())
     {
         return i->first;
