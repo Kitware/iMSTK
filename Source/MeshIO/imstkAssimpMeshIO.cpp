@@ -81,8 +81,8 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
     auto mesh = std::make_shared<SurfaceMesh>(std::string(importedMesh->mName.C_Str()));
 
     // Get mesh information
-    auto numVertices  = importedMesh->mNumVertices;
-    auto numTriangles = importedMesh->mNumFaces;
+    auto numVertices = importedMesh->mNumVertices;
+    auto numFaces    = importedMesh->mNumFaces;
 
     if (numVertices == 0)
     {
@@ -103,17 +103,20 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
     }
 
     // Triangles
-    std::shared_ptr<VecDataArray<int, 3>> trianglesPtr = std::make_shared<VecDataArray<int, 3>>(numTriangles);
-    VecDataArray<int, 3>&                 triangles    = *trianglesPtr;
+    auto trianglesPtr = std::make_shared<VecDataArray<int, 3>>();
+    trianglesPtr->reserve(numFaces);
+    VecDataArray<int, 3>& triangles = *trianglesPtr;
 
-    for (unsigned int i = 0; i < numTriangles; i++)
+    for (unsigned int i = 0; i < numFaces; i++)
     {
-        auto triangle = importedMesh->mFaces[i];
-        auto indices  = triangle.mIndices;
-        triangles[i][0] = indices[0];
-        triangles[i][1] = indices[1];
-        triangles[i][2] = indices[2];
+        aiFace        triangle = importedMesh->mFaces[i];
+        unsigned int* indices  = triangle.mIndices;
+        if (triangle.mNumIndices == 3) // Only supports triangles
+        {
+            triangles.push_back(Vec3i(indices[0], indices[1], indices[2]));
+        }
     }
+    trianglesPtr->squeeze();
 
     // Vertex normals, tangents, and bitangents
     std::shared_ptr<VecDataArray<double, 3>> normalsPtr    = std::make_shared<VecDataArray<double, 3>>(numVertices);
