@@ -22,104 +22,73 @@
 #pragma once
 
 #include "imstkDeviceClient.h"
-#include "imstkModule.h"
 
-#include <vrpn_Configure.h>
-#include <vrpn_Tracker.h>
-#include <vrpn_Analog.h>
-#include <vrpn_Button.h>
-#include <vrpn_ForceDevice.h>
-#include <unordered_map>
+#include "vrpn_Tracker.h"
+#include "vrpn_Analog.h"
+#include "vrpn_Button.h"
+#include "vrpn_ForceDevice.h"
+
+#include "imstkVRPNDeviceManager.h"
 
 namespace imstk
 {
 ///
 /// \class VRPNDeviceClient
-/// \brief Subclass of DeviceClient using VRPN
+/// \brief This class is the receiver of the updates sent by the vrpn_server
 ///
-class VRPNDeviceClient : public DeviceClient, public Module
+/// After adding a `VRPNDeviceClient` to the `VRPNDeviceManger` the static functions
+/// in this class will be called whenever new data comes in from `vrpn_server`.
+///
+class VRPNDeviceClient : public DeviceClient
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    VRPNDeviceClient(const std::string& deviceName, const std::string& ip) : Module(),
-        DeviceClient(deviceName, ip)
-    {}
+    VRPNDeviceClient(const std::string& deviceName, VRPNDeviceType type, const std::string& ip = "localhost");
 
     ///
     /// \brief Destructor
     ///
     virtual ~VRPNDeviceClient() override = default;
 
-protected:
-    ///
-    /// \brief Initialize device client module
-    ///
-    bool initModule() override;
-
-    ///
-    /// \brief Run the device client
-    ///
-    void updateModule() override;
-
-    ///
-    /// \brief Clean the device client
-    ///
-    void uninitModule() override;
-
-private:
-
     ///
     /// \brief VRPN call back for position and orientation data
-    /// \param userData Pointer to this to allow updating
-    /// internal data
-    /// \param b VRPN callback structure containing new position and
-    /// orientation data
+    /// \param userData Pointer to a VRPNDeviceClient to allow updating internal data the server class
+    ///                 used the device client pointer when registering
+    /// \param t VRPN callback structure containing new position and orientation data
     ///
-    static void VRPN_CALLBACK trackerChangeHandler(void* userData, const _vrpn_TRACKERCB t);
+    static void VRPN_CALLBACK trackerPositionChangeHandler(void* userData, const _vrpn_TRACKERCB t);
 
     ///
-    /// \brief VRPN call back for position and orientation data
-    /// \param userData Pointer to this to allow updating
-    /// internal data
-    /// \param b VRPN callback structure containing new position and
-    /// orientation data
+    /// \brief VRPN call back for velocity data
+    /// \param userData Pointer to a VRPNDeviceClient to allow updating internal data the server class
+    ///                 used the device client pointer when registering
+    /// \param v VRPN callback structure tracker velocity
+    ///
+    static void VRPN_CALLBACK trackerVelocityChangeHandler(void* userData, const _vrpn_TRACKERVELCB v);
+
+    ///
+    /// \brief VRPN call back analog data
+    /// \param userData Pointer to a VRPNDeviceClient to allow updating internal data the server class
+    ///                 used the device client pointer when registering
+    /// \param a VRPN callback structure for the analog data
     ///
     static void VRPN_CALLBACK analogChangeHandler(void* userData, const _vrpn_ANALOGCB a);
 
     ///
-    /// \brief VRPN call back for velocity data
-    /// \param userData Pointer to this to allow updating
-    /// internal data
-    /// \param v VRPN callback structure containing new position and
-    /// orientation data
-    ///
-    static void VRPN_CALLBACK velocityChangeHandler(void* userData, const _vrpn_TRACKERVELCB v);
-
-    ///
     /// \brief VRPN call back for button changed (pressed or released)
-    /// \param userData Pointer to this to allow updating
-    /// internal data
+    /// \param userData Pointer to a VRPNDeviceClient to allow updating internal data the server class
+    ///                 used the device client pointer when registering
     /// \param b VRPN callback structure containing new button data
     ///
     static void VRPN_CALLBACK buttonChangeHandler(void* userData, const _vrpn_BUTTONCB b);
 
-    ///
-    /// \brief VRPN call back for force data
-    /// \param userData Pointer to this to allow updating
-    /// internal data
-    /// \param f VRPN callback structure containing new force data
-    ///
-    static void VRPN_CALLBACK forceChangeHandler(void* userData, const _vrpn_FORCECB f);
+    /// \return all the types that this client is tracking
+    VRPNDeviceType getType() const;
 
-    std::shared_ptr<vrpn_Tracker_Remote>     m_vrpnTracker;     //!< VRPN position/orientation interface
-    std::shared_ptr<vrpn_Analog_Remote>      m_vrpnAnalog;      //!< VRPN position/orientation interface
-    std::shared_ptr<vrpn_Button_Remote>      m_vrpnButton;      //!< VRPN button interface
-    std::shared_ptr<vrpn_ForceDevice_Remote> m_vrpnForceDevice; //!< VRPN force interface
-
-public:
-    std::unordered_map<int, bool> m_buttons;
+private:
+    VRPNDeviceType m_type;
 };
 }

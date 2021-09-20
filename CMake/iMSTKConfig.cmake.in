@@ -14,6 +14,7 @@ set(iMSTK_USE_OpenHaptics @iMSTK_USE_OpenHaptics@)
 set(iMSTK_USE_VTK_OSMESA @iMSTK_USE_VTK_OSMESA@)
 set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)
 set(iMSTK_USE_PHYSX @iMSTK_USE_PHYSX@)
+set(iMSTK_USE_VRPN @iMSTK_USE_VRPN@)
 
 # Use the iMSTK modules to find all required packages
 set(CACHE_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})

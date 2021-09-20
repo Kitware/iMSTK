@@ -157,3 +157,18 @@ We can also apply forces on a haptics devices so the user may feel feedback. Whe
     ...
 
     client->applyForce(Vec3d(0.0, 1.0, 0.0)); // Apply upwards force
+
+VRPN
+====
+iMSTK currently supports the Tracker, Button and Analog device types of the VRPN library. It utilizes the normal VRPN server that will be in the installation directory when VRPN is enabled. The VRPNManager utilizes the VRPN client protocol to connect to the server and retrieve the data delivered by the VRPN. As VRPN uses TCP/IP for communication devices may be connected to a remote machine. With VRPN most of the device configuration is being done in the vrpn.cfg that is being used, ports, speeds, or world to virtual space transforms can be set up there. To use VRPN in iMSTK vrpn_server has to be started from the command line. When VRPN is enabled it will be installed in the iMSTK binary directory.
+
+::
+    
+    auto server = std::make_shared<VRPNDeviceManager>("localhost", 38833);
+    auto client = vrpnManager->makeDeviceClient("Tracker0", VRPNTracker)
+
+    auto manager = std::make_shared<SimulationManager>();
+    manager->addModule(server)
+    ...  
+
+If a special device is needs there are multiple extensions points, VRPNDeviceClient can be derived from and data could be mapped there. There are some VRPN devices that map data, or a specific VRPN device client could be implemented by overriding the update() method in the client. 

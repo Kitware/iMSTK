@@ -118,6 +118,22 @@ To support the [Geomagic Touch (formerly Sensable Phantom Omni)](http://www.geom
   2. Reboot your system.
   3. Configure your CMake project with the variable `iMSTK_USE_OpenHaptics` set to `ON`.
   4. After configuration, the CMake variable `OPENHAPTICS_ROOT_DIR` should be set to the OpenHaptics path on your system.
+  
+* ##### VRPN Support
+
+The `VRPNDeviceModule` enables access to a large number devices supported by VRPN. The `VRPNDeviceModule` expects a `vrpn_server` to be running. The iMSTK superbuild builds and
+installs a server with some default settings but if you want to configure a specific server
+it might be easier to separately build a server. The file `CMake\External\External_VRPN.cmake`
+shows how to pass configuration into VRPN in case you want to modify the modules enabled and
+disabled by the build
+
+The `vrpn.cfg` that is installed by default doesn't have any devices enabled, before use you 
+will need to uncomment the devices that you would like to use. If you use the one inside the 
+iMSTK install directory please note that it will be overwritten every time the superbuild is 
+run. 
+
+Currently iMSTK supports VRPN `Analog`, `Button` and `Tracker` devices. Future support will
+depend on user demand.
 
 * ##### Offscreen Rendering
 To render without the usage of a GPU or without the usage of a screen on linux (or WSL), iMSTK's VTK renderer may be built with OSMesa.
