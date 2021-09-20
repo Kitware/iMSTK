@@ -109,7 +109,7 @@ using Mat3d = Eigen::Matrix<double, 3, 3>;
 using StdVectorOfMat3d = std::vector<Mat3d, Eigen::aligned_allocator<Mat3d>>;
 
 // 4x4 Matrix
-using Mat4f = Eigen::Matrix<float, 4, 4> ;
+using Mat4f = Eigen::Matrix<float, 4, 4>;
 using Mat4d = Eigen::Matrix<double, 4, 4>;
 
 /// A dynamic size matrix of floats
