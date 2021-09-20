@@ -185,8 +185,7 @@ public:
     ///
     /// \brief Get and unordered map of cameras with names
     ///
-    const std::unordered_map<std::string, std::shared_ptr<Camera>>& 
-    getCameras() const { return m_cameras; }
+    const std::unordered_map<std::string, std::shared_ptr<Camera>>& getCameras() const { return m_cameras; }
 
     ///
     /// \brief Add light from the scene
