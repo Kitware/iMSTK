@@ -23,6 +23,7 @@
 
 #include "imstkDataArray.h"
 #include "imstkMath.h"
+#include "imstkLogger.h"
 //#include "imstkParallelReduce.h"
 
 namespace imstk
@@ -85,7 +86,7 @@ public:
         using iterator_category = std::forward_iterator_tag;
         using difference_type   = std::ptrdiff_t;
         using pointer   = VecType*;
-        using reference = VecType&;
+        using reference = const VecType&;
 
     public:
         const_iterator(pointer ptr) : ptr_(ptr) { }
@@ -99,7 +100,7 @@ public:
 
         self_type operator++(int junk) { ptr_++; return *this; }
 
-        const reference operator*() { return *ptr_; }
+        reference operator*() { return *ptr_; }
 
         const pointer operator->() { return ptr_; }
 

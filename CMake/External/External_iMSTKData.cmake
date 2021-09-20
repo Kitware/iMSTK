@@ -16,13 +16,14 @@ set(copy_data_command
   )
 
 include(imstkAddExternalProject)
+set(GIT_SHA "14824e3d53328ed6be481981959780f32881030b")
+set(DATA_URL "https://gitlab.kitware.com/iMSTK/imstk-data/-/archive/${GIT_SHA}/imstk-data-${GIT_SHA}.zip")
+
 imstk_add_external_project( iMSTKData
-  GIT_REPOSITORY  "https://gitlab.kitware.com/iMSTK/imstk-data.git"
-  GIT_TAG  "14824e3d53328ed6be481981959780f32881030b"
+  URL ${DATA_URL}
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
   INSTALL_COMMAND COMMAND ${copy_data_command}
   DEPENDENCIES ""
-  #VERBOSE
 )
 

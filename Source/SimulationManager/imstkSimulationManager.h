@@ -53,6 +53,8 @@ public:
     };
 
 public:
+
+    SimulationManager() = default;
     virtual ~SimulationManager() override = default;
 
 public:
