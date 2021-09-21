@@ -669,6 +669,31 @@ TaskGraph::removeRedundantNodes(std::shared_ptr<TaskGraph> graph)
     return results;
 }
 
+std::shared_ptr<TaskGraph>
+TaskGraph::removeUnusedNodes(std::shared_ptr<TaskGraph> graph)
+{
+    std::shared_ptr<TaskGraph> results = std::make_shared<TaskGraph>(*graph);
+
+    // Find the set of nodes not used by any edge
+    std::unordered_set<std::shared_ptr<TaskNode>> nodes;
+    nodes.reserve(results->m_nodes.size());
+    for (TaskNodeAdjList::const_iterator i = results->m_adjList.begin(); i != results->m_adjList.end(); i++)
+    {
+        nodes.insert((*i).first);
+        for (TaskNodeSet::const_iterator j = (*i).second.begin(); j != (*i).second.end(); j++)
+        {
+            nodes.insert(*j);
+        }
+    }
+    results->m_nodes.resize(nodes.size());
+    int iter = 0;
+    for (std::unordered_set<std::shared_ptr<TaskNode>>::const_iterator i = nodes.begin(); i != nodes.end(); i++)
+    {
+        results->m_nodes[iter++] = *i;
+    }
+    return results;
+}
+
 bool
 TaskGraph::isCyclic(std::shared_ptr<TaskGraph> graph)
 {

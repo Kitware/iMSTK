@@ -41,6 +41,7 @@
 
 #ifdef IMSTK_USE_PHYSX
 #include "imstkRigidBodyWorld.h"
+#include "imstkRigidObject.h"
 #endif
 
 namespace imstk
@@ -138,15 +139,9 @@ Scene::buildTaskGraph()
     m_taskGraph->clear();
     m_taskGraph->addEdge(m_taskGraph->getSource(), m_taskGraph->getSink());
 
-    // Setup all SceneObject compute graphs (and segment the rigid bodies)
-    std::list<std::shared_ptr<SceneObject>> rigidBodies;
+    // Setup all SceneObject compute graphs
     for (const auto& obj : m_sceneObjects)
     {
-        if (obj->getTypeName() == "RigidObject")
-        {
-            rigidBodies.push_back(obj);
-        }
-
         obj->initGraphEdges();
     }
 
@@ -171,6 +166,15 @@ Scene::buildTaskGraph()
     }
 
 #ifdef IMSTK_USE_PHYSX
+    // Gather all the physX rigid bodies
+    std::list<std::shared_ptr<SceneObject>> rigidBodies;
+    for (const auto& obj : m_sceneObjects)
+    {
+        if (std::dynamic_pointer_cast<RigidObject>(obj) != nullptr)
+        {
+            rigidBodies.push_back(obj);
+        }
+    }
 
     // Edge Case: Rigid bodies all have a singular update point because of how PhysX works
     // Think about generalizes these islands of interaction to Systems
@@ -214,6 +218,9 @@ Scene::initTaskGraph()
     {
         m_taskGraph = TaskGraph::reduce(m_taskGraph);
     }
+    // An extra precaution (some algoritms such as topological sort may not
+    // behave well with unused nodes)
+    m_taskGraph = TaskGraph::removeUnusedNodes(m_taskGraph);
 
     // If user wants to benchmark, tell all the nodes to time themselves
     for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
