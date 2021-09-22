@@ -238,9 +238,10 @@ main()
             //tissueObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
             });
 
-        std::cout << "================================================" << std::endl;
+        std::cout << "================================================\n";
+        std::cout << "Key i/j/k/u/o move the needle in space \n";
         std::cout << "Key s : injection \n" << "Key a : deflation \n";
-        std::cout << "================================================" << std::endl << std::endl;
+        std::cout << "================================================\n\n";
 
         driver->start();
     }

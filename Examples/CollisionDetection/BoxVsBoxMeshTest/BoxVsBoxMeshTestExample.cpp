@@ -174,6 +174,11 @@ main()
             viewer->addControl(keyControl);
         }
 
+        std::cout << "================================================\n";
+        std::cout << "Key i/j/k/u/o move the cube\n";
+        std::cout << "Key 1/2/3/4 rotate the cube\n";
+        std::cout << "================================================\n\n";
+
         driver->start();
     }
 
