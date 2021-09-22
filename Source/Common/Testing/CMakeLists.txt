@@ -1,2 +1,2 @@
   include(imstkAddTest)
-  imstk_add_test( Common )
+  imstk_add_test(Common)
