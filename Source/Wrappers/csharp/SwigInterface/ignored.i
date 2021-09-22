@@ -30,6 +30,8 @@
 %ignore imstk::Log;
 %rename("%s") imstk::Logger::startLogger();
 
+%ignore imstk::Scene::getCameras() const;
+
 %ignore imstk::InteractionPair::getTaskNodeInputs();
 %ignore imstk::InteractionPair::getTaskNodeOutputs();
 %ignore imstk::CollisionGraph::getInteractionPairMap();
