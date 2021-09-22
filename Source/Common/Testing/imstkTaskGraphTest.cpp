@@ -42,4 +42,3 @@ TEST(imstkTaskGraphTest, removeUnusedNodes_)
     EXPECT_EQ(3, taskGraph->removeUnusedNodes(taskGraph)->getNodes().size());
     EXPECT_EQ(node1, taskGraph->getNodes()[2]);// test if the left out node is the one that is wired
 }
-
