@@ -19,6 +19,7 @@
 
 =========================================================================*/
 
+// This example is haptic only
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
@@ -41,14 +42,9 @@
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
-
-#ifdef iMSTK_USE_OPENHAPTICS
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkRigidObjectController.h"
-#else
-#include "imstkKeyboardDeviceClient.h"
-#endif
 
 using namespace imstk;
 

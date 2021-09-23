@@ -34,7 +34,6 @@ using namespace imstk;
 
 NeedleObject::NeedleObject() : RigidObject2("Needle")
 {
-    // 18mm needle, 0.018m
     auto sutureMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
     auto sutureLineMesh = MeshIO::read<LineMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture_hull.vtk");
 
@@ -51,23 +50,18 @@ NeedleObject::NeedleObject() : RigidObject2("Needle")
     getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
     getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
     getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-    //getVisualModel(0)->getRenderMaterial()->setOpacity(0.5);
 
     std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
     rbdModel->getConfig()->m_gravity = Vec3d::Zero();
     rbdModel->getConfig()->m_maxNumIterations = 5;
     setDynamicalModel(rbdModel);
 
-    /*auto lineMeshModel = std::make_shared<VisualModel>();
-    lineMeshModel->setGeometry(sutureLineMesh);
-    addVisualModel(lineMeshModel);*/
-
     getRigidBody()->m_mass = 1.0;
     getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
 
-    // Rather than manually entering arc, an arc definition and geometry generator
-    // could be nice for imstk
+    // Manually setup an arc aligned with the geometry, some sort of needle+arc generator
+    // could be a nice addition to imstk
     Mat3d arcBasis = Mat3d::Identity();
     arcBasis.col(0) = Vec3d(0.0, 0.0, -1.0);
     arcBasis.col(1) = Vec3d(1.0, 0.0, 0.0);

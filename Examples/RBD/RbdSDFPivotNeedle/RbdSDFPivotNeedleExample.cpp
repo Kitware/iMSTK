@@ -21,47 +21,33 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
-#include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkImageData.h"
 #include "imstkIsometricMap.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
-#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidObjectCollision.h"
-#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSignedDistanceField.h"
 #include "imstkSimulationManager.h"
-#include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkSurfaceMeshFlyingEdges.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
 
-//#define USE_VR
-
-#ifdef USE_VR
-#include "imstkVTKOpenVRViewer.h"
-#include "imstkOpenVRDeviceClient.h"
-#else
 #ifdef iMSTK_USE_OPENHAPTICS
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
-#endif
+#include "imstkRigidObjectController.h"
+#else
+#include "imstkMouseDeviceClient.h"
 #endif
 
 using namespace imstk;
@@ -150,7 +136,7 @@ main()
     std::shared_ptr<CollidingObject> tissueObj = createTissueObj();
     scene->addSceneObject(tissueObj);
 
-    // Create the drill
+    // Create the needle
     std::shared_ptr<NeedleObject> needleObj = createNeedleObj();
     needleObj->setForceThreshold(50.0);
     scene->addSceneObject(needleObj);
@@ -187,15 +173,10 @@ main()
 
     // Run the simulation
     {
-#ifdef USE_VR
-        imstkNew<VTKOpenVRViewer> viewer("Viewer");
-        viewer->setActiveScene(scene);
-#else
         // Setup a viewer to render in its own thread
         imstkNew<VTKViewer> viewer("Viewer");
         viewer->setActiveScene(scene);
         viewer->setDebugAxesLength(0.005, 0.005, 0.005);
-#endif
 
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
@@ -208,15 +189,10 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-#ifdef USE_VR
-        std::shared_ptr<OpenVRDeviceClient> deviceClient = viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER);
-#else
 #ifdef iMSTK_USE_OPENHAPTICS
         imstkNew<HapticDeviceManager>       hapticManager;
         std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
-#endif
-#endif
 
         imstkNew<RigidObjectController> controller(needleObj, deviceClient);
         controller->setTranslationScaling(0.001);
@@ -243,8 +219,42 @@ main()
 
             ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 15.0));
             });
+#else
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        {
+            // Keep the tool moving in real time
+            needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
 
-#ifndef USE_VR
+            const Vec2d mousePos   = viewer->getMouseDevice()->getPos();
+            const Vec3d desiredPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.25;
+            const Quatd desiredOrientation = Quatd(Rotd(-1.0, Vec3d(1.0, 0.0, 0.0)));
+
+            Vec3d virutalForce;
+            {
+                const Vec3d fS = (desiredPos - needleObj->getRigidBody()->getPosition()) * 1000.0;   // Spring force
+                const Vec3d fD = -needleObj->getRigidBody()->getVelocity() * 100.0;                  // Spring damping
+
+                const Quatd dq       = desiredOrientation * needleObj->getRigidBody()->getOrientation().inverse();
+                const Rotd angleAxes = Rotd(dq);
+                const Vec3d tS       = angleAxes.axis() * angleAxes.angle() * 10000000.0;
+                const Vec3d tD       = -needleObj->getRigidBody()->getAngularVelocity() * 1000.0;
+
+                virutalForce = fS + fD;
+                (*needleObj->getRigidBody()->m_force)  += virutalForce;
+                (*needleObj->getRigidBody()->m_torque) += tS + tD;
+            }
+
+            // Update the ghost debug geometry
+            std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
+            toolGhostMesh->setRotation(desiredOrientation);
+            toolGhostMesh->setTranslation(desiredPos);
+            toolGhostMesh->updatePostTransformData();
+            toolGhostMesh->postModified();
+
+            ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, virutalForce.norm() / 15.0));
+            });
+#endif
+
         // Add mouse and keyboard controls to the viewer
         {
             imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
@@ -256,7 +266,6 @@ main()
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
-#endif
 
         driver->start();
     }
