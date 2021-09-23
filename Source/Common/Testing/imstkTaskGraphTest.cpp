@@ -20,25 +20,67 @@
 =========================================================================*/
 
 #include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 #include "imstkTaskGraph.h"
 
 using namespace imstk;
+using testing::UnorderedElementsAre;
 
-TEST(imstkTaskGraphTest, removeUnusedNodes_)
+TEST(imstkTaskGraphTest, Constructor)
+{
+    auto taskGraph = std::make_shared<TaskGraph>();
+    EXPECT_EQ(2, taskGraph->getNodes().size());
+}
+
+TEST(imstkTaskGraphTest, RemoveUnusedNodes)
 {
     auto node1 = std::make_shared<TaskNode>();
     auto node2 = std::make_shared<TaskNode>();
 
-    auto taskGraph = std::make_shared<TaskGraph>();
+    {
+        SCOPED_TRACE("Remove One");
+        auto taskGraph = std::make_shared<TaskGraph>();
 
-    taskGraph->addNode(node1);
-    taskGraph->addNode(node2);
+        taskGraph->addNode(node1);
+        taskGraph->addNode(node2);
 
-    taskGraph->addEdge(taskGraph->getSource(), node1);
-    taskGraph->addEdge(node1, taskGraph->getSink());
+        taskGraph->addEdge(taskGraph->getSource(), node1);
+        taskGraph->addEdge(node1, taskGraph->getSink());
 
-    EXPECT_EQ(4, taskGraph->getNodes().size());
-    EXPECT_EQ(3, taskGraph->removeUnusedNodes(taskGraph)->getNodes().size());
-    EXPECT_EQ(node1, taskGraph->getNodes()[2]);// test if the left out node is the one that is wired
+        auto result = taskGraph->removeUnusedNodes(taskGraph);
+
+        EXPECT_EQ(4, taskGraph->getNodes().size());
+        EXPECT_EQ(3, result->getNodes().size());
+        EXPECT_THAT(result->getNodes(), UnorderedElementsAre(taskGraph->getSource(), taskGraph->getSink(), node1));
+    }
+    {
+        SCOPED_TRACE("All Nodes connected");
+        auto taskGraph = std::make_shared<TaskGraph>();
+
+        taskGraph->addNode(node1);
+        taskGraph->addNode(node2);
+
+        taskGraph->addEdge(taskGraph->getSource(), node1);
+        taskGraph->addEdge(node1, node2);
+        taskGraph->addEdge(node2, taskGraph->getSink());
+
+        auto result = taskGraph->removeUnusedNodes(taskGraph);
+
+        EXPECT_EQ(4, taskGraph->getNodes().size());
+        EXPECT_EQ(4, result->getNodes().size());
+        EXPECT_THAT(result->getNodes(), UnorderedElementsAre(taskGraph->getSource(), taskGraph->getSink(), node1, node2));
+    }
+    {
+        SCOPED_TRACE("No Connected nodes");
+        // Note source and sink are not connected
+        auto taskGraph = std::make_shared<TaskGraph>();
+
+        taskGraph->addNode(node1);
+        taskGraph->addNode(node2);
+        EXPECT_EQ(4, taskGraph->getNodes().size());
+
+        auto result = taskGraph->removeUnusedNodes(taskGraph);
+        EXPECT_EQ(0, result->getNodes().size());
+    }
 }
