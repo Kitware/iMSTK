@@ -27,7 +27,6 @@
 #include "NeedleObject.h"
 #include "RbdLineToPointTranslationConstraint.h"
 #include "RbdLineToPointRotationConstraint.h"
-#include "RbdAngularDampingConstraint.h"
 #include "imstkLineMesh.h"
 
 using namespace imstk;

@@ -27,7 +27,6 @@ imstk_add_executable(${PROJECT_NAME} RbdSDFPivotNeedleExample.cpp
   NeedleInteraction.cpp
   NeedleRigidBodyCH.h
   NeedleRigidBodyCH.cpp
-  RbdAngularDampingConstraint.h
   RbdLineToPointTranslationConstraint.h
   RbdLineToPointRotationConstraint.h
   NeedleRigidBodyCH.h)
