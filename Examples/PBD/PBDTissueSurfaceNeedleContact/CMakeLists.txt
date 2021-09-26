@@ -26,8 +26,8 @@ imstk_add_executable(${PROJECT_NAME}
     NeedleRigidBodyCH.h
     NeedlePbdCH.h
     NeedleObject.h
-    RbdAngularNeedleLockingConstraint.h
-    RbdLinearNeedleLockingConstraint.h
+    RbdAngularLockingConstraint.h
+    RbdAxesLockingConstraint.h
     NeedleInteraction.h)
 
 #-----------------------------------------------------------------------------

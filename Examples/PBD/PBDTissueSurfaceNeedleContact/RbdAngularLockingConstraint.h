@@ -26,23 +26,23 @@
 using namespace imstk;
 
 ///
-/// \class RbdAngularNeedleLockingConstraint
+/// \class RbdAngularLockingConstraint
 ///
-/// \brief Constrains the orientation to some initial orientation
+/// \brief Constrains the orientation to some fixed orientation
 ///
-class RbdAngularNeedleLockingConstraint : public RbdConstraint
+class RbdAngularLockingConstraint : public RbdConstraint
 {
 public:
-    RbdAngularNeedleLockingConstraint(
+    RbdAngularLockingConstraint(
         std::shared_ptr<RigidBody> obj,
-        const Quatd&               initNeedleOrientation,
+        const Quatd&               fixedOrientation,
         const double               beta = 0.05) : RbdConstraint(obj, nullptr, Side::A),
-        m_initNeedleOrientation(initNeedleOrientation),
+        m_fixedOrientation(fixedOrientation),
         m_beta(beta)
     {
     }
 
-    ~RbdAngularNeedleLockingConstraint() override = default;
+    ~RbdAngularLockingConstraint() override = default;
 
 public:
     void compute(double dt) override
@@ -51,7 +51,7 @@ public:
         J = Eigen::Matrix<double, 3, 4>::Zero();
         if ((m_side == Side::AB || m_side == Side::A) && !m_obj1->m_isStatic)
         {
-            const Quatd dq = m_initNeedleOrientation * m_obj1->getOrientation().inverse();
+            const Quatd dq = m_fixedOrientation * m_obj1->getOrientation().inverse();
             const Rotd  angleAxes = Rotd(dq);
             const Vec3d rotAxes   = angleAxes.axis();
             vu      = angleAxes.angle() * m_beta / dt;
@@ -62,6 +62,6 @@ public:
     }
 
 private:
-    Quatd  m_initNeedleOrientation; ///> Orientation to fix too
+    Quatd  m_fixedOrientation; ///> Orientation to fix too
     double m_beta = 0.05;
 };

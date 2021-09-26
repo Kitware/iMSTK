@@ -22,15 +22,9 @@
 #pragma once
 
 #include "imstkRigidBodyCH.h"
-#include "imstkRbdContactConstraint.h"
-#include "imstkRigidBodyModel2.h"
-#include "NeedleObject.h"
 
 using namespace imstk;
 
-///
-/// \brief Surface collision disabled upon puncture
-///
 class NeedleRigidBodyCH : public RigidBodyCH
 {
 public:
@@ -41,32 +35,22 @@ public:
 
 protected:
     ///
+    /// \brief Handle the collision/contact data
+    ///
+    virtual void handle(
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
+
+    ///
     /// \brief Add constraint for the rigid body given contact
     ///
     void addConstraint(
         std::shared_ptr<RigidObject2> rbdObj,
         const Vec3d& contactPt, const Vec3d& contactNormal,
-        const double contactDepth) override
-    {
-        auto needleObj = std::dynamic_pointer_cast<NeedleObject>(rbdObj);
+        const double contactDepth) override;
 
-        if (needleObj->getCollisionState() == NeedleObject::CollisionState::REMOVED)
-        {
-            needleObj->setCollisionState(NeedleObject::CollisionState::TOUCHING);
-        }
-
-        // Only add contact normal constraint if not inserted
-        if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
-        {
-            const Vec3d n = contactNormal.normalized();
-
-            auto contactConstraint = std::make_shared<RbdContactConstraint>(
-                rbdObj->getRigidBody(), nullptr,
-                n, contactPt, contactDepth,
-                m_beta,
-                RbdConstraint::Side::A);
-            contactConstraint->compute(rbdObj->getRigidBodyModel2()->getTimeStep());
-            rbdObj->getRigidBodyModel2()->addConstraint(contactConstraint);
-        }
-    }
+protected:
+    Vec3d m_initContactPt  = Vec3d::Zero();
+    Vec3d m_initNeedleAxes = Vec3d::Zero();
+    Quatd m_initNeedleOrientation = Quatd::Identity();
 };

@@ -21,39 +21,21 @@
 
 #pragma once
 
-#include "imstkPbdRigidObjectCollision.h"
+#include "imstkRigidObjectCollision.h"
 
 using namespace imstk;
 
-class NeedleEmbeddedCH;
 class NeedleObject;
-
-namespace imstk
-{
-class PbdObject;
-class TetraToLineMeshCD;
-}
 
 ///
 /// \class NeedleInteraction
 ///
 /// \brief Defines interaction between NeedleObject and PbdObject
 ///
-class NeedleInteraction : public PbdRigidObjectCollision
+class NeedleInteraction : public RigidObjectCollision
 {
 public:
-    NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
-                      std::shared_ptr<NeedleObject> needleObj);
+    NeedleInteraction(std::shared_ptr<CollidingObject> tissueObj,
+                      std::shared_ptr<NeedleObject>    needleObj);
     ~NeedleInteraction() override = default;
-
-public:
-    std::shared_ptr<TetraToLineMeshCD> getEmbeddingCD() const { return tetMeshCD; }
-    std::shared_ptr<NeedleEmbeddedCH> getEmbeddingCH() const { return embeddedCH; }
-
-protected:
-    void apply() override;
-
-protected:
-    std::shared_ptr<TetraToLineMeshCD> tetMeshCD;
-    std::shared_ptr<NeedleEmbeddedCH>  embeddedCH;
 };

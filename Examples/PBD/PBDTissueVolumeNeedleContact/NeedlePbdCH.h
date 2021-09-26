@@ -26,6 +26,9 @@
 
 using namespace imstk;
 
+///
+/// \brief Surface collision disabled upon puncture
+///
 class NeedlePbdCH : public PBDCollisionHandling
 {
 public:
@@ -43,8 +46,8 @@ protected:
         VertexMassPair ptB1, VertexMassPair ptB2, VertexMassPair ptB3,
         double stiffnessA, double stiffnessB)
     {
-        auto needleObject = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
-        if (!needleObject->getInserted())
+        auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
+        if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
         {
             PBDCollisionHandling::addVTConstraint(ptA, ptB1, ptB2, ptB3, stiffnessA, stiffnessB);
         }
@@ -58,8 +61,8 @@ protected:
         VertexMassPair ptB1, VertexMassPair ptB2,
         double stiffnessA, double stiffnessB)
     {
-        auto needleObject = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
-        if (!needleObject->getInserted())
+        auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
+        if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
         {
             PBDCollisionHandling::addEEConstraint(ptA1, ptA2, ptB1, ptB2, stiffnessA, stiffnessB);
         }
@@ -73,8 +76,8 @@ protected:
         VertexMassPair ptB1, VertexMassPair ptB2,
         double stiffnessA, double stiffnessB)
     {
-        auto needleObject = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
-        if (!needleObject->getInserted())
+        auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
+        if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
         {
             PBDCollisionHandling::addPEConstraint(ptA1, ptB1, ptB2, stiffnessA, stiffnessB);
         }
@@ -87,8 +90,8 @@ protected:
         VertexMassPair ptA, VertexMassPair ptB,
         double stiffnessA, double stiffnessB)
     {
-        auto needleObject = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
-        if (!needleObject->getInserted())
+        auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
+        if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
         {
             PBDCollisionHandling::addPPConstraint(ptA, ptB, stiffnessA, stiffnessB);
         }

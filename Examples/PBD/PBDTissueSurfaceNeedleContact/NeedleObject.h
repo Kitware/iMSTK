@@ -28,23 +28,38 @@ using namespace imstk;
 class NeedleObject : public RigidObject2
 {
 public:
+    enum class CollisionState
+    {
+        REMOVED,
+        TOUCHING,
+        INSERTED
+    };
+
+public:
     NeedleObject(const std::string& name) : RigidObject2(name) { }
     virtual ~NeedleObject() = default;
 
     virtual const std::string getTypeName() const override { return "NeedleObject"; }
 
 public:
-    void setInserted(const bool inserted) { m_inserted = inserted; }
-    bool getInserted() const { return m_inserted; }
+    void setCollisionState(const CollisionState state) { m_collisionState = state; }
+    CollisionState getCollisionState() const { return m_collisionState; }
 
     ///
-    /// \brief Returns the axes of the needle (tip-tail)
+    /// \brief Set the force threshold for the needle
     ///
-    const Vec3d getNeedleAxes() const
+    void setForceThreshold(const double forceThreshold) { m_forceThreshold = forceThreshold; }
+    double getForceThreshold() const { return m_forceThreshold; }
+
+    ///
+    /// \brief Returns the current axes of the needle (tip-tail)
+    ///
+    const Vec3d getAxes() const
     {
         return (-getCollidingGeometry()->getRotation().col(1)).normalized();
     }
 
 protected:
-    bool m_inserted = false;
+    CollisionState m_collisionState = CollisionState::REMOVED;
+    double m_forceThreshold = 10.0;
 };

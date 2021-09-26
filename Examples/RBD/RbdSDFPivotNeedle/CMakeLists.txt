@@ -16,19 +16,27 @@
 #
 ###########################################################################
 
-project(Example-PBDString)
+project(Example-RbdSDFPivotNeedle)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} pbdStringExample.cpp)
+imstk_add_executable(${PROJECT_NAME} RbdSDFPivotNeedleExample.cpp
+  NeedleObject.h
+  NeedleInteraction.h
+  NeedleInteraction.cpp
+  NeedleRigidBodyCH.h
+  NeedleRigidBodyCH.cpp
+  RbdLineToPointTranslationConstraint.h
+  RbdLineToPointRotationConstraint.h
+  NeedleRigidBodyCH.h)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/RBD)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
 #-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME} SimulationManager)
+target_link_libraries(${PROJECT_NAME} SimulationManager Filtering)
