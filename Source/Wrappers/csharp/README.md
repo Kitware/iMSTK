@@ -44,11 +44,11 @@ Some people like to compile all the `.cs` files into a separate library, the Vis
 - The C# examples run without building iMSTK csharp wrappers, but needs iMSTK built with OpenHaptics.
     - build iMSTK with `iMSTK_WRAP_CSHARP=ON`
     - There are several examples in `Source/Wrappers/csharp/Examples`. Taking pbdCloth.cs for an example, open a terminal, go to the imstk installation directory and execute 
-        - /path/to/mono/bin/csc '<imstkSource>\Source\Wrappers\csharp\Examples\pbdCloth.cs include\iMSTKCSharp\*.cs -out:bin\pbdCloth.exe
+        - /path/to/mono/bin/csc '<imstkSource>\Source\Wrappers\csharp\Examples\pbdCloth.cs include\iMSTKSharp\*.cs -out:bin\pbdCloth.exe
         - bin\pbdCloth.exe can run directly.
 		
 # How to compile SWIG generated C# code into a dll, and run examples with it?
 - open a terminal, cd to the iMSTK installation directory
-- /path/to/mono/bin/csc -target:library include\iMSTKCSharp\*.cs\*.cs -out:bin\iMSTKCS.dll (This compiles the C# code into a dynamic lib, iMSTKCS.dll)
+- /path/to/mono/bin/csc -target:library include\iMSTKSharp\*.cs\*.cs -out:bin\iMSTKCS.dll (This compiles the C# code into a dynamic lib, iMSTKCS.dll)
 - /path/to/mono/bin/csc -r:bin\iMSTKCS.dll <imstkSource>\Source\Wrappers\csharp\Examples\pbdCloth.cs -out:bin\pbdCloth.exe
 - bin\pbdCloth.exe can run directly.
