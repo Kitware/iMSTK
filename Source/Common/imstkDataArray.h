@@ -24,7 +24,6 @@
 #include "imstkAbstractDataArray.h"
 #include "imstkMath.h"
 #include "imstkMacros.h"
-//#include "imstkParallelReduce.h"
 
 namespace imstk
 {
@@ -49,18 +48,24 @@ public:
         using reference = T&;
 
     public:
-        iterator(pointer ptr) : ptr_(ptr) { }
+        iterator(pointer ptr, pointer end) : ptr_(ptr), end_(end) { }
 
         self_type operator++()
         {
             self_type i = *this;
             ptr_++;
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+            if ((end_ - ptr_) < 0) { throw std::runtime_error("iterator past bounds"); }
+#endif
             return i;
         }
 
         self_type operator++(int junk)
         {
             ptr_++;
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+            if ((end_ - ptr_) < 0) { throw std::runtime_error("iterator past bounds"); }
+#endif
             return *this;
         }
 
@@ -74,6 +79,7 @@ public:
 
     private:
         pointer ptr_;
+        pointer end_;
     };
 
     class const_iterator
@@ -87,16 +93,26 @@ public:
         using reference = const T&;
 
     public:
-        const_iterator(pointer ptr) : ptr_(ptr) { }
+        const_iterator(pointer ptr, pointer end) : ptr_(ptr), end_(end) { }
 
         self_type operator++()
         {
             self_type i = *this;
             ptr_++;
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+            if ((end_ - ptr_) < 0) { throw std::runtime_error("iterator past bounds"); }
+#endif
             return i;
         }
 
-        self_type operator++(int junk) { ptr_++; return *this; }
+        self_type operator++(int junk)
+        {
+            ptr_++;
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+            if ((end_ - ptr_) < 0) { throw std::runtime_error("iterator past bounds"); }
+#endif
+            return *this;
+        }
 
         reference operator*() { return *ptr_; }
 
@@ -108,6 +124,7 @@ public:
 
     private:
         pointer ptr_;
+        pointer end_;
     };
 
 public:
@@ -273,13 +290,13 @@ public:
         m_data[newSize - 1] = val;
     }
 
-    iterator begin() { return iterator(m_data); }
+    iterator begin() { return iterator(m_data, m_data + m_size); }
 
-    iterator end() { return iterator(m_data + m_size); }
+    iterator end() { return iterator(m_data + m_size, m_data + m_size); }
 
-    const_iterator cbegin() const { return const_iterator(m_data); }
+    const_iterator cbegin() const { return const_iterator(m_data, m_data + m_size); }
 
-    const_iterator cend() const { return const_iterator(m_data + m_size); }
+    const_iterator cend() const { return const_iterator(m_data + m_size, m_data + m_size); }
 
     ///
     /// \brief Allocates extra capacity, for the number of values, conservative reallocate
@@ -301,8 +318,21 @@ public:
     inline T* getPointer() { return m_data; }
     inline void* getVoidPointer() override { return static_cast<void*>(m_data); }
 
-    inline T& operator[](const size_t pos) { return m_data[pos]; }
-    inline const T& operator[](const size_t pos) const { return m_data[pos]; }
+    inline T& operator[](const size_t pos)
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+#endif
+        return m_data[pos];
+    }
+
+    inline const T& operator[](const size_t pos) const
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+#endif
+        return m_data[pos];
+    }
 
     ///
     /// \brief Allow initialization from initializer list, ie: DataArray<int> arr = { 1, 2 }
