@@ -199,3 +199,10 @@ TEST(imstkDataArrayTest, ParameterCast)
         EXPECT_DOUBLE_EQ(static_cast<double>(a[i]), (*actualB)[i]);
     }
 }
+
+TEST(imstkDataArrayTest, ResizeToOne)
+{
+    DataArray<int> a;
+    a.resize(1);
+    EXPECT_EQ(1, a.size());
+}

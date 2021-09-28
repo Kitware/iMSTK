@@ -233,3 +233,10 @@ TEST(imstkVecDataArrayTest, ParameterCast)
         EXPECT_TRUE(a[i].cast<double>().isApprox((*actualB)[i]));
     }
 }
+
+TEST(imstkVecDataArrayTest, ResizeToOne)
+{
+    VecDataArray<int, 2> a;
+    a.resize(1);
+    EXPECT_EQ(1, a.size());
+}

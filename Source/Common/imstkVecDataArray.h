@@ -215,8 +215,15 @@ public:
     inline void resize(const int size) override
     {
         // Can't resize a mapped vector
-        if (DataArray<T>::m_mapped || size == m_vecCapacity)
+        if (DataArray<T>::m_mapped)
         {
+            return;
+        }
+
+        if (size == m_vecCapacity)
+        {
+            DataArray<T>::m_size = DataArray<T>::m_capacity;
+            m_vecSize = m_vecCapacity;
             return;
         }
 
