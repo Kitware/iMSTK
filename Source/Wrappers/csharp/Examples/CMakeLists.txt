@@ -10,11 +10,14 @@ function(add_example example_name sources)
   set_property(TARGET ${target} PROPERTY VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.1")
   set_property(TARGET ${target} PROPERTY VS_DOTNET_REFERENCES "System;iMSTKCSharp")
   set_property(TARGET ${target} PROPERTY FOLDER Examples/CSharp)
-  
-  # Neither of these actually work, has to be set in the project explicitely 
-  set_property(TARGET ${target} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin")
-  set_property(TARGET ${target} PROPERTY VS_DEBUGGER_ENVIRONMENT "PATH=${CMAKE_INSTALL_PREFIX}/bin;%PATH%")
-  
+
+  if (MSVC)
+    set(BIN_PATH "${CMAKE_INSTALL_PREFIX}/bin/")
+    # csproj files picky about slashes
+    string(REPLACE "/" "\\" BIN_PATH "${BIN_PATH}")
+    set_property(TARGET ${target} PROPERTY VS_GLOBAL_StartWorkingDirectory ${BIN_PATH})
+  endif()
+
   add_custom_command(TARGET ${target} POST_BUILD
                      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${CMAKE_INSTALL_PREFIX}/bin)
   

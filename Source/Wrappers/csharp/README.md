@@ -32,12 +32,11 @@ The output of this step is a shared library `iMSTKCWrapper.[dll|sh]` (located in
 
 Some people like to compile all the `.cs` files into a separate library, the Visual Studio build does that in a separate target.
 
-# How ro run C# examples on Windows
+# How to run C# examples on Windows
 
 ## Via Visual Studio .NET
 - The superbuild needs to be run twice for the C# Examples to be run from the install folder
 - If you are looking at the inner build, after building `iMSTKCWrapper`, you will need to run CMake "Configure" and "Generate" again to load the example projects.
-- Due to the dependency relation ship noted above you can't immediately run the example out of visual studio at the moment but you need to make sure that the "Working Directory" under each examples' project settings is set to the iMSTK install folder
 
 ## Via Mono 
 - Install mono. See [https://www.mono-project.com/docs/getting-started/install/windows/](https://www.mono-project.com/docs/getting-started/install/windows/)

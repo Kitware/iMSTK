@@ -75,7 +75,6 @@
 #include "imstkPbdFEMConstraint.h"
 #include "imstkPbdCollisionConstraint.h"
 #include "imstkSPHBoundaryConditions.h"
-/* #include "imstkSPHHemorrhage.h" */
 #include "imstkInternalForceModelTypes.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkRigidBodyState2.h"
@@ -114,7 +113,6 @@
 /*
  * CollisionDetection
  */
-/* #include "imstkCollisionDetection.h" */
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkBidirectionalPlaneToSphereCD.h"
@@ -200,7 +198,7 @@
 namespace std {
   %template(VectorInt) vector<int>; 
   %template(VectorSizet) vector<std::size_t>;
-  %template(VectorCollisionData) vector<imstk::CollisionElement>;
+  %template(VectorCollisionElement) vector<imstk::CollisionElement>;
 }
 
 %include "shared_ptr_instantiation.i"
@@ -211,6 +209,7 @@ namespace std {
 %include "std_function.i"
 %include "callback.i"
 
+/* rename these operators to "compute" due to lack of operator overloading */
 %rename(compute) imstk::ImplicitFunctionGradient::operator();
 %rename(compute) imstk::ImplicitFunctionCentralGradient::operator();
 
@@ -271,6 +270,7 @@ namespace std {
  */
 %include "../../../MeshIO/imstkMeshIO.h";
 %template(readImageData) imstk::MeshIO::read<imstk::ImageData>;
+%template(readPointSet) imstk::MeshIO::read<imstk::PointSet>;
 %template(readSurfaceMesh) imstk::MeshIO::read<imstk::SurfaceMesh>;
 %template(readTetrahedralMesh) imstk::MeshIO::read<imstk::TetrahedralMesh>;
 
