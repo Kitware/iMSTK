@@ -7,7 +7,27 @@ swig_add_library(iMSTKCWrapper
     TYPE SHARED
     OUTPUT_DIR "${CMAKE_BINARY_DIR}/Source/Wrappers/csharp"
     LANGUAGE csharp
-    SOURCES SwigInterface/imstkCWrapper.i)
+    SOURCES
+        SwigInterface/imstkCWrapper.i)
+
+if (MSVC) 
+    # These files should not be provided via swig_add_library SOURCES
+    # But still displayed in visual studios
+    set(NOTGENERATED_FILES
+        SwigInterface/callback.i
+        SwigInterface/common.i
+        SwigInterface/debug.i
+        SwigInterface/ignored.i
+        SwigInterface/modifiers.i
+        SwigInterface/shared_ptr_instantiation.i
+        SwigInterface/std_function.i
+        SwigInterface/type_cast.i
+        SwigInterface/weak_ptr.i)
+
+    target_sources(iMSTKCWrapper PRIVATE ${NOTGENERATED_FILES})
+    set_source_files_properties(${NOTGENERATED_FILES}
+                                PROPERTIES HEADER_FILE_ONLY TRUE)
+endif()
 
 set_target_properties(iMSTKCWrapper PROPERTIES SWIG_COMPILE_OPTIONS "-namespace;imstk")
 if(iMSTK_SWIG_PINNED_ARRAY)
