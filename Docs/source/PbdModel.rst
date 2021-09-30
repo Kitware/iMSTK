@@ -31,7 +31,7 @@ Deformable Membranes
 
 For thin deformable membraneous tissues (cloth like) we use surfaces made of triangles. For this simulation one may use **PbdDistanceConstraint**, **PbdDihedralConstraint**, and/or **PbdAreaConstraint**. The most common setup is just distance and dihedral constraints though. The distance constraints keep the cloth together, whilst the dihedral constraint controls how resistent to bending the membrane is.
 
-.. image:: media/PbdModel/tissue1.png
+.. image:: media/PbdModel/tissue1Gif.gif
   :width: 400
   :alt: Cloth simulation
   :align: center
