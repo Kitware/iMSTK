@@ -33,6 +33,25 @@ TEST(imstkTaskGraphTest, Constructor)
     EXPECT_EQ(2, taskGraph->getNodes().size());
 }
 
+TEST(imstkTaskGraphTest, AddRemoveNodesNoEdges)
+{
+    auto taskGraph = std::make_shared<TaskGraph>();
+    auto node1     = std::make_shared<TaskNode>();
+    auto node2     = std::make_shared<TaskNode>();
+
+    taskGraph->addNode(node1);
+    EXPECT_THAT(taskGraph->getNodes(), UnorderedElementsAre(taskGraph->getSource(), taskGraph->getSink(), node1));
+
+    taskGraph->addNode(node2);
+    EXPECT_THAT(taskGraph->getNodes(), UnorderedElementsAre(taskGraph->getSource(), taskGraph->getSink(), node1, node2));
+
+    taskGraph->removeNode(node1);
+    EXPECT_THAT(taskGraph->getNodes(), UnorderedElementsAre(taskGraph->getSource(), taskGraph->getSink(), node2));
+
+    taskGraph->removeNode(node2);
+    EXPECT_THAT(taskGraph->getNodes(), UnorderedElementsAre(taskGraph->getSource(), taskGraph->getSink()));
+}
+
 TEST(imstkTaskGraphTest, RemoveUnusedNodes)
 {
     auto node1 = std::make_shared<TaskNode>();

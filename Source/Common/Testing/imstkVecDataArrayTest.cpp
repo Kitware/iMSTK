@@ -21,8 +21,10 @@
 
 #include "gtest/gtest.h"
 
+#define IMSTK_CHECK_ARRAY_RANGE
 #include "imstkDataArray.h"
 #include "imstkVecDataArray.h"
+#undef IMSTK_CHECK_ARRAY_RANGE
 
 using namespace imstk;
 
@@ -75,6 +77,31 @@ TEST(imstkVecDataArrayTest, Constructors)
     EXPECT_EQ(4, d.getCapacity());
     EXPECT_TRUE(isEqualTo(d, { Vec2i(0, 1), Vec2i(2, 3) }));
     EXPECT_EQ(ptr, d.getPointer());
+}
+
+TEST(imstkVecDataArrayTest, Accessors)
+{
+    VecDataArray<int, 2> a{ Vec2i(1, 1), Vec2i(2, 2), Vec2i(3, 3), Vec2i(4, 4) };
+
+    EXPECT_EQ(Vec2i(3, 3), a[2]);
+    EXPECT_EQ(Vec2i(1, 1), a[0]);
+
+    a[3] = Vec2i(6, 6);
+    EXPECT_EQ(Vec2i(6, 6), a[3]);
+
+    // Checked Arrays only
+    EXPECT_ANY_THROW(a[4]);
+}
+
+TEST(imstkVecDataArrayTest, AccessorsConst)
+{
+    const VecDataArray<int, 2> a{ Vec2i(1, 1), Vec2i(2, 2), Vec2i(3, 3), Vec2i(4, 4) };
+
+    EXPECT_EQ(Vec2i(3, 3), a[2]);
+    EXPECT_EQ(Vec2i(1, 1), a[0]);
+
+    // Checked Arrays only
+    EXPECT_ANY_THROW(a[4]);
 }
 
 TEST(imstkVecDataArrayTest, Assignment)
@@ -171,6 +198,9 @@ TEST(imstkVecDataArrayTest, Iterators)
         ++it;
         ++expected;
     }
+
+    // Checked Arrays only
+    EXPECT_ANY_THROW(++it);
 }
 
 TEST(imstkVecDataArrayTest, Erase)
@@ -232,4 +262,11 @@ TEST(imstkVecDataArrayTest, ParameterCast)
     {
         EXPECT_TRUE(a[i].cast<double>().isApprox((*actualB)[i]));
     }
+}
+
+TEST(imstkVecDataArrayTest, ResizeToOne)
+{
+    VecDataArray<int, 2> a;
+    a.resize(1);
+    EXPECT_EQ(1, a.size());
 }
