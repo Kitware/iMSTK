@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(iMSTK VERSION 5.0.0 LANGUAGES C CXX)
+project(iMSTK VERSION 4.0.0 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
