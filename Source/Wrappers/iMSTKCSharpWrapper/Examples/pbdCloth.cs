@@ -1,10 +1,11 @@
 using System;
-using System.Runtime.InteropServices;
 using imstk;
 
 public class PbdCloth
 {
-     public class CSReceiverFunc : ReceiverFunc {
+    private static string dataPath = "../data/";
+
+    public class CSReceiverFunc : KeyEventFunc {
          public CSReceiverFunc(Action<KeyEvent> action) {
              action_ = action;
          }
@@ -19,7 +20,75 @@ public class PbdCloth
         // Write log to stdout and file
         Logger.startLogger();
 
-        RunPbdCloth();
+        // Setup a scene
+        Scene scene = new Scene("PBDCloth");
+        PbdObject clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
+        scene.addSceneObject(clothObj);
+
+        // Adjust camera
+        scene.getActiveCamera().setFocalPoint(0.0, -5.0, 5.0);
+        scene.getActiveCamera().setPosition(-15.0, -5.0, 25.0);
+
+        // Run the simulation
+        {
+            // Setup a viewer to render
+            VTKViewer viewer = new VTKViewer("Viewer");
+            viewer.setActiveScene(scene);
+
+            // Setup a scene manager to advance the scene
+            SceneManager sceneManager = new SceneManager("Scene Manager");
+            sceneManager.setExecutionType(Module.ExecutionType.ADAPTIVE);
+            sceneManager.setActiveScene(scene);
+            sceneManager.pause(); // Start simulation paused
+
+            SimulationManager driver = new SimulationManager();
+            driver.addModule(viewer);
+            driver.addModule(sceneManager);
+            driver.setDesiredDt(0.001);
+
+            // Add mouse and keyboard controls to the viewer
+            {
+                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
+                mouseControl.setSceneManager(sceneManager);
+                viewer.addControl(mouseControl);
+
+                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
+                keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
+                keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
+                viewer.addControl(keyControl);
+            }
+
+            Action<KeyEvent> receiverAction = (KeyEvent e) => {
+                // Set new textures
+                if (e.m_key == '1')
+                {
+                    setFleshTextures(clothObj.getVisualModel(0).getRenderMaterial());
+                }
+                else if (e.m_key == '2')
+                {
+                    setFabricTextures(clothObj.getVisualModel(0).getRenderMaterial());
+                }
+                // Darken the texture pixel values
+                else if (e.m_key == 'h')
+                {
+                    ImageData imageData = clothObj.getVisualModel(0).getRenderMaterial().getTexture(Texture.Type.Diffuse).getImageData();
+                    VecDataArray3uc scalars = Utils.CastTo<VecDataArray3uc>(imageData.getScalars());
+                    byte[] newScalars = new byte[3 * scalars.size()];
+                    scalars.getValues(newScalars);
+
+                    for (int i = 0; i < newScalars.Length; i++)
+                    {
+                        newScalars[i] = (byte)(newScalars[i] * 0.8);
+                    }
+                    scalars.setValues(newScalars);
+                    clothObj.getVisualModel(0).getRenderMaterial().getTexture(Texture.Type.Diffuse).postModified();
+                }
+            };
+            CSReceiverFunc receiverFunc = new CSReceiverFunc(receiverAction);
+            Utils.connectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb, receiverFunc);
+
+            driver.start();
+        }
     }
 
     public static PbdObject makeClothObj(string name, double width, double height, int rowCount, int colCount)
@@ -129,89 +198,8 @@ public class PbdCloth
         return clothMesh;
     }
 
-    public static void RunPbdCloth()
-    {
-        // Setup a scene
-        Scene scene = new Scene("PBDCloth");
-        PbdObject clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
-        scene.addSceneObject(clothObj);
-
-        // Adjust camera
-        scene.getActiveCamera().setFocalPoint(0.0, -5.0, 5.0);
-        scene.getActiveCamera().setPosition(-15.0, -5.0, 25.0);
-
-        // Run the simulation
-        {
-            // Setup a viewer to render
-            VTKViewer viewer = new VTKViewer("Viewer");
-            viewer.setActiveScene(scene);
-
-            // Setup a scene manager to advance the scene
-            SceneManager sceneManager = new SceneManager("Scene Manager");
-            sceneManager.setExecutionType(Module.ExecutionType.ADAPTIVE);
-            sceneManager.setActiveScene(scene);
-            sceneManager.pause(); // Start simulation paused
-
-            SimulationManager driver = new SimulationManager();
-            driver.addModule(viewer);
-            driver.addModule(sceneManager);
-            driver.setDesiredDt(0.001);
-
-            // Add mouse and keyboard controls to the viewer
-            {
-                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
-                mouseControl.setSceneManager(sceneManager);
-                viewer.addControl(mouseControl);
-
-                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
-                keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
-                keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
-                viewer.addControl(keyControl);
-            }
-
-            Action<KeyEvent> receiverAction = (KeyEvent e) => {
-                // Set new textures
-                if (e.m_key == '1')
-                {
-                    setFleshTextures(clothObj.getVisualModel(0).getRenderMaterial());
-                }
-                else if (e.m_key == '2')
-                {
-                    setFabricTextures(clothObj.getVisualModel(0).getRenderMaterial());
-                }
-                // Darken the texture pixel values
-                else if (e.m_key == 'h')
-                {
-                    ImageData imageData = clothObj.getVisualModel(0).getRenderMaterial().getTexture(Texture.Type.Diffuse).getImageData();
-                    // std.shared_ptr<VecDataArray<unsigned char, 3>> scalars = std.dynamic_pointer_cast<VecDataArray<unsigned char, 3>>(imageData.getScalars());
-                    // VecDataArray3uc scalars = Utils.castToVecDataArray3uc(imageData.getScalars());
-                    VecDataArray3uc scalars = Utils.CastTo<VecDataArray3uc>(imageData.getScalars());
-                    // Console.WriteLine("{0} = {1}", scalars.size(), scalars2.size());
-                    byte[] newScalars = new byte[3*scalars.size()];
-                    scalars.getValues(newScalars);
-
-                    // Vec3uc scalarPtr = scalars.getPointer();
-                    for (int i = 0; i < newScalars.Length; i++)
-                    {
-                        // scalarPtr[i] = (scalarPtr[i].cast<double>() * 0.8).cast<unsigned char>();
-                        newScalars[i] = (byte)((double)newScalars[i] *0.8);
-                    }
-                    scalars.setValues(newScalars);
-                    // Console.WriteLine("'h' key is pressed to change the render material...");
-                    clothObj.getVisualModel(0).getRenderMaterial().getTexture(Texture.Type.Diffuse).postModified();
-                }
-            };
-            CSReceiverFunc receiverFunc = new CSReceiverFunc(receiverAction);
-            Utils.queueConnectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb, sceneManager, receiverFunc);
-
-            driver.start();
-        }
-
-    }
-
     private static void setFabricTextures(RenderMaterial material)
     {
-        // ImageData diffuseTex = MeshIO.readImageData("../../../install/data/textures/fabricDiffuse.jpg");
         ImageData diffuseTex = MeshIO.readImageData(dataPath + "textures/fabricDiffuse.jpg");
         material.addTexture(new Texture(diffuseTex, Texture.Type.Diffuse));
         ImageData normalTex = MeshIO.readImageData(dataPath + "textures/fabricNormal.jpg");
@@ -229,7 +217,4 @@ public class PbdCloth
         ImageData ormTex = MeshIO.readImageData(dataPath + "textures/fleshORM.jpg");
         material.addTexture(new Texture(ormTex, Texture.Type.ORM));
     }
-
-    private static string dataPath = "../data/";
-
 }

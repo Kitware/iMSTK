@@ -3,7 +3,12 @@ using imstk;
 
 public class PbdCutting
 {
-     public class CSReceiverFunc : ReceiverFunc {
+    private static double width = 50.0;
+    private static double height = 50.0;
+    private static int nRows = 12;
+    private static int nCols = 12;
+
+    public class CSReceiverFunc : KeyEventFunc {
          public CSReceiverFunc(Action<KeyEvent> action) {
              action_ = action;
          }
@@ -18,7 +23,83 @@ public class PbdCutting
         // Write log to stdout and file
         Logger.startLogger();
 
-        RunPbcCutting();
+        // Setup a scene
+        Scene scene = new Scene("PBDCutting");
+        SurfaceMesh cutGeom = makeClothGeometry(40, 40, 2, 2);
+        cutGeom.setTranslation(new Vec3d(-10.0, -20.0, 0.0));
+        cutGeom.updatePostTransformData();
+        CollidingObject cutObj = new CollidingObject("CuttingObject");
+        cutObj.setVisualGeometry(cutGeom);
+        cutObj.setCollidingGeometry(cutGeom);
+        cutObj.getVisualModel(0).getRenderMaterial().setDisplayMode(RenderMaterial.DisplayMode.WireframeSurface);
+        scene.addSceneObject(cutObj);
+
+        PbdObject clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
+        scene.addSceneObject(clothObj);
+
+        // Add interaction pair for pbd cutting
+        PbdObjectCuttingPair cuttingPair = new PbdObjectCuttingPair(clothObj, cutObj);
+
+        // Device Sever
+        HapticDeviceManager server = new HapticDeviceManager();
+        HapticDeviceClient client = server.makeDeviceClient();
+
+        SceneObjectController controller = new SceneObjectController(cutObj, client);
+        scene.addController(controller);
+
+        // Adjust camera
+        scene.getActiveCamera().setPosition(new Vec3d(0.0, -50.0, 0.0));
+        scene.getActiveCamera().setFocalPoint(new Vec3d(100.0, 100.0, 100.0));
+
+        // Light
+        DirectionalLight light = new DirectionalLight();
+        light.setFocalPoint(new Vec3d(5.0, -8.0, -5.0));
+        light.setIntensity(1.0);
+        scene.addLight("light", light);
+
+        // Run the simulation
+        {
+            // Setup a viewer to render
+            VTKViewer viewer = new VTKViewer("Viewer");
+            viewer.setActiveScene(scene);
+
+            // Setup a scene manager to advance the scene
+            SceneManager sceneManager = new SceneManager("Scene Manager");
+            sceneManager.setActiveScene(scene);
+            sceneManager.setExecutionType(Module.ExecutionType.ADAPTIVE);
+            sceneManager.pause(); // Start simulation paused
+
+            SimulationManager driver = new SimulationManager();
+            driver.addModule(server);
+            driver.addModule(viewer);
+            driver.addModule(sceneManager);
+            driver.setDesiredDt(0.001);
+
+            // Add mouse and keyboard controls to the viewer
+            {
+                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
+                mouseControl.setSceneManager(sceneManager);
+                viewer.addControl(mouseControl);
+
+                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
+                keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
+                keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
+                viewer.addControl(keyControl);
+            }
+
+            Action<KeyEvent> receiverAction = (KeyEvent e) => {
+                const int KEY_PRESS = 1;
+                // Set new textures
+                if (e.m_key == 'i' && e.m_keyPressType == KEY_PRESS)
+                {
+                    cuttingPair.apply();
+                }
+            };
+            CSReceiverFunc receiverFunc = new CSReceiverFunc(receiverAction);
+            Utils.connectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb, receiverFunc);
+
+            driver.start();
+        }
     }
 
     public static PbdObject makeClothObj(string name, double width, double height, int rowCount, int colCount)
@@ -113,91 +194,4 @@ public class PbdCutting
 
         return clothMesh;
     }
-
-    public static void RunPbcCutting()
-    {
-        // Setup a scene
-        Scene scene = new Scene("PBDCutting");
-        SurfaceMesh cutGeom = makeClothGeometry(40, 40, 2, 2);
-        cutGeom.setTranslation(new Vec3d(-10.0, -20.0, 0.0));
-        cutGeom.updatePostTransformData();
-        CollidingObject cutObj = new CollidingObject("CuttingObject");
-        cutObj.setVisualGeometry(cutGeom);
-        cutObj.setCollidingGeometry(cutGeom);
-        cutObj.getVisualModel(0).getRenderMaterial().setDisplayMode(RenderMaterial.DisplayMode.WireframeSurface);
-        scene.addSceneObject(cutObj);
-
-        PbdObject clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
-        scene.addSceneObject(clothObj);
-
-        // Add interaction pair for pbd cutting
-        PbdObjectCuttingPair cuttingPair = new PbdObjectCuttingPair(clothObj, cutObj);
-
-        // Device Sever
-        HapticDeviceManager server = new HapticDeviceManager();
-        HapticDeviceClient client = server.makeDeviceClient();
-
-        SceneObjectController controller = new SceneObjectController(cutObj, client);
-        scene.addController(controller);
-
-        // Adjust camera
-        scene.getActiveCamera().setPosition(new Vec3d(0.0, -50.0, 0.0));
-        scene.getActiveCamera().setFocalPoint(new Vec3d(100.0, 100.0, 100.0));
-
-        // Light
-        DirectionalLight light = new DirectionalLight();
-        light.setFocalPoint(new Vec3d(5.0, -8.0, -5.0));
-        light.setIntensity(1.0);
-        scene.addLight("light", light);
-
-        // Run the simulation
-        {
-            // Setup a viewer to render
-            VTKViewer viewer = new VTKViewer("Viewer");
-            viewer.setActiveScene(scene);
-
-            // Setup a scene manager to advance the scene
-            SceneManager sceneManager = new SceneManager("Scene Manager");
-            sceneManager.setActiveScene(scene);
-            sceneManager.setExecutionType(Module.ExecutionType.ADAPTIVE);
-            sceneManager.pause(); // Start simulation paused
-
-            SimulationManager driver = new SimulationManager();
-            driver.addModule(server);
-            driver.addModule(viewer);
-            driver.addModule(sceneManager);
-            driver.setDesiredDt(0.001);
-
-            // Add mouse and keyboard controls to the viewer
-            {
-                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
-                mouseControl.setSceneManager(sceneManager);
-                viewer.addControl(mouseControl);
-
-                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
-                keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
-                keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
-                viewer.addControl(keyControl);
-            }
-
-            Action<KeyEvent> receiverAction = (KeyEvent e) => {
-                const int KEY_PRESS = 1;
-                // Set new textures
-                if (e.m_key == 'i' && e.m_keyPressType == KEY_PRESS)
-                {
-                    cuttingPair.apply();
-                }
-            };
-            CSReceiverFunc receiverFunc = new CSReceiverFunc(receiverAction);
-            Utils.queueConnectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb, sceneManager, receiverFunc);
-
-            driver.start();
-        }
-    }
-	
-	private static double width = 50.0;
-	private static double height = 50.0;
-	private static int nRows = 12;
-	private static int nCols = 12;
 }
-

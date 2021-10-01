@@ -65,5 +65,3 @@
 
 %ignore imstk::CollisionElement::m_element;
 %ignore imstk::CollisionElement::m_type;
-%ignore imstk::CollisionData::elementsA;
-%ignore imstk::CollisionData::elementsB;

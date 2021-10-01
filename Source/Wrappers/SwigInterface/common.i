@@ -583,5 +583,5 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
 %template(eigen2cs_Mat3f) imstk::eigen2cs<imstk::Mat<float, 3>, Eigen::Matrix<float, 3, 3> >;
 %template(eigen2cs_Mat3d) imstk::eigen2cs<imstk::Mat<double, 3>, Eigen::Matrix<double, 3, 3> >;
 
-%template(queueConnectKeyEvent) imstk::queueConnect<imstk::KeyEvent>;
+%template(connectKeyEvent) imstk::connect<imstk::KeyEvent>;
 %template(connectEvent) imstk::connect<imstk::Event>;

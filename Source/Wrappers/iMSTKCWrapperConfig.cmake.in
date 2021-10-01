@@ -1,0 +1,4 @@
+#@PACKAGE_INIT@
+
+# Includelibs of the target we generated
+include(@CMAKE_CURRENT_BINARY_DIR@/iMSTKCWrapperTargets.cmake)

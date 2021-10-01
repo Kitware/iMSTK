@@ -1,4 +1,3 @@
-using System;
 using imstk;
 
 public class PbdCloth
@@ -7,7 +6,6 @@ public class PbdCloth
 
     public static void Main(string[] args)
     {
-
         // Setup logger (write to file and stdout)
         Logger.startLogger();
 
