@@ -2,28 +2,28 @@
 %include <arrays_csharp.i>
 
 #ifdef SWIG_PINNED_ARRAY
-  %csmethodmodifiers imstk::VecDataArray::setValues "public unsafe";
-  %csmethodmodifiers imstk::VecDataArray::getValues "public unsafe";
+    %csmethodmodifiers imstk::VecDataArray::setValues "public unsafe";
+    %csmethodmodifiers imstk::VecDataArray::getValues "public unsafe";
 #endif
 
 #ifdef SWIG_PINNED_ARRAY
-  %apply unsigned char FIXED[] {unsigned char* val}
-  %apply unsigned char FIXED[] {const unsigned char* val}
-  %apply int FIXED[] {int* val}
-  %apply int FIXED[] {const int* val}
-  %apply float FIXED[] {float * val}
-  %apply float FIXED[] {const float * val}
-  %apply double FIXED[] {double* val}
-  %apply double FIXED[] {const double* val}
+    %apply unsigned char FIXED[] {unsigned char* val}
+    %apply unsigned char FIXED[] {const unsigned char* val}
+    %apply int FIXED[] {int* val}
+    %apply int FIXED[] {const int* val}
+    %apply float FIXED[] {float * val}
+    %apply float FIXED[] {const float * val}
+    %apply double FIXED[] {double* val}
+    %apply double FIXED[] {const double* val}
 #else
-  %apply unsigned char INPUT[] {const unsigned char* val}
-  %apply unsigned char OUTPUT[] {unsigned char* val}
-  %apply int INPUT[] {const int* val}
-  %apply int OUTPUT[] {int* val}
-  %apply float INPUT[] {const float * val}
-  %apply float OUTPUT[] {float * val}
-  %apply double INPUT[] {const double* val}
-  %apply double OUTPUT[] {double* val}
+    %apply unsigned char INPUT[] {const unsigned char* val}
+    %apply unsigned char OUTPUT[] {unsigned char* val}
+    %apply int INPUT[] {const int* val}
+    %apply int OUTPUT[] {int* val}
+    %apply float INPUT[] {const float * val}
+    %apply float OUTPUT[] {float * val}
+    %apply double INPUT[] {const double* val}
+    %apply double OUTPUT[] {double* val}
 #endif
 
 /*
@@ -46,27 +46,28 @@
 %rename(Quatd) imstk::imstkQuatd;
 
 %define %extend_VecDataArray(T, N)
-%extend imstk::VecDataArray<T, N> {
-    void setValues(const T* val)
+    %extend imstk::VecDataArray<T, N>
     {
-        /* std::copy(val, val+$self->m_vecSize * N, $self->Base::m_data); */
-        T* data = $self->DataArray<T>::getPointer();
-        std::copy(val, val + $self->size() * N, data);
-    }
+        void setValues(const T* val)
+        {
+            /* std::copy(val, val+$self->m_vecSize * N, $self->Base::m_data); */
+            T* data = $self->DataArray<T>::getPointer();
+            std::copy(val, val + $self->size() * N, data);
+        }
 
-    void setValues(const T* val, const int n)
-    {
-        T* data = $self->DataArray<T>::getPointer();
-        CHECK($self->size()*N >= n) << "number of values are larger than the array size";
-        std::copy(val, val + n, data);
-    }
+        void setValues(const T* val, const int n)
+        {
+            T* data = $self->DataArray<T>::getPointer();
+            CHECK($self->size()*N >= n) << "number of values are larger than the array size";
+            std::copy(val, val + n, data);
+        }
 
-    void getValues(T* val)
-    {
-        T* data = $self->DataArray<T>::getPointer();
-        std::copy(data, data+$self->size()*N, val);
-    }
-};
+        void getValues(T* val)
+        {
+            T* data = $self->DataArray<T>::getPointer();
+            std::copy(data, data+$self->size()*N, val);
+        }
+    };
 %enddef
 
 %extend_VecDataArray(float, 2)
@@ -76,51 +77,64 @@
 %extend_VecDataArray(unsigned char, 3)
 %extend_VecDataArray(int, 4)
 
-%typemap(cscode) imstk::imstkQuatf %{
-    public static implicit operator SWIGTYPE_p_Eigen__QuaternionT_float_t (Quatf cs_data) {
+%typemap(cscode) imstk::imstkQuatf
+%{
+    public static implicit operator SWIGTYPE_p_Eigen__QuaternionT_float_t (Quatf cs_data)
+    {
         return cs_data.get();
     }
 
-    public static implicit operator Quatf (SWIGTYPE_p_Eigen__QuaternionT_float_t eigen_data) {
+    public static implicit operator Quatf (SWIGTYPE_p_Eigen__QuaternionT_float_t eigen_data)
+    {
         return Utils.eigen2cs_Quatf(eigen_data);
     }
 %}
 
-%typemap(cscode) imstk::imstkQuatd %{
-    public static implicit operator SWIGTYPE_p_Eigen__QuaternionT_double_t (Quatd cs_data) {
+%typemap(cscode) imstk::imstkQuatd
+%{
+    public static implicit operator SWIGTYPE_p_Eigen__QuaternionT_double_t (Quatd cs_data)
+    {
         return cs_data.get();
     }
 
-    public static implicit operator Quatd (SWIGTYPE_p_Eigen__QuaternionT_double_t eigen_data) {
+    public static implicit operator Quatd (SWIGTYPE_p_Eigen__QuaternionT_double_t eigen_data)
+    {
         return Utils.eigen2cs_Quatd(eigen_data);
     }
 %}
 
 #ifdef SWIGCSHARP
-%inline %{
-namespace imstk {
+%inline
+%{
+namespace imstk
+{
 template<typename T, int N>
-class Vec {
-  public:
+class Vec
+{
+public:
     using EigenData = Eigen::Matrix<T, N, 1>;
     Vec(const Vec& other) = default;
     Vec() = default;
-    Vec(const T t0, const T t1) {
+    Vec(const T t0, const T t1)
+    {
         m_data[0] = t0;
         m_data[1] = t1;
     }
-    Vec(const T t0, const T t1, const T t2) {
+    Vec(const T t0, const T t1, const T t2)
+    {
         m_data[0] = t0;
         m_data[1] = t1;
         m_data[2] = t2;
     }
-    Vec(const T t0, const T t1, const T t2, const T t3) {
+    Vec(const T t0, const T t1, const T t2, const T t3)
+    {
         m_data[0] = t0;
         m_data[1] = t1;
         m_data[2] = t2;
         m_data[3] = t3;
     }
-    Vec(const T t0, const T t1, const T t2, const T t3, const T t4, const T t5) {
+    Vec(const T t0, const T t1, const T t2, const T t3, const T t4, const T t5)
+    {
         m_data[0] = t0;
         m_data[1] = t1;
         m_data[2] = t2;
@@ -132,56 +146,67 @@ class Vec {
     Vec(const EigenData& other) { m_data = other; }
     inline T& operator[](const int pos) { return m_data[pos]; }
     inline const T& operator[](const int pos) const { return m_data[pos]; }
-    inline const EigenData& get() const {return m_data;}
-  private:
+    inline const EigenData& get() const { return m_data; }
+
+private:
     EigenData m_data;
 };
 
 template <typename T, int N>
-class Mat {
-  public:
+class Mat
+{
+public:
     using EigenData = Eigen::Matrix<T, N, N>;
     Mat (const EigenData& data) : m_data(data) {}
     static Mat Identity () { return Mat (EigenData::Identity()); }
-    inline const EigenData& get() const {return m_data;}
-  private:
+    inline const EigenData& get() const { return m_data; }
+
+private:
     EigenData m_data;
 };
 
-class imstkRotf {
+class imstkRotf
+{
 public:
     using EigenData = Eigen::AngleAxisf;
     imstkRotf(float s, const imstk::Vec3f& vec): m_data(s, vec) { }
     const EigenData& get() const { return m_data; }
+
 private:
     EigenData m_data;
 };
 
-class imstkRotd {
+class imstkRotd
+{
 public:
     using EigenData = Eigen::AngleAxisd;
     imstkRotd(double s, const imstk::Vec3d& vec): m_data(s, vec) { }
     inline const EigenData& get() const { return m_data; }
+
 private:
     EigenData m_data;
 };
 
-class imstkQuatf {
+class imstkQuatf
+{
 public:
     using EigenData = Eigen::Quaternion<float>;
     imstkQuatf(const EigenData& data) : m_data(data) { }
     imstkQuatf(const imstkRotf& rot) : m_data(rot.get()) { }
     inline const EigenData& get() const { return m_data; }
+
 private:
     EigenData m_data;
 };
 
-class imstkQuatd {
+class imstkQuatd
+{
 public:
     using EigenData = Eigen::Quaternion<double>;
     imstkQuatd(const EigenData& data) : m_data(data) { }
     imstkQuatd(const imstkRotd& rot) : m_data(rot.get()) { }
     inline const EigenData& get() const { return m_data; }
+
 private:
     EigenData m_data;
 };
@@ -252,12 +277,14 @@ void vecdataarray_push_back(VecDataArray<T, N>& vec, const Vec<T, N>& vi)
 }
 
 template <typename csType, typename EigenType>
-csType eigen2cs(const EigenType& eigen_data) {
+csType eigen2cs(const EigenType& eigen_data)
+{
     return csType(eigen_data);
 }
 
 template <typename csType, typename EigenType>
-EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
+EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
+{
     return *eigen_data = cs_data.get();
 }
 
@@ -266,235 +293,300 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data) {
 %} // end of inline
 
 
-%typemap(cscode) imstk::Vec<int, 3> %{
-    public int this[int i] {
+%typemap(cscode) imstk::Vec<int, 3>
+%{
+    public int this[int i]
+    {
         get => getValue(i);
         set => Utils.intPtr_assign(setValue(i), value);
     }
 
-    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_int_3_1_t (Vec3i v) {
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_int_3_1_t (Vec3i v)
+    {
         return v.get(); 
     }
 
-    public static implicit operator Vec3i(SWIGTYPE_p_Eigen__MatrixT_int_3_1_t eigen_v) {
+    public static implicit operator Vec3i(SWIGTYPE_p_Eigen__MatrixT_int_3_1_t eigen_v)
+    {
         return Utils.vec_from_eigen_3i(eigen_v);
     }
 %}
 
-%typemap(cscode) imstk::Vec<int, 4> %{
-    public int this[int i] {
+%typemap(cscode) imstk::Vec<int, 4>
+%{
+    public int this[int i]
+    {
         get => getValue(i);
         set => Utils.intPtr_assign(setValue(i), value);
     }
 
-    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_int_4_1_t (Vec4i v) {
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_int_4_1_t (Vec4i v)
+    {
         return v.get(); 
     }
 
-    public static implicit operator Vec4i(SWIGTYPE_p_Eigen__MatrixT_int_4_1_t eigen_v) {
+    public static implicit operator Vec4i(SWIGTYPE_p_Eigen__MatrixT_int_4_1_t eigen_v)
+    {
         return Utils.vec_from_eigen_4i(eigen_v);
     }
 %}
 
-%typemap(cscode) imstk::Vec<float, 2> %{
-    public float this[int i] {
+%typemap(cscode) imstk::Vec<float, 2>
+%{
+    public float this[int i]
+    {
         get => getValue(i);
         set => Utils.floatPtr_assign(setValue(i), value);
     }
-    public static Vec2f operator * (Vec2f v, float c) {
+    public static Vec2f operator * (Vec2f v, float c)
+    {
         return Utils.vec_scale_2f(v, c);
     }
 
-    public static Vec2f operator * (float c, Vec2f v) {
+    public static Vec2f operator * (float c, Vec2f v)
+    {
         return Utils.vec_scale_2f(v, c);
     }
-    public static Vec2f operator / (Vec2f v, float c) {
+    public static Vec2f operator / (Vec2f v, float c)
+    {
         return Utils.vec_scale_2f(v, (float)1.0/c);
     }
 
-    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_float_2_1_t (Vec2f v) {
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_float_2_1_t (Vec2f v)
+    {
         return v.get(); 
     }
 
-    public static implicit operator Vec2f(SWIGTYPE_p_Eigen__MatrixT_float_2_1_t eigen_v) {
+    public static implicit operator Vec2f(SWIGTYPE_p_Eigen__MatrixT_float_2_1_t eigen_v)
+    {
         return Utils.vec_from_eigen_2f(eigen_v);
     }
 %}
 
-%typemap(cscode) imstk::Vec<double, 2> %{
-    public double this[int i] {
+%typemap(cscode) imstk::Vec<double, 2>
+%{
+    public double this[int i]
+    {
         get => getValue(i);
         set => Utils.doublePtr_assign(setValue(i), value);
     }
-    public static Vec2d operator * (Vec2d v, double c) {
+    public static Vec2d operator * (Vec2d v, double c)
+    {
         return Utils.vec_scale_2d(v, c);
     }
 
-    public static Vec2d operator * (double c, Vec2d v) {
+    public static Vec2d operator * (double c, Vec2d v)
+    {
         return Utils.vec_scale_2d(v, c);
     }
 
-    public static Vec2d operator / (Vec2d v, double c) {
+    public static Vec2d operator / (Vec2d v, double c)
+    {
         return Utils.vec_scale_2d(v, 1.0/c);
     }
 
-    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_2_1_t (Vec2d v) {
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_2_1_t (Vec2d v)
+    {
         return v.get(); 
     }
 
-    public static implicit operator Vec2d(SWIGTYPE_p_Eigen__MatrixT_double_2_1_t eigen_v) {
+    public static implicit operator Vec2d(SWIGTYPE_p_Eigen__MatrixT_double_2_1_t eigen_v)
+    {
         return Utils.vec_from_eigen_2d(eigen_v);
     }
 %}
 
-%typemap(cscode) imstk::Vec<double, 3> %{
-    public double this[int i] {
+%typemap(cscode) imstk::Vec<double, 3>
+%{
+    public double this[int i]
+    {
         get => getValue(i);
         set => Utils.doublePtr_assign(setValue(i), value);
     }
-    public static Vec3d operator + (Vec3d u, Vec3d v) {
+    public static Vec3d operator + (Vec3d u, Vec3d v)
+    {
         return Utils.vec_add_3d(u, v);
     }
-    public static Vec3d operator - (Vec3d u, Vec3d v) {
+    public static Vec3d operator - (Vec3d u, Vec3d v)
+    {
         return Utils.vec_subtract_3d(u, v);
     }
-    public static Vec3d operator * (Vec3d v, double c) {
+    public static Vec3d operator * (Vec3d v, double c)
+    {
         return Utils.vec_scale_3d(v, c);
     }
 
-    public static Vec3d operator * (double c, Vec3d v) {
+    public static Vec3d operator * (double c, Vec3d v)
+    {
         return Utils.vec_scale_3d(v, c);
     }
-    public static Vec3d operator / (Vec3d v, double c) {
+    public static Vec3d operator / (Vec3d v, double c)
+    {
         return Utils.vec_scale_3d(v, 1.0/c);
     }
 
-    public static Vec3d operator / (double c, Vec3d v) {
+    public static Vec3d operator / (double c, Vec3d v)
+    {
         return Utils.vec_scale_3d(v, 1.0/c);
     }
 
-    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_3_1_t (Vec3d v) {
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_3_1_t (Vec3d v)
+    {
         return v.get(); 
     }
 
-    public static implicit operator Vec3d(SWIGTYPE_p_Eigen__MatrixT_double_3_1_t eigen_v) {
+    public static implicit operator Vec3d(SWIGTYPE_p_Eigen__MatrixT_double_3_1_t eigen_v)
+    {
         return Utils.vec_from_eigen_3d(eigen_v);
     }
-    public Vec3d normalized() {
+    public Vec3d normalized()
+    {
         double nrm= getValue(0) * getValue(0) + getValue(1) * getValue(1) + getValue(2) * getValue(2);
         return this / System.Math.Sqrt(nrm);
     }
 %}
 
-%typemap(cscode) imstk::Vec<double, 6> %{
-    public double this[int i] {
+%typemap(cscode) imstk::Vec<double, 6>
+%{
+    public double this[int i]
+    {
         get => getValue(i);
         set => Utils.doublePtr_assign(setValue(i), value);
     }
-    public static Vec6d operator * (Vec6d v, double c) {
+    public static Vec6d operator * (Vec6d v, double c)
+    {
         return Utils.vec_scale_6d(v, c);
     }
 
-    public static Vec6d operator * (double c, Vec6d v) {
+    public static Vec6d operator * (double c, Vec6d v)
+    {
         return Utils.vec_scale_6d(v, c);
     }
-    public static Vec6d operator / (Vec6d v, double c) {
+    public static Vec6d operator / (Vec6d v, double c)
+    {
         return Utils.vec_scale_6d(v, 1.0/c);
     }
 
-    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_6_1_t (Vec6d v) {
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_6_1_t (Vec6d v)
+    {
         return v.get(); 
     }
 
-    public static implicit operator Vec6d(SWIGTYPE_p_Eigen__MatrixT_double_6_1_t eigen_v) {
+    public static implicit operator Vec6d(SWIGTYPE_p_Eigen__MatrixT_double_6_1_t eigen_v)
+    {
         return Utils.vec_from_eigen_6d(eigen_v);
     }
 %}
 
-%typemap(cscode) imstk::Vec<unsigned char, 3> %{
+%typemap(cscode) imstk::Vec<unsigned char, 3>
+%{
     /* public unsigned char this[int i] { */
-    public byte this[int i] {
+    public byte this[int i]
+    {
         get => getValue(i);
         set => Utils.ucharPtr_assign(setValue(i), value);
     }
 
-    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_unsigned_char_3_1_t (Vec3uc v) {
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_unsigned_char_3_1_t (Vec3uc v)
+    {
         return v.get(); 
     }
 
-    public static implicit operator Vec3uc(SWIGTYPE_p_Eigen__MatrixT_unsigned_char_3_1_t eigen_v) {
+    public static implicit operator Vec3uc(SWIGTYPE_p_Eigen__MatrixT_unsigned_char_3_1_t eigen_v)
+    {
         return Utils.vec_from_eigen_3uc(eigen_v);
     }
 %}
 
-%typemap(cscode) imstk::VecDataArray<int, 3> %{
-    public Vec3i this[uint i] {
+%typemap(cscode) imstk::VecDataArray<int, 3>
+%{
+    public Vec3i this[uint i]
+    {
         get => Utils.vec_from_eigen_3i(getValue(i));
         set => Utils.vec_to_eigen_3i(setValue(i), value);
     }
-    public void push_back(Vec3i v) {
+    public void push_back(Vec3i v)
+    {
         Utils.vecdataarray_push_back_3i(this, v);
     }
 %}
 
-%typemap(cscode) imstk::VecDataArray<int, 4> %{
-    public Vec4i this[uint i] {
+%typemap(cscode) imstk::VecDataArray<int, 4>
+%{
+    public Vec4i this[uint i]
+    {
         get => Utils.vec_from_eigen_4i(getValue(i));
         set => Utils.vec_to_eigen_4i(setValue(i), value);
     }
-    public void push_back(Vec4i v) {
+    public void push_back(Vec4i v)
+    {
         Utils.vecdataarray_push_back_4i(this, v);
     }
 
 %}
 
-%typemap(cscode) imstk::VecDataArray<float, 2> %{
-    public Vec2f this[uint i] {
+%typemap(cscode) imstk::VecDataArray<float, 2>
+%{
+    public Vec2f this[uint i]
+    {
         get => Utils.vec_from_eigen_2f(getValue(i));
         set => Utils.vec_to_eigen_2f(setValue(i), value);
     }
-    public void push_back(Vec2f v) {
+    public void push_back(Vec2f v)
+    {
         Utils.vecdataarray_push_back_2f(this, v);
     }
 %}
 
-%typemap(cscode) imstk::VecDataArray<double, 2> %{
-    public Vec2d this[uint i] {
+%typemap(cscode) imstk::VecDataArray<double, 2>
+%{
+    public Vec2d this[uint i]
+    {
         get => Utils.vec_from_eigen_2d(getValue(i));
         set => Utils.vec_to_eigen_2d(setValue(i), value);
     }
-    public void push_back(Vec2d v) {
+    public void push_back(Vec2d v)
+    {
         Utils.vecdataarray_push_back_2d(this, v);
     }
 %}
 
-%typemap(cscode) imstk::VecDataArray<double, 3> %{
-    public Vec3d this[uint i] {
+%typemap(cscode) imstk::VecDataArray<double, 3>
+%{
+    public Vec3d this[uint i]
+    {
         get => Utils.vec_from_eigen_3d(getValue(i));
         set => Utils.vec_to_eigen_3d(setValue(i), value);
     }
-    public void push_back(Vec3d v) {
+    public void push_back(Vec3d v)
+    {
         Utils.vecdataarray_push_back_3d(this, v);
     }
 %}
 
-%typemap(cscode) imstk::VecDataArray<unsigned char, 3> %{
-    public Vec3uc this[uint i] {
+%typemap(cscode) imstk::VecDataArray<unsigned char, 3>
+%{
+    public Vec3uc this[uint i]
+    {
         get => Utils.vec_from_eigen_3uc(getValue(i));
         set => Utils.vec_to_eigen_3uc(setValue(i), value);
     }
-    public void push_back(Vec3uc v) {
+    public void push_back(Vec3uc v)
+    {
         Utils.vecdataarray_push_back_3uc(this, v);
     }
 %}
 
 
-%typemap(cscode) imstk::Mat<double, 3> %{
-    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_3_3_t (Mat3d cs_data) {
+%typemap(cscode) imstk::Mat<double, 3>
+%{
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_3_3_t (Mat3d cs_data)
+    {
         return cs_data.get();
     }
 
-    public static implicit operator Mat3d (SWIGTYPE_p_Eigen__MatrixT_double_3_3_t eigen_data) {
+    public static implicit operator Mat3d (SWIGTYPE_p_Eigen__MatrixT_double_3_3_t eigen_data)
+    {
         return Utils.eigen2cs_Mat3d(eigen_data);
     }
 %}

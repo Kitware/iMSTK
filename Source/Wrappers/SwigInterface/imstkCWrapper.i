@@ -195,7 +195,8 @@
 %include <stdint.i>
 %include <std_string.i>
 %include <std_vector.i>
-namespace std {
+namespace std
+{
   %template(VectorInt) vector<int>; 
   %template(VectorSizet) vector<std::size_t>;
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;

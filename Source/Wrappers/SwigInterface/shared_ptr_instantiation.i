@@ -184,5 +184,3 @@
 %shared_ptr(imstk::KeyboardDeviceClient)
 %shared_ptr(imstk::HapticDeviceClient)
 %shared_ptr(imstk::HapticDeviceManager)
-
-
