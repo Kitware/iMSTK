@@ -34,7 +34,7 @@ endif()
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
   GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/vrpn.git
-  GIT_TAG 021396b8770e6f14cb14427345d0b74479a32d82
+  GIT_TAG f4fd31a774d5ac72add2467f8aff1b324599de3b
   # Cannot get a zip as vrpn uses submodules which are not pulled into the zip
   #URL https://gitlab.kitware.com/iMSTK/vrpn/-/archive/improve-openhaptics-rebase/vrpn-improve-openhaptics-rebase.zip
   #URL_MD5 f9f1f10b0844ee244d3478184d58da04
