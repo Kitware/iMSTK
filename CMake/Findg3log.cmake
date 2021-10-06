@@ -17,5 +17,5 @@ if(WIN32)
   target_link_libraries(g3log INTERFACE general dbghelp)
 endif()
 
-#message(STATUS "g3log include : ${G3LOG_INCLUDE_DIRS}")
-#message(STATUS "g3log libraries : ${G3LOG_LIBRARIES}")
+#message(STATUS "g3log include : ${g3log_INCLUDE_DIRS}")
+#message(STATUS "g3log libraries : ${g3log_LIBRARIES}")

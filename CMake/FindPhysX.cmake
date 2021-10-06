@@ -23,5 +23,5 @@ imstk_find_libary(PhysX PhysXPvdSDK _static${physx_release_type}_64 _staticDEBUG
 
 imstk_find_package(PhysX)
 
-#message(STATUS "PhysX include : ${PHYSX_INCLUDE_DIRS}")
-#message(STATUS "PhysX libraries : ${PHYSX_LIBRARIES}")
+#message(STATUS "PhysX include : ${PhysX_INCLUDE_DIRS}")
+#message(STATUS "PhysX libraries : ${PhysX_LIBRARIES}")

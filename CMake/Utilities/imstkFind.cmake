@@ -61,7 +61,7 @@ macro(imstk_find_header package header)
   
 
   if (EXISTS ${${package}_INCLUDE_DIR}/${header})
-    string(TOUPPER ${package} PACKAGE)
+    set(PACKAGE ${package})
     list(APPEND ${PACKAGE}_INCLUDE_DIRS ${${package}_INCLUDE_DIR})
     mark_as_advanced(${PACKAGE}_INCLUDE_DIRS)
   else()
@@ -122,7 +122,7 @@ macro(imstk_find_libary package library)
     #message(STATUS "Looking for ${package} libs in ${_SEARCH_DIR}")
     
     unset(${PACKAGE}_LIBRARY_${library}-RELEASE CACHE)
-    string(TOUPPER ${package} PACKAGE)
+    set(PACKAGE ${package})
     find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
       NAMES
         ${library}${release_postfix}
@@ -185,7 +185,7 @@ endmacro()
 #-----------------------------------------------------------------------------
 macro(imstk_find_package package)
 
-  string(TOUPPER ${package} PACKAGE)
+  set(PACKAGE ${package})
   if (${PACKAGE}_FOUND)
     return()
   endif()
@@ -222,7 +222,7 @@ endmacro()
 #-----------------------------------------------------------------------------
 macro(imstk_find_header_package package)
 
-  string(TOUPPER ${package} PACKAGE)
+  set(PACKAGE ${package})
   if (${PACKAGE}_FOUND)
     return()
   endif()
