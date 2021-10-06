@@ -40,7 +40,8 @@ if(iMSTK_USE_OpenHaptics)
   else()
     target_link_libraries(${PROJECT_NAME}
     SimulationManager
-    SFML)
+    SFML::SFML
+    )
   endif()
   
 endif()

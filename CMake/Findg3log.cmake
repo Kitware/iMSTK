@@ -11,10 +11,10 @@ endif()
 
 imstk_find_header(g3log g3log/g3log.hpp)
 imstk_find_libary(g3log g3logger ${postfix})
-imstk_find_package(g3log)
+imstk_find_package(g3log g3log::g3log)
 
 if(WIN32)
-  target_link_libraries(g3log INTERFACE general dbghelp)
+  target_link_libraries(g3log::g3log INTERFACE general dbghelp)
 endif()
 
 #message(STATUS "g3log include : ${g3log_INCLUDE_DIRS}")

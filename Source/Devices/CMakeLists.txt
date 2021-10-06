@@ -5,10 +5,10 @@
 list(APPEND Dependencies Common)
 
 if(iMSTK_USE_OpenHaptics)
-  list(APPEND Dependencies OpenHapticsSDK)
+  list(APPEND Dependencies OpenHapticsSDK::OpenHapticsSDK)
 endif()
 if(iMSTK_USE_VRPN)
-  list(APPEND Dependencies VRPN)
+  list(APPEND Dependencies VRPN::VRPN)
 endif()
 
 list(APPEND ExclusionFiles "")

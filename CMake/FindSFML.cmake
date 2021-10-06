@@ -8,7 +8,7 @@ imstk_find_header(SFML Config.hpp SFML)
 imstk_find_libary(SFML sfml-system "-d")
 imstk_find_libary(SFML sfml-main "-d")
 imstk_find_libary(SFML sfml-audio "-d")
-imstk_find_package(SFML)
+imstk_find_package(SFML SFML::SFML)
 
 #message(STATUS "SFML include : ${SFML_INCLUDE_DIRS}")
 #message(STATUS "SFML libraries : ${SFML_LIBRARIES}")

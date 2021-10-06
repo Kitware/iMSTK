@@ -6,7 +6,7 @@ imstk_add_library( MeshIO
   DEPENDS
     Common
 	Geometry    
-    Assimp    
+    Assimp::Assimp
     VegaFEM::volumetricMesh
     ${VTK_LIBRARIES}
   )
