@@ -29,16 +29,7 @@
 
 #include <Eigen/Geometry>
 #include <Eigen/StdVector>
-
-#ifdef WIN32
-#pragma warning( push )
-#pragma warning( disable : 4127 )
-#endif
 #include <Eigen/Sparse>
-#ifdef WIN32
-#pragma warning( pop )
-#endif
-
 
 #ifndef _MSC_VER
 namespace std

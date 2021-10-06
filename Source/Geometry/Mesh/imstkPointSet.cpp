@@ -348,7 +348,7 @@ PointSet::getVertexTCoords() const
 
 void
 PointSet::setActiveVertexAttribute(std::string& activeAttributeName, std::string attributeName,
-                                   const int expectedNumComponents, const ScalarType expectedScalarType)
+                                   const int expectedNumComponents, const ScalarTypeId expectedScalarType)
 {
     std::shared_ptr<AbstractDataArray> attribute = m_vertexAttributes[attributeName];
     if (attribute->getNumberOfComponents() != expectedNumComponents)

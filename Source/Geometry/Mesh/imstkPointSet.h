@@ -206,7 +206,7 @@ protected:
     /// Throws message and casts if incorrect scalar type is provided.
     ///
     void setActiveVertexAttribute(std::string& activeAttributeName, const std::string attributeName,
-                                  const int expectedNumComponents, const ScalarType expectedScalarType);
+                                  const int expectedNumComponents, const ScalarTypeId expectedScalarType);
 
     std::shared_ptr<VecDataArray<double, 3>> m_initialVertexPositions;
     std::shared_ptr<VecDataArray<double, 3>> m_vertexPositions;

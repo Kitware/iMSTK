@@ -136,7 +136,7 @@ LineMesh::getCellScalars() const
 
 void
 LineMesh::setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
-                                 const int expectedNumComponents, const ScalarType expectedScalarType)
+                                 const int expectedNumComponents, const ScalarTypeId expectedScalarType)
 {
     std::shared_ptr<AbstractDataArray> attribute = m_cellAttributes[attributeName];
     if (attribute->getNumberOfComponents() != expectedNumComponents)

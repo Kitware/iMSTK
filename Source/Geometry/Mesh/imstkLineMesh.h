@@ -134,7 +134,7 @@ public:
 
 protected:
     void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
-                                const int expectedNumComponents, const ScalarType expectedScalarType);
+                                const int expectedNumComponents, const ScalarTypeId expectedScalarType);
 
 protected:
     std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;   ///> line connectivity

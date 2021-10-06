@@ -428,7 +428,7 @@ public:
     ///
     /// \brief Cast array to the IMSTK type on the abstract interface
     ///
-    std::shared_ptr<AbstractDataArray> cast(ScalarType type) override
+    std::shared_ptr<AbstractDataArray> cast(ScalarTypeId type) override
     {
         if (type == AbstractDataArray::m_scalarType)
         {

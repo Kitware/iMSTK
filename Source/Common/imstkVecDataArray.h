@@ -205,7 +205,7 @@ public:
         return other;
     }
 
-    std::shared_ptr<AbstractDataArray> cast(ScalarType type) override
+    std::shared_ptr<AbstractDataArray> cast(ScalarTypeId type) override
     {
         if (type == AbstractDataArray::m_scalarType)
         {
