@@ -290,7 +290,7 @@ else()
 endif()
 
 # VTK
-find_package(VTK CONFIG)
+find_package(VTK REQUIRED CONFIG)
 # modules are linked via `VTK::CommonCore`
 # vtk_module_autoinit is needed
 list(APPEND VTK_DEPENDENCIES
@@ -321,7 +321,7 @@ list(APPEND VTK_DEPENDENCIES
   RenderingVolume
   RenderingVolumeOpenGL2
   ViewsContext2D)
-find_package(VTK COMPONENTS ${VTK_DEPENDENCIES})
+find_package(VTK COMPONENTS ${VTK_DEPENDENCIES} REQUIRED)
 if(${PROJECT_NAME}_USE_VTK_OSMESA)
   add_definitions(-DiMSTK_USE_VTK_OSMESA)
 endif()
