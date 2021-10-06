@@ -34,7 +34,7 @@ endif()
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
   GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/vrpn.git
-  GIT_TAG f4fd31a774d5ac72add2467f8aff1b324599de3b
+  GIT_TAG 7a2845e4b1be2707ccb67dd1d388fb22a766e8f7
   # Cannot get a zip as vrpn uses submodules which are not pulled into the zip
   #URL https://gitlab.kitware.com/iMSTK/vrpn/-/archive/improve-openhaptics-rebase/vrpn-improve-openhaptics-rebase.zip
   #URL_MD5 f9f1f10b0844ee244d3478184d58da04
@@ -51,16 +51,10 @@ imstk_add_external_project( VRPN
     -DVRPN_USE_HID:BOOL=ON
     -DVRPN_USE_LIBNIFALCON:BOOL=OFF
     -DVRPN_BUILD_SERVERS:BOOL=ON
-    -DVRPN_USE_PHANTOM_SERVER:BOOL=OFF
-    -DVRPN_USE_HDAPI:BOOL=OFF
-    #-DOPENHAPTICS_ROOT_DIR:PATH=${OPENHAPTICS_ROOT_DIR}
+    -DVRPN_USE_PHANTOM_SERVER:BOOL=${iMSTK_USE_OPENHAPTICS}
+    -DVRPN_USE_HDAPI:BOOL=${iMSTK_USE_OPENHAPTICS}
+    -DOPENHAPTICS_ROOT_DIR:PATH=${OPENHAPTICS_ROOT_DIR}
   DEPENDENCIES ${VRPN_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH ""
   #VERBOSE
 )
-
-# Note HS-2021-28-7 currently disabled openhaptics with regards to VRPN, 
-# between the imstk superbuild and the VRPN cmake files the Openhaptics 
-# libraries can't be found by the VRPN build inside of the imstk superbuild
-# as we will mostly run haptics through the imstkOpenHaptics module this is 
-# not an issue for now 
