@@ -170,6 +170,10 @@ main()
             viewer->addControl(keyControl);
         }
 
+        std::cout << "================================================\n";
+        std::cout << "Key i/j/k/u/o move the triangle\n";
+        std::cout << "================================================\n\n";
+
         driver->start();
     }
 

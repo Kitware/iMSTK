@@ -188,13 +188,6 @@ main()
         // This node computes displacements and sets the color to the magnitude
         std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
         {
-            /*const StdVectorOfVec3d& initPos = clothGeometry->getInitialVertexPositions();
-            const StdVectorOfVec3d& currPos = clothGeometry->getVertexPositions();
-            StdVectorOfReal& scalars = *scalarsPtr;
-            for (size_t i = 0; i < initPos.size(); i++)
-            {
-                scalars[i] = (currPos[i] - initPos[i]).norm();
-            }*/
             const VecDataArray<double, 3>& velocities =
                 *std::dynamic_pointer_cast<VecDataArray<double, 3>>(clothGeometry->getVertexAttribute("Velocities"));
             DataArray<double>& scalars = *scalarsPtr;

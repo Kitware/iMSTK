@@ -268,7 +268,7 @@ RenderParticleEmitter::emitParticle(std::unique_ptr<RenderParticle>& particle)
         particle->m_position[2] = (float)position[2] + z;
     }
 
-    float randomRotation = getRandomNormalizedFloat() * (float)imstk::PI * 2.0f;
+    float randomRotation = getRandomNormalizedFloat() * (float)PI * 2.0f;
     float randomRotationalVelocity = getRandomNormalizedFloat();
     particle->m_rotation = randomRotation;
     particle->m_rotationalVelocity = (randomRotationalVelocity * m_minRotationSpeed) +

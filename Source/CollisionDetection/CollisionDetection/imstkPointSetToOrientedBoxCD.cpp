@@ -36,10 +36,10 @@ PointSetToOrientedBoxCD::PointSetToOrientedBoxCD()
 
 void
 PointSetToOrientedBoxCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<PointSet>    pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
     std::shared_ptr<OrientedBox> box      = std::dynamic_pointer_cast<OrientedBox>(geomB);
@@ -47,9 +47,10 @@ PointSetToOrientedBoxCD::computeCollisionDataAB(
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
 
-    const Vec3d boxPos      = box->getPosition();
-    const Mat3d cubeRot     = box->getOrientation().toRotationMatrix();
-    const Vec3d cubeExtents = box->getExtents();
+    const Vec3d             boxPos      = box->getPosition();
+    const Mat3d             cubeRot     = box->getOrientation().toRotationMatrix();
+    const Vec3d             cubeExtents = box->getExtents();
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int idx)
         {
@@ -71,17 +72,19 @@ PointSetToOrientedBoxCD::computeCollisionDataAB(
                 elemB.pt  = cubeContactPt;       // Contact point on surface of cube
                 elemB.penetrationDepth = depth;
 
-                elementsA.safeAppend(elemA);
-                elementsB.safeAppend(elemB);
+                lock.lock();
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
+                lock.unlock();
             }
         }, vertices.size() > 100);
 }
 
 void
 PointSetToOrientedBoxCD::computeCollisionDataA(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA)
 {
     std::shared_ptr<PointSet>    pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
     std::shared_ptr<OrientedBox> box      = std::dynamic_pointer_cast<OrientedBox>(geomB);
@@ -89,9 +92,10 @@ PointSetToOrientedBoxCD::computeCollisionDataA(
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
 
-    const Vec3d boxPos      = box->getPosition();
-    const Mat3d cubeRot     = box->getOrientation().toRotationMatrix();
-    const Vec3d cubeExtents = box->getExtents();
+    const Vec3d             boxPos      = box->getPosition();
+    const Mat3d             cubeRot     = box->getOrientation().toRotationMatrix();
+    const Vec3d             cubeExtents = box->getExtents();
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int idx)
         {
@@ -108,16 +112,18 @@ PointSetToOrientedBoxCD::computeCollisionDataA(
                 elemA.ptIndex = idx;
                 elemA.penetrationDepth = depth;
 
-                elementsA.safeAppend(elemA);
+                lock.lock();
+                elementsA.push_back(elemA);
+                lock.unlock();
             }
         }, vertices.size() > 100);
 }
 
 void
 PointSetToOrientedBoxCD::computeCollisionDataB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<PointSet>    pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
     std::shared_ptr<OrientedBox> box      = std::dynamic_pointer_cast<OrientedBox>(geomB);
@@ -125,9 +131,10 @@ PointSetToOrientedBoxCD::computeCollisionDataB(
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
 
-    const Vec3d boxPos      = box->getPosition();
-    const Mat3d cubeRot     = box->getOrientation().toRotationMatrix();
-    const Vec3d cubeExtents = box->getExtents();
+    const Vec3d             boxPos      = box->getPosition();
+    const Mat3d             cubeRot     = box->getOrientation().toRotationMatrix();
+    const Vec3d             cubeExtents = box->getExtents();
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int idx)
         {
@@ -144,7 +151,9 @@ PointSetToOrientedBoxCD::computeCollisionDataB(
                 elemB.pt  = cubeContactPt;       // Contact point on surface of cube
                 elemB.penetrationDepth = depth;
 
-                elementsB.safeAppend(elemB);
+                lock.lock();
+                elementsB.push_back(elemB);
+                lock.unlock();
             }
         }, vertices.size() > 100);
 }

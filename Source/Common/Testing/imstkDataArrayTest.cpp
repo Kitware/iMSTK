@@ -21,7 +21,9 @@
 
 #include "gtest/gtest.h"
 
+#define IMSTK_CHECK_ARRAY_RANGE
 #include "imstkDataArray.h"
+#undef IMSTK_CHECK_ARRAY_RANGE
 
 using namespace imstk;
 
@@ -65,6 +67,31 @@ TEST(imstkDataArrayTest, Constructors)
     EXPECT_EQ(4, d.size());
     EXPECT_EQ(4, d.getCapacity());
     EXPECT_TRUE(isEqualTo(d, { 0, 1, 2, 3 }));
+}
+
+TEST(imstkDataArrayTest, Accessors)
+{
+    DataArray<int> b{ 0, 1, 2, 3 };
+
+    EXPECT_EQ(2, b[2]);
+    EXPECT_EQ(0, b[0]);
+
+    b[3] = 4;
+    EXPECT_EQ(4, b[3]);
+
+    // Checked Arrays only
+    EXPECT_ANY_THROW(b[4]);
+}
+
+TEST(imstkDataArrayTest, AccessorsConst)
+{
+    const DataArray<int> b{ 0, 1, 2, 3 };
+
+    EXPECT_EQ(2, b[2]);
+    EXPECT_EQ(0, b[0]);
+
+    // Checked Arrays only
+    EXPECT_ANY_THROW(b[4]);
 }
 
 TEST(imstkDataArrayTest, Assignment)
@@ -172,6 +199,9 @@ TEST(imstkDataArrayTest, Iterators)
         ++it;
         ++expected;
     }
+
+    // Checked iterators only
+    EXPECT_ANY_THROW(++it);
 }
 
 TEST(imstkDataArrayTest, ScalarType)
@@ -214,4 +244,11 @@ TEST(imstkDataArrayTest, ParameterCast)
     {
         EXPECT_DOUBLE_EQ(static_cast<double>(a[i]), (*actualB)[i]);
     }
+}
+
+TEST(imstkDataArrayTest, ResizeToOne)
+{
+    DataArray<int> a;
+    a.resize(1);
+    EXPECT_EQ(1, a.size());
 }

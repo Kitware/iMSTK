@@ -217,6 +217,8 @@ public:
         }
     }
 
+    static std::shared_ptr<TaskGraph> removeUnusedNodes(std::shared_ptr<TaskGraph> graph);
+
     ///
     /// \brief Returns if Graph is cyclic or not
     ///

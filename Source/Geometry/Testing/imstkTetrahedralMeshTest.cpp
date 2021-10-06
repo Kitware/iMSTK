@@ -27,17 +27,13 @@
 
 using namespace imstk;
 
-class imstkTetrahedralMeshTest : public ::testing::Test
-{
-protected:
-    TetrahedralMesh m_tetMesh;
-};
-
 ///
 /// \brief Test the mesh extraction of a cube
 ///
-TEST_F(imstkTetrahedralMeshTest, ExtractSurfaceMesh)
+TEST(imstkTetrahedralMeshTest, ExtractSurfaceMesh)
 {
+    TetrahedralMesh tetMesh;
+
     // Setup a cube
     //    0-------1
     //   /|      /|
@@ -68,11 +64,11 @@ TEST_F(imstkTetrahedralMeshTest, ExtractSurfaceMesh)
         indices[3] = Vec4i(1, 2, 0, 5);
         indices[4] = Vec4i(2, 6, 7, 5);
 
-        m_tetMesh.initialize(verticesPtr, indicesPtr);
+        tetMesh.initialize(verticesPtr, indicesPtr);
     }
 
     // Extract the surface
-    std::shared_ptr<SurfaceMesh>             surfMesh = m_tetMesh.extractSurfaceMesh();
+    std::shared_ptr<SurfaceMesh>             surfMesh = tetMesh.extractSurfaceMesh();
     std::shared_ptr<VecDataArray<double, 3>> surfVerticesPtr = surfMesh->getVertexPositions();
     std::shared_ptr<VecDataArray<int, 3>>    surfIndicesPtr  = surfMesh->getTriangleIndices();
     VecDataArray<double, 3>&                 surfVertices    = *surfVerticesPtr;
@@ -99,8 +95,10 @@ TEST_F(imstkTetrahedralMeshTest, ExtractSurfaceMesh)
 ///
 /// \brief Test the computation of volume
 ///
-TEST_F(imstkTetrahedralMeshTest, GetVolume)
+TEST(imstkTetrahedralMeshTest, GetVolume)
 {
+    TetrahedralMesh tetMesh;
+
     // We use a regular tetrahedron with edge lengths 2
     // V = (edge length)^3/(6sqrt(2))
     const double edgeLenth      = 2.0;
@@ -118,6 +116,6 @@ TEST_F(imstkTetrahedralMeshTest, GetVolume)
 
     indices[0] = Vec4i(0, 1, 2, 3);
 
-    m_tetMesh.initialize(verticesPtr, indicesPtr);
-    EXPECT_NEAR(expectedVolume, m_tetMesh.getVolume(), 0.000001);
+    tetMesh.initialize(verticesPtr, indicesPtr);
+    EXPECT_NEAR(expectedVolume, tetMesh.getVolume(), 0.000001);
 }

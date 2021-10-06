@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(iMSTK VERSION 4.0.0 LANGUAGES C CXX)
+project(iMSTK VERSION 5.0.0 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
@@ -64,24 +64,41 @@ endif()
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
+
+# SWIG 
+option(${PROJECT_NAME}_WRAP_CSHARP "Build iMSTK-C# wrapper code and lib" OFF)
+# SWIG will generate managed array using pinning if this option is ON. Otherwise using P/Invoke default array marshalling.
+option(${PROJECT_NAME}_SWIG_PINNED_ARRAY "Managed C# arrays using pinning" ON)
+mark_as_advanced(${PROJECT_NAME}_SWIG_PINNED_ARRAY)
+if (${PROJECT_NAME}_WRAP_CSHARP)
+  find_package(SWIG REQUIRED)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+  set(CMAKE_SWIG_FLAGS "")
+endif()
+
+# CUDA
 option(${PROJECT_NAME}_ENABLE_CUDA_BACKEND "Enable iMSTK CUDA backend" OFF)
 if (${PROJECT_NAME}_ENABLE_CUDA_BACKEND)
-	include(CheckLanguage)
-	check_language(CUDA)
-	if (CMAKE_CUDA_COMPILER)
-		enable_language(CUDA)
-		set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
-		set(CUDA_PROPAGATE_HOST_FLAGS ON)
-		if(NOT DEFINED CMAKE_CUDA_STANDARD)
-			set(CMAKE_CUDA_STANDARD 11)
-			set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-		endif()
-	else()
-		message(STATUS "WARNING: CUDA compiler NOT FOUND; CUDA backend not enabled!")
-		set(${PROJECT_NAME}_ENABLE_CUDA_BACKEND OFF)
+  include(CheckLanguage)
+  check_language(CUDA)
+  if (CMAKE_CUDA_COMPILER)
+    enable_language(CUDA)
+	set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+	set(CUDA_PROPAGATE_HOST_FLAGS ON)
+	if(NOT DEFINED CMAKE_CUDA_STANDARD)
+	  set(CMAKE_CUDA_STANDARD 11)
+	  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 	endif()
+  else()
+	message(STATUS "WARNING: CUDA compiler NOT FOUND; CUDA backend not enabled!")
+    set(${PROJECT_NAME}_ENABLE_CUDA_BACKEND OFF)
+  endif()
 endif ()
 
+# General Options
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build iMSTK examples" ON)
 option(${PROJECT_NAME}_BUILD_TESTING "Build iMSTK tests" ON)
 set(BUILD_TESTING OFF)
@@ -134,7 +151,12 @@ if(${PROJECT_NAME}_SUPERBUILD)
 
   option(${PROJECT_NAME}_USE_Uncrustify "Use Uncrustify as a code style beautifier." ON)
   if(${PROJECT_NAME}_USE_Uncrustify)
-    imstk_define_dependency(Uncrustify)
+    find_package (Python COMPONENTS Interpreter)
+    if(Python_Interpreter_FOUND)
+      imstk_define_dependency(Uncrustify)
+    else()
+      message(WARN "Uncrustify requires a python interpreter, please install python and rerun configure")
+    endif()
   endif()
 
   option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
@@ -182,6 +204,10 @@ if(${PROJECT_NAME}_SUPERBUILD)
     set_directory_properties(PROPERTIES TEST_INCLUDE_FILE
       "${CMAKE_CURRENT_BINARY_DIR}/imstkCTestAddInnerbuild.cmake"
     )
+  endif()
+
+  if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
+    imstk_define_dependency(iMSTKData)
   endif()
 
   #-----------------------------------------------------------------------------
@@ -289,6 +315,7 @@ list(APPEND VTK_DEPENDENCIES
   RenderingContext2D
   RenderingContextOpenGL2
   RenderingCore
+  RenderingExternal
   RenderingOpenGL2
   RenderingOpenVR
   RenderingVolume
@@ -312,6 +339,23 @@ else(Uncrustify_EXECUTABLE)
   message(WARNING "uncrustify not found! Cannot run code-style test.")
 endif(Uncrustify_EXECUTABLE)
 
+
+#-----------------------------------------------------------------------------
+# Data
+#----------------------------------------------------------------------
+if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
+  add_definitions( -DiMSTK_DATA_ROOT=\"${CMAKE_INSTALL_PREFIX}/data/\")
+  
+  # Note if the target name or data name changes this has to be changed as well
+  add_custom_target(CopyDataFiles ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_BINARY_DIR}/../External/iMSTKData/src/Data
+    ${CMAKE_INSTALL_PREFIX}/data
+    )
+endif()
+
+
+
 #-----------------------------------------------------------------------------
 # Testing
 #----------------------------------------------------------------------
@@ -332,21 +376,6 @@ if(${PROJECT_NAME}_COVERAGE)
     EXECUTABLE ctest -E "(CodeFormatTest|RenderTest.*)"
     EXCLUDE "${CMAKE_BINARY_DIR}/../install/include/*" "/usr/*" "*/Testing/*"
   )
-endif()
-
-#-----------------------------------------------------------------------------
-# Download the external data needed for both testing and examples
-#-----------------------------------------------------------------------------
-if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
-  include(imstkExternalData)
-  include(imstkExternalDataDownloadTest)
-  # Create a target for all the data files
-  file(GLOB_RECURSE FILE_LIST
-    LIST_DIRECTORIES FALSE
-    RELATIVE "${CMAKE_SOURCE_DIR}/Data/"
-    "${CMAKE_SOURCE_DIR}/Data/*")
-  string(REGEX REPLACE "\.sha512" "" FILE_LIST "${FILE_LIST}")
-  imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 endif()
 
 # Folder name to put our headers/cmake config files under
@@ -376,6 +405,10 @@ add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/Testing)
 add_subdirectory(Source/Filtering)
 add_subdirectory(Source/FilteringCore)
+
+if (${PROJECT_NAME}_WRAP_CSHARP)
+  add_subdirectory(Source/Wrappers)
+endif()
 
 #--------------------------------------------------------------------------
 # Add Examples subdirectories

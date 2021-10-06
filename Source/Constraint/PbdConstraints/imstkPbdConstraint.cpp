@@ -43,7 +43,7 @@ PbdConstraint::projectConstraint(const DataArray<double>& invMasses, const doubl
         dcMidc += invMasses[m_vertexIds[i]] * m_dcdx[i].squaredNorm();
     }
 
-    if (dcMidc < VERY_SMALL_EPSILON)
+    if (dcMidc < IMSTK_DOUBLE_EPS)
     {
         return;
     }

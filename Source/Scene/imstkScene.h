@@ -56,7 +56,7 @@ struct SceneConfig
     bool trackFPS = false;
 
     // If off, tasks will run sequentially
-    bool taskParallelizationEnabled = true;
+    bool taskParallelizationEnabled = false;
 
     // If on, elapsed times for computational steps will be reported in map
     bool taskTimingEnabled = false;
@@ -78,10 +78,10 @@ struct SceneConfig
 ///
 class Scene : public EventObject
 {
-template<class T>
-using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
-
 public:
+    template<class T>
+    using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
+
     Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
     virtual ~Scene() override = default;
 
@@ -148,12 +148,6 @@ public:
     const std::unordered_set<std::shared_ptr<SceneObject>>& getSceneObjects() const { return m_sceneObjects; }
 
     ///
-    /// \brief Return a vector of shared pointers to the scene objects
-    /// \note A separate list might be efficient as this is called runtime
-    ///
-    const std::vector<std::shared_ptr<VisualModel>> getDebugRenderModels() const;
-
-    ///
     /// \brief Get the scene object controllers
     ///
     const std::vector<std::shared_ptr<TrackingDeviceControl>> getControllers() const { return m_trackingControllers; }
@@ -191,7 +185,7 @@ public:
     ///
     /// \brief Get and unordered map of cameras with names
     ///
-    const NamedMap<Camera>& getCameras() const { return m_cameras; }
+    const std::unordered_map<std::string, std::shared_ptr<Camera>>& getCameras() const { return m_cameras; }
 
     ///
     /// \brief Add light from the scene
@@ -294,11 +288,10 @@ protected:
 
     std::string m_name; ///> Name of the scene
     std::unordered_set<std::shared_ptr<SceneObject>> m_sceneObjects;
-    NamedMap<VisualModel>     m_DebugRenderModelMap;
-    NamedMap<Light>           m_lightsMap;
+    std::unordered_map<std::string, std::shared_ptr<Light>> m_lightsMap;
     std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
 
-    NamedMap<Camera> m_cameras;
+    std::unordered_map<std::string, std::shared_ptr<Camera>> m_cameras;
     std::shared_ptr<Camera> m_activeCamera;
 
     std::shared_ptr<CollisionGraph> m_collisionGraph;

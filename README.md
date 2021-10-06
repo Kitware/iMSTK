@@ -47,12 +47,13 @@ Designed more specifically for developers, the issue tracker allows developers t
 
 ## Prerequisites
 * Git
+* Git LFS
 * CMake 3.15 or higher
 
 ##### On Linux:
 
 ```bash
-sudo apt-get install build-essential libgl1-mesa-dev libxt-dev libusb-1.0-0-dev
+sudo apt-get install build-essential libgl1-mesa-dev libxt-dev libusb-1.0-0-dev git-lfs
 ```
 
 ## Getting started with iMSTK
@@ -85,6 +86,7 @@ This will checkout, build and link all iMSTK dependencies. When making changes t
 * ##### On Windows
 Run CMake-GUI and follow the directions described [HERE](https://cmake.org/runningcmake/). You will have to choose which version of Visual Studio you'd like to use when configuring the project, make sure to select **Microsoft Visual Studio C++ 15 2017 or 2019**. CMake will generate a `iMSTK.sln` solution file for Visual Studio at the top level. Open this file and build all targets, which will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `iMSTK.sln` solution file located in the `Innerbuild` directory.
 If you would like to build on multiple cores add /MP[N] to CMAKE_CXX_FLAGS in CMake-GUI, where N is optional representing the number of cores (without N supplied, the build will use as many cores as available on the device).
+If you check out the unit tests or the examples make sure to run `git install lfs` to make sure that `git lfs` is installed.
 
 * ##### PhysX Support
 Please note, we are currently deprecating PhysX support, by default PhysX will be OFF but can be turned on via `iMSTK_USE_PHYSX` in  the CMAKE configuration
@@ -116,6 +118,22 @@ To support the [Geomagic Touch (formerly Sensable Phantom Omni)](http://www.geom
   2. Reboot your system.
   3. Configure your CMake project with the variable `iMSTK_USE_OpenHaptics` set to `ON`.
   4. After configuration, the CMake variable `OPENHAPTICS_ROOT_DIR` should be set to the OpenHaptics path on your system.
+  
+* ##### VRPN Support
+
+The `VRPNDeviceModule` enables access to a large number devices supported by VRPN. The `VRPNDeviceModule` expects a `vrpn_server` to be running. The iMSTK superbuild builds and
+installs a server with some default settings but if you want to configure a specific server
+it might be easier to separately build a server. The file `CMake\External\External_VRPN.cmake`
+shows how to pass configuration into VRPN in case you want to modify the modules enabled and
+disabled by the build
+
+The `vrpn.cfg` that is installed by default doesn't have any devices enabled, before use you 
+will need to uncomment the devices that you would like to use. If you use the one inside the 
+iMSTK install directory please note that it will be overwritten every time the superbuild is 
+run. 
+
+Currently iMSTK supports VRPN `Analog`, `Button` and `Tracker` devices. Future support will
+depend on user demand.
 
 * ##### Offscreen Rendering
 To render without the usage of a GPU or without the usage of a screen on linux (or WSL), iMSTK's VTK renderer may be built with OSMesa.

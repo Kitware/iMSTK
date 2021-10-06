@@ -71,8 +71,9 @@ struct FEMModelConfig
 ///
 class FEMDeformableBodyModel : public DynamicalModel<FeDeformBodyState>
 {
-using kinematicState = FeDeformBodyState;
-using System = NonLinearSystem<SparseMatrixd>;
+public:
+    using kinematicState = FeDeformBodyState;
+    using System = NonLinearSystem<SparseMatrixd>;
 
 public:
     ///

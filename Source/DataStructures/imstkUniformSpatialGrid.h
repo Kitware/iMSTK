@@ -40,7 +40,7 @@ public:
     ///
     /// \brief Construct a default grid ([0, 1]^3) with cell size of 1
     ///
-    UniformSpatialGrid() : UniformSpatialGrid(Vec3r(0, 0, 0), Vec3r(1, 1, 1), Real(1.0))
+    UniformSpatialGrid() : UniformSpatialGrid(Vec3d::Zero(), Vec3d(1.0, 1.0, 1.0), double(1.0))
     {}
 
     ///
@@ -49,7 +49,7 @@ public:
     /// \param upperCorner The upper corner of the grid
     /// \param cellSize The length of grid cell
     ///
-    UniformSpatialGrid(const Vec3r& lowerCorner, const Vec3r& upperCorner, Real cellSize)
+    UniformSpatialGrid(const Vec3d& lowerCorner, const Vec3d& upperCorner, double cellSize)
     {
         initialize(lowerCorner, upperCorner, cellSize);
     }
@@ -60,7 +60,7 @@ public:
     /// \param upperCorner The upper corner of the grid
     /// \param cellSize the edge length of grid cell
     ///
-    void initialize(const Vec3r& lowerCorner, const Vec3r& upperCorner, const Real cellSize)
+    void initialize(const Vec3d& lowerCorner, const Vec3d& upperCorner, const double cellSize)
     {
         CHECK(cellSize > 0) << "Invalid cell size";
 
@@ -68,7 +68,7 @@ public:
         m_UpperCorner = upperCorner;
 
         m_CellSize    = cellSize;
-        m_InvCellSize = Real(1.0) / m_CellSize;
+        m_InvCellSize = 1.0 / m_CellSize;
 
         m_NTotalCells = 1u;
         for (int i = 0; i < 3; ++i)
@@ -113,7 +113,7 @@ public:
     /// \brief Get the 3D index (cell_x, cell_y, cell_z) of the cell containing the given positions
     ///
     template<class IndexType>
-    std::array<IndexType, 3> getCell3DIndices(const Vec3r& ppos) const
+    std::array<IndexType, 3> getCell3DIndices(const Vec3d& ppos) const
     {
         std::array<IndexType, 3> cellIdx;
         for (int d = 0; d < 3; ++d)
@@ -137,7 +137,7 @@ public:
     /// \brief Get data in a cell
     /// \param A position in space
     ///
-    CellData& getCellData(const Vec3r& ppos)
+    CellData& getCellData(const Vec3d& ppos)
     {
         return m_CellData[getCellLinearizedIndex<unsigned int>(ppos)];
     }
@@ -146,7 +146,7 @@ public:
     /// \brief Get data in a cell
     /// \param A position in space
     ///
-    const CellData& getCellData(const Vec3r& ppos) const
+    const CellData& getCellData(const Vec3d& ppos) const
     { return m_CellData[getCellLinearizedIndex<unsigned int>(ppos)]; }
 
     ///
@@ -238,7 +238,7 @@ public:
     /// \param A position in space
     ///
     template<class IndexType>
-    IndexType getCellLinearizedIndex(const Vec3r& ppos) const
+    IndexType getCellLinearizedIndex(const Vec3d& ppos) const
     {
         auto cellIdx = getCell3DIndices<IndexType>(ppos);
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
@@ -252,10 +252,10 @@ public:
     }
 
 private:
-    Vec3r m_LowerCorner;                      ///> Lower corner of the grid
-    Vec3r m_UpperCorner;                      ///> Upper corner of the grid
-    Real  m_CellSize;                         ///> Length of grid cell
-    Real  m_InvCellSize;                      ///> Inverse length of grid cell
+    Vec3d  m_LowerCorner;                     ///> Lower corner of the grid
+    Vec3d  m_UpperCorner;                     ///> Upper corner of the grid
+    double m_CellSize;                        ///> Length of grid cell
+    double m_InvCellSize;                     ///> Inverse length of grid cell
 
     unsigned int m_NTotalCells;               ///> Number of total cells
     std::array<unsigned int, 3> m_Resolution; ///> Grid resolution (number of cells in x/y/z dimensions)

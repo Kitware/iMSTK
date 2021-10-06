@@ -47,6 +47,8 @@ Color Color::Marigold(0.9, 0.9, 0.4);
 Color Color::YellowBone(0.828, 0.785, 0.501);
 Color Color::Bone(0.89, 0.86, 0.79);
 Color Color::Blood(0.4, 0.0, 0.0);
+Color Color::LightSkin(1.0, 0.86, 0.7);
+Color Color::DarkSkin(0.38, 0.27, 0.18);
 
 Color::Color()
 {

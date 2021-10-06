@@ -38,13 +38,6 @@ function(imstk_add_test_internal target kind)
   file(GLOB test_files "${CMAKE_CURRENT_SOURCE_DIR}/*Test.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/*Test.cpp")
 
-  # Get all source file names
-  set(test_file_names "")
-  foreach(test_file ${test_files})
-    get_filename_component(test_file_name ${test_file} NAME)
-    list(APPEND test_file_names ${test_file_name})
-  endforeach()
-
   # Create test driver executable
   imstk_add_executable(${test_driver_executable} ${test_files})
 

@@ -28,11 +28,22 @@ set(copy_ftd2xx_lib_command
   ${FTD2XX_EXTRACT_DIR}/${ftd2xx_libdir}/ftd2xx.lib
   ${CMAKE_INSTALL_PREFIX}/lib/ftd2xx.lib
   )
+  
 set(copy_ftd2xx_dll_command
   ${CMAKE_COMMAND} -E copy
   ${FTD2XX_EXTRACT_DIR}/${ftd2xx_libdir}/ftd2xx64.dll
   ${CMAKE_INSTALL_PREFIX}/bin/ftd2xx64.dll
   )
+
+# HS 2021-aug-08 Some dependencies expect the dll name to 
+# be ftd2xx.dll rather than ftd2xx64.dll we're copying here
+# to the renamed version as the whole chain is built via 64 bit builds
+set(copy_ftd2xx_dll_command_rename
+  ${CMAKE_COMMAND} -E copy
+  ${FTD2XX_EXTRACT_DIR}/${ftd2xx_libdir}/ftd2xx64.dll
+  ${CMAKE_INSTALL_PREFIX}/bin/ftd2xx.dll
+  )
+
 
 #-----------------------------------------------------------------------------
 # Add External Project
@@ -51,6 +62,7 @@ imstk_add_external_project( FTD2XX
     COMMAND ${copy_ftd2xx_headers_command}
     COMMAND ${copy_ftd2xx_lib_command}
     COMMAND ${copy_ftd2xx_dll_command}
+    COMMAND ${copy_ftd2xx_dll_command_rename}
   RELATIVE_INCLUDE_PATH "/"
   #VERBOSE
 )

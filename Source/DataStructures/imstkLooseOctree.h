@@ -37,7 +37,6 @@ class LooseOctree;
 class Geometry;
 class PointSet;
 class SurfaceMesh;
-class DebugRenderGeometry;
 
 ///
 /// \brief The OctreePrimitiveType enum
@@ -74,11 +73,11 @@ struct OctreePrimitive
 
     union
     {
-        std::array<Real, 3> m_Position;   ///> For a point primitive, store its position
+        std::array<double, 3> m_Position;   ///> For a point primitive, store its position
         struct
         {
-            std::array<Real, 3> m_LowerCorner;   ///> For a non-point primitive, store its AABB's lower corner
-            std::array<Real, 3> m_UpperCorner;   ///> For a non-point primitive, store its AABB's upper corner
+            std::array<double, 3> m_LowerCorner;   ///> For a non-point primitive, store its AABB's lower corner
+            std::array<double, 3> m_UpperCorner;   ///> For a non-point primitive, store its AABB's upper corner
         };
     };
 
@@ -111,8 +110,8 @@ public:
     OctreeNode() :
         m_pTree(nullptr),
         m_pParent(nullptr),
-        m_Center(Vec3r(0, 0, 0)),
-        m_HalfWidth(0),
+        m_Center(Vec3d::Zero()),
+        m_HalfWidth(0.0),
         m_Depth(0),
         m_MaxDepth(0),
         m_bIsLeaf(true) {}
@@ -120,8 +119,8 @@ public:
     ///
     /// \brief OctreeNode constructor, called during node splitting when initializing children node
     ///
-    explicit OctreeNode(LooseOctree* const tree, OctreeNode* const pParent, const Vec3r& nodeCenter,
-                        const Real halfWidth, const uint32_t depth);
+    explicit OctreeNode(LooseOctree* const tree, OctreeNode* const pParent, const Vec3d& nodeCenter,
+                        const double halfWidth, const uint32_t depth);
 
     ///
     /// \brief Check if this node is a leaf node
@@ -205,9 +204,9 @@ public:
     ///
     /// \brief Check if the given point is contained exactly in the node boundary (bounding box)
     ///
-    bool contains(const Vec3r& point) { return contains(point[0], point[1], point[2]); }
-    bool contains(const std::array<Real, 3>& point) { return contains(point[0], point[1], point[2]); }
-    bool contains(const Real x, const Real y, const Real z)
+    bool contains(const Vec3d& point) { return contains(point[0], point[1], point[2]); }
+    bool contains(const std::array<double, 3>& point) { return contains(point[0], point[1], point[2]); }
+    bool contains(const double x, const double y, const double z)
     {
         return x >= m_LowerBound[0]
                && y >= m_LowerBound[1]
@@ -222,7 +221,7 @@ public:
     /// \param lowerCorner The AABB's lower corner of the primitive
     /// \param upperCorner The AABB's upper corner of the primitive
     ///
-    bool contains(const std::array<Real, 3>& lowerCorner, const std::array<Real, 3>& upperCorner)
+    bool contains(const std::array<double, 3>& lowerCorner, const std::array<double, 3>& upperCorner)
     {
         return lowerCorner[0] >= m_LowerBound[0]
                && lowerCorner[1] >= m_LowerBound[1]
@@ -235,9 +234,9 @@ public:
     ///
     /// \brief Check if the given point is contained in the node loose boundary (which is 2X bigger than the bounding box)
     ///
-    bool looselyContains(const Vec3r& point) { return looselyContains(point[0], point[1], point[2]); }
-    bool looselyContains(const std::array<Real, 3>& point) { return looselyContains(point[0], point[1], point[2]); }
-    bool looselyContains(const Real x, const Real y, const Real z)
+    bool looselyContains(const Vec3d& point) { return looselyContains(point[0], point[1], point[2]); }
+    bool looselyContains(const std::array<double, 3>& point) { return looselyContains(point[0], point[1], point[2]); }
+    bool looselyContains(const double x, const double y, const double z)
     {
         return x >= m_LowerExtendedBound[0]
                && y >= m_LowerExtendedBound[1]
@@ -253,7 +252,7 @@ public:
     /// \param lowerCorner The AABB's lower corner of the primitive
     /// \param upperCorner The AABB's upper corner of the primitive
     ///
-    bool looselyContains(const std::array<Real, 3>& lowerCorner, const std::array<Real, 3>& upperCorner)
+    bool looselyContains(const std::array<double, 3>& lowerCorner, const std::array<double, 3>& upperCorner)
     {
         return lowerCorner[0] >= m_LowerExtendedBound[0]
                && lowerCorner[1] >= m_LowerExtendedBound[1]
@@ -269,7 +268,7 @@ public:
     /// \param lowerCorner The AABB's lower corner of the primitive
     /// \param upperCorner The AABB's upper corner of the primitive
     ///
-    bool looselyOverlaps(const std::array<Real, 3>& lowerCorner, const std::array<Real, 3>& upperCorner)
+    bool looselyOverlaps(const std::array<double, 3>& lowerCorner, const std::array<double, 3>& upperCorner)
     {
         return upperCorner[0] >= m_LowerExtendedBound[0]
                && upperCorner[1] >= m_LowerExtendedBound[1]
@@ -285,12 +284,12 @@ public:
     OctreeNode*      m_pParent;             ///> Pointer to the parent node
     OctreeNodeBlock* m_pChildren = nullptr; ///> Pointer to a memory block containing 8 children nodes
 
-    const Vec3r    m_Center;                ///> Center of this node
-    const Vec3r    m_LowerBound;            ///> The AABB's lower corner of the node
-    const Vec3r    m_UpperBound;            ///> The AABB's upper corner of the node
-    const Vec3r    m_LowerExtendedBound;    ///> The extended AABB's lower corner of the node, which is 2X bigger than the exact AABB
-    const Vec3r    m_UpperExtendedBound;    ///> The extended AABB's upper corner of the node, which is 2X bigger than the exact AABB
-    const Real     m_HalfWidth;             ///> Half width of the node AABB
+    const Vec3d    m_Center;                ///> Center of this node
+    const Vec3d    m_LowerBound;            ///> The AABB's lower corner of the node
+    const Vec3d    m_UpperBound;            ///> The AABB's upper corner of the node
+    const Vec3d    m_LowerExtendedBound;    ///> The extended AABB's lower corner of the node, which is 2X bigger than the exact AABB
+    const Vec3d    m_UpperExtendedBound;    ///> The extended AABB's upper corner of the node, which is 2X bigger than the exact AABB
+    const double   m_HalfWidth;             ///> Half width of the node AABB
     const uint32_t m_Depth;                 ///> Depth of this node (depth > 0, depth = 1 starting at the root node)
     uint32_t       m_MaxDepth;              ///> Cache the max depth of the tree (maximum depth level possible)
     bool m_bIsLeaf = true;                  ///> True if this node does not have any child node (a node should have either 0 or 8 children)
@@ -339,8 +338,8 @@ public:
     /// \param minWidthRatio If there is primitive that is not a point, minWidth will be recomputed as minWidth = min(width of all non-point primitives) * minWidthRatio
     /// \param name Name of the octree
     ///
-    explicit LooseOctree(const Vec3r& center, const Real width, const Real minWidth,
-                         const Real minWidthRatio = 1.0, const std::string name = "LooseOctree");
+    explicit LooseOctree(const Vec3d& center, const double width, const double minWidth,
+                         const double minWidthRatio = 1.0, const std::string name = "LooseOctree");
 
     ///
     /// Destructor, doing memory cleanup
@@ -360,17 +359,17 @@ public:
     ///
     /// \brief Return center of the tree
     ///
-    const Vec3r getCenter() const { return m_Center; }
+    const Vec3d getCenter() const { return m_Center; }
 
     ///
     /// \brief Return width of the tree
     ///
-    Real getWidth() const { return m_Width; }
+    double getWidth() const { return m_Width; }
 
     ///
     /// \brief Return width of the lowest level tree nodes
     ///
-    Real getMinWidth() const { return m_MinWidth; }
+    double getMinWidth() const { return m_MinWidth; }
 
     ///
     /// \brief Get the maximum depth in this tree, which is computed based on the minWidth value
@@ -527,13 +526,13 @@ protected:
     void deallocateMemoryPool();
 
     const std::string m_Name;   ///> Name of the tree
-    const Vec3r       m_Center; ///> Center of the tree
-    const Real m_Width;         ///> Width of the tree bounding box
+    const Vec3d       m_Center; ///> Center of the tree
+    const double      m_Width;  ///> Width of the tree bounding box
 
     /// If there is no point primitive, minWidth will be recomputed as minWidth = min(width of all non-point primitives) * minWidthRatio
-    const Real m_MinWidthRatio;
+    const double m_MinWidthRatio;
 
-    Real     m_MinWidth;                                         ///> Minimum width allowed for the tree nodes
+    double   m_MinWidth;                                         ///> Minimum width allowed for the tree nodes
     uint32_t m_MaxDepth;                                         ///> Max depth of the tree, which is computed based on m_MinWidth
     bool     m_useMaxDepth;                                      ///> If on max depth specified by user will be used, otherwise maxdepth is based of minwidth
 

@@ -53,7 +53,6 @@ public:
 
     virtual ~ButtonEvent() override = default;
 
-public:
     ButtonStateType m_buttonState;
     const int       m_button = -1;
 };
@@ -64,7 +63,7 @@ public:
 /// \brief The device client's represents the device and provides
 /// an interface to acquire data from a device.
 /// It posts events the device may have as well as provides the state
-/// \todo HAVE AN ABSTRACK BASE CLASS FOR THE DEVICE CLIENT
+/// \todo Abstract base class for device client
 ///
 class DeviceClient : public EventObject
 {
@@ -74,12 +73,10 @@ public:
     ///
     virtual ~DeviceClient() = default;
 
-public:
     // *INDENT-OFF*
     SIGNAL(DeviceClient,buttonStateChanged);
     // *INDENT-ON*
 
-public:
     ///
     /// \brief Get/Set the device IP
     ///
@@ -138,7 +135,7 @@ public:
     ///
     /// \brief Get button map
     ///
-    const std::unordered_map<int, int>& getButtons() const { return m_buttons; }
+    const std::unordered_map<int, int>& getButtons() const;
 
     ///
     /// \brief Get the state of a button
@@ -146,15 +143,17 @@ public:
     ///
     const int getButton(const int buttonId)
     {
+        int result = 0;
+        m_dataLock.lock();
         if (m_buttons.find(buttonId) != m_buttons.end())
         {
-            return m_buttons.at(buttonId);
+            result = m_buttons.at(buttonId);
         }
-        else
-        {
-            return 0;
-        }
+        m_dataLock.unlock();
+        return result;
     }
+
+    const std::vector<double> getAnalog() const;
 
     ///
     /// \brief Do runtime logic
@@ -177,11 +176,14 @@ protected:
     Vec3d m_angularVelocity;                          ///< Angular velocity of the end effector
     Quatd m_orientation;                              ///< Orientation of the end effector
     Vec3d m_force;                                    ///< Force vector
-    Vec3d m_endEffectorOffset = Vec3d(0.0, 0.0, 0.0); ///> Offset from origin
+    Vec3d m_endEffectorOffset = Vec3d(0.0, 0.0, 0.0); ///< Offset from origin
 
     std::unordered_map<int, int> m_buttons;
+    std::vector<double> m_analogChannels;
 
-    ParallelUtils::SpinLock m_transformLock; /// > Used for devices filling data from other threads
-    ParallelUtils::SpinLock m_forceLock;     /// > Used for devices filling data from other threads
+    ParallelUtils::SpinLock m_transformLock;    /// > Used for devices filling data from other threads
+    ParallelUtils::SpinLock m_forceLock;        /// > Used for devices filling data from other threads
+    mutable ParallelUtils::SpinLock m_dataLock; /// > Used for button and analog data
+private:
 };
 }

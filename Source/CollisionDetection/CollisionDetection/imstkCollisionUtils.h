@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0.txt
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -75,8 +75,8 @@ testPointToTriAABB(const double x1, const double y1, const double z1,
     const auto max_z = std::max({ z2, z3, z4 });
 
     return testAABBToAABB(x1 - prox1, x1 + prox1, y1 - prox1, y1 + prox1,
-                z1 - prox1, z1 + prox1, min_x - prox2, max_x + prox2,
-                min_y - prox2, max_y + prox2, min_z - prox2, max_z + prox2);
+        z1 - prox1, z1 + prox1, min_x - prox2, max_x + prox2,
+        min_y - prox2, max_y + prox2, min_z - prox2, max_z + prox2);
 }
 
 ///
@@ -104,19 +104,19 @@ bool testLineToLineAABB(const double x1, const double y1, const double z1,
 /// \param prox2 Round-off precision for the test
 ///
 inline bool
-testLineToLineAABB(const Vec3r& p1A, const Vec3r& p1B,
-                   const Vec3r& p2A, const Vec3r& p2B,
+testLineToLineAABB(const Vec3d& p1A, const Vec3d& p1B,
+                   const Vec3d& p2A, const Vec3d& p2B,
                    const double prox1 = VERY_SMALL_EPSILON_D, const double prox2 = VERY_SMALL_EPSILON_D)
 {
-    const Real* p1Aptr = &p1A[0];
-    const Real* p1Bptr = &p1B[0];
-    const Real* p2Aptr = &p2A[0];
-    const Real* p2Bptr = &p2B[0];
+    const double* p1Aptr = &p1A[0];
+    const double* p1Bptr = &p1B[0];
+    const double* p2Aptr = &p2A[0];
+    const double* p2Bptr = &p2B[0];
     return testLineToLineAABB(p1Aptr[0], p1Aptr[1], p1Aptr[2],
-                p1Bptr[0], p1Bptr[1], p1Bptr[2],
-                p2Aptr[0], p2Aptr[1], p2Aptr[2],
-                p2Bptr[0], p2Bptr[1], p2Bptr[2],
-                prox1, prox2);
+        p1Bptr[0], p1Bptr[1], p1Bptr[2],
+        p2Aptr[0], p2Aptr[1], p2Aptr[2],
+        p2Bptr[0], p2Bptr[1], p2Bptr[2],
+        prox1, prox2);
 }
 
 ///
@@ -153,9 +153,8 @@ testOBBToPoint(
     const Vec3d& pt,
     Vec3d& ptContactNormal, Vec3d& cubeContactPt, double& penetrationDepth)
 {
-    const Vec3d diff   = (pt - cubePos);
-    const Mat3d rotInv = rot.transpose();
-    const Vec3d proj   = rotInv * diff; // dot product on each axes
+    const Vec3d diff = (pt - cubePos);
+    const Vec3d proj = rot.transpose() * diff;   // dot product on each axes
 
     bool inside[3] =
     {
@@ -172,7 +171,7 @@ testOBBToPoint(
         for (int i = 0; i < 3; i++)
         {
             double       dist = proj[i];
-            const Vec3d& axes = rotInv.col(i);
+            const Vec3d& axes = rot.col(i);
 
             if (dist < extents[i] && dist > 0.0)
             {
@@ -205,7 +204,7 @@ testOBBToPoint(
         for (int i = 0; i < 3; i++)
         {
             double       dist = proj[i];
-            const Vec3d& axes = rotInv.col(i);
+            const Vec3d& axes = rot.col(i);
 
             // If distance farther than the box extents, clamp to the box
             if (dist >= extents[i])
@@ -584,60 +583,41 @@ testPlaneLine(const Vec3d& p, const Vec3d& q,
 }
 
 ///
-/// \brief Computes scalar triple product of three vectors
+/// \brief Compute intersection of triangle vs segment and returns triangle interpolation
+/// weights
 ///
-static double
-scalarTripleProduct(const Vec3d& u, const Vec3d& v, const Vec3d& w)
-{
-    return u.cross(v).dot(w);
-}
-
 static bool
 testSegmentTriangle(
     const Vec3d& p, const Vec3d& q,
     const Vec3d& a, const Vec3d& b, const Vec3d& c,
     Vec3d& uvw)
 {
-    const Vec3d  pq  = q - p;
-    const double pqL = pq.norm();
-    if (pqL < IMSTK_DOUBLE_EPS)
-    {
-        return false;
-    }
-    const Vec3d pa = a - p;
-    const Vec3d pb = b - p;
-    const Vec3d pc = c - p;
-
-    // Test if pq is inside the edges bc, ca and ab. Done by testing
-    // that the signed tetrahedral volumes, computed using scalar triple
-    // products, are all positive
-    uvw[0] = scalarTripleProduct(pq, pc, pb);
-    if (uvw[0] < 0.0)
-    {
-        return false;
-    }
-    uvw[1] = scalarTripleProduct(pq, pa, pc);
-    if (uvw[1] < 0.0)
-    {
-        return false;
-    }
-    uvw[2] = scalarTripleProduct(pq, pb, pa);
-    if (uvw[2] < 0.0)
+    const Vec3d  n = q - p;
+    const Vec3d  planeNormal = (b - a).cross(c - a);
+    const double denom       = n.dot(planeNormal);
+    // Plane and line are parallel
+    if (std::abs(denom) < IMSTK_DOUBLE_EPS)
     {
         return false;
     }
 
-    // Compute the barycentric coordinates (u, v, w) determining the
-    // intersection point r, r = u*a + v*b + w*c
-    double denom = 1.0 / (uvw[0] + uvw[1] + uvw[2]);
-    uvw[0] *= denom;
-    uvw[1] *= denom;
-    uvw[2] *= denom; // w = 1.0f - u - v;
+    const double t1 = (a - p).dot(planeNormal);
+    const double t2 = (a - q).dot(planeNormal);
 
-    const Vec3d  iPt  = uvw[0] * a + uvw[1] * b + uvw[2] * c;
-    const double dist = (pq / pqL).dot(iPt - p);
-
-    return (dist >= 0.0 && dist <= pqL);
+    // Check if p and q lie on opposites side of the plane
+    if ((t1 < 0.0 && t2 >= 0.0) || (t1 >= 0.0 && t2 < 0.0))
+    {
+        // \todo: Does planeNormal need to be normalized to get valid p + t1 * n, given division by denom
+        //t1 /= denom;
+        //t2 /= denom;
+        uvw = baryCentric(p + t1 / denom * n, a, b, c);
+        // Lastly check if the point on the plane p+t1*n is inside the triangle
+        return (uvw[0] >= 0.0 && uvw[1] >= 0.0 && uvw[2] >= 0.0);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 ///
@@ -645,45 +625,35 @@ testSegmentTriangle(
 ///
 static bool
 testSegmentTriangle(
-    const Vec3d& pA, const Vec3d& pB,
-    const Vec3d& v0, const Vec3d& v1, const Vec3d& v2)
+    const Vec3d& p, const Vec3d& q,
+    const Vec3d& a, const Vec3d& b, const Vec3d& c)
 {
-    static const double EPSILON = 1e-8;
-    Vec3d               dirAB   = pB - pA;
-    const double        lAB     = dirAB.norm();
-
-    if (lAB < 1e-8)
+    const Vec3d  n = q - p;
+    const Vec3d  planeNormal = (b - a).cross(c - a);
+    const double denom       = n.dot(planeNormal);
+    // Plane and line are parallel
+    if (std::abs(denom) < IMSTK_DOUBLE_EPS)
     {
         return false;
     }
-    dirAB /= lAB;
 
-    const Vec3d  edge1 = v1 - v0;
-    const Vec3d  edge2 = v2 - v0;
-    const Vec3d  h     = dirAB.cross(edge2);
-    const double a     = edge1.dot(h);
-    if (a > -EPSILON && a < EPSILON)
+    const double t1 = (a - p).dot(planeNormal);
+    const double t2 = (a - q).dot(planeNormal);
+
+    // Check if p and q lie on opposites side of the plane
+    if ((t1 < 0.0 && t2 >= 0.0) || (t1 >= 0.0 && t2 < 0.0))
     {
-        return false;    // This ray is parallel to this triangle.
+        // \todo: Does planeNormal need to be normalized to get valid p + t1 * n, given division by denom
+        //t1 /= denom;
+        //t2 /= denom;
+        const Vec3d uvw = baryCentric(p + t1 / denom * n, a, b, c);
+        // Lastly check if the point on the plane p+t1*n is inside the triangle
+        return (uvw[0] >= 0.0 && uvw[1] >= 0.0 && uvw[2] >= 0.0);
     }
-    const double f = 1.0 / a;
-    const Vec3d  s = pA - v0;
-    const double u = f * s.dot(h);
-    if (u < 0.0 || u > 1.0)
+    else
     {
         return false;
     }
-    const Vec3d  q = s.cross(edge1);
-    const double v = f * dirAB.dot(q);
-    if (v < 0.0 || u + v > 1.0)
-    {
-        return false;
-    }
-    // At this stage we can compute t to find out where the intersection point is on the line.
-    const double t = f * edge2.dot(q);
-
-    // ray - triangle intersection
-    return (t > EPSILON && t + EPSILON < lAB);
 }
 
 ///
@@ -961,12 +931,12 @@ testRayToPlane(const Vec3d& rayOrigin, const Vec3d& rayDir,
 ///
 /// \brief Compute closest distance from a point to a segment x1-x2
 ///
-Real pointSegmentClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2);
+double pointSegmentClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2);
 
 ///
 /// \brief Compute closest distance from a point to a triangle x1-x2-x3
 ///
-Real pointTriangleClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, const Vec3d& x3);
+double pointTriangleClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, const Vec3d& x3);
 
 ///
 /// \brief Given two triangles and their ids produce the vertex ids for edge-edge and

@@ -25,8 +25,8 @@
 #include "imstkRbdContactConstraint.h"
 #include "imstkRigidBodyModel2.h"
 #include "NeedleObject.h"
-#include "RbdLinearNeedleLockingConstraint.h"
-#include "RbdAngularNeedleLockingConstraint.h"
+#include "RbdAxesLockingConstraint.h"
+#include "RbdAngularLockingConstraint.h"
 
 using namespace imstk;
 
@@ -47,17 +47,17 @@ protected:
     /// \brief Handle the collision/contact data
     ///
     virtual void handle(
-        const CDElementVector<CollisionElement>& elementsA,
-        const CDElementVector<CollisionElement>& elementsB) override
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override
     {
         // Do it the normal way
         RigidBodyCH::handle(elementsA, elementsB);
 
         // If no collision, needle must be removed
-        if (elementsA.getSize() == 0)
+        if (elementsA.size() == 0)
         {
-            auto needleObject = std::dynamic_pointer_cast<NeedleObject>(getInputObjectA());
-            needleObject->setInserted(false);
+            auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectA());
+            needleObj->setCollisionState(NeedleObject::CollisionState::REMOVED);
         }
     }
 
@@ -69,27 +69,35 @@ protected:
         const Vec3d& contactPt, const Vec3d& contactNormal,
         const double contactDepth) override
     {
-        auto        needleObject = std::dynamic_pointer_cast<NeedleObject>(rbdObj);
-        const Vec3d n = contactNormal.normalized();
+        auto needleObj = std::dynamic_pointer_cast<NeedleObject>(rbdObj);
 
-        // Get all inwards force
-        const Vec3d  needleAxes = needleObject->getNeedleAxes();
-        const double fN = std::max(needleAxes.dot(needleObject->getRigidBody()->getForce()), 0.0);
-
-        // If the normal force exceeds 150 the needle may insert
-        if (fN > m_needleForceThreshold && !needleObject->getInserted())
+        // If the normal force exceeds threshold the needle may insert
+        if (needleObj->getCollisionState() == NeedleObject::CollisionState::REMOVED)
         {
-            LOG(INFO) << "Puncture!\n";
-            needleObject->setInserted(true);
+            needleObj->setCollisionState(NeedleObject::CollisionState::TOUCHING);
+        }
 
-            // Record the axes to constrain too
-            m_initNeedleAxes = needleAxes;
-            m_initNeedleOrientation = Quatd(needleObject->getCollidingGeometry()->getRotation());
-            m_initContactPt = contactPt;
+        const Vec3d n = contactNormal.normalized();
+        if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
+        {
+            // Get all inwards force
+            const Vec3d  needleAxes = needleObj->getAxes();
+            const double fN = std::max(needleAxes.dot(needleObj->getRigidBody()->getForce()), 0.0);
+
+            if (fN > m_needleForceThreshold)
+            {
+                LOG(INFO) << "Puncture!\n";
+                needleObj->setCollisionState(NeedleObject::CollisionState::INSERTED);
+
+                // Record the axes to constrain too
+                m_initNeedleAxes = needleAxes;
+                m_initNeedleOrientation = Quatd(needleObj->getCollidingGeometry()->getRotation());
+                m_initContactPt = contactPt;
+            }
         }
 
         // Only add contact normal constraint if not inserted
-        if (!needleObject->getInserted())
+        if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
         {
             auto contactConstraint = std::make_shared<RbdContactConstraint>(
                 rbdObj->getRigidBody(), nullptr,
@@ -100,32 +108,20 @@ protected:
             rbdObj->getRigidBodyModel2()->addConstraint(contactConstraint);
         }
         // Lock to the initial axes when the needle is inserted
-        else
+        else if (needleObj->getCollisionState() == NeedleObject::CollisionState::INSERTED)
         {
-            auto needleLockConstraint = std::make_shared<RbdLinearNeedleLockingConstraint>(
+            auto needleLockConstraint = std::make_shared<RbdAxesLockingConstraint>(
                 rbdObj->getRigidBody(),
                 m_initContactPt, m_initNeedleAxes,
                 0.05);
             needleLockConstraint->compute(rbdObj->getRigidBodyModel2()->getTimeStep());
             rbdObj->getRigidBodyModel2()->addConstraint(needleLockConstraint);
 
-            auto needleLockConstraint2 = std::make_shared<RbdAngularNeedleLockingConstraint>(
+            auto needleLockConstraint2 = std::make_shared<RbdAngularLockingConstraint>(
                 rbdObj->getRigidBody(), m_initNeedleOrientation, 0.05);
             needleLockConstraint2->compute(rbdObj->getRigidBodyModel2()->getTimeStep());
             rbdObj->getRigidBodyModel2()->addConstraint(needleLockConstraint2);
         }
-
-        /*if (m_useFriction)
-        {
-            std::shared_ptr<RbdFrictionConstraint> frictionConstraint =
-                std::make_shared<RbdFrictionConstraint>(
-                    rbdObj->getRigidBody(), nullptr,
-                    contactPt, contactNormal.normalized(), contactDepth,
-                    m_frictionalCoefficient,
-                    RbdConstraint::Side::A);
-            frictionConstraint->compute(rbdObj->getRigidBodyModel2()->getTimeStep());
-            rbdObj->getRigidBodyModel2()->addConstraint(frictionConstraint);
-        }*/
     }
 
 protected:

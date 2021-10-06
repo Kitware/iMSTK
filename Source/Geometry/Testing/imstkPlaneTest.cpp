@@ -19,76 +19,74 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
 #include "imstkPlane.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 
-class imstkPlaneTest : public ::testing::Test
+TEST(imstkPlaneTest, SetGetWidth)
 {
-protected:
-    Plane m_plane;
-};
+    Plane plane;
+    plane.setWidth(2);
+    EXPECT_DOUBLE_EQ(2, plane.getWidth());
 
-TEST_F(imstkPlaneTest, SetGetWidth)
-{
-    m_plane.setWidth(2);
-    EXPECT_DOUBLE_EQ(2, m_plane.getWidth());
+    plane.setWidth(0.003);
+    EXPECT_DOUBLE_EQ(0.003, plane.getWidth());
 
-    m_plane.setWidth(0.003);
-    EXPECT_DOUBLE_EQ(0.003, m_plane.getWidth());
+    plane.setWidth(400000000);
+    EXPECT_DOUBLE_EQ(400000000.0, plane.getWidth());
 
-    m_plane.setWidth(400000000);
-    EXPECT_DOUBLE_EQ(400000000.0, m_plane.getWidth());
+    plane.setWidth(0.0);
+    EXPECT_DOUBLE_EQ(0.0, plane.getWidth());
 
-    m_plane.setWidth(0.0);
-    EXPECT_DOUBLE_EQ(0.0, m_plane.getWidth());
-
-    m_plane.setWidth(-5.0);
-    EXPECT_LT(-5.0, m_plane.getWidth());
+    plane.setWidth(-5.0);
+    EXPECT_LT(-5.0, plane.getWidth());
 }
 
-TEST_F(imstkPlaneTest, SetGetNormal)
+TEST(imstkPlaneTest, SetGetNormal)
 {
+    Plane plane;
     Vec3d n1 = Vec3d(0.2, -0.3, 0.9);
     Vec3d n2 = Vec3d(0.003, -0.001, 0.002);
     Vec3d n3 = Vec3d(400000000, -500000000, 600000000);
 
-    m_plane.setNormal(n1);
-    EXPECT_TRUE(m_plane.getNormal().isApprox(n1.normalized()));
+    plane.setNormal(n1);
+    EXPECT_TRUE(plane.getNormal().isApprox(n1.normalized()));
 
-    m_plane.setNormal(n2);
-    EXPECT_TRUE(m_plane.getNormal().isApprox(n2.normalized()));
+    plane.setNormal(n2);
+    EXPECT_TRUE(plane.getNormal().isApprox(n2.normalized()));
 
-    m_plane.setNormal(n3);
-    EXPECT_TRUE(m_plane.getNormal().isApprox(n3.normalized()));
+    plane.setNormal(n3);
+    EXPECT_TRUE(plane.getNormal().isApprox(n3.normalized()));
 
-    m_plane.setNormal(Vec3d::Zero());
-    EXPECT_FALSE(m_plane.getNormal().isApprox(Vec3d::Zero()));
+    plane.setNormal(Vec3d::Zero());
+    EXPECT_FALSE(plane.getNormal().isApprox(Vec3d::Zero()));
 }
 
-TEST_F(imstkPlaneTest, GetVolume)
+TEST(imstkPlaneTest, GetVolume)
 {
-    EXPECT_DOUBLE_EQ(0, m_plane.getVolume());
+    Plane plane;
+    EXPECT_DOUBLE_EQ(0, plane.getVolume());
 }
 
-TEST_F(imstkPlaneTest, GetFunctionValue)
+TEST(imstkPlaneTest, GetFunctionValue)
 {
-    m_plane.setNormal(Vec3d(0., 1., 0.));
-    m_plane.updatePostTransformData();
+    Plane plane;
+    plane.setNormal(Vec3d(0., 1., 0.));
+    plane.updatePostTransformData();
 
-    EXPECT_DOUBLE_EQ(0., m_plane.getFunctionValue(Vec3d(0., 0., 0.)));
-    EXPECT_DOUBLE_EQ(0., m_plane.getFunctionValue(Vec3d(0.5, 0., 0.)));
-    EXPECT_DOUBLE_EQ(1., m_plane.getFunctionValue(Vec3d(1., 1., 1.)));
-    EXPECT_DOUBLE_EQ(-10., m_plane.getFunctionValue(Vec3d(0., -10., 0.)));
+    EXPECT_DOUBLE_EQ(0., plane.getFunctionValue(Vec3d(0., 0., 0.)));
+    EXPECT_DOUBLE_EQ(0., plane.getFunctionValue(Vec3d(0.5, 0., 0.)));
+    EXPECT_DOUBLE_EQ(1., plane.getFunctionValue(Vec3d(1., 1., 1.)));
+    EXPECT_DOUBLE_EQ(-10., plane.getFunctionValue(Vec3d(0., -10., 0.)));
 
-    m_plane.setPosition(Vec3d(1., 1., 1.));
-    m_plane.setNormal(Vec3d(1., 1., 1.));
-    m_plane.updatePostTransformData();
+    plane.setPosition(Vec3d(1., 1., 1.));
+    plane.setNormal(Vec3d(1., 1., 1.));
+    plane.updatePostTransformData();
 
-    EXPECT_DOUBLE_EQ(-std::sqrt(3.0), m_plane.getFunctionValue(Vec3d(0., 0., 0.)));
-    EXPECT_DOUBLE_EQ(0.0, m_plane.getFunctionValue(Vec3d(1., 1., 1.)));
-    EXPECT_DOUBLE_EQ(-2.0 / std::sqrt(3.0), m_plane.getFunctionValue(Vec3d(1., 0., 0.)));
-    EXPECT_DOUBLE_EQ(-13.0 / std::sqrt(3.0), m_plane.getFunctionValue(Vec3d(0., -10., 0.)));
+    EXPECT_DOUBLE_EQ(-std::sqrt(3.0), plane.getFunctionValue(Vec3d(0., 0., 0.)));
+    EXPECT_DOUBLE_EQ(0.0, plane.getFunctionValue(Vec3d(1., 1., 1.)));
+    EXPECT_DOUBLE_EQ(-2.0 / std::sqrt(3.0), plane.getFunctionValue(Vec3d(1., 0., 0.)));
+    EXPECT_DOUBLE_EQ(-13.0 / std::sqrt(3.0), plane.getFunctionValue(Vec3d(0., -10., 0.)));
 }

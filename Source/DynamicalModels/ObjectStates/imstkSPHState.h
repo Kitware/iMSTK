@@ -34,8 +34,8 @@ template<typename T, int N> class VecDataArray;
 ///
 struct NeighborInfo
 {
-    Vec3r xpq;     ///> relative position: xpq = x_p - x_q
-    Real density;  ///> density of neighbor particle q
+    Vec3d xpq;      ///> relative position: xpq = x_p - x_q
+    double density; ///> density of neighbor particle q
 };
 
 ///
@@ -147,6 +147,6 @@ private:
 
     std::vector<std::vector<size_t>>       m_NeighborLists;       ///>  store a list of neighbors for each particle, updated each time step
     std::vector<std::vector<size_t>>       m_BDNeighborLists;     ///>  store a list of boundary particle neighbors for each particle, updated each time step
-    std::vector<std::vector<NeighborInfo>> m_NeighborInfo;        ///>  store a list of Vec4r(Vec3r(relative position), density) for neighbors, including boundary particle
+    std::vector<std::vector<NeighborInfo>> m_NeighborInfo;        ///>  store a list of Vec4d(Vec3d(relative position), density) for neighbors, including boundary particle
 };
 } // end namespace imstk

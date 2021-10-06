@@ -36,10 +36,10 @@ PointSetToCapsuleCD::PointSetToCapsuleCD()
 
 void
 PointSetToCapsuleCD::computeCollisionDataAB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
     std::shared_ptr<Capsule>  capsule  = std::dynamic_pointer_cast<Capsule>(geomB);
@@ -51,7 +51,7 @@ PointSetToCapsuleCD::computeCollisionDataAB(
 
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
-
+    ParallelUtils::SpinLock                  lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int idx)
         {
@@ -73,17 +73,19 @@ PointSetToCapsuleCD::computeCollisionDataAB(
                 elemB.pt  = capsuleContactPt;     // Contact point on surface of capsule
                 elemB.penetrationDepth = depth;
 
-                elementsA.safeAppend(elemA);
-                elementsB.safeAppend(elemB);
+                lock.lock();
+                elementsA.push_back(elemA);
+                elementsB.push_back(elemB);
+                lock.unlock();
             }
                 }, vertices.size() > 100);
 }
 
 void
 PointSetToCapsuleCD::computeCollisionDataA(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsA)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsA)
 {
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
     std::shared_ptr<Capsule>  capsule  = std::dynamic_pointer_cast<Capsule>(geomB);
@@ -95,7 +97,7 @@ PointSetToCapsuleCD::computeCollisionDataA(
 
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
-
+    ParallelUtils::SpinLock                  lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int idx)
         {
@@ -112,16 +114,18 @@ PointSetToCapsuleCD::computeCollisionDataA(
                 elemA.ptIndex = idx;
                 elemA.penetrationDepth = depth;
 
-                elementsA.safeAppend(elemA);
+                lock.lock();
+                elementsA.push_back(elemA);
+                lock.unlock();
             }
                 }, vertices.size() > 100);
 }
 
 void
 PointSetToCapsuleCD::computeCollisionDataB(
-    std::shared_ptr<Geometry>          geomA,
-    std::shared_ptr<Geometry>          geomB,
-    CDElementVector<CollisionElement>& elementsB)
+    std::shared_ptr<Geometry>      geomA,
+    std::shared_ptr<Geometry>      geomB,
+    std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
     std::shared_ptr<Capsule>  capsule  = std::dynamic_pointer_cast<Capsule>(geomB);
@@ -133,7 +137,7 @@ PointSetToCapsuleCD::computeCollisionDataB(
 
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
-
+    ParallelUtils::SpinLock                  lock;
     ParallelUtils::parallelFor(vertices.size(),
         [&](const int idx)
         {
@@ -150,7 +154,9 @@ PointSetToCapsuleCD::computeCollisionDataB(
                 elemB.pt  = capsuleContactPt;     // Contact point on surface of capsule
                 elemB.penetrationDepth = depth;
 
-                elementsB.safeAppend(elemB);
+                lock.lock();
+                elementsB.push_back(elemB);
+                lock.unlock();
             }
                 }, vertices.size() > 100);
 }

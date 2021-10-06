@@ -46,17 +46,17 @@ public:
     /// \brief Constructor
     /// \param The selected search method
     ///
-    explicit NeighborSearch(Method searchMethod, Real searchRadius = 0);
+    explicit NeighborSearch(Method searchMethod, double searchRadius = 0.0);
 
     ///
     /// \brief Set the search radius
     ///
-    void setSearchRadius(const Real searchRadius);
+    void setSearchRadius(const double searchRadius);
 
     ///
     /// \brief Get the current search radius
     ///
-    Real getSearchRadius() const { return m_SearchRadius; }
+    double getSearchRadius() const { return m_SearchRadius; }
 
     ///
     /// \brief Search neighbors for each points within the search radius
@@ -82,7 +82,7 @@ public:
 
 private:
     Method m_Method;
-    Real   m_SearchRadius = 0;
+    double m_SearchRadius = 0.0;
 
     std::shared_ptr<GridBasedNeighborSearch> m_GridBasedSearcher;
     std::shared_ptr<SpatialHashTableSeparateChaining> m_SpatialHashSearcher;

@@ -23,6 +23,7 @@
 
 #include "imstkDataArray.h"
 #include "imstkMath.h"
+#include "imstkLogger.h"
 //#include "imstkParallelReduce.h"
 
 namespace imstk
@@ -50,18 +51,24 @@ public:
         using reference = VecType&;
 
     public:
-        iterator(pointer ptr) : ptr_(ptr) { }
+        iterator(pointer ptr, pointer end) : ptr_(ptr), end_(end) { }
 
         self_type operator++()
         {
             self_type i = *this;
             ptr_++;
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+            if ((end_ - ptr_) < 0) { throw std::runtime_error("iterator past bounds"); }
+#endif
             return i;
         }
 
         self_type operator++(int junk)
         {
             ptr_++;
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+            if ((end_ - ptr_) < 0) { throw std::runtime_error("iterator past bounds"); }
+#endif
             return *this;
         }
 
@@ -75,6 +82,7 @@ public:
 
     private:
         pointer ptr_;
+        pointer end_;
     };
 
     class const_iterator
@@ -85,21 +93,24 @@ public:
         using iterator_category = std::forward_iterator_tag;
         using difference_type   = std::ptrdiff_t;
         using pointer   = VecType*;
-        using reference = VecType&;
+        using reference = const VecType&;
 
     public:
-        const_iterator(pointer ptr) : ptr_(ptr) { }
+        const_iterator(pointer ptr, pointer end) : ptr_(ptr), end_(end) { }
 
         self_type operator++()
         {
             self_type i = *this;
             ptr_++;
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+            if ((end_ - ptr_) < 0) { throw std::runtime_error("iterator past bounds"); }
+#endif
             return i;
         }
 
         self_type operator++(int junk) { ptr_++; return *this; }
 
-        const reference operator*() { return *ptr_; }
+        reference operator*() { return *ptr_; }
 
         const pointer operator->() { return ptr_; }
 
@@ -109,6 +120,7 @@ public:
 
     private:
         pointer ptr_;
+        pointer end_;
     };
 
 public:
@@ -214,8 +226,15 @@ public:
     inline void resize(const int size) override
     {
         // Can't resize a mapped vector
-        if (DataArray<T>::m_mapped || size == m_vecCapacity)
+        if (DataArray<T>::m_mapped)
         {
+            return;
+        }
+
+        if (size == m_vecCapacity)
+        {
+            DataArray<T>::m_size = DataArray<T>::m_capacity;
+            m_vecSize = m_vecCapacity;
             return;
         }
 
@@ -284,13 +303,13 @@ public:
         m_dataCast[newVecSize - 1] = val;
     }
 
-    iterator begin() { return iterator(m_dataCast); }
+    iterator begin() { return iterator(m_dataCast, m_dataCast + m_vecSize); }
 
-    iterator end() { return iterator(m_dataCast + m_vecSize); }
+    iterator end() { return iterator(m_dataCast + m_vecSize, m_dataCast + m_vecSize); }
 
-    const_iterator cbegin() const { return const_iterator(m_dataCast); }
+    const_iterator cbegin() const { return const_iterator(m_dataCast, m_dataCast + m_vecSize); }
 
-    const_iterator cend() const { return const_iterator(m_dataCast + m_vecSize); }
+    const_iterator cend() const { return const_iterator(m_dataCast + m_vecSize, m_dataCast + m_vecSize); }
 
     ///
     /// \brief Allocates extra capacity, for the number of values, conservative reallocate
@@ -313,8 +332,21 @@ public:
 
     inline VecType* getPointer() { return m_dataCast; }
 
-    inline VecType& operator[](const size_t pos) { return m_dataCast[pos]; }
-    inline const VecType& operator[](const size_t pos) const { return m_dataCast[pos]; }
+    inline VecType& operator[](const size_t pos)
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_vecSize) { throw std::runtime_error("Index out of range"); }
+#endif
+        return m_dataCast[pos];
+    }
+
+    inline const VecType& operator[](const size_t pos) const
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_vecSize) { throw std::runtime_error("Index out of range"); }
+#endif
+        return m_dataCast[pos];
+    }
 
     inline void erase(const int vecPos)
     {

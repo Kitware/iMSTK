@@ -68,7 +68,7 @@ getVertex(const CollisionElement& elem, const MeshSide& side)
     {
         if (side.m_mapPtr && side.m_mapPtr->getType() == GeometryMap::Type::OneToOne)
         {
-            ptId = side.m_mapPtr->getMapIdx(ptId);
+            ptId = side.m_mapPtr->getMapIdx(static_cast<size_t>(ptId));
         }
         results[0] = { &side.m_vertices[ptId], side.m_invMasses[ptId], &side.m_velocities[ptId] };
     }
@@ -172,8 +172,8 @@ PBDCollisionHandling::~PBDCollisionHandling()
 
 void
 PBDCollisionHandling::handle(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     // Remove constraints without deallocating the memory
     // \todo: Consider using stack
@@ -226,8 +226,8 @@ PBDCollisionHandling::handle(
 
 void
 PBDCollisionHandling::generateMeshNonMeshConstraints(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     // \todo: For when elementsA == 0 or elementsB == 0 and only one side of collision is handled
     std::shared_ptr<PbdObject>       pbdObjectA = std::dynamic_pointer_cast<PbdObject>(getInputObjectA()); // Garunteed
@@ -249,7 +249,7 @@ PBDCollisionHandling::generateMeshNonMeshConstraints(
         nullptr);
 
     // \todo: Test if splitting constraints by type is more efficient
-    for (int i = 0; i < elementsA.getSize(); i++)
+    for (int i = 0; i < elementsA.size(); i++)
     {
         const CollisionElement& colElemA = elementsA[i];
 
@@ -273,9 +273,9 @@ PBDCollisionHandling::generateMeshNonMeshConstraints(
         }
     }
 
-    if (elementsA.getSize() == elementsB.getSize())
+    if (elementsA.size() == elementsB.size())
     {
-        for (int i = 0; i < elementsA.getSize(); i++)
+        for (int i = 0; i < elementsA.size(); i++)
         {
             const CollisionElement& colElemA = elementsA[i];
             const CollisionElement& colElemB = elementsB[i];
@@ -352,11 +352,11 @@ PBDCollisionHandling::generateMeshNonMeshConstraints(
 
 void
 PBDCollisionHandling::generateMeshMeshConstraints(
-    const CDElementVector<CollisionElement>& elementsA,
-    const CDElementVector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& elementsA,
+    const std::vector<CollisionElement>& elementsB)
 {
     // TwoWay CD, constraints used solve both sides with one constraint
-    if (elementsA.getSize() != elementsB.getSize())
+    if (elementsA.size() != elementsB.size())
     {
         return;
     }
@@ -419,7 +419,7 @@ PBDCollisionHandling::generateMeshMeshConstraints(
         nullptr);
 
     // \todo: Test if splitting constraints by type is more efficient
-    for (int i = 0; i < elementsA.getSize(); i++)
+    for (int i = 0; i < elementsA.size(); i++)
     {
         const CollisionElement& colElemA = elementsA[i];
         const CollisionElement& colElemB = elementsB[i];
