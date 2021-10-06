@@ -109,6 +109,10 @@ macro(imstk_find_libary package library)
   
   # Should I look in system locations?
   set(use_system ${IMSTK_FIND_LIBRARY_USE_SYSTEM})
+
+  set(IMSTK_ORIG_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
+  set(CMAKE_FIND_LIBRARY_PREFIXES "lib" "")
+
   if(NOT use_system)
     unset(_SEARCH_DIR)
     if(${package}_ROOT_DIR)
@@ -125,7 +129,6 @@ macro(imstk_find_libary package library)
     find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
       NAMES
         ${library}${release_postfix}
-        lib${library}${release_postfix}
       PATHS
         ${_SEARCH_DIR}
         ${_SEARCH_DIR}/Release
@@ -136,7 +139,6 @@ macro(imstk_find_libary package library)
     find_library(${PACKAGE}_LIBRARY_${library}-DEBUG
       NAMES
         ${library}${debug_postfix}
-        lib${library}${debug_postfix}
       PATHS
         ${_SEARCH_DIR}
         ${_SEARCH_DIR}/Debug
@@ -148,7 +150,6 @@ macro(imstk_find_libary package library)
     find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
       NAMES
         ${library}${release_postfix}
-        lib${library}${release_postfix}
     )
     
     unset(${PACKAGE}_LIBRARY_${library}-DEBUG CACHE)
@@ -159,6 +160,8 @@ macro(imstk_find_libary package library)
     )
 
   endif()
+
+  set(CMAKE_FIND_LIBRARY_PREFIXES "${IMSTK_ORIG_FIND_LIBRARY_PREFIXES}")
 
   #message(STATUS "Looking for Release Library : ${library}${release_postfix} in ${_SEARCH_DIR}")
   if (EXISTS ${${PACKAGE}_LIBRARY_${library}-RELEASE})
