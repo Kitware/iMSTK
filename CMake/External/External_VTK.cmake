@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Dependencies
 #-----------------------------------------------------------------------------
-set(VTK_DEPENDENCIES "openvr")
+set(VTK_DEPENDENCIES "OpenVR")
 
 set(${PROJECT_NAME}_VTK_REPO_SOURCE "9.0" CACHE STRING "Select VTK Source Branch/Tag")
 set(VTK_SOURCES "9.0;master;release;nightly-master" CACHE INTERNAL "List of available VTK branch,tags to get")

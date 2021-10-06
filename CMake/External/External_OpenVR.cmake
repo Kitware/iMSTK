@@ -32,7 +32,7 @@ endif()
 set(copy_openvr_headers_command
   ${CMAKE_COMMAND} -E copy_directory
   ${OPENVR_EXTRACT_DIR}/headers
-  ${CMAKE_INSTALL_PREFIX}/include/openvr
+  ${CMAKE_INSTALL_PREFIX}/include/OpenVR
   )
 set(copy_openvr_dll_command
   ${CMAKE_COMMAND} -E copy
@@ -49,7 +49,7 @@ set(copy_openvr_lib_command
 # Add External Project
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
-imstk_add_external_project( openvr
+imstk_add_external_project( OpenVR
   URL "https://gitlab.kitware.com/iMSTK/openvr/-/archive/v1.12.5/openvr-v1.12.5.tar.gz"
   URL_MD5 "42c4d1c4a194860aaa4e793b009b99c0"
   DOWNLOAD_DIR ${OPENVR_PREFIX}

@@ -51,7 +51,7 @@ find_package( LibNiFalcon REQUIRED)
 find_package( Libusb REQUIRED)
 
 # OpenVR
-find_package( openvr REQUIRED )
+find_package( OpenVR REQUIRED )
 
 # PhysX
 if (iMSTK_USE_PHYSX)
@@ -86,9 +86,7 @@ if(iMSTK_USE_OpenHaptics)
 endif()
 
 # VTK
-list(GET openvr_INCLUDE_DIRS 0 OpenVR_INCLUDE_DIR)
-list(GET openvr_LIBRARIES 1 OpenVR_LIBRARY)
-set(OpenVR_INCLUDE_DIR ${OpenVR_INCLUDE_DIR} CACHE INTERNAL "")
+list(GET OpenVR_LIBRARIES 1 OpenVR_LIBRARY)
 set(OpenVR_LIBRARY ${OpenVR_LIBRARY} CACHE INTERNAL "")
 set(VTK_DIR "@VTK_DIR@")
 find_dependency(VTK CONFIG)

@@ -160,7 +160,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(Eigen3)
   imstk_define_dependency(g3log)
   imstk_define_dependency(LibNiFalcon)
-  imstk_define_dependency(openvr)
+  imstk_define_dependency(OpenVR)
   if (${PROJECT_NAME}_USE_PHYSX)
     imstk_define_dependency(PhysX)
   endif()
@@ -244,7 +244,7 @@ find_package( LibNiFalcon REQUIRED)
 # Libusb
 find_package( Libusb REQUIRED)
 # OpenVR
-find_package( openvr REQUIRED )
+find_package( OpenVR REQUIRED )
 
 # Select the release version of PhysX to use
 if (${PROJECT_NAME}_USE_PHYSX)
