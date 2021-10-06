@@ -8,9 +8,23 @@ endif()
 
 macro(imstk_find_header package header)
 
+  set(options
+    USE_SYSTEM
+    )
+  set(oneValueArgs
+    )
+  set(multiValueArgs
+    )
+  cmake_parse_arguments(IMSTK_FIND_HEADER
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+    )
+
   # Subdir to the include directory is optional
   set(sub_dir "")
-  set (extra_macro_args ${ARGN})
+  set (extra_macro_args ${IMSTK_FIND_HEADER_UNPARSED_ARGUMENTS})
   # Did we get any optional args?
   list(LENGTH extra_macro_args num_extra_args)
   if (${num_extra_args} GREATER 0)
@@ -18,12 +32,7 @@ macro(imstk_find_header package header)
   endif ()
   
   # Should I look in system locations?
-  set(use_system)
-  foreach(arg IN LISTS extra_macro_args)
-    if(arg STREQUAL "USE_SYSTEM")
-      set(use_system TRUE)
-    endif()
-  endforeach()
+  set(use_system ${IMSTK_FIND_HEADER_USE_SYSTEM})
 
   if(NOT use_system)
     unset(_SEARCH_DIR)
@@ -67,11 +76,24 @@ endmacro()
 #-----------------------------------------------------------------------------
 
 macro(imstk_find_libary package library)
+  set(options
+    USE_SYSTEM
+    )
+  set(oneValueArgs
+    )
+  set(multiValueArgs
+    )
+  cmake_parse_arguments(IMSTK_FIND_LIBRARY
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+    )
 
   # Debug postfix argument is optional
   set(release_postfix)
   set(debug_postfix ${CMAKE_DEBUG_POSTFIX})
-  set (extra_macro_args ${ARGN})
+  set (extra_macro_args ${IMSTK_FIND_LIBRARY_UNPARSED_ARGUMENTS})
   # Did we get any optional args?
   list(LENGTH extra_macro_args num_extra_args)
   if (${num_extra_args} EQUAL 1)
@@ -87,13 +109,7 @@ macro(imstk_find_libary package library)
   endif()
   
   # Should I look in system locations?
-  set(use_system)
-  foreach(arg IN LISTS extra_macro_args)
-    if(arg STREQUAL "USE_SYSTEM")
-      set(use_system TRUE)
-    endif()
-  endforeach()
-  
+  set(use_system ${IMSTK_FIND_LIBRARY_USE_SYSTEM})
   if(NOT use_system)
     unset(_SEARCH_DIR)
     if(${package}_ROOT_DIR)
