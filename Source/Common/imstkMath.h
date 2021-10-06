@@ -23,7 +23,12 @@
 
 #define NOMINMAX
 
+#include <vector>
+#include <memory>
+#include <utility>
+
 #include <Eigen/Geometry>
+#include <Eigen/StdVector>
 
 #ifdef WIN32
 #pragma warning( push )
@@ -34,9 +39,6 @@
 #pragma warning( pop )
 #endif
 
-#include <Eigen/StdVector>
-#include <vector>
-#include <memory>
 
 #ifndef _MSC_VER
 namespace std
@@ -324,8 +326,8 @@ template<typename T>
 static T
 symCantor(const T a, const T b)
 {
-    const T max = std::max(a, b);
-    const T min = std::min(a, b);
+    const T max = std::max<T>(a, b);
+    const T min = std::min<T>(a, b);
     return max * (max + 1) / 2 + min;
 }
 }
