@@ -81,6 +81,13 @@ macro(imstk_add_external_project extProj)
 
     imstk_define_external_dirs( ${extProj} )
 
+    set(${extProj}_CMAKE_CACHE_ARGS)
+    if(DEFINED ${extProj}_INSTALL_DIR)
+      list(APPEND ${extProj}_CMAKE_CACHE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=${${extProj}_INSTALL_DIR}
+        )
+    endif()
+
     #-----------------------------------------------------------------------------
     # Add project
     #-----------------------------------------------------------------------------    
@@ -91,6 +98,7 @@ macro(imstk_add_external_project extProj)
       TMP_DIR ${${extProj}_TMP_DIR}       # from above
       STAMP_DIR ${${extProj}_STAMP_DIR}   # from above
       ${${extProj}_EP_ARGS}               # from ExternalProject_Include_Dependencies
+      CMAKE_CACHE_ARGS ${${extProj}_CMAKE_CACHE_ARGS}
       ${${extProj}_UNPARSED_ARGUMENTS}    # from unparsed arguments of this macro
       DEPENDS ${${extProj}_DEPENDENCIES}  # from parsed argument
       )
