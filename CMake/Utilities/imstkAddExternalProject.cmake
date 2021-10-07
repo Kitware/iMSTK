@@ -77,7 +77,7 @@ macro(imstk_add_external_project extProj)
   #-----------------------------------------------------------------------------
   # If needs to download and build
   #-----------------------------------------------------------------------------
-  if(NOT DEFINED ${extProj}_DIR AND NOT ${USE_SYSTEM_${extProj}})
+  if(NOT DEFINED ${extProj}_DIR AND NOT USE_SYSTEM_${extProj})
 
     imstk_define_external_dirs( ${extProj} )
 
