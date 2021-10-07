@@ -17,11 +17,6 @@ set(CMAKE_DEBUG_POSTFIX "d")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "Install location" FORCE)
-endif()
-set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
- 
 #-----------------------------------------------------------------------------
 # Project install directories
 #-----------------------------------------------------------------------------
