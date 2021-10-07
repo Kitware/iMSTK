@@ -1,12 +1,13 @@
-#-----------------------------------------------------------------------------
-# Set project prefix path
-#-----------------------------------------------------------------------------
-set(OPENVR_PREFIX ${CMAKE_BINARY_DIR}/External/openvr)
-set(OPENVR_EXTRACT_DIR ${OPENVR_PREFIX}/v${_version})
+include(imstkAddExternalProject)
+
+# Set OpenVR_SOURCE_DIR
+imstk_define_external_dirs( OpenVR )
 
 #-----------------------------------------------------------------------------
 # Set install commands
 #-----------------------------------------------------------------------------
+set(OPENVR_EXTRACT_DIR ${OpenVR_SOURCE_DIR})
+
 if(WIN32)
   set(openvr_libdir "${OPENVR_EXTRACT_DIR}/lib/win64")
   set(openvr_libname "openvr_api.lib")
@@ -48,13 +49,11 @@ set(copy_openvr_lib_command
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
-include(imstkAddExternalProject)
 imstk_add_external_project( OpenVR
   URL "https://gitlab.kitware.com/iMSTK/openvr/-/archive/v1.12.5/openvr-v1.12.5.tar.gz"
   URL_MD5 "42c4d1c4a194860aaa4e793b009b99c0"
-  DOWNLOAD_DIR ${OPENVR_PREFIX}
-  SOURCE_DIR ${OPENVR_EXTRACT_DIR}
-  BINARY_DIR ${OPENVR_EXTRACT_DIR}
+  DOWNLOAD_DIR ${OpenVR_PREFIX}
+  SOURCE_DIR ${OpenVR_SOURCE_DIR}
   UPDATE_COMMAND ${SKIP_STEP_COMMAND}
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
