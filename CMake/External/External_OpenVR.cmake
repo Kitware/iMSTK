@@ -3,48 +3,59 @@ include(imstkAddExternalProject)
 # Set OpenVR_SOURCE_DIR
 imstk_define_external_dirs( OpenVR )
 
+# Directories and filenames specific to the OpenVR archive layout
+set(OpenVR_INC_DIR "headers")
+if(WIN32)
+  set(OpenVR_DLL_DIR "bin/win64")
+  set(OpenVR_DLL_NAME "openvr_api.dll")
+  set(OpenVR_LIB_DIR "lib/win64")
+  set(OpenVR_LIB_NAME "openvr_api.lib")
+elseif(APPLE)
+  set(OpenVR_DLL_DIR "bin/osx64")
+  set(OpenVR_DLL_NAME "OpenVR.framework")
+  set(OpenVR_LIB_DIR "lib/osx32")
+  set(OpenVR_LIB_NAME "libopenvr_api.dylib")
+elseif(UNIX)
+  set(OpenVR_DLL_DIR "bin/linux64")
+  set(OpenVR_DLL_NAME "libopenvr_api.so")
+  set(OpenVR_LIB_DIR "lib/linux64")
+  set(OpenVR_LIB_NAME "libopenvr_api.so")
+endif()
+
 #-----------------------------------------------------------------------------
 # Set install commands
 #-----------------------------------------------------------------------------
-set(OpenVR_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
+if(NOT DEFINED OpenVR_INSTALL_DIR)
+  set(OpenVR_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 
-if(WIN32)
-  set(openvr_libdir "${OpenVR_SOURCE_DIR}/lib/win64")
-  set(openvr_libname "openvr_api.lib")
-elseif(APPLE)
-  set(openvr_libdir "${OpenVR_SOURCE_DIR}/lib/osx32")
-  set(openvr_libname "libopenvr_api.dylib")
-elseif(UNIX)
-  set(openvr_libdir "${OpenVR_SOURCE_DIR}/lib/linux64")
-  set(openvr_libname "libopenvr_api.so")
+  set(copy_openvr_headers_command
+    ${CMAKE_COMMAND} -E copy_directory
+      ${OpenVR_SOURCE_DIR}/${OpenVR_INC_DIR}
+      ${OpenVR_INSTALL_DIR}/include/OpenVR
+    )
+  set(copy_openvr_dll_command
+    ${CMAKE_COMMAND} -E copy
+      ${OpenVR_SOURCE_DIR}/${OpenVR_DLL_DIR}/${OpenVR_DLL_NAME}
+      ${OpenVR_INSTALL_DIR}/bin/${OpenVR_DLL_NAME}
+    )
+  set(copy_openvr_lib_command
+    ${CMAKE_COMMAND} -E copy
+      ${OpenVR_SOURCE_DIR}/${OpenVR_LIB_DIR}/${OpenVR_LIB_NAME}
+      ${OpenVR_INSTALL_DIR}/lib/${OpenVR_LIB_NAME}
+    )
+
+  set(OpenVR_INSTALL_COMMAND
+    INSTALL_COMMAND
+      COMMAND ${copy_openvr_headers_command}
+      COMMAND ${copy_openvr_lib_command}
+      COMMAND ${copy_openvr_dll_command}
+    )
+else()
+  set(OpenVR_INSTALL_COMMAND
+    INSTALL_COMMAND
+      COMMAND ${SKIP_STEP_COMMAND}
+    )
 endif()
-
-if(WIN32)
-  set(openvr_dlldir "${OpenVR_SOURCE_DIR}/bin/win64")
-  set(openvr_dllname "openvr_api.dll")
-elseif(APPLE)
-  set(openvr_dlldir "${OpenVR_SOURCE_DIR}/bin/osx64")
-  set(openvr_dllname "OpenVR.framework")
-elseif(UNIX)
-  set(openvr_dlldir "${OpenVR_SOURCE_DIR}/bin/linux64")
-  set(openvr_dllname "libopenvr_api.so")
-endif()
-
-set(copy_openvr_headers_command
-  ${CMAKE_COMMAND} -E copy_directory
-  ${OpenVR_SOURCE_DIR}/headers
-  ${OpenVR_INSTALL_DIR}/include/OpenVR
-  )
-set(copy_openvr_dll_command
-  ${CMAKE_COMMAND} -E copy
-  ${openvr_dlldir}/${openvr_dllname}
-  ${OpenVR_INSTALL_DIR}/bin/${openvr_dllname}
-  )
-set(copy_openvr_lib_command
-  ${CMAKE_COMMAND} -E copy
-  ${openvr_libdir}/${openvr_libname}
-  ${OpenVR_INSTALL_DIR}/lib/${openvr_libname}
-  )
 
 #-----------------------------------------------------------------------------
 # Add External Project
@@ -57,11 +68,8 @@ imstk_add_external_project( OpenVR
   UPDATE_COMMAND ${SKIP_STEP_COMMAND}
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
-  INSTALL_COMMAND
-    COMMAND ${copy_openvr_headers_command}
-    COMMAND ${copy_openvr_lib_command}
-    COMMAND ${copy_openvr_dll_command}
-  RELATIVE_INCLUDE_PATH "headers"
+  ${OpenVR_INSTALL_COMMAND}
+  RELATIVE_INCLUDE_PATH "${OpenVR_INC_DIR}"
   #VERBOSE
 )
 
