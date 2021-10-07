@@ -405,4 +405,3 @@ namespace std
 %include "../../Devices/imstkHapticDeviceManager.h"
 %include "../../Devices/imstkHapticDeviceClient.h"
 #endif
-

@@ -5,16 +5,6 @@ public class PbdCloth
 {
     private static string dataPath = "../data/";
 
-    public class CSReceiverFunc : KeyEventFunc {
-         public CSReceiverFunc(Action<KeyEvent> action) {
-             action_ = action;
-         }
-         public override void call(KeyEvent e) {
-             action_(e);
-         }
-         private Action<KeyEvent> action_;
-     }
-
     public static void Main(string[] args)
     {
         // Write log to stdout and file
@@ -58,34 +48,34 @@ public class PbdCloth
                 viewer.addControl(keyControl);
             }
 
-            Action<KeyEvent> receiverAction = (KeyEvent e) => {
-                // Set new textures
-                if (e.m_key == '1')
+            Utils.connectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb,
+                (KeyEvent e) =>
                 {
-                    setFleshTextures(clothObj.getVisualModel(0).getRenderMaterial());
-                }
-                else if (e.m_key == '2')
-                {
-                    setFabricTextures(clothObj.getVisualModel(0).getRenderMaterial());
-                }
-                // Darken the texture pixel values
-                else if (e.m_key == 'h')
-                {
-                    ImageData imageData = clothObj.getVisualModel(0).getRenderMaterial().getTexture(Texture.Type.Diffuse).getImageData();
-                    VecDataArray3uc scalars = Utils.CastTo<VecDataArray3uc>(imageData.getScalars());
-                    byte[] newScalars = new byte[3 * scalars.size()];
-                    scalars.getValues(newScalars);
-
-                    for (int i = 0; i < newScalars.Length; i++)
+                    // Set new textures
+                    if (e.m_key == '1')
                     {
-                        newScalars[i] = (byte)(newScalars[i] * 0.8);
+                        setFleshTextures(clothObj.getVisualModel(0).getRenderMaterial());
                     }
-                    scalars.setValues(newScalars);
-                    clothObj.getVisualModel(0).getRenderMaterial().getTexture(Texture.Type.Diffuse).postModified();
-                }
-            };
-            CSReceiverFunc receiverFunc = new CSReceiverFunc(receiverAction);
-            Utils.connectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb, receiverFunc);
+                    else if (e.m_key == '2')
+                    {
+                        setFabricTextures(clothObj.getVisualModel(0).getRenderMaterial());
+                    }
+                    // Darken the texture pixel values
+                    else if (e.m_key == 'h')
+                    {
+                        ImageData imageData = clothObj.getVisualModel(0).getRenderMaterial().getTexture(Texture.Type.Diffuse).getImageData();
+                        VecDataArray3uc scalars = Utils.CastTo<VecDataArray3uc>(imageData.getScalars());
+                        byte[] newScalars = new byte[3 * scalars.size()];
+                        scalars.getValues(newScalars);
+
+                        for (int i = 0; i < newScalars.Length; i++)
+                        {
+                            newScalars[i] = (byte)(newScalars[i] * 0.8);
+                        }
+                        scalars.setValues(newScalars);
+                        clothObj.getVisualModel(0).getRenderMaterial().getTexture(Texture.Type.Diffuse).postModified();
+                    }
+                });
 
             driver.start();
         }

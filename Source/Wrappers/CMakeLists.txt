@@ -7,17 +7,18 @@ set(SWIG_CSHARP_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/iMSTKCSharpWrapper/src")
 include(UseSWIG)
 set_source_files_properties(${SWIG_INTERFACE_DIR}/imstkCWrapper.i PROPERTIES CPLUSPLUS ON)
 
-# Always clear the ".cs" files from the directory before generating
-# add_custom_command(
-#     OUTPUT "Clearing files"
-#     PRE_BUILD
-#     COMMAND "${CMAKE_COMMAND} -Dsource_dir:PATH=${SWIG_CSHARP_OUTPUT_DIR}/tmp -Ddest_dir:PATH=${SWIG_CSHARP_OUTPUT_DIR}/ -P ${CMAKE_CURRENT_LIST_DIR}/clearInstall.cmake")
 swig_add_library(iMSTKCWrapper
     TYPE SHARED
     OUTPUT_DIR ${SWIG_CSHARP_OUTPUT_DIR}
     LANGUAGE csharp
     SOURCES
     ${SWIG_INTERFACE_DIR}/imstkCWrapper.i)
+# Always clear the ".cs" files from the build directory before generating
+add_custom_command(
+    TARGET iMSTKCWrapper
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -Ddir:PATH=${SWIG_CSHARP_OUTPUT_DIR}/ -P ${CMAKE_CURRENT_LIST_DIR}/ClearDirectory.cmake
+    DEPENDS ${PROJECT_NAME})
 
 # These files should not be provided via swig_add_library SOURCES
 # But still useful to display in visual studios
@@ -33,6 +34,9 @@ if (MSVC)
 		${SWIG_INTERFACE_DIR}/type_cast.i
 		${SWIG_INTERFACE_DIR}/weak_ptr.i)
 
+    # \todo: I think there's some property we can use to indicate to visual studios
+    # that it should recompile if one of them changes, this must internally
+    # happen in swig_add_library somewhere
     target_sources(iMSTKCWrapper PRIVATE ${OTHER_FILES})
     set_source_files_properties(${OTHER_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 endif()
@@ -117,5 +121,5 @@ if (MSVC)
         FOLDER Wrappers)
 endif()
 
-# Clear the ".cs" wrapper code directory and install new ones
-install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -Dsource_dir:PATH=${SWIG_CSHARP_OUTPUT_DIR} -Ddest_dir:PATH=${CMAKE_INSTALL_PREFIX}/include/iMSTKSharp/ -P ${CMAKE_CURRENT_LIST_DIR}/clearInstall.cmake)")
+# Clear the ".cs" wrapper code in the install directory and install new ones
+install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -Dsource_dir:PATH=${SWIG_CSHARP_OUTPUT_DIR} -Ddest_dir:PATH=${CMAKE_INSTALL_PREFIX}/include/iMSTKSharp/ -P ${CMAKE_CURRENT_LIST_DIR}/ClearInstall.cmake)")

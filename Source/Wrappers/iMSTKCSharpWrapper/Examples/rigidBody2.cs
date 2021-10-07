@@ -3,19 +3,6 @@ using imstk;
 
 public class RigidBody2
 {
-    public class CSReceiverFunc : EventFunc
-    {
-        public CSReceiverFunc(Action<Event> action)
-        {
-            action_ = action;
-        }
-        public override void call(Event e)
-        {
-            action_(e);
-        }
-        private Action<Event> action_;
-    }
-
     public static void Main(string[] args)
     {
         // Write log to stdout and file
@@ -159,44 +146,43 @@ public class RigidBody2
 
             Vec3d dx = Utils.vec_subtract_3d(scene.getActiveCamera().getPosition(), scene.getActiveCamera().getFocalPoint());
             KeyboardDeviceClient keyDevice = viewer.getKeyboardDevice();
-            Action<Event> receiverAction = (Event e) =>
-            {
-                Vec3d extForce = new Vec3d(0.0, 0.0, 0.0);
-                Vec3d extTorque = new Vec3d(0.0, 0.0, 0.0);
-                // If w down, move forward
-                if (keyDevice.getButton('i') == 1)
+            Utils.connectEvent(sceneManager, Utils.SceneManager_getPostUpdate_cb,
+                (Event e) =>
                 {
-                    extForce = Utils.vec_add_3d(extForce, new Vec3d(0.0, 0.0, -900.0));
-                }
-                if (keyDevice.getButton('k') == 1)
-                {
-                    extForce = Utils.vec_add_3d(extForce, new Vec3d(0.0, 0.0, 900.0));
-                }
-                if (keyDevice.getButton('j') == 1)
-                {
-                    extForce = Utils.vec_add_3d(extForce, new Vec3d(-900.0, 0.0, 0.0));
-                }
-                if (keyDevice.getButton('l') == 1)
-                {
-                    extForce = Utils.vec_add_3d(extForce, new Vec3d(900.0, 0.0, 0.0));
-                }
-                if (keyDevice.getButton('u') == 1)
-                {
-                    extForce = Utils.vec_add_3d(extForce, new Vec3d(0.0, 1.5, 0.0));
-                }
-                if (keyDevice.getButton('o') == 1)
-                {
-                    extForce = Utils.vec_add_3d(extForce, new Vec3d(0.0, -1.5, 0.0));
-                }
-                // \todo: Add setters to imstk
-                cubeObj.getRigidBody().m_force = extForce;
-                cubeObj.getRigidBody().m_torque = extTorque;
-                scene.getActiveCamera().setFocalPoint(cubeObj.getRigidBody().getPosition());
-                scene.getActiveCamera().setPosition(Utils.vec_add_3d(cubeObj.getRigidBody().getPosition(), dx));
-                cubeObj.getRigidBodyModel2().getConfig().m_dt = sceneManager.getDt();
-            };
-            CSReceiverFunc receiverFunc = new CSReceiverFunc(receiverAction);
-            Utils.connectEvent(sceneManager, Utils.SceneManager_getPostUpdate_cb, receiverFunc);
+                    Vec3d extForce = new Vec3d(0.0, 0.0, 0.0);
+                    Vec3d extTorque = new Vec3d(0.0, 0.0, 0.0);
+                    // If w down, move forward
+                    if (keyDevice.getButton('i') == 1)
+                    {
+                        extForce = Utils.vec_add_3d(extForce, new Vec3d(0.0, 0.0, -900.0));
+                    }
+                    if (keyDevice.getButton('k') == 1)
+                    {
+                        extForce = Utils.vec_add_3d(extForce, new Vec3d(0.0, 0.0, 900.0));
+                    }
+                    if (keyDevice.getButton('j') == 1)
+                    {
+                        extForce = Utils.vec_add_3d(extForce, new Vec3d(-900.0, 0.0, 0.0));
+                    }
+                    if (keyDevice.getButton('l') == 1)
+                    {
+                        extForce = Utils.vec_add_3d(extForce, new Vec3d(900.0, 0.0, 0.0));
+                    }
+                    if (keyDevice.getButton('u') == 1)
+                    {
+                        extForce = Utils.vec_add_3d(extForce, new Vec3d(0.0, 1.5, 0.0));
+                    }
+                    if (keyDevice.getButton('o') == 1)
+                    {
+                        extForce = Utils.vec_add_3d(extForce, new Vec3d(0.0, -1.5, 0.0));
+                    }
+                    // \todo: Add setters to imstk
+                    cubeObj.getRigidBody().m_force = extForce;
+                    cubeObj.getRigidBody().m_torque = extTorque;
+                    scene.getActiveCamera().setFocalPoint(cubeObj.getRigidBody().getPosition());
+                    scene.getActiveCamera().setPosition(Utils.vec_add_3d(cubeObj.getRigidBody().getPosition(), dx));
+                    cubeObj.getRigidBodyModel2().getConfig().m_dt = sceneManager.getDt();
+                });
 
             driver.start();
         }

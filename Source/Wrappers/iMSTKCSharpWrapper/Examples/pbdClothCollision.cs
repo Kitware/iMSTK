@@ -3,16 +3,6 @@ using imstk;
 
 public class PbdCloth
 {
-     public class CSReceiverFunc : KeyEventFunc {
-         public CSReceiverFunc(Action<KeyEvent> action) {
-             action_ = action;
-         }
-         public override void call(KeyEvent e) {
-             action_(e);
-         }
-         private Action<KeyEvent> action_;
-     }
-
     public static void Main(string[] args)
     {
         // Write log to stdout and file
@@ -83,71 +73,70 @@ public class PbdCloth
                 viewer.addControl(keyControl);
             }
 
-            Action<KeyEvent> receiverAction = (KeyEvent e) => {
-                // Switch to sphere and reset
-                int indexToShow = -1;
-                CollisionDetectionAlgorithm newCDMethod = null;
-                if (e.m_key == '1')
+            Utils.connectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb,
+                (KeyEvent e) =>
                 {
-                    indexToShow = 0;
-                    newCDMethod = new PointSetToCapsuleCD();
-                }
-                // Switch to capsule and reset
-                else if (e.m_key == '2')
-                {
-                    indexToShow = 1;
-                    newCDMethod = new PointSetToSphereCD();
-                }
-                // Switch to cube and reset
-                else if (e.m_key == '3')
-                {
-                    indexToShow = 2;
-                    newCDMethod = new PointSetToOrientedBoxCD();
-                }
-                // Switch to plane and reset
-                else if (e.m_key == '4')
-                {
-                    indexToShow = 3;
-                    newCDMethod = new PointSetToPlaneCD();
-                }
-                // Switch to sphere vs surface and reset
-                else if (e.m_key == '5')
-                {
-                    indexToShow = 1;
-                    newCDMethod = new SurfaceMeshToSphereCD();
-                }
-                // Switch to sphere vs surface and reset
-                else if (e.m_key == '6')
-                {
-                    indexToShow = 0;
-                    newCDMethod = new SurfaceMeshToCapsuleCD();
-                }
-
-                if (indexToShow != -1)
-                {
-                    // Hide all models
-                    for (uint i = 0; i < 4; i++)
+                    // Switch to sphere and reset
+                    int indexToShow = -1;
+                    CollisionDetectionAlgorithm newCDMethod = null;
+                    if (e.m_key == '1')
                     {
-                        collisionObj.getVisualModel(i).hide();
+                        indexToShow = 0;
+                        newCDMethod = new PointSetToCapsuleCD();
                     }
-                    // Show the selected one
-                    VisualModel visualModel = collisionObj.getVisualModel((uint)indexToShow);
-                    visualModel.show();
-                    collisionObj.setCollidingGeometry(visualModel.getGeometry());
+                    // Switch to capsule and reset
+                    else if (e.m_key == '2')
+                    {
+                        indexToShow = 1;
+                        newCDMethod = new PointSetToSphereCD();
+                    }
+                    // Switch to cube and reset
+                    else if (e.m_key == '3')
+                    {
+                        indexToShow = 2;
+                        newCDMethod = new PointSetToOrientedBoxCD();
+                    }
+                    // Switch to plane and reset
+                    else if (e.m_key == '4')
+                    {
+                        indexToShow = 3;
+                        newCDMethod = new PointSetToPlaneCD();
+                    }
+                    // Switch to sphere vs surface and reset
+                    else if (e.m_key == '5')
+                    {
+                        indexToShow = 1;
+                        newCDMethod = new SurfaceMeshToSphereCD();
+                    }
+                    // Switch to sphere vs surface and reset
+                    else if (e.m_key == '6')
+                    {
+                        indexToShow = 0;
+                        newCDMethod = new SurfaceMeshToCapsuleCD();
+                    }
 
-                    newCDMethod.setInputGeometryA(clothObj.getCollidingGeometry());
-                    newCDMethod.setInputGeometryB(visualModel.getGeometry());
-                    pbdInteraction.setCollisionDetection(newCDMethod);
-                    pbdInteraction.getCollisionHandlingA().setInputCollisionData(newCDMethod.getCollisionData());
+                    if (indexToShow != -1)
+                    {
+                        // Hide all models
+                        for (uint i = 0; i < 4; i++)
+                        {
+                            collisionObj.getVisualModel(i).hide();
+                        }
+                        // Show the selected one
+                        VisualModel visualModel = collisionObj.getVisualModel((uint)indexToShow);
+                        visualModel.show();
+                        collisionObj.setCollidingGeometry(visualModel.getGeometry());
 
-                    scene.buildTaskGraph();
-                    scene.initTaskGraph();
-                    scene.reset();
-                }
-            };
+                        newCDMethod.setInputGeometryA(clothObj.getCollidingGeometry());
+                        newCDMethod.setInputGeometryB(visualModel.getGeometry());
+                        pbdInteraction.setCollisionDetection(newCDMethod);
+                        pbdInteraction.getCollisionHandlingA().setInputCollisionData(newCDMethod.getCollisionData());
 
-            CSReceiverFunc receiverFunc = new CSReceiverFunc(receiverAction);
-            Utils.connectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb, receiverFunc);
+                        scene.buildTaskGraph();
+                        scene.initTaskGraph();
+                        scene.reset();
+                    }
+                });
 
             driver.start();
         }
@@ -166,8 +155,8 @@ public class PbdCloth
         pbdParams.enableConstraint(PbdConstraint.Type.Distance, 1.0e2);
         pbdParams.enableConstraint(PbdConstraint.Type.Dihedral, 1.0e1);
         pbdParams.m_uniformMassValue = width * height / (rowCount * colCount);
-        pbdParams.m_gravity    = new Vec3d(0.0, -9.8, 0.0);
-        pbdParams.m_dt  = 0.005;
+        pbdParams.m_gravity = new Vec3d(0.0, -9.8, 0.0);
+        pbdParams.m_dt = 0.005;
         pbdParams.m_iterations = 5;
 
         // Setup the Model
@@ -196,8 +185,8 @@ public class PbdCloth
 
     static SurfaceMesh makeClothGeometry(double width,
                                          double height,
-                                         int    nRows,
-                                         int    nCols,
+                                         int nRows,
+                                         int nCols,
                                          double uvScale)
     {
         SurfaceMesh clothMesh = new SurfaceMesh();

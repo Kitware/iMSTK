@@ -23,74 +23,41 @@
 %enddef
 
 %define %std_function(Name, Ret, ...)
-    %feature("director") Name##Impl;
-    %typemap(csclassmodifiers) Name##Impl "public abstract class";
+    // Define a director for Name. When an object of Name class is constructed it will
+    // register its virtual function via reverse pinvoke (this passes back function pointers
+    // to its functions that should be called)
+    %feature("director") Name;
+    %typemap(csclassmodifiers) Name "public abstract class";
 
+    // We then create a class of Name to be wrapped with virtual function call
+    // which will be reverse pinvoked called in the C# version of the class
     %{
-        struct Name##Impl
+        struct Name
         {
-            virtual ~Name##Impl() {}
-            void do_nothing() {}
+            virtual ~Name() {}
             virtual Ret call(__VA_ARGS__) = 0;
         };
     %}
 
-    %csmethodmodifiers Name##Impl::call "public abstract";
-    %typemap(csout) Ret Name##Impl::call ";" // Suppress the body of the abstract method
+    // Make the call pure abstract
+    %csmethodmodifiers Name::call "public abstract";
+    %typemap(csout) Ret Name::call ";" // Suppress the body of the abstract method
 
-    struct Name##Impl
+    // Provide the implementation
+    // Note: The body of call in C# cannot be called (though is possible to generate it)
+    struct Name
     {
-        virtual ~Name##Impl();
+        virtual ~Name();
     protected:
         virtual Ret call(__VA_ARGS__) = 0;
     };
 
-    %typemap(maybereturn) SWIGTYPE "return ";
-    %typemap(maybereturn) void "";
-    %typemap(Functor) SWIGTYPE "Func"
-    %typemap(Functor) void "Action"
-
-    %typemap(csin) std::function<Ret(__VA_ARGS__)> "$csclassname.getCPtr($csclassname.makeNative($csinput))"
-    %typemap(cscode) std::function<Ret(__VA_ARGS__)> %{
-
-        private class Name##ImplCB : Name##Impl
-        {
-            public Name##ImplCB($csclassname func)
-            {
-                func_ = func;
-            }
-
-            public override Ret call (FOR_EACH(param, __VA_ARGS__))
-            {
-                $typemap(maybereturn, Ret) func_.call(FOR_EACH(unpack, __VA_ARGS__));
-            }
-
-            protected $csclassname func_;
-        }
-
-        public Name()
-        {
-            wrapper = new Name##ImplCB(this);
-            proxy = new $csclassname(wrapper);
-        }
-
-
-        public static $csclassname makeNative($csclassname func_in)
-        {
-            if (null == func_in.wrapper)
-            {
-                return func_in;
-            }
-            return func_in.proxy;
-        }
-
-        private Name##Impl wrapper;
-        private $csclassname proxy;
-    %}
-
-    %rename(Name) std::function<Ret(__VA_ARGS__)>;
+    // We then need to wrap the std::function<...> such that it's callback
+    // will actually call the virtual call function in the class Name
+    %rename(Name##Std) std::function<Ret(__VA_ARGS__)>;
     %rename(call) std::function<Ret(__VA_ARGS__)>::operator();
 
+    // Wrap the std::function class
     namespace std
     {
         struct function<Ret(__VA_ARGS__)>
@@ -104,22 +71,21 @@
             // Conversion constructor from function pointer
             function<Ret(__VA_ARGS__)>(Ret(*const)(__VA_ARGS__));
 
-            // Important: Here we forward the call from std::function to in->call which can
-            // be implemented in whatever other language (note: Typically calling an std::function
-            // would use the operator() but not all languages support this)
+            // The function for the std::function actually just forwards
+            // to in->call here
             %extend
             {
-                function<Ret(__VA_ARGS__)>(Name##Impl *in)
+                function<Ret(__VA_ARGS__)>(Name* in)
                 {
                     return new std::function<Ret(__VA_ARGS__)>(
-                    [=](FOR_EACH(lvalref, __VA_ARGS__)) {
-                        return in->call(FOR_EACH(forward, __VA_ARGS__));
-                    });
+                        [=](FOR_EACH(lvalref, __VA_ARGS__))
+                        {
+                            return in->call(FOR_EACH(forward, __VA_ARGS__));
+                        });
                 }
             }
         };
     }
-
 %enddef
 
 %std_function(EventFunc, void, imstk::Event*)

@@ -3,16 +3,6 @@ using imstk;
 
 public class SdfHaptics
 {
-     public class CSReceiverFunc : EventFunc {
-         public CSReceiverFunc(Action<Event> action) {
-             action_ = action;
-         }
-         public override void call(Event e) {
-             action_(e);
-         }
-         private Action<Event> action_;
-     }
-
     public static void Main(string[] args)
     {
         Logger.startLogger();
@@ -77,26 +67,25 @@ public class SdfHaptics
             centralGrad.setFunction(sdf);
             centralGrad.setDx(sdf.getImage().getSpacing());
 
-            Action<Event> receiverAction = (Event e) => {
-				Vec3d tmpPos = client.getPosition();
-                Vec3d pos = tmpPos * 0.1 + new Vec3d(0.0, 0.1, 10.0);
-
-                client.update();
-                axesMesh.setTranslation(pos);
-                axesMesh.setRotation(client.getOrientation());
-                axesMesh.postModified();
-
-                double dx = sdf.getFunctionValue(pos);
-                if (dx < 0.0)
+            Utils.connectEvent(sceneManager, Utils.SceneManager_getPostUpdate_cb,
+                (Event e) =>
                 {
-                    Vec3d g = centralGrad.compute(pos);
-					Vec3d nrm_g = new Vec3d(-g[0]*dx*4.0, -g[1]*dx*4.0, -g[2]*dx*4.0); 
-                    client.setForce(nrm_g);
-                }
-            };
+                    Vec3d tmpPos = client.getPosition();
+                    Vec3d pos = tmpPos * 0.1 + new Vec3d(0.0, 0.1, 10.0);
 
-            CSReceiverFunc receiverFunc = new CSReceiverFunc(receiverAction);
-            Utils.connectEvent(sceneManager, Utils.SceneManager_getPostUpdate_cb, receiverFunc);
+                    client.update();
+                    axesMesh.setTranslation(pos);
+                    axesMesh.setRotation(client.getOrientation());
+                    axesMesh.postModified();
+
+                    double dx = sdf.getFunctionValue(pos);
+                    if (dx < 0.0)
+                    {
+                        Vec3d g = centralGrad.compute(pos);
+                        Vec3d nrm_g = new Vec3d(-g[0] * dx * 4.0, -g[1] * dx * 4.0, -g[2] * dx * 4.0);
+                        client.setForce(nrm_g);
+                    }
+                });
 
             // Add mouse and keyboard controls to the viewer
             {

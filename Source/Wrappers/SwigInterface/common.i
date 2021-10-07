@@ -675,5 +675,34 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
 %template(eigen2cs_Mat3f) imstk::eigen2cs<imstk::Mat<float, 3>, Eigen::Matrix<float, 3, 3> >;
 %template(eigen2cs_Mat3d) imstk::eigen2cs<imstk::Mat<double, 3>, Eigen::Matrix<double, 3, 3> >;
 
-%template(connectKeyEvent) imstk::connect<imstk::KeyEvent>;
-%template(connectEvent) imstk::connect<imstk::Event>;
+%define %connectMacro(Name)
+    %template(connect##Name##Internal) imstk::connect<imstk::Name>;
+
+    // As the EventFunc is virtual, see std_function.i, we implement it in this
+    // C# class
+    %pragma(csharp) modulecode=%{
+        public class Name##FuncImpl : Name##Func
+        {
+            public Name##FuncImpl(System.Action<Name> action)
+            {
+                this.action = action;
+            }
+
+            public override void call(Name e)
+            {
+                if (action != null) { action.Invoke(e); }
+            }
+
+            public System.Action<Name> action = null;
+        }
+
+        public static void connect##Name (EventObject obj, SWIGTYPE_p_f___std__string arg1, System.Action<Name> action)
+        {
+            Name##FuncImpl func = new Name##FuncImpl(action);
+            connect##Name##Internal (obj, arg1, new Name##FuncStd(func));
+        }
+    %}
+%enddef
+
+%connectMacro(Event)
+%connectMacro(KeyEvent)

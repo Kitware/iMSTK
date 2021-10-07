@@ -74,6 +74,7 @@
 %shared_ptr(imstk::DynamicalModel<imstk::PbdState>)
 %shared_ptr(imstk::DynamicalModel<imstk::FeDeformBodyState>)
 %shared_ptr(imstk::DynamicalModel<imstk::SPHState>)
+%shared_ptr(imstk::SPHState)
 %shared_ptr(imstk::RigidBodyState2)
 %shared_ptr(imstk::DynamicalModel<imstk::RigidBodyState2>)
 %shared_ptr(imstk::PbdModel)

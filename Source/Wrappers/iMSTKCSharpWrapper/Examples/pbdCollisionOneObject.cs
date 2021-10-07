@@ -18,8 +18,9 @@ public class PbdCollisionOneObject
         Scene scene = new Scene("PbdCollisionOneDragon");
         {
             // Set the camera
-            scene.getActiveCamera().setPosition(0, 3.0, 20.0);
-            scene.getActiveCamera().setFocalPoint(0.0, -10.0, 0.0);
+            scene.getActiveCamera().setPosition(0.248534, 9.71495, 17.3109);
+            scene.getActiveCamera().setFocalPoint(0.927986, 2.73914, 2.15692);
+            scene.getActiveCamera().setViewUp(0.0092602, 0.911091, -0.412101);
 
             // Setup a tetrahedral pbd dragon object
             PbdObject deformableObj = new PbdObject("DeformableObj");

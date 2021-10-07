@@ -8,16 +8,6 @@ public class PbdCutting
     private static int nRows = 12;
     private static int nCols = 12;
 
-    public class CSReceiverFunc : KeyEventFunc {
-         public CSReceiverFunc(Action<KeyEvent> action) {
-             action_ = action;
-         }
-         public override void call(KeyEvent e) {
-             action_(e);
-         }
-         private Action<KeyEvent> action_;
-     }
-
     public static void Main(string[] args)
     {
         // Write log to stdout and file
@@ -48,8 +38,8 @@ public class PbdCutting
         scene.addController(controller);
 
         // Adjust camera
-        scene.getActiveCamera().setPosition(new Vec3d(0.0, -50.0, 0.0));
-        scene.getActiveCamera().setFocalPoint(new Vec3d(100.0, 100.0, 100.0));
+        scene.getActiveCamera().setPosition(100.0, 100.0, 100.0);
+        scene.getActiveCamera().setFocalPoint(0.0, -50.0, 0.0);
 
         // Light
         DirectionalLight light = new DirectionalLight();
@@ -87,16 +77,16 @@ public class PbdCutting
                 viewer.addControl(keyControl);
             }
 
-            Action<KeyEvent> receiverAction = (KeyEvent e) => {
-                const int KEY_PRESS = 1;
-                // Set new textures
-                if (e.m_key == 'i' && e.m_keyPressType == KEY_PRESS)
+            Utils.connectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb,
+                (KeyEvent e) =>
                 {
-                    cuttingPair.apply();
-                }
-            };
-            CSReceiverFunc receiverFunc = new CSReceiverFunc(receiverAction);
-            Utils.connectKeyEvent(viewer.getKeyboardDevice(), Utils.KeyboardDeviceClient_getKeyPress_cb, receiverFunc);
+                    const int KEY_PRESS = 1;
+                    // Set new textures
+                    if (e.m_key == 'i' && e.m_keyPressType == KEY_PRESS)
+                    {
+                        cuttingPair.apply();
+                    }
+                });
 
             driver.start();
         }
