@@ -90,19 +90,22 @@ function(imstk_add_library target)
 
   #-----------------------------------------------------------------------------
   # Set compile flags for the target
-  #-----------------------------------------------------------------------------  
+  #-----------------------------------------------------------------------------
+  # MSVC ignoring warnings
+  # C4505  'function' : unreferenced local function has been removed
+  # C4127  conditional expression is constant
   if (iMSTK_COLOR_OUTPUT)
     target_compile_options(${target} PRIVATE
       $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
           -Wall -Wno-unused-function -fdiagnostics-color=always>
       $<$<CXX_COMPILER_ID:MSVC>:
-          -W4 -MP -wd4505 /bigobj>)
+          -W4 -MP -wd4505 -wd4127 /bigobj /permissive->)
   else()
     target_compile_options(${target} PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
         -Wall -Wno-unused-function>
     $<$<CXX_COMPILER_ID:MSVC>:
-        -W4 -MP -wd4505 /bigobj>)
+        -W4 -MP -wd4505 -wd4127 /bigobj /permissive->)
   endif()
 
   #-----------------------------------------------------------------------------

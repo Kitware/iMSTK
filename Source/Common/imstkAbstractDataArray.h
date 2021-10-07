@@ -76,7 +76,7 @@ public:
     ///
     /// \brief Returns the scalar type of this array
     ///
-    inline ScalarType getScalarType() const { return m_scalarType; }
+    inline ScalarTypeId getScalarType() const { return m_scalarType; }
 
     ///
     /// \brief Return the capacity of the array
@@ -92,7 +92,7 @@ public:
     /// \brief cast the content to the given imstk scalar type without
     ///        having to know the type of the enclosed array
     ///
-    virtual std::shared_ptr<AbstractDataArray> cast(ScalarType) = 0;
+    virtual std::shared_ptr<AbstractDataArray> cast(ScalarTypeId) = 0;
 
 public:
     ///
@@ -102,10 +102,10 @@ public:
     inline void postModified() { this->postEvent(Event(AbstractDataArray::modified())); }
 
 protected:
-    void setType(const ScalarType type) { this->m_scalarType = type; }
+    void setType(const ScalarTypeId type) { this->m_scalarType = type; }
 
 protected:
-    ScalarType m_scalarType;
+    ScalarTypeId m_scalarType;
     int m_size;     // Number of values
     int m_capacity; // Capacity of the vector
 };

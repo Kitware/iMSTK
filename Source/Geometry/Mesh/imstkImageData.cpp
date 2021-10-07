@@ -61,7 +61,7 @@ ImageData::getVoidPointer()
 }
 
 std::shared_ptr<ImageData>
-ImageData::cast(ScalarType toType)
+ImageData::cast(ScalarTypeId toType)
 {
     // Create image of new type
     std::shared_ptr<ImageData> results = std::make_shared<ImageData>();
@@ -71,7 +71,7 @@ ImageData::cast(ScalarType toType)
     return results;
 }
 
-const ScalarType
+const ScalarTypeId
 ImageData::getScalarType() const
 {
     return m_scalarArray->getScalarType();
@@ -93,7 +93,7 @@ ImageData::setScalars(std::shared_ptr<AbstractDataArray> scalars, const int numC
 }
 
 void
-ImageData::allocate(const ScalarType type, const int numComps, const Vec3i& dims, const Vec3d& spacing, const Vec3d& origin)
+ImageData::allocate(const ScalarTypeId type, const int numComps, const Vec3i& dims, const Vec3d& spacing, const Vec3d& origin)
 {
     m_dims   = dims;
     m_origin = origin;

@@ -3,8 +3,8 @@
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( Eigen3
-  URL "https://gitlab.kitware.com/iMSTK/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz"
-  URL_HASH MD5=9e30f67e8531477de4117506fe44669b
+  URL "https://gitlab.kitware.com/iMSTK/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz"
+  URL_HASH MD5=4c527a9171d71a72a9d4186e65bea559
   CMAKE_CACHE_ARGS
         -DBUILD_TESTING:BOOL=OFF
   RELATIVE_INCLUDE_PATH ""
