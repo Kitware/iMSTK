@@ -191,7 +191,6 @@ main()
         LOG(INFO) << " | u - rotate left";
         LOG(INFO) << " | o - rotate right";
 
-        // Not perfectly thread safe movement lambda, ijkl movement instead of wasd because d is already used
         std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
         const Vec3d                           dx = scene->getActiveCamera()->getPosition() - scene->getActiveCamera()->getFocalPoint();
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
