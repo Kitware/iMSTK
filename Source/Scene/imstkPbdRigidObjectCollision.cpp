@@ -28,9 +28,9 @@ limitations under the License.
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkRigidBodyCH.h"
+#include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkTaskGraph.h"
-#include "imstkRigidBodyModel2.h"
 
 namespace imstk
 {
@@ -40,8 +40,9 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
     std::shared_ptr<PbdModel> pbdModel1 = obj1->getPbdModel();
 
     // Setup the CD
-    std::shared_ptr<CollisionDetectionAlgorithm> cd =
-        makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry());
+    std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
+    cd->setInput(obj1->getCollidingGeometry(), 0);
+    cd->setInput(obj2->getCollidingGeometry(), 1);
     setCollisionDetection(cd);
 
     // Setup the handler to resolve obj1

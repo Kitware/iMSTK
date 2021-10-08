@@ -19,11 +19,12 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
 #include "imstkLineMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraToLineMeshCD.h"
+#include "imstkVecDataArray.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 

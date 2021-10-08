@@ -20,12 +20,12 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkPbdObjectPicking.h"
-#include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
-#include "imstkPBDPickingCH.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkPBDPickingCH.h"
 #include "imstkPbdSolver.h"
 #include "imstkTaskGraph.h"
 
@@ -36,7 +36,10 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
                                    std::string cdType) : CollisionPair(obj1, obj2)
 {
     // Setup the CD
-    setCollisionDetection(makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry()));
+    std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
+    cd->setInput(obj1->getCollidingGeometry(), 0);
+    cd->setInput(obj2->getCollidingGeometry(), 1);
+    setCollisionDetection(cd);
 
     // Setup the handler
     auto ch = std::make_shared<PBDPickingCH>();

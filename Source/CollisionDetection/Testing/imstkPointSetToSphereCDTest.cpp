@@ -19,13 +19,13 @@
 
 =========================================================================*/
 
-#include <tuple>
-
-#include "gtest/gtest.h"
-
 #include "imstkPointSet.h"
 #include "imstkPointSetToSphereCD.h"
 #include "imstkSphere.h"
+#include "imstkVecDataArray.h"
+
+#include <gtest/gtest.h>
+#include <tuple>
 
 using namespace imstk;
 

@@ -22,6 +22,7 @@
 #include "imstkPointSetToSphereCD.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionUtils.h"
+#include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkSphere.h"
 

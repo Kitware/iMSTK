@@ -22,9 +22,10 @@
 #include "imstkBoneDrillingCH.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkRigidObject2.h"
+#include "imstkParallelFor.h"
 #include "imstkRbdConstraint.h"
+#include "imstkRigidObject2.h"
+#include "imstkTetrahedralMesh.h"
 
 namespace imstk
 {

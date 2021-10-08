@@ -19,15 +19,16 @@ limitations under the License.
 
 =========================================================================*/
 
+#include "imstkPBDPickingCH.h"
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCollisionData.h"
+#include "imstkParallelUtils.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPBDPickingCH.h"
+#include "imstkPbdPointPointConstraint.h"
 #include "imstkPbdSolver.h"
 #include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkPbdPointPointConstraint.h"
 
 namespace imstk
 {

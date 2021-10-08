@@ -22,6 +22,7 @@
 #include "imstkCollisionDataDebugObject.h"
 #include "imstkLineMesh.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {

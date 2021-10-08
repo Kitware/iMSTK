@@ -19,11 +19,12 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
 #include "imstkOrientedBox.h"
 #include "imstkPointSet.h"
 #include "imstkPointSetToOrientedBoxCD.h"
+#include "imstkVecDataArray.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 

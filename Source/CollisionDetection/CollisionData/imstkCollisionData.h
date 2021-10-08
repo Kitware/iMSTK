@@ -23,7 +23,7 @@
 
 #include "imstkLogger.h"
 #include "imstkMath.h"
-#include "imstkParallelUtils.h"
+#include "imstkTypes.h"
 
 namespace imstk
 {

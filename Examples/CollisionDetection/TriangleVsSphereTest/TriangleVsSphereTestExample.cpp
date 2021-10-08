@@ -34,6 +34,7 @@
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshToSphereCD.h"
+#include "imstkVecDataArray.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKRenderer.h"
 #include "imstkVTKViewer.h"

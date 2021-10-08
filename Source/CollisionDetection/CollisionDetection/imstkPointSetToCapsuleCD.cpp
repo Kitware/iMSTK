@@ -22,9 +22,10 @@
 #include "imstkPointSetToCapsuleCD.h"
 #include "imstkCapsule.h"
 #include "imstkCollisionData.h"
+#include "imstkCollisionUtils.h"
+#include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkVecDataArray.h"
-#include "imstkCollisionUtils.h"
 
 namespace imstk
 {

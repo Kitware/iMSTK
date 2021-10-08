@@ -22,11 +22,14 @@ limitations under the License.
 #include "imstkRigidObjectCollision.h"
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
+#include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkParallelFor.h"
 #include "imstkPointSet.h"
 #include "imstkRigidBodyCH.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkTaskGraph.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -35,8 +38,9 @@ RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1
 {
     std::shared_ptr<RigidBodyModel2> model1 = rbdObj1->getRigidBodyModel2();
 
-    std::shared_ptr<CollisionDetectionAlgorithm> cd =
-        makeCollisionDetectionObject(cdType, rbdObj1->getCollidingGeometry(), obj2->getCollidingGeometry());
+    std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
+    cd->setInput(rbdObj1->getCollidingGeometry(), 0);
+    cd->setInput(obj2->getCollidingGeometry(), 1);
     setCollisionDetection(cd);
 
     auto ch = std::make_shared<RigidBodyCH>();

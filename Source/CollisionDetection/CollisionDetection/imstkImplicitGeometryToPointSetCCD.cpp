@@ -22,6 +22,7 @@ limitations under the License.
 #include "imstkImplicitGeometryToPointSetCCD.h"
 #include "imstkCollisionData.h"
 #include "imstkImageData.h"
+#include "imstkParallelUtils.h"
 #include "imstkSurfaceMesh.h"
 
 namespace imstk

@@ -37,8 +37,9 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
     std::shared_ptr<PbdModel> pbdModel1 = obj1->getPbdModel();
 
     // Setup the CD
-    std::shared_ptr<CollisionDetectionAlgorithm> cd =
-        makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry());
+    std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
+    cd->setInput(obj1->getCollidingGeometry(), 0);
+    cd->setInput(obj2->getCollidingGeometry(), 1);
     setCollisionDetection(cd);
 
     // Setup the handler

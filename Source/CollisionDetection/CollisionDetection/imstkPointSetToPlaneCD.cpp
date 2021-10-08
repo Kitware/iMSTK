@@ -21,10 +21,11 @@
 
 #include "imstkPointSetToPlaneCD.h"
 #include "imstkCollisionData.h"
+#include "imstkCollisionUtils.h"
+#include "imstkParallelUtils.h"
+#include "imstkPlane.h"
 #include "imstkPointSet.h"
 #include "imstkVecDataArray.h"
-#include "imstkPlane.h"
-#include "imstkCollisionUtils.h"
 
 namespace imstk
 {

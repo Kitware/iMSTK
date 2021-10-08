@@ -24,6 +24,7 @@ limitations under the License.
 #include "imstkImageData.h"
 #include "imstkImplicitGeometry.h"
 #include "imstkMath.h"
+#include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkSignedDistanceField.h"
 

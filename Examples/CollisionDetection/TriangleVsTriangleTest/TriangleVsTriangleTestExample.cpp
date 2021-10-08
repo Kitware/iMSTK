@@ -33,6 +33,7 @@
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
+#include "imstkVecDataArray.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKRenderer.h"
 #include "imstkVTKViewer.h"
