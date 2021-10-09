@@ -158,7 +158,6 @@ ObjectIO::createTexture(std::string textureFolderPath, std::string textureFilePa
     textureFilePath = getSubstringGivenString(textureFilePath, "\\", true);
 
     std::string fileName = getSubstringGivenString(textureFilePath, ".", false);
-    fileName = getSubstringGivenString(fileName, "_", false);
 
     const std::string fileExt = getSubstringGivenString(textureFilePath, ".", true);
 
@@ -254,6 +253,8 @@ ObjectIO::readMaterial(aiMaterial* material, std::string textureFolderPath)
     {
         // Not supported yet
     }
+
+    renderMaterial->setRecomputeVertexNormals(false);
 
     aiString texFilePath;
     ret = material->GetTexture(aiTextureType::aiTextureType_AMBIENT, 0, &texFilePath);
