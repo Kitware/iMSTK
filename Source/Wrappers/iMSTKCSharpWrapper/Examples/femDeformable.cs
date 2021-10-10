@@ -1,6 +1,4 @@
-using System;
 using imstk;
-
 
 public enum Geom
 {
@@ -14,22 +12,15 @@ public class Input
     public VectorSizet fixedNodeIds;
 }
 
-// public class FeMain
-// {
-//
-// }
-
 public class FeDeformable
 {
+    private const Geom geom = Geom.Heart;
+    private static Input input;
+
     public static void Main(string[] args)
     {
         // Write log to stdout and file
         Logger.startLogger();
-        runFEMDeformable();
-    }
-
-    private static void runFEMDeformable()
-    {
 
         input = new Input();
         if (geom == Geom.Dragon)
@@ -156,9 +147,4 @@ public class FeDeformable
 
         return deformableObj;
     }
-
-    private const Geom geom = Geom.Heart;
-    private static Input input;
 }
-
-// femDefomrbale = new FeDeformable();

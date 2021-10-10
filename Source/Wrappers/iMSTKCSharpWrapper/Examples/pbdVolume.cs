@@ -1,13 +1,57 @@
-using System;
 using imstk;
 
 public class PbdVolume
 {
+    private static string dataPath = "../data/";
+
     public static void Main(string[] args)
     {
         // Write log to stdout and file
         Logger.startLogger();
-        runPbdDeformable();
+
+        Scene scene = new Scene("PBDVolume");
+        scene.getActiveCamera().setPosition(0, 2.0, 15.0);
+
+        string tetMeshFileName = dataPath + "textured_organs/heart_volume.vtk";
+        // create and add a PBD object
+        scene.addSceneObject(createAndAddPbdObject(tetMeshFileName));
+
+        // Light
+        DirectionalLight light = new DirectionalLight();
+        light.setFocalPoint(new Vec3d(5, -8, -5));
+        light.setIntensity(1.1);
+        scene.addLight("light", light);
+
+        // Run the simulation
+        {
+            // Setup a viewer to render
+            VTKViewer viewer = new VTKViewer("Viewer");
+            viewer.setActiveScene(scene);
+            viewer.setBackgroundColors(new Color(0.3285, 0.3285, 0.6525), new Color(0.13836, 0.13836, 0.2748), true);
+
+            // Setup a scene manager to advance the scene
+            SceneManager sceneManager = new SceneManager("Scene Manager");
+            sceneManager.setActiveScene(scene);
+            sceneManager.pause(); // Start simulation paused
+
+            SimulationManager driver = new SimulationManager();
+            driver.addModule(viewer);
+            driver.addModule(sceneManager);
+
+            // Add mouse and keyboard controls to the viewer
+            {
+                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
+                mouseControl.setSceneManager(sceneManager);
+                viewer.addControl(mouseControl);
+
+                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
+                keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
+                keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
+                viewer.addControl(keyControl);
+            }
+
+            driver.start();
+        }
     }
 
     private static PbdObject createAndAddPbdObject(string tetMeshName)
@@ -72,52 +116,4 @@ public class PbdVolume
 
         return deformableObj;
     }
-
-    private static void runPbdDeformable()
-    {
-        Scene scene = new Scene("PBDVolume");
-        scene.getActiveCamera().setPosition(0, 2.0, 15.0);
-
-        string tetMeshFileName = dataPath + "textured_organs/heart_volume.vtk";
-        // create and add a PBD object
-        scene.addSceneObject(createAndAddPbdObject(tetMeshFileName));
-
-        // Light
-        DirectionalLight light = new DirectionalLight();
-        light.setFocalPoint(new Vec3d(5, -8, -5));
-        light.setIntensity(1.1);
-        scene.addLight("light", light);
-
-        // Run the simulation
-        {
-            // Setup a viewer to render
-            VTKViewer viewer = new VTKViewer("Viewer");
-            viewer.setActiveScene(scene);
-            viewer.setBackgroundColors(new Color(0.3285, 0.3285, 0.6525), new Color(0.13836, 0.13836, 0.2748), true);
-
-            // Setup a scene manager to advance the scene
-            SceneManager sceneManager = new SceneManager("Scene Manager");
-            sceneManager.setActiveScene(scene);
-            sceneManager.pause(); // Start simulation paused
-
-            SimulationManager driver = new SimulationManager();
-            driver.addModule(viewer);
-            driver.addModule(sceneManager);
-
-            // Add mouse and keyboard controls to the viewer
-            {
-                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
-                mouseControl.setSceneManager(sceneManager);
-                viewer.addControl(mouseControl);
-
-                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
-                keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
-                keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
-                viewer.addControl(keyControl);
-            }
-
-            driver.start();
-        }
-    }
-    private static string dataPath = "../data/";
 }

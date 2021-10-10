@@ -1,4 +1,3 @@
-using System;
 using imstk;
 
 public class PbdCloth
@@ -7,7 +6,6 @@ public class PbdCloth
 
     public static void Main(string[] args)
     {
-
         // Setup logger (write to file and stdout)
         Logger.startLogger();
 
@@ -57,16 +55,13 @@ public class PbdCloth
             statusManager.setStatusFontSize(VTKTextStatusManager.StatusType.Custom, 30);
             statusManager.setStatusFontColor(VTKTextStatusManager.StatusType.Custom, Color.Red);
 
-            // Action<KeyEvent> receiverAction = (KeyEvent e) => {
-            //     statusManager.setCustomStatus("Number of particles: " +
-            //                                    std.to_string(fluidObj.getSPHModel().getCurrentState().getNumParticles()) +
-            //                                    "\nNumber of solids: " + std.to_string(solids.size()));
-            //
-            // };
-
-            // CSReceiverFunc eventFunc = new CSReceiverFunc(receiverAction);
-            // Utils.connectEvent(viewer, Utils.VTKViewer_getPostUpdate_cb, eventFunc);
-
+            Utils.connectKeyEvent(viewer, Utils.VTKViewer_getPostUpdate_cb,
+                (KeyEvent e) =>
+                {
+                    statusManager.setCustomStatus(
+                        "Number of particles: " + fluidObj.getSPHModel().getCurrentState().getNumParticles().ToString() +
+                        "\nNumber of Solids: " + solids.Length);
+                });
 
             // Setup a scene manager to advance the scene
             SceneManager sceneManager = new SceneManager("Scene Manager");

@@ -13,9 +13,9 @@
 %ignore imstk::DataArray::cend() const; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::iterator; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::const_iterator;
-%ignore imstk::VecDataArray::begin(); /* fix the multiple-definition problem. */
+%ignore imstk::VecDataArray::begin(); /* fix the multiple-definition problem. */ 
 %ignore imstk::VecDataArray::cbegin() const; /* fix the multiple-definition problem. */
-%ignore imstk::VecDataArray::end(); /* fix the multiple-definition problem. */
+%ignore imstk::VecDataArray::end(); /* fix the multiple-definition problem. */ 
 %ignore imstk::VecDataArray::cend() const; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::setData();
 %ignore imstk::stdSink;
@@ -65,5 +65,3 @@
 
 %ignore imstk::CollisionElement::m_element;
 %ignore imstk::CollisionElement::m_type;
-%ignore imstk::CollisionData::elementsA;
-%ignore imstk::CollisionData::elementsB;
