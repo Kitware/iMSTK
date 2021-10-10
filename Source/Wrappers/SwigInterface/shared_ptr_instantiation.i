@@ -58,6 +58,7 @@
 %shared_ptr(imstk::SurfaceMeshSubdivide)
 %shared_ptr(imstk::ImplicitGeometryToImageData)
 %shared_ptr(imstk::SurfaceMeshFlyingEdges)
+%shared_ptr(imstk::SelectEnclosedPoints)
 
 /* 
  * DynamicalModel 
