@@ -42,7 +42,7 @@ if (MSVC)
 endif()
 
 set_target_properties(iMSTKCWrapper PROPERTIES
-    SWIG_COMPILE_OPTIONS "-namespace;imstk"
+    SWIG_COMPILE_OPTIONS "-namespace;Imstk"
     FOLDER Wrappers)
 if(iMSTK_SWIG_PINNED_ARRAY)
     set_target_properties(iMSTKCWrapper PROPERTIES

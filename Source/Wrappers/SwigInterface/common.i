@@ -4,6 +4,8 @@
 #ifdef SWIG_PINNED_ARRAY
     %csmethodmodifiers imstk::VecDataArray::setValues "public unsafe";
     %csmethodmodifiers imstk::VecDataArray::getValues "public unsafe";
+    %csmethodmodifiers imstk::DataArray::setValues "public unsafe";
+    %csmethodmodifiers imstk::DataArray::getValues "public unsafe";
 #endif
 
 #ifdef SWIG_PINNED_ARRAY
@@ -37,6 +39,8 @@
 
 %rename(getValue) imstk::VecDataArray::operator[] (const size_t pos) const;
 %rename(setValue) imstk::VecDataArray::operator[] (const size_t pos);
+%rename(getValue) imstk::DataArray::operator[] (const size_t pos) const;
+%rename(setValue) imstk::DataArray::operator[] (const size_t pos);
 %rename(getValue) imstk::Vec::operator[] (const int pos) const;
 %rename(setValue) imstk::Vec::operator[] (const int pos);
 
@@ -69,6 +73,30 @@
         }
     };
 %enddef
+%define %extend_DataArray(T)
+    %extend imstk::DataArray<T>
+    {
+        void setValues(const T* val)
+        {
+            /* std::copy(val, val+$self->m_vecSize, $self->Base::m_data); */
+            T* data = $self->DataArray<T>::getPointer();
+            std::copy(val, val + $self->size(), data);
+        }
+
+        void setValues(const T* val, const int n)
+        {
+            T* data = $self->DataArray<T>::getPointer();
+            CHECK($self->size() >= n) << "number of values are larger than the array size";
+            std::copy(val, val + n, data);
+        }
+
+        void getValues(T* val)
+        {
+            T* data = $self->DataArray<T>::getPointer();
+            std::copy(data, data+$self->size(), val);
+        }
+    };
+%enddef
 
 %extend_VecDataArray(float, 2)
 %extend_VecDataArray(double, 2)
@@ -76,6 +104,11 @@
 %extend_VecDataArray(double, 3)
 %extend_VecDataArray(unsigned char, 3)
 %extend_VecDataArray(int, 4)
+
+%extend_DataArray(float)
+%extend_DataArray(double)
+%extend_DataArray(int)
+%extend_DataArray(unsigned char)
 
 %typemap(cscode) imstk::imstkQuatf
 %{

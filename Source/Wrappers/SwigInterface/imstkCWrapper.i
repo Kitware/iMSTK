@@ -56,6 +56,7 @@
 #include "imstkSurfaceMeshSubdivide.h"
 #include "imstkImplicitGeometryToImageData.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
+#include "imstkSelectEnclosedPoints.h"
 
 /* 
  * MeshIO 
@@ -195,11 +196,14 @@
 %include <stdint.i>
 %include <std_string.i>
 %include <std_vector.i>
+%include <std_pair.i>
 namespace std
 {
   %template(VectorInt) vector<int>; 
   %template(VectorSizet) vector<std::size_t>;
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
+  %template(PbdTypeStiffnessPair) pair<imstk::PbdConstraint::Type, double>;
+  %template(VectorPbdTypeStiffnessPair) vector<std::pair<imstk::PbdConstraint::Type, double>>;
 }
 
 %include "shared_ptr_instantiation.i"
@@ -265,6 +269,7 @@ namespace std
 %include "../../Filtering/imstkSurfaceMeshSubdivide.h"
 %include "../../Filtering/imstkImplicitGeometryToImageData.h"
 %include "../../Filtering/imstkSurfaceMeshFlyingEdges.h"
+%include "../../Filtering/imstkSelectEnclosedPoints.h"
 
 /*
  * MeshIO
