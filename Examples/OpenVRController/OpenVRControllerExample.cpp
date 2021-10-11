@@ -125,13 +125,12 @@ main()
 
     {
         // Add a module to run the viewer
-        imstkNew<VTKOpenVRViewer> viewer("VRViewer");
+        imstkNew<VTKOpenVRViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Add a module to run the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);

@@ -25,8 +25,6 @@
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
-#include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdConstraintContainer.h"
@@ -203,7 +201,7 @@ makeTissueObj(const std::string& name,
     // Setup the Parameters
     imstkNew<PBDModelConfig> pbdParams;
     // Use FEMTet constraints
-    pbdParams->m_femParams->m_YoungModulus = 10.0;
+    pbdParams->m_femParams->m_YoungModulus = 50.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.4;
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet,
         PbdFEMConstraint::MaterialType::StVK);
@@ -212,7 +210,6 @@ makeTissueObj(const std::string& name,
     pbdParams->m_gravity    = Vec3d(0.0, -0.2, 0.0);
     pbdParams->m_dt         = 0.05;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.05;
 
     // Fix the borders
     for (int z = 0; z < dim[2]; z++)
@@ -318,14 +315,13 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;

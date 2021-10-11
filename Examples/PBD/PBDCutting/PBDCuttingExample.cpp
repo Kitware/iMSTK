@@ -25,7 +25,6 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
-#include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
@@ -200,13 +199,12 @@ main()
     //Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;
@@ -228,17 +226,18 @@ main()
         }
 
         // Queue keypress to be called after scene thread
-        queueConnect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, sceneManager, [&](KeyEvent* e)
+        queueConnect<ButtonEvent>(client, &HapticDeviceClient::buttonStateChanged, sceneManager,
+            [&](ButtonEvent* e)
         {
             // When i is pressed replace the PBD cloth with a cut one
-            if (e->m_key == 'i' && e->m_keyPressType == KEY_PRESS)
+            if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
             {
                 cuttingPair->apply();
             }
             });
 
         std::cout << "================================================\n";
-        std::cout << "Key i cut the cloth.\n";
+        std::cout << "Key haptic button 0 to cut the cloth.\n";
         std::cout << "================================================\n\n";
 
         driver->start();

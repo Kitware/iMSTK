@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionDataDebugObject.h"
 #include "imstkCollisionGraph.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -144,15 +143,14 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
         std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer())->setAxesLength(0.0, 0.0, 0.0);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;

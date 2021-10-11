@@ -23,14 +23,12 @@
 #include "imstkCamera.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
-#include "imstkImageData.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOneToOneMap.h"
-#include "imstkPbdConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
@@ -43,7 +41,6 @@
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraTriangleMap.h"
-#include "imstkViewer.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -248,7 +245,6 @@ main()
 
     // Setup the scene
     {
-        scene->getConfig()->taskTimingEnabled = true;
         scene->getActiveCamera()->setPosition(0.0, 2.0, 25.0);
 
         // Deformable Pbd Dragon
@@ -273,12 +269,13 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setBackgroundColors(Color(0.3285, 0.3285, 0.6525), Color(0.13836, 0.13836, 0.2748), true);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
+        sceneManager->setExecutionType(Module::ExecutionType::PARALLEL);
         sceneManager->setActiveScene(scene);
 
         imstkNew<SimulationManager> driver;

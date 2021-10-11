@@ -21,13 +21,11 @@
 
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
+#include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
-#include "imstkImageData.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -93,13 +91,12 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);

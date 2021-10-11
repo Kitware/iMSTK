@@ -20,10 +20,9 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -93,12 +92,12 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setBackgroundColors(Color(0.3285, 0.3285, 0.6525), Color(0.13836, 0.13836, 0.2748), true);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
 
         imstkNew<SimulationManager> driver;

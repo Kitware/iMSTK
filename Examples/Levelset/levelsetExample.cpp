@@ -20,10 +20,10 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkDirectionalLight.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
-#include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -105,7 +105,7 @@ main()
     Logger::startLogger();
 
     // Setup the scene
-    imstkNew<Scene> scene("Levelset");
+    imstkNew<Scene> scene("LevelsetScene");
     {
         std::shared_ptr<LevelSetDeformableObject> obj = makeLevelsetObj("DragonLevelset");
         scene->addSceneObject(obj);
@@ -123,19 +123,18 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause();
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(0.015);
+        driver->setDesiredDt(0.01);
 
         // Add mouse and keyboard controls to the viewer
         {

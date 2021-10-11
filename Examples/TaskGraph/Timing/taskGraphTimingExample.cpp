@@ -149,7 +149,6 @@ makePbdStrings(const int    numStrings,
     return pbdStringObjs;
 }
 
-const double dt            = 0.0005;
 const double radius        = 1.5;
 const int    numStrings    = 8;                    // Number of strings
 const int    numVerts      = 30;                   // Number of vertices on each string
@@ -170,7 +169,7 @@ main()
     Logger::startLogger();
 
     imstkNew<Scene> scene("PBDString");
-    scene->getConfig()->taskTimingEnabled = true;
+    scene->getActiveCamera()->setPosition(0.0, 0.0, 15.0);
 
     // Setup N separate strings with varying bend stiffnesses
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
@@ -181,41 +180,37 @@ main()
         scene->addSceneObject(obj);
     }
 
-    // Adjust the camera
-    scene->getActiveCamera()->setPosition(0.0, 0.0, 15.0);
-
-    // Move the points every frame
-    double t = 0.0;
-    auto   movePoints =
-        [&pbdStringObjs, &t](Event*)
-        {
-            for (size_t i = 0; i < pbdStringObjs.size(); i++)
-            {
-                std::shared_ptr<PbdModel>                model     = pbdStringObjs[i]->getPbdModel();
-                std::shared_ptr<VecDataArray<double, 3>> positions = model->getCurrentState()->getPositions();
-                (*positions)[0] += Vec3d(
-                -std::sin(t) * radius * dt,
-                0.0,
-                std::cos(t) * radius * dt);
-            }
-            t += dt;
-        };
-
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
         sceneManager->pause();
-        connect<Event>(sceneManager, &SceneManager::postUpdate, movePoints);
+        double t = 0.0;
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        {
+            const double dt = sceneManager->getDt();
+            for (size_t i = 0; i < pbdStringObjs.size(); i++)
+            {
+                std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
+                model->getParameters()->m_dt    = dt;
+                std::shared_ptr<VecDataArray<double, 3>> positions = model->getCurrentState()->getPositions();
+                (*positions)[0] += Vec3d(
+                        -std::sin(t) * radius * dt,
+                        0.0,
+                        std::cos(t) * radius * dt);
+            }
+            t += dt;
+            });
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.005);
 
         // Add mouse and keyboard controls to the viewer
         {

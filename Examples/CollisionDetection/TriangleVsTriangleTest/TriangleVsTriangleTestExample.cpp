@@ -109,12 +109,12 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer())->setAxesLength(0.05, 0.05, 0.05);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
 
         sceneManager->init();

@@ -110,11 +110,11 @@ main()
     //Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer 1");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
 
         imstkNew<SimulationManager> driver;

@@ -25,10 +25,8 @@
 #include "imstkCylinder.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
-#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
-#include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOrientedBox.h"
@@ -89,13 +87,12 @@ main()
     //Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer 1");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);

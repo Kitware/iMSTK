@@ -21,11 +21,9 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
-#include "imstkDataArray.h"
-#include "imstkImageData.h"
+#include "imstkDirectionalLight.h"
 #include "imstkImageDistanceTransform.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -40,7 +38,6 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshDistanceTransform.h"
 #include "imstkSurfaceMeshImageMask.h"
-#include "imstkViewer.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -219,8 +216,6 @@ main()
 
     // Setup the scene
     {
-        //scene->getConfig()->taskTimingEnabled = true;
-
         // Static Dragon object
         std::shared_ptr<CollidingObject> legsObj = makeLegs("Legs");
         scene->addSceneObject(legsObj);
@@ -250,13 +245,14 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setBackgroundColors(Color(0.3285, 0.3285, 0.6525), Color(0.13836, 0.13836, 0.2748), true);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::PARALLEL);
         sceneManager->pause();
 
         imstkNew<SimulationManager> driver;

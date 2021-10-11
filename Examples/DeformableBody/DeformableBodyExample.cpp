@@ -21,10 +21,10 @@
 
 #include "imstkBackwardEuler.h"
 #include "imstkCamera.h"
+#include "imstkDirectionalLight.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
@@ -115,17 +115,18 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer 1");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
         sceneManager->pause();
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.03);
 
         // Add mouse and keyboard controls to the viewer
         {

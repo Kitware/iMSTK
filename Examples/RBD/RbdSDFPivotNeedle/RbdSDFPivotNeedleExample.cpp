@@ -22,7 +22,6 @@
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
-#include "imstkGeometryUtilities.h"
 #include "imstkIsometricMap.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
@@ -174,14 +173,13 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setDebugAxesLength(0.005, 0.005, 0.005);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause();
 
         imstkNew<SimulationManager> driver;

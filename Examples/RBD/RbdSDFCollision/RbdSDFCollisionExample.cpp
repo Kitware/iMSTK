@@ -33,7 +33,6 @@
 #include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyCH.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkRigidObjectCollision.h"
@@ -156,13 +155,12 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause();
 
         imstkNew<SimulationManager> driver;
