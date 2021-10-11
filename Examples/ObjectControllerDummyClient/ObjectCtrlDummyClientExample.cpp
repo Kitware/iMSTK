@@ -22,8 +22,9 @@
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkDummyClient.h"
-#include "imstkDirectionalLight.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOrientedBox.h"
 #include "imstkScene.h"
@@ -45,10 +46,6 @@ main()
 
     imstkNew<Scene> scene("ObjectControllerDummyClient");
 
-    // Device Client
-    imstkNew<DummyClient> client("DummyClient");
-
-    // Object
     imstkNew<OrientedBox> geom(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 1.0, 1.0));
 
     imstkNew<CollidingObject> object("VirtualObject");
@@ -56,46 +53,47 @@ main()
     object->setCollidingGeometry(geom);
     scene->addSceneObject(object);
 
-    imstkNew<SceneObjectController> controller(object, client);
-    controller->setTranslationScaling(0.1);
-    scene->addController(controller);
-
-    // Supply translation to dummy client frame
-    auto translateFunc =
-        [&client](Event*)
-        {
-            Vec3d p = client->getPosition() + Vec3d(1.0e-4, 0, 0);
-            if (p.x() > 50.)
-            {
-                p = Vec3d(0, 0, 0);
-            }
-            client->setPosition(p);
-        };
-
     // Update Camera position
     scene->getActiveCamera()->setPosition(0.0, 0.0, 10.0);
     scene->getActiveCamera()->setFocalPoint(geom->getPosition());
 
-    // Light
-    imstkNew<DirectionalLight> light;
-    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-    light->setIntensity(1.0);
-    scene->addLight("light", light);
+    // Device Client
+    imstkNew<DummyClient>           client("DummyClient");
+    imstkNew<SceneObjectController> controller(object, client);
+    scene->addController(controller);
 
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        connect<Event>(sceneManager, &SceneManager::postUpdate, translateFunc);
+        double t = 0.0;
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+        {
+            t += sceneManager->getDt();
+            client->setPosition(Vec3d(cos(t) * 2.0, 0.0, 0.0));
+            });
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setModuleDriver(driver);
+            viewer->addControl(keyControl);
+        }
 
         driver->start();
     }

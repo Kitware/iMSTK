@@ -21,9 +21,8 @@
 
 #include "imstkCamera.h"
 #include "imstkDataArray.h"
-#include "imstkImageData.h"
 #include "imstkDirectionalLight.h"
-#include "imstkLogger.h"
+#include "imstkImageData.h"
 #include "imstkMeshIO.h"
 #include "imstkNew.h"
 #include "imstkQuadricDecimate.h"
@@ -51,6 +50,7 @@ main()
 
     // simManager and Scene
     imstkNew<Scene> scene("GeometryProcessing");
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 12.0, 12.0));
 
     auto                         coarseTetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     std::shared_ptr<SurfaceMesh> coarseSurfMesh = coarseTetMesh->extractSurfaceMesh();
@@ -105,9 +105,6 @@ main()
     }
     scene->addSceneObject(sceneObj);
 
-    // Set Camera configuration
-    scene->getActiveCamera()->setPosition(Vec3d(0.0, 12.0, 12.0));
-
     // Light
     imstkNew<DirectionalLight> light;
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
@@ -117,11 +114,11 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
 
         imstkNew<SimulationManager> driver;

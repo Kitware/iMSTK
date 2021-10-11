@@ -20,11 +20,9 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
-#include "imstkSpotLight.h"
-#include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
@@ -33,6 +31,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSpotLight.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshSubdivide.h"
 #include "imstkVisualModel.h"
@@ -163,7 +162,7 @@ main()
     imstkNew<Scene>            scene("PBDCloth");
     std::shared_ptr<PbdObject> clothObj = nullptr;
     {
-        clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
+        clothObj = makeClothObj("Cloth", 10.0, 10.0, 8, 8);
         scene->addSceneObject(clothObj);
 
         // Light (white)
@@ -189,13 +188,12 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;

@@ -18,6 +18,7 @@
    limitations under the License.
 
 =========================================================================*/
+
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkDirectionalLight.h"
@@ -92,13 +93,12 @@ main()
     //Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer 1");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);

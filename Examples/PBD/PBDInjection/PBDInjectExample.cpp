@@ -20,31 +20,26 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
-#include "imstkImageData.h"
+#include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
+#include "imstkLineMesh.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkOneToOneMap.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdObject.h"
+#include "imstkNew.h"
 #include "imstkRbdConstraint.h"
+#include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkVTKViewer.h"
-#include "imstkLineMesh.h"
 #include "imstkVisualModel.h"
-#include "imstkRenderMaterial.h"
-#include "imstkLogger.h"
-
-#include "imstkMeshToMeshBruteForceCD.h"
-#include "imstkNew.h"
+#include "imstkVTKViewer.h"
 #include "InflatableObject.h"
+
+#ifdef iMSTK_USE_OPENHAPTICS
+#define EXAMPLE_USE_HAPTICS
+#endif
 
 #ifdef EXAMPLE_USE_HAPTICS
 #include "imstkHapticDeviceManager.h"
@@ -79,13 +74,13 @@ makeToolObj(const std::string& name)
 
     std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
     rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-    rbdModel->getConfig()->m_maxNumIterations = 2;
+    rbdModel->getConfig()->m_maxNumIterations = 6;
     toolObj->setDynamicalModel(rbdModel);
 
-    toolObj->getRigidBody()->m_mass = 1000.0;
+    toolObj->getRigidBody()->m_mass = 10.0;
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     toolObj->getRigidBody()->m_initPos  = Vec3d(0.0, 0.8, 0.0);
-    toolObj->getRigidBody()->m_isStatic = true;
+    toolObj->getRigidBody()->m_isStatic = false;
 
     return toolObj;
 }
@@ -107,10 +102,10 @@ main()
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
     // Setup a tissue
-    Vec3d                      tissueSize   = Vec3d(10.0, 3.0, 10.0);
-    Vec3i                      tissueDim    = Vec3i(20, 5, 20);
-    Vec3d                      tissueCenter = Vec3d(0.1, -1.0, 0.0);
-    double                     radius       = tissueSize[0] / 5.0;
+    const Vec3d                tissueSize   = Vec3d(10.0, 3.0, 10.0);
+    const Vec3i                tissueDim    = Vec3i(20, 5, 20);
+    const Vec3d                tissueCenter = Vec3d(0.1, -1.0, 0.0);
+    const double               radius       = tissueSize[0] / 5.0;
     imstkNew<InflatableObject> tissueObj("PBDTissue", tissueSize, tissueDim, tissueCenter);
     scene->addSceneObject(tissueObj);
 
@@ -118,9 +113,6 @@ main()
     Vec3d                         toolTip = tissueCenter + Vec3d(0.0, tissueSize[1] / 2.0, 0.0);
     std::shared_ptr<RigidObject2> toolObj = makeToolObj("RBDTool");
     scene->addSceneObject(toolObj);
-
-    //auto interaction = std::make_shared<PbdRigidObjectCollision>(tissueObj, toolObj, "MeshToMeshBruteForceCD");
-    //scene->getCollisionGraph()->addInteraction(interaction);
 
     // Light
     imstkNew<DirectionalLight> light;
@@ -131,15 +123,14 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
         viewer->setDebugAxesLength(0.1, 0.1, 0.1);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;
@@ -157,21 +148,52 @@ main()
         viewer->addControl(keyControl);
 
 #ifdef EXAMPLE_USE_HAPTICS
-        imstkNew<HapticDeviceManager> hapticManager;
-        hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
+        imstkNew<HapticDeviceManager>       hapticManager;
         std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
         imstkNew<RigidObjectController> controller(toolObj, hapticDeviceClient);
-        controller->setTranslationScaling(0.05);
-        controller->setLinearKs(1000.0);
-        controller->setLinearKd(50.0);
+        controller->setTranslationScaling(0.1);
+        controller->setLinearKs(20000.0);
+        controller->setLinearKd(400.0);
         controller->setAngularKs(10000000.0);
         controller->setAngularKd(500000.0);
-        controller->setForceScaling(0.005);
-        controller->setSmoothingKernelSize(25);
+        controller->setForceScaling(0.0);
+        controller->setSmoothingKernelSize(15);
         controller->setUseForceSmoothening(true);
         scene->addController(controller);
+
+        connect<Event>(sceneManager, SceneManager::postUpdate, [&](Event*)
+        {
+            if (hapticDeviceClient->getButton(0))
+            {
+                // The LineMesh used for collision with the PBD tissue
+                std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                const Vec3d vertex = lineMesh->getVertexPosition(0);
+
+                if ((toolTip - vertex).norm() > 0.01)
+                {
+                    toolTip = vertex;
+                    tissueObj->setUpdateAffectedConstraint();
+                }
+
+                tissueObj->inject(toolTip, radius, 0.01);
+            }
+            else if (hapticDeviceClient->getButton(1))
+            {
+                // The LineMesh used for collision with the PBD tissue
+                std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                const Vec3d vertex = lineMesh->getVertexPosition(0);
+
+                if ((toolTip - vertex).norm() > 0.01)
+                {
+                    toolTip = vertex;
+                    tissueObj->setUpdateAffectedConstraint();
+                }
+
+                tissueObj->inject(toolTip, radius, -0.01);
+            }
+            });
 #else
         // Use keyboard controls
         connect<Event>(sceneManager, SceneManager::preUpdate, [&](Event*)

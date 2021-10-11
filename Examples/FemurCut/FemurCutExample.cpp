@@ -28,7 +28,6 @@
 #include "imstkLevelSetCH.h"
 #include "imstkLevelSetModel.h"
 #include "imstkDirectionalLight.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -141,14 +140,13 @@ main()
     scene->getActiveCamera()->setViewUp(0.05, 0.86, -0.51);
 
     {
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
         viewer->setActiveScene(scene);
 
         // Add a module to run the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<HapticDeviceManager> hapticManager;
         hapticManager->setSleepDelay(0.5); // Delay for 1/2ms (haptics thread is limited to max 2000hz)

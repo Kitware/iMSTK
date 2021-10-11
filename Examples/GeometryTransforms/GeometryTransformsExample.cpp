@@ -124,12 +124,11 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
 
         imstkNew<SimulationManager> driver;

@@ -23,8 +23,6 @@
 #include "imstkImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -209,12 +207,11 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 

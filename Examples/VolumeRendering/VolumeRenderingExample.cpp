@@ -23,7 +23,6 @@
 #include "imstkImageData.h"
 #include "imstkImageReslice.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -34,7 +33,6 @@
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVolumeRenderMaterialPresets.h"
-#include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
@@ -68,16 +66,14 @@ main()
 
     // Update Camera to position volume close to viewer
     auto cam = scene->getActiveCamera();
-    cam->setPosition(Vec3d(0.0, -200.0, -100.0) * 2.0);
-    cam->setFocalPoint(Vec3d(0.0, 0.0, -50.0));
-    cam->setViewUp(Vec3d(0.02, 0.4, 0.9));
+    cam->setPosition(108.991, -310.752, 109.795);
+    cam->setFocalPoint(41.0774, 35.6817, -33.9048);
+    cam->setViewUp(-0.83121, 0.0660308, 0.552024);
 
     // Setup a viewer to render in its own thread
-    imstkNew<VTKViewer> viewer("Viewer");
+    imstkNew<VTKViewer> viewer;
     viewer->setActiveScene(scene);
-
-    auto renderer = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
-    renderer->updateBackground(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+    viewer->setBackgroundColors(Color(0.3285, 0.3285, 0.6525), Color(0.13836, 0.13836, 0.2748), true);
 
     auto statusManager = viewer->getTextStatusManager();
     statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
@@ -111,7 +107,7 @@ main()
     // Run the simulation
     {
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
         connect<Event>(viewer, &SceneManager::postUpdate, updateFunc);
 

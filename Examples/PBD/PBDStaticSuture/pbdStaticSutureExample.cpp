@@ -22,9 +22,10 @@
 // This example is haptic only
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -32,8 +33,8 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
-#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
+#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -42,9 +43,6 @@
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkRigidObjectController.h"
 
 using namespace imstk;
 
@@ -230,14 +228,13 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setDebugAxesLength(0.01, 0.01, 0.01);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;

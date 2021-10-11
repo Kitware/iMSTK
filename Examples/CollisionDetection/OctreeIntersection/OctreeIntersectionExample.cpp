@@ -22,7 +22,6 @@
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLogger.h"
 #include "imstkLooseOctree.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -110,7 +109,7 @@ main()
     imstkNew<Scene> scene("Octree Example");
 
     // Setup a viewer to render in its own thread
-    imstkNew<VTKViewer> viewer("Viewer");
+    imstkNew<VTKViewer> viewer;
     viewer->setActiveScene(scene);
     viewer->setWindowTitle("Octree Example");
     viewer->setSize(1920, 1080);
@@ -253,9 +252,8 @@ main()
     // Run the simulation
     {
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(SceneManager::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
         connect<Event>(sceneManager, &SceneManager::postUpdate, updateFunc);
 
