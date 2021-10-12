@@ -55,10 +55,17 @@
  * FilteringCore
  */
 %shared_ptr(imstk::GeometryAlgorithm)
-%shared_ptr(imstk::SurfaceMeshSubdivide)
+
+/*
+ * Filtering
+ */
 %shared_ptr(imstk::ImplicitGeometryToImageData)
-%shared_ptr(imstk::SurfaceMeshFlyingEdges)
+%shared_ptr(imstk::QuadricDecimate)
 %shared_ptr(imstk::SelectEnclosedPoints)
+%shared_ptr(imstk::SurfaceMeshFlyingEdges)
+%shared_ptr(imstk::SurfaceMeshSmoothen)
+%shared_ptr(imstk::SurfaceMeshSubdivide)
+%shared_ptr(imstk::SurfaceMeshTextureProject)
 
 /* 
  * DynamicalModel 
