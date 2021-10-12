@@ -53,10 +53,13 @@
  * Filter
  */
 #include "imstkGeometryAlgorithm.h"
-#include "imstkSurfaceMeshSubdivide.h"
 #include "imstkImplicitGeometryToImageData.h"
-#include "imstkSurfaceMeshFlyingEdges.h"
+#include "imstkQuadricDecimate.h"
 #include "imstkSelectEnclosedPoints.h"
+#include "imstkSurfaceMeshFlyingEdges.h"
+#include "imstkSurfaceMeshSmoothen.h"
+#include "imstkSurfaceMeshSubdivide.h"
+#include "imstkSurfaceMeshTextureProject.h"
 
 /* 
  * MeshIO 
@@ -135,12 +138,12 @@
 #include "imstkTetraToPointSetCD.h"
 #include "imstkUnidirectionalPlaneToSphereCD.h"
 
-
 /*
  * CollisionHandling
  */
 #include "imstkCollisionHandling.h"
 #include "imstkRigidBodyCH.h"
+
 /*
  * Controller
  */
@@ -263,13 +266,20 @@ namespace std
 %include "../../GeometryMappers/imstkTetraTriangleMap.h"
 
 /*
- * Filtering
+ * FilteringCore
  */
 %include "../../FilteringCore/imstkGeometryAlgorithm.h"
-%include "../../Filtering/imstkSurfaceMeshSubdivide.h"
+
+/*
+ * Filtering
+ */
 %include "../../Filtering/imstkImplicitGeometryToImageData.h"
-%include "../../Filtering/imstkSurfaceMeshFlyingEdges.h"
+%include "../../Filtering/imstkQuadricDecimate.h"
 %include "../../Filtering/imstkSelectEnclosedPoints.h"
+%include "../../Filtering/imstkSurfaceMeshFlyingEdges.h"
+%include "../../Filtering/imstkSurfaceMeshSmoothen.h"
+%include "../../Filtering/imstkSurfaceMeshSubdivide.h"
+%include "../../Filtering/imstkSurfaceMeshTextureProject.h"
 
 /*
  * MeshIO
