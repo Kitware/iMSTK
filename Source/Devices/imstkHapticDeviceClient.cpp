@@ -71,6 +71,7 @@ HapticDeviceClient::initialize()
     hdEnable(HD_FORCE_OUTPUT);
     hdEnable(HD_FORCE_RAMPING);
 
+    m_schedulerHandle = hdScheduleAsynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY); // Call sometime later
     // Success
     LOG(INFO) << "\"" << this->getDeviceName() << "\" successfully initialized.";
 }
@@ -78,13 +79,25 @@ HapticDeviceClient::initialize()
 void
 HapticDeviceClient::update()
 {
-    //hdScheduleSynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);
-    hdScheduleAsynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY); // Call sometime later
+    std::vector<std::pair<int, int>> localEvents;
+    m_dataLock.lock();
+    std::swap(m_events, localEvents);
+    m_dataLock.unlock();
+
+    for (const auto& item : localEvents)
+    {
+        postEvent(ButtonEvent(HapticDeviceClient::buttonStateChanged(), item.first, item.second));
+    }
 }
 
 void
 HapticDeviceClient::disable()
 {
+    // HS 2021-oct-07 There is no documentation on whether hdUnschedule is synchronous
+    // or asynchronous, but as all the examples set the sequence to shutdown an HD device
+    // with hdStopScheduler, hdUnschedule, hdDisableDevice i'm assuming an hdWaitForCompletion
+    // is unnecessary here
+    hdUnschedule(m_schedulerHandle);
     hdDisableDevice(m_handle);
 }
 
@@ -125,23 +138,26 @@ HapticDeviceClient::hapticCallback(void* pData)
     client->m_orientation = orientation;
     client->m_transformLock.unlock();
 
+    client->m_dataLock.lock();
     for (int i = 0; i < 4; i++)
     {
         // If button down and not previously down
         if ((state.buttons & (1 << i)) && !client->m_buttons[i])
         {
             client->m_buttons[i] = true;
-            client->postEvent(ButtonEvent(HapticDeviceClient::buttonStateChanged(), i, BUTTON_PRESSED));
+            client->m_events.push_back({ i, BUTTON_PRESSED });
         }
         // If button not down, and previously down
         else if (!(state.buttons & (1 << i)) && client->m_buttons[i])
         {
             client->m_buttons[i] = false;
-            client->postEvent(ButtonEvent(HapticDeviceClient::buttonStateChanged(), i, BUTTON_RELEASED));
+            client->m_events.push_back({ i, BUTTON_RELEASED });
         }
     }
+    client->m_dataLock.unlock();
+
     client->m_trackingEnabled = true;
 
-    return HD_CALLBACK_DONE;
+    return HD_CALLBACK_CONTINUE;
 }
 } // imstk

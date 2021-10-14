@@ -26,6 +26,8 @@
 
 #include <HD/hd.h>
 
+#include <array>
+
 namespace imstk
 {
 struct HDstate
@@ -51,7 +53,6 @@ friend class HapticDeviceManager;
 public:
     virtual ~HapticDeviceClient() = default;
 
-public:
     ///
     /// \brief Use callback to get tracking data from phantom omni
     ///
@@ -86,5 +87,7 @@ private:
 
     HHD     m_handle; ///< device handle
     HDstate m_state;  ///< device reading state
+    HDSchedulerHandle m_schedulerHandle = 0;
+    std::vector<std::pair<int, int>> m_events;
 };
 }
