@@ -151,9 +151,9 @@ makeClothObj(const std::string& name,
     std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(10.0, 10.0, 16, 16, 2.0);
 
     // Setup the Parameters
-    imstkNew<PBDModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1.0e2);
-    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1.0e1);
+    imstkNew<PbdModelConfig> pbdParams;
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e2);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e1);
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(colCount) - 1 };
     pbdParams->m_uniformMassValue = width * height / (rowCount * colCount);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);

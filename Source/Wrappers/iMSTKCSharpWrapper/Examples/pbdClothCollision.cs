@@ -151,9 +151,9 @@ public class PbdCloth
         SurfaceMesh clothMesh = makeClothGeometry(width, height, rowCount, colCount, 2.0);
 
         // Setup the Parameters
-        PBDModelConfig pbdParams = new PBDModelConfig();
-        pbdParams.enableConstraint(PbdConstraint.Type.Distance, 1.0e2);
-        pbdParams.enableConstraint(PbdConstraint.Type.Dihedral, 1.0e1);
+        PbdModelConfig pbdParams = new PbdModelConfig();
+        pbdParams.enableConstraint(PbdModelConfig.ConstraintGenType.Distance, 1.0e2);
+        pbdParams.enableConstraint(PbdModelConfig.ConstraintGenType.Dihedral, 1.0e1);
         pbdParams.m_uniformMassValue = width * height / (rowCount * colCount);
         pbdParams.m_gravity = new Vec3d(0.0, -9.8, 0.0);
         pbdParams.m_dt = 0.005;

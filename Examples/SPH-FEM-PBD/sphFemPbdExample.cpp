@@ -200,11 +200,11 @@ makePBDDragonObject(const std::string& name, const Vec3d& position)
     std::shared_ptr<SurfaceMesh> coarseSurfMesh = coarseTetMesh->extractSurfaceMesh();
 
     // Setup the Parameters
-    imstkNew<PBDModelConfig> pbdParams;
+    imstkNew<PbdModelConfig> pbdParams;
     pbdParams->m_femParams->m_YoungModulus = 1000.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.3;
     pbdParams->m_fixedNodeIds = { 50, 126, 177 };
-    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
+    pbdParams->enableFEMConstraint(PbdFEMConstraint::MaterialType::StVK);
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_dt         = 0.01;

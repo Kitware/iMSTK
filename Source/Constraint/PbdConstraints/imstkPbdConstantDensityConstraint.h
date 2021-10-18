@@ -50,9 +50,9 @@ public:
     void initConstraint(const VecDataArray<double, 3>& initVertexPositions, const double k);
 
     ///
-    /// \brief Returns PBD constraint of type Type::ConstantDensity
+    /// \brief Returns PBD constraint of type ConstantDensity
     ///
-    Type getType() const override { return Type::ConstantDensity; }
+    std::string getType() const override { return "ConstantDensity"; }
 
     ///
     /// \brief Solves the constant density constraint

@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Returns PBD constraint of type Type::Distance
     ///
-    inline Type getType() const override { return Type::Distance; }
+    std::string getType() const override { return "Distance"; }
 
     ///
     /// \brief Initializes the distance constraint

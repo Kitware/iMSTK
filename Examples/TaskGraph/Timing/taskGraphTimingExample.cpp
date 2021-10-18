@@ -88,9 +88,9 @@ makePbdString(
     std::shared_ptr<LineMesh> stringMesh = makeStringGeometry(pos, numVerts, stringLength);
 
     // Setup the Parameters
-    imstkNew<PBDModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e7);
-    pbdParams->enableConstraint(PbdConstraint::Type::Bend, bendStiffness);
+    imstkNew<PbdModelConfig> pbdParams;
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e7);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Bend, bendStiffness);
     pbdParams->m_fixedNodeIds     = { 0 };
     pbdParams->m_uniformMassValue = 5.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
@@ -197,7 +197,7 @@ main()
             for (size_t i = 0; i < pbdStringObjs.size(); i++)
             {
                 std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
-                model->getParameters()->m_dt    = dt;
+                model->getConfig()->m_dt = dt;
                 std::shared_ptr<VecDataArray<double, 3>> positions = model->getCurrentState()->getPositions();
                 (*positions)[0] += Vec3d(
                         -std::sin(t) * radius * dt,

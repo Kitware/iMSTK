@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkPbdFETetConstraint.h"
+#include "imstkPbdFEMTetConstraint.h"
 
 namespace  imstk
 {

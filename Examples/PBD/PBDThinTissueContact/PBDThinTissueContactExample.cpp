@@ -38,6 +38,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
+#include "imstkPbdConstraintFunctor.h"
 
 #ifdef iMSTK_USE_OPENHAPTICS
 #include "imstkHapticDeviceManager.h"
@@ -126,9 +127,9 @@ makeTissueObj(const std::string& name,
     std::shared_ptr<SurfaceMesh> clothMesh = makeTriangleGrid(width, height, rowCount, colCount);
 
     // Setup the Parameters
-    imstkNew<PBDModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 5000.0);
-    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 5000.0);
+    imstkNew<PbdModelConfig> pbdParams;
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5000.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 5000.0);
     for (int x = 0; x < rowCount; x++)
     {
         for (int y = 0; y < colCount; y++)

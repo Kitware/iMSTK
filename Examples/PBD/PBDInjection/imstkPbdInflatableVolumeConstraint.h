@@ -71,14 +71,16 @@ struct PbdInflatableVolumeConstraintFunctor : public PbdVolumeConstraintFunctor
 
     virtual void operator()(PbdConstraintContainer& constraints) override
     {
-        // Check if constraint type matches the mesh type
-        CHECK(m_geom->getTypeName() == "TetrahedralMesh")
-            << "Volume constraint should come with volumetric mesh";
+        // Check for correct mesh type
+        CHECK(std::dynamic_pointer_cast<TetrahedralMesh>(m_geom) != nullptr)
+            << "PbdInflatableVolumeConstraint can only be generated with a TetrahedralMesh";
 
         // Create constraints
-        auto                           tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
-        const VecDataArray<double, 3>& vertices = *m_geom->getVertexPositions();
-        const VecDataArray<int, 4>&    elements = *tetMesh->getTetrahedraIndices();
+        auto                                     tetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
+        std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
+        const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+        std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getTetrahedraIndices();
+        const VecDataArray<int, 4>&              elements    = *elementsPtr;
 
         ParallelUtils::parallelFor(elements.size(),
             [&](const size_t k)

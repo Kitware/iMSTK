@@ -70,71 +70,16 @@ struct PbdInflatableDistanceConstraintFunctor : public PbdDistanceConstraintFunc
         PbdInflatableDistanceConstraintFunctor() : PbdDistanceConstraintFunctor() {}
         ~PbdInflatableDistanceConstraintFunctor() override = default;
 
-        virtual void operator()(PbdConstraintContainer& constraints) override
+        ///
+        /// \brief Create the distance constraint
+        ///
+        virtual std::shared_ptr<PbdDistanceConstraint> makeDistConstraint(
+            const VecDataArray<double, 3>& vertices,
+            size_t i1, size_t i2) override
         {
-            const VecDataArray<double, 3>& vertices = *m_geom->getVertexPositions();
-            auto                           addDistConstraint =
-                [&](std::vector<std::vector<bool>>& E, size_t i1, size_t i2)
-                {
-                    if (i1 > i2) // Make sure i1 is always smaller than i2
-                    {
-                        std::swap(i1, i2);
-                    }
-                    if (E[i1][i2])
-                    {
-                        E[i1][i2] = 0;
-                        auto c = std::make_shared<PbdInflatableDistanceConstraint>();
-                        c->initConstraint(vertices, i1, i2, m_stiffness);
-                        constraints.addConstraint(c);
-                    }
-                };
-
-            if (m_geom->getTypeName() == "TetrahedralMesh")
-            {
-                const auto&                    tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
-                const VecDataArray<int, 4>&    elements = *tetMesh->getTetrahedraIndices();
-                const auto                     nV       = tetMesh->getNumVertices();
-                std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
-
-                for (int k = 0; k < elements.size(); ++k)
-                {
-                    auto& tet = elements[k];
-                    addDistConstraint(E, tet[0], tet[1]);
-                    addDistConstraint(E, tet[0], tet[2]);
-                    addDistConstraint(E, tet[0], tet[3]);
-                    addDistConstraint(E, tet[1], tet[2]);
-                    addDistConstraint(E, tet[1], tet[3]);
-                    addDistConstraint(E, tet[2], tet[3]);
-                }
-            }
-            else if (m_geom->getTypeName() == "SurfaceMesh")
-            {
-                const auto&                    triMesh  = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
-                const VecDataArray<int, 3>&    elements = *triMesh->getTriangleIndices();
-                const auto                     nV       = triMesh->getNumVertices();
-                std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
-
-                for (int k = 0; k < elements.size(); ++k)
-                {
-                    auto& tri = elements[k];
-                    addDistConstraint(E, tri[0], tri[1]);
-                    addDistConstraint(E, tri[0], tri[2]);
-                    addDistConstraint(E, tri[1], tri[2]);
-                }
-            }
-            else if (m_geom->getTypeName() == "LineMesh")
-            {
-                const auto&                    lineMesh = std::dynamic_pointer_cast<LineMesh>(m_geom);
-                const VecDataArray<int, 2>&    elements = *lineMesh->getLinesIndices();
-                const auto&                    nV       = lineMesh->getNumVertices();
-                std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
-
-                for (int k = 0; k < elements.size(); k++)
-                {
-                    auto& seg = elements[k];
-                    addDistConstraint(E, seg[0], seg[1]);
-                }
-            }
+            auto constraint = std::make_shared<PbdInflatableDistanceConstraint>();
+            constraint->initConstraint(vertices, i1, i2, m_stiffness);
+            return constraint;
         }
 };
 } // imstk

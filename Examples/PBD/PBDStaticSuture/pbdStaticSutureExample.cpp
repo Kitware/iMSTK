@@ -90,8 +90,8 @@ makePbdString(
     std::shared_ptr<LineMesh> stringMesh = makeStringGeometry(pos, dir * dx, numVerts);
 
     // Setup the Parameters
-    imstkNew<PBDModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 100.0);
+    imstkNew<PbdModelConfig> pbdParams;
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100.0);
     pbdParams->enableBendConstraint(100000.0, 1);
     pbdParams->enableBendConstraint(100000.0, 2);
     pbdParams->m_fixedNodeIds     = { 0, 1 };
@@ -264,7 +264,7 @@ main()
             [&](Event*)
         {
             //needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-            sutureThreadObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
+            sutureThreadObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
             });
         Vec3d clampOffset = Vec3d(-0.009, 0.01, 0.001);
         connect<Event>(sceneManager, &SceneManager::postUpdate,

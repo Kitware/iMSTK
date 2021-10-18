@@ -37,13 +37,13 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit PbdFEMTetConstraint(MaterialType mtype = MaterialType::StVK) :
+    PbdFEMTetConstraint(MaterialType mtype = MaterialType::StVK) :
         PbdFEMConstraint(4, mtype) {}
 
     ///
     /// \brief Get the type of FEM constraint
     ///
-    inline Type getType() const override { return Type::FEMTet; }
+    std::string getType() const override { return "FEMTet"; }
 
     ///
     /// \brief Initialize the tetrahedral FEM constraint

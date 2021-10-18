@@ -71,7 +71,7 @@
  * DynamicalModel 
  */
 %shared_ptr(imstk::PbdObject)
-%shared_ptr(imstk::PBDModelConfig)
+%shared_ptr(imstk::PbdModelConfig)
 %shared_ptr(imstk::PbdCollisionConstraintConfig)
 %shared_ptr(imstk::PbdFEMConstraintConfig)
 %shared_ptr(imstk::PbdSolver)

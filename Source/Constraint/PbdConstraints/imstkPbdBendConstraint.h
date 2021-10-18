@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Returns PBD constraint of type Type::Bend
     ///
-    inline Type getType() const override { return Type::Bend; }
+    std::string getType() const override { return "Bend"; }
 
     /**
         \brief initConstraint

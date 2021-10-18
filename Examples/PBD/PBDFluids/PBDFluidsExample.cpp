@@ -70,10 +70,10 @@ createPbdFluid(const std::string& tetMeshName)
     pbdModel->setModelGeometry(fluidMesh);
 
     // Configure model
-    imstkNew<PBDModelConfig> pbdParams;
+    imstkNew<PbdModelConfig> pbdParams;
 
     // Constant density constraint with stiffness
-    pbdParams->enableConstraint(PbdConstraint::Type::ConstantDensity, 1.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::ConstantDensity, 1.0);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;

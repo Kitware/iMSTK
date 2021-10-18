@@ -239,7 +239,7 @@ PBDCollisionHandling::generateMeshNonMeshConstraints(
     std::shared_ptr<DataArray<double>>       invMassesAPtr  = std::dynamic_pointer_cast<DataArray<double>>(pointSetA->getVertexAttribute("InvMass"));
     std::shared_ptr<VecDataArray<double, 3>> velocitiesAPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSetA->getVertexAttribute("Velocities"));
 
-    const double stiffnessA = pbdObjectA->getPbdModel()->getParameters()->m_contactStiffness;
+    const double stiffnessA = pbdObjectA->getPbdModel()->getConfig()->m_contactStiffness;
 
     MeshSide sideA(
         *verticesAPtr,
@@ -402,8 +402,8 @@ PBDCollisionHandling::generateMeshMeshConstraints(
     }
 
     // Get the configs (one may be nullptr)
-    const double stiffnessA = pbdObjectA->getPbdModel()->getParameters()->m_contactStiffness;
-    const double stiffnessB = (pbdObjectB == nullptr) ? 0.0 : pbdObjectB->getPbdModel()->getParameters()->m_contactStiffness;
+    const double stiffnessA = pbdObjectA->getPbdModel()->getConfig()->m_contactStiffness;
+    const double stiffnessB = (pbdObjectB == nullptr) ? 0.0 : pbdObjectB->getPbdModel()->getConfig()->m_contactStiffness;
 
     MeshSide sideA(
         *verticesAPtr,
