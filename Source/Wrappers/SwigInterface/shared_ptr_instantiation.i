@@ -11,6 +11,7 @@
 %shared_ptr(imstk::DataArray<float>)
 %shared_ptr(imstk::DataArray<double>)
 %shared_ptr(imstk::DataArray<unsigned char>)
+%shared_ptr(imstk::VecDataArray<int, 2>)
 %shared_ptr(imstk::VecDataArray<int, 3>)
 %shared_ptr(imstk::VecDataArray<int, 4>)
 %shared_ptr(imstk::VecDataArray<float, 2>)
