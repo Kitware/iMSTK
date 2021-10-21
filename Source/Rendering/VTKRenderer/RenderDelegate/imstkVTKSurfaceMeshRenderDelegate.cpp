@@ -141,14 +141,15 @@ void
 VTKSurfaceMeshRenderDelegate::processEvents()
 {
     // Custom handling of events
-    std::shared_ptr<VecDataArray<double, 3>> verticesPtr      = m_geometry->getVertexPositions();
-    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr       = m_geometry->getTriangleIndices();
-    std::shared_ptr<AbstractDataArray>       cellScalarsPtr   = m_geometry->getCellScalars();
-    std::shared_ptr<AbstractDataArray>       vertexScalarsPtr = m_geometry->getVertexScalars();
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr           = m_geometry->getVertexPositions();
+    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr            = m_geometry->getTriangleIndices();
+    std::shared_ptr<AbstractDataArray>       cellScalarsPtr        = m_geometry->getCellScalars();
+    std::shared_ptr<AbstractDataArray>       vertexScalarsPtr      = m_geometry->getVertexScalars();
+    std::shared_ptr<AbstractDataArray>       textureCoordinatesPtr = m_geometry->getVertexTCoords();
 
     // Only use the most recent event from respective sender
-    std::array<Command, 7> cmds;
-    std::array<bool, 7>    contains = { false, false, false, false, false, false, false };
+    std::array<Command, 8> cmds;
+    std::array<bool, 8>    contains = { false, false, false, false, false, false, false, false };
     rforeachEvent([&](Command cmd)
         {
             if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
@@ -186,6 +187,11 @@ VTKSurfaceMeshRenderDelegate::processEvents()
                 cmds[6]     = cmd;
                 contains[6] = true;
             }
+            else if (cmd.m_event->m_sender == textureCoordinatesPtr.get() && !contains[7])
+            {
+                cmds[7]     = cmd;
+                contains[7] = true;
+            }
         });
 
     // Now do all the commands
@@ -195,6 +201,7 @@ VTKSurfaceMeshRenderDelegate::processEvents()
     cmds[4].invoke(); // Update cell scalars
     cmds[5].invoke(); // Update vertex scalars
     cmds[6].invoke(); // Update indices
+    cmds[7].invoke(); // Update texture coordinates
     cmds[2].invoke(); // Update geometry as a whole
 }
 
@@ -209,8 +216,6 @@ VTKSurfaceMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
         m_geometry->computeVertexNormals();
         setNormalBuffer(m_geometry->getVertexNormals());
     }
-
-    setTextureCoordinateBuffer(m_geometry->getVertexTCoords());
 }
 
 void
