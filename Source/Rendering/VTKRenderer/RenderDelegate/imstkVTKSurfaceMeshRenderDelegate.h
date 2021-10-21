@@ -68,6 +68,7 @@ protected:
     void normalDataModified(Event* e);
     void vertexScalarsModified(Event* e);
     void cellScalarsModified(Event* e);
+    void textureCoordinatesModified(Event* e);
 
     ///
     /// \brief Callback for when geometry is modified
@@ -85,6 +86,7 @@ protected:
     void setIndexBuffer(std::shared_ptr<VecDataArray<int, 3>> indices);
     void setVertexScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
     void setCellScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
+    void setTextureCoordinateBuffer(std::shared_ptr<AbstractDataArray> textureCoordinates);
 
 protected:
     std::shared_ptr<SurfaceMesh> m_geometry;
@@ -93,6 +95,7 @@ protected:
     std::shared_ptr<VecDataArray<int, 3>>    m_indices;
     std::shared_ptr<AbstractDataArray>       m_vertexScalars;
     std::shared_ptr<AbstractDataArray>       m_cellScalars;
+    std::shared_ptr<AbstractDataArray>       m_textureCoordinates;
 
     vtkSmartPointer<vtkPolyData> m_polydata;
 
