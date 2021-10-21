@@ -25,7 +25,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Set install commands
 #-----------------------------------------------------------------------------
-if(NOT DEFINED OpenVR_INSTALL_DIR)
+if(CMAKE_PROJECT_NAME STREQUAL "iMSTK")
   set(OpenVR_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 
   set(copy_openvr_headers_command
