@@ -16,21 +16,19 @@
 #
 ###########################################################################
 
-if(iMSTK_USE_OpenHaptics)
-	project(Example-FemurCut)
+project(Example-FemurCut)
 
-	#-----------------------------------------------------------------------------
-	# Create executable
-	#-----------------------------------------------------------------------------
-	imstk_add_executable(${PROJECT_NAME} FemurCutExample.cpp FemurObject.h FemurObject.cpp)
+#-----------------------------------------------------------------------------
+# Create executable
+#-----------------------------------------------------------------------------
+imstk_add_executable(${PROJECT_NAME} FemurCutExample.cpp FemurObject.h FemurObject.cpp)
 
-	#-----------------------------------------------------------------------------
-	# Add the target to Examples folder
-	#-----------------------------------------------------------------------------
-	SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
+#-----------------------------------------------------------------------------
+# Add the target to Examples folder
+#-----------------------------------------------------------------------------
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
 
-	#-----------------------------------------------------------------------------
-	# Link libraries to executable
-	#-----------------------------------------------------------------------------
-	target_link_libraries(${PROJECT_NAME} SimulationManager Filtering)
-endif()
+#-----------------------------------------------------------------------------
+# Link libraries to executable
+#-----------------------------------------------------------------------------
+target_link_libraries(${PROJECT_NAME} SimulationManager Filtering)

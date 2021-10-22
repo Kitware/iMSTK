@@ -22,12 +22,10 @@
 #include "FemurObject.h"
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
+#include "imstkDirectionalLight.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetCH.h"
 #include "imstkLevelSetModel.h"
-#include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -35,7 +33,6 @@
 #include "imstkRigidBodyCH.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
-#include "imstkRigidObjectController.h"
 #include "imstkRigidObjectLevelSetCollision.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -45,16 +42,24 @@
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVTKViewer.h"
 
+#ifdef iMSTK_USE_OPENHAPTICS
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
+#include "imstkRigidObjectController.h"
+#else
+#include "imstkMouseDeviceClient.h"
+#endif
+
 using namespace imstk;
 
 std::shared_ptr<RigidObject2>
 makeRigidObj(const std::string& name)
 {
     imstkNew<RigidBodyModel2> rbdModel;
-    rbdModel->getConfig()->m_maxNumIterations       = 8;
-    rbdModel->getConfig()->m_velocityDamping        = 1.0;
+    rbdModel->getConfig()->m_maxNumIterations = 8;
+    rbdModel->getConfig()->m_velocityDamping = 1.0;
     rbdModel->getConfig()->m_angularVelocityDamping = 1.0;
-    rbdModel->getConfig()->m_maxNumConstraints      = 40;
+    rbdModel->getConfig()->m_maxNumConstraints = 40;
 
     // Create the first rbd, plane floor
     imstkNew<RigidObject2> rigidObj(name);
@@ -148,8 +153,15 @@ main()
         imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
 
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
+        driver->setDesiredDt(0.001); // Exactly 1000ups
+
+#ifdef iMSTK_USE_OPENHAPTICS
         imstkNew<HapticDeviceManager> hapticManager;
         hapticManager->setSleepDelay(0.5); // Delay for 1/2ms (haptics thread is limited to max 2000hz)
+        driver->addModule(hapticManager);
         std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
 
         imstkNew<RigidObjectController> controller(rbdObj, hapticDeviceClient);
@@ -174,22 +186,37 @@ main()
         }
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-            femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
+            {
+                rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+                femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
 
-            // Also apply controller transform to ghost geometry
-            ghostMesh->setTranslation(controller->getPosition());
-            ghostMesh->setRotation(controller->getRotation());
-            ghostMesh->updatePostTransformData();
-            ghostMesh->postModified();
+                // Also apply controller transform to ghost geometry
+                ghostMesh->setTranslation(controller->getPosition());
+                ghostMesh->setRotation(controller->getRotation());
+                ghostMesh->updatePostTransformData();
+                ghostMesh->postModified();
             });
+#else
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+            {
+                rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+                femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
 
-        imstkNew<SimulationManager> driver;
-        driver->addModule(viewer);
-        driver->addModule(sceneManager);
-        driver->addModule(hapticManager);
-        driver->setDesiredDt(0.001); // Exactly 1000ups
+                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] + 0.2, 1.575);
+
+                const Vec3d fS = (worldPos - rbdObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
+                const Vec3d fD = -rbdObj->getRigidBody()->getVelocity() * 100.0;                  // Spring damping
+
+                (*rbdObj->getRigidBody()->m_force) += (fS + fD);
+
+                // Also apply controller transform to ghost geometry
+                ghostMesh->setTranslation(worldPos);
+                ghostMesh->setRotation(Mat3d::Identity());
+                ghostMesh->updatePostTransformData();
+                ghostMesh->postModified();
+            });
+#endif
 
         {
             imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
