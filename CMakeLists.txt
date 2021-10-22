@@ -288,6 +288,10 @@ endif()
 find_package(VTK REQUIRED CONFIG)
 # modules are linked via `VTK::CommonCore`
 # vtk_module_autoinit is needed
+
+find_package(vtkRenderingOpenVR QUIET)
+find_package(vtkRenderingExternal QUIET)
+
 list(APPEND VTK_DEPENDENCIES
   ChartsCore
   CommonCore
