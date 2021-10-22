@@ -76,5 +76,5 @@ public:
         CDObjectFactory::registerCD(name, []() { return std::make_shared<T>(); });
     }
 };
-#define RegisterCollisionDetection(cdType) CDObjectRegistrar<cdType> __register ## cdType(#cdType)
+#define REGISTER_COLLISION_DETECTION(cdType) CDObjectRegistrar<cdType> __register ## cdType(#cdType)
 }
