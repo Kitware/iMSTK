@@ -56,10 +56,10 @@ std::shared_ptr<RigidObject2>
 makeRigidObj(const std::string& name)
 {
     imstkNew<RigidBodyModel2> rbdModel;
-    rbdModel->getConfig()->m_maxNumIterations = 8;
-    rbdModel->getConfig()->m_velocityDamping = 1.0;
+    rbdModel->getConfig()->m_maxNumIterations       = 8;
+    rbdModel->getConfig()->m_velocityDamping        = 1.0;
     rbdModel->getConfig()->m_angularVelocityDamping = 1.0;
-    rbdModel->getConfig()->m_maxNumConstraints = 40;
+    rbdModel->getConfig()->m_maxNumConstraints      = 40;
 
     // Create the first rbd, plane floor
     imstkNew<RigidObject2> rigidObj(name);
@@ -186,35 +186,35 @@ main()
         }
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-            {
-                rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-                femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
+        {
+            rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+            femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
 
-                // Also apply controller transform to ghost geometry
-                ghostMesh->setTranslation(controller->getPosition());
-                ghostMesh->setRotation(controller->getRotation());
-                ghostMesh->updatePostTransformData();
-                ghostMesh->postModified();
+            // Also apply controller transform to ghost geometry
+            ghostMesh->setTranslation(controller->getPosition());
+            ghostMesh->setRotation(controller->getRotation());
+            ghostMesh->updatePostTransformData();
+            ghostMesh->postModified();
             });
 #else
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-            {
-                rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-                femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
+        {
+            rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+            femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
 
-                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] + 0.2, 1.575);
+            const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+            const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] + 0.2, 1.575);
 
-                const Vec3d fS = (worldPos - rbdObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
-                const Vec3d fD = -rbdObj->getRigidBody()->getVelocity() * 100.0;                  // Spring damping
+            const Vec3d fS = (worldPos - rbdObj->getRigidBody()->getPosition()) * 1000.0;         // Spring force
+            const Vec3d fD = -rbdObj->getRigidBody()->getVelocity() * 100.0;                      // Spring damping
 
-                (*rbdObj->getRigidBody()->m_force) += (fS + fD);
+            (*rbdObj->getRigidBody()->m_force) += (fS + fD);
 
-                // Also apply controller transform to ghost geometry
-                ghostMesh->setTranslation(worldPos);
-                ghostMesh->setRotation(Mat3d::Identity());
-                ghostMesh->updatePostTransformData();
-                ghostMesh->postModified();
+            // Also apply controller transform to ghost geometry
+            ghostMesh->setTranslation(worldPos);
+            ghostMesh->setRotation(Mat3d::Identity());
+            ghostMesh->updatePostTransformData();
+            ghostMesh->postModified();
             });
 #endif
 
