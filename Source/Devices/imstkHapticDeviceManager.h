@@ -39,7 +39,7 @@ class HapticDeviceManager : public Module
 public:
     HapticDeviceManager() : Module()
     {
-        muteUpdateEvents = true;
+        m_muteUpdateEvents = true;
     }
 
     ///

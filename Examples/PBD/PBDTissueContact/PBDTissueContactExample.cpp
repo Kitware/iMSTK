@@ -310,7 +310,7 @@ makeToolObj()
 
     toolObj->getRigidBody()->m_mass = 1.0;
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
-#ifdef EXAMPLE_USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.8, 0.0);
 #else
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
