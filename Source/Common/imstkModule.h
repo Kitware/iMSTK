@@ -96,7 +96,8 @@ public:
     ExecutionType getExecutionType() const { return m_executionType; }
     void setExecutionType(const ExecutionType type) { m_executionType = type; }
 
-    void setSleepDelay(const double ms) { sleepDelay = ms; }
+    void setSleepDelay(const double ms);
+    double getSleepDelay() const { return m_sleepDelay; }
 
     void pause() { m_paused = true; }
     void resume() { m_paused = false; }
@@ -120,7 +121,7 @@ protected:
     tbb::atomic<bool> m_paused = false;
     double m_dt = 0.0;
     ExecutionType m_executionType = ExecutionType::PARALLEL; // Defaults to parallel, subclass and set
-    bool   muteUpdateEvents       = false;                   // Avoid posting pre/post update, useful when running modules at extremely fast rates
-    double sleepDelay = 0.0;                                 // ms sleep for the module, useful for throttling some modules
+    bool   m_muteUpdateEvents     = false;                   // Avoid posting pre/post update, useful when running modules at extremely fast rates
+    double m_sleepDelay = 0.0;                               // ms sleep for the module, useful for throttling some modules
 };
 }
