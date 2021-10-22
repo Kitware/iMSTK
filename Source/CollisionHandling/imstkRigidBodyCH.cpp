@@ -21,14 +21,14 @@
 
 #include "imstkRigidBodyCH.h"
 #include "imstkCollisionData.h"
+#include "imstkCollisionUtils.h"
 #include "imstkLineMesh.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRbdFrictionConstraint.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkSurfaceMesh.h"
-
-#include "imstkCollisionUtils.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {

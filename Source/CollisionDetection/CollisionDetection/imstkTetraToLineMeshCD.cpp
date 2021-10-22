@@ -21,9 +21,10 @@
 
 #include "imstkTetraToLineMeshCD.h"
 #include "imstkCollisionData.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkLineMesh.h"
 #include "imstkCollisionUtils.h"
+#include "imstkLineMesh.h"
+#include "imstkParallelUtils.h"
+#include "imstkTetrahedralMesh.h"
 
 namespace imstk
 {

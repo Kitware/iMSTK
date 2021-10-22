@@ -22,8 +22,8 @@
 #include "imstkUnidirectionalPlaneToSphereCD.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionUtils.h"
-#include "imstkSphere.h"
 #include "imstkPlane.h"
+#include "imstkSphere.h"
 
 namespace imstk
 {
@@ -70,74 +70,6 @@ UnidirectionalPlaneToSphereCD::computeCollisionDataAB(
         elemB.penetrationDepth = depth;
 
         elementsA.push_back(elemA);
-        elementsB.push_back(elemB);
-    }
-}
-
-void
-UnidirectionalPlaneToSphereCD::computeCollisionDataA(
-    std::shared_ptr<Geometry>      geomA,
-    std::shared_ptr<Geometry>      geomB,
-    std::vector<CollisionElement>& elementsA)
-{
-    std::shared_ptr<Plane>  plane  = std::dynamic_pointer_cast<Plane>(geomA);
-    std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(geomB);
-
-    // Get geometry properties
-    const Vec3d  spherePos = sphere->getPosition();
-    const double r = sphere->getRadius();
-    const Vec3d  planePos = plane->getPosition();
-    const Vec3d  n = plane->getNormal();
-
-    Vec3d  planeContactPt, sphereContactPt;
-    Vec3d  planeContactNormal, sphereContactNormal;
-    double depth;
-    if (CollisionUtils::testPlaneToSphere(
-                planePos, n,
-                spherePos, r,
-                planeContactPt, planeContactNormal,
-                sphereContactPt, sphereContactNormal,
-                depth))
-    {
-        PointDirectionElement elemA;
-        elemA.dir = planeContactNormal;         // Direction to resolve plane
-        elemA.pt  = planeContactPt;
-        elemA.penetrationDepth = depth;
-
-        elementsA.push_back(elemA);
-    }
-}
-
-void
-UnidirectionalPlaneToSphereCD::computeCollisionDataB(
-    std::shared_ptr<Geometry>      geomA,
-    std::shared_ptr<Geometry>      geomB,
-    std::vector<CollisionElement>& elementsB)
-{
-    std::shared_ptr<Plane>  plane  = std::dynamic_pointer_cast<Plane>(geomA);
-    std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(geomB);
-
-    // Get geometry properties
-    const Vec3d  spherePos = sphere->getPosition();
-    const double r = sphere->getRadius();
-    const Vec3d  planePos = plane->getPosition();
-    const Vec3d  n = plane->getNormal();
-
-    Vec3d  planeContactPt, sphereContactPt;
-    Vec3d  planeContactNormal, sphereContactNormal;
-    double depth;
-    if (CollisionUtils::testPlaneToSphere(
-                planePos, n,
-                spherePos, r,
-                planeContactPt, planeContactNormal,
-                sphereContactPt, sphereContactNormal,
-                depth))
-    {
-        PointDirectionElement elemB;
-        elemB.dir = sphereContactNormal;         // Direction to resolve sphere
-        elemB.pt  = sphereContactPt;
-        elemB.penetrationDepth = depth;
-
         elementsB.push_back(elemB);
     }
 }

@@ -22,6 +22,7 @@
 #include "imstkSurfaceMeshToSphereCD.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionUtils.h"
+#include "imstkParallelUtils.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 

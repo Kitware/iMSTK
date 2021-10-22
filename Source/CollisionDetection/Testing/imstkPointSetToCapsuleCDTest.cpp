@@ -19,11 +19,12 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
+#include "imstkCapsule.h"
 #include "imstkPointSet.h"
 #include "imstkPointSetToCapsuleCD.h"
-#include "imstkCapsule.h"
+#include "imstkVecDataArray.h"
+
+#include <gtest/gtest.h>
 #include <iostream>
 
 using namespace imstk;

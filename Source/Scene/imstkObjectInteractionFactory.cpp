@@ -112,7 +112,9 @@ makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr
     else if (intType == InteractionType::BoneDrilling)
     {
         // Setup CD and collision data
-        std::shared_ptr<CollisionDetectionAlgorithm> cd = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry());
+        std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
+        cd->setInput(obj1->getCollidingGeometry(), 0);
+        cd->setInput(obj2->getCollidingGeometry(), 1);
 
         // Setup the handler
         std::shared_ptr<BoneDrillingCH> ch = std::make_shared<BoneDrillingCH>();
