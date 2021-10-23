@@ -26,8 +26,6 @@
 #include <vtkSmartPointer.h>
 #include <list>
 
-class vtkInteractorStyle;
-class vtkInteractorStyleVR;
 class vtkRenderWindow;
 
 namespace imstk
@@ -84,8 +82,6 @@ protected:
     void updateModule() override;
 
 protected:
-    std::shared_ptr<vtkInteractorStyle> m_vtkInteractorStyle;
-
     ///> The VR controllers are tied to the view
     std::list<std::shared_ptr<OpenVRDeviceClient>> m_vrDeviceClients;
 };

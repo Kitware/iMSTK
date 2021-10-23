@@ -25,7 +25,6 @@
 #include "imstkLogger.h"
 #include "imstkOpenVRDeviceClient.h"
 #include "imstkScene.h"
-#include "imstkVTKInteractorStyle.h"
 #include "imstkVTKInteractorStyleVR.h"
 #include "imstkVTKRenderer.h"
 
@@ -40,13 +39,12 @@ namespace imstk
 VTKOpenVRViewer::VTKOpenVRViewer(std::string name) : AbstractVTKViewer(name)
 {
     // Create the interactor style
-    auto vrInteractorStyle = std::make_shared<vtkInteractorStyleVR>();
-    m_interactorStyle    = std::dynamic_pointer_cast<InteractorStyle>(vrInteractorStyle);
-    m_vtkInteractorStyle = std::dynamic_pointer_cast<vtkInteractorStyle>(m_interactorStyle);
+    auto vrInteractorStyle = vtkSmartPointer<vtkInteractorStyleVR>::New();
+    m_vtkInteractorStyle = vrInteractorStyle;
 
     // Create the interactor
-    vtkNew<vtkOpenVRRenderWindowInteractor> iren;
-    iren->SetInteractorStyle(m_vtkInteractorStyle.get());
+    auto iren = vtkSmartPointer<vtkOpenVRRenderWindowInteractor>::New();
+    iren->SetInteractorStyle(m_vtkInteractorStyle);
 
     // Create the RenderWindow
     m_vtkRenderWindow = vtkSmartPointer<vtkOpenVRRenderWindow>::New();

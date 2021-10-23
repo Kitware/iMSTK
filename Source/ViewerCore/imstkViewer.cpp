@@ -22,7 +22,6 @@
 #include "imstkViewer.h"
 #include "imstkCamera.h"
 #include "imstkDeviceControl.h"
-#include "imstkInteractorStyle.h"
 #include "imstkLogger.h"
 
 namespace imstk
@@ -30,7 +29,6 @@ namespace imstk
 Viewer::Viewer(std::string name) :
     m_activeScene(nullptr),
     m_debugCamera(std::make_shared<Camera>()),
-    m_interactorStyle(nullptr),
     m_screenCapturer(nullptr),
     m_config(std::make_shared<ViewerConfig>())
 {

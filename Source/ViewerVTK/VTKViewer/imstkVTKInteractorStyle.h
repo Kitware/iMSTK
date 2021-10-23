@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "imstkInteractorStyle.h"
-
 #include <vtkInteractorStyleTrackballCamera.h>
 
 namespace imstk
@@ -35,11 +33,13 @@ class MouseDeviceClient;
 ///
 /// \brief Interactor styles forward their controls to imstk objects
 ///
-class VTKInteractorStyle : public vtkInteractorStyleTrackballCamera, public InteractorStyle
+class VTKInteractorStyle : public vtkInteractorStyleTrackballCamera
 {
 public:
     static VTKInteractorStyle* New();
-    vtkTypeMacro(VTKInteractorStyle, vtkInteractorStyleTrackballCamera) VTKInteractorStyle();
+    vtkTypeMacro(VTKInteractorStyle, vtkInteractorStyleTrackballCamera);
+
+    VTKInteractorStyle();
     virtual ~VTKInteractorStyle() override;
 
 public:
