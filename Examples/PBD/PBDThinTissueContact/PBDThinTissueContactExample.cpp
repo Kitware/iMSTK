@@ -248,9 +248,8 @@ main()
 #endif
         driver->setDesiredDt(0.005);
 
-        Mat3d rotationalOffset = Mat3d::Identity();
-
 #ifdef iMSTK_USE_OPENHAPTICS
+        Mat3d rotationalOffset = Mat3d::Identity();
         connect<Event>(sceneManager, SceneManager::preUpdate, [&](Event*)
         {
             hapticDeviceClient->update();

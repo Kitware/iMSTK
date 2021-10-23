@@ -17,22 +17,23 @@
 ###########################################################################
 
 if(iMSTK_USE_VRPN)
+    project(Example-VRPNDeviceClient)
 
-project(Example-VRPNDeviceClient)
+    #-----------------------------------------------------------------------------
+    # Create executable
+    #-----------------------------------------------------------------------------
+    imstk_add_executable(${PROJECT_NAME} VRPNDeviceClientExample.cpp)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} VRPNDeviceClientExample.cpp)
+    #-----------------------------------------------------------------------------
+    # Add the target to Examples folder
+    #-----------------------------------------------------------------------------
+    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 
-#-----------------------------------------------------------------------------
-# Add the target to Examples folder
-#-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
-
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME} SimulationManager Devices)
-
+    #-----------------------------------------------------------------------------
+    # Link libraries to executable
+    #-----------------------------------------------------------------------------
+    target_link_libraries(${PROJECT_NAME}
+        SimulationManager
+        Devices
+        ViewerVTK)
 endif()

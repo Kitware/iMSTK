@@ -501,7 +501,7 @@ disconnect(EventObject* sender, EventObject* reciever, std::string (* senderFunc
         [eventType](const std::pair<std::string, std::vector<EventObject::Observer>>& j) { return j.first == eventType; });
     if (i1 != sender->directObservers.end())
     {
-        auto j = std::find_if(i1->second.begin(), i1->second.end(), [reciever](const EventObject::Observer& j) { return j.first == reciever; });
+        auto j = std::find_if(i1->second.begin(), i1->second.end(), [reciever](const EventObject::Observer& k) { return k.first == reciever; });
         i1->second.erase(j);
     }
 
@@ -509,7 +509,7 @@ disconnect(EventObject* sender, EventObject* reciever, std::string (* senderFunc
         [eventType](const std::pair<std::string, std::vector<EventObject::Observer>>& j) { return j.first == eventType; });
     if (i2 != sender->queuedObservers.end())
     {
-        auto j = std::find_if(i2->second.begin(), i2->second.end(), [reciever](const EventObject::Observer& j) { return j.first == reciever; });
+        auto j = std::find_if(i2->second.begin(), i2->second.end(), [reciever](const EventObject::Observer& k) { return k.first == reciever; });
         i2->second.erase(j);
     }
 }

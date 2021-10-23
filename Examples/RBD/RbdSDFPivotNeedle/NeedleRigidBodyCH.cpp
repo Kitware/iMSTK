@@ -19,8 +19,6 @@
 
 =========================================================================*/
 
-#pragma once
-
 #include "NeedleRigidBodyCH.h"
 #include "imstkLineMesh.h"
 #include "imstkRbdContactConstraint.h"

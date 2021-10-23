@@ -61,7 +61,7 @@ makeStringGeometry(const Vec3d& pos, const int numVerts, const double stringLeng
     // Add connectivity data
     imstkNew<VecDataArray<int, 2>> segmentsPtr;
     VecDataArray<int, 2>&          segments = *segmentsPtr.get();
-    for (size_t j = 0; j < numVerts - 1; j++)
+    for (int j = 0; j < numVerts - 1; j++)
     {
         segments.push_back(Vec2i(j, j + 1));
     }

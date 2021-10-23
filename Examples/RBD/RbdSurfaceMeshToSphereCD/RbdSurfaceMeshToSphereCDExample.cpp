@@ -271,8 +271,8 @@ main()
             [&](Event*)
         {
             // Keep cube updating at real time
-            std::shared_ptr<RigidBodyModel2> rbdModel = rigidObjects[0]->getRigidBodyModel2();     // All bodies share a model
-            const double dt = rbdModel->getConfig()->m_dt = sceneManager->getDt();
+            std::shared_ptr<RigidBodyModel2> rbdModel = rigidObjects[0]->getRigidBodyModel2(); // All bodies share a model
+            rbdModel->getConfig()->m_dt = sceneManager->getDt();
 
             if (sphereSelected != -1)
             {

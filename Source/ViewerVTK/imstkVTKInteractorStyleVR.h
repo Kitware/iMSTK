@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include <vtkInteractorStyle3D.h>
+#include <memory>
 
 namespace imstk
 {

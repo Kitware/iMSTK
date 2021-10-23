@@ -22,6 +22,7 @@
 #pragma once
 
 #include <vtkInteractorStyleTrackballCamera.h>
+#include <memory>
 
 namespace imstk
 {
