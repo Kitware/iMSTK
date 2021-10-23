@@ -2,29 +2,28 @@
 # Create target
 #-----------------------------------------------------------------------------
 
-file(GLOB VTK_H_FILES VTKRenderer/imstk*.h)
-file(GLOB VTK_CPP_FILES VTKRenderer/imstk*.cpp)
+file(GLOB H_FILES imstk*.h)
+file(GLOB SRC_FILES imstk*.cpp)
 
-file(GLOB SIMMANAGER_H_FILES imstk*.h)
-file(GLOB SIMMANAGER_CPP_FILES imstk*.cpp)
+set(H_FILES
+  imstkConsoleModule.h
+  imstkSceneManager.h
+  imstkSimulationManager.h)
 
-set(SIMULATIONMANAGER_H_FILES ${SIMMANAGER_H_FILES} ${VTK_H_FILES})
-set(SIMULATIONMANAGER_CPP_FILES ${SIMMANAGER_CPP_FILES} ${VTK_CPP_FILES})
-set(SIMULATIONMANAGER_SUBDIR
-  VTKRenderer)
+set(SRC_FILES
+  imstkConsoleModule.cpp
+  imstkSceneManager.cpp
+  imstkSimulationManager.cpp)
 
 include(imstkAddLibrary)
 imstk_add_library(SimulationManager
   H_FILES
-    ${SIMULATIONMANAGER_H_FILES}
+    ${H_FILES}
   CPP_FILES
-    ${SIMULATIONMANAGER_CPP_FILES}
-  SUBDIR_LIST
-    ${SIMULATIONMANAGER_SUBDIR}
+    ${SRC_FILES}
   DEPENDS
     Scene
-    Rendering
-  )
+    ViewerCore)
 
 # Install VR actions json
 file(GLOB VTK_VR_JSON_FILES VTKRenderer/vtk_openvr_*.json)
