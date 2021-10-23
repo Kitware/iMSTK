@@ -7,11 +7,15 @@ file(GLOB SRC_FILES imstk*.cpp)
 
 set(H_FILES
   imstkConsoleModule.h
+  imstkKeyboardSceneControl.h
+  imstkMouseSceneControl.h
   imstkSceneManager.h
   imstkSimulationManager.h)
 
 set(SRC_FILES
   imstkConsoleModule.cpp
+  imstkKeyboardSceneControl.cpp
+  imstkMouseSceneControl.cpp
   imstkSceneManager.cpp
   imstkSimulationManager.cpp)
 

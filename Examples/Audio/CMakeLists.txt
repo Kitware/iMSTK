@@ -33,9 +33,9 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 #-----------------------------------------------------------------------------
 if(UNIX)
   target_link_libraries(${PROJECT_NAME}
-  SimulationManager)
+	Common)
 else()
   target_link_libraries(${PROJECT_NAME}
-  SimulationManager
-  ${SFML_LIBRARIES})
+	Common
+	${SFML_LIBRARIES})
 endif()

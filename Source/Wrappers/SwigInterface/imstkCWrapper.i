@@ -321,8 +321,8 @@ namespace std
 /* 
  * Rendering 
  */
-%include "../../Rendering/Materials/imstkRenderMaterial.h";
-%include "../../Rendering/Materials/imstkTexture.h";
+%include "../../Materials/imstkRenderMaterial.h";
+%include "../../Materials/imstkTexture.h";
 
 /*
  * SceneEntities
@@ -391,12 +391,20 @@ namespace std
 %include "../../Scene/imstkSphObjectCollision.h"
 
 /*
+ * ViewerCore & ViewerVTK
+ */
+%include "../../ViewerCore/imstkViewer.h";
+
+/*
+ * ViewerVTK
+ */
+%include "../../ViewerVTK/imstkAbstractVTKViewer.h";
+%include "../../ViewerVTK/imstkVTKViewer.h";
+%include "../../ViewerVTK/imstkVTKTextStatusManager.h";
+
+/*
  * SimulationManager
  */
-%include "../../SimulationManager/imstkViewer.h";
-%include "../../SimulationManager/VTKRenderer/imstkAbstractVTKViewer.h";
-%include "../../SimulationManager/VTKRenderer/imstkVTKViewer.h";
-%include "../../SimulationManager/VTKRenderer/imstkVTKTextStatusManager.h";
 %include "../../SimulationManager/imstkSceneManager.h"
 %include "../../SimulationManager/imstkSimulationManager.h"
 %include "../../SimulationManager/imstkMouseSceneControl.h"

@@ -153,6 +153,34 @@ VTKViewer::setDebugAxesLength(double x, double y, double z)
 }
 
 void
+VTKViewer::setInfoLevel(int level)
+{
+    Viewer::setInfoLevel(level);
+
+    // Level 0 show no info
+    if (level == 0)
+    {
+        getTextStatusManager()->setStatusVisibility(VTKTextStatusManager::StatusType::FPS, false);
+        getActiveScene()->setEnableTaskTiming(false);
+        std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer())->setTimeTableVisibility(false);
+    }
+    // Level 1, show fps only
+    else if (level == 1)
+    {
+        getTextStatusManager()->setStatusVisibility(VTKTextStatusManager::StatusType::FPS, true);
+        getActiveScene()->setEnableTaskTiming(false);
+        std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer())->setTimeTableVisibility(false);
+    }
+    // Level 2 show fps and timing graph
+    else if (level == 2)
+    {
+        getTextStatusManager()->setStatusVisibility(VTKTextStatusManager::StatusType::FPS, true);
+        getActiveScene()->setEnableTaskTiming(true);
+        std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer())->setTimeTableVisibility(true);
+    }
+}
+
+void
 VTKViewer::setRenderingMode(const Renderer::Mode mode)
 {
     if (!m_activeScene)
