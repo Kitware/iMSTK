@@ -243,13 +243,13 @@ public:
             DataArray<T>::resize(N);
             m_dataCast = reinterpret_cast<VecType*>(DataArray<T>::m_data);
             AbstractDataArray::m_size = m_vecSize = 0;
-            m_vecCapacity = 1;
         }
         else
         {
             DataArray<T>::resize(size * N);
-            m_dataCast = reinterpret_cast<VecType*>(DataArray<T>::m_data);
-            m_vecSize  = m_vecCapacity = size;
+            m_dataCast    = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+            m_vecSize     = size;
+            m_vecCapacity = DataArray<T>::m_capacity / N;
         }
     }
 
@@ -257,7 +257,12 @@ public:
 
     inline int size() const { return m_vecSize; }
 
-    inline void squeeze() override { resize(m_vecSize); }
+    inline void squeeze() override
+    {
+        DataArray<T>::squeeze();
+        m_dataCast    = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+        m_vecCapacity = DataArray<T>::m_capacity / N;
+    }
 
     ///
     /// \brief Append the data array to hold the new value, resizes if neccesary
