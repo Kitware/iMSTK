@@ -50,6 +50,7 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedIntArray.h>
 #include <vtkUnsignedLongArray.h>
+#include <vtkUnsignedLongLongArray.h>
 #include <vtkUnsignedShortArray.h>
 #include <vtkUnstructuredGrid.h>
 
@@ -86,9 +87,11 @@ makeVtkDataArray(unsigned char type)
     case VTK_LONG_LONG:
         arr = vtkSmartPointer<vtkLongLongArray>::New();
         break;
-    case VTK_UNSIGNED_LONG_LONG:
+    case VTK_UNSIGNED_LONG:
         arr = vtkSmartPointer<vtkUnsignedLongArray>::New();
         break;
+    case VTK_UNSIGNED_LONG_LONG:
+        arr = vtkSmartPointer<vtkUnsignedLongLongArray>::New();
     default:
         LOG(WARNING) << "Unknown scalar type";
         break;

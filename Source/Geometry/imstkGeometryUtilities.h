@@ -82,7 +82,8 @@ static std::unordered_map<int, ScalarTypeId> vtkToImstkScalarType =
     { VTK_FLOAT, IMSTK_FLOAT },
     { VTK_DOUBLE, IMSTK_DOUBLE },
     { VTK_LONG_LONG, IMSTK_LONG_LONG },
-    { VTK_UNSIGNED_LONG_LONG, IMSTK_UNSIGNED_LONG_LONG }
+    { VTK_UNSIGNED_LONG_LONG, IMSTK_UNSIGNED_LONG_LONG },
+    { VTK_ID_TYPE, IMSTK_UNSIGNED_LONG_LONG }
 };
 static std::unordered_map<ScalarTypeId, int> imstkToVtkScalarType =
 {
