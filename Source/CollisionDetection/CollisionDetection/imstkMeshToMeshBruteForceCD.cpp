@@ -23,6 +23,7 @@
 #include "imstkCollisionUtils.h"
 #include "imstkLineMesh.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkVecDataArray.h"
 
 #include <unordered_set>
 

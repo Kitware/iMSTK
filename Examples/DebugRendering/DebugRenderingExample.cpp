@@ -26,13 +26,9 @@
 #include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkVisualModel.h"
-#include "imstkVTKRenderDelegate.h"
-#include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
@@ -72,7 +68,7 @@ main()
     scene->getCamera("debug")->setPosition(0.0, 0.0, 50.0);
 
     // Setup a viewer to render in its own thread
-    imstkNew<VTKViewer> viewer("Viewer");
+    imstkNew<VTKViewer> viewer;
     viewer->setActiveScene(scene);
     viewer->setWindowTitle("Debug Rendering");
     viewer->setSize(1920, 1080);
@@ -144,9 +140,8 @@ main()
     // Run the simulation
     {
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         connect<Event>(sceneManager, &SceneManager::postUpdate, updateFunc);
 
         imstkNew<SimulationManager> driver;

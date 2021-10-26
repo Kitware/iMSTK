@@ -285,7 +285,7 @@ PBDCollisionHandling::generateMeshNonMeshConstraints(
                 continue;
             }
 
-            const CellType cellTypeA = colElemA.m_element.m_CellIndexElement.cellType;
+            const CellTypeId cellTypeA = colElemA.m_element.m_CellIndexElement.cellType;
 
             // Triangle vs ...
             if (cellTypeA == IMSTK_TRIANGLE)
@@ -429,8 +429,8 @@ PBDCollisionHandling::generateMeshMeshConstraints(
             continue;
         }
 
-        const CellType cellTypeA = colElemA.m_element.m_CellIndexElement.cellType;
-        const CellType cellTypeB = colElemB.m_element.m_CellIndexElement.cellType;
+        const CellTypeId cellTypeA = colElemA.m_element.m_CellIndexElement.cellType;
+        const CellTypeId cellTypeB = colElemB.m_element.m_CellIndexElement.cellType;
 
         // Vertex vs Triangle
         if (cellTypeA == IMSTK_VERTEX && cellTypeB == IMSTK_TRIANGLE)

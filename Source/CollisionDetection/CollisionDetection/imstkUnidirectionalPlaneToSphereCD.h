@@ -52,21 +52,5 @@ protected:
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsA,
         std::vector<CollisionElement>& elementsB) override;
-
-    ///
-    /// \brief Compute collision data for side A
-    ///
-    virtual void computeCollisionDataA(
-        std::shared_ptr<Geometry>      geomA,
-        std::shared_ptr<Geometry>      geomB,
-        std::vector<CollisionElement>& elementsA) override;
-
-    ///
-    /// \brief Compute collision data for side B
-    ///
-    virtual void computeCollisionDataB(
-        std::shared_ptr<Geometry>      geomA,
-        std::shared_ptr<Geometry>      geomB,
-        std::vector<CollisionElement>& elementsB) override;
 };
 }

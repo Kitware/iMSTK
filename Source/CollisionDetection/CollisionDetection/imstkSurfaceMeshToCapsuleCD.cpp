@@ -22,6 +22,7 @@
 #include "imstkSurfaceMeshToCapsuleCD.h"
 #include "imstkCapsule.h"
 #include "imstkCollisionUtils.h"
+#include "imstkParallelUtils.h"
 #include "imstkSurfaceMesh.h"
 
 namespace imstk

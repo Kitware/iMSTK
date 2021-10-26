@@ -35,8 +35,9 @@ SphObjectCollision::SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::sha
                                        std::string cdType) : CollisionPair(obj1, obj2)
 {
     // Setup the CD
-    std::shared_ptr<CollisionDetectionAlgorithm> cd =
-        makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry());
+    std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
+    cd->setInput(obj1->getCollidingGeometry(), 0);
+    cd->setInput(obj2->getCollidingGeometry(), 1);
     cd->setGenerateCD(true, false); // CD data is only needed for the SPHObject geometry
     setCollisionDetection(cd);
 

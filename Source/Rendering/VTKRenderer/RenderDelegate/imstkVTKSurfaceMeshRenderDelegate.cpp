@@ -101,18 +101,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     // Map TCoords
     if (m_geometry->getVertexTCoords() != nullptr)
     {
-        m_mappedTCoordsArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_geometry->getVertexTCoords()));
-        m_mappedTCoordsArray->SetName(m_geometry->getActiveVertexTCoords().c_str());
-        m_polydata->GetPointData()->SetTCoords(m_mappedTCoordsArray);
-
-        // Map Tangents
-        if (m_geometry->getVertexTangents() == nullptr)
-        {
-            m_geometry->computeVertexTangents();
-        }
-        // These need to be float for PBR
-        m_mappedTangentArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_geometry->getVertexTangents()));
-        m_polydata->GetPointData()->SetTangents(m_mappedTangentArray);
+        setTextureCoordinateBuffer(m_geometry->getVertexTCoords());
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
@@ -152,14 +141,15 @@ void
 VTKSurfaceMeshRenderDelegate::processEvents()
 {
     // Custom handling of events
-    std::shared_ptr<VecDataArray<double, 3>> verticesPtr      = m_geometry->getVertexPositions();
-    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr       = m_geometry->getTriangleIndices();
-    std::shared_ptr<AbstractDataArray>       cellScalarsPtr   = m_geometry->getCellScalars();
-    std::shared_ptr<AbstractDataArray>       vertexScalarsPtr = m_geometry->getVertexScalars();
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr           = m_geometry->getVertexPositions();
+    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr            = m_geometry->getTriangleIndices();
+    std::shared_ptr<AbstractDataArray>       cellScalarsPtr        = m_geometry->getCellScalars();
+    std::shared_ptr<AbstractDataArray>       vertexScalarsPtr      = m_geometry->getVertexScalars();
+    std::shared_ptr<AbstractDataArray>       textureCoordinatesPtr = m_geometry->getVertexTCoords();
 
     // Only use the most recent event from respective sender
-    std::array<Command, 7> cmds;
-    std::array<bool, 7>    contains = { false, false, false, false, false, false, false };
+    std::array<Command, 8> cmds;
+    std::array<bool, 8>    contains = { false, false, false, false, false, false, false, false };
     rforeachEvent([&](Command cmd)
         {
             if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
@@ -197,6 +187,11 @@ VTKSurfaceMeshRenderDelegate::processEvents()
                 cmds[6]     = cmd;
                 contains[6] = true;
             }
+            else if (cmd.m_event->m_sender == textureCoordinatesPtr.get() && !contains[7])
+            {
+                cmds[7]     = cmd;
+                contains[7] = true;
+            }
         });
 
     // Now do all the commands
@@ -206,6 +201,7 @@ VTKSurfaceMeshRenderDelegate::processEvents()
     cmds[4].invoke(); // Update cell scalars
     cmds[5].invoke(); // Update vertex scalars
     cmds[6].invoke(); // Update indices
+    cmds[7].invoke(); // Update texture coordinates
     cmds[2].invoke(); // Update geometry as a whole
 }
 
@@ -247,6 +243,12 @@ VTKSurfaceMeshRenderDelegate::cellScalarsModified(Event* imstkNotUsed(e))
 }
 
 void
+VTKSurfaceMeshRenderDelegate::textureCoordinatesModified(Event* imstkNotUsed(e))
+{
+    setTextureCoordinateBuffer(m_geometry->getVertexTCoords());
+}
+
+void
 VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
 {
     // If the vertices were reallocated
@@ -283,6 +285,11 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
     if (m_cellScalars != m_geometry->getCellScalars())
     {
         setCellScalarBuffer(m_geometry->getCellScalars());
+    }
+
+    if (m_textureCoordinates != m_geometry->getVertexTCoords())
+    {
+        setTextureCoordinateBuffer(m_geometry->getVertexTCoords());
     }
 }
 
@@ -424,6 +431,41 @@ VTKSurfaceMeshRenderDelegate::setCellScalarBuffer(std::shared_ptr<AbstractDataAr
     m_mappedCellScalarArray->SetVoidArray(m_cellScalars->getVoidPointer(),
         static_cast<vtkIdType>(m_cellScalars->size()), 1);
     m_mappedCellScalarArray->Modified();
+}
+
+void
+VTKSurfaceMeshRenderDelegate::setTextureCoordinateBuffer(std::shared_ptr<AbstractDataArray> textureCoordinates)
+{
+    // If the buffer changed
+    if (m_textureCoordinates != textureCoordinates)
+    {
+        // If previous buffer exist
+        if (m_textureCoordinates != nullptr)
+        {
+            // stop observing its changes
+            disconnect(m_textureCoordinates, this, &AbstractDataArray::modified);
+        }
+        // Set new buffer and observe
+        m_textureCoordinates = textureCoordinates;
+        queueConnect<Event>(m_textureCoordinates, &AbstractDataArray::modified, this, &VTKSurfaceMeshRenderDelegate::textureCoordinatesModified);
+        m_mappedTCoordsArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(textureCoordinates));
+        m_mappedTCoordsArray->SetName(m_geometry->getActiveVertexTCoords().c_str());
+        m_polydata->GetPointData()->SetTCoords(m_mappedTCoordsArray);
+    }
+
+    m_mappedTCoordsArray->SetNumberOfComponents(m_textureCoordinates->getNumberOfComponents());
+    m_mappedTCoordsArray->SetVoidArray(m_textureCoordinates->getVoidPointer(), static_cast<vtkIdType>(m_textureCoordinates->size()), 1);
+    m_mappedTCoordsArray->Modified();
+
+    // Map Tangents
+    if (m_geometry->getVertexTangents() == nullptr)
+    {
+        m_geometry->computeVertexTangents();
+    }
+    // These need to be float for PBR
+    m_mappedTangentArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_geometry->getVertexTangents()));
+    m_polydata->GetPointData()->SetTangents(m_mappedTangentArray);
+    m_mappedTangentArray->Modified();
 }
 
 void

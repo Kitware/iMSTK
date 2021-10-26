@@ -19,11 +19,12 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
+#include "imstkPlane.h"
 #include "imstkPointSet.h"
 #include "imstkPointSetToPlaneCD.h"
-#include "imstkPlane.h"
+#include "imstkVecDataArray.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 

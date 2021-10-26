@@ -62,6 +62,30 @@ struct RigidBody
         const Vec3d& getForce() const { return *m_force; }
         const Vec3d& getTorque() const { return *m_torque; }
 
+        const double getMass() const { return m_mass; }
+        void setMass(const double mass) { m_mass = mass; }
+
+        const Mat3d& getIntertiaTensor() const { return m_intertiaTensor; }
+        void setInertiaTensor(const Mat3d& inertiaTensor) { m_intertiaTensor = inertiaTensor; }
+
+        const Vec3d& getInitPos() const { return m_initPos; }
+        void setInitPos(const Vec3d& pos) { m_initPos = pos; }
+
+        const Quatd& getInitOrientation() const { return m_initOrientation; }
+        void setInitOrientation(const Quatd& orientation) { m_initOrientation = orientation; }
+
+        const Vec3d& getInitVelocity() const { return m_initVelocity; }
+        void setInitVelocity(const Vec3d& velocity) { m_initVelocity = velocity; }
+
+        const Vec3d& getInitAngularVelocity() const { return m_initAngularVelocity; }
+        void setInitAngularVelocity(const Vec3d& angularVelocity) { m_initAngularVelocity = angularVelocity; }
+
+        const Vec3d& getInitForce() const { return m_initForce; }
+        void setInitForce(const Vec3d& force) { m_initForce = force; }
+
+        const Vec3d& getInitTorque() const { return m_initTorque; }
+        void setInitTorque(const Vec3d& torque) { m_initTorque = torque; }
+
         ///
         /// \brief Convience function to set the inertia tensor based off provided geometry
         /// assuming uniform mass at each point.

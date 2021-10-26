@@ -23,7 +23,7 @@
 
 #include "imstkLogger.h"
 #include "imstkMath.h"
-#include "imstkParallelUtils.h"
+#include "imstkTypes.h"
 
 namespace imstk
 {
@@ -76,9 +76,9 @@ struct CellVertexElement
 ///
 struct CellIndexElement
 {
-    int ids[4]        = { -1, -1, -1, -1 };
-    int idCount       = 0;
-    CellType cellType = IMSTK_VERTEX;
+    int ids[4]  = { -1, -1, -1, -1 };
+    int idCount = 0;
+    CellTypeId cellType = IMSTK_VERTEX;
 };
 
 ///

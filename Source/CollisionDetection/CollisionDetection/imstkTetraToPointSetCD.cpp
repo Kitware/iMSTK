@@ -21,6 +21,7 @@
 
 #include "imstkTetraToPointSetCD.h"
 #include "imstkCollisionData.h"
+#include "imstkParallelUtils.h"
 #include "imstkTetrahedralMesh.h"
 
 namespace imstk

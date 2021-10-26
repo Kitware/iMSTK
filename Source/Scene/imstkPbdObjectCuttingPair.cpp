@@ -20,7 +20,6 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkPbdObjectCuttingPair.h"
-
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCollidingObject.h"
 #include "imstkLogger.h"

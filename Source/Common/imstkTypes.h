@@ -25,7 +25,7 @@
 
 namespace imstk
 {
-using ScalarType = unsigned char;
+typedef unsigned char ScalarTypeId;
 #define IMSTK_VOID 0
 #define IMSTK_CHAR 1
 #define IMSTK_UNSIGNED_CHAR 2
@@ -40,7 +40,7 @@ using ScalarType = unsigned char;
 #define IMSTK_LONG_LONG 11
 #define IMSTK_UNSIGNED_LONG_LONG 12
 
-using CellType = unsigned char;
+using CellTypeId = unsigned char;
 #define IMSTK_VERTEX 0
 #define IMSTK_EDGE 1
 #define IMSTK_TRIANGLE 2

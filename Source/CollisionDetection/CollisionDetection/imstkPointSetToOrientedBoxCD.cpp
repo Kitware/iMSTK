@@ -23,6 +23,7 @@
 #include "imstkCollisionData.h"
 #include "imstkCollisionUtils.h"
 #include "imstkOrientedBox.h"
+#include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkVecDataArray.h"
 

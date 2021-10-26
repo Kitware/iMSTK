@@ -1,0 +1,195 @@
+/*
+ * Instantiation of shared_ptr
+ */
+%include <std_shared_ptr.i>
+
+/*
+ * Common
+ */
+%shared_ptr(imstk::AbstractDataArray)
+%shared_ptr(imstk::DataArray<int>)
+%shared_ptr(imstk::DataArray<float>)
+%shared_ptr(imstk::DataArray<double>)
+%shared_ptr(imstk::DataArray<unsigned char>)
+%shared_ptr(imstk::VecDataArray<int, 3>)
+%shared_ptr(imstk::VecDataArray<int, 4>)
+%shared_ptr(imstk::VecDataArray<float, 2>)
+%shared_ptr(imstk::VecDataArray<double, 2>)
+%shared_ptr(imstk::VecDataArray<double, 3>)
+%shared_ptr(imstk::VecDataArray<unsigned char, 3>)
+%shared_ptr(imstk::ModuleDriver)
+%shared_ptr(imstk::Event)
+%shared_ptr(imstk::EventObject)
+%shared_ptr(imstk::ButtonEvent)
+%shared_ptr(imstk::KeyEvent)
+
+/* 
+ * Geometry 
+ */
+%shared_ptr(imstk::Geometry)
+%shared_ptr(imstk::PointSet)
+%shared_ptr(imstk::ImageData)
+%shared_ptr(imstk::LineMesh)
+%shared_ptr(imstk::PointSet)
+%shared_ptr(imstk::SurfaceMesh)
+%shared_ptr(imstk::VolumetricMesh)
+%shared_ptr(imstk::TetrahedralMesh)
+%shared_ptr(imstk::HexahedralMesh)
+%shared_ptr(imstk::ImplicitGeometry)
+%shared_ptr(imstk::AnalyticalGeometry)
+%shared_ptr(imstk::CompositeImplicitGeometry)
+%shared_ptr(imstk::Plane)
+%shared_ptr(imstk::Sphere)
+%shared_ptr(imstk::OrientedBox)
+%shared_ptr(imstk::Capsule)
+%shared_ptr(imstk::SignedDistanceField)
+
+/* 
+ * GeometryMap
+ */
+%shared_ptr(imstk::GeometryMap)
+%shared_ptr(imstk::OneToOneMap)
+%shared_ptr(imstk::TetraTriangleMap)
+
+/*
+ * FilteringCore
+ */
+%shared_ptr(imstk::GeometryAlgorithm)
+
+/*
+ * Filtering
+ */
+%shared_ptr(imstk::ImplicitGeometryToImageData)
+%shared_ptr(imstk::QuadricDecimate)
+%shared_ptr(imstk::SelectEnclosedPoints)
+%shared_ptr(imstk::SurfaceMeshFlyingEdges)
+%shared_ptr(imstk::SurfaceMeshSmoothen)
+%shared_ptr(imstk::SurfaceMeshSubdivide)
+%shared_ptr(imstk::SurfaceMeshTextureProject)
+
+/* 
+ * DynamicalModel 
+ */
+%shared_ptr(imstk::PbdObject)
+%shared_ptr(imstk::PBDModelConfig)
+%shared_ptr(imstk::PbdCollisionConstraintConfig)
+%shared_ptr(imstk::PbdFEMConstraintConfig)
+%shared_ptr(imstk::PbdSolver)
+%shared_ptr(imstk::FeDeformBodyState)
+%shared_ptr(imstk::FEMModelConfig)
+%shared_ptr(imstk::FEMDeformableBodyModel)
+%shared_ptr(imstk::AbstractDynamicalModel)
+%shared_ptr(imstk::DynamicalModel<imstk::PbdState>)
+%shared_ptr(imstk::DynamicalModel<imstk::FeDeformBodyState>)
+%shared_ptr(imstk::DynamicalModel<imstk::SPHState>)
+%shared_ptr(imstk::SPHState)
+%shared_ptr(imstk::RigidBodyState2)
+%shared_ptr(imstk::DynamicalModel<imstk::RigidBodyState2>)
+%shared_ptr(imstk::PbdModel)
+%shared_ptr(imstk::RigidBodyModel2Config)
+%shared_ptr(imstk::RigidBodyModel2)
+%shared_ptr(imstk::SPHModelConfig)
+%shared_ptr(imstk::SPHModel)
+%shared_ptr(imstk::TimeIntegrator)
+%shared_ptr(imstk::BackwardEuler)
+
+/* 
+ * Rendering
+ */
+%shared_ptr(imstk::RenderMaterial)
+%shared_ptr(imstk::Texture)
+
+/*
+ * Constraint
+ */
+%shared_ptr(imstk::RigidBody)
+
+/* 
+ * SceneEntities
+ */
+%shared_ptr(imstk::SceneEntity)
+%shared_ptr(imstk::SceneObject)
+%shared_ptr(imstk::CollidingObject)
+%shared_ptr(imstk::DynamicObject)
+%shared_ptr(imstk::PbdObject)
+%shared_ptr(imstk::FeDeformableObject)
+%shared_ptr(imstk::SPHObject)
+%shared_ptr(imstk::RigidObject2)
+%shared_ptr(imstk::VisualModel)
+%shared_ptr(imstk::Camera)
+%shared_ptr(imstk::Light)
+%shared_ptr(imstk::DirectionalLight)
+%shared_ptr(imstk::PointLight)
+%shared_ptr(imstk::SpotLight)
+
+/*
+ * CollisionDetection
+ */
+%shared_ptr(imstk::CollisionDetectionAlgorithm)
+%shared_ptr(imstk::BidirectionalPlaneToSphereCD)
+%shared_ptr(imstk::ImplicitGeometryToPointSetCCD)
+%shared_ptr(imstk::ImplicitGeometryToPointSetCD)
+%shared_ptr(imstk::MeshToMeshBruteForceCD)
+%shared_ptr(imstk::PointSetToCapsuleCD)
+%shared_ptr(imstk::PointSetToOrientedBoxCD)
+%shared_ptr(imstk::PointSetToSphereCD)
+%shared_ptr(imstk::PointSetToPlaneCD)
+%shared_ptr(imstk::SphereToCylinderCD)
+%shared_ptr(imstk::SphereToSphereCD)
+%shared_ptr(imstk::SurfaceMeshToCapsuleCD)
+%shared_ptr(imstk::SurfaceMeshToSphereCD)
+%shared_ptr(imstk::SurfaceMeshToSurfaceMeshCD)
+%shared_ptr(imstk::TetraToLineMeshCD)
+%shared_ptr(imstk::TetraToPointSetCD)
+%shared_ptr(imstk::UnidirectionalPlaneToSphereCD)
+
+/*
+ * CollisionHandling
+ */
+%shared_ptr(imstk::CollisionPair)
+%shared_ptr(imstk::CollisionHandling)
+%shared_ptr(imstk::RigidObjectCollidingCollisionPair)
+%shared_ptr(imstk::RigidBodyCH)
+
+/*
+ * Controller
+ */
+%shared_ptr(imstk::DeviceControl)
+%shared_ptr(imstk::MouseControl)
+%shared_ptr(imstk::KeyboardControl)
+%shared_ptr(imstk::TrackingDeviceControl)
+%shared_ptr(imstk::SceneObjectController)
+
+/*
+ * Scene
+ */
+%shared_ptr(imstk::SceneConfig)
+%shared_ptr(imstk::Scene)
+%shared_ptr(imstk::CollisionGraph)
+%shared_ptr(imstk::RigidObjectCollision)
+%shared_ptr(imstk::InteractionPair)
+%shared_ptr(imstk::ObjectInteractionPair)
+%shared_ptr(imstk::PbdObjectCuttingPair)
+%shared_ptr(imstk::PbdObjectCollision)
+%shared_ptr(imstk::SphObjectCollision)
+
+/*
+ * SimulationManager
+ */
+%shared_ptr(imstk::Module)
+%shared_ptr(imstk::Viewer)
+%shared_ptr(imstk::AbstractVTKViewer)
+%shared_ptr(imstk::VTKViewer)
+%shared_ptr(imstk::VTKTextStatusManager)
+%shared_ptr(imstk::SceneManager)
+%shared_ptr(imstk::SimulationManager)
+%shared_ptr(imstk::MouseSceneControl)
+%shared_ptr(imstk::KeyboardSceneControl)
+
+/*
+ * Devices
+ */
+%shared_ptr(imstk::DeviceClient)
+%shared_ptr(imstk::KeyboardDeviceClient)
+%shared_ptr(imstk::HapticDeviceClient)
+%shared_ptr(imstk::HapticDeviceManager)

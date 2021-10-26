@@ -23,8 +23,9 @@
 #include "imstkCollisionData.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
-#include "imstkRigidObject2.h"
+#include "imstkParallelUtils.h"
 #include "imstkRbdConstraint.h"
+#include "imstkRigidObject2.h"
 
 namespace imstk
 {

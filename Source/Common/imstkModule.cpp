@@ -20,20 +20,28 @@
 =========================================================================*/
 
 #include "imstkModule.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
+void
+Module::setSleepDelay(const double ms)
+{
+    CHECK(ms >= 0.0);
+    m_sleepDelay = ms;
+}
+
 void
 Module::update()
 {
     if (m_init && !m_paused)
     {
-        if (sleepDelay != 0.0)
+        if (m_sleepDelay != 0.0)
         {
-            std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(sleepDelay));
+            std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(m_sleepDelay));
         }
 
-        if (muteUpdateEvents)
+        if (m_muteUpdateEvents)
         {
             this->updateModule();
         }

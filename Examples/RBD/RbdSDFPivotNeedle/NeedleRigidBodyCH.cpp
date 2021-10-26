@@ -22,12 +22,13 @@
 #pragma once
 
 #include "NeedleRigidBodyCH.h"
+#include "imstkLineMesh.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRigidBodyModel2.h"
+#include "imstkVecDataArray.h"
 #include "NeedleObject.h"
-#include "RbdLineToPointTranslationConstraint.h"
 #include "RbdLineToPointRotationConstraint.h"
-#include "imstkLineMesh.h"
+#include "RbdLineToPointTranslationConstraint.h"
 
 using namespace imstk;
 

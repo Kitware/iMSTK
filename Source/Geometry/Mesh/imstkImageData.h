@@ -89,7 +89,7 @@ public:
     ///
     inline static size_t getScalarIndex(int x, int y, int z, const Vec3i& dims, int numComps) { return (x + dims[0] * (y + z * dims[1])) * numComps; }
 
-    std::shared_ptr<ImageData> cast(ScalarType type);
+    std::shared_ptr<ImageData> cast(ScalarTypeId type);
 
     ///
     /// \brief Returns the origin of the image
@@ -109,7 +109,7 @@ public:
     ///
     /// \brief Returns the scalar type of the image
     ///
-    const ScalarType getScalarType() const;
+    const ScalarTypeId getScalarType() const;
 
     ///
     /// \brief Returns bounds of the image (voxel to voxel)
@@ -165,7 +165,7 @@ public:
     ///
     /// \brief Allocate image by type
     ///
-    void allocate(const ScalarType type, const int numComps, const Vec3i& dims, const Vec3d& spacing = Vec3d(1.0, 1.0, 1.0), const Vec3d& origin = Vec3d(0.0, 0.0, 0.0));
+    void allocate(const ScalarTypeId type, const int numComps, const Vec3i& dims, const Vec3d& spacing = Vec3d(1.0, 1.0, 1.0), const Vec3d& origin = Vec3d(0.0, 0.0, 0.0));
 
     ///
     /// \brief Generates points in the geometry from the ImageData (center of each voxel)

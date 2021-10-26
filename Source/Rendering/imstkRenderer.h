@@ -31,9 +31,9 @@ struct SSAOConfig
 {
     bool m_enableSSAO         = false;
     bool m_SSAOBlur           = false; // blur occlusion
-    double m_SSAORadius       = 0.1;   // comparison radius
-    double m_SSAOBias         = 0.001; // comparison bias
-    unsigned int m_KernelSize = 128;   // number of samples used
+    double m_SSAORadius       = 0.1;   // Sampling radius
+    double m_SSAOBias         = 0.001; // Bias/offset
+    unsigned int m_KernelSize = 128;   // Number of samples in the radius
 };
 
 struct RendererConfig

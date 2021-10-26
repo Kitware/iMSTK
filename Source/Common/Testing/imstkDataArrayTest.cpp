@@ -204,7 +204,7 @@ TEST(imstkDataArrayTest, Iterators)
     EXPECT_ANY_THROW(++it);
 }
 
-TEST(imstkDataArrayTest, ScalarType)
+TEST(imstkDataArrayTest, ScalarTypeId)
 {
     DataArray<int> a;
     EXPECT_EQ(IMSTK_INT, a.getScalarType());

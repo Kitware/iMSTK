@@ -310,7 +310,7 @@ makeToolObj()
 
     toolObj->getRigidBody()->m_mass = 1.0;
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
-#ifdef EXAMPLE_USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.8, 0.0);
 #else
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
@@ -367,14 +367,13 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;

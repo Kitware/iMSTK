@@ -21,19 +21,60 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionDetectionAlgorithm.h"
+#include <functional>
+#include <memory>
+#include <string>
+#include <unordered_map>
 
 namespace imstk
 {
-class Geometry;
+class CollisionDetectionAlgorithm;
 
 ///
-/// \brief Static factory for collision detection sub classes
-/// If the collision pair is PointSet to SurfaceMesh, or SurfaceMesh to SurfaceMesh,
-/// it will be added to an internal static octree for detecting collision
-/// \todo Other collision pair may be considered to use octree too
+/// \class CDObjectFactory
 ///
-extern std::shared_ptr<CollisionDetectionAlgorithm> makeCollisionDetectionObject(const std::string         collisionTypeName,
-                                                                                 std::shared_ptr<Geometry> collidingGeometryA,
-                                                                                 std::shared_ptr<Geometry> collidingGeometryB);
+/// \brief This is the factory class for CollisionDetectionAlgorithm. It may be
+/// used to construct CollisionDetectionAlgorithm objects by name.
+/// Note: Does not auto register CollisionDetectionAlgorithm's. If one creates
+/// their own CollisionDetectionAlgorithm they must register themselves.
+///
+class CDObjectFactory
+{
+public:
+    using CDMakeFunc = std::function<std::shared_ptr<CollisionDetectionAlgorithm>()>;
+
+    ///
+    /// \brief Register the CollisionDetectionAlgorithm creation function given name
+    ///
+    static void registerCD(std::string name, CDMakeFunc func)
+    {
+        cdObjCreationMap[name] = func;
+    }
+
+    ///
+    /// \brief Creates a CollisionDetectionAlgorithm object by name if registered to factory
+    ///
+    static std::shared_ptr<CollisionDetectionAlgorithm> makeCollisionDetection(const std::string collisionTypeName);
+
+private:
+    static std::unordered_map<std::string, CDMakeFunc> cdObjCreationMap;
+};
+
+///
+/// \class CDObjectRegistrar
+///
+/// \brief Construction of this object will register to the CDObjectFactory. One could
+/// construct this at the bottom of their CollisionDetectionAlgorithm when building
+/// dynamic libraries or executables for static initialization.
+///
+template<typename T>
+class CDObjectRegistrar
+{
+public:
+    CDObjectRegistrar(std::string name)
+    {
+        CDObjectFactory::registerCD(name, []() { return std::make_shared<T>(); });
+    }
+};
+#define REGISTER_COLLISION_DETECTION(cdType) CDObjectRegistrar<cdType> __register ## cdType(#cdType)
 }

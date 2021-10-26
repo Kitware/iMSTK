@@ -30,7 +30,7 @@ SceneManager::SceneManager(std::string name) : m_activeScene(nullptr),
     m_mode(Mode::Simulation), m_prevCamName("default")
 {
     // Set the preferred execution mode
-    m_executionType = ExecutionType::PARALLEL;
+    m_executionType = ExecutionType::ADAPTIVE;
 }
 
 void

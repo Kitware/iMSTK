@@ -19,11 +19,12 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
+#include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshToSphereCD.h"
-#include "imstkSphere.h"
+#include "imstkVecDataArray.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 

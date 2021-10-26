@@ -97,7 +97,7 @@ protected:
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override;
 
-private:
+protected:
     std::unordered_set<int> m_ptIdMask;
     double  m_velocityScaling      = 0.1;
     bool    m_useProportionalForce = false;

@@ -22,6 +22,7 @@
 #include "imstkSPHCollisionHandling.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkParallelFor.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 
@@ -36,7 +37,7 @@ SPHCollisionHandling::setInputSPHObject(std::shared_ptr<SPHObject> sphObj)
 void
 SPHCollisionHandling::handle(
     const std::vector<CollisionElement>& elementsA,
-    const std::vector<CollisionElement>& elementsB)
+    const std::vector<CollisionElement>& imstkNotUsed(elementsB))
 {
     std::shared_ptr<SPHObject> obj      = std::dynamic_pointer_cast<SPHObject>(getInputObjectA());
     std::shared_ptr<SPHModel>  sphModel = obj->getSPHModel();

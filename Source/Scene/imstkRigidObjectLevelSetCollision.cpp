@@ -20,7 +20,6 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkRigidObjectLevelSetCollision.h"
-#include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
 #include "imstkImplicitGeometry.h"
 #include "imstkImplicitGeometryToPointSetCCD.h"
@@ -28,11 +27,13 @@ limitations under the License.
 #include "imstkLevelSetCH.h"
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
+#include "imstkParallelFor.h"
 #include "imstkRigidBodyCH.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {

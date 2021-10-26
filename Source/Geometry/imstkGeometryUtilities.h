@@ -68,7 +68,7 @@ class Plane;
 ///
 namespace GeometryUtils
 {
-static std::unordered_map<int, ScalarType> vtkToImstkScalarType =
+static std::unordered_map<int, ScalarTypeId> vtkToImstkScalarType =
 {
     { VTK_VOID, IMSTK_VOID },
     { VTK_CHAR, IMSTK_CHAR },
@@ -84,7 +84,7 @@ static std::unordered_map<int, ScalarType> vtkToImstkScalarType =
     { VTK_LONG_LONG, IMSTK_LONG_LONG },
     { VTK_UNSIGNED_LONG_LONG, IMSTK_UNSIGNED_LONG_LONG }
 };
-static std::unordered_map<ScalarType, int> imstkToVtkScalarType =
+static std::unordered_map<ScalarTypeId, int> imstkToVtkScalarType =
 {
     { IMSTK_VOID, VTK_VOID },
     { IMSTK_CHAR, VTK_CHAR },

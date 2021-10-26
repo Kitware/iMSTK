@@ -104,7 +104,7 @@ main(int argc, char* argv[])
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setWindowTitle("SPH Fluid");
         viewer->setSize(1920, 1080);
@@ -120,8 +120,9 @@ main(int argc, char* argv[])
             });
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::PARALLEL);
         sceneManager->pause();
 
         imstkNew<SimulationManager> driver;

@@ -22,7 +22,6 @@
 #include "imstkCamera.h"
 #include "imstkColorFunction.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -104,7 +103,7 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
     pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt         = 0.005;
+    pbdParams->m_dt         = 0.007;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
@@ -208,11 +207,11 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
         sceneManager->pause();
 

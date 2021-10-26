@@ -48,10 +48,6 @@ namespace ParallelUtils { class SpinLock; }
 
 struct SceneConfig
 {
-    // Initializes the scene only when it needs to frame
-    // Note: May cause delays to run the first frame of the scene due to scene initialization
-    bool lazyInitialization = false;
-
     // Keep track of the fps for the scene
     bool trackFPS = false;
 

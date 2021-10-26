@@ -32,7 +32,7 @@ ScreenCaptureUtility::ScreenCaptureUtility(std::string prefix) :
 std::string
 ScreenCaptureUtility::saveScreenShot()
 {
-    std::string captureName = m_screenShotPrefix + std::to_string(m_screenShotNumber) + ".png";
+    std::string captureName = m_screenShotPrefix + std::to_string(m_screenShotNumber);
     ++m_screenShotNumber;
     return saveScreenShot(captureName);
 }

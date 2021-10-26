@@ -24,7 +24,6 @@
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -33,9 +32,9 @@
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
+#include "imstkSpotLight.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVTKViewer.h"
-#include "imstkSpotLight.h"
 
 using namespace imstk;
 
@@ -91,13 +90,12 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         // attach the camera controller to the viewer
         viewer->addControl(camController);

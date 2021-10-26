@@ -22,6 +22,7 @@
 #include "imstkCollisionDataDebugObject.h"
 #include "imstkLineMesh.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -36,8 +37,8 @@ CollisionDataDebugObject::addCollisionElement(std::shared_ptr<PointSet> pointSet
     }
     if (elem.m_type == CollisionElementType::CellIndex)
     {
-        const int      idCount = elem.m_element.m_CellIndexElement.idCount;
-        const CellType type    = elem.m_element.m_CellIndexElement.cellType;
+        const int        idCount = elem.m_element.m_CellIndexElement.idCount;
+        const CellTypeId type    = elem.m_element.m_CellIndexElement.cellType;
         if (type == IMSTK_VERTEX)
         {
             addPoint(vertices[elem.m_element.m_CellIndexElement.ids[0]]);

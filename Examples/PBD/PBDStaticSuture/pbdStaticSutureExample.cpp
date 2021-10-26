@@ -22,9 +22,10 @@
 // This example is haptic only
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -32,8 +33,8 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
-#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
+#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -42,9 +43,6 @@
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkRigidObjectController.h"
 
 using namespace imstk;
 
@@ -159,12 +157,12 @@ makeTissueObj()
 }
 
 static std::shared_ptr<SceneObject>
-makeToolObj()
+makeToolObj(std::string name)
 {
     auto surfMesh =
         MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Clamps/Gregory Suture Clamp/gregory_suture_clamp.obj");
 
-    auto toolObj = std::make_shared<SceneObject>("Clamps");
+    auto toolObj = std::make_shared<SceneObject>(name);
     toolObj->setVisualGeometry(surfMesh);
     auto renderMaterial = std::make_shared<RenderMaterial>();
     renderMaterial->setColor(Color::LightGray);
@@ -207,8 +205,13 @@ main()
     std::shared_ptr<CollidingObject> tissueObj = makeTissueObj();
     scene->addSceneObject(tissueObj);
 
-    std::shared_ptr<SceneObject> clampsObj = makeToolObj();
+    std::shared_ptr<SceneObject> clampsObj = makeToolObj("Clamps");
     scene->addSceneObject(clampsObj);
+
+    // Ghost clamps to show real position of hand
+    std::shared_ptr<SceneObject> ghostClampsObj = makeToolObj("GhostClamps");
+    ghostClampsObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
+    scene->addSceneObject(ghostClampsObj);
 
     auto interaction = std::make_shared<PbdObjectCollision>(sutureThreadObj, tissueObj, "ImplicitGeometryToPointSetCD");
     interaction->setFriction(0.0);
@@ -225,14 +228,13 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer("Viewer");
+        imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setDebugAxesLength(0.01, 0.01, 0.01);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager("Scene Manager");
+        imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;
@@ -264,7 +266,7 @@ main()
             //needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
             sutureThreadObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
             });
-        Vec3d trans = Vec3d(-0.009, 0.01, 0.001);
+        Vec3d clampOffset = Vec3d(-0.009, 0.01, 0.001);
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
         {
@@ -277,9 +279,18 @@ main()
             // Transform the clamps relative to the needle
             clampsObj->getVisualGeometry()->setTransform(
                     needleObj->getVisualGeometry()->getTransform() *
-                    mat4dTranslate(trans) *
+                    mat4dTranslate(clampOffset) *
                     mat4dRotation(Rotd(PI, Vec3d(0.0, 1.0, 0.0))));
             clampsObj->getVisualGeometry()->postModified();
+
+            // Transform the ghost tool to show the real tool location
+            ghostClampsObj->getVisualGeometry()->setTransform(
+                mat4dTranslate(controller->getPosition()) * mat4dRotation(controller->getRotation()) *
+                mat4dTranslate(clampOffset) *
+                mat4dRotation(Rotd(PI, Vec3d(0.0, 1.0, 0.0))));
+            ghostClampsObj->getVisualGeometry()->updatePostTransformData();
+            ghostClampsObj->getVisualGeometry()->postModified();
+            ghostClampsObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 5.0));
             });
 
         // Add mouse and keyboard controls to the viewer
