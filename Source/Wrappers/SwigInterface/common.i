@@ -28,10 +28,6 @@
     %apply double OUTPUT[] {double* val}
 #endif
 
-/*
- * TODO: use %define to simplify the process of wrapping Eigen types.
- */
-
 %pointer_functions(int, intPtr)
 %pointer_functions(float, floatPtr)
 %pointer_functions(double, doublePtr)
@@ -98,17 +94,24 @@
     };
 %enddef
 
+%extend_VecDataArray(int, 2)
+%extend_VecDataArray(int, 3)
+%extend_VecDataArray(int, 4)
 %extend_VecDataArray(float, 2)
 %extend_VecDataArray(double, 2)
-%extend_VecDataArray(int, 3)
 %extend_VecDataArray(double, 3)
 %extend_VecDataArray(unsigned char, 3)
-%extend_VecDataArray(int, 4)
 
 %extend_DataArray(float)
 %extend_DataArray(double)
 %extend_DataArray(int)
 %extend_DataArray(unsigned char)
+
+/*
+ * TODO: use %define to simplify the process of wrapping Eigen types.
+ * What we do here is define our own interface for Eigen as the Eigen types
+ * themselves are quite cumbersome to wrap.
+ */
 
 %typemap(cscode) imstk::imstkQuatf
 %{
@@ -190,9 +193,13 @@ class Mat
 {
 public:
     using EigenData = Eigen::Matrix<T, N, N>;
-    Mat (const EigenData& data) : m_data(data) {}
+    Mat (const EigenData& data) : m_data(data) { }
+    Mat() : m_data(EigenData::Identity()) { }
     static Mat Identity () { return Mat (EigenData::Identity()); }
     inline const EigenData& get() const { return m_data; }
+
+    inline void setValue(int row, int col, const T& val) { m_data(row, col) = val; }
+    inline T getValue(int row, int col) const { return m_data(row, col); }
 
 private:
     EigenData m_data;
@@ -226,7 +233,13 @@ public:
     using EigenData = Eigen::Quaternion<float>;
     imstkQuatf(const EigenData& data) : m_data(data) { }
     imstkQuatf(const imstkRotf& rot) : m_data(rot.get()) { }
+    imstkQuatf(float x, float y, float z, float w) : m_data(x, y, z, w) { }
     inline const EigenData& get() const { return m_data; }
+
+    inline float x() const { return m_data.x(); }
+    inline float y() const { return m_data.y(); }
+    inline float z() const { return m_data.z(); }
+    inline float w() const { return m_data.w(); }
 
 private:
     EigenData m_data;
@@ -238,7 +251,13 @@ public:
     using EigenData = Eigen::Quaternion<double>;
     imstkQuatd(const EigenData& data) : m_data(data) { }
     imstkQuatd(const imstkRotd& rot) : m_data(rot.get()) { }
+    imstkQuatd(double x, double y, double z, double w) : m_data(x, y, z, w) { }
     inline const EigenData& get() const { return m_data; }
+
+    inline double x() const { return m_data.x(); }
+    inline double y() const { return m_data.y(); }
+    inline double z() const { return m_data.z(); }
+    inline double w() const { return m_data.w(); }
 
 private:
     EigenData m_data;
@@ -326,12 +345,67 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
 %} // end of inline
 
 
+%typemap(cscode) imstk::Vec<int, 2>
+%{
+    public int this[int i]
+    {
+        get => getValue(i);
+        set => Utils.intPtr_assign(setValue(i), value);
+    }
+
+    public static Vec2i operator + (Vec2i u, Vec2i v)
+    {
+        return Utils.vec_add_2i(u, v);
+    }
+    public static Vec2i operator - (Vec2i u, Vec2i v)
+    {
+        return Utils.vec_subtract_2i(u, v);
+    }
+    public static Vec2i operator * (Vec2i v, int c)
+    {
+        return Utils.vec_scale_2i(v, c);
+    }
+
+    public static Vec2i operator * (int c, Vec2i v)
+    {
+        return Utils.vec_scale_2i(v, c);
+    }
+
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_int_2_1_t (Vec2i v)
+    {
+        return v.get(); 
+    }
+
+    public static implicit operator Vec2i(SWIGTYPE_p_Eigen__MatrixT_int_2_1_t eigen_v)
+    {
+        return Utils.vec_from_eigen_2i(eigen_v);
+    }
+%}
+
 %typemap(cscode) imstk::Vec<int, 3>
 %{
     public int this[int i]
     {
         get => getValue(i);
         set => Utils.intPtr_assign(setValue(i), value);
+    }
+
+    public static Vec3i operator + (Vec3i u, Vec3i v)
+    {
+        return Utils.vec_add_3i(u, v);
+    }
+    public static Vec3i operator - (Vec3i u, Vec3i v)
+    {
+        return Utils.vec_subtract_3i(u, v);
+    }
+    public static Vec3i operator * (Vec3i v, int c)
+    {
+        return Utils.vec_scale_3i(v, c);
+    }
+
+    public static Vec3i operator * (int c, Vec3i v)
+    {
+        return Utils.vec_scale_3i(v, c);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_int_3_1_t (Vec3i v)
@@ -353,6 +427,24 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
         set => Utils.intPtr_assign(setValue(i), value);
     }
 
+    public static Vec4i operator + (Vec4i u, Vec4i v)
+    {
+        return Utils.vec_add_4i(u, v);
+    }
+    public static Vec4i operator - (Vec4i u, Vec4i v)
+    {
+        return Utils.vec_subtract_4i(u, v);
+    }
+    public static Vec4i operator * (Vec4i v, int c)
+    {
+        return Utils.vec_scale_4i(v, c);
+    }
+
+    public static Vec4i operator * (int c, Vec4i v)
+    {
+        return Utils.vec_scale_4i(v, c);
+    }
+
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_int_4_1_t (Vec4i v)
     {
         return v.get(); 
@@ -371,6 +463,15 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
         get => getValue(i);
         set => Utils.floatPtr_assign(setValue(i), value);
     }
+    
+    public static Vec2f operator + (Vec2f u, Vec2f v)
+    {
+        return Utils.vec_add_2f(u, v);
+    }
+    public static Vec2f operator - (Vec2f u, Vec2f v)
+    {
+        return Utils.vec_subtract_2f(u, v);
+    }
     public static Vec2f operator * (Vec2f v, float c)
     {
         return Utils.vec_scale_2f(v, c);
@@ -382,7 +483,12 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
     }
     public static Vec2f operator / (Vec2f v, float c)
     {
-        return Utils.vec_scale_2f(v, (float)1.0/c);
+        return Utils.vec_scale_2f(v, 1.0f / c);
+    }
+
+    public static Vec2f operator / (float c, Vec2f v)
+    {
+        return Utils.vec_scale_2f(v, 1.0f / c);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_float_2_1_t (Vec2f v)
@@ -403,6 +509,15 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
         get => getValue(i);
         set => Utils.doublePtr_assign(setValue(i), value);
     }
+    
+    public static Vec2d operator + (Vec2d u, Vec2d v)
+    {
+        return Utils.vec_add_2d(u, v);
+    }
+    public static Vec2d operator - (Vec2d u, Vec2d v)
+    {
+        return Utils.vec_subtract_2d(u, v);
+    }
     public static Vec2d operator * (Vec2d v, double c)
     {
         return Utils.vec_scale_2d(v, c);
@@ -415,7 +530,12 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
 
     public static Vec2d operator / (Vec2d v, double c)
     {
-        return Utils.vec_scale_2d(v, 1.0/c);
+        return Utils.vec_scale_2d(v, 1.0 / c);
+    }
+
+    public static Vec2d operator / (double c, Vec2d v)
+    {
+        return Utils.vec_scale_2d(v, 1.0 / c);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_2_1_t (Vec2d v)
@@ -436,6 +556,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
         get => getValue(i);
         set => Utils.doublePtr_assign(setValue(i), value);
     }
+
     public static Vec3d operator + (Vec3d u, Vec3d v)
     {
         return Utils.vec_add_3d(u, v);
@@ -453,6 +574,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
     {
         return Utils.vec_scale_3d(v, c);
     }
+
     public static Vec3d operator / (Vec3d v, double c)
     {
         return Utils.vec_scale_3d(v, 1.0/c);
@@ -460,7 +582,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
 
     public static Vec3d operator / (double c, Vec3d v)
     {
-        return Utils.vec_scale_3d(v, 1.0/c);
+        return Utils.vec_scale_3d(v, 1.0 / c);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_3_1_t (Vec3d v)
@@ -486,6 +608,16 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
         get => getValue(i);
         set => Utils.doublePtr_assign(setValue(i), value);
     }
+    
+    public static Vec6d operator + (Vec6d u, Vec6d v)
+    {
+        return Utils.vec_add_6d(u, v);
+    }
+    public static Vec6d operator - (Vec6d u, Vec6d v)
+    {
+        return Utils.vec_subtract_6d(u, v);
+    }
+
     public static Vec6d operator * (Vec6d v, double c)
     {
         return Utils.vec_scale_6d(v, c);
@@ -497,7 +629,12 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
     }
     public static Vec6d operator / (Vec6d v, double c)
     {
-        return Utils.vec_scale_6d(v, 1.0/c);
+        return Utils.vec_scale_6d(v, 1.0 / c);
+    }
+
+    public static Vec6d operator / (double c, Vec6d v)
+    {
+        return Utils.vec_scale_6d(v, 1.0 / c);
     }
 
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_6_1_t (Vec6d v)
@@ -520,6 +657,24 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
         set => Utils.ucharPtr_assign(setValue(i), value);
     }
 
+    public static Vec3uc operator + (Vec3uc u, Vec3uc v)
+    {
+        return Utils.vec_add_3uc(u, v);
+    }
+    public static Vec3uc operator - (Vec3uc u, Vec3uc v)
+    {
+        return Utils.vec_subtract_3uc(u, v);
+    }
+    public static Vec3uc operator * (Vec3uc v, byte c)
+    {
+        return Utils.vec_scale_3uc(v, c);
+    }
+
+    public static Vec3uc operator * (byte c, Vec3uc v)
+    {
+        return Utils.vec_scale_3uc(v, c);
+    }
+
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_unsigned_char_3_1_t (Vec3uc v)
     {
         return v.get(); 
@@ -528,6 +683,19 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
     public static implicit operator Vec3uc(SWIGTYPE_p_Eigen__MatrixT_unsigned_char_3_1_t eigen_v)
     {
         return Utils.vec_from_eigen_3uc(eigen_v);
+    }
+%}
+
+%typemap(cscode) imstk::VecDataArray<int, 2>
+%{
+    public Vec2i this[uint i]
+    {
+        get => Utils.vec_from_eigen_2i(getValue(i));
+        set => Utils.vec_to_eigen_2i(setValue(i), value);
+    }
+    public void push_back(Vec2i v)
+    {
+        Utils.vecdataarray_push_back_2i(this, v);
     }
 %}
 
@@ -610,7 +778,6 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
     }
 %}
 
-
 %typemap(cscode) imstk::Mat<double, 3>
 %{
     public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_3_3_t (Mat3d cs_data)
@@ -621,6 +788,19 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
     public static implicit operator Mat3d (SWIGTYPE_p_Eigen__MatrixT_double_3_3_t eigen_data)
     {
         return Utils.eigen2cs_Mat3d(eigen_data);
+    }
+%}
+
+%typemap(cscode) imstk::Mat<double, 4>
+%{
+    public static implicit operator SWIGTYPE_p_Eigen__MatrixT_double_4_4_t (Mat4d cs_data)
+    {
+        return cs_data.get();
+    }
+
+    public static implicit operator Mat4d (SWIGTYPE_p_Eigen__MatrixT_double_4_4_t eigen_data)
+    {
+        return Utils.eigen2cs_Mat4d(eigen_data);
     }
 %}
 
@@ -644,6 +824,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
 %include "../../Common/imstkModuleDriver.h";
 %include "../../Common/imstkColor.h";
 %include "../../Common/imstkVecDataArray.h";
+%template(VecDataArray2i) imstk::VecDataArray<int, 2>;
 %template(VecDataArray3i) imstk::VecDataArray<int, 3>;
 %template(VecDataArray4i) imstk::VecDataArray<int, 4>;
 %template(VecDataArray2f) imstk::VecDataArray<float, 2>;
@@ -654,6 +835,7 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
 /*
  * Instantiation of Vec and VecDataArray
  */
+%template(Vec2i) imstk::Vec<int, 2>;
 %template(Vec3i) imstk::Vec<int, 3>;
 %template(Vec4i) imstk::Vec<int, 4>;
 %template(Vec2f) imstk::Vec<float, 2>;
@@ -664,49 +846,71 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
 
 %template(vec_scale_2i) imstk::vec_scale<int, 2>;
 %template(vec_scale_3i) imstk::vec_scale<int, 3>;
+%template(vec_scale_4i) imstk::vec_scale<int, 4>;
 %template(vec_scale_2f) imstk::vec_scale<float, 2>;
 %template(vec_scale_2d) imstk::vec_scale<double, 2>;
 %template(vec_scale_3d) imstk::vec_scale<double, 3>;
 %template(vec_scale_6d) imstk::vec_scale<double, 6>;
+%template(vec_scale_3uc) imstk::vec_scale<unsigned char, 3>;
+
 %template(vec_add_2i) imstk::vec_add<int, 2>;
 %template(vec_add_3i) imstk::vec_add<int, 3>;
+%template(vec_add_4i) imstk::vec_add<int, 4>;
 %template(vec_add_2f) imstk::vec_add<float, 2>;
 %template(vec_add_2d) imstk::vec_add<double, 2>;
 %template(vec_add_3d) imstk::vec_add<double, 3>;
 %template(vec_add_6d) imstk::vec_add<double, 6>;
+%template(vec_add_3uc) imstk::vec_add<unsigned char, 3>;
+
 %template(vec_subtract_2i) imstk::vec_subtract<int, 2>;
 %template(vec_subtract_3i) imstk::vec_subtract<int, 3>;
+%template(vec_subtract_4i) imstk::vec_subtract<int, 4>;
 %template(vec_subtract_2f) imstk::vec_subtract<float, 2>;
 %template(vec_subtract_2d) imstk::vec_subtract<double, 2>;
 %template(vec_subtract_3d) imstk::vec_subtract<double, 3>;
 %template(vec_subtract_6d) imstk::vec_subtract<double, 6>;
+%template(vec_subtract_3uc) imstk::vec_subtract<unsigned char, 3>;
+
+%template(vec_to_eigen_2i) imstk::vec_to_eigen<int, 2>;
 %template(vec_to_eigen_3i) imstk::vec_to_eigen<int, 3>;
 %template(vec_to_eigen_4i) imstk::vec_to_eigen<int, 4>;
 %template(vec_to_eigen_2f) imstk::vec_to_eigen<float, 2>;
 %template(vec_to_eigen_2d) imstk::vec_to_eigen<double, 2>;
 %template(vec_to_eigen_3d) imstk::vec_to_eigen<double, 3>;
 %template(vec_to_eigen_3uc) imstk::vec_to_eigen<unsigned char, 3>;
+
+%template(vec_from_eigen_2i) imstk::vec_from_eigen<int, 2>;
 %template(vec_from_eigen_3i) imstk::vec_from_eigen<int, 3>;
 %template(vec_from_eigen_4i) imstk::vec_from_eigen<int, 4>;
 %template(vec_from_eigen_2f) imstk::vec_from_eigen<float, 2>;
 %template(vec_from_eigen_2d) imstk::vec_from_eigen<double, 2>;
 %template(vec_from_eigen_3d) imstk::vec_from_eigen<double, 3>;
 %template(vec_from_eigen_3uc) imstk::vec_from_eigen<unsigned char, 3>;
+
+%template(vecdataarray_push_back_2i) imstk::vecdataarray_push_back<int, 2>;
 %template(vecdataarray_push_back_3i) imstk::vecdataarray_push_back<int, 3>;
 %template(vecdataarray_push_back_4i) imstk::vecdataarray_push_back<int, 4>;
 %template(vecdataarray_push_back_2f) imstk::vecdataarray_push_back<float, 2>;
 %template(vecdataarray_push_back_2d) imstk::vecdataarray_push_back<double, 2>;
 %template(vecdataarray_push_back_3d) imstk::vecdataarray_push_back<double, 3>;
 %template(vecdataarray_push_back_3uc) imstk::vecdataarray_push_back<unsigned char, 3>;
+
 %template(cs2Eigen_Quatf) imstk::cs2Eigen<imstk::imstkQuatf, Eigen::Quaternion<float> >;
 %template(cs2Eigen_Quatd) imstk::cs2Eigen<imstk::imstkQuatd, Eigen::Quaternion<double> >;
 %template(eigen2cs_Quatf) imstk::eigen2cs<imstk::imstkQuatf, Eigen::Quaternion<float> >;
 %template(eigen2cs_Quatd) imstk::eigen2cs<imstk::imstkQuatd, Eigen::Quaternion<double> >;
+
 %template(Mat3d) imstk::Mat<double, 3>;
 %template(cs2Eigen_Mat3f) imstk::cs2Eigen<imstk::Mat<float, 3>, Eigen::Matrix<float, 3, 3> >;
 %template(cs2Eigen_Mat3d) imstk::cs2Eigen<imstk::Mat<double, 3>, Eigen::Matrix<double, 3, 3> >;
 %template(eigen2cs_Mat3f) imstk::eigen2cs<imstk::Mat<float, 3>, Eigen::Matrix<float, 3, 3> >;
 %template(eigen2cs_Mat3d) imstk::eigen2cs<imstk::Mat<double, 3>, Eigen::Matrix<double, 3, 3> >;
+
+%template(Mat4d) imstk::Mat<double, 4>;
+%template(cs2Eigen_Mat4f) imstk::cs2Eigen<imstk::Mat<float, 4>, Eigen::Matrix<float, 4, 4> >;
+%template(cs2Eigen_Mat4d) imstk::cs2Eigen<imstk::Mat<double, 4>, Eigen::Matrix<double, 4, 4> >;
+%template(eigen2cs_Mat4f) imstk::eigen2cs<imstk::Mat<float, 4>, Eigen::Matrix<float, 4, 4> >;
+%template(eigen2cs_Mat4d) imstk::eigen2cs<imstk::Mat<double, 4>, Eigen::Matrix<double, 4, 4> >;
 
 %define %connectMacro(Name)
     %template(connect##Name##Internal) imstk::connect<imstk::Name>;
