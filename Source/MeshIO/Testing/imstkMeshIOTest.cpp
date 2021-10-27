@@ -31,3 +31,12 @@ TEST(imstkMeshIODeathTest, FailOnMissingFile)
 {
     EXPECT_DEATH(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "doesntexist.obj"), "doesntexist.obj doesn't exist");
 }
+
+// Test for issue https://gitlab.kitware.com/iMSTK/iMSTK/-/issues/365
+TEST(imstkMeshIOTest, conversionBug)
+{
+    auto mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "testing/MeshIO/bugs/membrane_model.vtk");
+    ASSERT_TRUE(mesh);
+
+    EXPECT_NO_FATAL_FAILURE(auto data = GeometryUtils::copyToVtkPolyData(mesh));
+}
