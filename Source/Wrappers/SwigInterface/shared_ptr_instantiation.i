@@ -43,6 +43,7 @@
 %shared_ptr(imstk::Sphere)
 %shared_ptr(imstk::OrientedBox)
 %shared_ptr(imstk::Capsule)
+%shared_ptr(imstk::Cylinder)
 %shared_ptr(imstk::SignedDistanceField)
 
 /* 
