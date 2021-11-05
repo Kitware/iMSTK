@@ -61,7 +61,7 @@ makePbdTriangle(const std::string& name)
     triangleMesh->initialize(verticesPtr, indicesPtr);
 
     // Setup the Parameters
-    imstkNew<PBDModelConfig> pbdParams;
+    imstkNew<PbdModelConfig> pbdParams;
     pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 0.1;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);

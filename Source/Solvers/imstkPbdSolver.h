@@ -100,7 +100,7 @@ public:
     ///
     /// \brief Set the PBD solver type
     ///
-    void setSolverType(const PbdConstraint::SolverType& type);
+    void setSolverType(const PbdConstraint::SolverType& type) { m_solverType = type; }
 
     ///
     /// \brief Solve the non linear system of equations G(x)=0 using Newton's method.

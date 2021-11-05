@@ -197,7 +197,7 @@ makeTissueObj(const std::string& name,
     setSphereTexCoords(surfMesh, 6.0);
 
     // Setup the Parameters
-    imstkNew<PBDModelConfig> pbdParams;
+    imstkNew<PbdModelConfig> pbdParams;
     // Actual skin young's modulus, 0.42MPa to 0.85Mpa, as reported in papers
     // Actual skin possion ratio, 0.48, as reported in papers
     pbdParams->m_femParams->m_YoungModulus = 420000.0;
@@ -208,8 +208,7 @@ makeTissueObj(const std::string& name,
     //    gives complete bulk where its rigid
     //  - Youngs modulus then gives the scaling of the above in pressure
     //    (pascals).
-    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet,
-        PbdFEMConstraint::MaterialType::StVK);
+    pbdParams->enableFEMConstraint(PbdFEMConstraint::MaterialType::StVK);
     pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 100.0;
     pbdParams->m_dt = 0.001; // realtime used in update calls later in main

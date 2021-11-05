@@ -115,9 +115,9 @@ makeClothObj(const std::string& name,
     std::shared_ptr<SurfaceMesh> clothMesh(makeClothGeometry(width, height, nRows, nCols));
 
     // Setup the Parameters
-    imstkNew<PBDModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 4000.0);
-    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 100.0);
+    imstkNew<PbdModelConfig> pbdParams;
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 4000.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 100.0);
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
     pbdParams->m_uniformMassValue = width * height / ((double)nRows * (double)nCols);
     pbdParams->m_gravity    = Vec3d(0.0, -140.0, 0.0);
@@ -264,7 +264,7 @@ main()
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
             // Simulate the cloth in real time
-            clothObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
+            clothObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
         });
 
         connect<Event>(controller, &LaparoscopicToolController::JawClosed,

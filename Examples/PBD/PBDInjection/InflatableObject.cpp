@@ -51,13 +51,22 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
     setSphereTexCoords(4.0);
 
     // Setup the Parameters
-    imstkNew<PBDModelConfig> pbdParams;
+    imstkNew<PbdModelConfig> pbdParams;
     pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 0.1;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.05;
     pbdParams->m_iterations = 2;
     pbdParams->m_viscousDampingCoeff = 0.05;
+
+    // Add custom constraint generation functors
+    auto distanceFunctor = std::make_shared<PbdInflatableDistanceConstraintFunctor>();
+    distanceFunctor->setStiffness(0.95);
+    auto volumeFunctor = std::make_shared<PbdInflatableVolumeConstraintFunctor>();
+    volumeFunctor->setStiffness(0.9);
+
+    pbdParams->addPbdConstraintFunctor(distanceFunctor);
+    pbdParams->addPbdConstraintFunctor(volumeFunctor);
 
     // Fix the borders
     for (int z = 0; z < tissueDim[2]; z++)
@@ -78,13 +87,6 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
     imstkNew<PbdModel> pbdModel;
     pbdModel->setModelGeometry(m_objectTetMesh);
     pbdModel->configure(pbdParams);
-
-    auto distanceFunctor = std::make_shared<PbdInflatableDistanceConstraintFunctor>();
-    distanceFunctor->setStiffness(0.95);
-    auto volumeFunctor = std::make_shared<PbdInflatableVolumeConstraintFunctor>();
-    volumeFunctor->setStiffness(0.9);
-    pbdModel->addPbdConstraintFunctor(distanceFunctor);
-    pbdModel->addPbdConstraintFunctor(volumeFunctor);
 
     // Setup the material
     imstkNew<RenderMaterial> material;
@@ -323,12 +325,12 @@ InflatableObject::inject(const Vec3d& toolTip, const double radius, double dx)
         const double dv = id.second * de;
 
         auto& c = (m_constraintContainer->getConstraints())[id.first];
-        if (c->getType() == PbdConstraint::Type::Volume)
+        if (c->getType() == "Volume")
         {
             const auto& constraint = std::dynamic_pointer_cast<PbdInflatableVolumeConstraint>(c);
             constraint->setRestVolume(dv + constraint->getRestVolume());
         }
-        else if (c->getType() == PbdConstraint::Type::Distance)
+        else if (c->getType() == "Distance")
         {
             // If a tets volume scales by X then each of it sides grow by ?
             /* const auto& constraint = std::dynamic_pointer_cast<PbdInflatableDistanceConstraint>(c);
@@ -368,12 +370,12 @@ InflatableObject::reset()
 
     for (auto& c : m_constraintContainer->getConstraints())
     {
-        if (c->getType() == PbdConstraint::Type::Volume)
+        if (c->getType() == "Volume")
         {
             const auto& constraint = std::dynamic_pointer_cast<PbdInflatableVolumeConstraint>(c);
             constraint->resetRestVolume();
         }
-        else if (c->getType() == PbdConstraint::Type::Distance)
+        else if (c->getType() == "Distance")
         {
             const auto& constraint = std::dynamic_pointer_cast<PbdInflatableDistanceConstraint>(c);
             constraint->resetRestLength();

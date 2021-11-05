@@ -67,7 +67,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit PbdFEMConstraint(const unsigned int cardinality, MaterialType mtype = MaterialType::StVK);
+    PbdFEMConstraint(const unsigned int cardinality, MaterialType mtype = MaterialType::StVK);
 
 public:
     double       m_elementVolume = 0.0; ///> Volume of the element

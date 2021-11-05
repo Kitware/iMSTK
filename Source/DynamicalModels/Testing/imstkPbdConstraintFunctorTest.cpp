@@ -61,7 +61,7 @@ TEST(imstkPbdConstraintFunctorTest, TestBendingConstraintStride1Generation)
     EXPECT_NE(constraint, nullptr);
 
     // Check constraint generated between correct elements and with correct values
-    EXPECT_EQ(constraint->getType(), PbdConstraint::Type::Bend);
+    EXPECT_EQ(constraint->getType(), "Bend");
     EXPECT_EQ(constraint->getStiffness(), 1e20);
     EXPECT_EQ(constraint->getVertexIds().size(), 3);
     EXPECT_EQ(constraint->getVertexIds()[0], 0);
@@ -107,7 +107,7 @@ TEST(imstkPbdConstraintFunctorTest, TestBendingConstraintStride2Generation)
     EXPECT_NE(constraint, nullptr);
 
     // Check constraint generated between correct elements and with correct values
-    EXPECT_EQ(constraint->getType(), PbdConstraint::Type::Bend);
+    EXPECT_EQ(constraint->getType(), "Bend");
     EXPECT_EQ(constraint->getStiffness(), 1e20);
     EXPECT_EQ(constraint->getVertexIds().size(), 3);
     EXPECT_EQ(constraint->getVertexIds()[0], 0);
@@ -146,7 +146,7 @@ TEST(imstkPbdConstraintFunctorTest, TestDistanceConstraintGeneration)
     EXPECT_NE(constraint, nullptr);
 
     // Check constraint generated between correct elements and with correct values
-    EXPECT_EQ(constraint->getType(), PbdConstraint::Type::Distance);
+    EXPECT_EQ(constraint->getType(), "Distance");
     EXPECT_EQ(constraint->getStiffness(), 1.0e3);
     EXPECT_EQ(constraint->getVertexIds().size(), 2);
     EXPECT_EQ(constraint->getVertexIds()[0], 0);
@@ -169,7 +169,7 @@ TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGeneration)
     tetMesh->initialize(vertices, indices);
 
     // Create functor
-    PbdFemConstraintFunctor constraintFunctor;
+    PbdFemTetConstraintFunctor constraintFunctor;
     constraintFunctor.setMaterialType(PbdFEMTetConstraint::MaterialType::Corotation);
     auto FeConfig = std::make_shared<PbdFEMConstraintConfig>(0.0, 0.0, 1000.0, 0.2);
     constraintFunctor.setFemConfig(FeConfig);
@@ -187,7 +187,7 @@ TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGeneration)
     EXPECT_NE(constraint, nullptr);
 
     // Check constraint generated between correct elements and with correct values
-    EXPECT_EQ(constraint->getType(), PbdConstraint::Type::FEMTet);
+    EXPECT_EQ(constraint->getType(), "FEMTet");
     EXPECT_EQ(constraint->m_material, PbdFEMTetConstraint::MaterialType::Corotation);
     EXPECT_EQ(constraint->m_config->m_mu, 0.0);
     EXPECT_EQ(constraint->m_config->m_lambda, 0.0);
@@ -232,7 +232,7 @@ TEST(imstkPbdConstraintFunctorTest, TestVolumeConstraintGeneration)
     EXPECT_NE(constraint, nullptr);
 
     // Check constraint generated between correct elements and with correct values
-    EXPECT_EQ(constraint->getType(), PbdConstraint::Type::Volume);
+    EXPECT_EQ(constraint->getType(), "Volume");
     EXPECT_EQ(constraint->getStiffness(), 1.0e4);
     EXPECT_EQ(constraint->getVertexIds().size(), 4);
     EXPECT_EQ(constraint->getVertexIds()[0], 0);
@@ -273,7 +273,7 @@ TEST(imstkPbdConstraintFunctorTest, TestAreaConstraintGeneration)
     EXPECT_NE(constraint, nullptr);
 
     // Check constraint generated between correct elements and with correct values
-    EXPECT_EQ(constraint->getType(), PbdConstraint::Type::Area);
+    EXPECT_EQ(constraint->getType(), "Area");
     EXPECT_EQ(constraint->getStiffness(), 1.0e4);
     EXPECT_EQ(constraint->getVertexIds().size(), 3);
     EXPECT_EQ(constraint->getVertexIds()[0], 0);
@@ -311,6 +311,6 @@ TEST(imstkPbdConstraintFunctorTest, TestConstDensityConstraintGeneration)
     EXPECT_NE(constraint, nullptr);
 
     // Check constraint generated between correct elements and with correct values
-    EXPECT_EQ(constraint->getType(), PbdConstraint::Type::ConstantDensity);
+    EXPECT_EQ(constraint->getType(), "ConstantDensity");
     EXPECT_EQ(constraint->getVertexIds().size(), 0);
 }

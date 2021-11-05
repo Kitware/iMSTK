@@ -108,11 +108,11 @@ createSoftBodyScene(std::string sceneName)
     pbdModel->setModelGeometry(tetMesh);
 
     // Configure model
-    auto pbdConfig = std::make_shared<PBDModelConfig>();
+    auto pbdConfig = std::make_shared<PbdModelConfig>();
     pbdConfig->m_femParams->m_YoungModulus = 1000000.0;
     pbdConfig->m_femParams->m_PoissonRatio = 0.3;
     pbdConfig->m_fixedNodeIds = { 51, 127, 178 };
-    pbdConfig->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
+    pbdConfig->enableFEMConstraint(PbdFEMConstraint::MaterialType::StVK);
     pbdConfig->m_uniformMassValue = 1.0;
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_iterations = 5;
@@ -144,9 +144,9 @@ createClothScene(std::string sceneName)
         std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(width, height, dim, dim);
 
         // Setup the Parameters
-        auto pbdConfig = std::make_shared<PBDModelConfig>();
-        pbdConfig->enableConstraint(PbdConstraint::Type::Distance, 1.0e2);
-        pbdConfig->enableConstraint(PbdConstraint::Type::Dihedral, 1.0e1);
+        auto pbdConfig = std::make_shared<PbdModelConfig>();
+        pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e2);
+        pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e1);
         pbdConfig->m_fixedNodeIds     = { 0, static_cast<size_t>(16) - 1 };
         pbdConfig->m_uniformMassValue = width * height / static_cast<double>(dim * dim);
         pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);

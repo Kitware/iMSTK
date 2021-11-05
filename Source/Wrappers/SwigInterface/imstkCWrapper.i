@@ -205,8 +205,6 @@ namespace std
   %template(VectorInt) vector<int>; 
   %template(VectorSizet) vector<std::size_t>;
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
-  %template(PbdTypeStiffnessPair) pair<imstk::PbdConstraint::Type, double>;
-  %template(VectorPbdTypeStiffnessPair) vector<std::pair<imstk::PbdConstraint::Type, double>>;
 }
 
 %include "shared_ptr_instantiation.i"
@@ -367,8 +365,6 @@ namespace std
 %include "../../CollisionDetection/CollisionDetection/imstkTetraToLineMeshCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkTetraToPointSetCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkUnidirectionalPlaneToSphereCD.h"
-
-
 
 /*
  * CollisionHandling

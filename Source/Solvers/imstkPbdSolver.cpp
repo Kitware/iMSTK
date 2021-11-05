@@ -36,19 +36,6 @@ PbdSolver::PbdSolver() :
 }
 
 void
-PbdSolver::setSolverType(const PbdConstraint::SolverType& type)
-{
-    if (type == PbdConstraint::SolverType::GCD)
-    {
-        LOG(WARNING) << "GCD is NOT implemented yet, use xPBD instead";
-        m_solverType = PbdConstraint::SolverType::xPBD;
-        return;
-    }
-
-    m_solverType = type;
-}
-
-void
 PbdSolver::solve()
 {
     // Solve the constraints and partitioned constraints

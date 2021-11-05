@@ -38,56 +38,85 @@ class PbdSolver;
 
 ///
 /// \struct PBDModelConfig
-/// \brief Parameters for PBD simulation
 ///
-struct PBDModelConfig
+/// \brief Gives parameters for PBD simulation
+///
+struct PbdModelConfig
 {
-    double m_uniformMassValue    = 1.0;       ///> Mass properties
-    double m_viscousDampingCoeff = 0.01;      ///> Viscous damping coefficient [0, 1]
-    double m_contactStiffness    = 1.0;       ///> Stiffness for contact
-    unsigned int m_iterations    = 10;        ///> Pbd iterations
-    double m_dt = 0.0;                        ///> Time step size
-    bool m_doPartitioning = true;             ///> Does graph coloring to solve in parallel
-
-    std::vector<std::size_t> m_fixedNodeIds;  ///> Nodal IDs of the nodes that are fixed
-    Vec3d m_gravity = Vec3d(0.0, -9.81, 0.0); ///> Gravity
-
-    std::shared_ptr<PbdFEMConstraintConfig> m_femParams =
-        std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
+    public:
+        ///
+        /// \brief Gives the set of standard pbd constraint generation schemes/functors
+        /// provided by iMSTK. Note, these do not correspond to constraint types
+        /// as there may be multiple schemes for one constraint or even multiple
+        /// constraints per scheme
+        ///
+        enum class ConstraintGenType
         {
-            0.0,                                                                                  // Lame constant, if constraint type is FEM
-            0.0,                                                                                  // Lame constant, if constraint type is FEM
-            1000.0,                                                                               // FEM parameter, if constraint type is FEM
-            0.2                                                                                   // FEM parameter, if constraint type is FEM
-        });                                                                                       ///> Info shared between the fem constraints
+            Custom,
+            Distance,
+            FemTet,
+            Volume,
+            Area,
+            Bend,
+            Dihedral,
+            ConstantDensity
+        };
 
-    std::vector<std::pair<PbdConstraint::Type, double>> m_regularConstraints;                     ///> Constraints except FEM
-    std::unordered_map<int, int> m_constraintStrides;                                             ///> Extra parameter for bend constraints
-    std::vector<std::pair<PbdConstraint::Type, PbdFEMConstraint::MaterialType>> m_FEMConstraints; ///> Constraints except FEM
+    public:
+        ///
+        /// \brief Enables a regular constraint (not FEM constraint) with given stiffness
+        /// If constraint of that type already exists, sets the stiffness on it
+        ///
+        void enableConstraint(ConstraintGenType type, double stiffness);
 
-    ///
-    /// \brief Enable a regular constraint (constraint that is not FEM constraint)
-    /// with a given constraint stiffness
-    ///
-    void enableConstraint(PbdConstraint::Type type, double stiffness);
+        ///
+        /// \brief Enables a bend constraint with given stride (stride=1 connects every neighbor vertex
+        /// so a constraint is formed every 3 verts, stride=2 forms between 5 verts)
+        ///
+        void enableBendConstraint(const double stiffness, const int stride);
 
-    ///
-    /// \brief Enables a bend constraint with given stride (stride=1 connects every neighbor vertex
-    /// so a constraint is formed every 3 verts, stride=2 forms between 5 verts)
-    ///
-    void enableBendConstraint(const double stiffness, const int stride);
+        ///
+        /// \brief Enable a FEM constraint with the material provided
+        ///
+        void enableFEMConstraint(PbdFEMConstraint::MaterialType material);
 
-    ///
-    /// \brief Enable a FEM constraint with mu, lambda
-    ///
-    void enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material);
+        ///
+        /// \brief If lame parameters (mu+lambda) are given in femParams, then youngs modulus and poissons ratio are computed
+        /// Conversly if youngs and poissons are given, lame parameters are computed
+        ///
+        void computeElasticConstants();
 
-    ///
-    /// \brief Set the PBD solver type
-    ///
-    void setSolverType(const PbdConstraint::SolverType& type);
+        ///
+        /// \brief Adds a functor to generate constraints
+        ///
+        void addPbdConstraintFunctor(std::shared_ptr<PbdConstraintFunctor> functor) { m_functors[ConstraintGenType::Custom].push_back(functor); }
 
-    PbdConstraint::SolverType m_solverType = PbdConstraint::SolverType::xPBD;
+    public:
+        double m_uniformMassValue    = 1.0;       ///> Mass properties, not used if per vertex masses are given in geometry attributes
+        double m_viscousDampingCoeff = 0.01;      ///> Viscous damping coefficient [0, 1]
+        double m_contactStiffness    = 1.0;       ///> Stiffness for contact
+        unsigned int m_iterations    = 10;        ///> Internal constraints pbd solver iterations
+        double m_dt = 0.0;                        ///> Time step size
+        bool m_doPartitioning = true;             ///> Does graph coloring to solve in parallel
+
+        std::vector<std::size_t> m_fixedNodeIds;  ///> Nodal/vertex IDs of the nodes that are fixed
+        Vec3d m_gravity = Vec3d(0.0, -9.81, 0.0); ///> Gravity acceleration
+
+        std::shared_ptr<PbdFEMConstraintConfig> m_femParams =
+            std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
+        {
+            0.0,        // Lame constant, if constraint type is FEM
+            0.0,        // Lame constant, if constraint type is FEM
+            1000.0,     // FEM parameter, if constraint type is FEM
+            0.2         // FEM parameter, if constraint type is FEM
+            });
+
+        PbdConstraint::SolverType m_solverType = PbdConstraint::SolverType::xPBD;
+
+    protected:
+        friend class PbdModel;
+
+        std::unordered_map<ConstraintGenType, std::vector<std::shared_ptr<PbdConstraintFunctor>>> m_functors;
 };
 
 ///
@@ -108,22 +137,16 @@ public:
     ///
     virtual ~PbdModel() override = default;
 
+public:
     ///
     /// \brief Set simulation parameters
     ///
-    void configure(std::shared_ptr<PBDModelConfig> params);
+    void configure(std::shared_ptr<PbdModelConfig> params);
 
     ///
     /// \brief Get the simulation parameters
     ///
-    const std::shared_ptr<PBDModelConfig>& getParameters() const { assert(m_parameters); return m_parameters; }
-
-    ///
-    /// \brief Compute elastic constants: Young Modulus, Poisson Ratio, first and second Lame
-    /// \brief If both Young Modulus or Poisson Ratio are zero, then compute them from the Lame coefficients
-    /// \brief And vice versas, if both Lame coefficients are zero, compute them from Young Modulus and Poisson Ratio
-    ///
-    void computeElasticConstants();
+    std::shared_ptr<PbdModelConfig> getConfig() const { assert(m_config); return m_config; }
 
     ///
     /// \brief Add constraints related to a set of vertices.
@@ -132,8 +155,8 @@ public:
     ///
     void addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices);
 
-    virtual void setTimeStep(const double timeStep) override { m_parameters->m_dt = timeStep; }
-    double getTimeStep() const override { return m_parameters->m_dt; }
+    virtual void setTimeStep(const double timeStep) override { m_config->m_dt = timeStep; }
+    double getTimeStep() const override { return m_config->m_dt; }
 
     ///
     /// \brief Return all constraints that are solved sequentially
@@ -200,11 +223,6 @@ public:
     ///
     void setSolver(std::shared_ptr<PbdSolver> solver) { this->m_pbdSolver = solver; }
 
-    ///
-    /// \brief Adds a functor to generate constraints
-    ///
-    void addPbdConstraintFunctor(std::shared_ptr<PbdConstraintFunctor> functor) { m_functors.push_back(functor); }
-
     std::shared_ptr<TaskNode> getIntegratePositionNode() const { return m_integrationPositionNode; }
 
     std::shared_ptr<TaskNode> getSolveNode() const { return m_solveConstraintsNode; }
@@ -226,11 +244,10 @@ protected:
     std::shared_ptr<DataArray<double>> m_invMass = nullptr;                               ///> Inverse of mass of nodes
     std::shared_ptr<std::unordered_map<size_t, double>> m_fixedNodeInvMass = nullptr;     ///> Map for archiving fixed nodes' mass.
 
-    std::shared_ptr<PBDModelConfig> m_parameters = nullptr;                               ///> Model parameters, must be set before simulation
+    std::shared_ptr<PbdModelConfig> m_config = nullptr;                                   ///> Model parameters, must be set before simulation
 
 protected:
     std::shared_ptr<PbdConstraintContainer> m_constraints;         ///> The set of constraints to update/use
-    std::vector<std::shared_ptr<PbdConstraintFunctor>> m_functors; ///> The set of functors for constraint generation
 
 protected:
     // Computational Nodes

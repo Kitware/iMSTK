@@ -43,9 +43,9 @@ public:
     }
 
     ///
-    /// \brief Returns PBD constraint of type Type::Area
+    /// \brief Returns PBD constraint of type Area
     ///
-    Type getType() const override { return Type::Area; }
+    std::string getType() const override { return "Area"; }
 
     ///
     /// \brief Initializes the area constraint

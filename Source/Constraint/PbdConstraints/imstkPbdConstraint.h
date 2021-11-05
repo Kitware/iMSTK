@@ -35,29 +35,13 @@ class PbdConstraint
 {
 public:
     ///
-    /// \brief Type of the PBD constraint
-    ///
-    enum class Type
-    {
-        Distance,
-        Dihedral,
-        Bend,
-        Area,
-        Volume,
-        FEMTet,
-        FEMHex,
-        ConstantDensity,
-        None
-    };
-
-    ///
     /// \brief Type of solvers
     enum class SolverType
     {
         xPBD = 0,
-        PBD,
-        GCD
+        PBD
     };
+
     ///
     /// \brief Constructor
     ///
@@ -72,7 +56,7 @@ public:
     /// \brief abstract interface to know the type of constraint
     /// \return particular type
     ///
-    virtual Type getType() const = 0;
+    virtual std::string getType() const = 0;
 
     ///
     /// \brief Compute value and gradient of the constraint

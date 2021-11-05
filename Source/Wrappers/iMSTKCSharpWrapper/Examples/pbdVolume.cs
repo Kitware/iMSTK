@@ -78,7 +78,7 @@ public class PbdVolume
         pbdModel.setModelGeometry(tetMesh);
 
         // Configure model
-        PBDModelConfig pbdParams = new PBDModelConfig();
+        PbdModelConfig pbdParams = new PbdModelConfig();
 
         // FEM constraint
         pbdParams.m_femParams.m_YoungModulus = 500.0;
@@ -97,7 +97,7 @@ public class PbdVolume
         pbdParams.m_fixedNodeIds.Add(161);
         pbdParams.m_fixedNodeIds.Add(171);
         pbdParams.m_fixedNodeIds.Add(350);
-        pbdParams.enableFEMConstraint(PbdConstraint.Type.FEMTet, PbdFEMConstraint.MaterialType.StVK);
+        pbdParams.enableFEMConstraint(PbdFEMConstraint.MaterialType.StVK);
 
         // Other parameters
         pbdParams.m_uniformMassValue = 1.0;

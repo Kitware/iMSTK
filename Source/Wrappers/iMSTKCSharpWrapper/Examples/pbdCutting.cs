@@ -100,9 +100,9 @@ public class PbdCutting
         SurfaceMesh clothMesh = makeClothGeometry(width, height, nRows, nCols);
 
         // Setup the Parameters
-        PBDModelConfig pbdParams = new PBDModelConfig();
-        pbdParams.enableConstraint(PbdConstraint.Type.Distance, 1.0e3);
-        pbdParams.enableConstraint(PbdConstraint.Type.Dihedral, 1.0e3);
+        PbdModelConfig pbdParams = new PbdModelConfig();
+        pbdParams.enableConstraint(PbdModelConfig.ConstraintGenType.Distance, 1.0e3);
+        pbdParams.enableConstraint(PbdModelConfig.ConstraintGenType.Dihedral, 1.0e3);
         pbdParams.m_fixedNodeIds = new VectorSizet(2);
         pbdParams.m_fixedNodeIds.Add(0);
         pbdParams.m_fixedNodeIds.Add((uint)colCount - 1);

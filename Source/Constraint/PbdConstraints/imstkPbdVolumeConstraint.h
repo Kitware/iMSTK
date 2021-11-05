@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Returns PBD constraint of type Type::Volume
     ///
-    inline Type getType() const override { return Type::Volume; }
+    std::string getType() const override { return "Volume"; }
 
     ///
     /// \brief Initializes the volume constraint
