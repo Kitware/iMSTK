@@ -248,8 +248,6 @@ SimulationManager::runModuleParallel(std::shared_ptr<Module> module)
 
     waitForInit();
 
-    postEvent(Event(SimulationManager::starting()));
-
     m_running[module.get()] = true;
     while (m_running[module.get()])
     {
@@ -270,8 +268,6 @@ SimulationManager::runModuleParallel(std::shared_ptr<Module> module)
             module->update();
         }
     }
-
-    postEvent(Event(SimulationManager::ending()));
 }
 
 void
