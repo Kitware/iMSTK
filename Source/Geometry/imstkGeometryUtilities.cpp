@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkGeometryUtilities.h"
+#include "imstkCapsule.h"
+#include "imstkCylinder.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkImageData.h"
 #include "imstkLineMesh.h"
@@ -31,10 +33,12 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 
+#include <vtkCapsuleSource.h>
 #include <vtkCellData.h>
 #include <vtkCharArray.h>
 #include <vtkCleanPolyData.h>
 #include <vtkCubeSource.h>
+#include <vtkCylinderSource.h>
 #include <vtkDoubleArray.h>
 #include <vtkFeatureEdges.h>
 #include <vtkFloatArray.h>
@@ -838,22 +842,22 @@ GeometryUtils::toSurfaceMesh(std::shared_ptr<AnalyticalGeometry> geom)
         Vec3d p3 = plane->getPosition() + plane->getWidth() * (-i + j);
         Vec3d p4 = plane->getPosition() + plane->getWidth() * (-i - j);
 
-        vtkNew<vtkPlaneSource> planeSource;
-        planeSource->SetOrigin(p4.data());
-        planeSource->SetPoint1(p3.data());
-        planeSource->SetPoint2(p2.data());
-        planeSource->Update();
-        results = planeSource->GetOutput();
+        vtkNew<vtkPlaneSource> source;
+        source->SetOrigin(p4.data());
+        source->SetPoint1(p3.data());
+        source->SetPoint2(p2.data());
+        source->Update();
+        results = source->GetOutput();
     }
     else if (auto orientedBox = std::dynamic_pointer_cast<OrientedBox>(geom))
     {
-        vtkNew<vtkCubeSource> cubeSource;
+        vtkNew<vtkCubeSource> source;
         Vec3d                 extents = orientedBox->getExtents(Geometry::DataType::PreTransform);
-        cubeSource->SetCenter(0.0, 0.0, 0.0);
-        cubeSource->SetXLength(extents[0] * 2.0);
-        cubeSource->SetYLength(extents[1] * 2.0);
-        cubeSource->SetZLength(extents[2] * 2.0);
-        cubeSource->Update();
+        source->SetCenter(0.0, 0.0, 0.0);
+        source->SetXLength(extents[0] * 2.0);
+        source->SetYLength(extents[1] * 2.0);
+        source->SetZLength(extents[2] * 2.0);
+        source->Update();
 
         AffineTransform3d T = AffineTransform3d::Identity();
         T.translate(orientedBox->getPosition(Geometry::DataType::PostTransform));
@@ -864,11 +868,61 @@ GeometryUtils::toSurfaceMesh(std::shared_ptr<AnalyticalGeometry> geom)
         vtkNew<vtkTransform> transformVtk;
         transformVtk->SetMatrix(T.data());
 
-        vtkNew<vtkTransformFilter> transformCube;
-        transformCube->SetInputData(cubeSource->GetOutput());
-        transformCube->SetTransform(transformVtk);
-        transformCube->Update();
-        results = transformCube->GetOutput();
+        vtkNew<vtkTransformFilter> transformFilter;
+        transformFilter->SetInputData(source->GetOutput());
+        transformFilter->SetTransform(transformVtk);
+        transformFilter->Update();
+        results = transformFilter->GetOutput();
+    }
+    else if (auto cylinder = std::dynamic_pointer_cast<Cylinder>(geom))
+    {
+        vtkNew<vtkCylinderSource> source;
+        source->SetCenter(0.0, 0.0, 0.0);
+        source->SetRadius(cylinder->getRadius());
+        source->SetHeight(cylinder->getLength());
+        source->SetResolution(20);
+        source->Update();
+
+        AffineTransform3d T = AffineTransform3d::Identity();
+        T.translate(cylinder->getPosition(Geometry::DataType::PostTransform));
+        T.rotate(cylinder->getOrientation(Geometry::DataType::PostTransform));
+        T.scale(1.0);
+        T.matrix().transposeInPlace();
+
+        vtkNew<vtkTransform> transformVtk;
+        transformVtk->SetMatrix(T.data());
+
+        vtkNew<vtkTransformFilter> transformFilter;
+        transformFilter->SetInputData(source->GetOutput());
+        transformFilter->SetTransform(transformVtk);
+        transformFilter->Update();
+        results = transformFilter->GetOutput();
+    }
+    else if (auto capsule = std::dynamic_pointer_cast<Capsule>(geom))
+    {
+        vtkNew<vtkCapsuleSource> source;
+        source->SetCenter(0.0, 0.0, 0.0);
+        source->SetRadius(capsule->getRadius());
+        source->SetCylinderLength(capsule->getLength());
+        source->SetLatLongTessellation(20);
+        source->SetPhiResolution(20);
+        source->SetThetaResolution(20);
+        source->Update();
+
+        AffineTransform3d T = AffineTransform3d::Identity();
+        T.translate(capsule->getPosition(Geometry::DataType::PostTransform));
+        T.rotate(capsule->getOrientation(Geometry::DataType::PostTransform));
+        T.scale(1.0);
+        T.matrix().transposeInPlace();
+
+        vtkNew<vtkTransform> transformVtk;
+        transformVtk->SetMatrix(T.data());
+
+        vtkNew<vtkTransformFilter> transformFilter;
+        transformFilter->SetInputData(source->GetOutput());
+        transformFilter->SetTransform(transformVtk);
+        transformFilter->Update();
+        results = transformFilter->GetOutput();
     }
     else
     {
