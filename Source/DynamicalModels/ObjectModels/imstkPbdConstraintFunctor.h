@@ -480,7 +480,7 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
 
         void setStride(const int stride)
         {
-            CHECK(m_stride > 1) << "Stride should be at least 1.";
+            CHECK(m_stride >= 1) << "Stride should be at least 1.";
             m_stride = stride;
         }
 
