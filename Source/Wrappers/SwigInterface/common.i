@@ -251,7 +251,7 @@ public:
     using EigenData = Eigen::Quaternion<double>;
     imstkQuatd(const EigenData& data) : m_data(data) { }
     imstkQuatd(const imstkRotd& rot) : m_data(rot.get()) { }
-    imstkQuatd(double x, double y, double z, double w) : m_data(x, y, z, w) { }
+    imstkQuatd(double x, double y, double z, double w) : m_data(w, x, y, z) { }
     inline const EigenData& get() const { return m_data; }
 
     inline double x() const { return m_data.x(); }
