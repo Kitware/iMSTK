@@ -292,7 +292,7 @@ find_package(VTK REQUIRED CONFIG)
 find_package(vtkRenderingOpenVR QUIET)
 find_package(vtkRenderingExternal QUIET)
 
-list(APPEND VTK_DEPENDENCIES
+list(APPEND iMSTK_VTK_DEPENDENCIES
   ChartsCore
   CommonCore
   CommonDataModel
@@ -320,7 +320,7 @@ list(APPEND VTK_DEPENDENCIES
   RenderingVolume
   RenderingVolumeOpenGL2
   ViewsContext2D)
-find_package(VTK COMPONENTS ${VTK_DEPENDENCIES} REQUIRED)
+find_package(VTK COMPONENTS ${iMSTK_VTK_DEPENDENCIES} REQUIRED)
 if(${PROJECT_NAME}_USE_VTK_OSMESA)
   add_definitions(-DiMSTK_USE_VTK_OSMESA)
 endif()
@@ -478,6 +478,45 @@ export(
   NAMESPACE ${PROJECT_NAMESPACE}
   )
 # Configure '${PROJECT_NAME}Config.cmake' for a build tree
+set(CONFIG_CODE "####### Expanded from \@CONFIG_CODE\@ #######\n")
+
+set(CONFIG_CODE "${CONFIG_CODE}set(Assimp_ROOT_DIR \"${Assimp_ROOT_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(Assimp_LIB_DIR \"${Assimp_LIB_DIR}\")\n")
+
+set(CONFIG_CODE "${CONFIG_CODE}set(Eigen3_DIR \"${Eigen3_DIR}\")\n")
+
+set(CONFIG_CODE "${CONFIG_CODE}set(g3log_ROOT_DIR \"${g3log_ROOT_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(g3log_LIB_DIR \"${g3log_LIB_DIR}\")\n")
+
+set(CONFIG_CODE "${CONFIG_CODE}set(GTest_DIR \"${GTest_DIR}\")\n")
+
+set(CONFIG_CODE "${CONFIG_CODE}set(LibNiFalcon_ROOT_DIR \"${LibNiFalcon_ROOT_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(LibNiFalcon_LIB_DIR \"${LibNiFalcon_LIB_DIR}\")\n")
+
+if(WIN32)
+  set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_ROOT_DIR \"${Libusb_ROOT_DIR}\")\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_LIB_DIR \"${Libusb_LIB_DIR}\")\n")
+else()
+  set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_INCLUDE_DIR \"${Libusb_INCLUDE_DIR}\")\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_LIBRARY_libusb-1.0-RELEASE \"${Libusb_LIBRARY_libusb-1.0-RELEASE}\")\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_LIBRARY_libusb-1.0-DEBUG \"${Libusb_LIBRARY_libusb-1.0-DEBUG}\")\n")
+endif()
+
+set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_INCLUDE_DIR \"${OpenVR_INCLUDE_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_LIBRARY \"${OpenVR_LIBRARY}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_ROOT_DIR \"${OpenVR_ROOT_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_LIB_DIR \"${OpenVR_LIB_DIR}\")\n")
+
+set(CONFIG_CODE "${CONFIG_CODE}set(TBB_DIR \"${TBB_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(tbb_ROOT_DIR \"${tbb_ROOT_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(tbb_LIB_DIR \"${tbb_LIB_DIR}\")\n")
+
+set(CONFIG_CODE "${CONFIG_CODE}set(VegaFEM_DIR \"${VegaFEM_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(VTK_DIR \"${VTK_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(vtkRenderingOpenVR_DIR \"${vtkRenderingOpenVR_DIR}\")\n")
+set(CONFIG_CODE "${CONFIG_CODE}set(vtkRenderingExternal_DIR \"${vtkRenderingExternal_DIR}\")\n")
+
+set(CONFIG_CODE "${CONFIG_CODE}##################################################")
 set(build_config ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake)
 configure_package_config_file(
   CMake/${PROJECT_NAME}Config.cmake.in
@@ -493,7 +532,8 @@ install(
   NAMESPACE ${PROJECT_NAMESPACE}
   DESTINATION ${${PROJECT_NAME}_INSTALL_CONFIG_DIR}
   )
-  
+# Configure '${PROJECT_NAME}Config.cmake' for an install tree
+set(CONFIG_CODE "")
 set(install_config ${PROJECT_BINARY_DIR}/CMakeFiles/${PROJECT_NAME}Config.cmake)
 configure_package_config_file(
   CMake/${PROJECT_NAME}Config.cmake.in 
