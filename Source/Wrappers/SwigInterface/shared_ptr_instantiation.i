@@ -161,6 +161,7 @@
 %shared_ptr(imstk::KeyboardControl)
 %shared_ptr(imstk::TrackingDeviceControl)
 %shared_ptr(imstk::SceneObjectController)
+%shared_ptr(imstk::RigidObjectController)
 
 /*
  * Scene

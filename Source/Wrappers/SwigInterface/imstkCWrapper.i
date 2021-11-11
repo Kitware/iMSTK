@@ -153,6 +153,7 @@
 #include "imstkKeyboardControl.h"
 #include "imstkTrackingDeviceControl.h"
 #include "imstkSceneObjectController.h"
+#include "imstkRigidObjectController.h"
 
 /*
  * Scene
@@ -382,6 +383,7 @@ namespace std
 %include "../../Controllers/imstkKeyboardControl.h"
 %include "../../Controllers/imstkTrackingDeviceControl.h"
 %include "../../Controllers/imstkSceneObjectController.h"
+%include "../../Controllers/imstkRigidObjectController.h"
 
 /* 
  * Scene
