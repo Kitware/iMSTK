@@ -233,7 +233,7 @@ public:
     using EigenData = Eigen::Quaternion<float>;
     imstkQuatf(const EigenData& data) : m_data(data) { }
     imstkQuatf(const imstkRotf& rot) : m_data(rot.get()) { }
-    imstkQuatf(float x, float y, float z, float w) : m_data(x, y, z, w) { }
+    imstkQuatf(float x, float y, float z, float w) : m_data(w, x, y, z) { }
     inline const EigenData& get() const { return m_data; }
 
     inline float x() const { return m_data.x(); }
