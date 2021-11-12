@@ -285,7 +285,7 @@ main()
 
             // Transform the ghost tool to show the real tool location
             ghostClampsObj->getVisualGeometry()->setTransform(
-                mat4dTranslate(controller->getPosition()) * mat4dRotation(controller->getRotation()) *
+                mat4dTranslate(controller->getPosition()) * mat4dRotation(controller->getOrientation()) *
                 mat4dTranslate(clampOffset) *
                 mat4dRotation(Rotd(PI, Vec3d(0.0, 1.0, 0.0))));
             ghostClampsObj->getVisualGeometry()->updatePostTransformData();

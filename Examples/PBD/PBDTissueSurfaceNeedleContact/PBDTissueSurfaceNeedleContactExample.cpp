@@ -387,7 +387,7 @@ main()
 
             // Also apply controller transform to ghost geometry
             toolGhostMesh->setTranslation(controller->getPosition());
-            toolGhostMesh->setRotation(controller->getRotation());
+            toolGhostMesh->setRotation(controller->getOrientation());
             toolGhostMesh->updatePostTransformData();
             toolGhostMesh->postModified();
             });

@@ -72,7 +72,7 @@ RigidObjectController::update(const double dt)
         Vec3d&       currTorque = *m_rigidObject->getRigidBody()->m_torque;
 
         const Vec3d& devicePos = getPosition();
-        const Quatd& deviceOrientation = getRotation();
+        const Quatd& deviceOrientation = getOrientation();
         //const Vec3d& deviceVelocity        = getVelocity();
         //const Vec3d& deviceAngularVelocity = getAngularVelocity();
         const Vec3d& deviceOffset = Vec3d(0.0, 0.0, 0.0);
@@ -114,7 +114,7 @@ RigidObjectController::update(const double dt)
         *m_rigidObject->getRigidBody()->m_torque = Vec3d(0.0, 0.0, 0.0);
         // Directly set position/rotation
         (*m_rigidObject->getRigidBody()->m_pos) = getPosition();
-        (*m_rigidObject->getRigidBody()->m_orientation) = getRotation();
+        (*m_rigidObject->getRigidBody()->m_orientation) = getOrientation();
     }
 
     this->postEvent(Event(RigidObjectController::modified()));

@@ -63,7 +63,7 @@ LaparoscopicToolController::update(const double dt)
     }
 
     const Vec3d controllerPosition    = getPosition();
-    const Quatd controllerOrientation = getRotation();
+    const Quatd controllerOrientation = getOrientation();
 
     // Controller transform
     m_controllerWorldTransform = mat4dTranslate(controllerPosition) * mat4dRotation(controllerOrientation);

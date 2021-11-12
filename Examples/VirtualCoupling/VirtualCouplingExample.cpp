@@ -45,6 +45,8 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
+#include "imstkVTKRenderer.h"
+
 using namespace imstk;
 
 ///
@@ -85,33 +87,28 @@ main()
         scene->addSceneObject(obstacleObjs[i]);
     }
 
-    // A line mesh is used for collision geometry
-    imstkNew<LineMesh> lineMesh;
-    auto               verticesPtr = std::make_shared<VecDataArray<double, 3>>(2);
-    (*verticesPtr)[0] = Vec3d(0.0, 0.0, 2.0);
-    (*verticesPtr)[1] = Vec3d(0.0, 0.0, -2.4); // tip
-    auto indicesPtr = std::make_shared<VecDataArray<int, 2>>(1);
-    (*indicesPtr)[0] = Vec2i(0, 1);
-    lineMesh->initialize(verticesPtr, indicesPtr);
-
     // The visual geometry is the scissor mesh read in from file
-    auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
+    
 
-    imstkNew<RigidObject2>    rbdObj("rbdObj");
-    imstkNew<RigidBodyModel2> rbdModel;
-    rbdModel->getConfig()->m_dt      = 0.001;
-    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-    rbdObj->setDynamicalModel(rbdModel);
-    rbdObj->getRigidBody()->m_mass = 0.5;
-    rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 1000000.0;
-    rbdObj->setCollidingGeometry(lineMesh);
-    rbdObj->setVisualGeometry(surfMesh);
-    rbdObj->setPhysicsGeometry(lineMesh);
-    rbdObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(lineMesh, surfMesh));
-    std::shared_ptr<RenderMaterial> mat = rbdObj->getVisualModel(0)->getRenderMaterial();
-    mat->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    mat->setRoughness(0.5);
-    mat->setMetalness(1.0);
+    imstkNew<RigidObject2> rbdObj("rbdObj1");
+    {
+        imstkNew<RigidBodyModel2> rbdModel;
+        rbdModel->getConfig()->m_dt      = 0.001;
+        rbdModel->getConfig()->m_gravity = Vec3d::Zero();
+        rbdObj->setDynamicalModel(rbdModel);
+        rbdObj->getRigidBody()->m_mass = 0.5;
+        rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 1000000.0;
+
+        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
+        rbdObj->setCollidingGeometry(surfMesh);
+        rbdObj->setVisualGeometry(surfMesh);
+        rbdObj->setPhysicsGeometry(surfMesh);
+
+        std::shared_ptr<RenderMaterial> mat = rbdObj->getVisualModel(0)->getRenderMaterial();
+        mat->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        mat->setRoughness(0.5);
+        mat->setMetalness(1.0);
+    }
     scene->addSceneObject(rbdObj);
 
     // Create a virtual coupling controller
@@ -158,11 +155,10 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
-        {
-            // Run the rbd model in real time
-            rbdModel->getConfig()->m_dt = driver->getDt();
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+            {
+                // Run the rbd model in real time
+                rbdObj->getRigidBodyModel2()->getConfig()->m_dt = driver->getDt();
             });
 
         // Add mouse and keyboard controls to the viewer

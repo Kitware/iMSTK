@@ -45,7 +45,7 @@ CameraController::update(const double dt)
     }
 
     Vec3d p = getPosition();
-    Quatd r = getRotation();
+    Quatd r = getOrientation();
 
     // Apply Offsets over the device pose
     p  = p + m_translationOffset;   // Offset the device position
