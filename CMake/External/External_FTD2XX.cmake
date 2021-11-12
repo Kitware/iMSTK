@@ -4,15 +4,16 @@ if(NOT WIN32)
   return()
 endif()
 
-#-----------------------------------------------------------------------------
-# Set project prefix path
-#-----------------------------------------------------------------------------
-set(FTD2XX_PREFIX ${CMAKE_BINARY_DIR}/External/FTD2XX)
-set(FTD2XX_EXTRACT_DIR ${FTD2XX_PREFIX}/ftd2xx-2.12.18)
+include(imstkAddExternalProject)
+
+# Set FTD2XX_SOURCE_DIR
+imstk_define_external_dirs( FTD2XX )
 
 #-----------------------------------------------------------------------------
 # Set install commands
 #-----------------------------------------------------------------------------
+set(FTD2XX_EXTRACT_DIR ${FTD2XX_SOURCE_DIR})
+
 set(ftd2xx_libdir "i386")
 if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
   set(ftd2xx_libdir "amd64")
@@ -48,13 +49,11 @@ set(copy_ftd2xx_dll_command_rename
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
-include(imstkAddExternalProject)
 imstk_add_external_project( FTD2XX
   URL http://www.ftdichip.com/Drivers/CDM/CDM%20v2.12.18%20WHQL%20Certified.zip
   URL_MD5 e1a194765d7bcc58968d523484b74140
   DOWNLOAD_DIR ${FTD2XX_PREFIX}
-  SOURCE_DIR ${FTD2XX_EXTRACT_DIR}
-  BINARY_DIR ${FTD2XX_EXTRACT_DIR}
+  SOURCE_DIR ${FTD2XX_SOURCE_DIR}
   UPDATE_COMMAND ${SKIP_STEP_COMMAND}
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
