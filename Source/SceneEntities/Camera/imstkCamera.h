@@ -258,8 +258,8 @@ protected:
 
 protected:
     // Lookat camera parameters
-    Vec3d m_position   = Vec3d(0, 2, 5); ///> camera position
-    Vec3d m_focalPoint = WORLD_ORIGIN;   ///> camera focal point
-    Vec3d m_viewUp     = UP_VECTOR;      ///> camera up vector
+    Vec3d m_position   = Vec3d(0.0, 2.0, 5.0); ///> camera position
+    Vec3d m_focalPoint = Vec3d::Zero();   ///> camera focal point
+    Vec3d m_viewUp     = Vec3d(0.0, 1.0, 0.0);      ///> camera up vector
 };
 }

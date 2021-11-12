@@ -53,8 +53,8 @@ CameraController::update(const double dt)
 
     // Set camera info
     m_camera->setPosition(p);
-    m_camera->setFocalPoint((r * FORWARD_VECTOR) + p);
-    m_camera->setViewUp(r * UP_VECTOR);
+    m_camera->setFocalPoint((r * Vec3d(0.0, 0.0, -1.0)) + p);
+    m_camera->setViewUp(r * Vec3d(0.0, 1.0, 0.0));
 }
 
 void

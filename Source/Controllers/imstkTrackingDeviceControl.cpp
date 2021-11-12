@@ -27,14 +27,14 @@
 namespace imstk
 {
 TrackingDeviceControl::TrackingDeviceControl() :
-    m_translationOffset(WORLD_ORIGIN),
+    m_translationOffset(Vec3d::Zero()),
     m_rotationOffset(Quatd::Identity())
 {
 }
 
 TrackingDeviceControl::TrackingDeviceControl(std::shared_ptr<DeviceClient> device) :
     DeviceControl(device),
-    m_translationOffset(WORLD_ORIGIN),
+    m_translationOffset(Vec3d::Zero()),
     m_rotationOffset(Quatd::Identity())
 {
 }
