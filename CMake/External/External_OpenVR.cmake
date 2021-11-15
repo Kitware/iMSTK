@@ -1,6 +1,6 @@
 include(imstkAddExternalProject)
 
-# Set OpenVR_SOURCE_DIR
+# Set OpenVR_SOURCE_DIR and OpenVR_PREFIX
 imstk_define_external_dirs( OpenVR )
 
 # Directories and filenames specific to the OpenVR archive layout
