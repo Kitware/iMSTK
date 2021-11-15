@@ -9,14 +9,27 @@ include(imstkAddExternalProject)
 # Set Libusb_SOURCE_DIR and Libusb_PREFIX
 imstk_define_external_dirs( Libusb )
 
+# Directories and filenames specific to the Libusb archive layout
+set(_dll_dir "MS32/dll")
+if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
+  set(_dll_dir "MS64/dll")
+endif()
+set(_dll_name "libusb-1.0.dll")
+set(_lib_dir "${_dll_dir}")
+set(_lib_name "libusb-1.0.lib")
+
+# Directories and filenames specific to the Libusb install layout
+set(Libusb_INC_DIR "include/libusb-1.0")
+set(Libusb_DLL_DIR "bin")
+set(Libusb_DLL_NAME "${_dll_name}")
+set(Libusb_LIB_DIR "lib")
+set(Libusb_LIB_NAME "${_lib_name}")
+
 #-----------------------------------------------------------------------------
 # Set install commands
 #-----------------------------------------------------------------------------
-set(Libusb_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
-
-set(libusb_libdir "MS32")
-if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
-  set(libusb_libdir "MS64")
+if(CMAKE_PROJECT_NAME STREQUAL "iMSTK")
+  set(Libusb_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 endif()
 
 set(copy_libusb_headers_command
@@ -26,13 +39,20 @@ set(copy_libusb_headers_command
   )
 set(copy_libusb_lib_command
   ${CMAKE_COMMAND} -E copy
-  ${Libusb_SOURCE_DIR}/${libusb_libdir}/dll/libusb-1.0.lib
-  ${Libusb_INSTALL_DIR}/lib/libusb-1.0.lib
+  ${Libusb_SOURCE_DIR}/${_lib_dir}/${_lib_name}
+  ${Libusb_INSTALL_DIR}/${Libusb_LIB_DIR}/${_lib_name}
   )
 set(copy_libusb_dll_command
   ${CMAKE_COMMAND} -E copy
-  ${Libusb_SOURCE_DIR}/${libusb_libdir}/dll/libusb-1.0.dll
-  ${Libusb_INSTALL_DIR}/bin
+  ${Libusb_SOURCE_DIR}/${_dll_dir}/${_dll_name}
+  ${Libusb_INSTALL_DIR}/${Libusb_DLL_DIR}/${_dll_name}
+  )
+
+set(Libusb_INSTALL_COMMAND
+  INSTALL_COMMAND
+    COMMAND ${copy_libusb_headers_command}
+    COMMAND ${copy_libusb_lib_command}
+    COMMAND ${copy_libusb_dll_command}
   )
 
 #-----------------------------------------------------------------------------
@@ -46,10 +66,7 @@ imstk_add_external_project( Libusb
   UPDATE_COMMAND ${SKIP_STEP_COMMAND}
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
-  INSTALL_COMMAND
-    COMMAND ${copy_libusb_headers_command}
-    COMMAND ${copy_libusb_lib_command}
-    COMMAND ${copy_libusb_dll_command}
-  RELATIVE_INCLUDE_PATH "include/libusb-1.0"
+  ${Libusb_INSTALL_COMMAND}
+  RELATIVE_INCLUDE_PATH "${Libusb_INC_DIR}"
   #VERBOSE
 )
