@@ -12,7 +12,7 @@ imstk_define_external_dirs( Libusb )
 #-----------------------------------------------------------------------------
 # Set install commands
 #-----------------------------------------------------------------------------
-set(Libusb_EXTRACT_DIR ${Libusb_SOURCE_DIR})
+set(Libusb_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 
 set(libusb_libdir "MS32")
 if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
@@ -21,18 +21,18 @@ endif()
 
 set(copy_libusb_headers_command
   ${CMAKE_COMMAND} -E copy_directory
-  ${Libusb_EXTRACT_DIR}/include
-  ${CMAKE_INSTALL_PREFIX}/include
+  ${Libusb_SOURCE_DIR}/include
+  ${Libusb_INSTALL_DIR}/include
   )
 set(copy_libusb_lib_command
   ${CMAKE_COMMAND} -E copy
-  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll/libusb-1.0.lib
-  ${CMAKE_INSTALL_PREFIX}/lib/libusb-1.0.lib
+  ${Libusb_SOURCE_DIR}/${libusb_libdir}/dll/libusb-1.0.lib
+  ${Libusb_INSTALL_DIR}/lib/libusb-1.0.lib
   )
 set(copy_libusb_dll_command
   ${CMAKE_COMMAND} -E copy
-  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll/libusb-1.0.dll
-  ${CMAKE_INSTALL_PREFIX}/bin/
+  ${Libusb_SOURCE_DIR}/${libusb_libdir}/dll/libusb-1.0.dll
+  ${Libusb_INSTALL_DIR}/bin
   )
 
 #-----------------------------------------------------------------------------
