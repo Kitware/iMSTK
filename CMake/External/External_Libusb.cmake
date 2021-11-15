@@ -4,15 +4,16 @@ if(NOT WIN32)
   return()
 endif()
 
-#-----------------------------------------------------------------------------
-# Set project prefix path
-#-----------------------------------------------------------------------------
-set(Libusb_PREFIX ${CMAKE_BINARY_DIR}/External/Libusb)
-set(Libusb_EXTRACT_DIR ${Libusb_PREFIX}/libusb-1.0.20)
+include(imstkAddExternalProject)
+
+# Set Libusb_SOURCE_DIR and Libusb_PREFIX
+imstk_define_external_dirs( Libusb )
 
 #-----------------------------------------------------------------------------
 # Set install commands
 #-----------------------------------------------------------------------------
+set(Libusb_EXTRACT_DIR ${Libusb_SOURCE_DIR})
+
 set(libusb_libdir "MS32")
 if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
   set(libusb_libdir "MS64")
@@ -37,13 +38,11 @@ set(copy_libusb_dll_command
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
-include(imstkAddExternalProject)
 imstk_add_external_project( Libusb
   URL http://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.21/libusb-1.0.21.7z https://data.kitware.com/api/v1/item/59cbcefd8d777f7d33e9d9d7/download
   URL_MD5 7fbcf5580b8ffc88f3af6eddd638de9f
   DOWNLOAD_DIR ${Libusb_PREFIX}
-  SOURCE_DIR ${Libusb_EXTRACT_DIR}
-  BINARY_DIR ${Libusb_EXTRACT_DIR}
+  SOURCE_DIR ${Libusb_SOURCE_DIR}
   UPDATE_COMMAND ${SKIP_STEP_COMMAND}
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
