@@ -95,8 +95,8 @@ endif()
 
 # VTK
 find_dependency(VTK CONFIG)
-find_dependency(vtkRenderingOpenVR QUIET)
-find_dependency(vtkRenderingExternal QUIET)
+find_package(vtkRenderingOpenVR QUIET)
+find_package(vtkRenderingExternal QUIET)
 find_dependency(VTK COMPONENTS ${iMSTK_VTK_DEPENDENCIES})
 
 if(iMSTK_USE_VTK_OSMESA)
