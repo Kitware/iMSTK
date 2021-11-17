@@ -123,7 +123,8 @@ ExternalProject_Add( ${PROJECT_NAME}
     # Always build these non standard configurations
   )
 
-	#-----------------------------------------------------------------------------
-    # Add the target to Examples folder
-    #-----------------------------------------------------------------------------
-    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER iMSTK)
+#-----------------------------------------------------------------------------
+# Add the target to iMSTK folder
+#-----------------------------------------------------------------------------
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER iMSTK)
+
