@@ -140,7 +140,7 @@ main()
             [&](Event*)
         {
             const Vec3d pos = camController->getPosition();
-            const Quatd orientation = camController->getRotation();
+            const Quatd orientation = camController->getOrientation();
 
             light->setPosition(pos);
             light->setFocalPoint(pos - orientation.toRotationMatrix().col(2));

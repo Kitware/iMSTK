@@ -413,7 +413,7 @@ main()
         {
             // Update the ghost debug geometry
             std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-            toolGhostMesh->setRotation(controller->getRotation());
+            toolGhostMesh->setRotation(controller->getOrientation());
             toolGhostMesh->setTranslation(controller->getPosition());
             toolGhostMesh->updatePostTransformData();
             toolGhostMesh->postModified();

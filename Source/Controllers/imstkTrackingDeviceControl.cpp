@@ -27,14 +27,14 @@
 namespace imstk
 {
 TrackingDeviceControl::TrackingDeviceControl() :
-    m_translationOffset(WORLD_ORIGIN),
+    m_translationOffset(Vec3d::Zero()),
     m_rotationOffset(Quatd::Identity())
 {
 }
 
 TrackingDeviceControl::TrackingDeviceControl(std::shared_ptr<DeviceClient> device) :
     DeviceControl(device),
-    m_translationOffset(WORLD_ORIGIN),
+    m_translationOffset(Vec3d::Zero()),
     m_rotationOffset(Quatd::Identity())
 {
 }
@@ -77,17 +77,20 @@ TrackingDeviceControl::updateTrackingData(const double dt)
     }
     if (m_invertFlags & InvertFlag::rotX)
     {
-        m_currentOrientation.x()    = -m_currentOrientation.x();
+        m_currentOrientation.y()    = -m_currentOrientation.y();
+        m_currentOrientation.z()    = -m_currentOrientation.z();
         m_currentAngularVelocity[0] = -m_currentAngularVelocity[0];
     }
     if (m_invertFlags & InvertFlag::rotY)
     {
-        m_currentOrientation.y()    = -m_currentOrientation.y();
+        m_currentOrientation.x()    = -m_currentOrientation.x();
+        m_currentOrientation.z()    = -m_currentOrientation.z();
         m_currentAngularVelocity[1] = -m_currentAngularVelocity[1];
     }
     if (m_invertFlags & InvertFlag::rotZ)
     {
-        m_currentOrientation.z()    = -m_currentOrientation.z();
+        m_currentOrientation.x()    = -m_currentOrientation.x();
+        m_currentOrientation.y()    = -m_currentOrientation.y();
         m_currentAngularVelocity[2] = -m_currentAngularVelocity[2];
     }
 
@@ -152,13 +155,13 @@ TrackingDeviceControl::setPosition(const Vec3d& pos)
 }
 
 const imstk::Quatd&
-TrackingDeviceControl::getRotation() const
+TrackingDeviceControl::getOrientation() const
 {
     return m_currentOrientation;
 }
 
 void
-TrackingDeviceControl::setRotation(const Quatd& orientation)
+TrackingDeviceControl::setOrientation(const Quatd& orientation)
 {
     this->m_currentOrientation = orientation;
 }

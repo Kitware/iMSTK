@@ -61,7 +61,7 @@ SceneObjectController::update(const double dt)
     // Update geometry
     // \todo revisit this; what if we need to move a group of objects
     m_sceneObject->getMasterGeometry()->setTranslation(getPosition());
-    m_sceneObject->getMasterGeometry()->setRotation(getRotation());
+    m_sceneObject->getMasterGeometry()->setRotation(getOrientation());
     m_sceneObject->getMasterGeometry()->postModified();
 }
 }

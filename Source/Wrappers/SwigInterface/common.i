@@ -236,6 +236,7 @@ public:
     imstkQuatf(float x, float y, float z, float w) : m_data(w, x, y, z) { }
     inline const EigenData& get() const { return m_data; }
 
+    inline imstk::Mat3f toRotationMatrix() { return m_data.toRotationMatrix(); }
     inline float x() const { return m_data.x(); }
     inline float y() const { return m_data.y(); }
     inline float z() const { return m_data.z(); }
@@ -254,6 +255,7 @@ public:
     imstkQuatd(double x, double y, double z, double w) : m_data(w, x, y, z) { }
     inline const EigenData& get() const { return m_data; }
 
+    inline imstk::Mat3d toRotationMatrix() { return m_data.toRotationMatrix(); }
     inline double x() const { return m_data.x(); }
     inline double y() const { return m_data.y(); }
     inline double z() const { return m_data.z(); }

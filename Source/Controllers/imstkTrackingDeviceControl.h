@@ -80,8 +80,8 @@ public:
     ///
     /// \brief Set/Get the orientation of the tracker
     ///@{
-    const Quatd& getRotation() const;;
-    void setRotation(const Quatd& orientation);
+    const Quatd& getOrientation() const;;
+    void setOrientation(const Quatd& orientation);
     ///@}
 
     ///
