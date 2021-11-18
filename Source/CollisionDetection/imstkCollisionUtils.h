@@ -254,7 +254,7 @@ testPlaneToSphere(
     planeContactPt      = spherePos - d * planeNormal;
     sphereContactPt     = spherePos - r * planeNormal;
 
-    penetrationDepth = r + std::abs(d);
+    penetrationDepth = r - d;
     return d < r;
 }
 
