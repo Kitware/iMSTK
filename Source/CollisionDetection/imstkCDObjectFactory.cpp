@@ -25,6 +25,7 @@ limitations under the License.
 #include "imstkImplicitGeometryToPointSetCD.h"
 #include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkPointSetToCapsuleCD.h"
+#include "imstkPointSetToCylinderCD.h"
 #include "imstkPointSetToOrientedBoxCD.h"
 #include "imstkPointSetToPlaneCD.h"
 #include "imstkPointSetToSphereCD.h"
@@ -45,6 +46,7 @@ IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCCD);
 IMSTK_REGISTER_COLLISION_DETECTION(MeshToMeshBruteForceCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToCapsuleCD);
+IMSTK_REGISTER_COLLISION_DETECTION(PointSetToCylinderCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToPlaneCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToSphereCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToOrientedBoxCD);
