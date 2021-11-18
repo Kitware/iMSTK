@@ -413,7 +413,7 @@ VTKRenderer::updateCamera()
     m_camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
 
     // Copy the projection back to the camera
-    vtkMatrix4x4* projVtk = m_camera->GetProjectionTransformMatrix(m_vtkRenderer);
+    auto projVtk = vtkSmartPointer<vtkMatrix4x4>::Take(m_camera->GetProjectionTransformMatrix(m_vtkRenderer));
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
