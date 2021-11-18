@@ -69,49 +69,40 @@ TaskGraph::containsNode(std::shared_ptr<TaskNode> node) const
 }
 
 bool
-TaskGraph::containsEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode)
+TaskGraph::containsEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode) const
 {
-    return (m_adjList.count(srcNode) != 0 && m_adjList[srcNode].count(destNode) != 0);
+    return (m_adjList.count(srcNode) != 0 && m_adjList.at(srcNode).count(destNode) != 0);
 }
 
 void
 TaskGraph::addEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode)
 {
-    if (!containsNode(srcNode))
-    {
-        LOG(WARNING) << "srcNode " << srcNode->m_name << " does not exist in graph";
-        return;
-    }
-    if (!containsNode(destNode))
-    {
-        LOG(WARNING) << "destNode " << destNode->m_name << " does not exist n graph";
-        return;
-    }
+    CHECK(containsNode(srcNode)) << "source node \"" << srcNode->m_name << "\" does not exist in graph";
+    CHECK(containsNode(destNode)) << "destination node \"" << destNode->m_name << "\" does not exist in graph";
 
     m_adjList[srcNode].insert(destNode);
     m_invAdjList[destNode].insert(srcNode);
 }
 
 void
+TaskGraph::addEdges(const std::vector<std::pair<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>>>& edges)
+{
+    using EdgePair = std::pair<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>>;
+    std::for_each(edges.begin(), edges.end(), [this](const EdgePair& edge) { addEdge(edge.first, edge.second); });
+}
+
+void
 TaskGraph::nestGraph(std::shared_ptr<TaskGraph> subgraph, std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    // Ensure source and sink are in the graph
-    if (findNode(source) == endNode())
-    {
-        LOG(WARNING) << "Tried to nest a graph using source, but source does not exist in this";
-        return;
-    }
-    if (findNode(sink) == endNode())
-    {
-        LOG(WARNING) << "Tried to nest a graph using sink, but sink does not exist in this";
-        return;
-    }
+    CHECK(containsNode(source)) << "Tried to nest a graph using source, but source does not exist in this";
+    CHECK(containsNode(sink)) << "Tried to nest a graph using sink, but sink does not exist in this";
 
     // Copy all of the nodes into this graph (check duplicates)
-    for (TaskNodeVector::iterator it = subgraph->getNodes().begin(); it != subgraph->getNodes().end(); it++)
+    for (const auto& node : subgraph->getNodes())
     {
-        addNode(*it);
+        addNode(node);
     }
+
     // Copy all the edges into the graph (no need to check for duplicates)
     const TaskNodeAdjList& adjList = subgraph->getAdjList();
     for (TaskNodeAdjList::const_iterator it = adjList.begin(); it != adjList.end(); it++)
@@ -164,6 +155,12 @@ TaskGraph::addNode(std::shared_ptr<TaskNode> node)
     {
         return false;
     }
+}
+
+void
+TaskGraph::addNodes(const std::vector<std::shared_ptr<TaskNode>>& nodes)
+{
+    std::for_each(nodes.begin(), nodes.end(), [this](const std::shared_ptr<TaskNode>& node) { addNode(node); });
 }
 
 std::shared_ptr<TaskNode>
@@ -247,11 +244,10 @@ TaskGraph::removeNodeAndRedirect(std::shared_ptr<TaskNode> node)
 void
 TaskGraph::insertAfter(std::shared_ptr<TaskNode> refNode, std::shared_ptr<TaskNode> newNode)
 {
-    // Try to add to graph, if already exists, exit
-    if (!addNode(newNode))
-    {
-        return;
-    }
+    CHECK(containsNode(refNode)) << "Reference Node has to exist in graph for insertAfter.";
+    CHECK(!containsNode(newNode)) << "New Node " << newNode->m_name << " already exists in this graph.";
+
+    addNode(newNode);
 
     // Remove output edges
     TaskNodeSet outputs = m_adjList[refNode]; // Copy (since we are modifying)
@@ -389,8 +385,8 @@ TaskGraph::clear()
 //    return results;
 //}
 
-std::shared_ptr<TaskNodeList>
-TaskGraph::topologicalSort(std::shared_ptr<TaskGraph> graph)
+std::shared_ptr<imstk::TaskNodeList>
+TaskGraph::topologicalSort(std::shared_ptr<const TaskGraph> graph)
 {
     // Compute the number of inputs to each node (we will remove these as we go)
     std::unordered_map<std::shared_ptr<TaskNode>, size_t> numInputs;
@@ -414,7 +410,7 @@ TaskGraph::topologicalSort(std::shared_ptr<TaskGraph> graph)
                                   return (removedEdges.count(node1) != 0) && (removedEdges[node1] == node2);
                               };
 
-    // Kahns algorithm (BFS/queue)
+    //  Kahns algorithm (BFS/queue)
     //  iterate through all nodes (BFS or DFS) removing edges
     //  nodes are accepted when all input edges have been removed
     std::queue<std::shared_ptr<TaskNode>> sources;
