@@ -167,6 +167,7 @@
 #include "imstkInteractionPair.h"
 #include "imstkObjectInteractionPair.h"
 #include "imstkPbdObjectCuttingPair.h"
+#include "imstkPbdRigidObjectCollision.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkSphObjectCollision.h"
 
@@ -396,6 +397,7 @@ namespace std
 %include "../../Scene/imstkCollisionPair.h";
 %include "../../Scene/imstkRigidObjectCollision.h";
 %include "../../Scene/imstkPbdObjectCuttingPair.h"
+%include "../../Scene/imstkPbdRigidObjectCollision.h"
 %include "../../Scene/imstkPbdObjectCollision.h"
 %include "../../Scene/imstkSphObjectCollision.h"
 
