@@ -173,6 +173,7 @@
 %shared_ptr(imstk::InteractionPair)
 %shared_ptr(imstk::ObjectInteractionPair)
 %shared_ptr(imstk::PbdObjectCuttingPair)
+%shared_ptr(imstk::PbdRigidObjectCollision)
 %shared_ptr(imstk::PbdObjectCollision)
 %shared_ptr(imstk::SphObjectCollision)
 
