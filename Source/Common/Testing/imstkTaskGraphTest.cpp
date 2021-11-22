@@ -75,7 +75,7 @@ TEST(imstkTaskGraphDeathTest, InvalidEdges)
 
     taskGraph->addNode(node1);
 
-    /// Adding Edges to the graph with nodes that are not in the graph 
+    /// Adding Edges to the graph with nodes that are not in the graph
     /// should fail with DEATH
     EXPECT_DEATH(taskGraph->addEdge(node1, node2), "does not exist in graph");
     EXPECT_DEATH(taskGraph->addEdge(node2, node1), "does not exist in graph");
@@ -171,9 +171,9 @@ TEST(imstkTaskGraphTest, RemoveNodesWithEdges)
     auto source    = taskGraph->getSource();
     auto sink      = taskGraph->getSink();
 
-    /// source - node1 - node2 
+    /// source - node1 - node2
     ///               \    |
-    ///                sink 
+    ///                sink
     taskGraph->addNode(node1);
     taskGraph->addNode(node2);
     taskGraph->addEdge(node1, node2);
@@ -239,10 +239,12 @@ TEST(imstkTaskGraphTest, RemoveNodesWithEdgesAndRedirect)
 
         taskGraph->addNode(node1);
         taskGraph->addNode(node2);
-     
+
+        // *INDENT-OFF*
         /// source - node1 - sink
         ///                \
-        ///                  node2
+        ///                 node2
+        // *INDENT-ON*
         taskGraph->addEdge(source, node1);
         taskGraph->addEdge(node1, node2);
         taskGraph->addEdge(node1, sink);
@@ -262,9 +264,12 @@ TEST(imstkTaskGraphTest, RemoveNodesWithEdgesAndRedirect)
         taskGraph->addNode(node1);
         taskGraph->addNode(node2);
         taskGraph->addNode(node3);
+
+        // *INDENT-OFF*
         /// source - node1 - sink
         ///        /         \
-        ///  node2            node3
+        /// node2            node3
+        // *INDENT-ON*
         taskGraph->addEdge(source, node1);
         taskGraph->addEdge(node2, node1);
         taskGraph->addEdge(node1, sink);
@@ -291,9 +296,11 @@ TEST(imstkTaskGraphTest, InsertBefore)
     // Fan in
     taskGraph->addNode(node1);
     taskGraph->addNode(node2);
+    // *INDENT-OFF*
     /// source - node1 - sink
     ///                /
     ///          node2
+    // *INDENT-ON*
     taskGraph->addEdge(source, node1);
     taskGraph->addEdge(node2, node1);
     taskGraph->addEdge(node1, sink);
@@ -319,9 +326,11 @@ TEST(imstkTaskGraphTest, InsertAfter)
     // Fan out
     taskGraph->addNode(node1);
     taskGraph->addNode(node2);
+    // *INDENT-OFF*
     /// source - node1 - sink
     ///                \
     ///                 node2
+    // *INDENT-ON*
     taskGraph->addEdge(source, node1);
     taskGraph->addEdge(node1, node2);
     taskGraph->addEdge(node1, sink);
@@ -372,10 +381,9 @@ TEST(imstkTaskGraphTest, AddSubGraph)
         { node2, sink },
         });
 
-
     /// Expected shape
-    /// node1 connected to subgraph->source maintaining subgraph structure, and then 
-    /// subgraph->sink connecting to node2 
+    /// node1 connected to subgraph->source maintaining subgraph structure, and then
+    /// subgraph->sink connecting to node2
     taskGraph->nestGraph(subGraph, node1, node2);
     EXPECT_THAT(taskGraph->getNodes(), UnorderedElementsAre(source, sink, node1, node2,
         innerNode1, innerNode2, subGraph->getSource(), subGraph->getSink()));
@@ -413,6 +421,9 @@ TEST(imstkTaskGraphTest, TopologicalSort)
     auto taskGraph = std::make_shared<TaskGraph>();
     taskGraph->addNodes({ std::make_shared<TaskNode>(), std::make_shared<TaskNode>(), std::make_shared<TaskNode>() });
     auto& nodes = taskGraph->getNodes();
+    nodes[2]->m_name = "two";
+    nodes[3]->m_name = "three";
+    nodes[4]->m_name = "four";
 
     taskGraph->addEdges({
         { nodes[0], nodes[2] },
@@ -424,10 +435,21 @@ TEST(imstkTaskGraphTest, TopologicalSort)
 
     auto           sorted = TaskGraph::topologicalSort(taskGraph);
     TaskNodeVector result;
-
+    EXPECT_EQ(5, sorted->size());
     std::copy(sorted->begin(), sorted->end(), std::back_inserter(result));
 
-    EXPECT_THAT(result, ElementsAre(nodes[0], nodes[2], nodes[3], nodes[4], nodes[1]));
+    std::string message;
+    std::for_each(result.begin(), result.end(), [&message](std::shared_ptr<TaskNode>& node) { message += node->m_name + ", "; });
+
+    EXPECT_EQ(nodes[0], result[0]);
+
+    // The order varies between source, two, three, four, sink
+    // and source, three, two, four, sink
+    EXPECT_TRUE(nodes[2] == result[1] || nodes[3] == result[1]);
+    EXPECT_TRUE(nodes[2] == result[2] || nodes[3] == result[2]);
+    EXPECT_NE(result[1], result[2]);
+    EXPECT_EQ(nodes[4], result[3]);
+    EXPECT_EQ(nodes[1], result[4]);
 }
 
 TEST(imstkTaskGraphTest, IsCyclic)
@@ -519,10 +541,10 @@ TEST(imstkTaskGraphTest, TransitiveReduce)
             );
         auto result = TaskGraph::transitiveReduce(taskGraph);
         EXPECT_THAT(result->getNodes(), ElementsAre(taskGraph->getSource(), taskGraph->getSink(), node1, node2));
-        EXPECT_TRUE(correctlyConnected(taskGraph, taskGraph->getSource(), node1));
-        EXPECT_TRUE(correctlyConnected(taskGraph, node1, node2));
-        EXPECT_TRUE(correctlyConnected(taskGraph, node2, taskGraph->getSink()));
-        EXPECT_FALSE(correctlyConnected(taskGraph, node1, taskGraph->getSink()));
+        EXPECT_TRUE(correctlyConnected(result, taskGraph->getSource(), node1));
+        EXPECT_TRUE(correctlyConnected(result, node1, node2));
+        EXPECT_TRUE(correctlyConnected(result, node2, taskGraph->getSink()));
+        EXPECT_FALSE(correctlyConnected(result, node1, taskGraph->getSink()));
     }
 }
 

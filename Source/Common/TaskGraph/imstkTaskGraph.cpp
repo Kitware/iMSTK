@@ -405,7 +405,7 @@ TaskGraph::topologicalSort(std::shared_ptr<const TaskGraph> graph)
     // Create an edge blacklist for edge removal during algorithm
     std::unordered_map<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>> removedEdges;
 
-    auto edgeHasBeenRemoved = [&](const std::shared_ptr<TaskNode>& node1, const std::shared_ptr<TaskNode>& node2)
+    auto edgeHasBeenRemoved = [&removedEdges](const std::shared_ptr<TaskNode>& node1, const std::shared_ptr<TaskNode>& node2)
                               {
                                   return (removedEdges.count(node1) != 0) && (removedEdges[node1] == node2);
                               };
