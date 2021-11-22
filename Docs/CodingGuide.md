@@ -1,8 +1,8 @@
 # Introduction
 
-This guide collates best practices from a variety of sources, while some of these express a certain _taste_ we want the items that are covered here to be consistent accross iMSTK. 
+This guide collates best practices from a variety of sources, while some of these express a certain _taste_ we want the items that are covered here to be consistent across iMSTK. 
 
-Coding style is not only limited to the actual formatting but also to things like the naming of functions or variables, or the use of certain c++ features or patterns. By being consistent in these we make development for iMSTK easier for ourselves and others as names and patterns are reused accross the code base. 
+Coding style is not only limited to the actual formatting but also to things like the naming of functions or variables, or the use of certain c++ features or patterns. By being consistent in these we make development for iMSTK easier for ourselves and others as names and patterns are reused across the code base. 
 
 While the text of this guide is mostly culled from the [OpenSurgSim coding guide](https://app.assembla.com/spaces/OpenSurgSim/wiki/Coding_Standards) the following resources were used to create and refine the style 
 
@@ -65,7 +65,7 @@ fooBar(bool baz, StringRef quux, std::vector<int>& result);
 // more than one line.
 ```
 
-* Document responsibilities and background rather than what the code does, escpecially inline. The code should be readible and its details shouldn't need documentation. 
+* Document responsibilities and background rather than what the code does, especially inline. The code should be readable and its details shouldn't need documentation. 
 
     Example : 
 ```
@@ -74,7 +74,7 @@ fooBar(bool baz, StringRef quux, std::vector<int>& result);
 ///
 /// \brief Base class for viewer that manages render window and the renderers
 /// Creates backend-specific renderers on a per-scene basis.
-/// Contains user API to configure the rendering with various backends
+/// Contains user API to configure the rendering with various back-ends
 ///
 ```
 
@@ -102,17 +102,25 @@ void setPoint(double x, double y, double z);
 # Naming conventions
 ## General naming conventions
 
-Consistent naming enables users to guess names and once they are familiar, correctly named functions and variables also should enhance readibility of the code
+Consistent naming enables users to guess names and once they are familiar, correctly named functions and variables also should enhance readability of the code
 
-* Names representing types should be in mixed case starting with upper case.
+### Terms 
+For the purpose of this document we use the following convention
+
+* PascalCase: used for classes, enum constants
+* camelCase: used for function and variable names, 
+* MACRO_CASE: used for macros and defines
+
+### Rules 
+* Names representing types should be in PascalCase.
 
     Example: `Line`, `SurfaceMesh`
 
-* Variable names should be in mixed case starting with lower case.
+* Variable names should be in camelCase, class member variable should be prefixed with `m_`.
 
     Example: `line`, `surfaceMesh`, `m_surfaceMesh`
 
-* Named constants (including enumeration values) must be all uppercase using underscore to separate words.
+* Named constants (including enumeration values) must be all MACRO_CASE.
 
     Example: `MAX_ITERATIONS`, `COLOR_RED`, `PI`
 
@@ -120,7 +128,7 @@ Consistent naming enables users to guess names and once they are familiar, corre
 
 * Macro names follow the same rules as constants.
 * All macro names should be prefixed with `IMSTK_` this prevents clashes with macros imported from other projects
-* Names representing methods or functions should be verbs and written in mixed case starting with lower case.
+* Names representing methods or functions should be verbs and written in camelCase.
 
     Example: `getName()`, `computeTotalWidth()`
 
@@ -130,17 +138,20 @@ Consistent naming enables users to guess names and once they are familiar, corre
 
     `template <int N, class C, typename D>`
 
-* Abbreviations and acronyms should not be all uppercase when used as a part of a name.
+* Abbreviations and acronyms should use mixed case when used as a part of a name.
 
-    `exportHTMLSource();` (NOT: `exportHtmlSource();`)
+    `exportHtmlSource();` (NOT: `exportHTMLSource();`)
 
-    `openDVDPlayer();` (NOT: `openDVDPlayer();`)
+    `openDvdPlayer();` (NOT: `openDVDPlayer();`)
 
 * Data members in a class should have names starting with "m_".
 
     `class SomeClass { private: int m_length; }`
 
-* Data members in a data-only struct should not start with "m_".
+* Data members in a data-only struct should not start with "m_". As the purpose is to access member variables of structs prefixing those with `m_` makes the code less readable
+   
+   `struct SomeStruct { int a, int b}`
+
 
 * All names should be written in US English and spelled correctly.
 
@@ -157,7 +168,7 @@ Consistent naming enables users to guess names and once they are familiar, corre
 
 * Top level namespace for iMSTK code is `imstk`.
 
-* Math drive code is an exception to the naming rules, to mainting correspondence with publish formulas, appropriate variable names may be used, be that single letter variables or capitalized, e.g. the implemented formula may use `F` and `f` and so should the code.
+* Highly math based code is an exception to the naming rules, to maintain correspondence with published formulas, appropriate variable names may be used, be that single letter variables or capitalized, e.g. the implemented formula may use `F` and `f` and so should the code.
 
 ## Specific naming conventions
 
@@ -179,9 +190,11 @@ Consistent naming enables users to guess names and once they are familiar, corre
 
     * Use more expressive names when using multiple iterators in the same construct
 
+    * Generally prefer ranged based for loops over iterators
+
 * Accessors and modifiers must start with "get" and "set".
 
-* Accessors that return boolean must start with an interoggative such as "is" or "are".
+* Accessors that return boolean must start with an interrogative such as "is" or "are".
 
 * Try to use complementary names for complementary operations.
     * get/set, add/remove, create/destroy, start/stop, insert/delete, increment/decrement, old/new, begin/end, first/last, up/down, min/max, next/previous, old/new, open/close, show/hide, suspend/resume, etc.
@@ -207,11 +220,11 @@ Consistent naming enables users to guess names and once they are familiar, corre
 
     It is not immediately apparent what `!isNotFound` means.
 
-* Enumeration constants should be prefixed by the enumeration type name.
+* Enumeration should use `class` identifiers, and enum Constants should use PascalCase 
 
-    `enum Color { NONE = 0, COLOR_RED, COLOR_GREEN, COLOR_BLUE, MAX_COLORS };`
+    `enum class Color { None = 0, Red, Green, Blue, MaxColors };`
 
-    If the final enumeration value is used only to track the number of other values, it can be named `MAX_<type>S`; this is clearer than `<type>_MAX`.
+    If the final enumeration value is used only to track the number of other values, it should be named `Max<type>s`; this is clearer than `<type>Max`.
 
 # Declarations
 
@@ -249,8 +262,6 @@ class Y : public X
 * Be aware that arithmetic can result in invalid or wrapped values. You may need to verify the result will be within a valid range before performing arithmetic.
 
 * We prefer using integer values that match the processor's word size: `size_t` for unsigned values and `ptrdiff_t` for signed values.
-
-* For quantities and indices, we prefer `imstk::index_t` which is an unsiged datatype.
 
 * In Standard Library, `size_type` corresponds to `size_t`, and `difference_type` corresponds to `ptrdiff_t`.
 
@@ -320,11 +331,11 @@ if (ptr != nullptr)
 
 # Constructors
 
-* Ideally all or most member variables should be intialized after the constructor has run
+* Ideally all or most member variables should be initialized after the constructor has run
 
 * Note that `Eigen` matrices do not initialize to `0` the default constructor intentionally leaves the content at a random value
 
-* Prefer the default member initializer over constructor inizialization, this is safer when multiple constructors need to be implemented and reduces the footprint of the member initializer list.
+* Prefer the default member initializer over constructor initialization, this is safer when multiple constructors need to be implemented and reduces the footprint of the member initializer list.
 
 Example:
 ```
@@ -338,10 +349,10 @@ NOT
 class A
 {
     A() : m_a(5) {}
-    
     int m_a;
 }
 ```
+
 
 ## Miscellaneous
 
@@ -378,7 +389,7 @@ Under this aspect, use:
 
 - `unique_ptr` and `shared_ptr` to indicate ownership
 - Take smart pointers as parameters only to indicate lifetime semantics
-    - A `Widget&` or `Widget*` is non owning, use when no transfer of ownership is occuring 
+    - A `Widget&` or `Widget*` is non owning, use when no transfer of ownership is occurring 
     - Take a `unique_ptr<Widget>` to express that a function assumes ownership of the `widget`
     - Take a `unique_ptr<Widget>&` to express that the function reseats the `widget`
     - Take a `shared_ptr<Widget>` to express that the function is part owner
@@ -393,7 +404,7 @@ Under this aspect, use:
 * Don't leave code in the header unless it is intended for inlining. In general there is no need to inline functions. Inline only when they are small, say, 10 lines or fewer. See [Google Style/Inline Functions](https://google.github.io/styleguide/cppguide.html#Inline_Functions). 
 
 * A class should be declared in a header file and defined in a source file where the name of the files match the name of the class.
-    * Filenames can freely use mixed case. Don't create file names (or class names) that differ only in capitalization. When in doubt, the file name should start with upper case.
+    * Filenames can freely use camelCase. Don't create file names (or class names) that differ only in capitalization.
 
 * Unless absolutely necessary, have one .h file and one .cpp *or* -inl.h file per class, and only one class in each file.
 
@@ -426,7 +437,7 @@ Example:
 #include "PropertiesDialog.h"
 ```
 
-* When possible use forward class references but don't use forward references to other projects this may cause unintneded side-effects see https://google.github.io/styleguide/cppguide.html#Forward_Declarations
+* When possible use forward class references but don't use forward references to other projects this may cause unintended side-effects see https://google.github.io/styleguide/cppguide.html#Forward_Declarations
 
 # Git Repository
 
@@ -445,13 +456,13 @@ should be wrapped at 72 characters.
 - `INFO`, Informational, notify of state changes. Example a file was successfully loaded
 - `WARNING`, Something failed, but the impact of the failure is not know or minimal (e.g. purely visual). Example: The iteration limit was exceeded
 - `SEVERE`, Something failed and will impact functionality, some parts of the program will not function correctly. Example: NaN was found in a calculation result, where none was ever expected
-- `FATAL`, Used by assertion, after using this level the program will not be functional at all. Example a nullptr was passed where not null was expeced
+- `FATAL`, Used by assertion, after using this level the program will not be functional at all. Example a nullptr was passed where not null was expected
 
 # Error Handling
 
-A function that fails to do its job due to invalid input parameters or a violation of constraints should not do so silently, just prining a warning is not sufficient
+A function that fails to do its job due to invalid input parameters or a violation of constraints should not do so silently, just printing a warning is not sufficient
 
-Prefer to use `CHECK()` or `LOG(FATAL)` and abort in most cases, a CHECK as per glog definition is a contract, if the contract is violated the programm will not be able to execute correctly. There is no point in proceeding, examples here are, nullptr passed where that is not acceptable if you think that the error should not force the system to shut down, use `LOG(WARNING)` but in this case the function that failed needs to provide a method that indicates to the user that a failure occured (e.g. returning `false`). Note that the latter will more likely cause more code to be written as now return values will have to be checked.
+Prefer to use `CHECK()` or `LOG(FATAL)` and abort in most cases, a CHECK as per glog definition is a contract, if the contract is violated the program will not be able to execute correctly. There is no point in proceeding, examples here are, nullptr passed where that is not acceptable if you think that the error should not force the system to shut down, use `LOG(WARNING)` but in this case the function that failed needs to provide a method that indicates to the user that a failure occurred (e.g. returning `false`). Note that the latter will more likely cause more code to be written as now return values will have to be checked.
 
 
 
