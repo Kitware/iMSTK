@@ -49,23 +49,24 @@ public:
     virtual ~TaskGraph() = default;
 
 public:
-    std::shared_ptr<TaskNode> getSource() { return m_source; }
-    std::shared_ptr<TaskNode> getSink() { return m_sink; }
+    std::shared_ptr<TaskNode> getSource() const { return m_source; }
+    std::shared_ptr<TaskNode> getSink() const { return m_sink; }
 
     ///
     /// \brief Get the nodes belonging to this graph
+    /// HS This is bad, there are algorithms that change the nodes of the graph from the outside
     ///
     TaskNodeVector& getNodes() { return m_nodes; }
 
     ///
     /// \brief Get the edges belonging to this graph
     ///
-    TaskNodeAdjList& getAdjList() { return m_adjList; }
+    const TaskNodeAdjList& getAdjList() const { return m_adjList; }
 
     ///
     /// \brief Get the inverse edges belonging to this graph
     ///
-    TaskNodeAdjList& getInvAdjList() { return m_invAdjList; }
+    const TaskNodeAdjList& getInvAdjList() const { return m_invAdjList; }
 
 // Node operations
 public:
@@ -103,6 +104,11 @@ public:
     bool addNode(std::shared_ptr<TaskNode> node);
 
     ///
+    /// \brief Adds a series of nodes at the same time
+    /// Use with {} initializer for easier graph construction
+    void addNodes(const std::vector<std::shared_ptr<TaskNode>>& nodes);
+
+    ///
     /// \brief Creates a node for the function, adds it to the graph
     ///
     std::shared_ptr<TaskNode> addFunction(std::string name, std::function<void()> func);
@@ -134,12 +140,17 @@ public:
     ///
     /// \brief Returns whether or not this graph contains the given directed edge
     ///
-    bool containsEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode);
+    bool containsEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode) const;
 
     ///
-    /// \brief Adds a directed edge to the graph (doesn't check if nodes are in graph)
+    /// \brief Adds a directed edge to the graph both the source and target have to exist in the graph
     ///
     void addEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode);
+
+    /// \brief Adds a series of directed edges {source, target} to the graph
+    /// both the source and target of the edge have to exist in the graph
+    ///
+    void addEdges(const std::vector<std::pair<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>>>& edges);
 
     ///
     /// \brief Attaches another TaskGraph as a subgraph (copies nodes and edges, then connects source->subgraph::source, subgraph::sink->sink),
@@ -182,7 +193,7 @@ public:
     ///
     /// \brief Topological sort of all nodes within graph
     ///
-    static std::shared_ptr<TaskNodeList> topologicalSort(std::shared_ptr<TaskGraph> graph);
+    static std::shared_ptr<TaskNodeList> topologicalSort(std::shared_ptr<const TaskGraph> graph);
 
     ///
     /// \brief Makes sure no two *critical nodes* run at the same time by establishing an edge between them.
