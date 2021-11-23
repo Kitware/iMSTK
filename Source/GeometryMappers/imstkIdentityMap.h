@@ -28,16 +28,18 @@ namespace imstk
 ///
 /// \class IdentityMap
 ///
-/// \brief A maps that lets the slave follow the master's position and orientation
+/// \brief A maps that lets the child follow the parent's position and orientation
 ///
 class IdentityMap : public GeometryMap
 {
 public:
+    IdentityMap() { }
 
-    IdentityMap() : GeometryMap(GeometryMap::Type::Identity) {}
+    ~IdentityMap() override = default;
 
-    ~IdentityMap() = default;
+    virtual const std::string getTypeName() const override { return "IdentityMap"; }
 
+public:
     ///
     /// \brief Compute the map
     ///

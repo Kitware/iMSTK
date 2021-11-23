@@ -48,56 +48,28 @@ GeometryMap::isActive() const
     return m_isActive;
 }
 
-const GeometryMap::Type&
-GeometryMap::getType() const
-{
-    return m_type;
-}
-
-const std::string
-GeometryMap::getTypeName() const
-{
-    switch (m_type)
-    {
-    case Type::Isometric:
-        return "Isometric map";
-    case Type::Identity:
-        return "Identity map";
-    case Type::TetraTriangle:
-        return "Tetra-Triangle map";
-    case Type::HexaTriangle:
-        return "Hexa-Triangle map";
-    case Type::TetraTetra:
-        return "Tetra-Tetra map";
-    case Type::OneToOne:
-        return "One-to-One nodal map";
-    default:
-        return "Map type not determined!";
-    }
-}
-
 void
-GeometryMap::setMaster(std::shared_ptr<Geometry> master)
+GeometryMap::setParentGeometry(std::shared_ptr<Geometry> parent)
 {
-    m_master = master;
+    m_parentGeom = parent;
 }
 
 std::shared_ptr<Geometry>
-GeometryMap::getMaster() const
+GeometryMap::getParentGeometry() const
 {
-    return m_master;
+    return m_parentGeom;
 }
 
 void
-GeometryMap::setSlave(std::shared_ptr<Geometry> slave)
+GeometryMap::setChildGeometry(std::shared_ptr<Geometry> child)
 {
-    m_slave = slave;
+    m_childGeom = child;
 }
 
 std::shared_ptr<Geometry>
-GeometryMap::getSlave() const
+GeometryMap::getChildGeometry() const
 {
-    return m_slave;
+    return m_childGeom;
 }
 
 void

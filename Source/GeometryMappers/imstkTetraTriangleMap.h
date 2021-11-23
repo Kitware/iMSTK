@@ -30,32 +30,27 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class TetraTriangleMap
 ///
-/// \brief Computes and applies the triangle-tetrahedra map. The master mesh is the
-///  tetrahedral mesh and the slave is the surface triangular mesh.
+/// \brief Computes and applies the triangle-tetrahedra map. The parent mesh is the
+///  tetrahedral mesh and the child is the surface triangular mesh.
 ///
 class TetraTriangleMap : public GeometryMap
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    TetraTriangleMap() : GeometryMap(GeometryMap::Type::TetraTriangle), m_boundingBoxAvailable(false) {}
-
-    ///
-    /// \brief Constructor
-    ///
-    TetraTriangleMap(std::shared_ptr<Geometry> master, std::shared_ptr<Geometry> slave)
-        : GeometryMap(GeometryMap::Type::TetraTriangle), m_boundingBoxAvailable(false)
+    TetraTriangleMap() : m_boundingBoxAvailable(false) { }
+    TetraTriangleMap(
+        std::shared_ptr<Geometry> parent,
+        std::shared_ptr<Geometry> child)
+        : m_boundingBoxAvailable(false)
     {
-        this->setMaster(master);
-        this->setSlave(slave);
+        this->setParentGeometry(parent);
+        this->setChildGeometry(child);
     }
 
-    ///
-    /// \brief Destructor
-    ///
     virtual ~TetraTriangleMap() override = default;
 
+    virtual const std::string getTypeName() const override { return "TetraTriangleMap"; }
+
+public:
     ///
     /// \brief Compute the tetra-triangle mesh map
     ///
@@ -79,15 +74,14 @@ public:
     ///
     /// \brief Set the geometry that dictates the map
     ///
-    void setMaster(std::shared_ptr<Geometry> master) override;
+    void setParentGeometry(std::shared_ptr<Geometry> parent) override;
 
     ///
-    /// \brief Set the geometry that follows the master
+    /// \brief Set the geometry that follows the parent
     ///
-    void setSlave(std::shared_ptr<Geometry> slave) override;
+    void setChildGeometry(std::shared_ptr<Geometry> child) override;
 
 protected:
-
     ///
     /// \brief Find the tetrahedron that encloses a given point in 3D space
     ///
@@ -113,6 +107,6 @@ protected:
     bool m_boundingBoxAvailable;
 
 private:
-    std::shared_ptr<VecDataArray<double, 3>> m_slaveVerts;
+    std::shared_ptr<VecDataArray<double, 3>> m_childVerts;
 };
 }  // namespace imstk

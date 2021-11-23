@@ -110,7 +110,7 @@ main()
 
     std::shared_ptr<SceneObject> scalpelBlade15 = makeBlade("Scalpel_Blade15");
     scene->addSceneObject(scalpelBlade15);
-    scalpelBlade15->getMasterGeometry()->setTranslation(0.2, 1.0, -0.8);
+    scalpelBlade15->getVisualGeometry()->setTranslation(0.2, 1.0, -0.8);
 
     std::shared_ptr<SceneObject> tableObj = ObjectIO::importSceneObject("Instrument Table",
         iMSTK_DATA_ROOT "/Surgical instruments/Instrument Table/Instrument_Table.dae",
@@ -157,42 +157,42 @@ main()
                 {
                     // Swap to blade 15 only if it's close in space
                     Vec3d min, max;
-                    scalpelBlade15->getMasterGeometry()->computeBoundingBox(min, max);
+                    scalpelBlade15->getVisualGeometry()->computeBoundingBox(min, max);
                     const Vec3d posBlade = (min + max) * 0.5;
                     const double dist    = (posControl - posBlade).norm();
                     LOG(INFO) << "Dist: " << dist;
                     if (dist < 2.0)
                     {
-                        const Vec3d t = scalpelBlade15->getMasterGeometry()->getTranslation();
-                        const Mat3d r = scalpelBlade15->getMasterGeometry()->getRotation();
+                        const Vec3d t = scalpelBlade15->getVisualGeometry()->getTranslation();
+                        const Mat3d r = scalpelBlade15->getVisualGeometry()->getRotation();
 
                         // Set the new blade to move
                         controller2->setControlledSceneObject(scalpelBlade15);
                         blade10InHand = false;
 
-                        scalpelBlade10->getMasterGeometry()->setTranslation(t);
-                        scalpelBlade10->getMasterGeometry()->setRotation(r);
+                        scalpelBlade10->getVisualGeometry()->setTranslation(t);
+                        scalpelBlade10->getVisualGeometry()->setRotation(r);
                     }
                 }
                 else
                 {
                     // Swap to blade 10 only if it's close in space
                     Vec3d min, max;
-                    scalpelBlade10->getMasterGeometry()->computeBoundingBox(min, max);
+                    scalpelBlade10->getVisualGeometry()->computeBoundingBox(min, max);
                     const Vec3d posBlade = (min + max) * 0.5;
                     const double dist    = (posControl - posBlade).norm();
                     LOG(INFO) << "Dist: " << dist;
                     if (dist < 2.0)
                     {
-                        const Vec3d t = scalpelBlade10->getMasterGeometry()->getTranslation();
-                        const Mat3d r = scalpelBlade10->getMasterGeometry()->getRotation();
+                        const Vec3d t = scalpelBlade10->getVisualGeometry()->getTranslation();
+                        const Mat3d r = scalpelBlade10->getVisualGeometry()->getRotation();
 
                         controller2->setControlledSceneObject(scalpelBlade10);
                         blade10InHand = true;
 
                         // Swap transforms of the blades
-                        scalpelBlade15->getMasterGeometry()->setTranslation(t);
-                        scalpelBlade15->getMasterGeometry()->setRotation(r);
+                        scalpelBlade15->getVisualGeometry()->setTranslation(t);
+                        scalpelBlade15->getVisualGeometry()->setRotation(r);
                     }
                 }
             }

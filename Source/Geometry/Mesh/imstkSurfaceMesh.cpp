@@ -489,19 +489,19 @@ SurfaceMesh::flipNormals()
 void
 SurfaceMesh::correctWindingOrder()
 {
-    // Enforce consistency in winding of a particular triangle with its neighbor (master)
+    // Enforce consistency in winding of a particular triangle with its neighbor (parent)
     VecDataArray<int, 3>& indices = *m_triangleIndices;
     auto                  enforceWindingConsistency =
         [&](const size_t masterTriId, const size_t neighTriId)
         {
-            const Vec3i& masterTri = indices[masterTriId];
+            const Vec3i& parentTri = indices[masterTriId];
             Vec3i&       neighTri  = indices[neighTriId];
 
             for (unsigned int l = 0; l < 3; ++l)
             {
                 for (unsigned int k = 0; k < 3; ++k)
                 {
-                    if (masterTri[k] == neighTri[l] && masterTri[(k + 1) % 3] == neighTri[(l + 1) % 3])
+                    if (parentTri[k] == neighTri[l] && parentTri[(k + 1) % 3] == neighTri[(l + 1) % 3])
                     {
                         // Flip the order of neighbor triangle
                         auto tempId = neighTri[0];

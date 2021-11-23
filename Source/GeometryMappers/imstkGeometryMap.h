@@ -32,23 +32,18 @@ namespace imstk
 ///
 class GeometryMap
 {
+protected:
+    GeometryMap() : m_isActive(true) { }
+
 public:
-
-    enum class Type
-    {
-        Isometric,
-        Identity,
-        OneToOne,
-        TetraTriangle,
-        HexaTriangle,
-        TetraTetra
-    };
-
-    ///
-    /// \brief Destructor
-    ///
     virtual ~GeometryMap() = default;
 
+    ///
+    /// \brief Returns the string class name
+    ///
+    virtual const std::string getTypeName() const = 0;
+
+public:
     ///
     /// \brief Compute the map
     ///
@@ -87,31 +82,21 @@ public:
     // Accessors
 
     ///
-    /// \brief Returns the type of the map
+    /// \brief Get/Set parent geometry
     ///
-    const Type& getType() const;
+    virtual void setParentGeometry(std::shared_ptr<Geometry> parent);
+    virtual std::shared_ptr<Geometry> getParentGeometry() const;
 
     ///
-    /// \brief Returns the string representing the type name of the map
+    /// \brief Get/Set child geometry
     ///
-    const std::string getTypeName() const;
-
-    ///
-    /// \brief Get/Set master geometry
-    ///
-    virtual void setMaster(std::shared_ptr<Geometry> master);
-    virtual std::shared_ptr<Geometry> getMaster() const;
-
-    ///
-    /// \brief Get/Set slace geometry
-    ///
-    virtual void setSlave(std::shared_ptr<Geometry> slave);
-    virtual std::shared_ptr<Geometry> getSlave() const;
+    virtual void setChildGeometry(std::shared_ptr<Geometry> child);
+    virtual std::shared_ptr<Geometry> getChildGeometry() const;
 
     ///
     /// \brief getMapIdx
     /// \param idx
-    /// \return index of Master corresponding to the idx of Slave
+    /// \return index of parent corresponding to the idx of child
     ///
     virtual size_t getMapIdx(const size_t&) { return 0; }
 
@@ -121,29 +106,9 @@ public:
     virtual void initialize();
 
 protected:
+    bool m_isActive; ///> true if the map us active at runtime
 
-    ///
-    /// \brief Protected constructor
-    ///
-    GeometryMap(Type type) : m_type(type), m_isActive(true) {}
-
-    ///
-    /// \brief Protected constructor
-    ///
-    GeometryMap(const std::shared_ptr<Geometry> master,
-                const std::shared_ptr<Geometry> slave,
-                Type                            type) :
-        m_type(type),
-        m_isActive(true)
-    {
-        this->setMaster(master);
-        this->setSlave(slave);
-    }
-
-    Type m_type;                        ///> type of the map
-    bool m_isActive;                    ///> true if the map us active at runtime
-
-    std::shared_ptr<Geometry> m_master; ///> the geometry which dictates the configuration
-    std::shared_ptr<Geometry> m_slave;  ///> the geometry which follows the master
+    std::shared_ptr<Geometry> m_parentGeom; ///> the geometry which dictates the configuration
+    std::shared_ptr<Geometry> m_childGeom;  ///> the geometry which follows the parent
 };
 }

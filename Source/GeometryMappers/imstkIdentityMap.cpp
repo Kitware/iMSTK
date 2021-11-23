@@ -35,11 +35,11 @@ IdentityMap::apply()
     }
 
     // Check geometries
-    CHECK(m_master != nullptr && m_slave != nullptr) << "Identity map is being applied without valid geometries";
+    CHECK(m_parentGeom != nullptr && m_childGeom != nullptr) << "Identity map is being applied without valid geometries";
 
-    // Set the follower mesh configuration to be same as that of master
-    m_slave->setTranslation(m_master->getTranslation());
-    m_slave->setRotation(m_master->getRotation());
+    // Set the child mesh configuration to be same as that of parent
+    m_childGeom->setTranslation(m_parentGeom->getTranslation());
+    m_childGeom->setRotation(m_parentGeom->getRotation());
 }
 
 const RigidTransform3d
