@@ -19,7 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkPbdObjectCuttingPair.h"
+#include "imstkPbdObjectCutting.h"
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCollidingObject.h"
 #include "imstkLogger.h"
@@ -34,7 +34,8 @@ limitations under the License.
 
 namespace imstk
 {
-PbdObjectCuttingPair::PbdObjectCuttingPair(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj) : ObjectInteractionPair(pbdObj, cutObj)
+PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj) :
+    SceneObject(pbdObj->getName() + "_vs_" + cutObj->getName() + "_pbdCutting")
 {
     // check whether pbd object is a surfacemesh
     if (std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getPhysicsGeometry()) == nullptr)
@@ -52,12 +53,17 @@ PbdObjectCuttingPair::PbdObjectCuttingPair(std::shared_ptr<PbdObject> pbdObj, st
     }
 }
 
+//
+//void
+//PbdObjectCuttingPair::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+//{
+//
+//}
+
 void
-PbdObjectCuttingPair::apply()
+PbdObjectCutting::apply()
 {
-    auto pbdObj   = std::static_pointer_cast<PbdObject>(m_objects.first);
-    auto cutObj   = std::static_pointer_cast<CollidingObject>(m_objects.second);
-    auto pbdModel = pbdObj->getPbdModel();
+    auto pbdModel = m_objA->getPbdModel();
     auto pbdMesh  = std::static_pointer_cast<SurfaceMesh>(pbdModel->getModelGeometry());
 
     m_addConstraintVertices->clear();
@@ -66,7 +72,7 @@ PbdObjectCuttingPair::apply()
     // Perform cutting
     imstkNew<SurfaceMeshCut> surfCut;
     surfCut->setInputMesh(pbdMesh);
-    surfCut->setCutGeometry(cutObj->getCollidingGeometry());
+    surfCut->setCutGeometry(m_objB->getCollidingGeometry());
     surfCut->update();
     auto newPbdMesh = surfCut->getOutputMesh();
 
@@ -90,9 +96,9 @@ PbdObjectCuttingPair::apply()
 }
 
 void
-PbdObjectCuttingPair::addVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
-                                  std::shared_ptr<VecDataArray<double, 3>> newVertices,
-                                  std::shared_ptr<VecDataArray<double, 3>> newInitialVertices)
+PbdObjectCutting::addVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
+                              std::shared_ptr<VecDataArray<double, 3>> newVertices,
+                              std::shared_ptr<VecDataArray<double, 3>> newInitialVertices)
 {
     auto vertices = pbdMesh->getVertexPositions();
     auto initialVertices = pbdMesh->getInitialVertexPositions();
@@ -115,10 +121,10 @@ PbdObjectCuttingPair::addVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
 }
 
 void
-PbdObjectCuttingPair::modifyVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
-                                     std::shared_ptr<std::vector<size_t>> modifiedVertexIndices,
-                                     std::shared_ptr<VecDataArray<double, 3>> modifiedVertices,
-                                     std::shared_ptr<VecDataArray<double, 3>> modifiedInitialVertices)
+PbdObjectCutting::modifyVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
+                                 std::shared_ptr<std::vector<size_t>> modifiedVertexIndices,
+                                 std::shared_ptr<VecDataArray<double, 3>> modifiedVertices,
+                                 std::shared_ptr<VecDataArray<double, 3>> modifiedInitialVertices)
 {
     auto vertices = pbdMesh->getVertexPositions();
     auto initialVertices = pbdMesh->getInitialVertexPositions();
@@ -142,8 +148,8 @@ PbdObjectCuttingPair::modifyVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
 }
 
 void
-PbdObjectCuttingPair::addTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
-                                   std::shared_ptr<VecDataArray<int, 3>> newTriangles)
+PbdObjectCutting::addTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
+                               std::shared_ptr<VecDataArray<int, 3>> newTriangles)
 {
     auto triangles     = pbdMesh->getTriangleIndices();
     auto nTriangles    = triangles->size();
@@ -161,9 +167,9 @@ PbdObjectCuttingPair::addTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
 }
 
 void
-PbdObjectCuttingPair::modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
-                                      std::shared_ptr<std::vector<size_t>> modifiedTriangleIndices,
-                                      std::shared_ptr<VecDataArray<int, 3>> modifiedTriangles)
+PbdObjectCutting::modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
+                                  std::shared_ptr<std::vector<size_t>> modifiedTriangleIndices,
+                                  std::shared_ptr<VecDataArray<int, 3>> modifiedTriangles)
 {
     auto triangles = pbdMesh->getTriangleIndices();
     auto nModifiedTriangles = static_cast<size_t>(modifiedTriangles->size());

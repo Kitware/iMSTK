@@ -38,7 +38,7 @@ limitations under the License.
 namespace imstk
 {
 RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2) :
-    CollisionPair(obj1, obj2), m_prevVertices(std::make_shared<VecDataArray<double, 3>>())
+    CollisionInteraction(obj1, obj2), m_prevVertices(std::make_shared<VecDataArray<double, 3>>())
 {
     std::shared_ptr<RigidBodyModel2> rbdModel    = obj1->getRigidBodyModel2();
     std::shared_ptr<LevelSetModel>   lvlSetModel = obj2->getLevelSetModel();
@@ -56,12 +56,11 @@ RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<Rigid
     //       [Solve rbd system]       [Evolve levelset]
     // Here the CH's adds constraints to the system on the LHS, and impulses to the levelset RHS
 
-    // Define where collision interaction happens
-    m_taskNodeInputs.first.push_back(rbdModel->getComputeTentativeVelocitiesNode());
-    m_taskNodeInputs.second.push_back(lvlSetModel->getGenerateVelocitiesBeginNode());
+    m_taskGraph->addNode(rbdModel->getComputeTentativeVelocitiesNode());
+    m_taskGraph->addNode(lvlSetModel->getGenerateVelocitiesBeginNode());
 
-    m_taskNodeOutputs.first.push_back(rbdModel->getSolveNode());
-    m_taskNodeOutputs.second.push_back(lvlSetModel->getGenerateVelocitiesEndNode());
+    m_taskGraph->addNode(rbdModel->getSolveNode());
+    m_taskGraph->addNode(lvlSetModel->getGenerateVelocitiesEndNode());
 
     // Setup the CD
     auto cd = std::make_shared<ImplicitGeometryToPointSetCCD>();
@@ -84,6 +83,16 @@ RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<Rigid
     lvlSetCH->setInputCollisionData(cd->getCollisionData());
     setCollisionHandlingB(lvlSetCH);
 
+    m_copyVertToPrevNode = std::make_shared<TaskNode>([ = ]()
+        {
+            copyVertsToPrevious();
+        }, "CopyVertsToPrevious");
+    m_taskGraph->addNode(m_copyVertToPrevNode);
+
+    m_computeDisplacementNode =
+        std::make_shared<TaskNode>(std::bind(&RigidObjectLevelSetCollision::measureDisplacementFromPrevious, this),
+            "ComputeDisplacements");
+
     // Give the point set displacements for CCD, if it doesn't already have them
     auto pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getCollidingGeometry());
     if (pointSet != nullptr && !pointSet->hasVertexAttribute("displacements"))
@@ -95,40 +104,52 @@ RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<Rigid
 }
 
 void
-RigidObjectLevelSetCollision::apply()
+RigidObjectLevelSetCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    CollisionPair::apply();
+    auto                             rbdObj1  = std::dynamic_pointer_cast<RigidObject2>(m_objA);
+    std::shared_ptr<RigidBodyModel2> rbdModel = rbdObj1->getRigidBodyModel2();
 
-    auto                             obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objects.first);
-    std::shared_ptr<RigidBodyModel2> rbdModel = obj1->getRigidBodyModel2();
-    std::shared_ptr<PointSet>        pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
-    const bool                       measureDisplacements = (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"));
+    auto                           lvlSetObj2 = std::dynamic_pointer_cast<LevelSetDeformableObject>(m_objB);
+    std::shared_ptr<LevelSetModel> lsmModel   = lvlSetObj2->getLevelSetModel();
+
+    std::shared_ptr<TaskNode> rbdHandlerNode = m_collisionHandleANode;
+    std::shared_ptr<TaskNode> lsmHandlerNode = m_collisionHandleBNode;
+
+    m_taskGraph->addEdge(rbdModel->getComputeTentativeVelocitiesNode(), m_collisionDetectionNode);
+    m_taskGraph->addEdge(lsmModel->getGenerateVelocitiesBeginNode(), m_collisionDetectionNode);
+
+    m_taskGraph->addEdge(m_collisionDetectionNode, rbdHandlerNode);
+    m_taskGraph->addEdge(m_collisionDetectionNode, lsmHandlerNode);
+
+    m_taskGraph->addEdge(rbdHandlerNode, rbdModel->getSolveNode());
+    m_taskGraph->addEdge(lsmHandlerNode, lsmModel->getGenerateVelocitiesEndNode());
+
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(rbdObj1->getPhysicsGeometry());
+    const bool                measureDisplacements = (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"));
 
     // The tentative body is never actually computed, it should be good to catch the contact
     // in the next frame
     if (measureDisplacements)
     {
         // 1.) Copy the vertices at the start of the frame
-        obj1->getTaskGraph()->insertBefore(obj1->getRigidBodyModel2()->getComputeTentativeVelocitiesNode(),
-            std::make_shared<TaskNode>([ = ]()
-            {
-                copyVertsToPrevious();
-                }, "CopyVertsToPrevious"));
+        m_taskGraph->addEdge(rbdObj1->getRigidBodyModel2()->getTaskGraph()->getSource(),
+            m_copyVertToPrevNode);
+        m_taskGraph->addEdge(m_copyVertToPrevNode,
+            rbdObj1->getRigidBodyModel2()->getComputeTentativeVelocitiesNode());
 
         // If you were to update to tentative, you'd do it here, then compute displacements
 
         // 2.) Compute the displacements after updating geometry
-        std::shared_ptr<TaskNode> computeDisplacements =
-            std::make_shared<TaskNode>(std::bind(&RigidObjectLevelSetCollision::measureDisplacementFromPrevious, this), "ComputeDisplacements");
-        obj1->getTaskGraph()->insertAfter(obj1->getUpdateGeometryNode(),
-            computeDisplacements);
+        m_taskGraph->addEdge(rbdObj1->getUpdateGeometryNode(), m_computeDisplacementNode);
+        m_taskGraph->addEdge(m_computeDisplacementNode,
+            rbdObj1->getRigidBodyModel2()->getTaskGraph()->getSink());
     }
 }
 
 void
 RigidObjectLevelSetCollision::copyVertsToPrevious()
 {
-    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objects.first);
+    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objA);
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
 
     if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))
@@ -148,7 +169,7 @@ RigidObjectLevelSetCollision::copyVertsToPrevious()
 void
 RigidObjectLevelSetCollision::measureDisplacementFromPrevious()
 {
-    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objects.first);
+    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objA);
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
 
     if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))

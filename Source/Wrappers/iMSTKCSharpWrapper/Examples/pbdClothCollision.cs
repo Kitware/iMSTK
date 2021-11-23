@@ -37,7 +37,7 @@ public class PbdCloth
         PbdObjectCollision pbdInteraction = new PbdObjectCollision(clothObj, collisionObj, "PointSetToCapsuleCD");
         pbdInteraction.setFriction(0.4);
         pbdInteraction.setRestitution(0.0);
-        scene.getCollisionGraph().addInteraction(pbdInteraction);
+        scene.addInteraction(pbdInteraction);
 
 
         // Adjust camera

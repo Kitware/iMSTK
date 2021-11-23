@@ -21,30 +21,29 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionPair.h"
-
-#include <string>
+#include "imstkCollisionInteraction.h"
 
 namespace imstk
 {
 class CollidingObject;
 class PbdObject;
-class PbdSolver;
-class PbdObjectCollision;
 
 ///
 /// \class PbdObjectPicking
 ///
 /// \brief This class defines a picking interaction between a PbdObject and a CollidingObject with AnalyticalGeometry
 ///
-class PbdObjectPicking : public CollisionPair
+class PbdObjectPicking : public CollisionInteraction
 {
 public:
     PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
     virtual ~PbdObjectPicking() override = default;
 
 public:
-    void apply() override;
+    virtual const std::string getTypeName() const override { return "PbdObjectPicking"; }
+
+public:
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     std::shared_ptr<TaskNode> m_pickingNode = nullptr;

@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
@@ -122,9 +121,9 @@ main()
     scene->addController(controller);
 
     // Add interaction between the rigid object sphere and static plane
-    scene->getCollisionGraph()->addInteraction(
+    scene->addInteraction(
         std::make_shared<RigidObjectCollision>(rbdObj, obstacleObjs[0], "PointSetToPlaneCD"));
-    scene->getCollisionGraph()->addInteraction(
+    scene->addInteraction(
         std::make_shared<RigidObjectCollision>(rbdObj, obstacleObjs[1], "PointSetToOrientedBoxCD"));
 
     // Camera

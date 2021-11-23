@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
@@ -178,7 +177,7 @@ main()
         scene->addSceneObject(sphFluidBox);
 
         // Interaction
-        scene->getCollisionGraph()->addInteraction(
+        scene->addInteraction(
             std::make_shared<SphObjectCollision>(sphFluidBox, dragonObj));
 
         // Light

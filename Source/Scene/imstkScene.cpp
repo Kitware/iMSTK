@@ -23,8 +23,6 @@
 #include "imstkCamera.h"
 #include "imstkCameraController.h"
 #include "imstkCollisionDetectionAlgorithm.h"
-#include "imstkCollisionGraph.h"
-#include "imstkCollisionPair.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkLight.h"
@@ -50,7 +48,6 @@ Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
     m_config(config),
     m_name(name),
     m_activeCamera(nullptr),
-    m_collisionGraph(std::make_shared<CollisionGraph>()),
     m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
     m_computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
 {
@@ -145,19 +142,14 @@ Scene::buildTaskGraph()
         obj->initGraphEdges();
     }
 
-    // Apply all the interaction graph element operations to the SceneObject graphs
-    const std::vector<std::shared_ptr<ObjectInteractionPair>>& pairs = m_collisionGraph->getInteractionPairs();
-    for (size_t i = 0; i < pairs.size(); i++)
-    {
-        pairs[i]->apply();
-    }
-
     // Nest all the SceneObject graphs within this Scene's ComputeGraph
     for (const auto& obj : m_sceneObjects)
     {
         std::shared_ptr<TaskGraph> objComputeGraph = obj->getTaskGraph();
         if (objComputeGraph != nullptr)
         {
+            // Remove any unused nodes
+            objComputeGraph = TaskGraph::removeUnusedNodes(objComputeGraph);
             // Add edges between any nodes that are marked critical and running simulatenously
             objComputeGraph = TaskGraph::resolveCriticalNodes(objComputeGraph);
             // Sum and nest the graph
@@ -214,13 +206,11 @@ Scene::initTaskGraph()
     }
 
     // Reduce the graph, removing nonfunctional nodes, and redundant edges
+    m_taskGraph = TaskGraph::removeUnusedNodes(m_taskGraph);
     if (m_config->graphReductionEnabled)
     {
         m_taskGraph = TaskGraph::reduce(m_taskGraph);
     }
-    // An extra precaution (some algoritms such as topological sort may not
-    // behave well with unused nodes)
-    m_taskGraph = TaskGraph::removeUnusedNodes(m_taskGraph);
 
     // If user wants to benchmark, tell all the nodes to time themselves
     for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
@@ -253,6 +243,12 @@ Scene::setEnableTaskTiming(const bool enabled)
     {
         node->m_enableTiming = m_config->taskTimingEnabled;
     }
+}
+
+void
+Scene::addInteraction(std::shared_ptr<SceneObject> interaction)
+{
+    addSceneObject(interaction);
 }
 
 std::shared_ptr<SceneObject>

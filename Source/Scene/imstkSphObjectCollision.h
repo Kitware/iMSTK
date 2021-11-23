@@ -21,9 +21,7 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionPair.h"
-
-#include <string>
+#include "imstkCollisionInteraction.h"
 
 namespace imstk
 {
@@ -35,11 +33,20 @@ class SPHObject;
 /// \brief This class defines where collision should happen between SphObject
 /// and CollidingObject pipelines
 ///
-class SphObjectCollision : public CollisionPair
+class SphObjectCollision : public CollisionInteraction
 {
 public:
     SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::shared_ptr<CollidingObject> obj2,
                        std::string cdType  = "ImplicitGeometryToPointSetCD");
     virtual ~SphObjectCollision() override = default;
+
+public:
+    virtual const std::string getTypeName() const override { return "SphObjectCollision"; }
+
+public:
+    ///
+    /// \brief Setup connectivity of task graph
+    ///
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 };
 }

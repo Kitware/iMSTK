@@ -24,12 +24,9 @@
 #include "imstkCollisionData.h"
 #include "imstkGeometryAlgorithm.h"
 
-#include <memory>
-
 namespace imstk
 {
 class Geometry;
-class TaskNode;
 
 ///
 /// \class CollisionDetectionAlgorithm
@@ -66,11 +63,6 @@ public:
     /// \brief Returns output collision data
     ///
     const std::shared_ptr<CollisionData> getCollisionData() const { return m_colData; }
-
-    ///
-    /// \brief Returns computational node
-    ///
-    std::shared_ptr<TaskNode> getTaskNode() const { return m_taskNode; }
 
     ///
     /// \brief If generateA is false, CD data will not be generated for input0,A
@@ -129,8 +121,7 @@ protected:
         std::vector<CollisionElement>& imstkNotUsed(elementsB)) { m_computeColDataBImplemented = false; }
 
 protected:
-    std::shared_ptr<CollisionData> m_colData  = nullptr;    ///> Collision data
-    std::shared_ptr<TaskNode>      m_taskNode = nullptr;    ///> Computational node to execute the detection
+    std::shared_ptr<CollisionData> m_colData = nullptr;     ///> Collision data
 
     bool m_flipOutput   = false;
     bool m_generateCD_A = true;

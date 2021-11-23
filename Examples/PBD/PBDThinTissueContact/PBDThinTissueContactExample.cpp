@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkImageData.h"
 #include "imstkKeyboardSceneControl.h"
@@ -218,8 +217,7 @@ main()
     scene->addSceneObject(toolObj);
 
     // Add a collision interaction between the tools
-    auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, toolObj.get(), "MeshToMeshBruteForceCD");
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(std::make_shared<PbdObjectCollision>(tissueObj, toolObj.get(), "MeshToMeshBruteForceCD"));
 
     // Light
     imstkNew<DirectionalLight> light;

@@ -23,14 +23,10 @@
 
 #include "imstkCollisionData.h"
 
-#include <memory>
-#include <vector>
-
 namespace imstk
 {
 class CollidingObject;
 class InteractionPair;
-class TaskNode;
 
 ///
 /// \class CollisionHandling
@@ -41,7 +37,7 @@ class TaskNode;
 class CollisionHandling
 {
 protected:
-    CollisionHandling();
+    CollisionHandling() = default;
 
 public:
     virtual ~CollisionHandling() = default;
@@ -74,8 +70,6 @@ public:
     void setInputCollisionData(std::shared_ptr<CollisionData> collisionData) { m_colData = collisionData; }
     std::shared_ptr<const CollisionData> getInputCollisionData() const { return m_colData; }
 
-    std::shared_ptr<TaskNode> getTaskNode() const { return m_taskNode; }
-
 public:
     ///
     /// \brief Handle the input collision data
@@ -99,6 +93,5 @@ protected:
     std::shared_ptr<CollidingObject> m_inputObjectB;
 
     std::shared_ptr<const CollisionData> m_colData = nullptr; ///< Collision data
-    std::shared_ptr<TaskNode> m_taskNode = nullptr;
 };
 }

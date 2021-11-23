@@ -78,7 +78,7 @@ public class PbdCollisionOneObject
             scene.addSceneObject(floorObj);
 
             // Collision
-            scene.getCollisionGraph().addInteraction(new PbdObjectCollision(deformableObj, floorObj, "PointSetToPlaneCD"));
+            scene.addInteraction(new PbdObjectCollision(deformableObj, floorObj, "PointSetToPlaneCD"));
 
             // Light
             DirectionalLight light = new DirectionalLight();

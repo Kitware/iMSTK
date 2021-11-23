@@ -51,6 +51,5 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<CollidingObject> tissueObj,
     needleRbdCH->setInputCollidingObjectB(tissueObj);
     needleRbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
     needleRbdCH->setBeta(0.001);
-    needleRbdCH->getTaskNode()->m_isCritical = true;
     setCollisionHandlingA(needleRbdCH);
 }

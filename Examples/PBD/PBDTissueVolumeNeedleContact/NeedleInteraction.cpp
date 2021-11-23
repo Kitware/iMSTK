@@ -43,8 +43,6 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
         LOG(WARNING) << "NeedleInteraction only works with TetrahedralMesh physics geometry on pbd tissueObj";
     }
 
-    // First replace the handlers with our needle subclasses
-
     // This handler consumes collision data to resolve the tool from the tissue
     // except when the needle is inserted
     auto needleRbdCH = std::make_shared<NeedleRigidBodyCH>();
@@ -52,7 +50,6 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
     needleRbdCH->setInputCollidingObjectB(tissueObj);
     needleRbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
     needleRbdCH->setBeta(0.001);
-    needleRbdCH->getTaskNode()->m_isCritical = true;
     setCollisionHandlingB(needleRbdCH);
 
     // This handler consumes the collision data to resolve the tissue from the tool
@@ -62,7 +59,6 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
     needlePbdCH->setInputObjectB(needleObj);
     needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
     //needlePbdCH->getCollisionSolver()->setCollisionIterations(1);
-    needlePbdCH->getTaskNode()->m_isCritical = true;
     setCollisionHandlingA(needlePbdCH);
 
     // Then add a separate scheme for when the needle is embedded
@@ -77,47 +73,35 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
     embeddedCH->setCollisionSolver(needlePbdCH->getCollisionSolver());
     embeddedCH->setInputObjectA(tissueObj);
     embeddedCH->setInputObjectB(needleObj);
-    embeddedCH->getTaskNode()->m_isCritical = true;
+
+    // Needle interaction introduces its own collision detection step, handling, solve, and velocity correction
+    embeddingCDNode =
+        std::make_shared<TaskNode>([&]() { tetMeshCD->update(); }, "NeedleEmbeddingCD", true);
+    m_taskGraph->addNode(embeddingCDNode);
+    embeddingCHNode =
+        std::make_shared<TaskNode>([&]() { embeddedCH->update(); }, "NeedleEmbeddingCH", true);
+    m_taskGraph->addNode(embeddingCHNode);
 }
 
 void
-NeedleInteraction::apply()
+NeedleInteraction::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    PbdRigidObjectCollision::apply();
-
-    std::shared_ptr<TaskGraph> taskGraphA = m_objects.first->getTaskGraph();  // Pbd
-    std::shared_ptr<TaskGraph> taskGraphB = m_objects.second->getTaskGraph(); // Rbd
+    PbdRigidObjectCollision::initGraphEdges(source, sink);
 
     std::shared_ptr<CollisionDetectionAlgorithm> cd = m_colDetect;
 
-    auto                               pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objects.first);
+    auto                               pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objA);
     std::shared_ptr<CollisionHandling> pbdCH  = m_colHandlingA;
 
-    auto                               rbdObj = std::dynamic_pointer_cast<RigidObject2>(m_objects.second);
+    auto                               rbdObj = std::dynamic_pointer_cast<RigidObject2>(m_objB);
     std::shared_ptr<CollisionHandling> rbdCH  = m_colHandlingB;
 
-    // Needle interaction introduces its own collision detection step, handling, solve, and velocity correction
-    auto needleEmbeddedCD =
-        std::make_shared<TaskNode>([&]() { tetMeshCD->update(); }, "NeedleEmbeddingCD", true);
-    auto embeddingCHNode =
-        std::make_shared<TaskNode>([&]() { embeddedCH->update(); }, "NeedleEmbeddingCH", true);
-
     {
-        taskGraphA->addNode(needleEmbeddedCD);
-        taskGraphA->addNode(embeddingCHNode);
-
         // PBD CH -> EmbeddedCD -> EmbeddedCH -> Collision Solve
-        taskGraphA->addEdge(m_colHandlingA->getTaskNode(), needleEmbeddedCD);
-        taskGraphA->addEdge(needleEmbeddedCD, embeddingCHNode);
-        taskGraphA->addEdge(embeddingCHNode, m_pbdCollisionSolveNode);
-    }
-
-    {
-        taskGraphB->addNode(needleEmbeddedCD);
-        taskGraphB->addNode(embeddingCHNode);
-
-        taskGraphB->addEdge(m_colHandlingB->getTaskNode(), needleEmbeddedCD);
-        taskGraphB->addEdge(needleEmbeddedCD, embeddingCHNode);
-        taskGraphB->addEdge(embeddingCHNode, rbdObj->getRigidBodyModel2()->getSolveNode());
+        m_taskGraph->addEdge(m_collisionHandleANode, embeddingCDNode);
+        m_taskGraph->addEdge(m_collisionHandleBNode, embeddingCDNode);
+        m_taskGraph->addEdge(embeddingCDNode, embeddingCHNode);
+        m_taskGraph->addEdge(embeddingCHNode, m_pbdCollisionSolveNode);
+        m_taskGraph->addEdge(embeddingCHNode, rbdObj->getRigidBodyModel2()->getSolveNode());
     }
 }

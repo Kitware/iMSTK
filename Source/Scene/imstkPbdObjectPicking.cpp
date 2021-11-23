@@ -33,7 +33,7 @@ namespace imstk
 {
 // Pbd Collision will be tested before any step of pbd, then resolved after the solve steps of the two objects
 PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                                   std::string cdType) : CollisionPair(obj1, obj2)
+                                   std::string cdType) : CollisionInteraction(obj1, obj2)
 {
     // Setup the CD
     std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
@@ -51,7 +51,7 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
     m_pickingNode = std::make_shared<TaskNode>([&]()
         {
             // Update collision geometry
-            getObjectsPair().first->updateGeometries();
+            m_objA->updateGeometries();
 
             // Do collision detection
             getCollisionDetection()->update();
@@ -60,31 +60,32 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
             auto pickingCH = std::dynamic_pointer_cast<PBDPickingCH>(getCollisionHandlingA());
             pickingCH->update();
         }, "PbdPickingCD_and_CH", true);
+    m_taskGraph->addNode(m_pickingNode);
+
+    m_taskGraph->addNode(obj1->getTaskGraph()->getSource());
+    m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
+    m_taskGraph->addNode(obj1->getTaskGraph()->getSink());
+    m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
 }
 
 void
-PbdObjectPicking::apply()
+PbdObjectPicking::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    // Add the collision interaction
-    CollisionPair::apply();
-
-    auto pbdObj     = std::dynamic_pointer_cast<PbdObject>(m_objects.first);
-    auto pickingObj = std::dynamic_pointer_cast<CollidingObject>(m_objects.second);
-
-    // Define when too do collision detection and handling between the two objects
-    std::shared_ptr<TaskGraph> taskGraphPbd = pbdObj->getTaskGraph();
-    std::shared_ptr<TaskGraph> taskGraphPickingObj = pickingObj->getTaskGraph();
-
-    taskGraphPbd->addNode(m_pickingNode);
-    taskGraphPickingObj->addNode(m_pickingNode);
+    auto pbdObj     = std::dynamic_pointer_cast<PbdObject>(m_objA);
+    auto pickingObj = m_objB;
 
     std::shared_ptr<PbdModel> pbdModel = pbdObj->getPbdModel();
 
-    // Do picking after everything in the pbd model
-    taskGraphPbd->addEdge(pbdModel->getUpdateVelocityNode(), m_pickingNode);
-    taskGraphPbd->addEdge(m_pickingNode, pbdModel->getTaskGraph()->getSink());
+    m_taskGraph->addEdge(source, pbdObj->getTaskGraph()->getSource());
+    m_taskGraph->addEdge(source, pickingObj->getTaskGraph()->getSource());
+    m_taskGraph->addEdge(pbdObj->getTaskGraph()->getSink(), sink);
+    m_taskGraph->addEdge(pickingObj->getTaskGraph()->getSink(), sink);
 
-    taskGraphPickingObj->addEdge(pickingObj->getUpdateGeometryNode(), m_pickingNode);
-    taskGraphPickingObj->addEdge(m_pickingNode, taskGraphPickingObj->getSink());
+    // Do picking after everything in the pbd model
+    m_taskGraph->addEdge(pbdModel->getUpdateVelocityNode(), m_pickingNode);
+    m_taskGraph->addEdge(m_pickingNode, pbdModel->getTaskGraph()->getSink());
+
+    m_taskGraph->addEdge(pickingObj->getUpdateGeometryNode(), m_pickingNode);
+    m_taskGraph->addEdge(m_pickingNode, pickingObj->getTaskGraph()->getSink());
 }
 }

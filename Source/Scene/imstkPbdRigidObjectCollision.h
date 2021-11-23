@@ -21,9 +21,7 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionPair.h"
-
-#include <string>
+#include "imstkCollisionInteraction.h"
 
 namespace imstk
 {
@@ -36,7 +34,7 @@ class RigidObject2;
 /// \brief This class defines a collision interaction between a first order PbdObject
 /// and second order RigidObject2. This will induce response in both models.
 ///
-class PbdRigidObjectCollision : public CollisionPair
+class PbdRigidObjectCollision : public CollisionInteraction
 {
 public:
     ///
@@ -48,6 +46,9 @@ public:
     virtual ~PbdRigidObjectCollision() override = default;
 
 public:
+    virtual const std::string getTypeName() const override { return "PbdRigidObjectCollision"; }
+
+public:
     void setRestitution(const double restitution);
     const double getRestitution() const;
 
@@ -55,7 +56,10 @@ public:
     const double getFriction() const;
 
 public:
-    virtual void apply() override;
+    ///
+    /// \brief Setup connectivity of task graph
+    ///
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     std::shared_ptr<TaskNode> m_pbdCollisionSolveNode = nullptr;

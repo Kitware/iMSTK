@@ -28,11 +28,9 @@ public class PbdCloth
         }
 
         // Collision between fluid and solid objects
-        CollisionGraph collisionGraph = scene.getCollisionGraph();
-
-        collisionGraph.addInteraction(new SphObjectCollision(fluidObj, solids[0]));
-        collisionGraph.addInteraction(new SphObjectCollision(fluidObj, solids[1]));
-        collisionGraph.addInteraction(new SphObjectCollision(fluidObj, solids[2]));
+        scene.addInteraction(new SphObjectCollision(fluidObj, solids[0]));
+        scene.addInteraction(new SphObjectCollision(fluidObj, solids[1]));
+        scene.addInteraction(new SphObjectCollision(fluidObj, solids[2]));
 
 
         // configure camera

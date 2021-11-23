@@ -168,11 +168,9 @@
  */
 %shared_ptr(imstk::SceneConfig)
 %shared_ptr(imstk::Scene)
-%shared_ptr(imstk::CollisionGraph)
+%shared_ptr(imstk::CollisionInteraction)
 %shared_ptr(imstk::RigidObjectCollision)
-%shared_ptr(imstk::InteractionPair)
-%shared_ptr(imstk::ObjectInteractionPair)
-%shared_ptr(imstk::PbdObjectCuttingPair)
+%shared_ptr(imstk::PbdObjectCutting)
 %shared_ptr(imstk::PbdRigidObjectCollision)
 %shared_ptr(imstk::PbdObjectCollision)
 %shared_ptr(imstk::SphObjectCollision)

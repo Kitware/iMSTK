@@ -48,7 +48,6 @@ public:
         needleRbdCH->setInputCollidingObjectB(tissueObj);
         needleRbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
         needleRbdCH->setBeta(0.001);
-        needleRbdCH->getTaskNode()->m_isCritical = true;
         setCollisionHandlingB(needleRbdCH);
 
         imstkNew<NeedlePbdCH> needlePbdCH;
@@ -56,7 +55,6 @@ public:
         needlePbdCH->setInputObjectB(needleObj);
         needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
         needlePbdCH->getCollisionSolver()->setCollisionIterations(1);
-        needlePbdCH->getTaskNode()->m_isCritical = true;
         setCollisionHandlingA(needlePbdCH);
     }
 

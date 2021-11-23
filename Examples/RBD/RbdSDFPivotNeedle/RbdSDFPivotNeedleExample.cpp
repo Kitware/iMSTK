@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkIsometricMap.h"
 #include "imstkKeyboardSceneControl.h"
@@ -158,8 +157,7 @@ main()
     scene->addSceneObject(ghostToolObj);
 
     // Setup interaction between tissue and needle
-    auto needleInteraction = std::make_shared<NeedleInteraction>(tissueObj, needleObj);
-    scene->getCollisionGraph()->addInteraction(needleInteraction);
+    scene->addInteraction(std::make_shared<NeedleInteraction>(tissueObj, needleObj));
 
     // Camera
     scene->getActiveCamera()->setPosition(0.0, 0.2, 0.2);
@@ -231,8 +229,8 @@ main()
 
             Vec3d virutalForce;
             {
-                const Vec3d fS = (desiredPos - needleObj->getRigidBody()->getPosition()) * 1000.0;   // Spring force
-                const Vec3d fD = -needleObj->getRigidBody()->getVelocity() * 100.0;                  // Spring damping
+                const Vec3d fS = (desiredPos - needleObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
+                const Vec3d fD = -needleObj->getRigidBody()->getVelocity() * 100.0;                    // Spring damping
 
                 const Quatd dq       = desiredOrientation * needleObj->getRigidBody()->getOrientation().inverse();
                 const Rotd angleAxes = Rotd(dq);

@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
@@ -28,9 +27,9 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkObjectInteractionFactory.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
+#include "imstkRigidObjectCollision.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -94,10 +93,7 @@ main()
     scene->addController(controller);
 
     // Add interaction
-    scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(bone, drill,
-        InteractionType::RbdObjCollision, "PointSetToSphereCD"));
-    /*scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(bone, drill,
-        InteractionType::BoneDrilling, "PointSetToSphereCD"));*/
+    scene->addInteraction(std::make_shared<RigidObjectCollision>(drill, bone, "PointSetToSphereCD"));
 
     // Light
     imstkNew<DirectionalLight> light;

@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkImageData.h"
 #include "imstkKeyboardSceneControl.h"
@@ -348,13 +347,13 @@ main()
     // tissue deforms)
     auto interaction = std::make_shared<PbdRigidObjectCollision>(tissueObj, toolObj, "MeshToMeshBruteForceCD");
     std::dynamic_pointer_cast<MeshToMeshBruteForceCD>(interaction->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(interaction);
 #else
     // With PbdObjectCollision we only have one-way coupling
     // The toolObj does not respond to the tissue (only the tissueObj responds to the tool, moving out of the way)
     auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, toolObj);
     std::dynamic_pointer_cast<MeshToMeshBruteForceCD>(interaction->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(interaction);
 #endif
 
     // Light
@@ -401,8 +400,8 @@ main()
             const Vec2d mousePos = viewer->getMouseDevice()->getPos();
             const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
 
-            const Vec3d fS = (worldPos - toolObj->getRigidBody()->getPosition()) * 1000.0; // Spring force
-            const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;              // Spring damping
+            const Vec3d fS = (worldPos - toolObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
+            const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                  // Spring damping
 
             (*toolObj->getRigidBody()->m_force) += (fS + fD);
             });

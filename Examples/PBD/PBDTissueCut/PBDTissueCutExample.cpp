@@ -303,7 +303,7 @@ main()
     scene->addSceneObject(toolObj);
 
     /*auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, toolObj, "MeshToMeshBruteForceCD");
-    scene->getCollisionGraph()->addInteraction(interaction);*/
+    scene->addInteraction(interaction);*/
 
     // Light
     imstkNew<DirectionalLight> light;

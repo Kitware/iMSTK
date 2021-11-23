@@ -37,7 +37,6 @@
 #include "imstkVTKViewer.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPlane.h"
-#include "imstkCollisionGraph.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkCollisionUtils.h"
 #include "imstkSphere.h"
@@ -216,7 +215,7 @@ main()
     scene->getActiveCamera()->setPosition(2.25549, 8.07292, 14.8692);
 
     auto clothCollision = std::make_shared<PbdObjectCollision>(clothObj, planeObj, "PointSetToPlaneCD");
-    scene->getCollisionGraph()->addInteraction(clothCollision);
+    scene->addInteraction(clothCollision);
 
     // Make two sphere's for indication
     imstkNew<SceneObject> clickObj("clickObj");

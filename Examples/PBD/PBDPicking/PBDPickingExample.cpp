@@ -21,7 +21,6 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
@@ -213,14 +212,14 @@ main()
     // Add collision for both jaws of the tool
     auto upperJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objUpperJaw, "SurfaceMeshToCapsuleCD");
     auto lowerJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objLowerJaw, "SurfaceMeshToCapsuleCD");
-    scene->getCollisionGraph()->addInteraction(upperJawCollision);
-    scene->getCollisionGraph()->addInteraction(lowerJawCollision);
+    scene->addInteraction(upperJawCollision);
+    scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
     auto upperJawPicking = std::make_shared<PbdObjectPicking>(clothObj, objUpperJaw, "PointSetToCapsuleCD");
     auto lowerJawPicking = std::make_shared<PbdObjectPicking>(clothObj, objLowerJaw, "PointSetToCapsuleCD");
-    scene->getCollisionGraph()->addInteraction(upperJawPicking);
-    scene->getCollisionGraph()->addInteraction(lowerJawPicking);
+    scene->addInteraction(upperJawPicking);
+    scene->addInteraction(lowerJawPicking);
 
     // Camera
     scene->getActiveCamera()->setPosition(Vec3d(1.0, 1.0, 1.0) * 100.0);

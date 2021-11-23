@@ -20,16 +20,10 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkCollisionHandling.h"
-#include "imstkTaskNode.h"
 #include "imstkCollidingObject.h"
 
 namespace imstk
 {
-CollisionHandling::CollisionHandling() :
-    m_taskNode(std::make_shared<TaskNode>(std::bind(&CollisionHandling::update, this), "CollisionHandling", true))
-{
-}
-
 void
 CollisionHandling::update()
 {

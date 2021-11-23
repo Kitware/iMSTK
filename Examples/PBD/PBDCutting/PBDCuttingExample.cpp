@@ -29,7 +29,7 @@
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdObjectCuttingPair.h"
+#include "imstkPbdObjectCutting.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -176,7 +176,7 @@ main()
     scene->addSceneObject(clothObj);
 
     // Add interaction pair for pbd cutting
-    imstkNew<PbdObjectCuttingPair> cuttingPair(clothObj, cutObj);
+    imstkNew<PbdObjectCutting> cuttingInteraction(clothObj, cutObj);
 
     // Device Server
     imstkNew<HapticDeviceManager>       server;
@@ -232,7 +232,7 @@ main()
             // When i is pressed replace the PBD cloth with a cut one
             if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
             {
-                cuttingPair->apply();
+                cuttingInteraction->apply();
             }
             });
 
