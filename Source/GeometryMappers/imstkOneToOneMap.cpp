@@ -147,7 +147,7 @@ void
 OneToOneMap::setParentGeometry(std::shared_ptr<Geometry> parent)
 {
     auto pointSet = std::dynamic_pointer_cast<PointSet>(parent);
-    if (parent != nullptr)
+    if (parent == nullptr)
     {
         LOG(WARNING) << "The geometry provided is not a PointSet!\n";
         return;
@@ -159,7 +159,7 @@ void
 OneToOneMap::setChildGeometry(std::shared_ptr<Geometry> child)
 {
     auto pointSet = std::dynamic_pointer_cast<PointSet>(child);
-    if (pointSet != nullptr)
+    if (pointSet == nullptr)
     {
         LOG(WARNING) << "The geometry provided is not a PointSet!\n";
         return;
