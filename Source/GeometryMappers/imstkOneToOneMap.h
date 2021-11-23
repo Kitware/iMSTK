@@ -93,7 +93,7 @@ public:
     ///@{
     void setTolerance(const double tolerance) { m_epsilon = tolerance; }
     double getTolerance() const { return m_epsilon; }
-    ///@}
+///@}
 
 protected:
     ///

@@ -106,7 +106,7 @@ public:
     virtual void initialize();
 
 protected:
-    bool m_isActive; ///> true if the map us active at runtime
+    bool m_isActive;                        ///> true if the map us active at runtime
 
     std::shared_ptr<Geometry> m_parentGeom; ///> the geometry which dictates the configuration
     std::shared_ptr<Geometry> m_childGeom;  ///> the geometry which follows the parent

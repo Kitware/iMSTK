@@ -143,7 +143,7 @@ TetraTriangleMap::isValid() const
     CHECK(m_parentGeom != nullptr) << "Fail to cast parent Geometry to TetrahedralMesh";
 
     size_t totalElementsParent = static_cast<size_t>(meshParent->getNumTetrahedra());
-    bool bOK = true;
+    bool   bOK = true;
 
     ParallelUtils::parallelFor(m_verticesEnclosingTetraId.size(), [&](const size_t tetId) {
             if (!bOK) // If map is invalid, no need to check further
@@ -180,10 +180,10 @@ TetraTriangleMap::setChildGeometry(std::shared_ptr<Geometry> child)
 size_t
 TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 {
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
-    double     closestDistanceSqr = MAX_D;
-    size_t     closestTetrahedron = std::numeric_limits<size_t>::max();
-    Vec3d      center(0, 0, 0);
+    auto   tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
+    double closestDistanceSqr = MAX_D;
+    size_t closestTetrahedron = std::numeric_limits<size_t>::max();
+    Vec3d  center(0, 0, 0);
 
     for (int tetId = 0; tetId < tetMesh->getNumTetrahedra(); ++tetId)
     {
@@ -209,8 +209,8 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 size_t
 TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 {
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
-    size_t     enclosingTetrahedron = std::numeric_limits<size_t>::max();
+    auto   tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
+    size_t enclosingTetrahedron = std::numeric_limits<size_t>::max();
 
     for (int idx = 0; idx < tetMesh->getNumTetrahedra(); ++idx)
     {

@@ -115,7 +115,7 @@ OneToOneMap::apply()
     CHECK(m_oneToOneMap.size() == m_oneToOneMapVector.size()) << "Internal data is corrupted";
 
     auto meshParent = std::dynamic_pointer_cast<PointSet>(m_parentGeom);
-    auto meshChild = std::dynamic_pointer_cast<PointSet>(m_childGeom);
+    auto meshChild  = std::dynamic_pointer_cast<PointSet>(m_childGeom);
 
     CHECK(meshParent != nullptr && meshChild != nullptr) << "Failed to cast from Geometry to PointSet";
 
