@@ -49,11 +49,6 @@ public:
     virtual void setPhysicsGeometry(std::shared_ptr<Geometry> geometry) { m_physicsGeometry = geometry; }
 
     ///
-    /// \brief Get the master geometry
-    ///
-    virtual std::shared_ptr<Geometry> getMasterGeometry() const override { return m_physicsGeometry; }
-
-    ///
     /// \brief Set/Get the Physics-to-Collision map
     ///
     std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const { return m_physicsToCollidingGeomMap; }

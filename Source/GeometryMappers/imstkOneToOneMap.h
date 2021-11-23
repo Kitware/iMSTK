@@ -26,31 +26,24 @@ class PointSet;
 ///
 /// \class OneToOneMap
 ///
-/// \brief Computes and applies the One-to-one map. The master and the slave geometries
-/// should contain nodes.
+/// \brief OneToOneMap can compute & apply a one-to-one mapping between parent
+/// and child PointSet geometries.
 ///
 class OneToOneMap : public GeometryMap
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    OneToOneMap() : GeometryMap(GeometryMap::Type::OneToOne) {}
-
-    ///
-    /// \brief Constructor
-    ///
-    OneToOneMap(std::shared_ptr<Geometry> master,
-                std::shared_ptr<Geometry> slave) : GeometryMap(GeometryMap::Type::OneToOne)
+    OneToOneMap() : GeometryMap() {}
+    OneToOneMap(
+        std::shared_ptr<Geometry> parent,
+        std::shared_ptr<Geometry> child)
     {
-        this->setMaster(master);
-        this->setSlave(slave);
+        this->setParentGeometry(parent);
+        this->setChildGeometry(child);
     }
 
-    ///
-    /// \brief Default destructor
-    ///
     virtual ~OneToOneMap() override = default;
+
+    virtual const std::string getTypeName() const override { return "OneToOneMap"; }
 
 public:
     ///
@@ -81,33 +74,32 @@ public:
     ///
     /// \brief Set the geometry that dictates the map
     ///
-    void setMaster(std::shared_ptr<Geometry> master) override;
+    void setParentGeometry(std::shared_ptr<Geometry> parent) override;
 
     ///
-    /// \brief Set the geometry that follows the master
+    /// \brief Set the geometry that follows the parent
     ///
-    void setSlave(std::shared_ptr<Geometry> slave) override;
+    void setChildGeometry(std::shared_ptr<Geometry> child) override;
 
     ///
-    /// \brief Get the corresponding master index, given a slave index
-    /// \param index on the slave geometry
+    /// \brief Get the corresponding parent index, given a child index
+    /// \param index on the child geometry
     ///
     size_t getMapIdx(const size_t& idx) override;
 
     ///
-    /// \brief Set the tolerance, that is the distance to consider
+    /// \brief Set/Get the tolerance. The distance to consider
     /// two points equivalent/corresponding
-    ///
+    ///@{
     void setTolerance(const double tolerance) { m_epsilon = tolerance; }
-
     double getTolerance() const { return m_epsilon; }
+///@}
 
 protected:
-
     ///
     /// \brief Returns the first matching vertex
     ///
-    bool findMatchingVertex(const VecDataArray<double, 3>& masterMesh, const Vec3d& p, size_t& nodeId);
+    bool findMatchingVertex(const VecDataArray<double, 3>& parentMesh, const Vec3d& p, size_t& vertexId);
 
     std::map<size_t, size_t> m_oneToOneMap;   ///> One to one mapping data
 

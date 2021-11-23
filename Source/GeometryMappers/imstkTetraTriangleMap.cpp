@@ -31,10 +31,10 @@ namespace imstk
 void
 TetraTriangleMap::compute()
 {
-    CHECK(m_master && m_slave) << "TetraTriangle map is being applied without valid geometries";
+    CHECK(m_parentGeom && m_childGeom) << "TetraTriangle map is being applied without valid geometries";
 
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
-    auto triMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_slave);
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
+    auto triMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_childGeom);
 
     CHECK(tetMesh && triMesh) << "Fail to cast from geometry to meshes";
 
@@ -42,7 +42,7 @@ TetraTriangleMap::compute()
     m_verticesWeights.clear();
     m_verticesEnclosingTetraId.resize(triMesh->getNumVertices());
     m_verticesWeights.resize(triMesh->getNumVertices());
-    m_slaveVerts = triMesh->getVertexPositions();
+    m_childVerts = triMesh->getVertexPositions();
     bool bValid = true;
 
     if (!m_boundingBoxAvailable)
@@ -97,17 +97,14 @@ TetraTriangleMap::apply()
     }
 
     // Check geometries
-    CHECK(m_master && m_slave) << "TetraTriangle map is being applied without valid  geometries";
+    CHECK(m_parentGeom && m_childGeom) << "TetraTriangle map is being applied without valid  geometries";
 
-    auto tetMesh = static_cast<TetrahedralMesh*>(m_master.get());
-    auto triMesh = static_cast<SurfaceMesh*>(m_slave.get());
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
+    auto triMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_childGeom);
 
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    CHECK(dynamic_cast<TetrahedralMesh*>(m_master.get()) && dynamic_cast<SurfaceMesh*>(m_slave.get()))
-        << "Fail to cast from geometry to meshes";
-#endif
+    CHECK(m_parentGeom != nullptr && m_childGeom != nullptr) << "Fail to cast from geometry to meshes";
 
-    VecDataArray<double, 3>& vertices = *m_slaveVerts;
+    VecDataArray<double, 3>& vertices = *m_childVerts;
     ParallelUtils::parallelFor(triMesh->getNumVertices(), [&](const size_t vertexId) {
             const Vec4i& tetVerts = tetMesh->getTetrahedronIndices(m_verticesEnclosingTetraId[vertexId]);
             const auto& weights   = m_verticesWeights[vertexId];
@@ -142,20 +139,18 @@ TetraTriangleMap::print() const
 bool
 TetraTriangleMap::isValid() const
 {
-    auto meshMaster = static_cast<TetrahedralMesh*>(m_master.get());
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    CHECK(dynamic_cast<TetrahedralMesh*>(m_master.get()) != nullptr) << "Fail to cast from geometry to mesh";
-#endif
+    auto meshParent = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
+    CHECK(m_parentGeom != nullptr) << "Fail to cast parent Geometry to TetrahedralMesh";
 
-    auto totalElementsMaster = static_cast<size_t>(meshMaster->getNumTetrahedra());
-    bool bOK = true;
+    size_t totalElementsParent = static_cast<size_t>(meshParent->getNumTetrahedra());
+    bool   bOK = true;
 
     ParallelUtils::parallelFor(m_verticesEnclosingTetraId.size(), [&](const size_t tetId) {
             if (!bOK) // If map is invalid, no need to check further
             {
                 return;
             }
-            if (!(m_verticesEnclosingTetraId[tetId] < totalElementsMaster))
+            if (!(m_verticesEnclosingTetraId[tetId] < totalElementsParent))
             {
                 bOK = false;
             }
@@ -165,30 +160,30 @@ TetraTriangleMap::isValid() const
 }
 
 void
-TetraTriangleMap::setMaster(std::shared_ptr<Geometry> master)
+TetraTriangleMap::setParentGeometry(std::shared_ptr<Geometry> parent)
 {
-    CHECK(std::dynamic_pointer_cast<TetrahedralMesh>(master) != nullptr) <<
-        "The geometry provided as master is not of tetrahedral type";
+    CHECK(std::dynamic_pointer_cast<TetrahedralMesh>(parent) != nullptr) <<
+        "The geometry provided as parent is not of tetrahedral type";
 
-    GeometryMap::setMaster(master);
+    GeometryMap::setParentGeometry(parent);
 }
 
 void
-TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
+TetraTriangleMap::setChildGeometry(std::shared_ptr<Geometry> child)
 {
-    CHECK(std::dynamic_pointer_cast<SurfaceMesh>(slave) != nullptr) <<
-        "The geometry provided as slave is not of triangular type (surface)";
+    CHECK(std::dynamic_pointer_cast<SurfaceMesh>(child) != nullptr) <<
+        "The geometry provided as child is not of triangular type (surface)";
 
-    GeometryMap::setSlave(slave);
+    GeometryMap::setChildGeometry(child);
 }
 
 size_t
 TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 {
-    const auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
-    double     closestDistanceSqr = MAX_D;
-    size_t     closestTetrahedron = std::numeric_limits<size_t>::max();
-    Vec3d      center(0, 0, 0);
+    auto   tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
+    double closestDistanceSqr = MAX_D;
+    size_t closestTetrahedron = std::numeric_limits<size_t>::max();
+    Vec3d  center(0, 0, 0);
 
     for (int tetId = 0; tetId < tetMesh->getNumTetrahedra(); ++tetId)
     {
@@ -214,8 +209,8 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 size_t
 TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 {
-    const auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
-    size_t     enclosingTetrahedron = std::numeric_limits<size_t>::max();
+    auto   tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
+    size_t enclosingTetrahedron = std::numeric_limits<size_t>::max();
 
     for (int idx = 0; idx < tetMesh->getNumTetrahedra(); ++idx)
     {
@@ -246,7 +241,7 @@ void
 TetraTriangleMap::updateBoundingBox()
 {
     /// \todo use parallelFor
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_parentGeom);
     m_bBoxMin.resize(tetMesh->getNumTetrahedra());
     m_bBoxMax.resize(tetMesh->getNumTetrahedra());
 

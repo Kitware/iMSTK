@@ -28,32 +28,24 @@ namespace imstk
 ///
 /// \class IsometricMap
 ///
-/// \brief A maps that lets the slave follow the master with a
-/// specified offset in position and orientation
+/// \brief A maps that lets the child follow the parent transform
 ///
 class IsometricMap : public GeometryMap
 {
 public:
+    IsometricMap() { }
 
-    ///
-    /// \brief Constructor
-    ///
-    IsometricMap() :
-        GeometryMap(GeometryMap::Type::Isometric)
-    { }
+    IsometricMap(std::shared_ptr<Geometry> parent, std::shared_ptr<Geometry> child)
+    {
+        this->setParentGeometry(parent);
+        this->setChildGeometry(child);
+    }
 
-    ///
-    /// \brief Constructor
-    ///
-    IsometricMap(std::shared_ptr<Geometry> master, std::shared_ptr<Geometry> slave) :
-        GeometryMap(master, slave, GeometryMap::Type::Isometric)
-    { }
-
-    ///
-    /// \brief Destructor
-    ///
     ~IsometricMap() override = default;
 
+    virtual const std::string getTypeName() const override { return "IsometricMap"; }
+
+public:
     ///
     /// \brief Compute the map
     ///

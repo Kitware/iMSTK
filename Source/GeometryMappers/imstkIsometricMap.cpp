@@ -35,12 +35,12 @@ IsometricMap::apply()
     }
 
     // Check geometries
-    if (!m_master || !m_slave)
+    if (!m_parentGeom || !m_childGeom)
     {
         LOG(WARNING) << "Isometric map is being applied without valid geometries";
         return;
     }
 
-    m_slave->setTransform(m_master->getTransform());
+    m_childGeom->setTransform(m_parentGeom->getTransform());
 }
 } // imstk

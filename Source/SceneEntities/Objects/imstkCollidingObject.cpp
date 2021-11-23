@@ -52,12 +52,6 @@ CollidingObject::setCollidingGeometry(std::shared_ptr<Geometry> geometry)
     m_collidingGeometry = geometry;
 }
 
-std::shared_ptr<Geometry>
-CollidingObject::getMasterGeometry() const
-{
-    return m_collidingGeometry;
-}
-
 std::shared_ptr<GeometryMap>
 CollidingObject::getCollidingToVisualMap() const
 {
@@ -76,7 +70,7 @@ CollidingObject::updateGeometries()
     if (m_collidingToVisualMap)
     {
         m_collidingToVisualMap->apply();
-        m_collidingToVisualMap->getSlave()->postModified();
+        m_collidingToVisualMap->getChildGeometry()->postModified();
     }
     SceneObject::updateGeometries();
 }

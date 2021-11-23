@@ -23,28 +23,28 @@ namespace imstk
 void
 OneToOneMap::compute()
 {
-    CHECK(m_master != nullptr && m_slave != nullptr) << "OneToOneMap map is being applied without valid geometries";
+    CHECK(m_parentGeom != nullptr && m_childGeom != nullptr) << "OneToOneMap map is being applied without valid geometries";
 
-    auto meshMaster = std::dynamic_pointer_cast<PointSet>(m_master);
-    auto meshSlave  = std::dynamic_pointer_cast<PointSet>(m_slave);
+    auto meshParent = std::dynamic_pointer_cast<PointSet>(m_parentGeom);
+    auto meshChild  = std::dynamic_pointer_cast<PointSet>(m_childGeom);
 
-    CHECK(meshMaster != nullptr && meshSlave != nullptr) << "Fail to cast from geometry to pointset";
+    CHECK(meshParent != nullptr && meshChild != nullptr) << "Fail to cast from geometry to pointset";
 
     m_oneToOneMap.clear();
     ParallelUtils::SpinLock lock;
 
-    std::shared_ptr<VecDataArray<double, 3>> masterVerticesPtr = meshMaster->getInitialVertexPositions();
-    const VecDataArray<double, 3>&           masterVertices    = *masterVerticesPtr;
-    std::shared_ptr<VecDataArray<double, 3>> slaveVerticesPtr  = meshSlave->getInitialVertexPositions();
-    const VecDataArray<double, 3>&           slaveVertices     = *slaveVerticesPtr;
+    std::shared_ptr<VecDataArray<double, 3>> parentVerticesPtr = meshParent->getInitialVertexPositions();
+    const VecDataArray<double, 3>&           parentVertices    = *parentVerticesPtr;
+    std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr  = meshChild->getInitialVertexPositions();
+    const VecDataArray<double, 3>&           childVertices     = *childVerticesPtr;
 
-    // For every vertex on the slave, find corresponding one on the master
-    ParallelUtils::parallelFor(meshSlave->getNumVertices(),
+    // For every vertex on the child, find corresponding one on the parent
+    ParallelUtils::parallelFor(meshChild->getNumVertices(),
         [&](const size_t nodeId)
         {
             // Find the enclosing or closest tetrahedron
             size_t matchingNodeId;
-            if (!findMatchingVertex(masterVertices, slaveVertices[nodeId], matchingNodeId))
+            if (!findMatchingVertex(parentVertices, childVertices[nodeId], matchingNodeId))
             {
                 return;
             }
@@ -52,7 +52,7 @@ OneToOneMap::compute()
             // Add to the map
             // Note: This replaces the map if one with <nodeId> already exists
             lock.lock();
-            m_oneToOneMap[nodeId] = matchingNodeId; // slave index -> master index
+            m_oneToOneMap[nodeId] = matchingNodeId; // child index -> parent index
             lock.unlock();
         });
 
@@ -65,12 +65,12 @@ OneToOneMap::compute()
 }
 
 bool
-OneToOneMap::findMatchingVertex(const VecDataArray<double, 3>& masterVertices, const Vec3d& p, size_t& nodeId)
+OneToOneMap::findMatchingVertex(const VecDataArray<double, 3>& parentVertices, const Vec3d& p, size_t& nodeId)
 {
     const double eps2 = m_epsilon * m_epsilon;
-    for (int idx = 0; idx < masterVertices.size(); ++idx)
+    for (int idx = 0; idx < parentVertices.size(); ++idx)
     {
-        if ((masterVertices[idx] - p).squaredNorm() < eps2)
+        if ((parentVertices[idx] - p).squaredNorm() < eps2)
         {
             nodeId = idx;
             return true;
@@ -109,27 +109,24 @@ OneToOneMap::apply()
     }
 
     // Check geometries
-    CHECK(m_master != nullptr && m_slave != nullptr) << "OneToOneMap map is being applied without valid geometries";
+    CHECK(m_parentGeom != nullptr && m_childGeom != nullptr) << "OneToOneMap map is being applied without valid geometries";
 
     // Check data
     CHECK(m_oneToOneMap.size() == m_oneToOneMapVector.size()) << "Internal data is corrupted";
 
-    auto meshMaster = static_cast<PointSet*>(m_master.get());
-    auto meshSlave  = static_cast<PointSet*>(m_slave.get());
+    auto meshParent = std::dynamic_pointer_cast<PointSet>(m_parentGeom);
+    auto meshChild  = std::dynamic_pointer_cast<PointSet>(m_childGeom);
 
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    CHECK(dynamic_cast<PointSet*>(m_master.get()) && dynamic_cast<PointSet*>(m_slave.get())) <<
-        "Failed to cast from geometry to pointset";
-#endif
+    CHECK(meshParent != nullptr && meshChild != nullptr) << "Failed to cast from Geometry to PointSet";
 
-    VecDataArray<double, 3>&       slaveVertices  = *meshSlave->getVertexPositions();
-    const VecDataArray<double, 3>& masterVertices = *meshMaster->getVertexPositions();
+    VecDataArray<double, 3>&       childVertices  = *meshChild->getVertexPositions();
+    const VecDataArray<double, 3>& parentVertices = *meshParent->getVertexPositions();
     ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
         [&](const size_t idx) {
             const auto& mapValue = m_oneToOneMapVector[idx];
-            slaveVertices[mapValue.first] = masterVertices[mapValue.second];
+            childVertices[mapValue.first] = parentVertices[mapValue.second];
         });
-    meshSlave->postModified();
+    meshChild->postModified();
 }
 
 void
@@ -139,7 +136,7 @@ OneToOneMap::print() const
     GeometryMap::print();
 
     // Print the one-to-one map
-    LOG(INFO) << "[slaveVertId, masterVertexId]\n";
+    LOG(INFO) << "[childVertId, parentVertexId]\n";
     for (auto const& mapValue : m_oneToOneMap)
     {
         LOG(INFO) << "[" << mapValue.first << ", " << mapValue.second << "]\n";
@@ -147,25 +144,27 @@ OneToOneMap::print() const
 }
 
 void
-OneToOneMap::setMaster(std::shared_ptr<Geometry> master)
+OneToOneMap::setParentGeometry(std::shared_ptr<Geometry> parent)
 {
-    if (!master->isMesh())
+    auto pointSet = std::dynamic_pointer_cast<PointSet>(parent);
+    if (parent == nullptr)
     {
-        LOG(WARNING) << "The geometry provided is not a mesh!\n";
+        LOG(WARNING) << "The geometry provided is not a PointSet!\n";
         return;
     }
-    GeometryMap::setMaster(master);
+    GeometryMap::setParentGeometry(parent);
 }
 
 void
-OneToOneMap::setSlave(std::shared_ptr<Geometry> slave)
+OneToOneMap::setChildGeometry(std::shared_ptr<Geometry> child)
 {
-    if (!slave->isMesh())
+    auto pointSet = std::dynamic_pointer_cast<PointSet>(child);
+    if (pointSet == nullptr)
     {
-        LOG(WARNING) << "The geometry provided is not a mesh!\n";
+        LOG(WARNING) << "The geometry provided is not a PointSet!\n";
         return;
     }
-    GeometryMap::setSlave(slave);
+    GeometryMap::setChildGeometry(child);
 }
 
 size_t

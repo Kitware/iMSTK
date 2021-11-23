@@ -105,11 +105,6 @@ public:
     size_t getNumVisualModels() { return m_visualModels.size(); }
 
     ///
-    /// \brief Get the master geometry
-    ///
-    virtual std::shared_ptr<Geometry> getMasterGeometry() const { return this->getVisualGeometry(); }
-
-    ///
     /// \brief Returns the computational node for updating
     ///
     std::shared_ptr<TaskNode> getUpdateNode() const { return m_updateNode; }
