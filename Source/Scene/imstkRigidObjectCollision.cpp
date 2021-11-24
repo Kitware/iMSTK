@@ -89,6 +89,7 @@ RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1
         setCollisionHandlingA(ch);
     }
 
+    m_taskGraph->addNode(rbdObj1->getUpdateGeometryNode());
     m_taskGraph->addNode(rbdObj1->getTaskGraph()->getSource());
     m_taskGraph->addNode(rbdObj1->getTaskGraph()->getSink());
     m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
