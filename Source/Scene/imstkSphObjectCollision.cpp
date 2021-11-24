@@ -52,7 +52,7 @@ SphObjectCollision::SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::sha
     m_taskGraph->addNode(obj1->getUpdateGeometryNode());
     m_taskGraph->addNode(obj2->getUpdateGeometryNode());
 
-    m_taskGraph->addNode(obj1->getSPHModel()->getTaskGraph()->getSink());
+    m_taskGraph->addNode(obj1->getTaskGraph()->getSink());
     m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
 }
 
@@ -67,15 +67,15 @@ SphObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     // ...SPH steps...
     // Update Geometry A                  Update Geometry B
     //                 Collision Detection
-    // Collision Handling A                objB Sink
-    //
+    //                 Collision Handling A 
+    //    objA Sink                          objB Sink
     //
     m_taskGraph->addEdge(sphObj1->getUpdateGeometryNode(), m_collisionDetectionNode);
     m_taskGraph->addEdge(m_objB->getUpdateGeometryNode(), m_collisionDetectionNode);
 
     m_taskGraph->addEdge(m_collisionDetectionNode, m_collisionHandleANode);
 
-    m_taskGraph->addEdge(m_collisionHandleANode, sphObj1->getSPHModel()->getTaskGraph()->getSink());
+    m_taskGraph->addEdge(m_collisionHandleANode, sphObj1->getTaskGraph()->getSink());
     m_taskGraph->addEdge(m_collisionHandleANode, m_objB->getTaskGraph()->getSink());
 }
 }
