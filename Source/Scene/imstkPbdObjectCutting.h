@@ -50,11 +50,6 @@ public:
 
 public:
     ///
-    /// \brief Setup connectivity of task graph
-    ///
-    //virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
-
-    ///
     /// \brief Applies the cut when called
     ///
     void apply();

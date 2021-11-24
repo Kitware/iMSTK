@@ -35,7 +35,7 @@ limitations under the License.
 namespace imstk
 {
 PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj) :
-    SceneObject(pbdObj->getName() + "_vs_" + cutObj->getName() + "_pbdCutting")
+    SceneObject(pbdObj->getName() + "_vs_" + cutObj->getName() + "_pbdCutting"), m_objA(pbdObj), m_objB(cutObj)
 {
     // check whether pbd object is a surfacemesh
     if (std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getPhysicsGeometry()) == nullptr)
@@ -52,13 +52,6 @@ PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::share
         return;
     }
 }
-
-//
-//void
-//PbdObjectCuttingPair::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
-//{
-//
-//}
 
 void
 PbdObjectCutting::apply()

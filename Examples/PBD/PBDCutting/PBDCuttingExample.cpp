@@ -20,11 +20,10 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
-#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
@@ -41,17 +40,11 @@
 
 using namespace imstk;
 
-// Parameters to play with
-const double gWidth  = 50.0;
-const double gHeight = 50.0;
-const int    gNRows  = 12;
-const int    gNCols  = 12;
-
 ///
 /// \brief Creates cloth geometry
 ///
 static std::shared_ptr<SurfaceMesh>
-makeClothGeometry(const double width,
+makePlaneGeometry(const double width,
                   const double height,
                   const int    nRows,
                   const int    nCols)
@@ -114,7 +107,7 @@ makeClothObj(const std::string& name,
     imstkNew<PbdObject> clothObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh(makeClothGeometry(width, height, nRows, nCols));
+    std::shared_ptr<SurfaceMesh> clothMesh(makePlaneGeometry(width, height, nRows, nCols));
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
@@ -162,7 +155,7 @@ main()
     imstkNew<Scene> scene("PBDCutting");
 
     // Create a cutting plane object in the scene
-    std::shared_ptr<SurfaceMesh> cutGeom(makeClothGeometry(40, 40, 2, 2));
+    std::shared_ptr<SurfaceMesh> cutGeom(makePlaneGeometry(40, 40, 2, 2));
     cutGeom->setTranslation(Vec3d(-10, -20, 0));
     cutGeom->updatePostTransformData();
     imstkNew<CollidingObject> cutObj("CuttingObject");
@@ -172,7 +165,7 @@ main()
     scene->addSceneObject(cutObj);
 
     // Create a pbd cloth object in the scene
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", gWidth, gHeight, gNRows, gNCols);
+    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 12, 12);
     scene->addSceneObject(clothObj);
 
     // Add interaction pair for pbd cutting
@@ -196,13 +189,12 @@ main()
     light->setIntensity(1.0);
     scene->addLight("light", light);
 
-    //Run the simulation
     {
-        // Setup a viewer to render in its own thread
+        // Setup a viewer to render
         imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
 
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
@@ -225,11 +217,11 @@ main()
             viewer->addControl(keyControl);
         }
 
-        // Queue keypress to be called after scene thread
+        // Queue haptic button press to be called after scene thread
         queueConnect<ButtonEvent>(client, &HapticDeviceClient::buttonStateChanged, sceneManager,
             [&](ButtonEvent* e)
         {
-            // When i is pressed replace the PBD cloth with a cut one
+            // When button 0 is pressed replace the PBD cloth with a cut one
             if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
             {
                 cuttingInteraction->apply();
@@ -237,7 +229,7 @@ main()
             });
 
         std::cout << "================================================\n";
-        std::cout << "Key haptic button 0 to cut the cloth.\n";
+        std::cout << "Haptic button 0 to cut the cloth.\n";
         std::cout << "================================================\n\n";
 
         driver->start();
