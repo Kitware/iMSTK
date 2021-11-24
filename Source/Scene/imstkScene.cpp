@@ -207,6 +207,11 @@ Scene::initTaskGraph()
 
     // Reduce the graph, removing nonfunctional nodes, and redundant edges
     m_taskGraph = TaskGraph::removeUnusedNodes(m_taskGraph);
+    if (TaskGraph::isCyclic(m_taskGraph))
+    {
+        LOG(FATAL) << "Scene TaskGraph is cyclic, cannot proceed";
+        return;
+    }
     if (m_config->graphReductionEnabled)
     {
         m_taskGraph = TaskGraph::reduce(m_taskGraph);
