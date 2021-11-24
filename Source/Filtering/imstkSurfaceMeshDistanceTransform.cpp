@@ -227,7 +227,7 @@ SurfaceMeshDistanceTransform::setBounds(const Vec6d& bounds)
     m_Bounds = bounds;
     if (m_Bounds.isZero())
     {
-        LOG(WARNING) << "Bounds are zero, the image bounds will be used instead.";
+        LOG(WARNING) << "SurfaceMeshDistanceTransform Bounds are zero, the input SurfaceMesh bounds will be used instead.";
     }
 }
 
@@ -237,7 +237,7 @@ SurfaceMeshDistanceTransform::setBounds(const Vec3d& min, const Vec3d& max)
     m_Bounds << min.x(), max.x(), min.y(), max.y(), min.z(), max.z();
     if (m_Bounds.isZero())
     {
-        LOG(WARNING) << "Bounds are zero, the image bounds will be used instead.";
+        LOG(WARNING) << "SurfaceMeshDistanceTransform Bounds are zero, the input SurfaceMesh bounds will be used instead.";
     }
 }
 
@@ -247,15 +247,9 @@ SurfaceMeshDistanceTransform::requestUpdate()
     std::shared_ptr<SurfaceMesh> inputSurfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(getInput(0));
     std::shared_ptr<ImageData>   outputImageData  = std::dynamic_pointer_cast<ImageData>(getOutput(0));
 
-    if (inputSurfaceMesh == nullptr)
-    {
-        LOG(WARNING) << "Missing input surface mesh";
-        return;
-    }
-
     if (m_Dimensions[0] == 0 || m_Dimensions[1] == 0 || m_Dimensions[2] == 0)
     {
-        LOG(WARNING) << "Dimensions not set";
+        LOG(WARNING) << "SurfaceMeshDistanceTransform Dimensions not set";
         return;
     }
 
@@ -265,7 +259,7 @@ SurfaceMeshDistanceTransform::requestUpdate()
         Vec3d min, max;
         inputSurfaceMesh->computeBoundingBox(min, max, 0.0);
         bounds << min.x(), max.x(), min.y(), max.y(), min.z(), max.z();
-        LOG(WARNING) << "Bounds are zero, the image bounds + " << bounds.transpose() << "will be used.";
+        LOG(WARNING) << "SurfaceMeshDistanceTransform Bounds are zero, the input SurfaceMesh bounds (" << bounds.transpose() << ") will be used.";
     }
 
     const Vec3d size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
