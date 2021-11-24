@@ -202,6 +202,7 @@ main()
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.03);
 
         // Add mouse and keyboard controls to the viewer
         {
