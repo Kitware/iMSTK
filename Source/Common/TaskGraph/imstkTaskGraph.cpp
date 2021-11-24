@@ -388,6 +388,7 @@ TaskGraph::clear()
 std::shared_ptr<imstk::TaskNodeList>
 TaskGraph::topologicalSort(std::shared_ptr<const TaskGraph> graph)
 {
+    CHECK(graph != nullptr) << "Graph is nullptr";
     // Compute the number of inputs to each node (we will remove these as we go)
     std::unordered_map<std::shared_ptr<TaskNode>, size_t> numInputs;
 
@@ -454,6 +455,7 @@ TaskGraph::topologicalSort(std::shared_ptr<const TaskGraph> graph)
 std::shared_ptr<TaskGraph>
 TaskGraph::resolveCriticalNodes(std::shared_ptr<TaskGraph> graph)
 {
+    CHECK(graph != nullptr) << "Graph is nullptr";
     std::shared_ptr<TaskGraph> results = std::make_shared<TaskGraph>(*graph);
 
     const TaskNodeAdjList& adjList = graph->getAdjList();
@@ -573,6 +575,7 @@ TaskGraph::resolveCriticalNodes(std::shared_ptr<TaskGraph> graph)
 std::shared_ptr<TaskGraph>
 TaskGraph::transitiveReduce(std::shared_ptr<TaskGraph> graph)
 {
+    CHECK(graph != nullptr) << "Graph is nullptr";
     // It's a bad idea to do this method if the graph is cyclic
     if (isCyclic(graph))
     {
@@ -611,6 +614,7 @@ TaskGraph::transitiveReduce(std::shared_ptr<TaskGraph> graph)
 std::shared_ptr<TaskGraph>
 TaskGraph::removeRedundantNodes(std::shared_ptr<TaskGraph> graph)
 {
+    CHECK(graph != nullptr) << "Graph is nullptr";
     std::shared_ptr<TaskGraph> results = std::make_shared<TaskGraph>(*graph);
 
     const TaskNodeAdjList& adjList    = results->getAdjList();
@@ -668,6 +672,7 @@ TaskGraph::removeRedundantNodes(std::shared_ptr<TaskGraph> graph)
 std::shared_ptr<TaskGraph>
 TaskGraph::removeUnusedNodes(std::shared_ptr<TaskGraph> graph)
 {
+    CHECK(graph != nullptr) << "Graph is nullptr";
     auto results = std::make_shared<TaskGraph>(*graph);
 
     // Find the set of nodes not used by any edge
@@ -693,6 +698,7 @@ TaskGraph::removeUnusedNodes(std::shared_ptr<TaskGraph> graph)
 bool
 TaskGraph::isCyclic(std::shared_ptr<TaskGraph> graph)
 {
+    CHECK(graph != nullptr) << "Graph is nullptr";
     // Brute force, DFS every node to find it again
     const TaskNodeAdjList& adjList = graph->getAdjList();
     const TaskNodeVector&  nodes   = graph->getNodes();
@@ -750,6 +756,7 @@ TaskGraph::isCyclic(std::shared_ptr<TaskGraph> graph)
 std::unordered_map<std::shared_ptr<TaskNode>, std::string>
 TaskGraph::getUniqueNodeNames(std::shared_ptr<TaskGraph> graph, bool apply)
 {
+    CHECK(graph != nullptr) << "Graph is nullptr";
     // Produce non colliding names
     std::unordered_map<std::shared_ptr<TaskNode>, std::string> nodeNames;
     std::unordered_map<std::string, int>                       names;
@@ -788,6 +795,7 @@ TaskGraph::getUniqueNodeNames(std::shared_ptr<TaskGraph> graph, bool apply)
 std::unordered_map<std::shared_ptr<TaskNode>, double>
 TaskGraph::getNodeStartTimes(std::shared_ptr<TaskGraph> graph)
 {
+    CHECK(graph != nullptr) << "Graph is nullptr";
     const TaskNodeAdjList& adjList = graph->getAdjList();
 
     // Setup a map for total elapsed times at each node
@@ -837,6 +845,7 @@ TaskGraph::getNodeStartTimes(std::shared_ptr<TaskGraph> graph)
 TaskNodeList
 TaskGraph::getCriticalPath(std::shared_ptr<TaskGraph> graph)
 {
+    CHECK(graph != nullptr) << "Graph is nullptr";
     std::unordered_map<std::shared_ptr<TaskNode>, double> nodeStartTimes = getNodeStartTimes(graph);
 
     // Now backtrack to acquire the path of longest duration
