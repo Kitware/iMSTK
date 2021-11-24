@@ -86,6 +86,7 @@ main()
 
     // Create and add virtual coupling object controller in the scene
     imstkNew<RigidObjectController> controller(drill, client);
+    controller->setTranslationScaling(0.1);
     controller->setLinearKs(100.0);
     controller->setLinearKd(10.0);
     controller->setAngularKs(0.0);
@@ -101,7 +102,8 @@ main()
     light->setIntensity(1.0);
     scene->addLight("light0", light);
 
-    scene->getActiveCamera()->setPosition(Vec3d(0.0, 3.0, 25.0));
+    scene->getActiveCamera()->setFocalPoint(tetMesh->getCenter());
+    scene->getActiveCamera()->setPosition(tetMesh->getCenter() + Vec3d(0.0, 3.0, 25.0));
 
     //Run the simulation
     {
