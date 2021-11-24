@@ -127,7 +127,7 @@ RigidObjectLevelSetCollision::initGraphEdges(std::shared_ptr<TaskNode> source, s
     ///                                Collision Detection
     /// Rigid Body Handler (add constraints)               LSM Handler (pointset erosion)
     ///              Rbd Solve                              LSM End Compute Velocities
-    /// 
+    ///
     m_taskGraph->addEdge(rbdModel->getComputeTentativeVelocitiesNode(), m_collisionDetectionNode);
     m_taskGraph->addEdge(lsmModel->getGenerateVelocitiesBeginNode(), m_collisionDetectionNode);
 

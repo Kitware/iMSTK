@@ -67,7 +67,7 @@ SphObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     // ...SPH steps...
     // Update Geometry A                  Update Geometry B
     //                 Collision Detection
-    //                 Collision Handling A 
+    //                 Collision Handling A
     //    objA Sink                          objB Sink
     //
     m_taskGraph->addEdge(sphObj1->getUpdateGeometryNode(), m_collisionDetectionNode);

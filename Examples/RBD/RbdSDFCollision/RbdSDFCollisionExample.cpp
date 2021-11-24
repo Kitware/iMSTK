@@ -58,7 +58,7 @@ main()
     // Write log to stdout and file
     Logger::startLogger();
 
-    imstkNew<Scene>        scene("Rigid Body Dynamics");
+    imstkNew<Scene> scene("Rigid Body Dynamics");
     scene->getConfig()->writeTaskGraph = true;
     imstkNew<RigidObject2> cubeObj("Cube");
     {
