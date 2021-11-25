@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkAssimpMeshIO.h"
+#include "imstkLineMesh.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkSurfaceMesh.h"
@@ -32,7 +33,7 @@
 
 namespace imstk
 {
-std::shared_ptr<SurfaceMesh>
+std::shared_ptr<PointSet>
 AssimpMeshIO::read(
     const std::string& filePath,
     MeshFileType       type)
@@ -52,7 +53,7 @@ AssimpMeshIO::read(
     }
 }
 
-std::shared_ptr<SurfaceMesh>
+std::shared_ptr<PointSet>
 AssimpMeshIO::readMeshData(const std::string& filePath)
 {
     // Import mesh(es) and apply some clean-up operations
@@ -74,12 +75,9 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
     return surfMesh;
 }
 
-std::shared_ptr<SurfaceMesh>
+std::shared_ptr<PointSet>
 AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
 {
-    // Build SurfaceMesh
-    auto mesh = std::make_shared<SurfaceMesh>(std::string(importedMesh->mName.C_Str()));
-
     // Get mesh information
     auto numVertices = importedMesh->mNumVertices;
     auto numFaces    = importedMesh->mNumFaces;
@@ -102,76 +100,118 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
         vertices[i] = Vec3d(positionX, positionY, positionZ);
     }
 
-    // Triangles
-    auto trianglesPtr = std::make_shared<VecDataArray<int, 3>>();
-    trianglesPtr->reserve(numFaces);
-    VecDataArray<int, 3>& triangles = *trianglesPtr;
-
+    // Count cell types
+    int numLines = 0;
+    int numTris  = 0;
+    int numQuads = 0;
     for (unsigned int i = 0; i < numFaces; i++)
     {
-        aiFace        triangle = importedMesh->mFaces[i];
-        unsigned int* indices  = triangle.mIndices;
-        if (triangle.mNumIndices == 3) // Only supports triangles
-        {
-            triangles.push_back(Vec3i(indices[0], indices[1], indices[2]));
-        }
+        aiFace cell = importedMesh->mFaces[i];
+        numTris  += static_cast<int>(cell.mNumIndices == 3);
+        numLines += static_cast<int>(cell.mNumIndices == 2);
+        numQuads += static_cast<int>(cell.mNumIndices == 4);
     }
-    trianglesPtr->squeeze();
 
-    // Vertex normals, tangents, and bitangents
-    std::shared_ptr<VecDataArray<double, 3>> normalsPtr    = std::make_shared<VecDataArray<double, 3>>(numVertices);
-    VecDataArray<double, 3>&                 normals       = *normalsPtr;
-    std::shared_ptr<VecDataArray<float, 3>>  tangentsPtr   = std::make_shared<VecDataArray<float, 3>>(numVertices);
-    VecDataArray<float, 3>&                  tangents      = *tangentsPtr;
-    std::shared_ptr<VecDataArray<double, 3>> bitangentsPtr = std::make_shared<VecDataArray<double, 3>>(numVertices);
-    VecDataArray<double, 3>&                 bitangents    = *bitangentsPtr;
-
-    if (importedMesh->HasNormals())
+    // If there are no cells in this mesh, read PointSet (assimp does not support)
+    /*if (importedMesh->mNumFaces == 0)
     {
-        for (unsigned int i = 0; i < numVertices; i++)
-        {
-            auto normalX = importedMesh->mNormals[i].x;
-            auto normalY = importedMesh->mNormals[i].y;
-            auto normalZ = importedMesh->mNormals[i].z;
-            normals[i] = Vec3d(normalX, normalY, normalZ);
-        }
-    }
-
-    mesh->initialize(verticesPtr, trianglesPtr, normalsPtr, false);
-    mesh->setVertexNormals("normals", normalsPtr);
-
-    if (importedMesh->HasTangentsAndBitangents() && importedMesh->HasTextureCoords(0))
+        auto ptMesh = std::make_shared<PointSet>(std::string(importedMesh->mName.C_Str()));
+        ptMesh->initialize(verticesPtr);
+        return ptMesh;
+    }*/
+    // If no triangles or quads, but lines, read LineMesh
+    if (numTris == 0 && numQuads == 0 && numLines > 0)
     {
-        for (unsigned int i = 0; i < numVertices; i++)
+        auto                  cellsPtr = std::make_shared<VecDataArray<int, 2>>(numLines);
+        VecDataArray<int, 2>& cells    = *cellsPtr;
+
+        unsigned int j = 0;
+        for (unsigned int i = 0; i < numFaces; i++)
         {
-            auto tangentX = importedMesh->mTangents[i].x;
-            auto tangentY = importedMesh->mTangents[i].y;
-            auto tangentZ = importedMesh->mTangents[i].z;
-            tangents[i] = Vec3f(tangentX, tangentY, tangentZ);
-
-            auto bitangentX = importedMesh->mBitangents[i].x;
-            auto bitangentY = importedMesh->mBitangents[i].y;
-            auto bitangentZ = importedMesh->mBitangents[i].z;
-            bitangents[i] = Vec3d(bitangentX, bitangentY, bitangentZ);
+            aiFace        triangle = importedMesh->mFaces[i];
+            unsigned int* indices  = triangle.mIndices;
+            if (triangle.mNumIndices == 2)
+            {
+                cells[j++] = Vec2i(indices[0], indices[1]);
+            }
         }
-        mesh->setVertexTangents("tangents", tangentsPtr);
+        auto lineMesh = std::make_shared<LineMesh>(std::string(importedMesh->mName.C_Str()));
+        lineMesh->initialize(verticesPtr, cellsPtr);
+        return lineMesh;
     }
-
-    // UV coordinates
-    if (importedMesh->HasTextureCoords(0))
+    // Otherwise just read SurfaceMesh
+    else
     {
-        std::shared_ptr<VecDataArray<float, 2>> UVs    = std::make_shared<VecDataArray<float, 2>>(numVertices);
-        VecDataArray<float, 2>&                 UVData = *UVs;
+        auto                  cellsPtr = std::make_shared<VecDataArray<int, 3>>(numTris);
+        VecDataArray<int, 3>& cells    = *cellsPtr;
 
-        auto texcoords = importedMesh->mTextureCoords[0];
-        for (unsigned int i = 0; i < numVertices; i++)
+        unsigned int j = 0;
+        for (unsigned int i = 0; i < numFaces; i++)
         {
-            UVData[i][0] = texcoords[i].x;
-            UVData[i][1] = texcoords[i].y;
+            aiFace        triangle = importedMesh->mFaces[i];
+            unsigned int* indices  = triangle.mIndices;
+            if (triangle.mNumIndices == 3)
+            {
+                cells[j++] = Vec3i(indices[0], indices[1], indices[2]);
+            }
         }
-        mesh->setVertexTCoords("tCoords", UVs);
+
+        // Vertex normals, tangents, and bitangents
+        std::shared_ptr<VecDataArray<double, 3>> normalsPtr    = std::make_shared<VecDataArray<double, 3>>(numVertices);
+        VecDataArray<double, 3>&                 normals       = *normalsPtr;
+        std::shared_ptr<VecDataArray<float, 3>>  tangentsPtr   = std::make_shared<VecDataArray<float, 3>>(numVertices);
+        VecDataArray<float, 3>&                  tangents      = *tangentsPtr;
+        std::shared_ptr<VecDataArray<double, 3>> bitangentsPtr = std::make_shared<VecDataArray<double, 3>>(numVertices);
+        VecDataArray<double, 3>&                 bitangents    = *bitangentsPtr;
+
+        if (importedMesh->HasNormals())
+        {
+            for (unsigned int i = 0; i < numVertices; i++)
+            {
+                auto normalX = importedMesh->mNormals[i].x;
+                auto normalY = importedMesh->mNormals[i].y;
+                auto normalZ = importedMesh->mNormals[i].z;
+                normals[i] = Vec3d(normalX, normalY, normalZ);
+            }
+        }
+
+        auto surfMesh = std::make_shared<SurfaceMesh>(std::string(importedMesh->mName.C_Str()));
+        surfMesh->initialize(verticesPtr, cellsPtr, normalsPtr, false);
+        surfMesh->setVertexNormals("normals", normalsPtr);
+
+        if (importedMesh->HasTangentsAndBitangents() && importedMesh->HasTextureCoords(0))
+        {
+            for (unsigned int i = 0; i < numVertices; i++)
+            {
+                auto tangentX = importedMesh->mTangents[i].x;
+                auto tangentY = importedMesh->mTangents[i].y;
+                auto tangentZ = importedMesh->mTangents[i].z;
+                tangents[i] = Vec3f(tangentX, tangentY, tangentZ);
+
+                auto bitangentX = importedMesh->mBitangents[i].x;
+                auto bitangentY = importedMesh->mBitangents[i].y;
+                auto bitangentZ = importedMesh->mBitangents[i].z;
+                bitangents[i] = Vec3d(bitangentX, bitangentY, bitangentZ);
+            }
+            surfMesh->setVertexTangents("tangents", tangentsPtr);
+        }
+
+        // UV coordinates
+        if (importedMesh->HasTextureCoords(0))
+        {
+            std::shared_ptr<VecDataArray<float, 2>> UVs    = std::make_shared<VecDataArray<float, 2>>(numVertices);
+            VecDataArray<float, 2>&                 UVData = *UVs;
+
+            auto texcoords = importedMesh->mTextureCoords[0];
+            for (unsigned int i = 0; i < numVertices; i++)
+            {
+                UVData[i][0] = texcoords[i].x;
+                UVData[i][1] = texcoords[i].y;
+            }
+            surfMesh->setVertexTCoords("tCoords", UVs);
+        }
+        return surfMesh;
     }
-    return mesh;
 }
 
 unsigned int

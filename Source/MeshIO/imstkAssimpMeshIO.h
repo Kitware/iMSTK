@@ -27,8 +27,6 @@ struct aiMesh;
 
 namespace imstk
 {
-class SurfaceMesh;
-
 ///
 /// \class AssimpMeshIO
 ///
@@ -43,23 +41,25 @@ public:
     /// \param type mesh file type
     /// \returns iMSTK surface mesh
     ///
-    static std::shared_ptr<SurfaceMesh> read(
+    static std::shared_ptr<PointSet> read(
         const std::string& filePath,
         MeshFileType       type);
 
     ///
-    /// \brief Reads mesh data and returns mesh
+    /// \brief Reads mesh data and returns mesh. May read a LineMesh
+    /// if no triangles & only lines are present.
     /// \param filePath
-    /// \returns iMSTK surface mesh
+    /// \returns iMSTK SurfaceMesh or LineMesh
     ///
-    static std::shared_ptr<SurfaceMesh> readMeshData(const std::string& filePath);
+    static std::shared_ptr<PointSet> readMeshData(const std::string& filePath);
 
     ///
-    /// \brief Convert from Assimp mesh to iMSTK surface mesh
-    /// \param importedMesh Assimp mesh to covert
-    /// \returns iMSTK surface mesh
+    /// \brief Convert from Assimp mesh to iMSTK SurfaceMesh. May convert to LineMesh
+    /// if no triangles & only lines are present
+    /// \param importedMesh Assimp mesh to convert
+    /// \returns iMSTK SurfaceMesh or LineMesh
     ///
-    static std::shared_ptr<SurfaceMesh> convertAssimpMesh(aiMesh* importedMesh);
+    static std::shared_ptr<PointSet> convertAssimpMesh(aiMesh* importedMesh);
 
     ///
     /// \brief Helper function for getting default post processing flags
