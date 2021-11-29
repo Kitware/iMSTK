@@ -19,11 +19,13 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
-#include "imstkMeshIO.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkLineMesh.h"
+#include "imstkMeshIO.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 
@@ -39,4 +41,63 @@ TEST(imstkMeshIOTest, conversionBug)
     ASSERT_TRUE(mesh);
 
     EXPECT_NO_FATAL_FAILURE(auto data = GeometryUtils::copyToVtkPolyData(mesh));
+}
+
+TEST(imstkMeshIOTest, ReadVtkTriangle)
+{
+    std::shared_ptr<PointSet> mesh =
+        MeshIO::read(iMSTK_DATA_ROOT "testing/MeshIO/triangle.vtk");
+    ASSERT_TRUE(mesh);
+
+    // Assure we read a SurfaceMesh
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(mesh);
+    ASSERT_TRUE(surfMesh);
+
+    ASSERT_EQ(surfMesh->getNumVertices(), 3);
+    ASSERT_EQ(surfMesh->getNumTriangles(), 1);
+}
+
+TEST(imstkMeshIOTest, ReadVtkLine)
+{
+    std::shared_ptr<PointSet> mesh =
+        MeshIO::read(iMSTK_DATA_ROOT "testing/MeshIO/line.vtk");
+    ASSERT_TRUE(mesh);
+
+    // Assure we read a LineMesh
+    auto lineMesh = std::dynamic_pointer_cast<LineMesh>(mesh);
+    ASSERT_TRUE(lineMesh);
+
+    ASSERT_EQ(lineMesh->getNumVertices(), 2);
+    ASSERT_EQ(lineMesh->getNumLines(), 1);
+}
+
+TEST(imstkMeshIOTest, ReadVtkPoints)
+{
+    std::shared_ptr<PointSet> mesh =
+        MeshIO::read(iMSTK_DATA_ROOT "testing/MeshIO/points.vtk");
+    ASSERT_TRUE(mesh);
+
+    ASSERT_EQ(mesh->getNumVertices(), 482);
+
+    // Assure we did not read a LineMesh or SurfaceMesh
+    auto lineMesh = std::dynamic_pointer_cast<LineMesh>(mesh);
+    ASSERT_FALSE(lineMesh);
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(mesh);
+    ASSERT_FALSE(surfMesh);
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(mesh);
+    ASSERT_FALSE(tetMesh);
+}
+
+TEST(imstkMeshIOTest, ReadVtkTetrahedron)
+{
+    std::shared_ptr<PointSet> mesh =
+        MeshIO::read(iMSTK_DATA_ROOT "testing/MeshIO/tet.vtk");
+    ASSERT_TRUE(mesh);
+
+    // Assure we read a TetrahedralMesh
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(mesh);
+    ASSERT_TRUE(tetMesh);
+
+    ASSERT_EQ(tetMesh->getNumVertices(), 4);
+    ASSERT_EQ(tetMesh->getNumTetrahedra(), 1);
 }

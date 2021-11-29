@@ -21,6 +21,7 @@
 
 #include "imstkVisualObjectImporter.h"
 #include "imstkAssimpMeshIO.h"
+#include "imstkLineMesh.h"
 #include "imstkLogger.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSceneObject.h"
@@ -100,7 +101,7 @@ ObjectIO::importSceneObject(
     }
 
     // Read all meshes
-    std::vector<std::shared_ptr<SurfaceMesh>>    meshes(scene->mNumMeshes);
+    std::vector<std::shared_ptr<PointSet>>       meshes(scene->mNumMeshes);
     std::vector<std::shared_ptr<RenderMaterial>> meshMaterials(scene->mNumMeshes);
     for (unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
@@ -130,14 +131,34 @@ ObjectIO::importSceneObject(
 
         for (unsigned int i = 0; i < currNode->mNumMeshes; i++)
         {
-            // Copy, transform, and insert the mesh
-            std::shared_ptr<SurfaceMesh> surfMesh  = std::make_shared<SurfaceMesh>();
-            const unsigned int           meshIndex = currNode->mMeshes[i];
-            surfMesh->deepCopy(meshes[meshIndex]);
-            auto visualModel = std::make_shared<VisualModel>(surfMesh);
+            const unsigned int meshIndex = currNode->mMeshes[i];
+
+            // Copy, transform, and insert the mesh (\todo: Better deep copy support)
+            std::shared_ptr<PointSet> copyMesh = nullptr;
+            if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(meshes[meshIndex]))
+            {
+                copyMesh = std::make_shared<SurfaceMesh>();
+                std::dynamic_pointer_cast<SurfaceMesh>(copyMesh)->deepCopy(surfMesh);
+            }
+            else if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(meshes[meshIndex]))
+            {
+                // Doesn't copy attributes
+                copyMesh = std::make_shared<LineMesh>();
+                std::dynamic_pointer_cast<LineMesh>(copyMesh)->initialize(
+                    std::make_shared<VecDataArray<double, 3>>(*lineMesh->getVertexPositions()),
+                    std::make_shared<VecDataArray<int, 2>>(*lineMesh->getLinesIndices()));
+            }
+            else
+            {
+                // Doesn't copy attributes
+                copyMesh = std::make_shared<PointSet>();
+                copyMesh->initialize(std::make_shared<VecDataArray<double, 3>>(*meshes[meshIndex]->getVertexPositions()));
+            }
+
+            auto visualModel = std::make_shared<VisualModel>(copyMesh);
             visualModel->setName(std::string(currNode->mName.C_Str()));
 
-            surfMesh->transform(currWorldTransform, Geometry::TransformType::ApplyToData);
+            copyMesh->transform(currWorldTransform, Geometry::TransformType::ApplyToData);
             visualModel->setRenderMaterial(meshMaterials[meshIndex]);
             visualObject->addVisualModel(visualModel);
         }
