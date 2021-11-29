@@ -80,6 +80,8 @@ fooBar(bool baz, StringRef quux, std::vector<int>& result);
 
 * Extensive comment blocks should generally only be used to explain the "rationale" behind an algorithmic choice or to explain an algorithm.
 
+* When using formulas from published work, add a reference to the work to the documentation
+
 * Doxygen supports inline [MathJax](https://www.doxygen.nl/manual/formulas.html) use it to write out formulas in critical algorithm implementations.
 
 * `///<` Can be used to create a comment within a line
@@ -168,7 +170,7 @@ For the purpose of this document we use the following convention
 
 * Top level namespace for iMSTK code is `imstk`.
 
-* Highly math based code is an exception to the naming rules, to maintain correspondence with published formulas, appropriate variable names may be used, be that single letter variables or capitalized, e.g. the implemented formula may use `F` and `f` and so should the code.
+* Highly math based code is an exception to the naming rules, to maintain correspondence with published formulas, appropriate variable names may be used, be that single letter variables or capitalized, e.g. the implemented formula may use `F` and `f` and so should the code. The documentation in these cases should include references to the published work
 
 ## Specific naming conventions
 
