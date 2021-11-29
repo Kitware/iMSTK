@@ -421,22 +421,22 @@ Under this aspect, use:
 * Include statements should be sorted and grouped so items are easy to find.
     * A typical approach:
         * First the .h file with the same name as the .cpp, followed by a blank line.
-        * Then the includes from outside of iMSTK, in alphabetical order, followed by a blank line.
-            * Only system header should be included via <>
         * Then the includes from iMSTK, in alphabetical order, followed by a blank line.
             * Any headers included from iMSTK should use "".
+        * Then the includes from outside of iMSTK, grouped by library, in alphabetical order, followed by a blank line.
+        * Standard library includes e.g, `<vector>` should come last and use `<>` delimiters
 
 Example:
  ```   
 #include "MyClass.h"
 
-#include <iomanip>
-
-#include "vtkActor.h"
-#include "vtkRenderer.h"
-
 #include "MainWindow.h"
 #include "PropertiesDialog.h"
+
+#include <vtkActor.h>
+#include <vtkRenderer.h>
+
+#include <iomanip>
 ```
 
 * When possible use forward class references but don't use forward references to other projects this may cause unintended side-effects see https://google.github.io/styleguide/cppguide.html#Forward_Declarations
@@ -451,6 +451,15 @@ Short one line description, 50 characters or less
 A blank line, followed by a detailed description. The longer description
 should be wrapped at 72 characters.
 ```
+
+* Prefix messages with one of the following 
+    * `BUG`: Fix for runtime crash or incorrect result
+    * `COMP`: Compiler error or warning fix
+    * `DOC`: Documentation change
+    * `ENH`: New functionality
+    * `PERF`: Performance improvement
+    * `STYLE`: No logic impact (indentation, comments)
+    * `WIP`: Work In Progress not ready for merge
 
 # Message Level Semantics
 
