@@ -103,13 +103,24 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
     // Count cell types
     int numLines = 0;
     int numTris  = 0;
-    int numQuads = 0;
+    // \todo: Quad mesh support in iMSTK
+    //int numQuads = 0;
+    bool hasGreaterThanTriangle = false;
     for (unsigned int i = 0; i < numFaces; i++)
     {
         aiFace cell = importedMesh->mFaces[i];
         numTris  += static_cast<int>(cell.mNumIndices == 3);
         numLines += static_cast<int>(cell.mNumIndices == 2);
-        numQuads += static_cast<int>(cell.mNumIndices == 4);
+        if (cell.mNumIndices > 3)
+        {
+            hasGreaterThanTriangle = true;
+        }
+        //numQuads += static_cast<int>(cell.mNumIndices == 4);
+    }
+
+    if (hasGreaterThanTriangle)
+    {
+        LOG(WARNING) << "assimp reader found file with unsupported index counts. Dropping those cells.";
     }
 
     // If there are no cells in this mesh, read PointSet (assimp does not support)
@@ -120,7 +131,7 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
         return ptMesh;
     }*/
     // If no triangles or quads, but lines, read LineMesh
-    if (numTris == 0 && numQuads == 0 && numLines > 0)
+    if (numTris == 0 && numLines > 0)
     {
         auto                  cellsPtr = std::make_shared<VecDataArray<int, 2>>(numLines);
         VecDataArray<int, 2>& cells    = *cellsPtr;
