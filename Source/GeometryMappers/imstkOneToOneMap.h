@@ -59,7 +59,7 @@ public:
     ///
     /// \brief Sets the one-to-one correspondence directly
     ///
-    void setMap(const std::map<size_t, size_t>& sourceMap);
+    void setMap(const std::unordered_map<int, int>& sourceMap);
 
     ///
     /// \brief Apply (if active) the tetra-triangle mesh map
@@ -82,10 +82,11 @@ public:
     void setChildGeometry(std::shared_ptr<Geometry> child) override;
 
     ///
-    /// \brief Get the corresponding parent index, given a child index
+    /// \brief Get the mapped/corresponding parent index, given a child index.
+    /// returns -1 if no correspondence found.
     /// \param index on the child geometry
     ///
-    size_t getMapIdx(const size_t& idx) override;
+    int getMapIdx(const int idx) const;
 
     ///
     /// \brief Set/Get the tolerance. The distance to consider
@@ -97,15 +98,14 @@ public:
 
 protected:
     ///
-    /// \brief Returns the first matching vertex
+    /// \brief Returns the first matching vertex, -1 if not found
     ///
-    bool findMatchingVertex(const VecDataArray<double, 3>& parentMesh, const Vec3d& p, size_t& vertexId);
+    int findMatchingVertex(const VecDataArray<double, 3>& parentMesh, const Vec3d& p);
 
-    std::map<size_t, size_t> m_oneToOneMap;   ///> One to one mapping data
+    // A map and vector are maintained. The vector for parallel processing, the map for fast lookup
+    std::unordered_map<int, int>     m_oneToOneMap;       ///> One to one mapping data
+    std::vector<std::pair<int, int>> m_oneToOneMapVector; ///> One to one mapping data
 
-    // This vector is for parallel processing, it should contain identical data as m_oneToOneMap
-    std::vector<std::pair<size_t, size_t>> m_oneToOneMapVector; ///> One to one mapping data
-
-    double m_epsilon = IMSTK_DOUBLE_EPS;                        // Tolerance for considering two points equivalent
+    double m_epsilon = IMSTK_DOUBLE_EPS;                  // Tolerance for considering two points equivalent
 };
 } // namespace imstk

@@ -67,9 +67,10 @@ getVertex(const CollisionElement& elem, const MeshSide& side)
     std::array<VertexMassPair, 1> results;
     if (ptId != -1)
     {
-        if (side.m_mapPtr && dynamic_cast<OneToOneMap*>(side.m_mapPtr) != nullptr)
+        auto oneToOneMap = dynamic_cast<OneToOneMap*>(side.m_mapPtr);
+        if (side.m_mapPtr && oneToOneMap != nullptr)
         {
-            ptId = static_cast<int>(side.m_mapPtr->getMapIdx(static_cast<size_t>(ptId)));
+            ptId = oneToOneMap->getMapIdx(ptId);
         }
         results[0] = { &side.m_vertices[ptId], side.m_invMasses[ptId], &side.m_velocities[ptId] };
     }
@@ -79,7 +80,7 @@ getVertex(const CollisionElement& elem, const MeshSide& side)
 static std::array<VertexMassPair, 2>
 getEdge(const CollisionElement& elem, const MeshSide& side)
 {
-    size_t v1, v2;
+    int v1, v2;
     v1 = v2 = -1;
     if (elem.m_type == CollisionElementType::CellIndex && elem.m_element.m_CellIndexElement.cellType == IMSTK_EDGE)
     {
@@ -98,10 +99,11 @@ getEdge(const CollisionElement& elem, const MeshSide& side)
     std::array<VertexMassPair, 2> results;
     if (v1 != -1)
     {
-        if (side.m_mapPtr && dynamic_cast<OneToOneMap*>(side.m_mapPtr) != nullptr)
+        auto oneToOneMap = dynamic_cast<OneToOneMap*>(side.m_mapPtr);
+        if (side.m_mapPtr && oneToOneMap != nullptr)
         {
-            v1 = side.m_mapPtr->getMapIdx(v1);
-            v2 = side.m_mapPtr->getMapIdx(v2);
+            v1 = oneToOneMap->getMapIdx(v1);
+            v2 = oneToOneMap->getMapIdx(v2);
         }
         results[0] = { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] };
         results[1] = { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] };
@@ -133,11 +135,12 @@ getTriangle(const CollisionElement& elem, const MeshSide& side)
     std::array<VertexMassPair, 3> results;
     if (v1 != -1)
     {
-        if (side.m_mapPtr && dynamic_cast<OneToOneMap*>(side.m_mapPtr) != nullptr)
+        auto oneToOneMap = dynamic_cast<OneToOneMap*>(side.m_mapPtr);
+        if (side.m_mapPtr && oneToOneMap != nullptr)
         {
-            v1 = static_cast<int>(side.m_mapPtr->getMapIdx(v1));
-            v2 = static_cast<int>(side.m_mapPtr->getMapIdx(v2));
-            v3 = static_cast<int>(side.m_mapPtr->getMapIdx(v3));
+            v1 = oneToOneMap->getMapIdx(v1);
+            v2 = oneToOneMap->getMapIdx(v2);
+            v3 = oneToOneMap->getMapIdx(v3);
         }
         results[0] = { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] };
         results[1] = { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] };

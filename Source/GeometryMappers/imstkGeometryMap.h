@@ -96,13 +96,6 @@ public:
     ///@}
 
     ///
-    /// \brief getMapIdx
-    /// \param idx
-    /// \return index of parent corresponding to the idx of child
-    ///
-    virtual size_t getMapIdx(const size_t&) { return 0; }
-
-    ///
     /// \brief Initialize the map
     ///
     virtual void initialize();

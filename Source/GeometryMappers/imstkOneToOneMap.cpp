@@ -40,11 +40,11 @@ OneToOneMap::compute()
 
     // For every vertex on the child, find corresponding one on the parent
     ParallelUtils::parallelFor(meshChild->getNumVertices(),
-        [&](const size_t nodeId)
+        [&](const int nodeId)
         {
             // Find the enclosing or closest tetrahedron
-            size_t matchingNodeId;
-            if (!findMatchingVertex(parentVertices, childVertices[nodeId], matchingNodeId))
+            int matchingNodeId = findMatchingVertex(parentVertices, childVertices[nodeId]);
+            if (matchingNodeId == -1)
             {
                 return;
             }
@@ -64,19 +64,18 @@ OneToOneMap::compute()
     }
 }
 
-bool
-OneToOneMap::findMatchingVertex(const VecDataArray<double, 3>& parentVertices, const Vec3d& p, size_t& nodeId)
+int
+OneToOneMap::findMatchingVertex(const VecDataArray<double, 3>& parentVertices, const Vec3d& p)
 {
     const double eps2 = m_epsilon * m_epsilon;
-    for (int idx = 0; idx < parentVertices.size(); ++idx)
+    for (int idx = 0; idx < parentVertices.size(); idx++)
     {
         if ((parentVertices[idx] - p).squaredNorm() < eps2)
         {
-            nodeId = idx;
-            return true;
+            return idx;
         }
     }
-    return false;
+    return -1;
 }
 
 bool
@@ -86,7 +85,7 @@ OneToOneMap::isValid() const
 }
 
 void
-OneToOneMap::setMap(const std::map<size_t, size_t>& sourceMap)
+OneToOneMap::setMap(const std::unordered_map<int, int>& sourceMap)
 {
     m_oneToOneMap = sourceMap;
 
@@ -119,8 +118,10 @@ OneToOneMap::apply()
 
     CHECK(meshParent != nullptr && meshChild != nullptr) << "Failed to cast from Geometry to PointSet";
 
-    VecDataArray<double, 3>&       childVertices  = *meshChild->getVertexPositions();
-    const VecDataArray<double, 3>& parentVertices = *meshParent->getVertexPositions();
+    std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr  = meshChild->getVertexPositions();
+    VecDataArray<double, 3>&                 childVertices     = *childVerticesPtr;
+    std::shared_ptr<VecDataArray<double, 3>> parentVerticesPtr = meshParent->getVertexPositions();
+    const VecDataArray<double, 3>&           parentVertices    = *parentVerticesPtr;
     ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
         [&](const size_t idx) {
             const auto& mapValue = m_oneToOneMapVector[idx];
@@ -167,12 +168,17 @@ OneToOneMap::setChildGeometry(std::shared_ptr<Geometry> child)
     GeometryMap::setChildGeometry(child);
 }
 
-size_t
-OneToOneMap::getMapIdx(const size_t& idx)
+int
+OneToOneMap::getMapIdx(const int idx) const
 {
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    CHECK(m_oneToOneMap.find(idx) != m_oneToOneMap.end()) << "Invalid source index";
-#endif
-    return m_oneToOneMap[idx];
+    auto citer = m_oneToOneMap.find(idx);
+    if (citer != m_oneToOneMap.end())
+    {
+        return citer->second;
+    }
+    else
+    {
+        return -1;
+    }
 }
 } // namespace imstk
