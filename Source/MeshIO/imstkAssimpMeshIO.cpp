@@ -64,15 +64,19 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
     CHECK(scene != nullptr && scene->HasMeshes()) << "Error: could not read with Assimp reader for input " << filePath;
 
     // Get first mesh
-    auto importedMesh = scene->mMeshes[0];
-
-    auto surfMesh = AssimpMeshIO::convertAssimpMesh(importedMesh);
-    if (!surfMesh)
+    aiMesh* importedMesh = scene->mMeshes[0];
+    if (scene->mNumMeshes > 1)
     {
-        LOG(WARNING) << "Error: Invalid surface mesh. Input: " << filePath;
+        LOG(WARNING) << "Warning: file " << filePath << " contains more than one mesh. Using the first, dropping the rest.";
     }
 
-    return surfMesh;
+    std::shared_ptr<PointSet> pointSet = AssimpMeshIO::convertAssimpMesh(importedMesh);
+    if (!pointSet)
+    {
+        LOG(WARNING) << "Error: Invalid mesh. Input: " << filePath;
+    }
+
+    return pointSet;
 }
 
 std::shared_ptr<PointSet>
