@@ -12,6 +12,7 @@ set(iMSTK_ROOT ${PACKAGE_PREFIX_DIR})
 set(iMSTK_DATA_DIR ${PACKAGE_PREFIX_DIR}/data)
 
 # iMSTK settings
+set(iMSTK_AUDIO_ENABLED @iMSTK_AUDIO_ENABLED@)
 set(iMSTK_USE_OpenHaptics @iMSTK_USE_OpenHaptics@)
 set(iMSTK_USE_VTK_OSMESA @iMSTK_USE_VTK_OSMESA@)
 set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)
@@ -68,7 +69,7 @@ if (iMSTK_USE_PHYSX)
 endif()
 
 # SFML
-if(WIN32)
+if(iMSTK_AUDIO_ENABLED)
   find_dependency( SFML REQUIRED )
   add_definitions( -DiMSTK_AUDIO_ENABLED )
 endif()

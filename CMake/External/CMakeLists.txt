@@ -81,6 +81,13 @@ if(NOT ${USE_SYSTEM_VTK} AND ${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "8.2")
     -P ${CMAKE_SOURCE_DIR}/CMake/External/Patches/vtk-8.2.cmake)
 endif()
 
+set(EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS)
+if(WIN32)
+  list(APPEND EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS
+    -D${PROJECT_NAME}_ENABLE_AUDIO:BOOL=${${PROJECT_NAME}_AUDIO_ENABLED}
+    )
+endif()
+
 #-----------------------------------------------------------------------------
 # Inner build of the main project
 #-----------------------------------------------------------------------------
@@ -97,7 +104,6 @@ ExternalProject_Add( ${PROJECT_NAME}
     -D${PROJECT_NAME}_WRAP_CSHARP:BOOL=${${PROJECT_NAME}_WRAP_CSHARP}
     -D${PROJECT_NAME}_USE_OpenHaptics:BOOL=${${PROJECT_NAME}_USE_OpenHaptics}
     -D${PROJECT_NAME}_USE_MODEL_REDUCTION:BOOL=${${PROJECT_NAME}_USE_MODEL_REDUCTION}    
-    -D${PROJECT_NAME}_ENABLE_AUDIO:BOOL=${${PROJECT_NAME}_ENABLE_AUDIO}
     -D${PROJECT_NAME}_USE_VRPN:BOOL=${${PROJECT_NAME}_USE_VRPN}
     -D${PROJECT_NAME}_USE_PHYSX:BOOL=${${PROJECT_NAME}_USE_PHYSX}
     -D${PROJECT_NAME}_COLOR_OUTPUT:BOOL=${${PROJECT_NAME}_COLOR_OUTPUT}
@@ -110,6 +116,7 @@ ExternalProject_Add( ${PROJECT_NAME}
     -DVTK_DIR:PATH=${VTK_DIR}
     # I don't think this is needed by the inner build
     # -DPHYSX_CONFIGURATION:STRING=${${PROJECT_NAME}_PHYSX_CONFIGURATION}
+    ${EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS}
   DEPENDS ${${PROJECT_NAME}_DEPENDENCIES}
   PATCH_COMMAND 
     COMMAND ${VTK_PATCH_COMMAND}

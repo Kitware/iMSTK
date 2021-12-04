@@ -93,6 +93,23 @@ if (${PROJECT_NAME}_ENABLE_CUDA_BACKEND)
   endif()
 endif ()
 
+# Audio
+if(WIN32)
+  if(DEFINED ${PROJECT_NAME}_ENABLE_AUDIO)
+    set(_enable_audio ${${PROJECT_NAME}_ENABLE_AUDIO})
+    set(_reason "${PROJECT_NAME}_ENABLE_AUDIO is SET")
+  else()
+    set(_enable_audio ON)
+    set(_reason "default initialization")
+  endif()
+else()
+  set(_enable_audio OFF)
+  set(_reason "not supported")
+endif()
+set(_msg "${PROJECT_NAME} Audio support")
+message(STATUS "${_msg} - ${_enable_audio} (${_reason})")
+set(${PROJECT_NAME}_AUDIO_ENABLED ${_enable_audio})
+
 # General Options
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build iMSTK examples" ON)
 option(${PROJECT_NAME}_BUILD_TESTING "Build iMSTK tests" ON)
@@ -178,11 +195,9 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(PThreads)
     imstk_define_dependency(Libusb) #for VRPN
     imstk_define_dependency(FTD2XX) #for LibNiFalcon
-    imstk_define_dependency(SFML)
-    set(${PROJECT_NAME}_AUDIO_ENABLED "Windows OS detected: Building iMSTK with AUDIO support." ON)
-  else()
-    message("Warning: Building iMSTK WITHOUT audio support!")
-    set(${PROJECT_NAME}_AUDIO_ENABLED OFF)
+    if(${PROJECT_NAME}_AUDIO_ENABLED)
+      imstk_define_dependency(SFML)
+    endif()
   endif()
 
   if(${PROJECT_NAME}_BUILD_TESTING)
@@ -256,7 +271,7 @@ if (${PROJECT_NAME}_USE_PHYSX)
 endif()
 
 # SFML
-if(APPLE OR LINUX)
+if(NOT iMSTK_AUDIO_ENABLED)
   remove_definitions( -DiMSTK_AUDIO_ENABLED )
 else()
   find_package( SFML REQUIRED )
