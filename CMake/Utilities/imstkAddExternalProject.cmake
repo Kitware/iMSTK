@@ -65,9 +65,9 @@ macro(imstk_add_external_project extProj)
   #-----------------------------------------------------------------------------
   # Solve dependencies
   #-----------------------------------------------------------------------------
-  set(PROJECT_VAR_TEMP ${extProj})
+  set(extProj ${extProj})
   ExternalProject_Include_Dependencies( ${extProj}
-    PROJECT_VAR PROJECT_VAR_TEMP
+    PROJECT_VAR extProj
     EP_ARGS_VAR ${extProj}_EP_ARGS
     DEPENDS_VAR _imstk_add_ep_${extProj}_DEPENDENCIES
     USE_SYSTEM_VAR USE_SYSTEM_${extProj}
