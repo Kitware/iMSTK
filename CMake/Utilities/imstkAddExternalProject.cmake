@@ -42,16 +42,16 @@ macro(imstk_add_external_project extProj)
   set(oneValueArgs RELATIVE_INCLUDE_PATH SOURCE_DIR BINARY_DIR)
   set(multiValueArgs DEPENDENCIES)
   include(CMakeParseArguments)
-  cmake_parse_arguments(${extProj} "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+  cmake_parse_arguments(_imstk_add_ep_${extProj} "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
   #-----------------------------------------------------------------------------
   # Verbose (display arguments)
   #-----------------------------------------------------------------------------
-  if(${extProj}_VERBOSE)
+  if(_imstk_add_ep_${extProj}_VERBOSE)
     foreach(opt ${options} ${oneValueArgs} ${multiValueArgs})
-      message(STATUS "${extProj}_${opt}: ${${extProj}_${opt}}")
+      message(STATUS "_imstk_add_ep_${extProj}_${opt}: ${_imstk_add_ep_${extProj}_${opt}}")
     endforeach()
-    message(STATUS "${extProj}_UNPARSED_ARGUMENTS: ${${extProj}_UNPARSED_ARGUMENTS}")
+    message(STATUS "_imstk_add_ep_${extProj}_UNPARSED_ARGUMENTS: ${_imstk_add_ep_${extProj}_UNPARSED_ARGUMENTS}")
   endif()
 
   #-----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ macro(imstk_add_external_project extProj)
   ExternalProject_Include_Dependencies( ${extProj}
     PROJECT_VAR PROJECT_VAR_TEMP
     EP_ARGS_VAR ${extProj}_EP_ARGS
-    DEPENDS_VAR ${extProj}_DEPENDENCIES
+    DEPENDS_VAR _imstk_add_ep_${extProj}_DEPENDENCIES
     USE_SYSTEM_VAR USE_SYSTEM_${extProj}
     SUPERBUILD_VAR ${PROJECT_NAME}_SUPERBUILD
     )
@@ -80,6 +80,15 @@ macro(imstk_add_external_project extProj)
   if(NOT DEFINED ${extProj}_DIR AND NOT USE_SYSTEM_${extProj})
 
     imstk_define_external_dirs( ${extProj} )
+
+    # SOURCE_DIR and BINARY_DIR variables set in the caller scope or
+    # by "imstk_define_external_dirs" take precedence
+    if(DEFINED ${extProj}_SOURCE_DIR)
+      set(_imstk_add_ep_${extProj}_SOURCE_DIR ${${extProj}_SOURCE_DIR})
+    endif()
+    if(DEFINED ${extProj}_BINARY_DIR)
+      set(_imstk_add_ep_${extProj}_BINARY_DIR ${${extProj}_BINARY_DIR})
+    endif()
 
     set(${extProj}_CMAKE_CACHE_ARGS)
     if(DEFINED ${extProj}_INSTALL_DIR)
@@ -92,15 +101,15 @@ macro(imstk_add_external_project extProj)
     # Add project
     #-----------------------------------------------------------------------------    
     ExternalProject_add( ${extProj}
-      PREFIX ${${extProj}_PREFIX}
-      SOURCE_DIR ${${extProj}_SOURCE_DIR} # from above or parsed argument
-      BINARY_DIR ${${extProj}_BINARY_DIR} # from above or parsed argument
-      TMP_DIR ${${extProj}_TMP_DIR}       # from above
-      STAMP_DIR ${${extProj}_STAMP_DIR}   # from above
+      PREFIX ${${extProj}_PREFIX} # from caller's scope (see imstk_define_external_dirs)
+      SOURCE_DIR ${_imstk_add_ep_${extProj}_SOURCE_DIR} # from caller's scope (see imstk_define_external_dirs) or parsed argument
+      BINARY_DIR ${_imstk_add_ep_${extProj}_BINARY_DIR} # from caller's scope (see imstk_define_external_dirs) or parsed argument
+      TMP_DIR ${${extProj}_TMP_DIR}       # from caller's scope (see imstk_define_external_dirs)
+      STAMP_DIR ${${extProj}_STAMP_DIR}   # from caller's scope (see imstk_define_external_dirs)
       ${${extProj}_EP_ARGS}               # from ExternalProject_Include_Dependencies
-      CMAKE_CACHE_ARGS ${${extProj}_CMAKE_CACHE_ARGS}
-      ${${extProj}_UNPARSED_ARGUMENTS}    # from unparsed arguments of this macro
-      DEPENDS ${${extProj}_DEPENDENCIES}  # from parsed argument
+      CMAKE_CACHE_ARGS ${${extProj}_CMAKE_CACHE_ARGS} # from above
+      ${_imstk_add_ep_${extProj}_UNPARSED_ARGUMENTS}    # from unparsed arguments of this macro
+      DEPENDS ${_imstk_add_ep_${extProj}_DEPENDENCIES}  # from parsed argument
       )
     
     #-----------------------------------------------------------------------------
@@ -131,7 +140,7 @@ macro(imstk_add_external_project extProj)
   # Keep track of include path for superbuild
   #-----------------------------------------------------------------------------
   list(APPEND CMAKE_INCLUDE_PATH
-     ${${extProj}_SOURCE_DIR}/${${extProj}_RELATIVE_INCLUDE_PATH}
+     ${_imstk_add_ep_${extProj}_SOURCE_DIR}/${_imstk_add_ep_${extProj}_RELATIVE_INCLUDE_PATH}
      )
 
 endmacro()
