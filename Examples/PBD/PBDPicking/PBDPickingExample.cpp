@@ -270,21 +270,17 @@ main()
             [&](Event*)
         {
             LOG(INFO) << "Jaw Closed!";
-            auto chUpper = std::dynamic_pointer_cast<PBDPickingCH>(upperJawPicking->getCollisionHandlingA());
-            auto chLower = std::dynamic_pointer_cast<PBDPickingCH>(lowerJawPicking->getCollisionHandlingA());
 
-            chUpper->beginPick();
-            chLower->beginPick();
+            upperJawPicking->beginPick();
+            lowerJawPicking->beginPick();
             });
         connect<Event>(controller, &LaparoscopicToolController::JawOpened,
             [&](Event*)
         {
             LOG(INFO) << "Jaw Opened!";
-            auto chUpper = std::dynamic_pointer_cast<PBDPickingCH>(upperJawPicking->getCollisionHandlingA());
-            auto chLower = std::dynamic_pointer_cast<PBDPickingCH>(lowerJawPicking->getCollisionHandlingA());
 
-            chUpper->endPick();
-            chLower->endPick();
+            upperJawPicking->endPick();
+            lowerJawPicking->endPick();
             });
 
         driver->start();

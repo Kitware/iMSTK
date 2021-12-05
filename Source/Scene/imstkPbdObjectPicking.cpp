@@ -69,6 +69,36 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
 }
 
 void
+PbdObjectPicking::endPick()
+{
+    auto ch = std::dynamic_pointer_cast<PBDPickingCH>(getCollisionHandlingA());
+    if (ch == nullptr)
+    {
+        LOG(FATAL) << "PbdObjectPicking ending pick, but PBDPickingCH/handlerA is nullptr";
+        return;
+    }
+    else
+    {
+        ch->endPick();
+    }
+}
+
+void
+PbdObjectPicking::beginPick()
+{
+    auto ch = std::dynamic_pointer_cast<PBDPickingCH>(getCollisionHandlingA());
+    if (ch == nullptr)
+    {
+        LOG(FATAL) << "PbdObjectPicking beginning pick, but PBDPickingCH/handlerA is nullptr";
+        return;
+    }
+    else
+    {
+        ch->beginPick();
+    }
+}
+
+void
 PbdObjectPicking::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     auto pbdObj     = std::dynamic_pointer_cast<PbdObject>(m_objA);

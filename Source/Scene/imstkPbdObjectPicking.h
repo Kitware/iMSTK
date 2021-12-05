@@ -43,7 +43,19 @@ public:
     virtual const std::string getTypeName() const override { return "PbdObjectPicking"; }
 
 public:
+    ///
+    /// \brief Remove all picking nodes and constraints
+    ///
+    void endPick();
+
+    ///
+    /// \brief Add picking nodes nodes and constraints
+    ///
+    void beginPick();
+
     virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+
+    std::shared_ptr<TaskNode> getPickingNode() const { return m_pickingNode; }
 
 protected:
     std::shared_ptr<TaskNode> m_pickingNode = nullptr;
