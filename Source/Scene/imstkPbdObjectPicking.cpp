@@ -62,7 +62,7 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
         }, "PbdPickingCD_and_CH", true);
     m_taskGraph->addNode(m_pickingNode);
 
-    m_taskGraph->addNode(obj1->getPbdModel()->getUpdateVelocityNode());
+    m_taskGraph->addNode(obj1->getPbdModel()->getSolveNode());
     m_taskGraph->addNode(obj2->getUpdateGeometryNode());
     m_taskGraph->addNode(obj1->getPbdModel()->getTaskGraph()->getSink());
 
@@ -115,8 +115,9 @@ PbdObjectPicking::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_p
     m_taskGraph->addEdge(pbdObj->getTaskGraph()->getSink(), sink);
     m_taskGraph->addEdge(pickingObj->getTaskGraph()->getSink(), sink);
 
-    // Do picking after everything in the pbd model
-    m_taskGraph->addEdge(pbdModel->getUpdateVelocityNode(), m_pickingNode);
+
+    // The ideal location is after the internal positional solve
+    m_taskGraph->addEdge(pbdModel->getSolveNode(), m_pickingNode);
     m_taskGraph->addEdge(m_pickingNode, pbdModel->getTaskGraph()->getSink());
 
     m_taskGraph->addEdge(pickingObj->getUpdateGeometryNode(), m_pickingNode);
