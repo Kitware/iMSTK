@@ -29,8 +29,9 @@ limitations under the License.
 namespace imstk
 {
 CollisionInteraction::CollisionInteraction(
+    std::string                      objName,
     std::shared_ptr<CollidingObject> objA,
-    std::shared_ptr<CollidingObject> objB) : SceneObject("CollisionInteraction_" + objA->getName() + "_vs_" + objB->getName()),
+    std::shared_ptr<CollidingObject> objB) : SceneObject(objName),
     m_objA(objA), m_objB(objB)
 {
     m_collisionDetectionNode = std::make_shared<TaskNode>(std::bind(&CollisionInteraction::updateCD, this),

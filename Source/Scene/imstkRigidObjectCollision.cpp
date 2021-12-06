@@ -34,7 +34,8 @@ limitations under the License.
 namespace imstk
 {
 RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1, std::shared_ptr<CollidingObject> obj2,
-                                           std::string cdType) : CollisionInteraction(rbdObj1, obj2)
+                                           std::string cdType) :
+    CollisionInteraction("RigidObjectCollision" + rbdObj1->getName() + "_vs_" + obj2->getName(), rbdObj1, obj2)
 {
     std::shared_ptr<RigidBodyModel2> model1 = rbdObj1->getRigidBodyModel2();
 

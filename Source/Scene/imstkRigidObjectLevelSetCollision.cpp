@@ -38,7 +38,8 @@ limitations under the License.
 namespace imstk
 {
 RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2) :
-    CollisionInteraction(obj1, obj2), m_prevVertices(std::make_shared<VecDataArray<double, 3>>())
+    CollisionInteraction("RigidObjectLevelSetCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2),
+    m_prevVertices(std::make_shared<VecDataArray<double, 3>>())
 {
     std::shared_ptr<RigidBodyModel2> rbdModel    = obj1->getRigidBodyModel2();
     std::shared_ptr<LevelSetModel>   lvlSetModel = obj2->getLevelSetModel();

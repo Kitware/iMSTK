@@ -38,8 +38,11 @@ class CollidingObject;
 class CollisionInteraction : public SceneObject
 {
 public:
-    CollisionInteraction(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2);
     virtual ~CollisionInteraction() override = default;
+
+protected:
+    CollisionInteraction(std::string objName,
+                         std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2);
 
 public:
     void setCollisionDetection(std::shared_ptr<CollisionDetectionAlgorithm> colDetect);

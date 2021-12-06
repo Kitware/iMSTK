@@ -31,7 +31,9 @@ class PbdObject;
 ///
 /// \class PbdObjectPicking
 ///
-/// \brief This class defines a picking interaction between a PbdObject and a CollidingObject with AnalyticalGeometry
+/// \brief This class defines a picking interaction between a PbdObject and
+/// a CollidingObject with AnalyticalGeometry. It does picking via vertex
+/// selection. The vertices are treated as infinite mass particles.
 ///
 class PbdObjectPicking : public CollisionInteraction
 {

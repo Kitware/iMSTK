@@ -32,7 +32,8 @@ namespace imstk
 {
 // Pbd Collision will be tested before any step of pbd, then resolved after the solve steps of the two objects
 SphObjectCollision::SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                                       std::string cdType) : CollisionInteraction(obj1, obj2)
+                                       std::string cdType) :
+    CollisionInteraction("SphObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2)
 {
     // Setup the CD
     std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);

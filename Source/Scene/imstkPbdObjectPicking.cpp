@@ -31,9 +31,9 @@ limitations under the License.
 
 namespace imstk
 {
-// Pbd Collision will be tested before any step of pbd, then resolved after the solve steps of the two objects
 PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                                   std::string cdType) : CollisionInteraction(obj1, obj2)
+                                   std::string cdType) :
+    CollisionInteraction("PbdObjectPicking_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2)
 {
     // Setup the CD
     std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
@@ -61,6 +61,10 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
             pickingCH->update();
         }, "PbdPickingCD_and_CH", true);
     m_taskGraph->addNode(m_pickingNode);
+
+    m_taskGraph->addNode(obj1->getPbdModel()->getUpdateVelocityNode());
+    m_taskGraph->addNode(obj2->getUpdateGeometryNode());
+    m_taskGraph->addNode(obj1->getPbdModel()->getTaskGraph()->getSink());
 
     m_taskGraph->addNode(obj1->getTaskGraph()->getSource());
     m_taskGraph->addNode(obj2->getTaskGraph()->getSource());

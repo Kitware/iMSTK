@@ -37,7 +37,8 @@ class SurfaceMesh;
 /// \class PbdObjectCuttingPair
 ///
 /// \brief This class defines a cutting interaction between a PbdObject and a CollidingObject
-/// call apply to perform the cut given the current states of both objects
+/// call apply to perform the cut given the current states of both objects. A discrete cut is
+/// performed, not for calling continuously.
 ///
 class PbdObjectCutting : public SceneObject
 {

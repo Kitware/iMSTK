@@ -42,6 +42,9 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
+#include "imstkTaskNode.h"
+#include "imstkCollisionDetectionAlgorithm.h"
+
 using namespace imstk;
 
 ///
@@ -271,6 +274,13 @@ main()
         {
             LOG(INFO) << "Jaw Closed!";
 
+            upperJawCollision->getCollisionDetectionNode()->setEnabled(false);
+            upperJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
+            upperJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
+            lowerJawCollision->getCollisionDetectionNode()->setEnabled(false);
+            lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
+            lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
+
             upperJawPicking->beginPick();
             lowerJawPicking->beginPick();
             });
@@ -279,6 +289,7 @@ main()
         {
             LOG(INFO) << "Jaw Opened!";
 
+            upperJawCollision->getCollisionDetectionNode()->setEnabled(true);
             upperJawPicking->endPick();
             lowerJawPicking->endPick();
             });

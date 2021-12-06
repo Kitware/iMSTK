@@ -32,7 +32,8 @@ limitations under the License.
 namespace imstk
 {
 PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                                       std::string cdType) : CollisionInteraction(obj1, obj2)
+                                       std::string cdType) :
+    CollisionInteraction("PbdObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2)
 {
     std::shared_ptr<PbdModel> pbdModel1 = obj1->getPbdModel();
 
