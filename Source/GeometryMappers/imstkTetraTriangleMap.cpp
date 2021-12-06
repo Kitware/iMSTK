@@ -162,18 +162,18 @@ TetraTriangleMap::isValid() const
 void
 TetraTriangleMap::setParentGeometry(std::shared_ptr<Geometry> parent)
 {
+    CHECK(parent != nullptr) << "The parent geometry provided is nullptr";
     CHECK(std::dynamic_pointer_cast<TetrahedralMesh>(parent) != nullptr) <<
-        "The geometry provided as parent is not of tetrahedral type";
-
+        "The parent geometry provided is not TetrahedralMesh";
     GeometryMap::setParentGeometry(parent);
 }
 
 void
 TetraTriangleMap::setChildGeometry(std::shared_ptr<Geometry> child)
 {
+    CHECK(child != nullptr) << "The child geometry provided is nullptr";
     CHECK(std::dynamic_pointer_cast<SurfaceMesh>(child) != nullptr) <<
-        "The geometry provided as child is not of triangular type (surface)";
-
+        "The child geometry provided is not SurfaceMesh";
     GeometryMap::setChildGeometry(child);
 }
 
