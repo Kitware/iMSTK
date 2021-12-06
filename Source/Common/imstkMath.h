@@ -31,18 +31,6 @@
 #include <Eigen/StdVector>
 #include <Eigen/Sparse>
 
-#ifndef _MSC_VER
-namespace std
-{
-template<typename T, typename ... Args>
-std::unique_ptr<T>
-make_unique(Args&& ... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args) ...));
-}
-}
-#endif
-
 namespace imstk
 {
 // 2D vector
