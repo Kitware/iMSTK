@@ -74,11 +74,8 @@ if(iMSTK_AUDIO_ENABLED)
   add_definitions( -DiMSTK_AUDIO_ENABLED )
 endif()
 
-# tbb
-find_dependency(tbb)
-if (MSVC)
-  add_definitions(-D__TBB_NO_IMPLICIT_LINKAGE=1)
-endif()
+# TBB
+find_dependency(TBB)
 
 # VegaFEM
 find_dependency( VegaFEM )

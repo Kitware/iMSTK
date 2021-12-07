@@ -6,7 +6,7 @@ imstk_add_library( Common
   DEPENDS
     Eigen3::Eigen
     g3log::g3log
-    tbb
+    TBB::tbb
   )
 
 #-----------------------------------------------------------------------------

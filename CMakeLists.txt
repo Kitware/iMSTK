@@ -181,7 +181,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   if (${PROJECT_NAME}_USE_PHYSX)
     imstk_define_dependency(PhysX)
   endif()
-  imstk_define_dependency(tbb)
+  imstk_define_dependency(TBB)
   imstk_define_dependency(VegaFEM)
   imstk_define_dependency(VTK)
   if(${PROJECT_NAME}_USE_OpenHaptics)
@@ -279,9 +279,7 @@ else()
 endif()
 
 # TBB
-find_package(tbb REQUIRED)
-# Define  __TBB_NO_IMPLICIT_LINKAGE so that MSVC will not always look for tbb_debug in debug mode
-add_definitions(-D__TBB_NO_IMPLICIT_LINKAGE)
+find_package(TBB REQUIRED)
 
 # VegaFEM
 find_package( VegaFEM REQUIRED CONFIG )
@@ -548,8 +546,6 @@ set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_ROOT_DIR \"${OpenVR_ROOT_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_LIB_DIR \"${OpenVR_LIB_DIR}\")\n")
 
 set(CONFIG_CODE "${CONFIG_CODE}set(TBB_DIR \"${TBB_DIR}\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(tbb_ROOT_DIR \"${tbb_ROOT_DIR}\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(tbb_LIB_DIR \"${tbb_LIB_DIR}\")\n")
 
 set(CONFIG_CODE "${CONFIG_CODE}set(VegaFEM_DIR \"${VegaFEM_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(VTK_DIR \"${VTK_DIR}\")\n")
