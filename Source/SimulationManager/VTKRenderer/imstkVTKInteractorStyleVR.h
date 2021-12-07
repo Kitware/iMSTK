@@ -38,7 +38,7 @@ public:
     vtkTypeMacro(vtkInteractorStyleVR, vtkInteractorStyle3D);
 
     void OnMove3D(vtkEventData* edata) override;
-    void OnButton3D(vtkEventData* edata) override;
+    void OnSelect3D(vtkEventData* edata) override;
 
     std::shared_ptr<imstk::OpenVRDeviceClient> getLeftControllerDeviceClient() const { return m_leftControllerDeviceClient; }
     std::shared_ptr<imstk::OpenVRDeviceClient> getRightControllerDeviceClient() const { return m_rightControllerDeviceClient; }

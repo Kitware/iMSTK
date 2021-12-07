@@ -164,18 +164,20 @@ VTKOpenVRViewer::initModule()
         iren->InvokeEvent(vtkCommand::StartEvent, nullptr);
         return true;
     }
+
+    vtkSmartPointer<vtkOpenVRRenderWindow> renWin = vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
+    renWin->Initialize();
+
     iren->Initialize();
 
     // Hide the device overlays
     // \todo: Display devices in debug mode
-    vtkSmartPointer<vtkOpenVRRenderWindow> renWin = vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
-    renWin->Initialize();
     renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the devices
 
     // Hide all controllers
     for (uint32_t i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
     {
-        vtkOpenVRModel* trackedDeviceModel = renWin->GetTrackedDeviceModel(i);
+        vtkVRModel* trackedDeviceModel = renWin->GetTrackedDeviceModel(i);
         if (trackedDeviceModel != nullptr)
         {
             trackedDeviceModel->SetVisibility(false);

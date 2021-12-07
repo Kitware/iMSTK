@@ -22,6 +22,8 @@
 #include "imstkVTKInteractorStyleVR.h"
 #include "imstkOpenVRDeviceClient.h"
 
+#include <vtkMath.h>
+#include <vtkEventData.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenVRRenderWindowInteractor.h>
 
@@ -73,13 +75,14 @@ vtkInteractorStyleVR::OnMove3D(vtkEventData* eventData)
 }
 
 void
-vtkInteractorStyleVR::OnButton3D(vtkEventData* eventData)
+vtkInteractorStyleVR::OnSelect3D(vtkEventData* eventData)
 {
-    if (eventData->GetType() != vtkCommand::Button3DEvent)
+    vtkEventDataDevice3D* eventDataDevice = static_cast<vtkEventDataDevice3D*>(eventData);
+    if (eventData->GetType() != vtkCommand::Select3DEvent)
     {
         return;
     }
-    vtkEventDataButton3D*         eventDataButton = static_cast<vtkEventDataButton3D*>(eventData);
+    vtkEventDataForDevice*        eventDataButton = eventDataDevice->GetAsEventDataForDevice();
     const vtkEventDataDevice      device = eventDataButton->GetDevice();
     const vtkEventDataAction      action = eventDataButton->GetAction();
     const vtkEventDataDeviceInput input  = eventDataButton->GetInput();
