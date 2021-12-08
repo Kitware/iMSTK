@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Example-VolumeRendering)
+project(Example-RenderingVolume)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} VolumeRenderingExample.cpp)
+imstk_add_executable(${PROJECT_NAME} RenderingVolumeExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
