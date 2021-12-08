@@ -103,12 +103,6 @@ public:
     void setDisplayMode(const DisplayMode displayMode);
 
     ///
-    /// \brief Get/Set tessellated
-    ///
-    const bool getTessellated() const { return m_tessellated; }
-    void setTessellated(const bool tessellated);
-
-    ///
     /// \brief Get/Set line width or the wireframe
     ///
     const double getLineWidth() const { return m_lineWidth; }
@@ -191,6 +185,33 @@ public:
     const double getEmissivity() const { return m_emissivity; }
     void setEmissivity(const double emissivity);
 
+    const double getAnisotropy() const { return m_anisotropy; }
+    void setAnisotropy(const double anisotropy);
+
+    const double getAnisotropyRotation() const { return m_anisotropyRotation; }
+    void setAnisotropyRotation(const double anisotropyRotation);
+
+    const double getBaseIOR() const { return m_baseIOR; }
+    void setBaseIOR(const double baseIOR);
+
+    const Color& getCoatColor() const { return m_coatColor; }
+    void setCoatColor(const Color& coatColor);
+
+    const double getCoatIOR() const { return m_coatIOR; }
+    void setCoatIOR(const double coatIOR);
+
+    const double getCoatNormalScale() const { return m_coatNormalScale; }
+    void setCoatNormalScale(const double coatNormalScale);
+
+    const double getCoatRoughness() const { return m_coatRoughness; }
+    void setCoatRoughness(const double coatRoughness);
+
+    const double getCoatStrength() const { return m_coatStrength; }
+    void setCoatStrength(const double coatStrength);
+
+    const Color& getEdgeTint() const { return m_edgeTint; }
+    void setEdgeTint(const Color& edgeTint);
+
     ///
     /// \brief Add/Remove/Get texture
     ///
@@ -213,13 +234,6 @@ public:
     virtual void setBlendMode(const BlendMode blendMode);
     const BlendMode getBlendMode() const { return m_blendMode; }
 
-    ///
-    /// \brief Checks if the material must be handled uniquely
-    ///
-    bool isDecal() const { return m_isDecal; }
-    bool isParticle() const { return m_isParticle; }
-    bool isLineMesh() const { return m_isLineMesh; }
-
     const DisplayMode getRenderMode() const { return m_displayMode; }
     const ShadingModel getShadingModel() const { return m_shadingModel; }
     void setShadingModel(const ShadingModel& model);
@@ -229,9 +243,6 @@ public:
 
     double getNormalStrength() const { return m_normalStrength; }
     void setNormalStrength(const double n);
-
-    double getIndexOfRefraction() const { return m_indexOfRefraction; }
-    void setIndexOfRefraction(const double n);
 
     const Color& getEdgeColor() const { return m_edgeColor; }
     void setEdgeColor(const Color& color);
@@ -300,7 +311,17 @@ protected:
     double m_roughness = 1.0; ///< Value for roughness with range: [0.0, 1.0]
     double m_occlusionStrength = 1.0;
     double m_normalStrength    = 1.0;
-    double m_indexOfRefraction = 1.0;
+
+    ///----------------PBR Clearcoat properties-------------------
+    double m_anisotropy = 0.0;
+    double m_anisotropyRotation = 0.0;
+    double m_baseIOR         = 1.5; // Base index of refraction
+    Color  m_coatColor       = Color::White;
+    double m_coatIOR         = 2.0; // Coat index of refraction
+    double m_coatNormalScale = 1.0;
+    double m_coatRoughness   = 0.0;
+    double m_coatStrength    = 0.0;
+    Color  m_edgeTint        = Color::White;
 
     ///---------------------Global states------------------------
     bool m_imageBasedLighting = false;
@@ -310,10 +331,6 @@ protected:
     DisplayMode  m_displayMode  = DisplayMode::Surface;
     ShadingModel m_shadingModel = ShadingModel::Phong;
 
-    bool m_tessellated = false;
-    bool m_isDecal     = false;
-    bool m_isLineMesh  = false;
-    bool m_isParticle  = false;
     bool m_recomputeVertexNormals = true; ///> Update vertex normals when vertex or index data is changed
 
     std::shared_ptr<ColorFunction> m_lookupTable;

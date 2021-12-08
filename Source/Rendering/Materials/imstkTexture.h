@@ -53,9 +53,11 @@ public:
         Cubemap,
         IrradianceCubeMap,
         RadianceCubeMap,
+        ORM,
         BRDF_LUT,
         Emissive,
-        ORM,
+        Anistropy,
+        CoatNormal,
         None
     };
 
@@ -102,16 +104,6 @@ public:
     /// \brief Get type
     ///
     Type getType() const;
-
-    ///
-    /// \brief Get type as a string
-    ///
-    std::string getTypeAsString() const;
-
-    ///
-    /// \brief Convert a Type into a string
-    ///
-    static std::string getTypeAsString(Type type);
 
     ///
     /// \brief Get path

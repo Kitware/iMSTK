@@ -512,7 +512,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures()
         */
 
         // Set texture
-        auto currentTexture = textureDelegate->getVtkTexture();
+        vtkSmartPointer<vtkTexture> currentTexture = textureDelegate->getVtkTexture();
         if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
         {
             switch (texture->getType())
@@ -531,6 +531,16 @@ VTKSurfaceMeshRenderDelegate::initializeTextures()
             case Texture::Type::ORM:
             {
                 actor->GetProperty()->SetORMTexture(currentTexture);
+                break;
+            }
+            case Texture::Type::Anistropy:
+            {
+                actor->GetProperty()->SetAnisotropyTexture(currentTexture);
+                break;
+            }
+            case Texture::Type::CoatNormal:
+            {
+                actor->GetProperty()->SetCoatNormalTexture(currentTexture);
                 break;
             }
             default:

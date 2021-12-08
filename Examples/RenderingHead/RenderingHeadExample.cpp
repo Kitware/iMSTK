@@ -39,8 +39,7 @@
 using namespace imstk;
 
 ///
-/// \brief This example demonstrates configuring the renderer
-/// objects, lights etc.
+/// \brief Demonstrates PBR rendering with SSAO
 ///
 int
 main()

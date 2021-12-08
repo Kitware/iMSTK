@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Example-Rendering)
+project(Example-RenderingColon)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} RenderingExample.cpp)
+imstk_add_executable(${PROJECT_NAME} RenderingColonExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

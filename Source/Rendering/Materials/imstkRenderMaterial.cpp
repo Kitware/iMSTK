@@ -44,16 +44,6 @@ RenderMaterial::setDisplayMode(const DisplayMode displayMode)
 }
 
 void
-RenderMaterial::setTessellated(const bool tessellated)
-{
-    if (tessellated != m_tessellated)
-    {
-        m_tessellated = tessellated;
-        postModified();
-    }
-}
-
-void
 RenderMaterial::setLineWidth(const double width)
 {
     if (width != m_lineWidth)
@@ -161,6 +151,96 @@ RenderMaterial::setEmissivity(const double emissivity)
     }
 }
 
+void
+RenderMaterial::setAnisotropy(const double anisotropy)
+{
+    if (m_anisotropy != anisotropy)
+    {
+        m_anisotropy = anisotropy;
+        postModified();
+    }
+}
+
+void
+RenderMaterial::setAnisotropyRotation(const double anisotropyRotation)
+{
+    if (m_anisotropyRotation != anisotropyRotation)
+    {
+        m_anisotropyRotation = anisotropyRotation;
+        postModified();
+    }
+}
+
+void
+RenderMaterial::setBaseIOR(const double baseIOR)
+{
+    if (m_baseIOR != baseIOR)
+    {
+        m_baseIOR = baseIOR;
+        postModified();
+    }
+}
+
+void
+RenderMaterial::setCoatColor(const Color& coatColor)
+{
+    if (m_coatColor != coatColor)
+    {
+        m_coatColor = coatColor;
+        postModified();
+    }
+}
+
+void
+RenderMaterial::setCoatIOR(const double coatIOR)
+{
+    if (m_coatIOR != coatIOR)
+    {
+        m_coatIOR = coatIOR;
+        postModified();
+    }
+}
+
+void
+RenderMaterial::setCoatNormalScale(const double coatNormalScale)
+{
+    if (m_coatNormalScale != coatNormalScale)
+    {
+        m_coatNormalScale = coatNormalScale;
+        postModified();
+    }
+}
+
+void
+RenderMaterial::setCoatRoughness(const double coatRoughness)
+{
+    if (m_coatRoughness != coatRoughness)
+    {
+        m_coatRoughness = coatRoughness;
+        postModified();
+    }
+}
+
+void
+RenderMaterial::setCoatStrength(const double coatStrength)
+{
+    if (m_coatStrength != coatStrength)
+    {
+        m_coatStrength = coatStrength;
+        postModified();
+    }
+}
+
+void
+RenderMaterial::setEdgeTint(const Color& edgeTint)
+{
+    if (m_edgeTint != edgeTint)
+    {
+        m_edgeTint = edgeTint;
+        postModified();
+    }
+}
+
 std::shared_ptr<Texture>
 RenderMaterial::getTexture(Texture::Type type)
 {
@@ -246,16 +326,6 @@ RenderMaterial::setNormalStrength(const double normalStrength)
     if (normalStrength != m_normalStrength)
     {
         m_normalStrength = normalStrength;
-        postModified();
-    }
-}
-
-void
-RenderMaterial::setIndexOfRefraction(const double indexOfRefraction)
-{
-    if (indexOfRefraction == m_indexOfRefraction)
-    {
-        m_indexOfRefraction = indexOfRefraction;
         postModified();
     }
 }
