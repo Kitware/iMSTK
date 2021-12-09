@@ -29,12 +29,12 @@ endif()
 
 # Download options
 if(NOT DEFINED iMSTK_VegaFEM_GIT_SHA)
-  set(iMSTK_VegaFEM_GIT_SHA "5be6525017b5e1199e55c6e25ad9c9a0fc05b61d") # master
+  set(iMSTK_VegaFEM_GIT_SHA "be55ca42bfc111f3a3419ade4a4e7bf5ba55c62d") # master
 endif()
 if(NOT DEFINED iMSTK_VegaFEM_GIT_REPOSITORY)
   set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
     URL https://gitlab.kitware.com/iMSTK/VegaFEM-CMake/-/archive/${iMSTK_VegaFEM_GIT_SHA}/VegaFEM-CMake-${iMSTK_VegaFEM_GIT_SHA}.zip
-    URL_HASH MD5=2af963e306dd364c0de3365d47105b65
+    URL_HASH MD5=5089ae54940d17ff8acaed94b155cce3
     )
 else()
   set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
