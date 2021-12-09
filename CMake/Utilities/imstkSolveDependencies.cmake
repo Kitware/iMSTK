@@ -447,16 +447,37 @@ function(_sb_get_external_project_arguments proj varname)
 
   set(_ep_arguments "")
 
-  # Automatically propagate CMake options
-  foreach(_cmake_option IN ITEMS
-    CMAKE_EXPORT_COMPILE_COMMANDS
-    CMAKE_JOB_POOL_COMPILE
-    CMAKE_JOB_POOL_LINK
-    CMAKE_JOB_POOLS
+  # Option CMAKE_FIND_USE_PACKAGE_REGISTRY was introduced in CMake 3.16
+  if(CMAKE_VERSION VERSION_GREATER "3.15")
+    if(NOT DEFINED CMAKE_FIND_USE_PACKAGE_REGISTRY)
+      set(CMAKE_FIND_USE_PACKAGE_REGISTRY OFF)
+    endif()
+  else()
+    if(NOT DEFINED CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY)
+      set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
+    endif()
+  endif()
+
+  # Set list of CMake options to propagate
+  set(_options
+    CMAKE_EXPORT_COMPILE_COMMANDS:BOOL
+    CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY:BOOL
+    CMAKE_JOB_POOL_COMPILE:STRING
+    CMAKE_JOB_POOL_LINK:STRING
+    CMAKE_JOB_POOLS:STRING
     )
+  if(CMAKE_VERSION VERSION_GREATER "3.15")
+    list(APPEND _options
+      CMAKE_FIND_USE_PACKAGE_REGISTRY:BOOL
+      )
+  endif()
+
+  # Automatically propagate CMake options
+  foreach(_cmake_option_and_type IN LISTS _options)
+    _sb_extract_varname_and_vartype(${_cmake_option_and_type} _cmake_option _cmake_option_type)
     if(DEFINED ${_cmake_option})
       list(APPEND _ep_arguments CMAKE_CACHE_ARGS
-        -D${_cmake_option}:BOOL=${${_cmake_option}}
+        -D${_cmake_option}:${_cmake_option_type}=${${_cmake_option}}
         )
     endif()
   endforeach()
