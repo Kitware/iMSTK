@@ -41,11 +41,10 @@ function(imstk_add_test_internal target kind)
   # Create test driver executable
   imstk_add_executable(${test_driver_executable} ${test_files})
 
-  # Link test driver against current target, gtest and pthread
+  # Link test driver against current target and GTest
   target_link_libraries(${test_driver_executable}
     ${target}
     Testing
-    Threads::Threads
     GTest::gtest
     GTest::gmock
 

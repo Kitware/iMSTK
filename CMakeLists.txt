@@ -192,7 +192,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   endif()
 
   if(WIN32)
-    imstk_define_dependency(PThreads)
     imstk_define_dependency(Libusb) #for VRPN
     imstk_define_dependency(FTD2XX) #for LibNiFalcon
     if(${PROJECT_NAME}_AUDIO_ENABLED)
@@ -522,19 +521,6 @@ else()
   set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_INCLUDE_DIR \"${Libusb_INCLUDE_DIR}\")\n")
   set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_LIBRARY_libusb-1.0-RELEASE \"${Libusb_LIBRARY_libusb-1.0-RELEASE}\")\n")
   set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_LIBRARY_libusb-1.0-DEBUG \"${Libusb_LIBRARY_libusb-1.0-DEBUG}\")\n")
-endif()
-
-if(WIN32)
-  set(CONFIG_CODE "${CONFIG_CODE}# Required by FindPThreads CMake module used in and provided by the iMSTK project\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(PThreads_ROOT_DIR \"${PThreads_ROOT_DIR}\")\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(PThreads_LIB_DIR \"${PThreads_LIB_DIR}\")\n")
-  set(CONFIG_CODE "${CONFIG_CODE}# Required by FindPThreads CMake module provided and used by the VegaFEM project\n")
-  set(CONFIG_CODE "${CONFIG_CODE}# Add variables to CACHE to workaround issue related to use of\n")
-  set(CONFIG_CODE "${CONFIG_CODE}# mark_as_advanced command in FindPThreads and described in CMP0102\n")
-  set(CONFIG_CODE "${CONFIG_CODE}# See https://cmake.org/cmake/help/latest/policy/CMP0102.html\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(PTHREAD_INCLUDE_DIR \"${PTHREAD_INCLUDE_DIR}\" CACHE PATH \"\")\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(PTHREAD_RELEASE_LIBRARY \"${PTHREAD_RELEASE_LIBRARY}\" CACHE FILEPATH \"\")\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(PTHREAD_DEBUG_LIBRARY \"${PTHREAD_DEBUG_LIBRARY}\" CACHE FILEPATH \"\")\n")
 endif()
 
 set(CONFIG_CODE "${CONFIG_CODE}# Add variables to CACHE to workaround issue related to use of\n")
