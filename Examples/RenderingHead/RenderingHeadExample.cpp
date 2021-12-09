@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkIBLProbe.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
 #include "imstkMeshIO.h"
@@ -47,16 +46,8 @@ main()
     // Write log to stdout and file
     Logger::startLogger();
 
-    double          sceneSize;
-    imstkNew<Scene> scene("Rendering");
+    imstkNew<Scene> scene("RenderingHead");
     {
-        // Add IBL Probe
-        imstkNew<IBLProbe> globalIBLProbe(
-            iMSTK_DATA_ROOT "/IBL/roomIrradiance.dds",
-            iMSTK_DATA_ROOT "/IBL/roomRadiance.dds",
-            iMSTK_DATA_ROOT "/IBL/roomBRDF.png");
-        scene->setGlobalIBLProbe(globalIBLProbe);
-
         // Head mesh
         auto surfaceMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/head/head_revised.obj");
 
@@ -118,7 +109,7 @@ main()
         // Enable SSAO
         Vec3d l, u;
         scene->computeBoundingBox(l, u);
-        sceneSize = (u - l).norm();
+        const double sceneSize = (u - l).norm();
 
         auto rendConfig = std::make_shared<RendererConfig>();
         rendConfig->m_ssaoConfig.m_enableSSAO = true;

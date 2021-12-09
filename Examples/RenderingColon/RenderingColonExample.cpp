@@ -133,7 +133,7 @@ main()
     // Write log to stdout and file
     Logger::startLogger();
 
-    imstkNew<Scene> scene("Rendering");
+    imstkNew<Scene> scene("RenderingColon");
     auto            colonObject = std::make_shared<SceneObject>("colon");
     {
         imstkNew<RenderMaterial> colonMaterial;
@@ -201,6 +201,18 @@ main()
         imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setBackgroundColors(Color::Black);
+        // Enable SSAO
+        Vec3d l, u;
+        scene->computeBoundingBox(l, u);
+        const double sceneSize = (u - l).norm();
+
+        auto renderConfig = std::make_shared<RendererConfig>();
+        renderConfig->m_ssaoConfig.m_enableSSAO = true;
+        renderConfig->m_ssaoConfig.m_SSAOBlur   = true;
+        renderConfig->m_ssaoConfig.m_SSAORadius = 50.0 * sceneSize;
+        renderConfig->m_ssaoConfig.m_SSAOBias   = 0.03 * sceneSize;
+        renderConfig->m_ssaoConfig.m_KernelSize = 128;
+        viewer->getActiveRenderer()->setConfig(renderConfig);
 
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager;
@@ -227,7 +239,7 @@ main()
         std::shared_ptr<Camera> cam = scene->getActiveCamera();
         {
             // Initialize the camera
-            const Vec3d eyePos = getSplinePositionFromLineMesh(0.0, colonMedialMesh);
+            const Vec3d eyePos  = getSplinePositionFromLineMesh(0.0, colonMedialMesh);
             const Vec3d focalPt = getSplinePositionFromLineMesh(0.07, colonMedialMesh);
             cam->setPosition(eyePos);
             cam->setFocalPoint(focalPt);
