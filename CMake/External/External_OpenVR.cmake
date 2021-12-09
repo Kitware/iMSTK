@@ -60,8 +60,9 @@ endif()
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
+set(git_sha "v1.12.5")
 imstk_add_external_project( OpenVR
-  URL "https://gitlab.kitware.com/iMSTK/openvr/-/archive/v1.12.5/openvr-v1.12.5.tar.gz"
+  URL "https://gitlab.kitware.com/iMSTK/openvr/-/archive/${git_sha}/openvr-${git_sha}.tar.gz"
   URL_MD5 "42c4d1c4a194860aaa4e793b009b99c0"
   DOWNLOAD_DIR ${OpenVR_PREFIX}
   SOURCE_DIR ${OpenVR_SOURCE_DIR}

@@ -38,8 +38,9 @@ set(g3log_INSTALL_COMMAND
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
+set(git_sha "6c1698c4f7db6b9e4246ead38051f9866ea3ac06")
 imstk_add_external_project( g3log
-  URL https://gitlab.kitware.com/iMSTK/g3log/-/archive/6c1698c4f7db6b9e4246ead38051f9866ea3ac06/archive.zip
+  URL https://gitlab.kitware.com/iMSTK/g3log/-/archive/${git_sha}/g3log-${git_sha}.zip
   URL_MD5 3815bbfec2ff51dc473063c35eec0f36
   CMAKE_CACHE_ARGS
     -DADD_FATAL_EXAMPLE:BOOL=OFF

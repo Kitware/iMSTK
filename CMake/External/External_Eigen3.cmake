@@ -22,8 +22,9 @@ else()
     )
 endif()
 
+set(git_sha "3.4.0")
 imstk_add_external_project( Eigen3
-  URL "https://gitlab.kitware.com/iMSTK/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz"
+  URL "https://gitlab.kitware.com/iMSTK/eigen/-/archive/${git_sha}/eigen-${git_sha}.tar.gz"
   URL_HASH MD5=4c527a9171d71a72a9d4186e65bea559
   CMAKE_CACHE_ARGS
         -DBUILD_TESTING:BOOL=OFF

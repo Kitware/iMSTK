@@ -27,8 +27,9 @@ else()
     )
 endif()
 
+set(git_sha "build_model_reduction")
 imstk_add_external_project( VegaFEM
-  URL https://gitlab.kitware.com/iMSTK/vegafemv4.0/-/archive/build_model_reduction/vegafemv4.0-build_model_reduction.zip
+  URL https://gitlab.kitware.com/iMSTK/vegafemv4.0/-/archive/${git_sha}/vegafemv4.0-${git_sha}.zip
   URL_MD5 3f04bb7c2ba080785bcadf44d1a462a3
   CMAKE_CACHE_ARGS
     -DVegaFEM_ENABLE_PTHREADS_SUPPORT:BOOL=ON

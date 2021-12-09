@@ -2,8 +2,9 @@
 # Add External Project
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
+set(git_sha "fixCompilationError")
 imstk_add_external_project( Assimp
-  URL https://gitlab.kitware.com/iMSTK/assimp/-/archive/fixCompilationError/assimp-fixCompilationError.zip
+  URL https://gitlab.kitware.com/iMSTK/assimp/-/archive/${git_sha}/assimp-${git_sha}.zip
   URL_MD5 fab081af9dbd73a9a5c61cd33dd93340
   CMAKE_CACHE_ARGS
     -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON

@@ -7,8 +7,9 @@ if(WIN32)
 endif(WIN32)
 
 include(imstkAddExternalProject)
+set(git_sha "libusb1-windows")
 imstk_add_external_project( LibNiFalcon
-  URL https://gitlab.kitware.com/iMSTK/libnifalcon/-/archive/libusb1-windows/libnifalcon-libusb1-windows.zip
+  URL https://gitlab.kitware.com/iMSTK/libnifalcon/-/archive/${git_sha}/libnifalcon-${git_sha}.zip
   URL_MD5 6d5d68c92837388bfcd27f99a48b921d
   CMAKE_CACHE_ARGS
     -DBUILD_TESTING:BOOL=OFF

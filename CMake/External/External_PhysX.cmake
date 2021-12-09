@@ -58,8 +58,9 @@ set(PHYSX_iMSTK_INSTALL "${CMAKE_COMMAND}"
   -DiMSTK_INSTALL_DIR=${CMAKE_INSTALL_PREFIX}
   -P ${CMAKE_SOURCE_DIR}/CMake/External/Patches/physx.cmake)
 
+set(git_sha "b03d0a74c1244a97b83dea58dc201beeacd45cf4")
 imstk_add_external_project( PhysX
-  URL https://gitlab.kitware.com/iMSTK/PhysX/-/archive/b03d0a74c1244a97b83dea58dc201beeacd45cf4/archive.zip
+  URL https://gitlab.kitware.com/iMSTK/PhysX/-/archive/${git_sha}/PhysX-${git_sha}.zip
   URL_MD5 9c17263ceec705eaf1ddd7c2ee796bac
   SOURCE_SUBDIR ./physx/compiler/public
   CMAKE_CACHE_ARGS
