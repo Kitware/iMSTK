@@ -58,10 +58,24 @@ set(PHYSX_iMSTK_INSTALL "${CMAKE_COMMAND}"
   -DiMSTK_INSTALL_DIR=${CMAKE_INSTALL_PREFIX}
   -P ${CMAKE_SOURCE_DIR}/CMake/External/Patches/physx.cmake)
 
-set(git_sha "b03d0a74c1244a97b83dea58dc201beeacd45cf4")
+# Download options
+if(NOT DEFINED iMSTK_PhysX_GIT_SHA)
+  set(iMSTK_PhysX_GIT_SHA "b03d0a74c1244a97b83dea58dc201beeacd45cf4")
+endif()
+if(NOT DEFINED iMSTK_PhysX_GIT_REPOSITORY)
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    URL https://gitlab.kitware.com/iMSTK/PhysX/-/archive/${iMSTK_PhysX_GIT_SHA}/PhysX-${iMSTK_PhysX_GIT_SHA}.zip
+    URL_HASH MD5=9c17263ceec705eaf1ddd7c2ee796bac
+    )
+else()
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    GIT_REPOSITORY ${iMSTK_PhysX_GIT_REPOSITORY}
+    GIT_TAG ${iMSTK_PhysX_GIT_SHA}
+    )
+endif()
+
 imstk_add_external_project( PhysX
-  URL https://gitlab.kitware.com/iMSTK/PhysX/-/archive/${git_sha}/PhysX-${git_sha}.zip
-  URL_MD5 9c17263ceec705eaf1ddd7c2ee796bac
+  ${EXTERNAL_PROJECT_DOWNLOAD_OPTIONS}
   SOURCE_SUBDIR ./physx/compiler/public
   CMAKE_CACHE_ARGS
     -DPHYSX_CXX_FLAGS:STRING=${NO_MEMSET}

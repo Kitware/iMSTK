@@ -67,9 +67,30 @@ Additionally to enable CMake to find the library correctly _if_ the library alre
 You will need to create this file which describes what files to download from where and how to build them to support your new library in the superbuild. In general this will mean customizing `imstk_add_external_project`.
 
     include(imstkAddExternalProject)
-	imstk_add_external_project(NewLib
-	  ....
-	)
+
+    # Download options
+    if(NOT DEFINED iMSTK_NewLib_GIT_SHA)
+      set(iMSTK_NewLib_GIT_SHA "...")
+    endif()
+    if(NOT DEFINED iMSTK_NewLib_GIT_REPOSITORY)
+      set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+        URL https://gitlab.kitware.com/iMSTK/newlib/-/archive/${iMSTK_NewLib_GIT_SHA}/newlib-${iMSTK_NewLib_GIT_SHA}.zip
+        URL_HASH MD5=...
+        )
+    else()
+      set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+        GIT_REPOSITORY ${iMSTK_NewLib_GIT_REPOSITORY}
+        GIT_TAG ${iMSTK_NewLib_GIT_SHA}
+        )
+    endif()
+
+    imstk_add_external_project(NewLib
+      ${EXTERNAL_PROJECT_DOWNLOAD_OPTIONS}
+      CMAKE_CACHE_ARGS
+        ...
+      DEPENDENCIES ${NewLib_DEPENDENCIES}
+      ...
+    )
 
 and customizing the build options for the new library by passing them via the `CMAKE_CACHE_ARGS` section. e.g.
 

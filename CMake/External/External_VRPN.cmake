@@ -31,10 +31,19 @@ endif()
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
+
+# Download options
+if(NOT DEFINED iMSTK_VRPN_GIT_SHA)
+  set(iMSTK_VRPN_GIT_SHA "7a2845e4b1be2707ccb67dd1d388fb22a766e8f7") # vrpn-imstk-additions
+endif()
+if(NOT DEFINED iMSTK_VRPN_GIT_REPOSITORY)
+  set(iMSTK_VRPN_GIT_REPOSITORY "https://gitlab.kitware.com/iMSTK/vrpn.git")
+endif()
+
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/vrpn.git
-  GIT_TAG 7a2845e4b1be2707ccb67dd1d388fb22a766e8f7 # vrpn-imstk-additions
+  GIT_REPOSITORY ${iMSTK_VRPN_GIT_REPOSITORY}
+  GIT_TAG ${iMSTK_VRPN_GIT_SHA}
   # Cannot get a zip as vrpn uses submodules which are not pulled into the zip
   CMAKE_CACHE_ARGS
     -DBUILD_TESTING:BOOL=OFF

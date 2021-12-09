@@ -67,20 +67,34 @@ endif()
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 
-if(WIN32)
-  set(tbb_file "tbb${TBB_VER}_win.zip")
-  set(tbb_md5 "a061a7c9821a374023201e8592860730")
-elseif(APPLE)
-  set(tbb_file "tbb${TBB_VER}_mac.tgz")
-  set(tbb_md5 "43a0d6409317ee94f047622fd489a6c8")
+# Download options
+if(NOT DEFINED iMSTK_TBB_GIT_SHA)
+  set(iMSTK_TBB_GIT_SHA "2019_U9")
+endif()
+if(NOT DEFINED iMSTK_TBB_GIT_REPOSITORY)
+  if(WIN32)
+    set(tbb_file "tbb${TBB_VER}_win.zip")
+    set(tbb_md5 "a061a7c9821a374023201e8592860730")
+  elseif(APPLE)
+    set(tbb_file "tbb${TBB_VER}_mac.tgz")
+    set(tbb_md5 "43a0d6409317ee94f047622fd489a6c8")
+  else()
+    set(tbb_file "tbb${TBB_VER}_lin.tgz")
+    set(tbb_md5 "b5025847fa47040b4d2da8d6bdba0224")
+  endif()
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    URL https://github.com/oneapi-src/oneTBB/releases/download/${iMSTK_TBB_GIT_SHA}/${tbb_file}
+    URL_HASH MD5=${tbb_md5}
+    )
 else()
-  set(tbb_file "tbb${TBB_VER}_lin.tgz")
-  set(tbb_md5 "b5025847fa47040b4d2da8d6bdba0224")
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    GIT_REPOSITORY ${iMSTK_TBB_GIT_REPOSITORY}
+    GIT_TAG ${iMSTK_TBB_GIT_SHA}
+    )
 endif()
 
 imstk_add_external_project(TBB
-  URL https://github.com/oneapi-src/oneTBB/releases/download/2019_U9/${tbb_file}
-  URL_MD5 ${tbb_md5}
+  ${EXTERNAL_PROJECT_DOWNLOAD_OPTIONS}
   DOWNLOAD_DIR ${TBB_PREFIX}
   SOURCE_DIR ${TBB_SOURCE_DIR}
   UPDATE_COMMAND ${SKIP_STEP_COMMAND}

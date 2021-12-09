@@ -60,10 +60,25 @@ endif()
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
-set(git_sha "v1.12.5")
+
+# Download options
+if(NOT DEFINED iMSTK_OpenVR_GIT_SHA)
+  set(iMSTK_OpenVR_GIT_SHA "v1.12.5")
+endif()
+if(NOT DEFINED iMSTK_OpenVR_GIT_REPOSITORY)
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    URL https://gitlab.kitware.com/iMSTK/openvr/-/archive/${iMSTK_OpenVR_GIT_SHA}/openvr-${iMSTK_OpenVR_GIT_SHA}.tar.gz
+    URL_HASH MD5=42c4d1c4a194860aaa4e793b009b99c0
+    )
+else()
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    GIT_REPOSITORY ${iMSTK_OpenVR_GIT_REPOSITORY}
+    GIT_TAG ${iMSTK_OpenVR_GIT_SHA}
+    )
+endif()
+
 imstk_add_external_project( OpenVR
-  URL "https://gitlab.kitware.com/iMSTK/openvr/-/archive/${git_sha}/openvr-${git_sha}.tar.gz"
-  URL_MD5 "42c4d1c4a194860aaa4e793b009b99c0"
+  ${EXTERNAL_PROJECT_DOWNLOAD_OPTIONS}
   DOWNLOAD_DIR ${OpenVR_PREFIX}
   SOURCE_DIR ${OpenVR_SOURCE_DIR}
   UPDATE_COMMAND ${SKIP_STEP_COMMAND}

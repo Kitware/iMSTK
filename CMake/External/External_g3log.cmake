@@ -38,10 +38,25 @@ set(g3log_INSTALL_COMMAND
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
-set(git_sha "6c1698c4f7db6b9e4246ead38051f9866ea3ac06")
+
+# Download options
+if(NOT DEFINED iMSTK_g3log_GIT_SHA)
+  set(iMSTK_g3log_GIT_SHA "6c1698c4f7db6b9e4246ead38051f9866ea3ac06")
+endif()
+if(NOT DEFINED iMSTK_g3log_GIT_REPOSITORY)
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    URL https://gitlab.kitware.com/iMSTK/g3log/-/archive/${iMSTK_g3log_GIT_SHA}/g3log-${iMSTK_g3log_GIT_SHA}.zip
+    URL_HASH MD5=3815bbfec2ff51dc473063c35eec0f36
+    )
+else()
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    GIT_REPOSITORY ${iMSTK_g3log_GIT_REPOSITORY}
+    GIT_TAG ${iMSTK_g3log_GIT_SHA}
+    )
+endif()
+
 imstk_add_external_project( g3log
-  URL https://gitlab.kitware.com/iMSTK/g3log/-/archive/${git_sha}/g3log-${git_sha}.zip
-  URL_MD5 3815bbfec2ff51dc473063c35eec0f36
+  ${EXTERNAL_PROJECT_DOWNLOAD_OPTIONS}
   CMAKE_CACHE_ARGS
     -DADD_FATAL_EXAMPLE:BOOL=OFF
   ${g3log_INSTALL_COMMAND}

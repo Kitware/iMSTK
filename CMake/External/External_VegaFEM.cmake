@@ -27,10 +27,24 @@ else()
     )
 endif()
 
-set(git_sha "build_model_reduction")
+# Download options
+if(NOT DEFINED iMSTK_VegaFEM_GIT_SHA)
+  set(iMSTK_VegaFEM_GIT_SHA "build_model_reduction")
+endif()
+if(NOT DEFINED iMSTK_VegaFEM_GIT_REPOSITORY)
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    URL https://gitlab.kitware.com/iMSTK/vegafemv4.0/-/archive/${iMSTK_VegaFEM_GIT_SHA}/vegafemv4.0-${iMSTK_VegaFEM_GIT_SHA}.zip
+    URL_HASH MD5=3f04bb7c2ba080785bcadf44d1a462a3
+    )
+else()
+  set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
+    GIT_REPOSITORY ${iMSTK_VegaFEM_GIT_REPOSITORY}
+    GIT_TAG ${iMSTK_VegaFEM_GIT_SHA}
+    )
+endif()
+
 imstk_add_external_project( VegaFEM
-  URL https://gitlab.kitware.com/iMSTK/vegafemv4.0/-/archive/${git_sha}/vegafemv4.0-${git_sha}.zip
-  URL_MD5 3f04bb7c2ba080785bcadf44d1a462a3
+  ${EXTERNAL_PROJECT_DOWNLOAD_OPTIONS}
   CMAKE_CACHE_ARGS
     -DVegaFEM_ENABLE_PTHREADS_SUPPORT:BOOL=ON
     -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=OFF
