@@ -45,13 +45,22 @@ if(CMAKE_PROJECT_NAME STREQUAL "iMSTK")
     )
 
   if(WIN32)
-    set(copy_tbb_dll_command
+    set(copy_tbb_dll_to_bin_subdir_command
       ${CMAKE_COMMAND} -E copy_directory
         ${TBB_SOURCE_DIR}/tbb${TBB_VER}/bin/${_subdir}
         ${TBB_INSTALL_DIR}/bin/${_subdir}
       )
+    # Also copy dlls directly into bin folder to support
+    # calling "gtest_discover_tests" with working directory
+    # set to <CMAKE_INSTALL_PREFIX>/bin
+    set(copy_tbb_dll_to_bin_command
+      ${CMAKE_COMMAND} -E copy_directory
+        ${TBB_SOURCE_DIR}/tbb${TBB_VER}/bin/${_subdir}
+        ${TBB_INSTALL_DIR}/bin/
+      )
     list(APPEND TBB_INSTALL_COMMAND
-      COMMAND ${copy_tbb_dll_command}
+      COMMAND ${copy_tbb_dll_to_bin_subdir_command}
+      COMMAND ${copy_tbb_dll_to_bin_command}
       )
   endif()
 
