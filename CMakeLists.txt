@@ -43,8 +43,17 @@ set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 #-----------------------------------------------------------------------------
 # C++11 Support
 #-----------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 14)
+set(_msg "Setting C++ standard")
+message(STATUS "${_msg}")
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+message(STATUS "${_msg} - C++${CMAKE_CXX_STANDARD}")
+if(NOT CMAKE_CXX_STANDARD MATCHES "^(11|14|17)$")
+  message(FATAL_ERROR "CMAKE_CXX_STANDARD must be set to 11, 14 or 17")
+endif()
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 # Prevents a compiler error for Visual Studio 15.8
