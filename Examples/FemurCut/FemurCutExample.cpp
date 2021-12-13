@@ -21,7 +21,6 @@
 
 #include "FemurObject.h"
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetCH.h"
@@ -131,7 +130,7 @@ main()
     }
     std::shared_ptr<CollisionDetectionAlgorithm> cd = interaction->getCollisionDetection();
 
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(interaction);
 
     // Light (white)
     imstkNew<DirectionalLight> whiteLight;

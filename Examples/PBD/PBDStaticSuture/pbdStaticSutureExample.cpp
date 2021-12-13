@@ -21,7 +21,6 @@
 
 // This example is haptic only
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
@@ -215,10 +214,10 @@ main()
 
     auto interaction = std::make_shared<PbdObjectCollision>(sutureThreadObj, tissueObj, "ImplicitGeometryToPointSetCD");
     interaction->setFriction(0.0);
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(interaction);
 
     auto needleInteraction = std::make_shared<NeedleInteraction>(tissueObj, needleObj);
-    scene->getCollisionGraph()->addInteraction(needleInteraction);
+    scene->addInteraction(needleInteraction);
 
     // Adjust the camera
     scene->getActiveCamera()->setFocalPoint(0.00138345, -0.0601133, -0.0261938);

@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseSceneControl.h"
@@ -137,8 +136,7 @@ main()
     pointObject->getVisualModel(0)->getRenderMaterial()->setPointSize(10.0);
     scene->addSceneObject(pointObject);
 
-    auto interaction = std::make_shared<PbdObjectCollision>(pbdObject, pointObject);
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(std::make_shared<PbdObjectCollision>(pbdObject, pointObject));
 
     // Run the simulation
     {

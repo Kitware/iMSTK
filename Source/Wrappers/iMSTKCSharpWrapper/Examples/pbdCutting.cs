@@ -28,7 +28,7 @@ public class PbdCutting
         scene.addSceneObject(clothObj);
 
         // Add interaction pair for pbd cutting
-        PbdObjectCuttingPair cuttingPair = new PbdObjectCuttingPair(clothObj, cutObj);
+        PbdObjectCutting cuttingPair = new PbdObjectCutting(clothObj, cutObj);
 
         // Device Sever
         HapticDeviceManager server = new HapticDeviceManager();

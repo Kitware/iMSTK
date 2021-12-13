@@ -21,7 +21,6 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCollisionHandling.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -214,7 +213,7 @@ main()
         pbdInteraction = std::make_shared<PbdObjectCollision>(clothObj, collisionObj, "PointSetToCapsuleCD");
         pbdInteraction->setFriction(0.4);
         pbdInteraction->setRestitution(0.0); // Inelastic collision
-        scene->getCollisionGraph()->addInteraction(pbdInteraction);
+        scene->addInteraction(pbdInteraction);
 
         // Adjust camera
         scene->getActiveCamera()->setFocalPoint(0.0, -2.0, 0.0);

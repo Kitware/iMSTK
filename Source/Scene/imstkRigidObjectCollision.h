@@ -21,9 +21,7 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionPair.h"
-
-#include <string>
+#include "imstkCollisionInteraction.h"
 
 namespace imstk
 {
@@ -37,11 +35,14 @@ template<typename T, int N> class VecDataArray;
 /// This involves a RigidObjCH which will generate 2 way or 1 way constraints for the RigidBodyModel/s
 /// depending on which system they belong too
 ///
-class RigidObjectCollision : public CollisionPair
+class RigidObjectCollision : public CollisionInteraction
 {
 public:
     RigidObjectCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
     virtual ~RigidObjectCollision() override = default;
+
+public:
+    virtual const std::string getTypeName() const override { return "RigidObjectCollision"; }
 
 public:
     void setStiffness(double stiffness);
@@ -51,7 +52,10 @@ public:
     const double getFriction() const;
 
 public:
-    void apply() override;
+    ///
+    /// \brief Setup connectivity of task graph
+    ///
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
     void copyVertsToPrevious();
 
@@ -59,5 +63,9 @@ public:
 
 public:
     std::shared_ptr<VecDataArray<double, 3>> m_prevVertices;
+
+protected:
+    std::shared_ptr<TaskNode> m_copyVertToPrevNode      = nullptr;
+    std::shared_ptr<TaskNode> m_computeDisplacementNode = nullptr;
 };
 }

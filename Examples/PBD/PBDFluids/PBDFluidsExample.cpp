@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
@@ -219,8 +218,7 @@ main()
         scene->addSceneObject(floorObj);
 
         // Collisions
-        auto collisionInteraction = std::make_shared<PbdObjectCollision>(fluidObj, floorObj);
-        scene->getCollisionGraph()->addInteraction(collisionInteraction);
+        scene->addInteraction(std::make_shared<PbdObjectCollision>(fluidObj, floorObj));
     }
 
     // Run the simulation

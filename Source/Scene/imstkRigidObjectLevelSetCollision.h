@@ -21,7 +21,7 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionPair.h"
+#include "imstkCollisionInteraction.h"
 
 namespace imstk
 {
@@ -35,19 +35,29 @@ template<typename T, int N> class VecDataArray;
 /// \brief This class defines a collision interaction pipeline between a
 /// RigidObject and LevelSetDeformableObject.
 ///
-class RigidObjectLevelSetCollision : public CollisionPair
+class RigidObjectLevelSetCollision : public CollisionInteraction
 {
 public:
     RigidObjectLevelSetCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2);
     virtual ~RigidObjectLevelSetCollision() override = default;
 
 public:
-    void apply() override;
+    virtual const std::string getTypeName() const override { return "RigidObjectLevelSetCollision"; }
+
+public:
+    ///
+    /// \brief Setup connectivity of task graph
+    ///
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
     void copyVertsToPrevious();
     void measureDisplacementFromPrevious();
 
 public:
     std::shared_ptr<VecDataArray<double, 3>> m_prevVertices;
+
+protected:
+    std::shared_ptr<TaskNode> m_copyVertToPrevNode      = nullptr;
+    std::shared_ptr<TaskNode> m_computeDisplacementNode = nullptr;
 };
 }

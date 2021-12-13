@@ -32,7 +32,8 @@ namespace imstk
 {
 // Pbd Collision will be tested before any step of pbd, then resolved after the solve steps of the two objects
 SphObjectCollision::SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                                       std::string cdType) : CollisionPair(obj1, obj2)
+                                       std::string cdType) :
+    CollisionInteraction("SphObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2)
 {
     // Setup the CD
     std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
@@ -49,10 +50,33 @@ SphObjectCollision::SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::sha
     setCollisionHandlingA(ch);
 
     // Collision should happen after positions and velocities are computed
-    m_taskNodeInputs.first.push_back(obj1->getUpdateGeometryNode());
-    m_taskNodeInputs.second.push_back(obj2->getUpdateNode());
+    m_taskGraph->addNode(obj1->getUpdateGeometryNode());
+    m_taskGraph->addNode(obj2->getUpdateGeometryNode());
 
-    m_taskNodeOutputs.first.push_back(obj1->getTaskGraph()->getSink());
-    m_taskNodeOutputs.second.push_back(obj2->getTaskGraph()->getSink());
+    m_taskGraph->addNode(obj1->getTaskGraph()->getSink());
+    m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
+}
+
+void
+SphObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+{
+    CollisionInteraction::initGraphEdges(source, sink);
+
+    auto sphObj1 = std::dynamic_pointer_cast<SPHObject>(m_objA);
+
+    //
+    // ...SPH steps...
+    // Update Geometry A                  Update Geometry B
+    //                 Collision Detection
+    //                 Collision Handling A
+    //    objA Sink                          objB Sink
+    //
+    m_taskGraph->addEdge(sphObj1->getUpdateGeometryNode(), m_collisionDetectionNode);
+    m_taskGraph->addEdge(m_objB->getUpdateGeometryNode(), m_collisionDetectionNode);
+
+    m_taskGraph->addEdge(m_collisionDetectionNode, m_collisionHandleANode);
+
+    m_taskGraph->addEdge(m_collisionHandleANode, sphObj1->getTaskGraph()->getSink());
+    m_taskGraph->addEdge(m_collisionHandleANode, m_objB->getTaskGraph()->getSink());
 }
 }

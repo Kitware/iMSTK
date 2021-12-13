@@ -21,7 +21,6 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
@@ -42,6 +41,9 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
+
+#include "imstkTaskNode.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 
 using namespace imstk;
 
@@ -213,14 +215,14 @@ main()
     // Add collision for both jaws of the tool
     auto upperJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objUpperJaw, "SurfaceMeshToCapsuleCD");
     auto lowerJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objLowerJaw, "SurfaceMeshToCapsuleCD");
-    scene->getCollisionGraph()->addInteraction(upperJawCollision);
-    scene->getCollisionGraph()->addInteraction(lowerJawCollision);
+    scene->addInteraction(upperJawCollision);
+    scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
     auto upperJawPicking = std::make_shared<PbdObjectPicking>(clothObj, objUpperJaw, "PointSetToCapsuleCD");
     auto lowerJawPicking = std::make_shared<PbdObjectPicking>(clothObj, objLowerJaw, "PointSetToCapsuleCD");
-    scene->getCollisionGraph()->addInteraction(upperJawPicking);
-    scene->getCollisionGraph()->addInteraction(lowerJawPicking);
+    scene->addInteraction(upperJawPicking);
+    scene->addInteraction(lowerJawPicking);
 
     // Camera
     scene->getActiveCamera()->setPosition(Vec3d(1.0, 1.0, 1.0) * 100.0);
@@ -271,21 +273,25 @@ main()
             [&](Event*)
         {
             LOG(INFO) << "Jaw Closed!";
-            auto chUpper = std::dynamic_pointer_cast<PBDPickingCH>(upperJawPicking->getCollisionHandlingA());
-            auto chLower = std::dynamic_pointer_cast<PBDPickingCH>(lowerJawPicking->getCollisionHandlingA());
 
-            chUpper->beginPick();
-            chLower->beginPick();
+            upperJawCollision->getCollisionDetectionNode()->setEnabled(false);
+            upperJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
+            upperJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
+            lowerJawCollision->getCollisionDetectionNode()->setEnabled(false);
+            lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
+            lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
+
+            upperJawPicking->beginPick();
+            lowerJawPicking->beginPick();
             });
         connect<Event>(controller, &LaparoscopicToolController::JawOpened,
             [&](Event*)
         {
             LOG(INFO) << "Jaw Opened!";
-            auto chUpper = std::dynamic_pointer_cast<PBDPickingCH>(upperJawPicking->getCollisionHandlingA());
-            auto chLower = std::dynamic_pointer_cast<PBDPickingCH>(lowerJawPicking->getCollisionHandlingA());
 
-            chUpper->endPick();
-            chLower->endPick();
+            upperJawCollision->getCollisionDetectionNode()->setEnabled(true);
+            upperJawPicking->endPick();
+            lowerJawPicking->endPick();
             });
 
         driver->start();

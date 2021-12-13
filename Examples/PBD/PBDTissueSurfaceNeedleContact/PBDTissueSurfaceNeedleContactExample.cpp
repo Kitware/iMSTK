@@ -21,7 +21,6 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionDetectionAlgorithm.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkImageData.h"
 #include "imstkIsometricMap.h"
@@ -337,8 +336,7 @@ main()
     ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.3);
     scene->addSceneObject(ghostToolObj);
 
-    auto interaction = std::make_shared<NeedleInteraction>(tissueObj, toolObj);
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(std::make_shared<NeedleInteraction>(tissueObj, toolObj));
 
     // Light
     imstkNew<DirectionalLight> light;
@@ -400,8 +398,8 @@ main()
 
             Vec3d virtualForce;
             {
-                const Vec3d fS = (desiredPos - toolObj->getRigidBody()->getPosition()) * 1000.0;   // Spring force
-                const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                  // Spring damping
+                const Vec3d fS = (desiredPos - toolObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
+                const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                    // Spring damping
 
                 const Quatd dq       = desiredOrientation * toolObj->getRigidBody()->getOrientation().inverse();
                 const Rotd angleAxes = Rotd(dq);

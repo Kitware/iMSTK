@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCompositeImplicitGeometry.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -59,7 +58,8 @@ main()
     // Write log to stdout and file
     Logger::startLogger();
 
-    imstkNew<Scene>        scene("Rigid Body Dynamics");
+    imstkNew<Scene> scene("Rigid Body Dynamics");
+    scene->getConfig()->writeTaskGraph = true;
     imstkNew<RigidObject2> cubeObj("Cube");
     {
         // This model is shared among interacting rigid bodies
@@ -141,7 +141,7 @@ main()
         auto rbdInteraction = std::make_shared<RigidObjectCollision>(cubeObj, planeObj, "ImplicitGeometryToPointSetCD");
         rbdInteraction->setFriction(0.0); // Don't use friction
         rbdInteraction->setStiffness(0.05);
-        scene->getCollisionGraph()->addInteraction(rbdInteraction);
+        scene->addInteraction(rbdInteraction);
 
         // Camera
         scene->getActiveCamera()->setPosition(0.0, 40.0, 40.0);

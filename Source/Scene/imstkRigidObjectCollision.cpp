@@ -34,7 +34,8 @@ limitations under the License.
 namespace imstk
 {
 RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1, std::shared_ptr<CollidingObject> obj2,
-                                           std::string cdType) : CollisionPair(rbdObj1, obj2)
+                                           std::string cdType) :
+    CollisionInteraction("RigidObjectCollision" + rbdObj1->getName() + "_vs_" + obj2->getName(), rbdObj1, obj2)
 {
     std::shared_ptr<RigidBodyModel2> model1 = rbdObj1->getRigidBodyModel2();
 
@@ -43,41 +44,57 @@ RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1
     cd->setInput(obj2->getCollidingGeometry(), 1);
     setCollisionDetection(cd);
 
+    // Only one handler is used, this means we only support one-way collisions or two-way
+    // If you want two one-way's, use two RigidObjectCollisions
     auto ch = std::make_shared<RigidBodyCH>();
     ch->setInputCollisionData(cd->getCollisionData());
     ch->setInputObjectA(rbdObj1);
     ch->setInputObjectB(obj2);
 
+    m_copyVertToPrevNode = std::make_shared<TaskNode>([ = ]()
+        {
+            copyVertsToPrevious();
+        }, "CopyVertsToPrevious");
+    m_taskGraph->addNode(m_copyVertToPrevNode);
+    m_computeDisplacementNode = std::make_shared<TaskNode>([ = ]()
+        {
+            measureDisplacementFromPrevious();
+        }, "ComputeDisplacements");
+    m_taskGraph->addNode(m_computeDisplacementNode);
+
     if (auto rbdObj2 = std::dynamic_pointer_cast<RigidObject2>(obj2))
     {
         std::shared_ptr<RigidBodyModel2> model2 = rbdObj2->getRigidBodyModel2();
 
-        // Here we use RigidBodyCH which generates constraints for the rigid body model
-        // This step is done *after* tentative velocities have been computed but *before*
-        // constraints and new velocities are solved.
+        // These could possibly be the same node if they belong to the same system
+        // Handled implicitly
+        m_taskGraph->addNode(model1->getComputeTentativeVelocitiesNode());
+        m_taskGraph->addNode(model2->getComputeTentativeVelocitiesNode());
 
-        // Define where collision interaction happens
-        m_taskNodeInputs.first.push_back(model1->getComputeTentativeVelocitiesNode());
-        m_taskNodeInputs.second.push_back(model2->getComputeTentativeVelocitiesNode());
-
-        m_taskNodeOutputs.first.push_back(model1->getSolveNode());
-        m_taskNodeOutputs.second.push_back(model2->getSolveNode());
+        m_taskGraph->addNode(model1->getSolveNode());
+        m_taskGraph->addNode(model2->getSolveNode());
 
         setCollisionHandlingAB(ch);
     }
     else
     {
         // Define where collision interaction happens
-        m_taskNodeInputs.first.push_back(model1->getComputeTentativeVelocitiesNode());
-        m_taskNodeInputs.second.push_back(obj2->getTaskGraph()->getSource());
+        m_taskGraph->addNode(model1->getComputeTentativeVelocitiesNode());
+        m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
 
-        m_taskNodeOutputs.first.push_back(model1->getSolveNode());
-        m_taskNodeOutputs.second.push_back(obj2->getUpdateNode());
+        m_taskGraph->addNode(model1->getSolveNode());
+        m_taskGraph->addNode(obj2->getUpdateNode());
 
         // Setup the handlers for only A and inform CD it only needs to generate A
         cd->setGenerateCD(true, false);
         setCollisionHandlingA(ch);
     }
+
+    m_taskGraph->addNode(rbdObj1->getUpdateGeometryNode());
+    m_taskGraph->addNode(rbdObj1->getTaskGraph()->getSource());
+    m_taskGraph->addNode(rbdObj1->getTaskGraph()->getSink());
+    m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
+    m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
 }
 
 void
@@ -105,41 +122,70 @@ RigidObjectCollision::getFriction() const
 }
 
 void
-RigidObjectCollision::apply()
+RigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    CollisionPair::apply();
+    CollisionInteraction::initGraphEdges(source, sink);
 
-    auto                             obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objects.first);
-    std::shared_ptr<RigidBodyModel2> rbdModel = obj1->getRigidBodyModel2();
-    std::shared_ptr<PointSet>        pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
-    const bool                       measureDisplacements = (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"));
+    auto                             rbdObj1   = std::dynamic_pointer_cast<RigidObject2>(m_objA);
+    std::shared_ptr<RigidBodyModel2> rbdModel1 = rbdObj1->getRigidBodyModel2();
+
+    std::shared_ptr<TaskNode> handlerABNode = m_collisionHandleANode;
+
+    if (auto rbdObj2 = std::dynamic_pointer_cast<RigidObject2>(m_objB))
+    {
+        std::shared_ptr<RigidBodyModel2> rbdModel2 = rbdObj2->getRigidBodyModel2();
+
+        // Note: ComputeTenative and RbdModel may be the same
+        // ComputeTenative Velocities 1   ComputeTenative Velocities 2
+        //                   Collision Detection
+        //                   Collision Handling
+        //       Rbd Solve 1                      Rbd Solve 2
+        m_taskGraph->addEdge(rbdModel1->getComputeTentativeVelocitiesNode(), m_collisionDetectionNode);
+        m_taskGraph->addEdge(rbdModel2->getComputeTentativeVelocitiesNode(), m_collisionDetectionNode);
+
+        m_taskGraph->addEdge(m_collisionDetectionNode, handlerABNode);
+        m_taskGraph->addEdge(handlerABNode, rbdModel1->getSolveNode());
+        m_taskGraph->addEdge(handlerABNode, rbdModel2->getSolveNode());
+    }
+    else
+    {
+        // Note: ComputeTenative and RbdModel may be the same
+        // ComputeTenative Velocities 1   CollidingObject Source
+        //                   Collision Detection
+        //       Collision Handling         \
+        //       Rbd Solve 1               CollidingObject Update
+        m_taskGraph->addEdge(rbdModel1->getComputeTentativeVelocitiesNode(), m_collisionDetectionNode);
+        m_taskGraph->addEdge(m_objB->getTaskGraph()->getSource(), m_collisionDetectionNode);
+
+        m_taskGraph->addEdge(m_collisionDetectionNode, handlerABNode);
+        m_taskGraph->addEdge(handlerABNode, rbdModel1->getSolveNode());
+        m_taskGraph->addEdge(m_collisionDetectionNode, m_objB->getUpdateNode());
+    }
+
+    // \todo: This should be handled differently (per object, not per interaction)
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(rbdObj1->getPhysicsGeometry());
+    const bool                measureDisplacements = (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"));
 
     // The tentative body is never actually computed, it should be good to catch the contact
     // in the next frame
     if (measureDisplacements)
     {
         // 1.) Copy the vertices at the start of the frame
-        obj1->getTaskGraph()->insertBefore(obj1->getRigidBodyModel2()->getComputeTentativeVelocitiesNode(),
-            std::make_shared<TaskNode>([ = ]()
-            {
-                copyVertsToPrevious();
-                }, "CopyVertsToPrevious"));
+        m_taskGraph->addEdge(rbdObj1->getTaskGraph()->getSource(), m_copyVertToPrevNode);
+        m_taskGraph->addEdge(m_copyVertToPrevNode, rbdObj1->getRigidBodyModel2()->getComputeTentativeVelocitiesNode());
 
         // If you were to update to tentative, you'd do it here, then compute displacements
 
         // 2.) Compute the displacements after updating geometry
-        obj1->getTaskGraph()->insertAfter(obj1->getUpdateGeometryNode(),
-            std::make_shared<TaskNode>([ = ]()
-            {
-                measureDisplacementFromPrevious();
-                }, "ComputeDisplacements"));
+        m_taskGraph->addEdge(rbdObj1->getUpdateGeometryNode(), m_computeDisplacementNode);
+        m_taskGraph->addEdge(m_computeDisplacementNode, rbdObj1->getTaskGraph()->getSink());
     }
 }
 
 void
 RigidObjectCollision::copyVertsToPrevious()
 {
-    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objects.first);
+    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objA);
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
 
     if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))
@@ -159,7 +205,7 @@ RigidObjectCollision::copyVertsToPrevious()
 void
 RigidObjectCollision::measureDisplacementFromPrevious()
 {
-    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objects.first);
+    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objA);
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
 
     if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))

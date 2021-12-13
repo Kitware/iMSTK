@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkImageDistanceTransform.h"
 #include "imstkKeyboardSceneControl.h"
@@ -232,7 +231,7 @@ main()
         scene->addSceneObject(sphObj);
 
         // Interaction
-        scene->getCollisionGraph()->addInteraction(
+        scene->addInteraction(
             std::make_shared<SphObjectCollision>(sphObj, legsObj));
 
         // Light

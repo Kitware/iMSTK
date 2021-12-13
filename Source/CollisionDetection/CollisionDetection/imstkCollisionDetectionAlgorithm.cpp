@@ -23,13 +23,11 @@
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCollisionData.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkTaskNode.h"
 
 namespace imstk
 {
 CollisionDetectionAlgorithm::CollisionDetectionAlgorithm() : GeometryAlgorithm(),
-    m_colData(std::make_shared<CollisionData>()),
-    m_taskNode(std::make_shared<TaskNode>(std::bind(&CollisionDetectionAlgorithm::update, this), "CollisionDetection"))
+    m_colData(std::make_shared<CollisionData>())
 {
     setNumberOfInputPorts(2);
 }

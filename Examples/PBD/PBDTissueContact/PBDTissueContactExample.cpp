@@ -20,9 +20,9 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDirectionalLight.h"
 #include "imstkImageData.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
@@ -333,6 +333,7 @@ main()
     scene->getActiveCamera()->setPosition(0.12, 4.51, 16.51);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
+    scene->getConfig()->writeTaskGraph = true;
 
     // Setup a tissue
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
@@ -348,13 +349,13 @@ main()
     // tissue deforms)
     auto interaction = std::make_shared<PbdRigidObjectCollision>(tissueObj, toolObj, "MeshToMeshBruteForceCD");
     std::dynamic_pointer_cast<MeshToMeshBruteForceCD>(interaction->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(interaction);
 #else
     // With PbdObjectCollision we only have one-way coupling
     // The toolObj does not respond to the tissue (only the tissueObj responds to the tool, moving out of the way)
     auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, toolObj);
     std::dynamic_pointer_cast<MeshToMeshBruteForceCD>(interaction->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(interaction);
 #endif
 
     // Light
@@ -388,11 +389,11 @@ main()
 
         imstkNew<RigidObjectController> controller(toolObj, hapticDeviceClient);
         controller->setTranslationScaling(0.05);
-        controller->setLinearKs(1000.0);
-        controller->setLinearKd(50.0);
+        controller->setLinearKs(5000.0);
+        controller->setLinearKd(100.0);
         controller->setAngularKs(10000000.0);
         controller->setAngularKd(500000.0);
-        controller->setForceScaling(0.005);
+        controller->setForceScaling(0.0025);
         controller->setUseForceSmoothening(true);
         scene->addController(controller);
 #else
@@ -401,12 +402,31 @@ main()
             const Vec2d mousePos = viewer->getMouseDevice()->getPos();
             const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
 
-            const Vec3d fS = (worldPos - toolObj->getRigidBody()->getPosition()) * 1000.0; // Spring force
-            const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;              // Spring damping
+            const Vec3d fS = (worldPos - toolObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
+            const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                  // Spring damping
 
             (*toolObj->getRigidBody()->m_force) += (fS + fD);
             });
 #endif
+
+        // Toggle collision interaction in scene with key y
+        connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
+            [&](KeyEvent* e)
+        {
+            if (e->m_key == 'y')
+            {
+                if (scene->getSceneObject(interaction->getName()) != nullptr)
+                {
+                    scene->removeSceneObject(interaction);
+                }
+                else
+                {
+                    scene->addInteraction(interaction);
+                }
+                scene->buildTaskGraph();
+                scene->initTaskGraph();
+            }
+            });
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {

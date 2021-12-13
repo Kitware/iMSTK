@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -164,7 +163,7 @@ main()
             auto rbdInteraction = std::make_shared<RigidObjectCollision>(rigidObjects[i], floorObj, "SurfaceMeshToSphereCD");
             rbdInteraction->setFriction(0.0);
             rbdInteraction->setStiffness(0.0001);
-            scene->getCollisionGraph()->addInteraction(rbdInteraction);
+            scene->addInteraction(rbdInteraction);
         }
 
         for (int i = 0; i < rbdObjCount; i++)
@@ -174,7 +173,7 @@ main()
                 auto rbdInteraction = std::make_shared<RigidObjectCollision>(rigidObjects[i], rigidObjects[j], "SphereToSphereCD");
                 rbdInteraction->setFriction(0.0);
                 rbdInteraction->setStiffness(0.0001);
-                scene->getCollisionGraph()->addInteraction(rbdInteraction);
+                scene->addInteraction(rbdInteraction);
             }
         }
     }
@@ -240,7 +239,7 @@ main()
                         Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
                 const Vec3d rayStart = scene->getActiveCamera()->getPosition();
 
-                double minDist = IMSTK_DOUBLE_MAX; // Use the closest picked sphere
+                double minDist = IMSTK_DOUBLE_MAX;     // Use the closest picked sphere
                 for (int i = 0; i < rbdObjCount; i++)
                 {
                     auto sphere = std::dynamic_pointer_cast<Sphere>(rigidObjects[i]->getPhysicsGeometry());
@@ -272,7 +271,7 @@ main()
             [&](Event*)
         {
             // Keep cube updating at real time
-            std::shared_ptr<RigidBodyModel2> rbdModel = rigidObjects[0]->getRigidBodyModel2(); // All bodies share a model
+            std::shared_ptr<RigidBodyModel2> rbdModel = rigidObjects[0]->getRigidBodyModel2();     // All bodies share a model
             const double dt = rbdModel->getConfig()->m_dt = sceneManager->getDt();
 
             if (sphereSelected != -1)
@@ -287,8 +286,8 @@ main()
                 auto sphere = std::dynamic_pointer_cast<Sphere>(rigidObjects[sphereSelected]->getPhysicsGeometry());
                 Vec3d iPt;
                 CollisionUtils::testRayToPlane(rayStart, rayDir, planePos, scene->getActiveCamera()->getForward(), iPt);
-                const Vec3d fS = (iPt - sphere->getPosition()) * 100.0;                               // Spring force
-                const Vec3d fD = -rigidObjects[sphereSelected]->getRigidBody()->getVelocity() * 10.0; // Spring damping
+                const Vec3d fS = (iPt - sphere->getPosition()) * 100.0;                                   // Spring force
+                const Vec3d fD = -rigidObjects[sphereSelected]->getRigidBody()->getVelocity() * 10.0;     // Spring damping
                 *rigidObjects[sphereSelected]->getRigidBody()->m_force += (fS + fD);
             }
         });

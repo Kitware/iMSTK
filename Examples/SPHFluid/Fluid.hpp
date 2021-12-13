@@ -185,7 +185,7 @@ generateFluid(const double particleRadius)
     geometry->initialize(particles);
 
     // Create a fluids object
-    imstkNew<SPHObject> fluidObj("Sphere");
+    imstkNew<SPHObject> fluidObj("SPHSphere");
 
     // Create a visual model
     imstkNew<VisualModel> visualModel(geometry.get());

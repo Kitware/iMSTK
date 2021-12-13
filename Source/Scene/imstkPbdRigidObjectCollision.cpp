@@ -35,7 +35,8 @@ limitations under the License.
 namespace imstk
 {
 PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<RigidObject2> obj2,
-                                                 std::string cdType) : CollisionPair(obj1, obj2)
+                                                 std::string cdType) :
+    CollisionInteraction("PbdRigidObjectCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2)
 {
     std::shared_ptr<PbdModel> pbdModel1 = obj1->getPbdModel();
 
@@ -50,7 +51,6 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
     pbdCH->setInputObjectA(obj1);
     pbdCH->setInputObjectB(obj2);
     pbdCH->setInputCollisionData(cd->getCollisionData());
-    pbdCH->getTaskNode()->m_isCritical = true;
     setCollisionHandlingA(pbdCH);
 
     auto rbdCH = std::make_shared<RigidBodyCH>();
@@ -58,7 +58,6 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
     rbdCH->setInputCollidingObjectB(obj1);
     rbdCH->setInputCollisionData(cd->getCollisionData());
     rbdCH->setBeta(0.05);
-    rbdCH->getTaskNode()->m_isCritical = true;
     setCollisionHandlingB(rbdCH);
 
     // Setup compute node for collision solver (true/critical node)
@@ -67,12 +66,29 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
             std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->getCollisionSolver()->solve();
         },
         obj1->getName() + "_vs_" + obj2->getName() + "_PBDCollisionSolver", true);
+    m_taskGraph->addNode(m_pbdCollisionSolveNode);
 
     m_correctVelocitiesNode = std::make_shared<TaskNode>([&]()
         {
             std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->correctVelocities();
         },
         obj1->getName() + "_vs_" + obj2->getName() + "_PBDVelocityCorrect", true);
+    m_taskGraph->addNode(m_correctVelocitiesNode);
+
+    // Nodes from objectA
+    auto pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objA);
+    m_taskGraph->addNode(pbdObj->getPbdModel()->getTaskGraph()->getSource());
+    m_taskGraph->addNode(pbdObj->getPbdModel()->getSolveNode());
+    m_taskGraph->addNode(pbdObj->getPbdModel()->getUpdateVelocityNode());
+    m_taskGraph->addNode(pbdObj->getPbdModel()->getTaskGraph()->getSink());
+
+    // Nodes from objectB
+    auto rbdObj = std::dynamic_pointer_cast<RigidObject2>(m_objB);
+    m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getTaskGraph()->getSource());
+    m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getComputeTentativeVelocitiesNode());
+    m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getSolveNode());
+    m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getIntegrateNode());
+    m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getTaskGraph()->getSink());
 }
 
 void
@@ -100,13 +116,11 @@ PbdRigidObjectCollision::getFriction() const
 }
 
 void
-PbdRigidObjectCollision::apply()
+PbdRigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Add the collision solve step (which happens after internal constraint solve)
-    std::shared_ptr<TaskGraph> computeGraphA = m_objects.first->getTaskGraph();  // Pbd
-    std::shared_ptr<TaskGraph> computeGraphB = m_objects.second->getTaskGraph(); // Rbd
-
-    std::shared_ptr<CollisionDetectionAlgorithm> cd = m_colDetect;
+    std::shared_ptr<TaskNode> pbdHandlerNode = m_collisionHandleANode;
+    std::shared_ptr<TaskNode> rbdHandlerNode = m_collisionHandleBNode;
 
     // Because pbd solves directly on positions it would cause a race condition
     // if we were to solve rbd and pbd at the same time. Pbd won't write to the
@@ -114,49 +128,40 @@ PbdRigidObjectCollision::apply()
     // We solve rigid body before pbd, this way pbd has the most up to date positions
     // semi-implicit
 
-    auto                               pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objects.first);
-    std::shared_ptr<CollisionHandling> pbdCH  = m_colHandlingA;
-    {
-        // Add all our collision step nodes to pbd pipeline
-        computeGraphA->addNode(m_pbdCollisionSolveNode);
-        computeGraphA->addNode(m_collisionGeometryUpdateNode);
-        computeGraphA->addNode(pbdCH->getTaskNode());
-        computeGraphA->addNode(m_correctVelocitiesNode);
-        computeGraphA->addNode(m_colDetect->getTaskNode());
+    auto pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objA);
+    auto rbdObj = std::dynamic_pointer_cast<RigidObject2>(m_objB);
 
+    m_taskGraph->addEdge(source, pbdObj->getPbdModel()->getTaskGraph()->getSource());
+    m_taskGraph->addEdge(source, rbdObj->getRigidBodyModel2()->getTaskGraph()->getSource());
+    m_taskGraph->addEdge(pbdObj->getPbdModel()->getTaskGraph()->getSink(), sink);
+    m_taskGraph->addEdge(rbdObj->getRigidBodyModel2()->getTaskGraph()->getSink(), sink);
+
+    std::shared_ptr<CollisionHandling> pbdCH = m_colHandlingA;
+    {
         // InternalConstraint Solve -> Update Collision Geometry ->
         // Collision Detect -> Collision Handle -> Solve Collision ->
         // Update Pbd Velocity -> Correct Velocity -> PbdModelSink
-        computeGraphA->addEdge(pbdObj->getPbdModel()->getSolveNode(), m_collisionGeometryUpdateNode);
-        computeGraphA->addEdge(m_collisionGeometryUpdateNode, m_colDetect->getTaskNode());
-        computeGraphA->addEdge(m_colDetect->getTaskNode(), pbdCH->getTaskNode());
-        computeGraphA->addEdge(pbdCH->getTaskNode(), m_pbdCollisionSolveNode);
-        computeGraphA->addEdge(m_pbdCollisionSolveNode, pbdObj->getPbdModel()->getUpdateVelocityNode());
-        computeGraphA->addEdge(pbdObj->getPbdModel()->getUpdateVelocityNode(), m_correctVelocitiesNode);
-        computeGraphA->addEdge(m_correctVelocitiesNode, pbdObj->getPbdModel()->getTaskGraph()->getSink());
+        m_taskGraph->addEdge(pbdObj->getPbdModel()->getSolveNode(), m_collisionGeometryUpdateNode);
+        m_taskGraph->addEdge(m_collisionGeometryUpdateNode, m_collisionDetectionNode);
+        m_taskGraph->addEdge(m_collisionDetectionNode, pbdHandlerNode);
+        m_taskGraph->addEdge(pbdHandlerNode, m_pbdCollisionSolveNode);
+        m_taskGraph->addEdge(m_pbdCollisionSolveNode, pbdObj->getPbdModel()->getUpdateVelocityNode());
+        m_taskGraph->addEdge(pbdObj->getPbdModel()->getUpdateVelocityNode(), m_correctVelocitiesNode);
+        m_taskGraph->addEdge(m_correctVelocitiesNode, pbdObj->getPbdModel()->getTaskGraph()->getSink());
     }
 
-    auto                               rbdObj = std::dynamic_pointer_cast<RigidObject2>(m_objects.second);
-    std::shared_ptr<CollisionHandling> rbdCH  = m_colHandlingB;
+    std::shared_ptr<CollisionHandling> rbdCH = m_colHandlingB;
     {
-        //computeGraphB->addNode(m_collisionGeometryUpdateNode);
-        // Add all the nodes we'll need to rbd pipeline
-        computeGraphB->addNode(rbdCH->getTaskNode());
-        computeGraphB->addNode(m_colDetect->getTaskNode());
-        computeGraphB->addNode(m_pbdCollisionSolveNode);
-        computeGraphB->addNode(m_collisionGeometryUpdateNode);
-        computeGraphB->addNode(pbdCH->getTaskNode());
-
         // Compute Tentative Velocities -> Collision Detect ->
         // Collision Handle -> Constraint Solve
-        computeGraphB->addEdge(rbdObj->getRigidBodyModel2()->getComputeTentativeVelocitiesNode(), m_collisionGeometryUpdateNode);
-        computeGraphB->addEdge(m_collisionGeometryUpdateNode, m_colDetect->getTaskNode());
-        computeGraphB->addEdge(m_colDetect->getTaskNode(), rbdCH->getTaskNode());
-        computeGraphB->addEdge(m_colDetect->getTaskNode(), pbdCH->getTaskNode());
-        computeGraphB->addEdge(pbdCH->getTaskNode(), rbdObj->getRigidBodyModel2()->getSolveNode()); // Ensure we aren't handling PBD whilst solving RBD
-        computeGraphB->addEdge(rbdCH->getTaskNode(), rbdObj->getRigidBodyModel2()->getSolveNode());
-        computeGraphB->addEdge(rbdObj->getRigidBodyModel2()->getSolveNode(), m_pbdCollisionSolveNode);
-        computeGraphB->addEdge(m_pbdCollisionSolveNode, rbdObj->getRigidBodyModel2()->getIntegrateNode());
+        m_taskGraph->addEdge(rbdObj->getRigidBodyModel2()->getComputeTentativeVelocitiesNode(), m_collisionGeometryUpdateNode);
+        m_taskGraph->addEdge(m_collisionGeometryUpdateNode, m_collisionDetectionNode);
+        m_taskGraph->addEdge(m_collisionDetectionNode, rbdHandlerNode);
+        m_taskGraph->addEdge(m_collisionDetectionNode, pbdHandlerNode);
+        m_taskGraph->addEdge(pbdHandlerNode, rbdObj->getRigidBodyModel2()->getSolveNode()); // Ensure we aren't handling PBD whilst solving RBD
+        m_taskGraph->addEdge(rbdHandlerNode, rbdObj->getRigidBodyModel2()->getSolveNode());
+        m_taskGraph->addEdge(rbdObj->getRigidBodyModel2()->getSolveNode(), m_pbdCollisionSolveNode);
+        m_taskGraph->addEdge(m_pbdCollisionSolveNode, rbdObj->getRigidBodyModel2()->getIntegrateNode());
     }
 }
 }

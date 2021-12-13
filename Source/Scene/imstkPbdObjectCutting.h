@@ -21,14 +21,14 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkObjectInteractionPair.h"
-#include "imstkVecDataArray.h"
+#include "imstkCollisionInteraction.h"
 
 #include <unordered_set>
 #include <vector>
 
 namespace imstk
 {
+template<typename T, int N> class VecDataArray;
 class CollidingObject;
 class PbdObject;
 class SurfaceMesh;
@@ -37,18 +37,25 @@ class SurfaceMesh;
 /// \class PbdObjectCuttingPair
 ///
 /// \brief This class defines a cutting interaction between a PbdObject and a CollidingObject
-/// call apply to perform the cut given the current states of both objects
+/// call apply to perform the cut given the current states of both objects. A discrete cut is
+/// performed, not for calling continuously.
 ///
-class PbdObjectCuttingPair : public ObjectInteractionPair
+class PbdObjectCutting : public SceneObject
 {
 public:
-    PbdObjectCuttingPair(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj);
-    virtual ~PbdObjectCuttingPair() override = default;
+    PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj);
+    virtual ~PbdObjectCutting() override = default;
 
+public:
+    virtual const std::string getTypeName() const override { return "PbdObjectCutting"; }
+
+public:
+    ///
+    /// \brief Applies the cut when called
+    ///
     void apply();
 
 protected:
-
     ///
     /// \brief Add new vertices to pbdObj
     ///
@@ -76,6 +83,10 @@ protected:
     void modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
                          std::shared_ptr<std::vector<size_t>> elementIndices,
                          std::shared_ptr<VecDataArray<int, 3>> elements);
+
+protected:
+    std::shared_ptr<PbdObject>       m_objA = nullptr;
+    std::shared_ptr<CollidingObject> m_objB = nullptr;
 
     std::shared_ptr<std::unordered_set<size_t>> m_removeConstraintVertices = std::make_shared<std::unordered_set<size_t>>();
     std::shared_ptr<std::unordered_set<size_t>> m_addConstraintVertices    = std::make_shared<std::unordered_set<size_t>>();

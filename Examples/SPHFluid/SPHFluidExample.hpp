@@ -21,12 +21,10 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionDetectionAlgorithm.h"
-#include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkObjectInteractionFactory.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
@@ -88,7 +86,7 @@ main(int argc, char* argv[])
     // Collision between fluid and solid objects
     for (auto& solid : solids)
     {
-        scene->getCollisionGraph()->addInteraction(
+        scene->addInteraction(
             std::make_shared<SphObjectCollision>(fluidObj, solid));
     }
 

@@ -21,7 +21,7 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkObjectInteractionPair.h"
+#include "imstkSceneObject.h"
 
 namespace imstk
 {
@@ -31,46 +31,41 @@ class CollisionHandling;
 class CollidingObject;
 
 ///
-/// \class CollisionPair
+/// \class CollisionInteraction
 ///
-/// \brief CollisionPair is a specialization of InteractionPair that adds Handler functions.
-/// The handler functions precede the interaction node/step as their own computational node/step.
-/// The handler functions may be a singular handler node (that handles both AB concurrently) or
-/// two separate concurrent nodes.
+/// \brief Abstract class for defining collision interactions between objects
 ///
-class CollisionPair : public ObjectInteractionPair
+class CollisionInteraction : public SceneObject
 {
 public:
-    CollisionPair(std::shared_ptr<CollidingObject> objA, std::shared_ptr<CollidingObject> objB);
+    virtual ~CollisionInteraction() override = default;
 
-    ///
-    /// \brief Specifies a CollisionPair with two handles (one or both can be nullptr)
-    ///
-    CollisionPair(std::shared_ptr<CollidingObject> objA, std::shared_ptr<CollidingObject> objB,
-                  std::shared_ptr<CollisionDetectionAlgorithm> cd,
-                  std::shared_ptr<CollisionHandling> chA,
-                  std::shared_ptr<CollisionHandling> chB);
-
-    ///
-    /// \brief Specifies CollisionPair with an AB handler
-    ///
-    CollisionPair(std::shared_ptr<CollidingObject> objA, std::shared_ptr<CollidingObject> objB,
-                  std::shared_ptr<CollisionDetectionAlgorithm> cd,
-                  std::shared_ptr<CollisionHandling> chAB);
-
-    virtual ~CollisionPair() override = default;
+protected:
+    CollisionInteraction(std::string objName,
+                         std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2);
 
 public:
-    /// \brief TODO
     void setCollisionDetection(std::shared_ptr<CollisionDetectionAlgorithm> colDetect);
+
+    ///
+    /// \brief Set the Collision Handling for object A
+    ///
     void setCollisionHandlingA(std::shared_ptr<CollisionHandling> colHandlingA);
+
+    ///
+    /// \brief Set the Collision Handling for object B
+    ///
     void setCollisionHandlingB(std::shared_ptr<CollisionHandling> colHandlingB);
+
+    ///
+    /// \brief Set the two-way Collision Handling for both objects
+    ///
     void setCollisionHandlingAB(std::shared_ptr<CollisionHandling> colHandlingAB);
 
-    /// \brief TODO
     std::shared_ptr<CollisionDetectionAlgorithm> getCollisionDetection() const { return m_colDetect; }
     std::shared_ptr<CollisionHandling> getCollisionHandlingA() const { return m_colHandlingA; }
     std::shared_ptr<CollisionHandling> getCollisionHandlingB() const { return m_colHandlingB; }
+    std::shared_ptr<CollisionHandling> getCollisionHandlingAB() const { return m_colHandlingA; }
 
     std::shared_ptr<TaskNode> getCollisionDetectionNode() const { return m_collisionDetectionNode; }
     std::shared_ptr<TaskNode> getCollisionHandlingANode() const { return m_collisionHandleANode; }
@@ -78,11 +73,27 @@ public:
 
     void updateCollisionGeometry();
 
-public:
-    virtual void apply() override;
+protected:
+    ///
+    /// \brief Update collision
+    ///
+    void updateCD();
+
+    ///
+    /// \brief Update handler A
+    ///
+    void updateCHA();
+
+    ///
+    /// \brief Update handler B
+    ///
+    void updateCHB();
 
 protected:
-    std::shared_ptr<CollisionDetectionAlgorithm> m_colDetect = nullptr;    ///< Collision detection algorithm
+    std::shared_ptr<CollidingObject> m_objA = nullptr;
+    std::shared_ptr<CollidingObject> m_objB = nullptr;
+
+    std::shared_ptr<CollisionDetectionAlgorithm> m_colDetect = nullptr; ///< Collision detection algorithm
     std::shared_ptr<CollisionHandling> m_colHandlingA = nullptr;
     std::shared_ptr<CollisionHandling> m_colHandlingB = nullptr;
 

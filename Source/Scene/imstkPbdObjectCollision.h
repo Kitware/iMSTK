@@ -21,9 +21,7 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionPair.h"
-
-#include <string>
+#include "imstkCollisionInteraction.h"
 
 namespace imstk
 {
@@ -33,17 +31,20 @@ class PbdObject;
 /// \class PbdObjectCollision
 ///
 /// \brief This class defines a collision interaction between two PbdObjects
+/// or PbdObject & CollidingObject
 ///
-class PbdObjectCollision : public CollisionPair
+class PbdObjectCollision : public CollisionInteraction
 {
 public:
     ///
     /// \brief Constructor for PbdObject-PbdObject or PbdObject-CollidingObject collisions
     ///
     PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                       std::string cdType = "MeshToMeshBruteForceCD");
-
+                       std::string cdType  = "MeshToMeshBruteForceCD");
     virtual ~PbdObjectCollision() override = default;
+
+public:
+    virtual const std::string getTypeName() const override { return "PbdObjectCollision"; }
 
 public:
     void setRestitution(const double restitution);
@@ -53,9 +54,13 @@ public:
     const double getFriction() const;
 
 public:
-    void apply() override;
+    ///
+    /// \brief Setup connectivity of task graph
+    ///
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
+    // Steps introduced in interaction
     std::shared_ptr<TaskNode> m_collisionSolveNode    = nullptr;
     std::shared_ptr<TaskNode> m_correctVelocitiesNode = nullptr;
 };

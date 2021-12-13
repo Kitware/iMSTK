@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDebugGeometryObject.h"
 #include "imstkDirectionalLight.h"
 #include "imstkIsometricMap.h"
@@ -364,7 +363,7 @@ main()
 
     // This adds both contact and puncture functionality
     auto interaction = std::make_shared<NeedleInteraction>(tissueObj, toolObj);
-    scene->getCollisionGraph()->addInteraction(interaction);
+    scene->addInteraction(interaction);
 
     // Light
     imstkNew<DirectionalLight> light;
@@ -429,8 +428,8 @@ main()
 
             Vec3d virtualForce;
             {
-                const Vec3d fS = (desiredPos - toolObj->getRigidBody()->getPosition()) * 1000.0; // Spring force
-                const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                // Spring damping
+                const Vec3d fS = (desiredPos - toolObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
+                const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                    // Spring damping
 
                 const Quatd dq       = desiredOrientation * toolObj->getRigidBody()->getOrientation().inverse();
                 const Rotd angleAxes = Rotd(dq);

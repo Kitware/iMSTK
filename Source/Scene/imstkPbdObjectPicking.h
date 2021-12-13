@@ -21,30 +21,43 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionPair.h"
-
-#include <string>
+#include "imstkCollisionInteraction.h"
 
 namespace imstk
 {
 class CollidingObject;
 class PbdObject;
-class PbdSolver;
-class PbdObjectCollision;
 
 ///
 /// \class PbdObjectPicking
 ///
-/// \brief This class defines a picking interaction between a PbdObject and a CollidingObject with AnalyticalGeometry
+/// \brief This class defines a picking interaction between a PbdObject and
+/// a CollidingObject with AnalyticalGeometry. It does picking via vertex
+/// selection. The vertices are treated as infinite mass particles.
 ///
-class PbdObjectPicking : public CollisionPair
+class PbdObjectPicking : public CollisionInteraction
 {
 public:
     PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
     virtual ~PbdObjectPicking() override = default;
 
 public:
-    void apply() override;
+    virtual const std::string getTypeName() const override { return "PbdObjectPicking"; }
+
+public:
+    ///
+    /// \brief Remove all picking nodes and constraints
+    ///
+    void endPick();
+
+    ///
+    /// \brief Add picking nodes nodes and constraints
+    ///
+    void beginPick();
+
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+
+    std::shared_ptr<TaskNode> getPickingNode() const { return m_pickingNode; }
 
 protected:
     std::shared_ptr<TaskNode> m_pickingNode = nullptr;

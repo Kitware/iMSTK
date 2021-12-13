@@ -35,9 +35,9 @@ namespace imstk
 {
 class Camera;
 class CameraController;
-class CollisionGraph;
 class IBLProbe;
 class Light;
+class ObjectInteractionPair;
 class SceneObject;
 class TaskGraph;
 class TaskGraphController;
@@ -154,7 +154,12 @@ public:
     std::shared_ptr<SceneObject> getSceneObject(const std::string& sceneObjectName) const;
 
     ///
-    /// \brief Add/remove a scene object
+    /// \brief Add an interaction
+    ///
+    void addInteraction(std::shared_ptr<SceneObject> interaction);
+
+    ///
+    /// \brief Add a scene object
     ///
     void addSceneObject(std::shared_ptr<SceneObject> newSceneObject);
 
@@ -245,11 +250,6 @@ public:
     void removeCamera(const std::string name);
 
     ///
-    /// \brief Return the collision graph of the scene
-    ///
-    std::shared_ptr<CollisionGraph> getCollisionGraph() const { return m_collisionGraph; }
-
-    ///
     /// \brief Add objects controller
     ///
     void addController(std::shared_ptr<TrackingDeviceControl> controller);
@@ -290,7 +290,6 @@ protected:
     std::unordered_map<std::string, std::shared_ptr<Camera>> m_cameras;
     std::shared_ptr<Camera> m_activeCamera;
 
-    std::shared_ptr<CollisionGraph> m_collisionGraph;
     std::vector<std::shared_ptr<TrackingDeviceControl>> m_trackingControllers; ///> List of object controllers
 
     std::shared_ptr<TaskGraph> m_taskGraph;                                    ///> Computational graph

@@ -24,6 +24,7 @@
 #include "imstkCollisionHandling.h"
 
 #include "imstkMath.h"
+
 namespace imstk
 {
 class CollidingObject;
@@ -35,8 +36,9 @@ class CollisionData;
 /// \class PBDPickingCH
 ///
 /// \brief Implements nodal picking for PBD object via PointPointCollisionConstraints
-/// All points inside the pickObj are constrained with PointPointConstraints constraining
-/// them to their relative position when they were picked
+/// All points inside the pickObj are constrained with PointPointConstraints keeping
+/// them relative to their initial position when they were picked. Their invMasses are
+/// also set to 0 to treat as infinite mass.
 ///
 class PBDPickingCH : public CollisionHandling
 {

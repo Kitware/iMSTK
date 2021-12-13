@@ -159,14 +159,9 @@
  * Scene
  */
 #include "imstkScene.h"
-#include "imstkCollisionGraph.h"
-#include "imstkObjectInteractionPair.h"
-#include "imstkObjectInteractionFactory.h"
-#include "imstkCollisionPair.h"
+#include "imstkCollisionInteraction.h"
 #include "imstkRigidObjectCollision.h"
-#include "imstkInteractionPair.h"
-#include "imstkObjectInteractionPair.h"
-#include "imstkPbdObjectCuttingPair.h"
+#include "imstkPbdObjectCutting.h"
 #include "imstkPbdRigidObjectCollision.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkSphObjectCollision.h"
@@ -314,7 +309,6 @@ namespace std
 %include "../../DynamicalModels/InternalForceModel/imstkInternalForceModelTypes.h"
 %include "../../DynamicalModels/ObjectModels/imstkFEMDeformableBodyModel.h"
 %include "../../DynamicalModels/ObjectModels/imstkSPHBoundaryConditions.h"
-/* %include "../../DynamicalModels/ObjectModels/imstkSPHHemorrhage.h" */
 %include "../../DynamicalModels/TimeIntegrators/imstkTimeIntegrator.h"
 %include "../../DynamicalModels/TimeIntegrators/imstkBackwardEuler.h"
 %include "../../DynamicalModels/ObjectStates/imstkRigidBodyState2.h"
@@ -349,7 +343,6 @@ namespace std
 /*
  * CollisionDetection
  */
-/* %include "../../CollisionDetection/CollisionDetection/imstkCollisionDetection.h"; */
 %include "../../CollisionDetection/CollisionData/imstkCollisionData.h";
 %include "../../CollisionDetection/CollisionDetection/imstkCollisionDetectionAlgorithm.h"
 %include "../../CollisionDetection/CollisionDetection/imstkBidirectionalPlaneToSphereCD.h"
@@ -390,13 +383,9 @@ namespace std
  * Scene
  */
 %include "../../Scene/imstkScene.h";
-%include "../../Scene/imstkCollisionGraph.h";
-%include "../../Scene/imstkInteractionPair.h"
-%include "../../Scene/imstkObjectInteractionPair.h";
-%include "../../Scene/imstkObjectInteractionFactory.h";
-%include "../../Scene/imstkCollisionPair.h";
-%include "../../Scene/imstkRigidObjectCollision.h";
-%include "../../Scene/imstkPbdObjectCuttingPair.h"
+%include "../../Scene/imstkCollisionInteraction.h"
+%include "../../Scene/imstkRigidObjectCollision.h"
+%include "../../Scene/imstkPbdObjectCutting.h"
 %include "../../Scene/imstkPbdRigidObjectCollision.h"
 %include "../../Scene/imstkPbdObjectCollision.h"
 %include "../../Scene/imstkSphObjectCollision.h"
