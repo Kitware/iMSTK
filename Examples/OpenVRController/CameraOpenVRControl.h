@@ -37,7 +37,7 @@ using namespace imstk;
 /// \class CameraOpenVRControl
 ///
 /// \brief Controls pose of a camera given two trackpads from OpenVRDeviceClient's
-/// 
+///
 ///
 class CameraOpenVRControl : public DeviceControl
 {
@@ -60,19 +60,19 @@ public:
 
     ///
     /// \brief Get/Set the device that can translate the camera
-    /// 
-    void setTranslateDevice(std::shared_ptr<OpenVRDeviceClient> translateDevice) { m_translateDevice  = translateDevice; }
+    ///
+    void setTranslateDevice(std::shared_ptr<OpenVRDeviceClient> translateDevice) { m_translateDevice = translateDevice; }
     std::shared_ptr<OpenVRDeviceClient> getTranslateDevice() const { return m_translateDevice; }
 
     ///
     /// \brief Get/Set the device that can rotate the camera
-    /// 
+    ///
     void setRotateDevice(std::shared_ptr<OpenVRDeviceClient> rotateDevice) { m_rotateDevice = rotateDevice; }
     std::shared_ptr<OpenVRDeviceClient> getRotateDevice() const { return m_rotateDevice; }
 
     ///
     /// \brief Get/Set the camera to be controlled
-    /// 
+    ///
     void setCamera(std::shared_ptr<Camera> camera) { m_camera = camera; }
     std::shared_ptr<Camera> getCamera() const { return m_camera; }
 
@@ -86,11 +86,11 @@ public:
 
 protected:
     std::shared_ptr<OpenVRDeviceClient> m_translateDevice = nullptr;
-    std::shared_ptr<OpenVRDeviceClient> m_rotateDevice = nullptr;
+    std::shared_ptr<OpenVRDeviceClient> m_rotateDevice    = nullptr;
 
     std::shared_ptr<Camera> m_camera = nullptr;
 
     // User changeable values
-    double m_rotateSpeedScale = 1.0;
+    double m_rotateSpeedScale    = 1.0;
     double m_translateSpeedScale = 1.0;
 };

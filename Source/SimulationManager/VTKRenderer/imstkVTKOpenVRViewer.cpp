@@ -204,8 +204,8 @@ VTKOpenVRViewer::updateModule()
 
     // For the VR view we can't supply the a camera in the normal sense
     // we need to pre multiply a "user view"
-    std::shared_ptr<Camera> cam = getActiveScene()->getActiveCamera();
-    const Mat4d& view = cam->getView();
+    std::shared_ptr<Camera> cam  = getActiveScene()->getActiveCamera();
+    const Mat4d&            view = cam->getView();
     setPhysicalToWorldTransform(view);
 
     // Update Camera

@@ -170,7 +170,7 @@ main()
         //        timer.start();
         //    });
         viewer->init();
-        while(true)
+        while (true)
         {
             double ms = timer.getTimeElapsed();
             printf("%f\n", ms);

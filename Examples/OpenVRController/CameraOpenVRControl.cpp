@@ -47,13 +47,13 @@ CameraOpenVRControl::update(const double dt)
 
     if (m_rotateDevice != nullptr)
     {
-        const Vec2d& pos = m_rotateDevice->getTrackpadPosition();
+        const Vec2d& pos  = m_rotateDevice->getTrackpadPosition();
         const Mat4d& view = m_camera->getView();
         m_camera->setView(view * mat4dRotation(Rotd(-pos[0] * m_rotateSpeedScale * dt, Vec3d(0.0, 1.0, 0.0))));
     }
     if (m_translateDevice != nullptr)
     {
-        const Vec2d& pos = m_translateDevice->getTrackpadPosition();
+        const Vec2d& pos  = m_translateDevice->getTrackpadPosition();
         const Mat4d& view = m_camera->getView();
         m_camera->setView(view * mat4dTranslate(Vec3d(pos[0], 0.0, -pos[1]) * m_translateSpeedScale * dt));
     }

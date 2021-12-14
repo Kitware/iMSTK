@@ -405,9 +405,9 @@ VTKRenderer::updateCamera()
         // Get the view matrix
         const Mat4d& invView = cam->getInvView();
 
-        const double eyePos[3] = { invView(0, 3), invView(1, 3), invView(2, 3) };
+        const double eyePos[3]  = { invView(0, 3), invView(1, 3), invView(2, 3) };
         const double forward[3] = { invView(0, 2), invView(1, 2), invView(2, 2) };
-        const double up[3] = { invView(0, 1), invView(1, 1), invView(2, 1) };
+        const double up[3]      = { invView(0, 1), invView(1, 1), invView(2, 1) };
 
         m_camera->SetPosition(eyePos);
         m_camera->SetFocalPoint(eyePos[0] - forward[0], eyePos[1] - forward[1], eyePos[2] - forward[2]);
