@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkVTKOpenVRViewer.h"
+#include "imstkCamera.h"
 #include "imstkDeviceControl.h"
 #include "imstkLogger.h"
 #include "imstkOpenVRDeviceClient.h"
@@ -174,11 +175,12 @@ VTKOpenVRViewer::initModule()
     // \todo: Display devices in debug mode
     renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the devices
 
+    // Actions must be added after initialization of interactor
     vtkInteractorStyleVR* iStyle = vtkInteractorStyleVR::SafeDownCast(m_vtkInteractorStyle.get());
     iStyle->addButtonActions();
     iStyle->addMovementActions();
 
-    // Hide all controllers
+    // Hide all controller models
     for (uint32_t i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
     {
         vtkVRModel* trackedDeviceModel = renWin->GetTrackedDeviceModel(i);
@@ -199,6 +201,12 @@ VTKOpenVRViewer::updateModule()
     {
         return;
     }
+
+    // For the VR view we can't supply the a camera in the normal sense
+    // we need to pre multiply a "user view"
+    std::shared_ptr<Camera> cam = getActiveScene()->getActiveCamera();
+    const Mat4d& view = cam->getView();
+    setPhysicalToWorldTransform(view);
 
     // Update Camera
     // \todo: No programmatic control over VR camera currently
