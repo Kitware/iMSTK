@@ -190,6 +190,7 @@ SimulationManager::start()
 
                 for (auto viewer : m_viewers)
                 {
+                    viewer->setDt(m_numSteps * m_dt);
                     viewer->update();
                 }
             }
