@@ -200,6 +200,7 @@ VTKViewer::initModule()
     }
 
     m_vtkRenderWindow->GetInteractor()->Initialize();
+    setUseVsync(m_useVsync);
     m_vtkRenderWindow->Render();
 
     return true;

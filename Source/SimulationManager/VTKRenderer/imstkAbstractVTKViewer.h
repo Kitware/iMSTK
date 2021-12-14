@@ -74,6 +74,12 @@ public:
     void setWindowTitle(const std::string& title) override;
 
     ///
+    /// \brief Set whether to vertical sync. Sync framerate to
+    /// the refresh of the monitor
+    /// 
+    void setUseVsync(const bool useVsync) override;
+
+    ///
     /// \brief Set the coloring of the screen background
     /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
     ///
@@ -104,5 +110,6 @@ protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     std::shared_ptr<vtkInteractorStyle> m_vtkInteractorStyle;
     vtkSmartPointer<vtkCallbackCommand> exitCallback;
+    bool m_useVsync = true;
 };
 } // imstk

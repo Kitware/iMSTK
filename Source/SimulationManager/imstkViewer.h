@@ -96,6 +96,11 @@ public:
     std::shared_ptr<Renderer> getActiveRenderer() const;
 
     ///
+    /// \brief Set whether to sync frames to the refresh of the monitor.
+    /// 
+    virtual void setUseVsync(const bool useVsync) { }
+
+    ///
     /// \brief Set a string to be the title for the render window
     ///
     virtual void setWindowTitle(const std::string& title) = 0;
