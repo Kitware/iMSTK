@@ -28,10 +28,10 @@
 
 #include <vtkCallbackCommand.h>
 #include <vtkFileOutputWindow.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkOpenGLRenderWindow.h>
 
 namespace imstk
 {

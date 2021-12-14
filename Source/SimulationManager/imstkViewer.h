@@ -97,7 +97,7 @@ public:
 
     ///
     /// \brief Set whether to sync frames to the refresh of the monitor.
-    /// 
+    ///
     virtual void setUseVsync(const bool useVsync) { }
 
     ///

@@ -76,7 +76,7 @@ public:
     ///
     /// \brief Set whether to vertical sync. Sync framerate to
     /// the refresh of the monitor
-    /// 
+    ///
     void setUseVsync(const bool useVsync) override;
 
     ///
