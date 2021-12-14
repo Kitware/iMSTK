@@ -21,7 +21,10 @@ project(Example-OpenVRController)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} OpenVRControllerExample.cpp)
+imstk_add_executable(${PROJECT_NAME}
+	OpenVRControllerExample.cpp
+	CameraOpenVRControl.h
+	CameraOpenVRControl.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

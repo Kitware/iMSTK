@@ -35,6 +35,10 @@
 #include "imstkVisualModel.h"
 #include "imstkVisualObjectImporter.h"
 #include "imstkVTKOpenVRViewer.h"
+#include "CameraOpenVRControl.h"
+#include "imstkVTKViewer.h"
+
+#include "imstkTimer.h"
 
 using namespace imstk;
 
@@ -125,80 +129,111 @@ main()
 
     {
         // Add a module to run the viewer
-        imstkNew<VTKOpenVRViewer> viewer;
+        imstkNew<VTKViewer> viewer;
+        viewer->setExecutionType(Module::ExecutionType::SEQUENTIAL);
         viewer->setActiveScene(scene);
 
         // Add a module to run the scene
-        imstkNew<SceneManager> sceneManager;
-        sceneManager->setActiveScene(scene);
+        /*imstkNew<SceneManager> sceneManager;
+        sceneManager->setActiveScene(scene);*/
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
-        driver->addModule(sceneManager);
+        //driver->addModule(sceneManager);
+        //driver->setDesiredDt(0.01);
 
-        // Add a VR controller for the scalpel handle
-        imstkNew<SceneObjectController> controller1(scalpelHandle, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
-        scene->addController(controller1);
-        // Add a VR controller for the scalpel blade
-        imstkNew<SceneObjectController> controller2(scalpelBlade10, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
-        scene->addController(controller2);
+        //// Add a VR controller for the scalpel handle
+        //imstkNew<SceneObjectController> controller1(scalpelHandle, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
+        //scene->addController(controller1);
+        //// Add a VR controller for the scalpel blade
+        //imstkNew<SceneObjectController> controller2(scalpelBlade10, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
+        //scene->addController(controller2);
 
-        // This button event is emitted from the viewer's thread, thus it is queued to the scene so that we do not
-        // run it while the scene is updating
-        bool blade10InHand = true;
-        queueConnect<ButtonEvent>(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER), &OpenVRDeviceClient::buttonStateChanged, sceneManager,
-            [&](ButtonEvent* e)
+        //imstkNew<CameraOpenVRControl> camControl;
+        //camControl->setRotateDevice(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
+        //camControl->setTranslateDevice(viewer->getVRDeviceClient(OPENVR_LEFT_CONTROLLER));
+        //camControl->setTranslateSpeedScale(1.0);
+        //camControl->setRotateSpeedScale(1.0);
+        //camControl->setCamera(scene->getActiveCamera());
+        //viewer->addControl(camControl); // Only needs to update every render
+
+        StopWatch timer;
+        timer.start();
+        int i = 0;
+        //connect<Event>(viewer, &Viewer::postUpdate, [&](Event*)
+        //    {
+        //        double ms = timer.getTimeElapsed();
+        //        //if (i++ % 100 == 0)
+        //        {
+        //            printf("%f\n", ms);
+        //        }
+        //        timer.start();
+        //    });
+        viewer->init();
+        while(true)
         {
-            // When any button pressed, swap blade
-            if (e->m_buttonState == BUTTON_PRESSED)
-            {
-                const Vec3d& posControl = viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER)->getPosition();
-                if (blade10InHand)
-                {
-                    // Swap to blade 15 only if it's close in space
-                    Vec3d min, max;
-                    scalpelBlade15->getVisualGeometry()->computeBoundingBox(min, max);
-                    const Vec3d posBlade = (min + max) * 0.5;
-                    const double dist    = (posControl - posBlade).norm();
-                    LOG(INFO) << "Dist: " << dist;
-                    if (dist < 2.0)
-                    {
-                        const Vec3d t = scalpelBlade15->getVisualGeometry()->getTranslation();
-                        const Mat3d r = scalpelBlade15->getVisualGeometry()->getRotation();
+            double ms = timer.getTimeElapsed();
+            printf("%f\n", ms);
+            timer.start();
+            viewer->update();
+        }
 
-                        // Set the new blade to move
-                        controller2->setControlledSceneObject(scalpelBlade15);
-                        blade10InHand = false;
+        //// This button event is emitted from the viewer's thread, thus it is queued to the scene so that we do not
+        //// run it while the scene is updating
+        //bool blade10InHand = true;
+        //queueConnect<ButtonEvent>(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER), &OpenVRDeviceClient::buttonStateChanged, sceneManager,
+        //    [&](ButtonEvent* e)
+        //{
+        //    // When any button pressed, swap blade
+        //    if (e->m_buttonState == BUTTON_PRESSED)
+        //    {
+        //        const Vec3d& posControl = viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER)->getPosition();
+        //        if (blade10InHand)
+        //        {
+        //            // Swap to blade 15 only if it's close in space
+        //            Vec3d min, max;
+        //            scalpelBlade15->getVisualGeometry()->computeBoundingBox(min, max);
+        //            const Vec3d posBlade = (min + max) * 0.5;
+        //            const double dist    = (posControl - posBlade).norm();
+        //            LOG(INFO) << "Dist: " << dist;
+        //            if (dist < 2.0)
+        //            {
+        //                const Vec3d t = scalpelBlade15->getVisualGeometry()->getTranslation();
+        //                const Mat3d r = scalpelBlade15->getVisualGeometry()->getRotation();
 
-                        scalpelBlade10->getVisualGeometry()->setTranslation(t);
-                        scalpelBlade10->getVisualGeometry()->setRotation(r);
-                    }
-                }
-                else
-                {
-                    // Swap to blade 10 only if it's close in space
-                    Vec3d min, max;
-                    scalpelBlade10->getVisualGeometry()->computeBoundingBox(min, max);
-                    const Vec3d posBlade = (min + max) * 0.5;
-                    const double dist    = (posControl - posBlade).norm();
-                    LOG(INFO) << "Dist: " << dist;
-                    if (dist < 2.0)
-                    {
-                        const Vec3d t = scalpelBlade10->getVisualGeometry()->getTranslation();
-                        const Mat3d r = scalpelBlade10->getVisualGeometry()->getRotation();
+        //                // Set the new blade to move
+        //                controller2->setControlledSceneObject(scalpelBlade15);
+        //                blade10InHand = false;
 
-                        controller2->setControlledSceneObject(scalpelBlade10);
-                        blade10InHand = true;
+        //                scalpelBlade10->getVisualGeometry()->setTranslation(t);
+        //                scalpelBlade10->getVisualGeometry()->setRotation(r);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            // Swap to blade 10 only if it's close in space
+        //            Vec3d min, max;
+        //            scalpelBlade10->getVisualGeometry()->computeBoundingBox(min, max);
+        //            const Vec3d posBlade = (min + max) * 0.5;
+        //            const double dist    = (posControl - posBlade).norm();
+        //            LOG(INFO) << "Dist: " << dist;
+        //            if (dist < 2.0)
+        //            {
+        //                const Vec3d t = scalpelBlade10->getVisualGeometry()->getTranslation();
+        //                const Mat3d r = scalpelBlade10->getVisualGeometry()->getRotation();
 
-                        // Swap transforms of the blades
-                        scalpelBlade15->getVisualGeometry()->setTranslation(t);
-                        scalpelBlade15->getVisualGeometry()->setRotation(r);
-                    }
-                }
-            }
-        });
+        //                controller2->setControlledSceneObject(scalpelBlade10);
+        //                blade10InHand = true;
 
-        driver->start();
+        //                // Swap transforms of the blades
+        //                scalpelBlade15->getVisualGeometry()->setTranslation(t);
+        //                scalpelBlade15->getVisualGeometry()->setRotation(r);
+        //            }
+        //        }
+        //    }
+        //});
+
+        //driver->start();
     }
 
     return 0;
