@@ -77,6 +77,7 @@ vtkInteractorStyleVR::OnMove3D(vtkEventData* eventData)
 void
 vtkInteractorStyleVR::OnSelect3D(vtkEventData* eventData)
 {
+    printf("OnSelect3D\n");
     vtkEventDataDevice3D* eventDataDevice = static_cast<vtkEventDataDevice3D*>(eventData);
     if (eventData->GetType() != vtkCommand::Select3DEvent)
     {

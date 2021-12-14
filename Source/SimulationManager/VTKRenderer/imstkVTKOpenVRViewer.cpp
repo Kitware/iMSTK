@@ -28,10 +28,10 @@
 #include "imstkVTKInteractorStyleVR.h"
 #include "imstkVTKRenderer.h"
 
+#include <vtkOpenVRRenderWindowInteractor.h>
 #include <vtkMatrix4x4.h>
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRRenderWindow.h>
-#include <vtkOpenVRRenderWindowInteractor.h>
 #include <vtkOpenVRModel.h>
 
 namespace imstk
@@ -157,7 +157,7 @@ VTKOpenVRViewer::initModule()
 
     // VR interactor doesn't support timers, here we throw timer event every update
     // another option would be to conform VTKs VR interactor
-    vtkSmartPointer<vtkOpenVRRenderWindowInteractor> iren = vtkOpenVRRenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
+    auto iren = vtkOpenVRRenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
     //iren->Start(); // Cannot use
     if (iren->HasObserver(vtkCommand::StartEvent))
     {
@@ -165,7 +165,7 @@ VTKOpenVRViewer::initModule()
         return true;
     }
 
-    vtkSmartPointer<vtkOpenVRRenderWindow> renWin = vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
+    auto renWin = vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
     renWin->Initialize();
 
     iren->Initialize();
@@ -173,6 +173,46 @@ VTKOpenVRViewer::initModule()
     // Hide the device overlays
     // \todo: Display devices in debug mode
     renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the devices
+
+    /*iren->AddAction("/actions/vtk/in/LeftGripMovement", true,
+        [&](vtkEventData* ed)
+        {
+            vtkEventDataDevice3D* edd = static_cast<vtkEventDataDevice3D*>(ed);
+            const double* pos = edd->GetTrackPadPosition();
+            printf("left movement %f, %f\n", pos[0], pos[1]);
+        });
+    iren->AddAction("/actions/vtk/in/RightGripMovement", true,
+        [&](vtkEventData* ed)
+        {
+            vtkEventDataDevice3D* edd = static_cast<vtkEventDataDevice3D*>(ed);
+            const double* pos = edd->GetTrackPadPosition();
+            printf("right movement %f, %f\n", pos[0], pos[1]);
+        });*/
+    iren->AddAction("/actions/vtk/in/ButtonPressed", true,
+        [&](vtkEventData* ed)
+        {
+            printf("button press\n");
+        });
+    iren->AddAction("/actions/vtk/in/RightGripPressed", false,
+        [&](vtkEventData* ed)
+        {
+            printf("right grip press\n");
+        });
+    iren->AddAction("/actions/vtk/in/LeftGripPressed", false,
+        [&](vtkEventData* ed)
+        {
+            printf("left grip press\n");
+        });
+    iren->AddAction("/actions/vtk/in/LeftTriggerPressed", false,
+        [&](vtkEventData* ed)
+        {
+            printf("left trigger press\n");
+        });
+    iren->AddAction("/actions/vtk/in/RightTriggerPressed", false,
+        [&](vtkEventData* ed)
+        {
+            printf("right trigger press\n");
+        });
 
     // Hide all controllers
     for (uint32_t i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)

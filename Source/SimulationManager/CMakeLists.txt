@@ -36,6 +36,15 @@ imstk_add_library(SimulationManager
     Rendering
   )
 
+# Install VR actions json
+file(GLOB VTK_VR_JSON_FILES VTKRenderer/vtk_openvr_*.json)
+if (MSVC)
+  # Show them in visual studios
+  target_sources(SimulationManager PRIVATE ${VTK_VR_JSON_FILES})
+  set_source_files_properties(${VTK_VR_JSON_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+endif()
+install(FILES ${VTK_VR_JSON_FILES} DESTINATION bin)
+
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------

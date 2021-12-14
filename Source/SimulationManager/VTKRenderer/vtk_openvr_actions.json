@@ -1,0 +1,62 @@
+{
+  "actions": [
+    {
+      "name": "/actions/vtk/in/RightTriggerPressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/LeftTriggerPressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/ButtonPressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/RightGripMovement",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/vtk/in/LeftGripMovement",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/vtk/in/LeftGripPressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/RightGripPressed",
+      "type": "boolean"
+    }
+  ],
+  "default_bindings": [
+    {
+      "binding_url": "vtk_openvr_binding_vive_controller.json",
+      "controller_type": "vive_controller"
+    },
+    {
+      "binding_url": "vtk_openvr_binding_oculus_touch.json",
+      "controller_type": "generic"
+    },
+    {
+      "binding_url": "vtk_openvr_binding_oculus_touch.json",
+      "controller_type": "oculus_touch"
+    },
+    {
+      "binding_url": "vtk_openvr_binding_hpmotioncontroller.json",
+      "controller_type": "hpmotioncontroller"
+    }
+  ],
+  "localization": [
+    {
+      "/actions/vtk/in/LeftGripPressed": "Left Grip Pressed",
+      "/actions/vtk/in/RightGripPressed": "Right Grip Pressed",
+      "/actions/vtk/in/RightGripMovement": "Right Grip Movement",
+      "/actions/vtk/in/LeftGripMovement": "Left Grip Movement",
+      "/actions/vtk/in/RightTriggerPressed": "Right Trigger Pressed",
+      "/actions/vtk/in/LeftTriggerPressed": "Left Trigger Pressed",
+      "/actions/vtk/in/ButtonPressed": "Button Pressed",
+      "language_tag": "en_US"
+    }
+  ]
+}
