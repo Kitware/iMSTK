@@ -82,6 +82,6 @@ protected:
 
 private:
     DeviceType m_deviceType;
-    Vec2d m_trackpadPosition;
+    Vec2d      m_trackpadPosition;
 };
 }

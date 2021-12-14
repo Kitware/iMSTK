@@ -41,7 +41,7 @@ public:
 
     ///
     /// \brief Adds button actions
-    /// 
+    ///
     void addButtonActions();
 
     ///

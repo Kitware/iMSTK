@@ -41,9 +41,9 @@ vtkInteractorStyleVR::vtkInteractorStyleVR()
 void
 vtkInteractorStyleVR::OnButtonPress(vtkEventData* data, int buttonId)
 {
-    vtkEventDataForDevice* eventDataButton = data->GetAsEventDataForDevice();
-    const vtkEventDataAction      action = eventDataButton->GetAction();
-    const vtkEventDataDevice      device = eventDataButton->GetDevice();
+    vtkEventDataForDevice*   eventDataButton = data->GetAsEventDataForDevice();
+    const vtkEventDataAction action = eventDataButton->GetAction();
+    const vtkEventDataDevice device = eventDataButton->GetDevice();
 
     if (device == vtkEventDataDevice::LeftController)
     {
@@ -78,17 +78,17 @@ vtkInteractorStyleVR::addMovementActions()
         "interactor has been initialized";
     iren->AddAction("/actions/vtk/in/LeftGripMovement", true,
         [this](vtkEventData* ed)
-        {
-            vtkEventDataDevice3D* edd = ed->GetAsEventDataDevice3D();
-            const double* pos = edd->GetTrackPadPosition();
-            m_leftControllerDeviceClient->setTrackpadPosition(imstk::Vec2d(pos[0], pos[1]));
+    {
+        vtkEventDataDevice3D* edd = ed->GetAsEventDataDevice3D();
+        const double* pos = edd->GetTrackPadPosition();
+        m_leftControllerDeviceClient->setTrackpadPosition(imstk::Vec2d(pos[0], pos[1]));
         });
     iren->AddAction("/actions/vtk/in/RightGripMovement", true,
         [this](vtkEventData* ed)
-        {
-            vtkEventDataDevice3D* edd = ed->GetAsEventDataDevice3D();
-            const double* pos = edd->GetTrackPadPosition();
-            m_rightControllerDeviceClient->setTrackpadPosition(imstk::Vec2d(pos[0], pos[1]));
+    {
+        vtkEventDataDevice3D* edd = ed->GetAsEventDataDevice3D();
+        const double* pos = edd->GetTrackPadPosition();
+        m_rightControllerDeviceClient->setTrackpadPosition(imstk::Vec2d(pos[0], pos[1]));
         });
 }
 
@@ -114,8 +114,8 @@ vtkInteractorStyleVR::addButtonActions()
     {
         iren->AddAction(buttonActionNames[i], false,
             [this, i](vtkEventData* ed)
-            {
-                OnButtonPress(ed, i);
+        {
+            OnButtonPress(ed, i);
             });
     }
 }
