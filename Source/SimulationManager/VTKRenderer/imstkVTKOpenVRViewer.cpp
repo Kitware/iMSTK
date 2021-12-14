@@ -174,45 +174,9 @@ VTKOpenVRViewer::initModule()
     // \todo: Display devices in debug mode
     renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the devices
 
-    /*iren->AddAction("/actions/vtk/in/LeftGripMovement", true,
-        [&](vtkEventData* ed)
-        {
-            vtkEventDataDevice3D* edd = static_cast<vtkEventDataDevice3D*>(ed);
-            const double* pos = edd->GetTrackPadPosition();
-            printf("left movement %f, %f\n", pos[0], pos[1]);
-        });
-    iren->AddAction("/actions/vtk/in/RightGripMovement", true,
-        [&](vtkEventData* ed)
-        {
-            vtkEventDataDevice3D* edd = static_cast<vtkEventDataDevice3D*>(ed);
-            const double* pos = edd->GetTrackPadPosition();
-            printf("right movement %f, %f\n", pos[0], pos[1]);
-        });*/
-    iren->AddAction("/actions/vtk/in/ButtonPressed", true,
-        [&](vtkEventData* ed)
-        {
-            printf("button press\n");
-        });
-    iren->AddAction("/actions/vtk/in/RightGripPressed", false,
-        [&](vtkEventData* ed)
-        {
-            printf("right grip press\n");
-        });
-    iren->AddAction("/actions/vtk/in/LeftGripPressed", false,
-        [&](vtkEventData* ed)
-        {
-            printf("left grip press\n");
-        });
-    iren->AddAction("/actions/vtk/in/LeftTriggerPressed", false,
-        [&](vtkEventData* ed)
-        {
-            printf("left trigger press\n");
-        });
-    iren->AddAction("/actions/vtk/in/RightTriggerPressed", false,
-        [&](vtkEventData* ed)
-        {
-            printf("right trigger press\n");
-        });
+    vtkInteractorStyleVR* iStyle = vtkInteractorStyleVR::SafeDownCast(m_vtkInteractorStyle.get());
+    iStyle->addButtonActions();
+    iStyle->addMovementActions();
 
     // Hide all controllers
     for (uint32_t i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)

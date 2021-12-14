@@ -26,7 +26,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/LeftGripPressed"
+              "output": "/actions/vtk/in/GripPressed"
             }
           },
           "mode": "button",
@@ -39,7 +39,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/RightGripPressed"
+              "output": "/actions/vtk/in/GripPressed"
             }
           },
           "mode": "button",
@@ -52,7 +52,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/LeftTriggerPressed"
+              "output": "/actions/vtk/in/TriggerPressed"
             }
           },
           "mode": "trigger",
@@ -61,7 +61,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/RightTriggerPressed"
+              "output": "/actions/vtk/in/TriggerPressed"
             }
           },
           "mode": "trigger",
@@ -70,7 +70,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/ButtonPressed"
+              "output": "/actions/vtk/in/Button1Pressed"
             }
           },
           "mode": "button",
@@ -79,7 +79,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/ButtonPressed"
+              "output": "/actions/vtk/in/Button0Pressed"
             }
           },
           "mode": "button",
@@ -88,7 +88,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/ButtonPressed"
+              "output": "/actions/vtk/in/Button2Pressed"
             }
           },
           "mode": "button",
@@ -97,7 +97,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/ButtonPressed"
+              "output": "/actions/vtk/in/Button3Pressed"
             }
           },
           "mode": "button",

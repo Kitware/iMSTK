@@ -42,7 +42,7 @@ protected:
     /// This object is only creatable through its New method
     ///
     OpenVRDeviceClient(DeviceType deviceType) : DeviceClient("OpenVRDevice", ""),
-        m_deviceType(deviceType) { }
+        m_deviceType(deviceType), m_trackpadPosition(Vec2d::Zero()) { }
 
     ///
     /// This object is only creatable through this method
@@ -57,6 +57,9 @@ public:
 
 public:
     DeviceType getDeviceType() const { return m_deviceType; }
+
+    const Vec2d& getTrackpadPosition() { return m_trackpadPosition; }
+    void setTrackpadPosition(const Vec2d& pos) { m_trackpadPosition = pos; }
 
     ///
     /// \brief Set the current position and orientation
@@ -79,5 +82,6 @@ protected:
 
 private:
     DeviceType m_deviceType;
+    Vec2d m_trackpadPosition;
 };
 }
