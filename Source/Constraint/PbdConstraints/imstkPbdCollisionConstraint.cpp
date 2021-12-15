@@ -23,7 +23,7 @@
 
 namespace imstk
 {
-PbdCollisionConstraint::PbdCollisionConstraint(const unsigned int& n1, const unsigned int& n2)
+PbdCollisionConstraint::PbdCollisionConstraint(const unsigned int n1, const unsigned int n2)
 {
     m_bodiesFirst.resize(n1);
     m_dcdxA.resize(n1);

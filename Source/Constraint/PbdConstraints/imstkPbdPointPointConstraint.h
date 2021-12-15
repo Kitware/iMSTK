@@ -38,11 +38,6 @@ public:
 
 public:
     ///
-    /// \brief Returns the type of the pbd collision constraint
-    ///
-    Type getType() const { return Type::PointPoint; }
-
-    ///
     /// \brief initialize constraint
     ///
     void initConstraint(

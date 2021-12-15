@@ -41,23 +41,10 @@ struct VertexMassPair
 class PbdCollisionConstraint
 {
 public:
-    enum class Type
-    {
-        EdgeEdge,
-        PointTriangle,
-        PointEdge,
-        PointPoint
-    };
-
-public:
     ///
-    /// \brief
-    ///
-    PbdCollisionConstraint(const unsigned int& nA, const unsigned int& nB);
-
-    ///
-    /// \brief Destructor
-    ///
+    /// \brief Construct with the number of vertices from A and B for each side
+    /// 
+    PbdCollisionConstraint(const unsigned int numVertsA, const unsigned int numVertsB);
     virtual ~PbdCollisionConstraint() = default;
 
 public:

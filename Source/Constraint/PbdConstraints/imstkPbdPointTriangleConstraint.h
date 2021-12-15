@@ -39,11 +39,6 @@ public:
 
 public:
     ///
-    /// \brief Returns the type of the pbd collision constraint
-    ///
-    Type getType() const { return Type::PointTriangle; }
-
-    ///
     /// \brief initialize constraint
     /// \param pIdxA1 index of the point from object1
     /// \param pIdxB1 first point of the triangle from object2

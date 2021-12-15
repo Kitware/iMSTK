@@ -38,11 +38,6 @@ public:
 
 public:
     ///
-    /// \brief Get the type of pbd constraint
-    ///
-    Type getType() const { return Type::EdgeEdge; }
-
-    ///
     /// \brief initialize constraint
     /// \return  true if succeeded
     ///
