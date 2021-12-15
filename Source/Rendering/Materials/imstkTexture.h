@@ -76,9 +76,9 @@ public:
 
     enum class WrapType
     {
-        CLAMP_TO_EDGE, // Clamps without border color
+        CLAMP_TO_EDGE,   // Clamps without border color
         CLAMP_TO_BORDER, // Pixels outside [0,1] use border color
-        REPEAT // Pixels outside [0,1] repeat back to [0,1] in a modulus fashion. Such that 1.3, becomes 0.3
+        REPEAT           // Pixels outside [0,1] repeat back to [0,1] in a modulus fashion. Such that 1.3, becomes 0.3
     };
 
     ///
@@ -187,8 +187,8 @@ protected:
     // Helps with texture aliasing (and a little with performance)
     bool m_mipmapsEnabled = true;
 
-    WrapType m_wrapType = WrapType::REPEAT;
-    Color m_borderColor = Color::Black;
+    WrapType m_wrapType    = WrapType::REPEAT;
+    Color    m_borderColor = Color::Black;
 
     // Helps sharpen mipmapped textures at more extreme angles
     bool   m_anisotropyEnabled = true;
