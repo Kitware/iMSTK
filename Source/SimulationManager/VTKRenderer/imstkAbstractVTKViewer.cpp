@@ -28,6 +28,7 @@
 
 #include <vtkCallbackCommand.h>
 #include <vtkFileOutputWindow.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -64,6 +65,16 @@ AbstractVTKViewer::setSize(const int width, const int height)
     if (m_vtkRenderWindow != NULL)
     {
         m_vtkRenderWindow->SetSize(width, height);
+    }
+}
+
+void
+AbstractVTKViewer::setUseVsync(const bool useVsync)
+{
+    m_useVsync = useVsync;
+    if (auto glRenWin = vtkOpenGLRenderWindow::SafeDownCast(m_vtkRenderWindow))
+    {
+        glRenWin->SetSwapControl(static_cast<int>(useVsync));
     }
 }
 
