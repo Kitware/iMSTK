@@ -122,13 +122,29 @@ void
 PbdModelConfig::enableBendConstraint(const double stiffness, const int stride)
 {
     auto& funcs = m_functors[ConstraintGenType::Bend];
-    if (funcs.size() == 0)
+
+    // Find the functor with the same stride
+    std::shared_ptr<PbdBendConstraintFunctor> foundFunctor = nullptr;
+    for (auto functor : funcs)
     {
-        funcs.push_back(std::make_shared<PbdBendConstraintFunctor>());
+        auto bendFunctor =
+            std::dynamic_pointer_cast<PbdBendConstraintFunctor>(functor);
+        if (bendFunctor->getStride() == stride)
+        {
+            foundFunctor = bendFunctor;
+            break;
+        }
     }
-    auto functor = std::dynamic_pointer_cast<PbdBendConstraintFunctor>(funcs.front());
-    functor->setStiffness(stiffness);
-    functor->setStride(stride);
+
+    // If one with stride not found, create our own
+    if (foundFunctor == nullptr)
+    {
+        foundFunctor = std::make_shared<PbdBendConstraintFunctor>();
+        funcs.push_back(foundFunctor);
+    }
+
+    foundFunctor->setStiffness(stiffness);
+    foundFunctor->setStride(stride);
 }
 
 void
