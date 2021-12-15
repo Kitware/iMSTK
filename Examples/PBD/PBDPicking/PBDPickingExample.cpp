@@ -290,6 +290,7 @@ main()
             LOG(INFO) << "Jaw Opened!";
 
             upperJawCollision->getCollisionDetectionNode()->setEnabled(true);
+            lowerJawCollision->getCollisionDetectionNode()->setEnabled(true);
             upperJawPicking->endPick();
             lowerJawPicking->endPick();
             });
