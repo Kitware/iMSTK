@@ -469,7 +469,7 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
                 };
 
             // Iterate sets of stride # of segments
-            for (int k = 0; k < vertices.size() - m_stride * 2; k += m_stride)
+            for (int k = 0; k < vertices.size() - m_stride * 2; k++)
             {
                 addBendConstraint(m_stiffness, k, k + m_stride, k + 2 * m_stride);
             }
