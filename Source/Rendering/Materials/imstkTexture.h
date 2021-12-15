@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkEventObject.h"
+#include "imstkColor.h"
 
 #include <string>
 #include <memory>
@@ -73,6 +74,13 @@ public:
         Dds
     };
 
+    enum class WrapType
+    {
+        CLAMP_TO_EDGE, // Clamps without border color
+        CLAMP_TO_BORDER, // Pixels outside [0,1] use border color
+        REPEAT // Pixels outside [0,1] repeat back to [0,1] in a modulus fashion. Such that 1.3, becomes 0.3
+    };
+
     ///
     /// \brief Constructor
     /// \param path Path to the texture source file
@@ -121,9 +129,21 @@ public:
     const bool getMipmapsEnabled() const { return m_mipmapsEnabled; }
 
     ///
-    /// \brief Get if repeat is enabled, if off it clamps
+    /// \brief Get the wrapping type
     ///
-    const bool getRepeating() const { return m_repeating; }
+    const WrapType getWrapType() const { return m_wrapType; }
+    void setWrapType(const WrapType repeat)
+    {
+        m_wrapType = repeat;
+        postModified();
+    }
+
+    const Color& getBorderColor() const { return m_borderColor; }
+    void setBorderColor(const Color& color)
+    {
+        m_borderColor = color;
+        postModified();
+    }
 
     ///
     /// \brief Get if anisotropic filtering is enabled
@@ -167,8 +187,8 @@ protected:
     // Helps with texture aliasing (and a little with performance)
     bool m_mipmapsEnabled = true;
 
-    // Repeating
-    bool m_repeating = true;
+    WrapType m_wrapType = WrapType::REPEAT;
+    Color m_borderColor = Color::Black;
 
     // Helps sharpen mipmapped textures at more extreme angles
     bool   m_anisotropyEnabled = true;

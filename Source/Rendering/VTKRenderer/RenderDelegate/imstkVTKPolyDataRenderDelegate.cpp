@@ -123,14 +123,8 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
 
     if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
     {
-        /*actorProperty->UseImageBasedLightingOn();
-            actorProperty->SetEnvironmentCubeMap(getVTKTexture(cubemap));*/
-
         actorProperty->LightingOn();
         actorProperty->SetInterpolationToPBR();
-
-        // configure the basic properties
-        //actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
     }
     else if (material->getShadingModel() == RenderMaterial::ShadingModel::Phong)
     {

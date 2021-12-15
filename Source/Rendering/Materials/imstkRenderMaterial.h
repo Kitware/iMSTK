@@ -323,9 +323,6 @@ protected:
     double m_coatStrength    = 0.0;
     Color  m_edgeTint        = Color::White;
 
-    ///---------------------Global states------------------------
-    bool m_imageBasedLighting = false;
-
     bool m_backfaceCulling = true; ///< For performance, uncommon for this to be false
 
     DisplayMode  m_displayMode  = DisplayMode::Surface;
