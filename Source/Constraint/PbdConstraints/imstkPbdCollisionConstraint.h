@@ -43,7 +43,7 @@ class PbdCollisionConstraint
 public:
     ///
     /// \brief Construct with the number of vertices from A and B for each side
-    /// 
+    ///
     PbdCollisionConstraint(const unsigned int numVertsA, const unsigned int numVertsB);
     virtual ~PbdCollisionConstraint() = default;
 
