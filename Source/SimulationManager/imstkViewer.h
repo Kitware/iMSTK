@@ -98,7 +98,7 @@ public:
     ///
     /// \brief Set whether to sync frames to the refresh of the monitor.
     ///
-    virtual void setUseVsync(const bool useVsync) { }
+    virtual void setUseVsync(const bool) { }
 
     ///
     /// \brief Set a string to be the title for the render window
