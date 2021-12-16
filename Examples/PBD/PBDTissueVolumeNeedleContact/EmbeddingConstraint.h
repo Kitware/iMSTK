@@ -51,8 +51,6 @@ public:
     ~EmbeddingConstraint() override = default;
 
 public:
-    Type getType() const { return Type::PointTriangle; }
-
     ///
     /// \brief Initializes both PBD and RBD constraint
     ///
