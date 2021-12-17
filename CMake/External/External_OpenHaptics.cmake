@@ -36,9 +36,16 @@ set(open_haptics_bin_dest ${CMAKE_INSTALL_PREFIX}/bin/)
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
+
+# Workaround issue in "imstk_add_external_project" by explicitly set the
+# OpenHaptics_SOURCE_DIR variable.
+# This ensures the call to "imstk_define_external_dirs" done in "imstk_add_external_project"
+# is not setting a default value because OpenHaptics_DIR is not defined.
+set(OpenHaptics_SOURCE_DIR ${OPENHAPTICS_ROOT_DIR})
+
 include(imstkAddExternalProject)
 imstk_add_external_project( OpenHaptics
-  SOURCE_DIR ${OPENHAPTICS_ROOT_DIR}
+  SOURCE_DIR ${OpenHaptics_SOURCE_DIR}
   UPDATE_COMMAND ${SKIP_STEP_COMMAND}
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
