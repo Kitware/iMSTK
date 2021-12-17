@@ -9,18 +9,12 @@ endif()
 # Add External Project
 #-----------------------------------------------------------------------------
 set(EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS)
-# After updating the CMake minimum required version to >= 3.15, package
-# export is disabled by default (see policy CMP0090) and explicitly setting
-# these options will not be needed.
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
-  list(APPEND EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS
-    -DCMAKE_EXPORT_PACKAGE_REGISTRY:BOOL=OFF
-    )
-else()
-  list(APPEND EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS
-    -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY:BOOL=ON
-    )
-endif()
+# After the external project updates its CMake minimum required version
+# to >= 3.15, package export is disabled by default (see policy CMP0090)
+# and explicitly setting this options will not be needed.
+list(APPEND EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS
+  -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY:BOOL=ON
+  )
 
 # Download options
 if(NOT DEFINED iMSTK_Eigen3_GIT_SHA)
