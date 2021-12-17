@@ -41,7 +41,7 @@
 #ifdef iMSTK_USE_VTK_OSMESA
 #include <vtkGenericRenderWindowInteractor.h>
 #else
-#include "imstkVtkXRenderWindowInteractor2.h"
+#include <vtkXRenderWindowInteractor.h>
 #endif
 #endif
 
@@ -65,7 +65,7 @@ VTKViewer::VTKViewer(std::string name) : AbstractVTKViewer(name),
     vtkSmartPointer<vtkGenericRenderWindowInteractor> iren = vtkSmartPointer<vtkGenericRenderWindowInteractor>::New();
     iren->SetInteractorStyle(m_vtkInteractorStyle.get());
 #else
-    vtkSmartPointer<vtkXRenderWindowInteractor2> iren = vtkSmartPointer<vtkXRenderWindowInteractor2>::New();
+    vtkSmartPointer<vtkXRenderWindowInteractor> iren = vtkSmartPointer<vtkXRenderWindowInteractor>::New();
     iren->SetInteractorStyle(m_vtkInteractorStyle.get());
 #endif
 #endif
