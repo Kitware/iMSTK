@@ -380,7 +380,7 @@ endif()
 # Testing
 #----------------------------------------------------------------------
 if(${PROJECT_NAME}_BUILD_TESTING)
-  find_package( GTest REQUIRED NO_DEFAULT_PATH)
+  find_package( GTest CONFIG REQUIRED )
 endif()
 
 #-----------------------------------------------------------------------------

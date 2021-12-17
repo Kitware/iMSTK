@@ -51,7 +51,7 @@ find_dependency( g3log )
 
 # GTest
 if(iMSTK_BUILD_TESTING)
-  find_dependency( GTest )
+  find_dependency( GTest CONFIG )
 endif()
 
 # LibNiFalcon
