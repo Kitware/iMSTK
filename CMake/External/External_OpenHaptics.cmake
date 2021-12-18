@@ -13,6 +13,10 @@ endif()
 #-----------------------------------------------------------------------------
 # Set install commands
 #-----------------------------------------------------------------------------
+if(CMAKE_PROJECT_NAME STREQUAL "iMSTK")
+  set(OpenHaptics_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
+endif()
+
 if(WIN32)
   set(open_haptics_libdir "Win32")
   if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
@@ -23,15 +27,17 @@ if(WIN32)
 endif()
 
 # Header Directories
-set(open_haptics_headers_dest ${CMAKE_INSTALL_PREFIX}/include/OpenHaptics)
+set(open_haptics_headers_dest ${OpenHaptics_INSTALL_DIR}/include/OpenHaptics)
 set(open_haptics_headers_dir ${OPENHAPTICS_ROOT_DIR}/include/)
 set(open_haptics_util_headers_dir ${OPENHAPTICS_ROOT_DIR}/utilities/include/)
+
 # Library Directories
-set(open_haptics_libs_dest ${CMAKE_INSTALL_PREFIX}/lib/)
+set(open_haptics_libs_dest ${OpenHaptics_INSTALL_DIR}/lib/)
 set(open_haptics_libs_dir ${OPENHAPTICS_ROOT_DIR}/lib/${open_haptics_libdir}/Release)
 set(open_haptics_util_libs_dir ${OPENHAPTICS_ROOT_DIR}/utilities/lib/${open_haptics_libdir}/Release)
+
 # Binary Directory
-set(open_haptics_bin_dest ${CMAKE_INSTALL_PREFIX}/bin/)
+set(open_haptics_bin_dest ${OpenHaptics_INSTALL_DIR}/bin/)
 
 #-----------------------------------------------------------------------------
 # Add External Project
