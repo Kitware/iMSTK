@@ -151,7 +151,7 @@ function(imstk_add_project_test name)
       --build-and-test
       "${_test_source_dir}"
       "${_test_binary_dir}"
-      --build-config Release
+      --build-config $<CONFIG>
       ${build_generator_args}
       --build-project ${project}
       --build-exe-dir "${_test_binary_dir}"
