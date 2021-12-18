@@ -1,13 +1,43 @@
 if(NOT WIN32)
-  message(WARNING "System not supported. Currently, only Windows is supported for External_OpenHaptics.cmake.")
+  message(WARNING "System not supported. Only Windows is supported for External_OpenHaptics.cmake.")
   return()
 endif()
 
-if(NOT DEFINED OPENHAPTICS_ROOT_DIR OR NOT EXISTS ${OPENHAPTICS_ROOT_DIR})
-  set(OPENHAPTICS_ROOT_DIR "$ENV{OH_SDK_BASE}" CACHE PATH "Path to OpenHaptics install directory." FORCE)
+# Attempt to initialize OPENHAPTICS_ROOT_DIR based on OH_SDK_BASE env. variable
+if(NOT DEFINED OPENHAPTICS_ROOT_DIR)
+
+  # Check if OH_SDK_BASE is defined
+  set(env_var_defined FALSE)
+  set(msg "Checking if OH_SDK_BASE env. variable is defined")
+  message(STATUS "${msg}")
+  if(DEFINED ENV{OH_SDK_BASE})
+    set(env_var_defined TRUE)
+  endif()
+  message(STATUS "${msg} - ${env_var_defined}")
+
+  # Check if path associated with OH_SDK_BASE exists
+  if(env_var_defined)
+    set(env_var_path_exist FALSE)
+    set(msg "Checking if OH_SDK_BASE env. variable is set to existing path")
+    message(STATUS "${msg}")
+    if(EXISTS "$ENV{OH_SDK_BASE}")
+      set(env_var_path_exist TRUE)
+    endif()
+    message(STATUS "${msg} - ${env_var_path_exist}")
+
+    if(env_var_path_exist)
+      set(OPENHAPTICS_ROOT_DIR "$ENV{OH_SDK_BASE}" CACHE PATH "Path to OpenHaptics install directory.")
+      message(STATUS "Setting OPENHAPTICS_ROOT_DIR to ${OPENHAPTICS_ROOT_DIR}")
+    endif()
+  endif()
+
+  unset(env_var_defined)
+  unset(env_var_path_exist)
 endif()
-if(NOT EXISTS ${OPENHAPTICS_ROOT_DIR})
-  message(FATAL_ERROR "\nCan not support Phantom Omni without OpenHaptics.\nSet OPENHAPTICS_ROOT_DIR to OpenHaptics installation directory.\n\n")
+
+# Sanity checks
+if(DEFINED OPENHAPTICS_ROOT_DIR AND NOT EXISTS ${OPENHAPTICS_ROOT_DIR})
+  message(FATAL_ERROR "OPENHAPTICS_ROOT_DIR variable is defined but corresponds to nonexistent directory")
 endif()
 
 #-----------------------------------------------------------------------------
