@@ -181,6 +181,9 @@ if(${PROJECT_NAME}_SUPERBUILD)
   endif()
 
   option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
+  if(NOT WIN32 AND ${PROJECT_NAME}_USE_OpenHaptics)
+    message(FATAL_ERROR "Setting ${PROJECT_NAME}_USE_OpenHaptics to ON is only supported on Windows")
+  endif()
   
   imstk_define_dependency(Assimp)
   imstk_define_dependency(Eigen3)
