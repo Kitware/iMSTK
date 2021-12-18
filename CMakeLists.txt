@@ -146,6 +146,11 @@ if(iMSTK_USE_PHYSX)
     )
 endif()
 
+option(iMSTK_USE_OpenHaptics "Use OpenHaptic Support." OFF)
+if(NOT WIN32 AND iMSTK_USE_OpenHaptics)
+  message(FATAL_ERROR "Setting iMSTK_USE_OpenHaptics to ON is only supported on Windows")
+endif()
+
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
 #-----------------------------------------------------------------------------
@@ -179,11 +184,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
     else()
       message(WARN "Uncrustify requires a python interpreter, please install python and rerun configure")
     endif()
-  endif()
-
-  option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
-  if(NOT WIN32 AND ${PROJECT_NAME}_USE_OpenHaptics)
-    message(FATAL_ERROR "Setting ${PROJECT_NAME}_USE_OpenHaptics to ON is only supported on Windows")
   endif()
   
   imstk_define_dependency(Assimp)
