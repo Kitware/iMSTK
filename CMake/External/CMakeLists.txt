@@ -87,6 +87,11 @@ if(WIN32)
     -D${PROJECT_NAME}_ENABLE_AUDIO:BOOL=${${PROJECT_NAME}_AUDIO_ENABLED}
     )
 endif()
+if(iMSTK_USE_PHYSX)
+  list(APPEND EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS
+    -DPHYSX_CONFIGURATION:STRING=${PHYSX_CONFIGURATION}
+  )
+endif()
 
 #-----------------------------------------------------------------------------
 # Inner build of the main project
@@ -113,8 +118,6 @@ ExternalProject_Add( ${PROJECT_NAME}
     -DGTest_DIR:PATH=${GTest_DIR}
     -DVegaFEM_DIR:PATH=${VegaFEM_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}
-    # I don't think this is needed by the inner build
-    # -DPHYSX_CONFIGURATION:STRING=${${PROJECT_NAME}_PHYSX_CONFIGURATION}
     ${EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS}
   DEPENDS ${${PROJECT_NAME}_DEPENDENCIES}
   PATCH_COMMAND 

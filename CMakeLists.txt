@@ -135,6 +135,16 @@ if (UNIX)
 endif()
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
 option(${PROJECT_NAME}_USE_PHYSX "Build with Physx support" OFF)
+if(iMSTK_USE_PHYSX)
+  set(PHYSX_CONFIGURATION "RELEASE" CACHE STRING "PhysX release library type")
+
+  # Set the possible values for cmake-gui
+  set_property(CACHE PHYSX_CONFIGURATION PROPERTY STRINGS
+    "RELEASE"
+    "CHECKED"
+    "PROFILE"
+    )
+endif()
 
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
@@ -151,11 +161,6 @@ include(CMakePackageConfigHelpers)
 option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
 
 if(${PROJECT_NAME}_SUPERBUILD)
-
-  # Select the release version of PhysX to use
-  set(${PROJECT_NAME}_PHYSX_CONFIGURATION "RELEASE" CACHE STRING "Select PhysX Library Type for Release and RelWithDebInfo builds")
-  set(PHYSX_RELEASE_TYPES "RELEASE;CHECKED;PROFILE" CACHE INTERNAL "List of available PhysX release library types")
-  set_property(CACHE ${PROJECT_NAME}_PHYSX_CONFIGURATION PROPERTY STRINGS ${PHYSX_RELEASE_TYPES})
 
   #-----------------------------------------------------------------------------
   # Define External dependencies
@@ -268,12 +273,11 @@ find_package( Libusb REQUIRED)
 # OpenVR
 find_package( OpenVR REQUIRED )
 
-# Select the release version of PhysX to use
-if (${PROJECT_NAME}_USE_PHYSX)
+# PhysX
+if (iMSTK_USE_PHYSX)
   add_compile_definitions(IMSTK_USE_PHYSX)
-  set(PHYSX_CONFIGURATION "${PHYSX_CONFIGURATION}" CACHE STRING "Select PhysX Library Type for Release and RelWithDebInfo builds")
-  set(PHYSX_RELEASE_TYPES "RELEASE;CHECKED;PROFILE" CACHE INTERNAL "List of available PhysX release library types")
-  set_property(CACHE PHYSX_CONFIGURATION PROPERTY STRINGS ${PHYSX_RELEASE_TYPES})
+  # Variable PHYSX_CONFIGURATION used in FindPhysX.cmake is set above where
+  # iMSTK_USE_PHYSX CMake option is defined.
   find_package(PhysX REQUIRED)
 endif()
 
