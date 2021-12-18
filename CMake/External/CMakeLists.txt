@@ -123,6 +123,8 @@ ExternalProject_Add( ${PROJECT_NAME}
     # Always build these non standard configurations
   )
 
+ExternalProject_AlwaysConfigure(${PROJECT_NAME})
+
 #-----------------------------------------------------------------------------
 # Add the target to iMSTK folder
 #-----------------------------------------------------------------------------
