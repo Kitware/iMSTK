@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 project(iMSTK VERSION 5.0.0 LANGUAGES C CXX)
 
-if(UNIX AND NOT APPLE)
-  set(LINUX TRUE)
-endif()
-
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
 #-----------------------------------------------------------------------------
