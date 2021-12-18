@@ -162,7 +162,6 @@ endif ()
 #-----------------------------------------------------------------------------
 # SUPERBUILD
 #-----------------------------------------------------------------------------
-include(CMakePackageConfigHelpers)
 option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
 
 if(${PROJECT_NAME}_SUPERBUILD)
