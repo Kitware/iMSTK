@@ -26,7 +26,7 @@ file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/include)
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib) 
 
 #-----------------------------------------------------------------------------
-# Update CMake module path & cmake dir
+# Update CMake module path & CMake dir
 #-----------------------------------------------------------------------------
 set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake
@@ -35,6 +35,9 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_INSTALL_PREFIX}/lib/cmake # Vega and VTK
     )
 set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+
+# Add "mark_as_superbuild" CMake function to associate option with inner build
+include(imstkSolveDependencies)
 
 #-----------------------------------------------------------------------------
 # C++11 Support
@@ -67,9 +70,13 @@ endif()
 
 # SWIG 
 option(${PROJECT_NAME}_WRAP_CSHARP "Build iMSTK-C# wrapper code and lib" OFF)
+mark_as_superbuild(${PROJECT_NAME}_WRAP_CSHARP:BOOL)
+
 # SWIG will generate managed array using pinning if this option is ON. Otherwise using P/Invoke default array marshalling.
 option(${PROJECT_NAME}_SWIG_PINNED_ARRAY "Managed C# arrays using pinning" ON)
 mark_as_advanced(${PROJECT_NAME}_SWIG_PINNED_ARRAY)
+mark_as_superbuild(${PROJECT_NAME}_SWIG_PINNED_ARRAY:BOOL)
+
 if (${PROJECT_NAME}_WRAP_CSHARP)
   find_package(SWIG REQUIRED)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -81,6 +88,7 @@ endif()
 
 # CUDA
 option(${PROJECT_NAME}_ENABLE_CUDA_BACKEND "Enable iMSTK CUDA backend" OFF)
+mark_as_superbuild(${PROJECT_NAME}_ENABLE_CUDA_BACKEND)
 if (${PROJECT_NAME}_ENABLE_CUDA_BACKEND)
   include(CheckLanguage)
   check_language(CUDA)
@@ -117,26 +125,42 @@ set(${PROJECT_NAME}_AUDIO_ENABLED ${_enable_audio})
 
 # General Options
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build iMSTK examples" ON)
+mark_as_superbuild(${PROJECT_NAME}_BUILD_EXAMPLES:BOOL)
+
 option(${PROJECT_NAME}_BUILD_TESTING "Build iMSTK tests" ON)
+mark_as_superbuild(${PROJECT_NAME}_BUILD_TESTING:BOOL)
+
 set(BUILD_TESTING OFF)
 if (${PROJECT_NAME}_BUILD_TESTING)
   set(BUILD_TESTING ON)
 endif ()
 if (UNIX)
   option(${PROJECT_NAME}_USE_MODEL_REDUCTION "Build with model reduction, requires a VegaFEM built with Intel MKL and arpack" OFF)
+  mark_as_superbuild(${PROJECT_NAME}_USE_MODEL_REDUCTION:BOOL)
+
   option(${PROJECT_NAME}_COLOR_OUTPUT "For coloring output in gcc" OFF)
+  mark_as_superbuild(${PROJECT_NAME}_COLOR_OUTPUT:BOOL)
+
   option(${PROJECT_NAME}_COVERAGE "Build for calculating coverage" OFF)
+  mark_as_superbuild(${PROJECT_NAME}_COVERAGE:BOOL)
+
   option(${PROJECT_NAME}_USE_VTK_OSMESA "Build with VTK OSMesa rendering" OFF)
+  mark_as_superbuild(${PROJECT_NAME}_USE_VTK_OSMESA:BOOL)
 
   if (${PROJECT_NAME}_COVERAGE AND NOT ${CMAKE_BUILD_TYPE} MATCHES [Dd][Ee][Bb][Uu][Gg])
     message(WARNING "Coverage requires a debug build forcing debug")
     set(CMAKE_BUILD_TYPE "DEBUG")
   endif()  
 endif()
+
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
+mark_as_superbuild(${PROJECT_NAME}_USE_VRPN:BOOL)
+
 option(${PROJECT_NAME}_USE_PHYSX "Build with Physx support" OFF)
+mark_as_superbuild(iMSTK_USE_PHYSX:BOOL)
 if(iMSTK_USE_PHYSX)
   set(PHYSX_CONFIGURATION "RELEASE" CACHE STRING "PhysX release library type")
+  mark_as_superbuild(PHYSX_CONFIGURATION:STRING)
 
   # Set the possible values for cmake-gui
   set_property(CACHE PHYSX_CONFIGURATION PROPERTY STRINGS
@@ -147,6 +171,7 @@ if(iMSTK_USE_PHYSX)
 endif()
 
 option(iMSTK_USE_OpenHaptics "Use OpenHaptic Support." OFF)
+mark_as_superbuild(iMSTK_USE_OpenHaptics:BOOL)
 if(NOT WIN32 AND iMSTK_USE_OpenHaptics)
   message(FATAL_ERROR "Setting iMSTK_USE_OpenHaptics to ON is only supported on Windows")
 endif()

@@ -45,20 +45,17 @@ This is executed in the innerbuild of `iMSTK`. It will enable the innerbuild to 
 Add a Setting `${PROJECT_NAME}_USE_NewLib` as
 	
     option(${PROJECT_NAME}_USE_NewLib "Build with NewLib support" OFF)
+    mark_as_superbuild(${PROJECT_NAME}_USE_NewLib)
 	
 The state of the option (`ON`/`OFF`) should reflect whether the new library should be built by default or not. If a dependency is a required one, one may omit this. If the dependency is optional, one can conditionally execute other steps in the CMake build process by surrounding the statements with `if(${PROJECT_NAME}_USE_NewLib)` or `if(iMSTK_USE_NewLIb)`.
+
+Variables that need to be passed from the superbuild to the innerbuild need to be "marked" as such using `mark_as_superbuild`.
 
 **Step 4:** Edit CMake\External\CMakeLists.txt
 
 ---
 
-This CMake script adds the project that makes up the innerbuild to the superbuild, any variables that need to be passed from the superbuild to the innerbuild need to be set here. This means you will probably want to add 
-
-    -D${PROJECT_NAME}_USE_NewLib:BOOL=${${PROJECT_NAME}_USE_NewLib} 
-
-to the section in `ExternalProject_Add`, so that the appropriate option is visible inside the innerbuild.
-
-Additionally to enable CMake to find the library correctly _if_ the library already provides a `Config.cmake` or a `Find` pass the path to the library into the innerbuild, so use 
+To enable CMake to find the library correctly _if_ the library already provides a `Config.cmake` or a `Find` pass the path to the library into the innerbuild, so use 
 
     -DNewLib_DIR:PATH=${NewLib_DIR}  
 
