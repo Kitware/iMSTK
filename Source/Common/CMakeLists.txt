@@ -5,8 +5,8 @@ include(imstkAddLibrary)
 imstk_add_library( Common
   DEPENDS
     Eigen3::Eigen
-    g3log
-    tbb
+    g3log::g3log
+    TBB::tbb
   )
 
 #-----------------------------------------------------------------------------

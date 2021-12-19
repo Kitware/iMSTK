@@ -32,7 +32,7 @@ else()
 endif()
 
 if (iMSTK_USE_PHYSX)
-  list(APPEND Dependencies PhysX)
+  list(APPEND Dependencies PhysX::PhysX)
 else()
   list(APPEND ExclusionFiles
     ObjectModels/imstkRigidBodyModel.h

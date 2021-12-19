@@ -5,125 +5,102 @@ set(export_config_name "@export_config_name@")
 set_and_check(${export_config_name}Targets "${CMAKE_CURRENT_LIST_DIR}/${export_config_name}Targets.cmake")
 
 include(${${export_config_name}Targets})
-include(CMakeFindDependencyMacro)
 
-# iMSTK settings
+@CONFIG_CODE@
+
 set(iMSTK_ROOT ${PACKAGE_PREFIX_DIR})
 set(iMSTK_DATA_DIR ${PACKAGE_PREFIX_DIR}/data)
+
+# iMSTK settings
+set(iMSTK_AUDIO_ENABLED @iMSTK_AUDIO_ENABLED@)
 set(iMSTK_USE_OpenHaptics @iMSTK_USE_OpenHaptics@)
 set(iMSTK_USE_VTK_OSMESA @iMSTK_USE_VTK_OSMESA@)
 set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)
 set(iMSTK_USE_PHYSX @iMSTK_USE_PHYSX@)
 set(iMSTK_USE_VRPN @iMSTK_USE_VRPN@)
+set(iMSTK_VTK_DEPENDENCIES "@iMSTK_VTK_DEPENDENCIES@")
 
-# Use the iMSTK modules to find all required packages
-set(CACHE_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")
-include(${CMAKE_CURRENT_LIST_DIR}/modules/imstkFind.cmake)
-include(CMakeFindDependencyMacro)
+# Save
+set(_iMSTK_ORIG_CMAKE_DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+set(_iMSTK_ORIG_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
+
 set(CMAKE_DEBUG_POSTFIX @CMAKE_DEBUG_POSTFIX@)
 
+# Use the iMSTK modules to find all required packages
+list(APPEND CMAKE_MODULE_PATH
+  "${CMAKE_CURRENT_LIST_DIR}/modules"
+  "@iMSTK_SOURCE_DIR@/CMake"
+  "@iMSTK_SOURCE_DIR@/CMake/Utilities"
+  )
+
+include(CMakeFindDependencyMacro)
+
 # Assimp
-find_package( Assimp REQUIRED )
+find_dependency( Assimp )
 
 # Eigen3
-set(Eigen3_DIR "@Eigen3_DIR@")
-find_dependency( Eigen3 REQUIRED )
+find_dependency( Eigen3 )
 
 # FTD2XX
 if(WIN32)
-  find_package( FTD2XX REQUIRED )
+  find_dependency( FTD2XX )
 endif()
 
 # g3log
-find_package( g3log REQUIRED )
+find_dependency( g3log )
 
 # GTest
 if(iMSTK_BUILD_TESTING)
-  set(GTest_DIR "@GTest_DIR@")
-  find_dependency( GTest REQUIRED NO_DEFAULT_PATH )
+  find_dependency( GTest CONFIG )
 endif()
 
 # LibNiFalcon
-find_package( LibNiFalcon REQUIRED)
+find_dependency( LibNiFalcon )
 
 # Libusb
-find_package( Libusb REQUIRED)
+find_dependency( Libusb )
 
 # OpenVR
-find_package( openvr REQUIRED )
+find_dependency( OpenVR )
 
 # PhysX
 if (iMSTK_USE_PHYSX)
-  find_package(PhysX REQUIRED)
+  find_dependency(PhysX REQUIRED)
 endif()
 
 # SFML
-if(WIN32)
-  find_package( SFML REQUIRED )
+if(iMSTK_AUDIO_ENABLED)
+  find_dependency( SFML REQUIRED )
   add_definitions( -DiMSTK_AUDIO_ENABLED )
 endif()
 
-# tbb
-find_package(tbb REQUIRED)
-if (MSVC)
-  add_definitions(-D__TBB_NO_IMPLICIT_LINKAGE=1)
-endif()
+# TBB
+find_dependency(TBB)
 
 # VegaFEM
-set(VegaFEM_DIR "@VegaFEM_DIR@")
-find_dependency( VegaFEM REQUIRED CONFIG )
+find_dependency( VegaFEM )
 
 # VRPN
 if (iMSTK_USE_VRPN)
-  find_package( VRPN REQUIRED )
+  find_dependency( VRPN )
 endif()
 
 # OpenHaptics
 if(iMSTK_USE_OpenHaptics)
-  find_package( OpenHapticsSDK REQUIRED )
+  find_dependency( OpenHapticsSDK )
   add_definitions( -DiMSTK_USE_OPENHAPTICS )
 endif()
 
 # VTK
-list(GET OPENVR_INCLUDE_DIRS 0 OpenVR_INCLUDE_DIR)
-list(GET OPENVR_LIBRARIES 1 OpenVR_LIBRARY)
-set(OpenVR_INCLUDE_DIR ${OpenVR_INCLUDE_DIR} CACHE INTERNAL "")
-set(OpenVR_LIBRARY ${OpenVR_LIBRARY} CACHE INTERNAL "")
-set(VTK_DIR "@VTK_DIR@")
 find_dependency(VTK CONFIG)
-# modules are linked via `VTK::CommonCore`
-# vtk_module_autoinit is needed
-find_dependency(VTK COMPONENTS
-  ChartsCore
-  CommonCore
-  CommonDataModel
-  FiltersCore
-  FiltersExtraction
-  FiltersGeneral
-  FiltersModeling
-  FiltersSources
-  IOExport
-  IOImport
-  IOPLY
-  IOParallel
-  IOParallelXML
-  ImagingCore
-  ImagingGeneral
-  ImagingStencil
-  InteractionStyle
-  RenderingAnnotation
-  RenderingContext2D
-  RenderingContextOpenGL2
-  RenderingCore
-  RenderingExternal
-  RenderingOpenGL2
-  RenderingOpenVR
-  RenderingVolume
-  RenderingVolumeOpenGL2
-  ViewsContext2D)
-find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
+find_package(vtkRenderingOpenVR QUIET)
+find_package(vtkRenderingExternal QUIET)
+find_dependency(VTK COMPONENTS ${iMSTK_VTK_DEPENDENCIES})
+
 if(iMSTK_USE_VTK_OSMESA)
   add_definitions(-DiMSTK_USE_VTK_OSMESA)
 endif()
-set(CMAKE_MODULE_PATH ${CACHE_CMAKE_MODULE_PATH})
+
+# Restore
+set(CMAKE_DEBUG_POSTFIX ${_iMSTK_ORIG_CMAKE_DEBUG_POSTFIX})
+set(CMAKE_MODULE_PATH ${_iMSTK_ORIG_CMAKE_MODULE_PATH})

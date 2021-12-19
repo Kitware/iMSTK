@@ -1,3 +1,15 @@
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+if(WIN32)
+  if(NOT DEFINED VRPN_USE_OpenHaptics)
+    set(VRPN_USE_OpenHaptics ${iMSTK_USE_OpenHaptics})
+  endif()
+else()
+  set(VRPN_USE_OpenHaptics OFF)
+endif()
+
 #-----------------------------------------------------------------------------
 # Dependencies
 #-----------------------------------------------------------------------------
@@ -6,38 +18,27 @@ if(WIN32)
   list(APPEND VRPN_DEPENDENCIES "Libusb")
   list(APPEND VRPN_DEPENDENCIES "FTD2XX")
 endif(WIN32)
-
-#-----------------------------------------------------------------------------
-# Phantom Omni
-#-----------------------------------------------------------------------------
-option(${PROJECT_NAME}_USE_OpenHaptics "Build OpenHaptics to support the Phantom Omni in VRPN." OFF)
-if(${${PROJECT_NAME}_USE_OpenHaptics})
-  message(STATUS "Superbuild -   VRPN => ENABLING Phantom Omni support")
-  if(NOT DEFINED OPENHAPTICS_ROOT_DIR OR NOT EXISTS ${OPENHAPTICS_ROOT_DIR})
-    set(OPENHAPTICS_ROOT_DIR "$ENV{OH_SDK_BASE}" CACHE PATH "Path to OpenHaptics install directory." FORCE)
-  endif()
-  if(NOT EXISTS ${OPENHAPTICS_ROOT_DIR})
-    message(FATAL_ERROR "\nCan not support Phantom Omni without OpenHaptics.\nSet OPENHAPTICS_ROOT_DIR to OpenHaptics installation directory.\n\n")
-  endif()
+if(VRPN_USE_OpenHaptics)
   list(APPEND VRPN_DEPENDENCIES "OpenHaptics")
-else()
-  message(STATUS "Superbuild -   VRPN => Phantom Omni support DISABLED")
-  if(DEFINED OPENHAPTICS_ROOT_DIR)
-    unset(OPENHAPTICS_ROOT_DIR CACHE)
-  endif()
-
 endif()
 
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
+
+# Download options
+if(NOT DEFINED iMSTK_VRPN_GIT_SHA)
+  set(iMSTK_VRPN_GIT_SHA "7a2845e4b1be2707ccb67dd1d388fb22a766e8f7") # vrpn-imstk-additions
+endif()
+if(NOT DEFINED iMSTK_VRPN_GIT_REPOSITORY)
+  set(iMSTK_VRPN_GIT_REPOSITORY "https://gitlab.kitware.com/iMSTK/vrpn.git")
+endif()
+
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/vrpn.git
-  GIT_TAG 7a2845e4b1be2707ccb67dd1d388fb22a766e8f7
+  GIT_REPOSITORY ${iMSTK_VRPN_GIT_REPOSITORY}
+  GIT_TAG ${iMSTK_VRPN_GIT_SHA}
   # Cannot get a zip as vrpn uses submodules which are not pulled into the zip
-  #URL https://gitlab.kitware.com/iMSTK/vrpn/-/archive/improve-openhaptics-rebase/vrpn-improve-openhaptics-rebase.zip
-  #URL_MD5 f9f1f10b0844ee244d3478184d58da04
   CMAKE_CACHE_ARGS
     -DBUILD_TESTING:BOOL=OFF
     -DVRPN_SUBPROJECT_BUILD:BOOL=ON
@@ -51,10 +52,12 @@ imstk_add_external_project( VRPN
     -DVRPN_USE_HID:BOOL=ON
     -DVRPN_USE_LIBNIFALCON:BOOL=OFF
     -DVRPN_BUILD_SERVERS:BOOL=ON
-    -DVRPN_USE_PHANTOM_SERVER:BOOL=${iMSTK_USE_OPENHAPTICS}
-    -DVRPN_USE_HDAPI:BOOL=${iMSTK_USE_OPENHAPTICS}
+    -DVRPN_USE_PHANTOM_SERVER:BOOL=${VRPN_USE_OPENHAPTICS}
+    -DVRPN_USE_HDAPI:BOOL=${VRPN_USE_OPENHAPTICS}
     -DOPENHAPTICS_ROOT_DIR:PATH=${OPENHAPTICS_ROOT_DIR}
   DEPENDENCIES ${VRPN_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH ""
   #VERBOSE
 )
+
+ExternalProject_Message("VRPN" "VRPN: Phantom Omni support [${VRPN_USE_OpenHaptics}]")

@@ -85,7 +85,7 @@ install( TARGETS iMSTKCWrapper EXPORT iMSTKCWrapperTargets
     LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
     ARCHIVE DESTINATION lib COMPONENT Development)
 
-if (LINUX)
+if (UNIX AND NOT APPLE)
 	# Why use CODE and then execute COMMAND?
     install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink iMSTKCWrapper.so ${CMAKE_INSTALL_PREFIX}/lib/libiMSTKCWrapper.so)")
 endif()

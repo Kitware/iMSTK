@@ -15,7 +15,7 @@
     add_test(NAME CodeFormatTest
       COMMAND ${Uncrustify_EXECUTABLE}
       -c ${CMAKE_CURRENT_LIST_DIR}/../../Utilities/Uncrustify/iMSTKUncrustify.cfg
-      -F ${CMAKE_CURRENT_BINARY_DIR}/Uncrustify.list
+      -F ${CMAKE_CURRENT_BINARY_DIR}/uncrustify.list
       --check
       #COMMENT "Run uncrustify in check mode"
       WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}

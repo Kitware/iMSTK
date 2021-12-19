@@ -49,7 +49,7 @@ set(RENDERING_SUBDIR
   VTKRenderer/RenderDelegate)
 set(RENDERING_DEPENDENCIES  
   Materials
-  openvr)
+  OpenVR::OpenVR)
 
 include(imstkAddLibrary)
 imstk_add_library( Rendering

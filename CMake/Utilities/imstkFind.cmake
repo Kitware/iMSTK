@@ -8,9 +8,23 @@ endif()
 
 macro(imstk_find_header package header)
 
+  set(options
+    USE_SYSTEM
+    )
+  set(oneValueArgs
+    )
+  set(multiValueArgs
+    )
+  cmake_parse_arguments(IMSTK_FIND_HEADER
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+    )
+
   # Subdir to the include directory is optional
   set(sub_dir "")
-  set (extra_macro_args ${ARGN})
+  set (extra_macro_args ${IMSTK_FIND_HEADER_UNPARSED_ARGUMENTS})
   # Did we get any optional args?
   list(LENGTH extra_macro_args num_extra_args)
   if (${num_extra_args} GREATER 0)
@@ -18,17 +32,15 @@ macro(imstk_find_header package header)
   endif ()
   
   # Should I look in system locations?
-  set(use_system)
-  foreach(arg IN LISTS extra_macro_args)
-    if(arg STREQUAL "USE_SYSTEM")
-      set(use_system TRUE)
-    endif()
-  endforeach()
+  set(use_system ${IMSTK_FIND_HEADER_USE_SYSTEM})
 
   if(NOT use_system)
     unset(_SEARCH_DIR)
     if(${package}_ROOT_DIR)
-      set(_SEARCH_DIR ${${package}_ROOT_DIR}/${sub_dir})
+      if(NOT DEFINED ${package}_INC_DIR)
+        set(${package}_INC_DIR "include")
+      endif()
+      set(_SEARCH_DIR ${${package}_ROOT_DIR}/${${package}_INC_DIR}/${sub_dir})
     else()
       set(_SEARCH_DIR ${PACKAGE_PREFIX_DIR}/include/${sub_dir})
     endif()
@@ -52,14 +64,13 @@ macro(imstk_find_header package header)
   
 
   if (EXISTS ${${package}_INCLUDE_DIR}/${header})
-    string(TOUPPER ${package} PACKAGE)
+    set(PACKAGE ${package})
     list(APPEND ${PACKAGE}_INCLUDE_DIRS ${${package}_INCLUDE_DIR})
     mark_as_advanced(${PACKAGE}_INCLUDE_DIRS)
   else()
     message(FATAL_ERROR "Could not find ${${package}_INCLUDE_DIR}/${header}")
   endif()
   #message(STATUS "${package}_INCLUDE_DIRS : ${${package}_INCLUDE_DIRS}")
-  unset(${package}_INCLUDE_DIR CACHE)
 endmacro()
 
 #-----------------------------------------------------------------------------
@@ -67,11 +78,24 @@ endmacro()
 #-----------------------------------------------------------------------------
 
 macro(imstk_find_libary package library)
+  set(options
+    USE_SYSTEM
+    )
+  set(oneValueArgs
+    )
+  set(multiValueArgs
+    )
+  cmake_parse_arguments(IMSTK_FIND_LIBRARY
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+    )
 
   # Debug postfix argument is optional
   set(release_postfix)
   set(debug_postfix ${CMAKE_DEBUG_POSTFIX})
-  set (extra_macro_args ${ARGN})
+  set (extra_macro_args ${IMSTK_FIND_LIBRARY_UNPARSED_ARGUMENTS})
   # Did we get any optional args?
   list(LENGTH extra_macro_args num_extra_args)
   if (${num_extra_args} EQUAL 1)
@@ -87,30 +111,28 @@ macro(imstk_find_libary package library)
   endif()
   
   # Should I look in system locations?
-  set(use_system)
-  foreach(arg IN LISTS extra_macro_args)
-    if(arg STREQUAL "USE_SYSTEM")
-      set(use_system TRUE)
-    endif()
-  endforeach()
-  
+  set(use_system ${IMSTK_FIND_LIBRARY_USE_SYSTEM})
+
+  set(IMSTK_ORIG_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
+  set(CMAKE_FIND_LIBRARY_PREFIXES "lib" "")
+
   if(NOT use_system)
     unset(_SEARCH_DIR)
     if(${package}_ROOT_DIR)
-      if(${package}_LIB_DIR)
-        set(_SEARCH_DIR ${${package}_ROOT_DIR}/${${package}_LIB_DIR})
+      if(NOT DEFINED ${package}_LIB_DIR)
+        set(${package}_LIB_DIR "lib")
       endif()
+      set(_SEARCH_DIR ${${package}_ROOT_DIR}/${${package}_LIB_DIR})
     else()
       set(_SEARCH_DIR ${PACKAGE_PREFIX_DIR}/lib)
     endif()
     #message(STATUS "Looking for ${package} libs in ${_SEARCH_DIR}")
     
     unset(${PACKAGE}_LIBRARY_${library}-RELEASE CACHE)
-    string(TOUPPER ${package} PACKAGE)
+    set(PACKAGE ${package})
     find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
       NAMES
         ${library}${release_postfix}
-        lib${library}${release_postfix}
       PATHS
         ${_SEARCH_DIR}
         ${_SEARCH_DIR}/Release
@@ -121,7 +143,6 @@ macro(imstk_find_libary package library)
     find_library(${PACKAGE}_LIBRARY_${library}-DEBUG
       NAMES
         ${library}${debug_postfix}
-        lib${library}${debug_postfix}
       PATHS
         ${_SEARCH_DIR}
         ${_SEARCH_DIR}/Debug
@@ -133,7 +154,6 @@ macro(imstk_find_libary package library)
     find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
       NAMES
         ${library}${release_postfix}
-        lib${library}${release_postfix}
     )
     
     unset(${PACKAGE}_LIBRARY_${library}-DEBUG CACHE)
@@ -144,6 +164,8 @@ macro(imstk_find_libary package library)
     )
 
   endif()
+
+  set(CMAKE_FIND_LIBRARY_PREFIXES "${IMSTK_ORIG_FIND_LIBRARY_PREFIXES}")
 
   #message(STATUS "Looking for Release Library : ${library}${release_postfix} in ${_SEARCH_DIR}")
   if (EXISTS ${${PACKAGE}_LIBRARY_${library}-RELEASE})
@@ -169,7 +191,7 @@ endmacro()
 #-----------------------------------------------------------------------------
 macro(imstk_find_package package)
 
-  string(TOUPPER ${package} PACKAGE)
+  set(PACKAGE ${package})
   if (${PACKAGE}_FOUND)
     return()
   endif()
@@ -206,7 +228,7 @@ endmacro()
 #-----------------------------------------------------------------------------
 macro(imstk_find_header_package package)
 
-  string(TOUPPER ${package} PACKAGE)
+  set(PACKAGE ${package})
   if (${PACKAGE}_FOUND)
     return()
   endif()
