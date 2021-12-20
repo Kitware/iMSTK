@@ -114,8 +114,8 @@ public:
     virtual void uninitModule() { }
 
 protected:
-    std::atomic<bool> m_init   = false;
-    std::atomic<bool> m_paused = false;
+    std::atomic<bool> m_init   = ATOMIC_VAR_INIT(false);
+    std::atomic<bool> m_paused = ATOMIC_VAR_INIT(false);
     double m_dt = 0.0;
     ExecutionType m_executionType = ExecutionType::PARALLEL; // Defaults to parallel, subclass and set
     bool   m_muteUpdateEvents     = false;                   // Avoid posting pre/post update, useful when running modules at extremely fast rates
