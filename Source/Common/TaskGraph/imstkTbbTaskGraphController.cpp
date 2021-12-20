@@ -20,86 +20,59 @@
 =========================================================================*/
 
 #include "imstkTbbTaskGraphController.h"
+#include "imstkMacros.h"
 #include "imstkTaskGraph.h"
 
-#include <tbb/tbb.h>
+DISABLE_WARNING_PUSH
+    DISABLE_WARNING_PADDING
+#include <tbb/flow_graph.h>
+DISABLE_WARNING_POP
+
+using namespace tbb::flow;
 
 namespace imstk
 {
-class NodeTbbTask : public tbb::task
-{
-public:
-    NodeTbbTask(std::shared_ptr<TaskNode> node) : m_node(node) { }
-
-public:
-    task* execute() override
-    {
-        __TBB_ASSERT(ref_count() == 0, NULL);
-
-        m_node->execute();
-
-        for (size_t i = 0; i < successors.size(); i++)
-        {
-            if (successors[i]->decrement_ref_count() == 0)
-            {
-                spawn(*successors[i]);
-            }
-        }
-        return NULL;
-    }
-
-public:
-    std::shared_ptr<TaskNode> m_node = nullptr;
-    std::vector<NodeTbbTask*> successors;
-};
-
 void
 TbbTaskGraphController::execute()
 {
-    // Create a Task for every node
+    using TbbContinueNode = continue_node<continue_msg>;
+
+    graph g;
+
+    broadcast_node<continue_msg> start(g);
+
+    // Create a continue node for every TaskNode (except start)
+    std::unordered_map<std::shared_ptr<TaskNode>, TbbContinueNode> tbbNodes;
+    using NodeKeyValuePair = std::pair<std::shared_ptr<TaskNode>, TbbContinueNode>;
+
     const TaskNodeVector& nodes = m_graph->getNodes();
     if (nodes.size() == 0)
     {
         return;
     }
-
-    // Create a task for every node
-    std::unordered_map<std::shared_ptr<TaskNode>, NodeTbbTask*> tasks;
-    tasks.reserve(nodes.size());
-
+    tbbNodes.reserve(nodes.size());
     for (size_t i = 0; i < nodes.size(); i++)
     {
-        std::shared_ptr<TaskNode> node = nodes[i];
-        tasks[node] = new (tbb::task::allocate_root())NodeTbbTask(node);
-    }
-    // Increment successor reference counts
-    const TaskNodeAdjList& adjList = m_graph->getAdjList();
-    // For every node in graph
-    for (size_t i = 0; i < nodes.size(); i++)
-    {
-        // If it contains outputs
-        if (adjList.count(nodes[i]) != 0)
+        if (m_graph->getSource() != nodes[i])
         {
-            // For every output
-            const TaskNodeSet& outputNodes = adjList.at(nodes[i]);
-            for (TaskNodeSet::const_iterator it = outputNodes.begin(); it != outputNodes.end(); it++)
-            {
-                // Lookup the task of the node
-                NodeTbbTask* successor = tasks[*it];
-                tasks[nodes[i]]->successors.push_back(successor);
-                successor->increment_ref_count();
-            }
+            std::shared_ptr<TaskNode> node = nodes[i];
+            tbbNodes.insert(NodeKeyValuePair(node, TbbContinueNode(g,
+                [node](continue_msg) { node->execute(); })));
         }
     }
 
-    NodeTbbTask* startTask = tasks[m_graph->getSource()];
-    NodeTbbTask* finalTask = tasks[m_graph->getSink()];
+    const TaskNodeAdjList& adjList = m_graph->getAdjList();
+    for (const auto& i : adjList)
+    {
+        TbbContinueNode& tbbNode1 = tbbNodes.at(i.first);
+        for (const auto& outputNode : i.second)
+        {
+            TbbContinueNode& tbbNode2 = tbbNodes.at(outputNode);
+            make_edge(tbbNode1, tbbNode2);
+        }
+    }
 
-    // Extra ref count on the final task
-    finalTask->increment_ref_count();
-    finalTask->spawn_and_wait_for_all(*startTask);
-
-    finalTask->execute(); // Execute final task explicitly
-    tbb::task::destroy(*finalTask);
+    start.try_put(continue_msg());
+    g.wait_for_all();
 }
 }

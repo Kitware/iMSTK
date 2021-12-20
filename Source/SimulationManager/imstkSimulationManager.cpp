@@ -20,33 +20,15 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
-#include "imstkViewer.h"
+#include "imstkMacros.h"
 #include "imstkTimer.h"
+#include "imstkViewer.h"
 
 #include <thread>
-#include <tbb/task.h>
-
-class FuncTask : public tbb::task
-{
-public:
-    FuncTask(std::shared_ptr<imstk::Module> module, std::function<void(std::shared_ptr<imstk::Module>)> func) :
-        m_func(func), m_module(module)
-    {
-    }
-
-    task* execute() override
-    {
-        __TBB_ASSERT(ref_count() == 0, NULL);
-
-        m_func(m_module);
-
-        return NULL;
-    }
-
-protected:
-    std::function<void(std::shared_ptr<imstk::Module>)> m_func;
-    std::shared_ptr<imstk::Module> m_module;
-};
+DISABLE_WARNING_PUSH
+    DISABLE_WARNING_PADDING
+#include <tbb/task_group.h>
+DISABLE_WARNING_POP
 
 namespace imstk
 {
@@ -76,18 +58,16 @@ SimulationManager::start()
     }
 
     // Start parallel modules
-    tbb::task_list           taskList;
+    tbb::task_group          tasks;
     std::vector<std::thread> threads(m_asyncModules.size());
     {
         if (m_threadType == ThreadingType::TBB)
         {
             for (auto module : m_asyncModules)
             {
-                FuncTask* moduleTask = new(tbb::task::allocate_root())FuncTask(module,
-                                                                               std::bind(&SimulationManager::runModuleParallel, this, std::placeholders::_1));
-                taskList.push_back(*moduleTask);
+                tasks.run([this, module]() { runModuleParallel(module); });
             }
-            tbb::task::spawn_root_and_wait(taskList);
+            tasks.wait();
         }
         else if (m_threadType == ThreadingType::STL)
         {

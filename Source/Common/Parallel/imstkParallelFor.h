@@ -21,7 +21,12 @@
 
 #pragma once
 
+#include "imstkMacros.h"
+
+DISABLE_WARNING_PUSH
+    DISABLE_WARNING_PADDING
 #include <tbb/tbb.h>
+DISABLE_WARNING_POP
 
 namespace imstk
 {

@@ -22,6 +22,8 @@
 #include "imstkModule.h"
 #include "imstkLogger.h"
 
+#include <thread>
+
 namespace imstk
 {
 void

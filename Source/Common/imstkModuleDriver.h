@@ -23,10 +23,6 @@
 
 #include "imstkEventObject.h"
 
-#include <memory>
-#include <tbb/atomic.h>
-#include <vector>
-
 namespace imstk
 {
 using ModuleDriverStatus = int;
@@ -72,6 +68,6 @@ public:
 protected:
     std::vector<std::shared_ptr<Module>> m_modules;
 
-    tbb::atomic<ModuleDriverStatus> simState = { ModuleDriverRunning };
+    std::atomic<ModuleDriverStatus> simState = { ModuleDriverRunning };
 };
 };
