@@ -49,7 +49,7 @@ imstk_add_library(RenderingVTK
   SUBDIR_LIST
     RenderDelegate
   DEPENDS
-    openvr
+    OpenVR::OpenVR
     Animation
     RenderingCore
     ${VTK_LIBRARIES})

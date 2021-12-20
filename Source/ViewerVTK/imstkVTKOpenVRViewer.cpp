@@ -174,7 +174,7 @@ VTKOpenVRViewer::initModule()
     renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the devices
 
     // Actions must be added after initialization of interactor
-    vtkInteractorStyleVR* iStyle = vtkInteractorStyleVR::SafeDownCast(m_vtkInteractorStyle.get());
+    vtkInteractorStyleVR* iStyle = vtkInteractorStyleVR::SafeDownCast(m_vtkInteractorStyle);
     iStyle->addButtonActions();
     iStyle->addMovementActions();
 

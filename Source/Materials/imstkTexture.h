@@ -131,8 +131,8 @@ public:
     ///
     /// \brief Get the wrapping type
     ///
-    const WrapType getWrapType() const { return m_wrapType; }
-    void setWrapType(const WrapType repeat)
+    const WrapType& getWrapType() const { return m_wrapType; }
+    void setWrapType(const WrapType& repeat)
     {
         m_wrapType = repeat;
         postModified();
