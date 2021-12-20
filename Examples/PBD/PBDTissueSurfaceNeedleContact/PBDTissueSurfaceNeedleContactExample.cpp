@@ -229,8 +229,6 @@ makeTissueObj(const std::string& name,
 
     // Setup the material
     imstkNew<RenderMaterial> material;
-    material->setBackFaceCulling(false);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
     material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
