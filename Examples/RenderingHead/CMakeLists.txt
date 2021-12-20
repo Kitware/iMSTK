@@ -16,20 +16,17 @@
 #
 ###########################################################################
 
-project(Example-OpenVRController)
+project(Example-RenderingHead)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME}
-	OpenVRControllerExample.cpp
-	CameraOpenVRControl.h
-	CameraOpenVRControl.cpp)
+imstk_add_executable(${PROJECT_NAME} RenderingHeadExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/OpenVR)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

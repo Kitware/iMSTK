@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkVTKOpenVRViewer.h"
+#include "imstkCamera.h"
 #include "imstkDeviceControl.h"
 #include "imstkLogger.h"
 #include "imstkOpenVRDeviceClient.h"
@@ -28,10 +29,10 @@
 #include "imstkVTKInteractorStyleVR.h"
 #include "imstkVTKRenderer.h"
 
+#include <vtkOpenVRRenderWindowInteractor.h>
 #include <vtkMatrix4x4.h>
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRRenderWindow.h>
-#include <vtkOpenVRRenderWindowInteractor.h>
 #include <vtkOpenVRModel.h>
 
 namespace imstk
@@ -157,25 +158,32 @@ VTKOpenVRViewer::initModule()
 
     // VR interactor doesn't support timers, here we throw timer event every update
     // another option would be to conform VTKs VR interactor
-    vtkSmartPointer<vtkOpenVRRenderWindowInteractor> iren = vtkOpenVRRenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
+    auto iren = vtkOpenVRRenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
     //iren->Start(); // Cannot use
     if (iren->HasObserver(vtkCommand::StartEvent))
     {
         iren->InvokeEvent(vtkCommand::StartEvent, nullptr);
         return true;
     }
+
+    auto renWin = vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
+    renWin->Initialize();
+
     iren->Initialize();
 
     // Hide the device overlays
     // \todo: Display devices in debug mode
-    vtkSmartPointer<vtkOpenVRRenderWindow> renWin = vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
-    renWin->Initialize();
     renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the devices
 
-    // Hide all controllers
+    // Actions must be added after initialization of interactor
+    vtkInteractorStyleVR* iStyle = vtkInteractorStyleVR::SafeDownCast(m_vtkInteractorStyle.get());
+    iStyle->addButtonActions();
+    iStyle->addMovementActions();
+
+    // Hide all controller models
     for (uint32_t i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
     {
-        vtkOpenVRModel* trackedDeviceModel = renWin->GetTrackedDeviceModel(i);
+        vtkVRModel* trackedDeviceModel = renWin->GetTrackedDeviceModel(i);
         if (trackedDeviceModel != nullptr)
         {
             trackedDeviceModel->SetVisibility(false);
@@ -193,6 +201,12 @@ VTKOpenVRViewer::updateModule()
     {
         return;
     }
+
+    // For the VR view we can't supply the a camera in the normal sense
+    // we need to pre multiply a "user view"
+    std::shared_ptr<Camera> cam  = getActiveScene()->getActiveCamera();
+    const Mat4d&            view = cam->getView();
+    setPhysicalToWorldTransform(view);
 
     // Update Camera
     // \todo: No programmatic control over VR camera currently

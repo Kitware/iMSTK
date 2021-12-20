@@ -46,7 +46,6 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
     // Setup the Geometry
     makeTetGrid(tissueSize, tissueDim, tissueCenter);
     m_objectSurfMesh = m_objectTetMesh->extractSurfaceMesh();
-    m_objectSurfMesh->flipNormals();
     //setXZPlaneTexCoords(4.0);
     setSphereTexCoords(4.0);
 
@@ -90,8 +89,6 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
 
     // Setup the material
     imstkNew<RenderMaterial> material;
-    material->setBackFaceCulling(false);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
     material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
@@ -104,12 +101,6 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
     imstkNew<VisualModel> visualModel(m_objectSurfMesh);
     visualModel->setRenderMaterial(material);
     addVisualModel(visualModel);
-
-    // Add a visual model to render the normals of the surface
-    imstkNew<VisualModel> normalsVisualModel(m_objectSurfMesh);
-    normalsVisualModel->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    normalsVisualModel->getRenderMaterial()->setPointSize(0.5);
-    addVisualModel(normalsVisualModel);
 
     // Setup the Object
     setPhysicsGeometry(m_objectTetMesh);

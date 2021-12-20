@@ -19,51 +19,32 @@
 
 =========================================================================*/
 
-#include "imstkModule.h"
-#include "imstkLogger.h"
+#include "imstkCamera.h"
 
-#include <thread>
+#include <gtest/gtest.h>
 
-namespace imstk
+using namespace imstk;
+
+TEST(imstkCameraTest, camera_defaults)
 {
-void
-Module::setSleepDelay(const double ms)
-{
-    CHECK(ms >= 0.0);
-    m_sleepDelay = ms;
+    Camera cam;
+
+    // Ensure the camera is initialized to identity
+    EXPECT_EQ(cam.getView(), Mat4d::Identity())
+        << "Expected: " << Mat4d::Identity()
+        << " Actual: " << cam.getView();
+    EXPECT_EQ(cam.getInvView(), Mat4d::Identity())
+        << "Expected: " << Mat4d::Identity()
+        << " Actual: " << cam.getInvView();
+
+    cam.update();
+
+    // Ensure camera is initialized to identity even after applying
+    // lookat
+    EXPECT_EQ(cam.getView(), Mat4d::Identity())
+        << "Expected: " << Mat4d::Identity()
+        << " Actual: " << cam.getView();
+    EXPECT_EQ(cam.getInvView(), Mat4d::Identity())
+        << "Expected: " << Mat4d::Identity()
+        << " Actual: " << cam.getInvView();
 }
-
-void
-Module::update()
-{
-    if (m_init && !m_paused)
-    {
-        if (m_sleepDelay != 0.0)
-        {
-            std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(m_sleepDelay));
-        }
-
-        if (m_muteUpdateEvents)
-        {
-            this->updateModule();
-        }
-        else
-        {
-            this->postEvent(Event(Module::preUpdate()));
-            this->updateModule();
-            this->postEvent(Event(Module::postUpdate()));
-        }
-    }
-}
-
-void
-Module::uninit()
-{
-    // Can only uninit if, init'd
-    if (m_init)
-    {
-        uninitModule();
-        m_init = false;
-    }
-}
-}// imstk

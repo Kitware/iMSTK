@@ -21,11 +21,13 @@
 
 #pragma once
 
-/// \todo Remove this in TBB 2019 Update 4: https://github.com/intel/tbb/blob/tbb_2019/CHANGES#L117
-#define TBB_PREVIEW_GLOBAL_CONTROL 1
+#include "imstkMacros.h"
 
+DISABLE_WARNING_PUSH
+    DISABLE_WARNING_PADDING
 #include <tbb/tbb.h>
 #include <tbb/global_control.h>
+DISABLE_WARNING_POP
 
 namespace imstk
 {
@@ -34,7 +36,6 @@ namespace ParallelUtils
 class ThreadManager
 {
 public:
-
     ///
     /// \brief Set system-wide thread pool size for parallel computation
     ///

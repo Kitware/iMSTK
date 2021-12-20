@@ -40,9 +40,9 @@ TEST(imstkRenderScreenshotTest, ScreenshotTest)
     const std::string screenshotFileName = "Screenshot-" + std::to_string(0) + ".png";
     if (vtksys::SystemTools::FileExists(screenshotFileName))
     {
-        const bool fileWasRemoved = vtksys::SystemTools::RemoveFile(screenshotFileName);
-        EXPECT_TRUE(fileWasRemoved) << "Failed to remove existing screenshot file before screenshotTest";
-        if (!fileWasRemoved)
+        const vtksys::Status fileStatus = vtksys::SystemTools::RemoveFile(screenshotFileName);
+        EXPECT_FALSE(fileStatus.IsSuccess()) << "Failed to remove existing screenshot file before screenshotTest";
+        if (!fileStatus.IsSuccess())
         {
             return;
         }

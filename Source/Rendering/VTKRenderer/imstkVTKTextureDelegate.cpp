@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkVTKTextureDelegate.h"
+#include "imstkColor.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkLogger.h"
 #include "imstkTexture.h"
@@ -82,7 +83,25 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
             imgReader->SetFileName(tFileName.c_str());
             imgReader->Update();
             m_vtkTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
-            m_vtkTexture->SetRepeat(m_texture->getRepeating());
+            const Texture::WrapType wrapType = m_texture->getWrapType();
+            if (wrapType == Texture::WrapType::REPEAT)
+            {
+                m_vtkTexture->SetWrap(vtkTexture::Repeat);
+            }
+            else if (wrapType == Texture::WrapType::CLAMP_TO_BORDER)
+            {
+                m_vtkTexture->SetWrap(vtkTexture::ClampToBorder);
+            }
+            else if (wrapType == Texture::WrapType::CLAMP_TO_EDGE)
+            {
+                m_vtkTexture->SetWrap(vtkTexture::ClampToEdge);
+            }
+            const Color& borderColor = m_texture->getBorderColor();
+            m_vtkTexture->SetBorderColor(
+                static_cast<float>(borderColor.r),
+                static_cast<float>(borderColor.g),
+                static_cast<float>(borderColor.b),
+                static_cast<float>(borderColor.a));
             m_vtkTexture->SetInterpolate(m_texture->getInterpolation());
             m_vtkTexture->SetInputConnection(0, imgReader->GetOutputPort());
 
@@ -98,7 +117,26 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
         vtkSmartPointer<vtkImageData> vtkImgData = GeometryUtils::coupleVtkImageData(imstkImgData);
         m_vtkTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
         m_vtkTexture->SetInterpolate(m_texture->getInterpolation());
-        m_vtkTexture->SetRepeat(m_texture->getRepeating());
+
+        const Texture::WrapType wrapType = m_texture->getWrapType();
+        if (wrapType == Texture::WrapType::REPEAT)
+        {
+            m_vtkTexture->SetWrap(vtkTexture::Repeat);
+        }
+        else if (wrapType == Texture::WrapType::CLAMP_TO_BORDER)
+        {
+            m_vtkTexture->SetWrap(vtkTexture::ClampToBorder);
+        }
+        else if (wrapType == Texture::WrapType::CLAMP_TO_EDGE)
+        {
+            m_vtkTexture->SetWrap(vtkTexture::ClampToEdge);
+        }
+        const Color& borderColor = m_texture->getBorderColor();
+        m_vtkTexture->SetBorderColor(
+            static_cast<float>(borderColor.r),
+            static_cast<float>(borderColor.g),
+            static_cast<float>(borderColor.b),
+            static_cast<float>(borderColor.a));
         m_vtkTexture->SetInputData(vtkImgData);
 
         if (texture->getType() == Texture::Type::Diffuse)

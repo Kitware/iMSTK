@@ -38,7 +38,16 @@ public:
     vtkTypeMacro(vtkInteractorStyleVR, vtkInteractorStyle3D);
 
     void OnMove3D(vtkEventData* edata) override;
-    void OnButton3D(vtkEventData* edata) override;
+
+    ///
+    /// \brief Adds button actions
+    ///
+    void addButtonActions();
+
+    ///
+    /// \brief Adds thumbstick movement actions
+    ///
+    void addMovementActions();
 
     std::shared_ptr<imstk::OpenVRDeviceClient> getLeftControllerDeviceClient() const { return m_leftControllerDeviceClient; }
     std::shared_ptr<imstk::OpenVRDeviceClient> getRightControllerDeviceClient() const { return m_rightControllerDeviceClient; }
@@ -46,6 +55,9 @@ public:
 
 public:
     vtkInteractorStyleVR();
+
+protected:
+    void OnButtonPress(vtkEventData* data, int buttonId);
 
 public:
     std::shared_ptr<imstk::OpenVRDeviceClient> m_leftControllerDeviceClient;

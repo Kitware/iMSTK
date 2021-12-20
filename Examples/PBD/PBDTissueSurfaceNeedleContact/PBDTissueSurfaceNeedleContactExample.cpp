@@ -229,7 +229,6 @@ makeTissueObj(const std::string& name,
 
     // Setup the material
     imstkNew<RenderMaterial> material;
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
     material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
@@ -340,7 +339,7 @@ main()
 
     // Light
     imstkNew<DirectionalLight> light;
-    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setDirection(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
     scene->addLight("Light", light);
 

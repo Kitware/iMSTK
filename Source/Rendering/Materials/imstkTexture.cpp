@@ -39,64 +39,6 @@ Texture::getType() const
     return m_type;
 }
 
-std::string
-Texture::getTypeAsString() const
-{
-    return Texture::getTypeAsString(m_type);
-}
-
-std::string
-Texture::getTypeAsString(Type type)
-{
-    switch (type)
-    {
-    case Type::Diffuse:
-    {
-        return "Diffuse";
-    }
-    case Type::Normal:
-    {
-        return "Normal";
-    }
-    case Type::Roughness:
-    {
-        return "Roughness";
-    }
-    case Type::Metalness:
-    {
-        return "Metalness";
-    }
-    case Type::SubsurfaceScattering:
-    {
-        return "Subsurface_scattering";
-    }
-    case Type::AmbientOcclusion:
-    {
-        return "Ambient_Occlusion";
-    }
-    case Type::Cavity:
-    {
-        return "Cavity";
-    }
-    case Type::IrradianceCubeMap:
-    {
-        return "Irradiance_Cubemap";
-    }
-    case Type::RadianceCubeMap:
-    {
-        return "Radiance_Cubemap";
-    }
-    case Type::BRDF_LUT:
-    {
-        return "BRDF_LUT";
-    }
-    default:
-    {
-        return "None";
-    }
-    }
-}
-
 const Texture::FileType
 Texture::getFileType()
 {

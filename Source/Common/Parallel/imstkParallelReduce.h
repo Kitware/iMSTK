@@ -24,7 +24,10 @@
 #include "imstkMath.h"
 #include "imstkVecDataArray.h"
 
+DISABLE_WARNING_PUSH
+    DISABLE_WARNING_PADDING
 #include <tbb/tbb.h>
+DISABLE_WARNING_POP
 
 #undef min
 #undef max

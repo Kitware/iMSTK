@@ -361,6 +361,10 @@ SurfaceMesh::computeVertexTangents()
 
         setVertexTangents("tangents", vertexTangentsPtr);
     }
+    else
+    {
+        LOG(FATAL) << "Tried to compute per vertex tangents for mesh with no UVs";
+    }
 }
 
 void

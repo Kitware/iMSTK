@@ -5,14 +5,6 @@
 file(GLOB VTK_H_FILES VTKRenderer/imstk*.h)
 file(GLOB VTK_CPP_FILES VTKRenderer/imstk*.cpp)
 
-list(APPEND ExclusionFiles "")
-# Don't build with X11 if on windows or (on linux and building headless)
-if(WIN32 OR (UNIX AND iMSTK_USE_VTK_OSMESA))
-  list(APPEND ExclusionFiles
-    VTKRenderer/imstkVtkXRenderWindowInteractor2.h
-    VTKRenderer/imstkVtkXRenderWindowInteractor2.cpp)
-endif()
-
 file(GLOB SIMMANAGER_H_FILES imstk*.h)
 file(GLOB SIMMANAGER_CPP_FILES imstk*.cpp)
 
@@ -29,12 +21,19 @@ imstk_add_library(SimulationManager
     ${SIMULATIONMANAGER_CPP_FILES}
   SUBDIR_LIST
     ${SIMULATIONMANAGER_SUBDIR}
-  EXCLUDE_FILES
-    ${ExclusionFiles}
   DEPENDS
     Scene
     Rendering
   )
+
+# Install VR actions json
+file(GLOB VTK_VR_JSON_FILES VTKRenderer/vtk_openvr_*.json)
+if (MSVC)
+  # Show them in visual studios
+  target_sources(SimulationManager PRIVATE ${VTK_VR_JSON_FILES})
+  set_source_files_properties(${VTK_VR_JSON_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+endif()
+install(FILES ${VTK_VR_JSON_FILES} DESTINATION bin)
 
 #-----------------------------------------------------------------------------
 # Testing

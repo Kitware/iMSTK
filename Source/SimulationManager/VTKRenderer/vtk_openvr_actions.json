@@ -1,0 +1,67 @@
+{
+  "actions": [
+    {
+      "name": "/actions/vtk/in/TriggerPressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/RightGripMovement",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/vtk/in/LeftGripMovement",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/vtk/in/GripPressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/Button0Pressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/Button1Pressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/Button2Pressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/Button3Pressed",
+      "type": "boolean"
+    }
+  ],
+  "default_bindings": [
+    {
+      "binding_url": "vtk_openvr_binding_vive_controller.json",
+      "controller_type": "vive_controller"
+    },
+    {
+      "binding_url": "vtk_openvr_binding_oculus_touch.json",
+      "controller_type": "generic"
+    },
+    {
+      "binding_url": "vtk_openvr_binding_oculus_touch.json",
+      "controller_type": "oculus_touch"
+    },
+    {
+      "binding_url": "vtk_openvr_binding_hpmotioncontroller.json",
+      "controller_type": "hpmotioncontroller"
+    }
+  ],
+  "localization": [
+    {
+      "/actions/vtk/in/GripPressed": "Grip Pressed",
+      "/actions/vtk/in/RightGripMovement": "Right Grip Movement",
+      "/actions/vtk/in/LeftGripMovement": "Left Grip Movement",
+      "/actions/vtk/in/TriggerPressed": "Trigger Pressed",
+      "/actions/vtk/in/Button0Pressed": "Button0 Pressed",
+      "/actions/vtk/in/Button1Pressed": "Button1 Pressed",
+      "/actions/vtk/in/Button2Pressed": "Button2 Pressed",
+      "/actions/vtk/in/Button3Pressed": "Button3 Pressed",
+      "language_tag": "en_US"
+    }
+  ]
+}

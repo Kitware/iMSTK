@@ -3,8 +3,8 @@
 #-----------------------------------------------------------------------------
 set(VTK_DEPENDENCIES "OpenVR")
 
-set(${PROJECT_NAME}_VTK_REPO_SOURCE "9.0" CACHE STRING "Select VTK Source Branch/Tag")
-set(VTK_SOURCES "9.0;master;release;nightly-master" CACHE INTERNAL "List of available VTK branch,tags to get")
+set(${PROJECT_NAME}_VTK_REPO_SOURCE "9.1" CACHE STRING "Select VTK Source Branch/Tag")
+set(VTK_SOURCES "9.1;master;release;nightly-master" CACHE INTERNAL "List of available VTK branch,tags to get")
 set_property(CACHE ${PROJECT_NAME}_VTK_REPO_SOURCE PROPERTY STRINGS ${VTK_SOURCES})
 
 set(VTK_MODULE_SETTINGS
@@ -45,8 +45,8 @@ if (${PROJECT_NAME}_USE_VTK_OSMESA)
 endif()
 set(${PROJECT_NAME}_VTK_SOURCE GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git)
 
-if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "9.0")
-  set(${PROJECT_NAME}_VTK_HASH GIT_TAG ab278e87b181e3a02082bea7361fbaa3ddafb3ad)
+if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "9.1")
+  set(${PROJECT_NAME}_VTK_HASH GIT_TAG 285daeedd58eb890cb90d6e907d822eea3d2d092)
 else()
   set(${PROJECT_NAME}_VTK_HASH GIT_TAG origin/${${PROJECT_NAME}_VTK_REPO_SOURCE})
 endif()

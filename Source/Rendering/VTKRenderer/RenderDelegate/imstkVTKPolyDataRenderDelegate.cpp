@@ -83,6 +83,8 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
     const Color& edgeColor     = material->getEdgeColor();
     const Color& vertexColor   = material->getVertexColor();
     const Color& surfaceColor  = material->getColor();
+    const Color& coatColor     = material->getCoatColor();
+    const Color& edgeTintColor = material->getEdgeTint();
 
     // Phong
     actorProperty->SetDiffuseColor(diffuseColor.r, diffuseColor.g, diffuseColor.b);
@@ -98,6 +100,16 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
     actorProperty->SetRoughness(material->getRoughness());
     actorProperty->SetMetallic(material->getMetalness());
     actorProperty->SetNormalScale(material->getNormalStrength());
+    // PBR clearcoat
+    actorProperty->SetAnisotropy(material->getAnisotropy());
+    actorProperty->SetAnisotropyRotation(material->getAnisotropyRotation());
+    actorProperty->SetBaseIOR(material->getBaseIOR());
+    actorProperty->SetCoatColor(coatColor.r, coatColor.g, coatColor.b);
+    actorProperty->SetCoatIOR(material->getCoatIOR());
+    actorProperty->SetCoatNormalScale(material->getCoatNormalScale());
+    actorProperty->SetCoatRoughness(material->getCoatRoughness());
+    actorProperty->SetCoatStrength(material->getCoatStrength());
+    actorProperty->SetEdgeTint(edgeTintColor.r, edgeTintColor.g, edgeTintColor.b);
 
     // Base
     actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
@@ -111,14 +123,8 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
 
     if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
     {
-        /*actorProperty->UseImageBasedLightingOn();
-            actorProperty->SetEnvironmentCubeMap(getVTKTexture(cubemap));*/
-
         actorProperty->LightingOn();
         actorProperty->SetInterpolationToPBR();
-
-        // configure the basic properties
-        //actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
     }
     else if (material->getShadingModel() == RenderMaterial::ShadingModel::Phong)
     {

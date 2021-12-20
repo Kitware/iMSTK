@@ -47,7 +47,7 @@ ThreadManager::setThreadPoolSize(const size_t nThreads)
 void
 ThreadManager::setOptimalParallelism()
 {
-    setThreadPoolSize(static_cast<size_t>(tbb::task_scheduler_init::default_num_threads()));
+    setThreadPoolSize(static_cast<size_t>(tbb::info::default_concurrency()));
 }
 
 size_t
