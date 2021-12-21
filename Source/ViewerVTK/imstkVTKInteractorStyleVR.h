@@ -19,9 +19,8 @@
 
 =========================================================================*/
 
-#include "imstkInteractorStyle.h"
-
 #include <vtkInteractorStyle3D.h>
+#include <memory>
 
 namespace imstk
 {
@@ -31,7 +30,7 @@ class OpenVRDeviceClient;
 ///
 /// \brief VTK Interactor style for VR
 ///
-class vtkInteractorStyleVR : public vtkInteractorStyle3D, public imstk::InteractorStyle
+class vtkInteractorStyleVR : public vtkInteractorStyle3D
 {
 public:
     static vtkInteractorStyleVR* New();

@@ -19,22 +19,4 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkEventObject.h"
-
-namespace imstk
-{
-class InteractorStyle;
-
-///
-/// \class InteractorStyle
-/// \brief TODO
-///
-class InteractorStyle
-{
-public:
-    InteractorStyle() = default;
-    virtual ~InteractorStyle() = default;
-};
-}
+#include "imstkRenderer.h"

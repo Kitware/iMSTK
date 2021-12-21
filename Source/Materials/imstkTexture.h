@@ -121,18 +121,18 @@ public:
     ///
     /// \brief Get file extension
     ///
-    const FileType getFileType();
+    FileType getFileType();
 
     ///
     /// \brief Get if mipmaps are enabled
     ///
-    const bool getMipmapsEnabled() const { return m_mipmapsEnabled; }
+    bool getMipmapsEnabled() const { return m_mipmapsEnabled; }
 
     ///
     /// \brief Get the wrapping type
     ///
-    const WrapType getWrapType() const { return m_wrapType; }
-    void setWrapType(const WrapType repeat)
+    const WrapType& getWrapType() const { return m_wrapType; }
+    void setWrapType(const WrapType& repeat)
     {
         m_wrapType = repeat;
         postModified();
@@ -148,12 +148,12 @@ public:
     ///
     /// \brief Get if anisotropic filtering is enabled
     ///
-    const bool isAnisotropyEnabled() const { return m_anisotropyEnabled; }
+    bool isAnisotropyEnabled() const { return m_anisotropyEnabled; }
 
     ///
     /// \brief Get anisotropy factor
     ///
-    const double getAnisotropyFactor() const { return m_anisotropyFactor; }
+    double getAnisotropyFactor() const { return m_anisotropyFactor; }
 
     ///
     /// \brief Set the input image data, not required (paths to files can be used instead)
@@ -172,7 +172,7 @@ public:
     ///
     /// \brief Get whether interpolation is used when sampling the texture
     ///
-    const bool getInterpolation() { return m_interpolation; }
+    bool getInterpolation() { return m_interpolation; }
 
     ///
     /// \brief Get the input image data for the texture, not required (paths to files can be used instead)

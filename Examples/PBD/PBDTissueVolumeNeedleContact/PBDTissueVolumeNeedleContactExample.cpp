@@ -463,13 +463,13 @@ main()
             const std::vector<Vec3d>& debugEmbeddingPts  = needleEmbeddedCH->m_debugEmbeddingPoints;
             const std::vector<Vec3i>& debugEmbeddingTris = needleEmbeddedCH->m_debugEmbeddedTriangles;
             debugGeomObj->clear();
-            for (int i = 0; i < debugEmbeddingPts.size(); i++)
+            for (size_t i = 0; i < debugEmbeddingPts.size(); i++)
             {
                 debugGeomObj->addPoint(debugEmbeddingPts[i]);
             }
             auto verticesPtr = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry())->getVertexPositions();
             VecDataArray<double, 3>& vertices = *verticesPtr;
-            for (int i = 0; i < debugEmbeddingTris.size(); i++)
+            for (size_t i = 0; i < debugEmbeddingTris.size(); i++)
             {
                 debugGeomObj->addTriangle(
                         vertices[debugEmbeddingTris[i][0]],

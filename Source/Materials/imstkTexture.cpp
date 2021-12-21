@@ -39,7 +39,7 @@ Texture::getType() const
     return m_type;
 }
 
-const Texture::FileType
+Texture::FileType
 Texture::getFileType()
 {
     FileType textureType = FileType::Unknown;

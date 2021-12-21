@@ -284,7 +284,7 @@ InflatableObject::findAffectedConstraint(const Vec3d& toolTip, const double radi
     }
     else
     {
-        for (int i = 0; i < constraintIDs.size(); i++)
+        for (size_t i = 0; i < constraintIDs.size(); i++)
         {
             m_constraintIDandWeight.push_back(std::make_pair(constraintIDs[i], weights[i]));
         }

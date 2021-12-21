@@ -22,7 +22,6 @@
 #include "imstkViewer.h"
 #include "imstkCamera.h"
 #include "imstkDeviceControl.h"
-#include "imstkInteractorStyle.h"
 #include "imstkLogger.h"
 
 namespace imstk
@@ -30,7 +29,6 @@ namespace imstk
 Viewer::Viewer(std::string name) :
     m_activeScene(nullptr),
     m_debugCamera(std::make_shared<Camera>()),
-    m_interactorStyle(nullptr),
     m_screenCapturer(nullptr),
     m_config(std::make_shared<ViewerConfig>())
 {
@@ -44,6 +42,14 @@ Viewer::getActiveRenderer() const
     CHECK(m_activeScene != nullptr) << "no active scene!";
 
     return m_rendererMap.at(m_activeScene);
+}
+
+void
+Viewer::setInfoLevel(const int level)
+{
+    CHECK(level < getInfoLevelCount())
+        << "There are only " << getInfoLevelCount() << " levels and level " << level << " was requested";
+    m_infoLevel = level;
 }
 
 void

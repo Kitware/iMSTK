@@ -38,8 +38,8 @@ public:
         const Vec3d& fixedPt,
         Vec3d* p, Vec3d* q,
         const double beta = 0.05) : RbdConstraint(obj, nullptr, Side::A),
-        m_fixedPt(fixedPt), m_p(p), m_q(q),
-        m_beta(beta)
+        m_beta(beta), m_fixedPt(fixedPt),
+        m_p(p), m_q(q)
     {
     }
 

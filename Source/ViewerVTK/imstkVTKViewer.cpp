@@ -53,22 +53,20 @@ VTKViewer::VTKViewer(std::string name) : AbstractVTKViewer(name),
     m_lastFps(60.0)
 {
     // Create the interactor style
-    m_interactorStyle    = std::make_shared<VTKInteractorStyle>();
-    m_vtkInteractorStyle = std::dynamic_pointer_cast<vtkInteractorStyle>(m_interactorStyle);
+    m_vtkInteractorStyle = vtkSmartPointer<VTKInteractorStyle>::New();
 
     // Create the interactor
 #ifdef WIN32
-    vtkNew<vtkRenderWindowInteractor> iren;
-    iren->SetInteractorStyle(m_vtkInteractorStyle.get());
+    auto iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
 #else
 #ifdef iMSTK_USE_VTK_OSMESA
-    vtkSmartPointer<vtkGenericRenderWindowInteractor> iren = vtkSmartPointer<vtkGenericRenderWindowInteractor>::New();
-    iren->SetInteractorStyle(m_vtkInteractorStyle.get());
+    auto iren = vtkSmartPointer<vtkGenericRenderWindowInteractor>::New();
 #else
     vtkSmartPointer<vtkXRenderWindowInteractor> iren = vtkSmartPointer<vtkXRenderWindowInteractor>::New();
     iren->SetInteractorStyle(m_vtkInteractorStyle.get());
 #endif
 #endif
+    iren->SetInteractorStyle(m_vtkInteractorStyle);
 
     // Create the RenderWindow
     m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
@@ -155,6 +153,34 @@ VTKViewer::setDebugAxesLength(double x, double y, double z)
 }
 
 void
+VTKViewer::setInfoLevel(const int level)
+{
+    Viewer::setInfoLevel(level);
+
+    // Level 0 show no info
+    if (level == 0)
+    {
+        getTextStatusManager()->setStatusVisibility(VTKTextStatusManager::StatusType::FPS, false);
+        getActiveScene()->setEnableTaskTiming(false);
+        std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer())->setTimeTableVisibility(false);
+    }
+    // Level 1, show fps only
+    else if (level == 1)
+    {
+        getTextStatusManager()->setStatusVisibility(VTKTextStatusManager::StatusType::FPS, true);
+        getActiveScene()->setEnableTaskTiming(false);
+        std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer())->setTimeTableVisibility(false);
+    }
+    // Level 2 show fps and timing graph
+    else if (level == 2)
+    {
+        getTextStatusManager()->setStatusVisibility(VTKTextStatusManager::StatusType::FPS, true);
+        getActiveScene()->setEnableTaskTiming(true);
+        std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer())->setTimeTableVisibility(true);
+    }
+}
+
+void
 VTKViewer::setRenderingMode(const Renderer::Mode mode)
 {
     if (!m_activeScene)
@@ -215,13 +241,13 @@ VTKViewer::getScreenCaptureUtility() const
 std::shared_ptr<KeyboardDeviceClient>
 VTKViewer::getKeyboardDevice() const
 {
-    return std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->getKeyboardDeviceClient();
+    return VTKInteractorStyle::SafeDownCast(m_vtkInteractorStyle)->getKeyboardDeviceClient();
 }
 
 std::shared_ptr<MouseDeviceClient>
 VTKViewer::getMouseDevice() const
 {
-    return std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->getMouseDeviceClient();
+    return VTKInteractorStyle::SafeDownCast(m_vtkInteractorStyle)->getMouseDeviceClient();
 }
 
 void

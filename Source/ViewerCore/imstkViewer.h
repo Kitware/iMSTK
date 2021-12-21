@@ -106,6 +106,22 @@ public:
     virtual void setWindowTitle(const std::string& title) = 0;
 
     ///
+    /// \brief Set the info level, usually means display framerates and other
+    /// viewer related information
+    ///
+    virtual void setInfoLevel(const int level);
+
+    ///
+    /// \brief Get the current info level
+    ///
+    int getInfoLevel() const { return m_infoLevel; }
+
+    ///
+    /// \brief Get the number of info levels for a viewer, varies on implementation
+    ///
+    virtual const int getInfoLevelCount() const { return 1; }
+
+    ///
     /// \brief access screen shot utility
     ///
     std::shared_ptr<ScreenCaptureUtility> getScreenCaptureUtility() const { return m_screenCapturer; }
@@ -145,9 +161,9 @@ protected:
 
     std::shared_ptr<Scene>  m_activeScene;
     std::shared_ptr<Camera> m_debugCamera;
-    std::shared_ptr<InteractorStyle>      m_interactorStyle;
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
 
     std::shared_ptr<ViewerConfig> m_config;
+    int m_infoLevel = 0; ///> Info level
 };
 }

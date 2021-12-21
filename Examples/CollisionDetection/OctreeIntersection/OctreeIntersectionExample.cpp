@@ -206,7 +206,7 @@ main()
             ParallelUtils::findAABB(centers, lowerCorners, upperCorner);
             if ((lowerCorners - upperCorner).norm() > 70.0)
             {
-                for (size_t i = 0; i < dirs.size(); ++i)
+                for (size_t i = 0; i < static_cast<size_t>(dirs.size()); i++)
                 {
                     dirs[i] = -dirs[i]; // Change moving direction to move the objects back if they have moved too far
                 }

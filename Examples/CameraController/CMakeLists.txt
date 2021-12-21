@@ -32,5 +32,7 @@ if(iMSTK_USE_OpenHaptics)
     #-----------------------------------------------------------------------------
     # Link libraries to executable
     #-----------------------------------------------------------------------------
-    target_link_libraries(${PROJECT_NAME} SimulationManager)
+    target_link_libraries(${PROJECT_NAME}
+        SimulationManager
+        ViewerVTK)
 endif()

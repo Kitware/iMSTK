@@ -57,13 +57,15 @@ endif()
 # Link C Wrapper to the imstk libraries
 target_link_libraries(iMSTKCWrapper PRIVATE
     Common
+    Materials
 	Geometry
 	DataStructures
 	Devices
 	Filtering
 	FilteringCore
 	Materials
-	Rendering
+	RenderingCore
+    RenderingVTK
 	Solvers
 	DynamicalModels
 	CollisionDetection
@@ -71,6 +73,8 @@ target_link_libraries(iMSTKCWrapper PRIVATE
 	SceneEntities
 	Scene
 	SimulationManager
+    ViewerCore
+    ViewerVTK
 	Constraints
 	Animation)
 target_compile_options(iMSTKCWrapper PRIVATE

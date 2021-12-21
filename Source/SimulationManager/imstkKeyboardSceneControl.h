@@ -65,6 +65,5 @@ public:
 protected:
     std::weak_ptr<ModuleDriver> m_driver;
     std::weak_ptr<SceneManager> m_sceneManager;
-    bool m_showFps = false;
 };
 }

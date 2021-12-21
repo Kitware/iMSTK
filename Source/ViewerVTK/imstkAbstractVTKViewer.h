@@ -25,9 +25,9 @@
 
 #include <vtkSmartPointer.h>
 
-class vtkInteractorStyle;
 class vtkRenderWindow;
 class vtkCallbackCommand;
+class vtkInteractorStyle;
 
 namespace imstk
 {
@@ -87,11 +87,6 @@ public:
                                      const bool gradientBackground = false) override;
 
     ///
-    /// \brief Returns the vtk interactor style
-    ///
-    std::shared_ptr<vtkInteractorStyle> getVtkInteractorStyle() const { return m_vtkInteractorStyle; }
-
-    ///
     /// \brief Processes VTK events, includes OS events
     ///
     void processEvents() override;
@@ -108,7 +103,7 @@ protected:
 
 protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
-    std::shared_ptr<vtkInteractorStyle> m_vtkInteractorStyle;
+    vtkSmartPointer<vtkInteractorStyle> m_vtkInteractorStyle;
     vtkSmartPointer<vtkCallbackCommand> exitCallback;
     bool m_useVsync = true;
 };

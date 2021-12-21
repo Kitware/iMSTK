@@ -32,24 +32,6 @@ RenderTest::SetUp()
     viewer = std::make_shared<VTKViewer>("Viewer");
     viewer->setActiveScene(scene);
 
-    // Setup a scene manager to advance the scene in its own thread
-    sceneManager = std::make_shared<SceneManager>("Scene Manager");
-    sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
-    sceneManager->setActiveScene(scene);
-
-    driver = std::make_shared<SimulationManager>();
-    driver->addModule(viewer);
-    driver->addModule(sceneManager);
-
-    mouseControl = std::make_shared<MouseSceneControl>(viewer->getMouseDevice());
-    mouseControl->setSceneManager(sceneManager);
-    viewer->addControl(mouseControl);
-
-    keyControl = std::make_shared<KeyboardSceneControl>(viewer->getKeyboardDevice());
-    keyControl->setSceneManager(sceneManager);
-    keyControl->setModuleDriver(driver);
-    viewer->addControl(keyControl);
-
     renderMaterial = std::make_shared<RenderMaterial>();
 
     createGeometry();
@@ -63,16 +45,20 @@ RenderTest::SetUp()
     sceneObj->addVisualModel(visualModel);
     scene->addSceneObject(sceneObj);
 
-    driver->requestStatus(ModuleDriverRunning);
+    viewer->init();
 }
 
 void
 RenderTest::runFor(const int seconds)
 {
-    std::thread t(&SimulationManager::start, driver);
-    std::this_thread::sleep_for(std::chrono::seconds(seconds));
-    driver->requestStatus(ModuleDriverStopped);
-    t.join();
+    StopWatch timer;
+    timer.start();
+    const double ms = seconds * 1000.0;
+    while (timer.getTimeElapsed() < ms)
+    {
+        viewer->update();
+    }
+    viewer->uninit();
 }
 
 void
@@ -84,25 +70,28 @@ RenderTest::runAllMaterials()
     shadingModel = 0;
     blendMode    = 0;
     updateMaterial();
-    connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+
+    viewer->init();
+    StopWatch timer;
+    timer.start();
+    const double updateMaterialTimeMs = 50.0;
+    const double angularVel = 0.005;
+    while (!complete)
     {
-        double Dt    = sceneManager->getDt();
-        elapsedTime += Dt;
-        if (elapsedTime > 0.05)
+        const double dt = timer.getTimeElapsed();
+        timer.start();
+        elapsedTime += dt;
+        if (elapsedTime > updateMaterialTimeMs)
         {
-            elapsedTime = 0;
+            elapsedTime = 0.0;
             updateMaterial();
         }
-        geom->rotate(Vec3d(0.0, 1.0, 0.0), PI * Dt);
+        geom->rotate(Vec3d(0.0, 1.0, 0.0), dt * angularVel);
         geom->postModified();
-  });
 
-    std::thread t(&SimulationManager::start, driver);
-    while (!complete) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        viewer->update();
     }
-    driver->requestStatus(ModuleDriverStopped);
-    t.join();
+    viewer->uninit();
 }
 
 void

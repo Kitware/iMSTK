@@ -23,12 +23,11 @@
 #include "imstkCamera.h"
 #include "imstkLogger.h"
 #include "imstkModuleDriver.h"
+#include "imstkRenderer.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkViewer.h"
 #include "imstkVisualModel.h"
-#include "imstkVTKRenderer.h"
-#include "imstkVTKTextStatusManager.h"
-#include "imstkVTKViewer.h"
 
 namespace imstk
 {
@@ -110,7 +109,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
                     subManager->setMode(SceneManager::Mode::Simulation);
                 }
             }
-            if (auto viewer = std::dynamic_pointer_cast<VTKViewer>(module))
+            if (auto viewer = std::dynamic_pointer_cast<Viewer>(module))
             {
                 if (simModeOn)
                 {
@@ -125,23 +124,15 @@ KeyboardSceneControl::OnKeyPress(const char key)
 
         simModeOn ? sceneManager->setMode(SceneManager::Mode::Debug) : sceneManager->setMode(SceneManager::Mode::Simulation);
     }
-    // Display framerate and performance graph
-    else if (key == 'p' || key == 'P')  // switch framerate display
+    // Toggle through info levels
+    else if (key == 'p' || key == 'P')
     {
-        // The designated m_sceneManager framerate is displayed in all views
         for (auto module : driver->getModules())
         {
-            std::shared_ptr<VTKViewer> viewer = std::dynamic_pointer_cast<VTKViewer>(module);
+            std::shared_ptr<Viewer> viewer = std::dynamic_pointer_cast<Viewer>(module);
             if (viewer != nullptr)
             {
-                m_showFps = !m_showFps;
-                std::shared_ptr<VTKTextStatusManager> textManager = viewer->getTextStatusManager();
-                textManager->setStatusVisibility(VTKTextStatusManager::StatusType::FPS, m_showFps);
-
-                std::shared_ptr<Scene> activeScene = sceneManager->getActiveScene();
-                activeScene->setEnableTaskTiming(m_showFps);
-                std::shared_ptr<VTKRenderer> vtkRen = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
-                vtkRen->setTimeTableVisibility(m_showFps);
+                viewer->setInfoLevel((viewer->getInfoLevel() + 1) % viewer->getInfoLevelCount());
             }
         }
     }

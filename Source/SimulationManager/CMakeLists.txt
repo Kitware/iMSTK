@@ -2,38 +2,29 @@
 # Create target
 #-----------------------------------------------------------------------------
 
-file(GLOB VTK_H_FILES VTKRenderer/imstk*.h)
-file(GLOB VTK_CPP_FILES VTKRenderer/imstk*.cpp)
+set(H_FILES
+  imstkConsoleModule.h
+  imstkKeyboardSceneControl.h
+  imstkMouseSceneControl.h
+  imstkSceneManager.h
+  imstkSimulationManager.h)
 
-file(GLOB SIMMANAGER_H_FILES imstk*.h)
-file(GLOB SIMMANAGER_CPP_FILES imstk*.cpp)
-
-set(SIMULATIONMANAGER_H_FILES ${SIMMANAGER_H_FILES} ${VTK_H_FILES})
-set(SIMULATIONMANAGER_CPP_FILES ${SIMMANAGER_CPP_FILES} ${VTK_CPP_FILES})
-set(SIMULATIONMANAGER_SUBDIR
-  VTKRenderer)
+set(SRC_FILES
+  imstkConsoleModule.cpp
+  imstkKeyboardSceneControl.cpp
+  imstkMouseSceneControl.cpp
+  imstkSceneManager.cpp
+  imstkSimulationManager.cpp)
 
 include(imstkAddLibrary)
 imstk_add_library(SimulationManager
   H_FILES
-    ${SIMULATIONMANAGER_H_FILES}
+    ${H_FILES}
   CPP_FILES
-    ${SIMULATIONMANAGER_CPP_FILES}
-  SUBDIR_LIST
-    ${SIMULATIONMANAGER_SUBDIR}
+    ${SRC_FILES}
   DEPENDS
     Scene
-    Rendering
-  )
-
-# Install VR actions json
-file(GLOB VTK_VR_JSON_FILES VTKRenderer/vtk_openvr_*.json)
-if (MSVC)
-  # Show them in visual studios
-  target_sources(SimulationManager PRIVATE ${VTK_VR_JSON_FILES})
-  set_source_files_properties(${VTK_VR_JSON_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
-endif()
-install(FILES ${VTK_VR_JSON_FILES} DESTINATION bin)
+    ViewerCore)
 
 #-----------------------------------------------------------------------------
 # Testing

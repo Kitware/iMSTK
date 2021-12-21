@@ -35,13 +35,13 @@ if(iMSTK_USE_OpenHaptics)
   #-----------------------------------------------------------------------------
   if(UNIX)
     target_link_libraries(${PROJECT_NAME}
-    SimulationManager
-    )
+        SimulationManager
+        ViewerVTK)
   else()
     target_link_libraries(${PROJECT_NAME}
-    SimulationManager
-    SFML::SFML
-    )
+      SimulationManager
+      SFML::SFML
+      ViewerVTK)
   endif()
   
 endif()

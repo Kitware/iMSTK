@@ -32,10 +32,14 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 # Link libraries to executable
 #-----------------------------------------------------------------------------
 if(UNIX)
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
+  find_package(Threads REQUIRED)
+
   target_link_libraries(${PROJECT_NAME}
-  SimulationManager)
+	Common
+	Threads::Threads)
 else()
   target_link_libraries(${PROJECT_NAME}
-  SimulationManager
-  ${SFML_LIBRARIES})
+	Common
+	${SFML_LIBRARIES})
 endif()

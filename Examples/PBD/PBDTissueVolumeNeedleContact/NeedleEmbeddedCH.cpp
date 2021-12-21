@@ -29,8 +29,6 @@
 #include "imstkTetrahedralMesh.h"
 #include "NeedleObject.h"
 
-#include "imstkMeshIO.h"
-
 #include <unordered_set>
 
 using namespace imstk;
@@ -50,7 +48,7 @@ NeedleEmbeddedCH::getHandlingGeometryA()
 void
 NeedleEmbeddedCH::correctVelocities()
 {
-    for (int i = 0; i < m_solverConstraints.size(); i++)
+    for (size_t i = 0; i < m_solverConstraints.size(); i++)
     {
         m_solverConstraints[i]->correctVelocity(m_friction, 1.0);
     }
@@ -161,7 +159,7 @@ NeedleEmbeddedCH::handle(
         };
 
     // For every intersected element
-    for (int i = 0; i < elementsA.size(); i++)
+    for (size_t i = 0; i < elementsA.size(); i++)
     {
         const CollisionElement& colElemA = elementsA[i];
         const CollisionElement& colElemB = elementsB[i];

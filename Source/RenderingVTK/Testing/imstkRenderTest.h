@@ -28,13 +28,9 @@
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometry.h"
-#include "imstkKeyboardSceneControl.h"
-#include "imstkMouseSceneControl.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
-#include "imstkSceneManager.h"
-#include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -45,8 +41,8 @@ class RenderTest : public testing::Test
 public:
     void runFor(const int seconds);
     void runAllMaterials();
-protected:
 
+protected:
     void SetUp() override;
 
     virtual void createGeometry() = 0;
@@ -56,13 +52,9 @@ protected:
     void applyColor();
 
     // Render Frame
-    std::shared_ptr<Scene>                scene;
-    std::shared_ptr<VTKViewer>            viewer;
-    std::shared_ptr<SceneManager>         sceneManager;
-    std::shared_ptr<SimulationManager>    driver;
-    std::shared_ptr<MouseSceneControl>    mouseControl;
-    std::shared_ptr<KeyboardSceneControl> keyControl;
-    std::shared_ptr<DirectionalLight>     light;
+    std::shared_ptr<Scene>     scene;
+    std::shared_ptr<VTKViewer> viewer;
+    std::shared_ptr<DirectionalLight> light;
 
     // Render Contents
     std::shared_ptr<Geometry>       geom;
