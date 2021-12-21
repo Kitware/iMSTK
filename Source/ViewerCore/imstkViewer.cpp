@@ -45,7 +45,7 @@ Viewer::getActiveRenderer() const
 }
 
 void
-Viewer::setInfoLevel(int level)
+Viewer::setInfoLevel(const int level)
 {
     CHECK(level < getInfoLevelCount())
         << "There are only " << getInfoLevelCount() << " levels and level " << level << " was requested";

@@ -7,7 +7,7 @@ set(templates_src_dir "${CMAKE_CURRENT_BINARY_DIR}/${proj}")
 FetchContent_Populate(${proj}
   SOURCE_DIR     "${templates_src_dir}"
   GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/imstkexternalprojecttemplate
-  GIT_TAG        e71107a4ad9fc33a0460cfef7cae58155af57262
+  GIT_TAG        8a90e0b67da782ee52f61d7e982ee64ade7f1c17
   QUIET
   )
 

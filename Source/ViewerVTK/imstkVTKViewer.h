@@ -65,7 +65,7 @@ public:
     /// 1 - framerate
     /// 2 - timing graph
     ///
-    void setInfoLevel(int level) override;
+    void setInfoLevel(const int level) override;
 
     ///
     /// \brief Get the amount of info levels

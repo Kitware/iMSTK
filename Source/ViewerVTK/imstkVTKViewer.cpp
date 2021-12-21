@@ -153,7 +153,7 @@ VTKViewer::setDebugAxesLength(double x, double y, double z)
 }
 
 void
-VTKViewer::setInfoLevel(int level)
+VTKViewer::setInfoLevel(const int level)
 {
     Viewer::setInfoLevel(level);
 

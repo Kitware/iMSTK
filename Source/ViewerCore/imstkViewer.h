@@ -109,7 +109,7 @@ public:
     /// \brief Set the info level, usually means display framerates and other
     /// viewer related information
     ///
-    virtual void setInfoLevel(int level);
+    virtual void setInfoLevel(const int level);
 
     ///
     /// \brief Get the current info level
