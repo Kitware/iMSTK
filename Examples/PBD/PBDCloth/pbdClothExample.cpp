@@ -234,28 +234,28 @@ main()
 
         using Vec3uc = Eigen::Matrix<unsigned char, 3, 1>;
         queueConnect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, sceneManager, [&](KeyEvent* e)
-        {
-            // Set new textures
-            if (e->m_key == '1')
             {
-                setFleshTextures(clothObj->getVisualModel(0)->getRenderMaterial());
-            }
-            else if (e->m_key == '2')
-            {
-                setFabricTextures(clothObj->getVisualModel(0)->getRenderMaterial());
-            }
-            // Darken the texture pixel values
-            else if (e->m_key == 'h')
-            {
-                auto imageData = clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->getImageData();
-                std::shared_ptr<VecDataArray<unsigned char, 3>> scalars = std::dynamic_pointer_cast<VecDataArray<unsigned char, 3>>(imageData->getScalars());
-                Vec3uc* scalarPtr = scalars->getPointer();
-                for (int i = 0; i < scalars->size(); i++)
+                // Set new textures
+                if (e->m_key == '1')
                 {
-                    scalarPtr[i] = (scalarPtr[i].cast<double>() * 0.8).cast<unsigned char>();
+                    setFleshTextures(clothObj->getVisualModel(0)->getRenderMaterial());
                 }
-                clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->postModified();
-            }
+                else if (e->m_key == '2')
+                {
+                    setFabricTextures(clothObj->getVisualModel(0)->getRenderMaterial());
+                }
+                // Darken the texture pixel values
+                else if (e->m_key == 'h')
+                {
+                    auto imageData = clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->getImageData();
+                    std::shared_ptr<VecDataArray<unsigned char, 3>> scalars = std::dynamic_pointer_cast<VecDataArray<unsigned char, 3>>(imageData->getScalars());
+                    Vec3uc* scalarPtr = scalars->getPointer();
+                    for (int i = 0; i < scalars->size(); i++)
+                    {
+                        scalarPtr[i] = (scalarPtr[i].cast<double>() * 0.8).cast<unsigned char>();
+                    }
+                    clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->postModified();
+                }
         });
 
         driver->start();

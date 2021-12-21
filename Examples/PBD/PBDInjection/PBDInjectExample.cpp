@@ -164,100 +164,100 @@ main()
         scene->addController(controller);
 
         connect<Event>(sceneManager, SceneManager::postUpdate, [&](Event*)
-        {
-            if (hapticDeviceClient->getButton(0))
             {
-                // The LineMesh used for collision with the PBD tissue
-                std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
-                const Vec3d vertex = lineMesh->getVertexPosition(0);
-
-                if ((toolTip - vertex).norm() > 0.01)
+                if (hapticDeviceClient->getButton(0))
                 {
-                    toolTip = vertex;
-                    tissueObj->setUpdateAffectedConstraint();
+                    // The LineMesh used for collision with the PBD tissue
+                    std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                    const Vec3d vertex = lineMesh->getVertexPosition(0);
+
+                    if ((toolTip - vertex).norm() > 0.01)
+                    {
+                        toolTip = vertex;
+                        tissueObj->setUpdateAffectedConstraint();
+                    }
+
+                    tissueObj->inject(toolTip, radius, 0.01);
                 }
-
-                tissueObj->inject(toolTip, radius, 0.01);
-            }
-            else if (hapticDeviceClient->getButton(1))
-            {
-                // The LineMesh used for collision with the PBD tissue
-                std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
-                const Vec3d vertex = lineMesh->getVertexPosition(0);
-
-                if ((toolTip - vertex).norm() > 0.01)
+                else if (hapticDeviceClient->getButton(1))
                 {
-                    toolTip = vertex;
-                    tissueObj->setUpdateAffectedConstraint();
-                }
+                    // The LineMesh used for collision with the PBD tissue
+                    std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                    const Vec3d vertex = lineMesh->getVertexPosition(0);
 
-                tissueObj->inject(toolTip, radius, -0.01);
-            }
+                    if ((toolTip - vertex).norm() > 0.01)
+                    {
+                        toolTip = vertex;
+                        tissueObj->setUpdateAffectedConstraint();
+                    }
+
+                    tissueObj->inject(toolTip, radius, -0.01);
+                }
             });
 #else
         // Use keyboard controls
         connect<Event>(sceneManager, SceneManager::preUpdate, [&](Event*)
-        {
-            if (viewer->getKeyboardDevice()->getButton('k') == KEY_PRESS)
             {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, -0.01, 0.0);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('i') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, 0.01, 0.0);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('j') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(-0.01, 0.0, 0.0);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('l') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.01, 0.0, 0.0);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('u') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, 0.0, -0.01);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('o') == KEY_PRESS)
-            {
-                (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, 0.0, 0.01);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('s') == KEY_PRESS)
-            {
-                // The LineMesh used for collision with the PBD tissue
-                std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
-                Vec3d vertice = lineMesh->getVertexPosition(0);
-
-                if ((toolTip - vertice).norm() > 0.01)
+                if (viewer->getKeyboardDevice()->getButton('k') == KEY_PRESS)
                 {
-                    toolTip = vertice;
-                    tissueObj->setUpdateAffectedConstraint();
+                    (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, -0.01, 0.0);
                 }
-
-                tissueObj->inject(toolTip, radius, 0.01);
-            }
-            else if (viewer->getKeyboardDevice()->getButton('a') == KEY_PRESS)
-            {
-                // The LineMesh used for collision with the PBD tissue
-                std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
-                Vec3d vertice = lineMesh->getVertexPosition(0);
-
-                if ((toolTip - vertice).norm() > 0.01)
+                else if (viewer->getKeyboardDevice()->getButton('i') == KEY_PRESS)
                 {
-                    toolTip = vertice;
-                    tissueObj->setUpdateAffectedConstraint();
+                    (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, 0.01, 0.0);
                 }
+                else if (viewer->getKeyboardDevice()->getButton('j') == KEY_PRESS)
+                {
+                    (*toolObj->getRigidBody()->m_pos) += Vec3d(-0.01, 0.0, 0.0);
+                }
+                else if (viewer->getKeyboardDevice()->getButton('l') == KEY_PRESS)
+                {
+                    (*toolObj->getRigidBody()->m_pos) += Vec3d(0.01, 0.0, 0.0);
+                }
+                else if (viewer->getKeyboardDevice()->getButton('u') == KEY_PRESS)
+                {
+                    (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, 0.0, -0.01);
+                }
+                else if (viewer->getKeyboardDevice()->getButton('o') == KEY_PRESS)
+                {
+                    (*toolObj->getRigidBody()->m_pos) += Vec3d(0.0, 0.0, 0.01);
+                }
+                else if (viewer->getKeyboardDevice()->getButton('s') == KEY_PRESS)
+                {
+                    // The LineMesh used for collision with the PBD tissue
+                    std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                    Vec3d vertice = lineMesh->getVertexPosition(0);
 
-                tissueObj->inject(toolTip, radius, -0.01);
-            }
+                    if ((toolTip - vertice).norm() > 0.01)
+                    {
+                        toolTip = vertice;
+                        tissueObj->setUpdateAffectedConstraint();
+                    }
+
+                    tissueObj->inject(toolTip, radius, 0.01);
+                }
+                else if (viewer->getKeyboardDevice()->getButton('a') == KEY_PRESS)
+                {
+                    // The LineMesh used for collision with the PBD tissue
+                    std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                    Vec3d vertice = lineMesh->getVertexPosition(0);
+
+                    if ((toolTip - vertice).norm() > 0.01)
+                    {
+                        toolTip = vertice;
+                        tissueObj->setUpdateAffectedConstraint();
+                    }
+
+                    tissueObj->inject(toolTip, radius, -0.01);
+                }
             });
 #endif
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            // Keep the tool moving in real time
-            toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-            //tissueObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
+            {
+                // Keep the tool moving in real time
+                toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+                //tissueObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
             });
 
         std::cout << "================================================\n";

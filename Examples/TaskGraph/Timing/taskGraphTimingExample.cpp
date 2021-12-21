@@ -192,19 +192,19 @@ main()
         sceneManager->pause();
         double t = 0.0;
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            const double dt = sceneManager->getDt();
-            for (size_t i = 0; i < pbdStringObjs.size(); i++)
             {
-                std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
-                model->getConfig()->m_dt = dt;
-                std::shared_ptr<VecDataArray<double, 3>> positions = model->getCurrentState()->getPositions();
-                (*positions)[0] += Vec3d(
+                const double dt = sceneManager->getDt();
+                for (size_t i = 0; i < pbdStringObjs.size(); i++)
+                {
+                    std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
+                    model->getConfig()->m_dt = dt;
+                    std::shared_ptr<VecDataArray<double, 3>> positions = model->getCurrentState()->getPositions();
+                    (*positions)[0] += Vec3d(
                         -std::sin(t) * radius * dt,
                         0.0,
                         std::cos(t) * radius * dt);
-            }
-            t += dt;
+                }
+                t += dt;
             });
 
         imstkNew<SimulationManager> driver;

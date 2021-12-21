@@ -250,66 +250,66 @@ main()
 
         connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
             [&](KeyEvent* e)
-        {
-            int indexToShow = -1;
-            std::shared_ptr<CollisionDetectionAlgorithm> newCDMethod = nullptr;
-            // Switch to sphere and reset
-            if (e->m_key == '1')
             {
-                indexToShow = 0;
-                newCDMethod = std::make_shared<PointSetToCapsuleCD>();
-            }
-            // Switch to capsule and reset
-            else if (e->m_key == '2')
-            {
-                indexToShow = 1;
-                newCDMethod = std::make_shared<PointSetToSphereCD>();
-            }
-            // Switch to cube and reset
-            else if (e->m_key == '3')
-            {
-                indexToShow = 2;
-                newCDMethod = std::make_shared<PointSetToOrientedBoxCD>();
-            }
-            // Switch to plane and reset
-            else if (e->m_key == '4')
-            {
-                indexToShow = 3;
-                newCDMethod = std::make_shared<PointSetToPlaneCD>();
-            }
-            // Switch to sphere vs surface and reset
-            else if (e->m_key == '5')
-            {
-                indexToShow = 1;
-                newCDMethod = std::make_shared<SurfaceMeshToSphereCD>();
-            }
-            // Switch to capsule vs surface and reset
-            else if (e->m_key == '6')
-            {
-                indexToShow = 0;
-                newCDMethod = std::make_shared<SurfaceMeshToCapsuleCD>();
-            }
-
-            if (indexToShow != -1)
-            {
-                std::shared_ptr<Geometry> newCDGeometry =
-                    collisionObj->getVisualModel(indexToShow)->getGeometry();
-                for (int i = 0; i < 4; i++)
+                int indexToShow = -1;
+                std::shared_ptr<CollisionDetectionAlgorithm> newCDMethod = nullptr;
+                // Switch to sphere and reset
+                if (e->m_key == '1')
                 {
-                    collisionObj->getVisualModel(i)->hide();
+                    indexToShow = 0;
+                    newCDMethod = std::make_shared<PointSetToCapsuleCD>();
                 }
-                collisionObj->getVisualModel(indexToShow)->show();
-                collisionObj->setCollidingGeometry(newCDGeometry);
+                // Switch to capsule and reset
+                else if (e->m_key == '2')
+                {
+                    indexToShow = 1;
+                    newCDMethod = std::make_shared<PointSetToSphereCD>();
+                }
+                // Switch to cube and reset
+                else if (e->m_key == '3')
+                {
+                    indexToShow = 2;
+                    newCDMethod = std::make_shared<PointSetToOrientedBoxCD>();
+                }
+                // Switch to plane and reset
+                else if (e->m_key == '4')
+                {
+                    indexToShow = 3;
+                    newCDMethod = std::make_shared<PointSetToPlaneCD>();
+                }
+                // Switch to sphere vs surface and reset
+                else if (e->m_key == '5')
+                {
+                    indexToShow = 1;
+                    newCDMethod = std::make_shared<SurfaceMeshToSphereCD>();
+                }
+                // Switch to capsule vs surface and reset
+                else if (e->m_key == '6')
+                {
+                    indexToShow = 0;
+                    newCDMethod = std::make_shared<SurfaceMeshToCapsuleCD>();
+                }
 
-                newCDMethod->setInputGeometryA(clothObj->getCollidingGeometry());
-                newCDMethod->setInputGeometryB(newCDGeometry);
-                pbdInteraction->setCollisionDetection(newCDMethod);
-                pbdInteraction->getCollisionHandlingA()->setInputCollisionData(newCDMethod->getCollisionData());
+                if (indexToShow != -1)
+                {
+                    std::shared_ptr<Geometry> newCDGeometry =
+                        collisionObj->getVisualModel(indexToShow)->getGeometry();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        collisionObj->getVisualModel(i)->hide();
+                    }
+                    collisionObj->getVisualModel(indexToShow)->show();
+                    collisionObj->setCollidingGeometry(newCDGeometry);
 
-                scene->buildTaskGraph();
-                scene->initTaskGraph();
-                scene->reset();
-            }
+                    newCDMethod->setInputGeometryA(clothObj->getCollidingGeometry());
+                    newCDMethod->setInputGeometryB(newCDGeometry);
+                    pbdInteraction->setCollisionDetection(newCDMethod);
+                    pbdInteraction->getCollisionHandlingA()->setInputCollisionData(newCDMethod->getCollisionData());
+
+                    scene->buildTaskGraph();
+                    scene->initTaskGraph();
+                    scene->reset();
+                }
              });
 
         driver->start();

@@ -379,53 +379,53 @@ main()
         scene->addController(controller);
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 15.0));
+            {
+                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 15.0));
 
-            // Also apply controller transform to ghost geometry
-            toolGhostMesh->setTranslation(controller->getPosition());
-            toolGhostMesh->setRotation(controller->getOrientation());
-            toolGhostMesh->updatePostTransformData();
-            toolGhostMesh->postModified();
+                // Also apply controller transform to ghost geometry
+                toolGhostMesh->setTranslation(controller->getPosition());
+                toolGhostMesh->setRotation(controller->getOrientation());
+                toolGhostMesh->updatePostTransformData();
+                toolGhostMesh->postModified();
             });
 #else
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            const Vec2d mousePos   = viewer->getMouseDevice()->getPos();
-            const Vec3d desiredPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 2.0 + Vec3d(0.0, 1.0, 0.0);
-            const Quatd desiredOrientation = Quatd(Rotd(0.0, Vec3d(1.0, 0.0, 0.0)));
-
-            Vec3d virtualForce;
             {
-                const Vec3d fS = (desiredPos - toolObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
-                const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                    // Spring damping
+                const Vec2d mousePos   = viewer->getMouseDevice()->getPos();
+                const Vec3d desiredPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 2.0 + Vec3d(0.0, 1.0, 0.0);
+                const Quatd desiredOrientation = Quatd(Rotd(0.0, Vec3d(1.0, 0.0, 0.0)));
 
-                const Quatd dq       = desiredOrientation * toolObj->getRigidBody()->getOrientation().inverse();
-                const Rotd angleAxes = Rotd(dq);
-                const Vec3d tS       = angleAxes.axis() * angleAxes.angle() * 10000000.0;
-                const Vec3d tD       = -toolObj->getRigidBody()->getAngularVelocity() * 1000.0;
+                Vec3d virtualForce;
+                {
+                    const Vec3d fS = (desiredPos - toolObj->getRigidBody()->getPosition()) * 1000.0; // Spring force
+                    const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                // Spring damping
 
-                virtualForce = fS + fD;
-                (*toolObj->getRigidBody()->m_force)  += virtualForce;
-                (*toolObj->getRigidBody()->m_torque) += tS + tD;
-            }
+                    const Quatd dq       = desiredOrientation * toolObj->getRigidBody()->getOrientation().inverse();
+                    const Rotd angleAxes = Rotd(dq);
+                    const Vec3d tS       = angleAxes.axis() * angleAxes.angle() * 10000000.0;
+                    const Vec3d tD       = -toolObj->getRigidBody()->getAngularVelocity() * 1000.0;
 
-            // Update the ghost debug geometry
-            std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-            toolGhostMesh->setRotation(desiredOrientation);
-            toolGhostMesh->setTranslation(desiredPos);
-            toolGhostMesh->updatePostTransformData();
-            toolGhostMesh->postModified();
+                    virtualForce = fS + fD;
+                    (*toolObj->getRigidBody()->m_force)  += virtualForce;
+                    (*toolObj->getRigidBody()->m_torque) += tS + tD;
+                }
 
-            ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, virtualForce.norm() / 15.0));
+                // Update the ghost debug geometry
+                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
+                toolGhostMesh->setRotation(desiredOrientation);
+                toolGhostMesh->setTranslation(desiredPos);
+                toolGhostMesh->updatePostTransformData();
+                toolGhostMesh->postModified();
+
+                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, virtualForce.norm() / 15.0));
             });
 #endif
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            // Keep the tool moving in real time
-            toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-            //tissueObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
+            {
+                // Keep the tool moving in real time
+                toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+                //tissueObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
         });
 
         // Add mouse and keyboard controls to the viewer

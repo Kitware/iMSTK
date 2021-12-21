@@ -124,14 +124,14 @@ SPHModel::SPHModel() : DynamicalModel<SPHState>(DynamicalModelType::SmoothedPart
 
     m_updateVelocityNode =
         m_taskGraph->addFunction("SPHModel_UpdateVelocity", [&]()
-        {
-            updateVelocity(getTimeStep());
+            {
+                updateVelocity(getTimeStep());
         });
 
     m_moveParticlesNode =
         m_taskGraph->addFunction("SPHModel_MoveParticles", [&]()
-        {
-            moveParticles(getTimeStep());
+            {
+                moveParticles(getTimeStep());
         });
 
     //m_computePositionNode =
@@ -509,7 +509,6 @@ SPHModel::computeViscosity()
                 return;
             }
 
-            Vec3d neighborVelContributions = Vec3d::Zero();
             Vec3d neighborVelContributionsNumerator    = Vec3d::Zero();
             double neighborVelContributionsDenominator = 0.0;
             Vec3d particleShifts = Vec3d::Zero();

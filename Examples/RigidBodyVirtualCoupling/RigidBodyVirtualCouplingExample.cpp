@@ -264,17 +264,17 @@ main()
         Vec3d prevCubePos = rbdModel->getModelGeometry()->getTranslation();
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
-        {
-            const Vec3d& devPos = controller->getPosition();
-            const Quatd& devQ   = controller->getRotation();
-            rbdModel->getModelGeometry()->rotate(devQ);
-            auto cubeGeo = std::dynamic_pointer_cast<OrientedBox>(cubeObj->getPhysicsGeometry());
-            const Vec3d cubePos      = rbdModel->getModelGeometry()->getTranslation();
-            const Vec3d cubeVelocity = (cubePos - prevCubePos) / 2.0;
-            const Vec3d damp  = -1000000 * cubeVelocity;
-            const Vec3d force = -1000 * (cubePos - devPos) + damp;
-            rbdModel->addForce(force, Vec3d(0.0, 0.0, 0.0));
-            prevCubePos = cubePos;
+            {
+                const Vec3d& devPos = controller->getPosition();
+                const Quatd& devQ   = controller->getRotation();
+                rbdModel->getModelGeometry()->rotate(devQ);
+                auto cubeGeo = std::dynamic_pointer_cast<OrientedBox>(cubeObj->getPhysicsGeometry());
+                const Vec3d cubePos      = rbdModel->getModelGeometry()->getTranslation();
+                const Vec3d cubeVelocity = (cubePos - prevCubePos) / 2.0;
+                const Vec3d damp  = -1000000 * cubeVelocity;
+                const Vec3d force = -1000 * (cubePos - devPos) + damp;
+                rbdModel->addForce(force, Vec3d(0.0, 0.0, 0.0));
+                prevCubePos = cubePos;
             });
 
         driver->start();

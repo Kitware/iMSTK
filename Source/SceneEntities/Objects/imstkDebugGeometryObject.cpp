@@ -164,7 +164,6 @@ DebugGeometryObject::addArrow(const Vec3d& start, const Vec3d& end, const Color&
 
     const Vec3d  diff   = scaledEnd - start;
     const double length = diff.norm();
-    const Vec3d  n      = diff / length;
     const Vec3d  tan    = Vec3d(1.0, 0.0, 0.0).cross(diff).normalized();
 
     addLine(start, scaledEnd, color);

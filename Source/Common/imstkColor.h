@@ -54,13 +54,16 @@ struct Color
     /// \brief Constructor
     ///
     Color();
-    Color(const double r, const double g, const double b, const double a = 1.0);
-    Color(const double* rgba);
+    Color(const double red,
+          const double green,
+          const double blue,
+          const double alpha = 1.0);
+    Color(const double* rgba_color);
 
     ///
     /// \brief Constructor overwrites the alpha component
     ///
-    Color(const Color& color, const double a);
+    Color(const Color& color, const double alpha);
 
     ///
     /// \brief Equality operator

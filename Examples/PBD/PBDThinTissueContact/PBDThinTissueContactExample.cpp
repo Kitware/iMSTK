@@ -251,22 +251,22 @@ main()
 #ifdef iMSTK_USE_OPENHAPTICS
         Mat3d rotationalOffset = Mat3d::Identity();
         connect<Event>(sceneManager, SceneManager::preUpdate, [&](Event*)
-        {
-            hapticDeviceClient->update();
-            const Quatd deviceOrientation = (Quatd(rotationalOffset) * hapticDeviceClient->getOrientation()).normalized();
-            const Vec3d devicePosition    = (rotationalOffset * hapticDeviceClient->getPosition()) * 0.05 + Vec3d(0.0, 0.0, 0.0);
-            toolGeometry->setRotation(deviceOrientation);
-            toolGeometry->setTranslation(devicePosition);
-            toolGeometry->postModified();
+            {
+                hapticDeviceClient->update();
+                const Quatd deviceOrientation = (Quatd(rotationalOffset) * hapticDeviceClient->getOrientation()).normalized();
+                const Vec3d devicePosition    = (rotationalOffset * hapticDeviceClient->getPosition()) * 0.05 + Vec3d(0.0, 0.0, 0.0);
+                toolGeometry->setRotation(deviceOrientation);
+                toolGeometry->setTranslation(devicePosition);
+                toolGeometry->postModified();
         });
 #else
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
-        {
-            const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-            const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
+            {
+                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
 
-            toolGeometry->setTranslation(worldPos);
-            toolGeometry->postModified();
+                toolGeometry->setTranslation(worldPos);
+                toolGeometry->postModified();
             });
 #endif
 

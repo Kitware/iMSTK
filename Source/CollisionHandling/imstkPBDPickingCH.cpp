@@ -33,8 +33,8 @@ limitations under the License.
 namespace imstk
 {
 PBDPickingCH::PBDPickingCH() :
-    m_isPrevPicking(false),
-    m_isPicking(false)
+    m_isPicking(false),
+    m_isPrevPicking(false)
 {
     m_pickedPtIdxOffset.clear();
 }

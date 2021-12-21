@@ -204,52 +204,52 @@ main()
         scene->addController(controller);
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            // Keep the tool moving in real time
-            needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+            {
+                // Keep the tool moving in real time
+                needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
 
-            // Update the ghost debug geometry
-            std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-            toolGhostMesh->setRotation(controller->getOrientation());
-            toolGhostMesh->setTranslation(controller->getPosition());
-            toolGhostMesh->updatePostTransformData();
-            toolGhostMesh->postModified();
+                // Update the ghost debug geometry
+                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
+                toolGhostMesh->setRotation(controller->getOrientation());
+                toolGhostMesh->setTranslation(controller->getPosition());
+                toolGhostMesh->updatePostTransformData();
+                toolGhostMesh->postModified();
 
-            ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 15.0));
+                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 15.0));
             });
 #else
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            // Keep the tool moving in real time
-            needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-
-            const Vec2d mousePos   = viewer->getMouseDevice()->getPos();
-            const Vec3d desiredPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.25;
-            const Quatd desiredOrientation = Quatd(Rotd(-1.0, Vec3d(1.0, 0.0, 0.0)));
-
-            Vec3d virutalForce;
             {
-                const Vec3d fS = (desiredPos - needleObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
-                const Vec3d fD = -needleObj->getRigidBody()->getVelocity() * 100.0;                    // Spring damping
+                // Keep the tool moving in real time
+                needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
 
-                const Quatd dq       = desiredOrientation * needleObj->getRigidBody()->getOrientation().inverse();
-                const Rotd angleAxes = Rotd(dq);
-                const Vec3d tS       = angleAxes.axis() * angleAxes.angle() * 10000000.0;
-                const Vec3d tD       = -needleObj->getRigidBody()->getAngularVelocity() * 1000.0;
+                const Vec2d mousePos   = viewer->getMouseDevice()->getPos();
+                const Vec3d desiredPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.25;
+                const Quatd desiredOrientation = Quatd(Rotd(-1.0, Vec3d(1.0, 0.0, 0.0)));
 
-                virutalForce = fS + fD;
-                (*needleObj->getRigidBody()->m_force)  += virutalForce;
-                (*needleObj->getRigidBody()->m_torque) += tS + tD;
-            }
+                Vec3d virutalForce;
+                {
+                    const Vec3d fS = (desiredPos - needleObj->getRigidBody()->getPosition()) * 1000.0; // Spring force
+                    const Vec3d fD = -needleObj->getRigidBody()->getVelocity() * 100.0;                // Spring damping
 
-            // Update the ghost debug geometry
-            std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-            toolGhostMesh->setRotation(desiredOrientation);
-            toolGhostMesh->setTranslation(desiredPos);
-            toolGhostMesh->updatePostTransformData();
-            toolGhostMesh->postModified();
+                    const Quatd dq       = desiredOrientation * needleObj->getRigidBody()->getOrientation().inverse();
+                    const Rotd angleAxes = Rotd(dq);
+                    const Vec3d tS       = angleAxes.axis() * angleAxes.angle() * 10000000.0;
+                    const Vec3d tD       = -needleObj->getRigidBody()->getAngularVelocity() * 1000.0;
 
-            ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, virutalForce.norm() / 15.0));
+                    virutalForce = fS + fD;
+                    (*needleObj->getRigidBody()->m_force)  += virutalForce;
+                    (*needleObj->getRigidBody()->m_torque) += tS + tD;
+                }
+
+                // Update the ghost debug geometry
+                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
+                toolGhostMesh->setRotation(desiredOrientation);
+                toolGhostMesh->setTranslation(desiredPos);
+                toolGhostMesh->updatePostTransformData();
+                toolGhostMesh->postModified();
+
+                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, virutalForce.norm() / 15.0));
             });
 #endif
 

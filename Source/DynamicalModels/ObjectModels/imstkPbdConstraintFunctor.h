@@ -267,12 +267,12 @@ struct PbdFemTetConstraintFunctor : public PbdConstraintFunctor
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
-            {
-                const Vec4i& tet = elements[k];
-                auto c = std::make_shared<PbdFEMTetConstraint>(m_matType);
-                c->initConstraint(vertices,
+                {
+                    const Vec4i& tet = elements[k];
+                    auto c = std::make_shared<PbdFEMTetConstraint>(m_matType);
+                    c->initConstraint(vertices,
                     tet[0], tet[1], tet[2], tet[3], m_femConfig);
-                constraints.addConstraint(c);
+                    constraints.addConstraint(c);
             }, elements.size() > 100);
         }
 
@@ -314,12 +314,12 @@ struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
-            {
-                auto& tet = elements[k];
-                auto c    = std::make_shared<PbdVolumeConstraint>();
-                c->initConstraint(vertices,
+                {
+                    auto& tet = elements[k];
+                    auto c    = std::make_shared<PbdVolumeConstraint>();
+                    c->initConstraint(vertices,
                     tet[0], tet[1], tet[2], tet[3], m_stiffness);
-                constraints.addConstraint(c);
+                    constraints.addConstraint(c);
             });
         }
 
@@ -357,11 +357,11 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
-            {
-                auto& tri = elements[k];
-                auto c    = std::make_shared<PbdAreaConstraint>();
-                c->initConstraint(vertices, tri[0], tri[1], tri[2], m_stiffness);
-                constraints.addConstraint(c);
+                {
+                    auto& tri = elements[k];
+                    auto c    = std::make_shared<PbdAreaConstraint>();
+                    c->initConstraint(vertices, tri[0], tri[1], tri[2], m_stiffness);
+                    constraints.addConstraint(c);
             });
         }
 
@@ -571,7 +571,7 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
                     }
                 };
 
-            for (int i = 0; i < vertIdsToTriangleIds.size(); i++)
+            for (size_t i = 0; i < vertIdsToTriangleIds.size(); i++)
             {
                 std::sort(vertIdsToTriangleIds[i].begin(), vertIdsToTriangleIds[i].end());
             }
@@ -650,25 +650,27 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
             }
 
             auto addDihedralConstraint =
-                [&](size_t t0, size_t t1, size_t i1, size_t i2, double stiffness)
+                [&](int t0, int t1, int i1, int i2, double stiffness)
                 {
                     const Vec3i& tri0 = elements[t0];
                     const Vec3i& tri1 = elements[t1];
                     size_t       idx0 = 0;
                     size_t       idx1 = 0;
-                    for (size_t i = 0; i < 3; ++i)
+                    for (int i = 0; i < 3; ++i)
                     {
                         if (tri0[i] != i1 && tri0[i] != i2)
                         {
-                            idx0 = tri0[i];
+                            idx0 = static_cast<size_t>(tri0[i]);
                         }
                         if (tri1[i] != i1 && tri1[i] != i2)
                         {
-                            idx1 = tri1[i];
+                            idx1 = static_cast<size_t>(tri1[i]);
                         }
                     }
                     auto c = std::make_shared<PbdDihedralConstraint>();
-                    c->initConstraint(initVertices, idx0, idx1, i1, i2, stiffness);
+                    c->initConstraint(initVertices,
+                        idx0, idx1, static_cast<size_t>(i1), static_cast<size_t>(i2),
+                        stiffness);
                     constraints.addConstraint(c);
                 };
 

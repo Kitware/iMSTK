@@ -343,87 +343,87 @@ main()
         scene->addController(controller);
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            // Keep the tool moving in real time
-            toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-
-            if (hapticDeviceClient->getButton(0))
             {
-                auto tissueMesh    = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
-                auto toolPlaneGeom = std::dynamic_pointer_cast<Plane>(toolObj->getCollidingGeometry());
+                // Keep the tool moving in real time
+                toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
 
-                // Default config of the tool is pointing downwards on y
-                const Mat3d rot     = toolPlaneGeom->getOrientation().toRotationMatrix();
-                const Vec3d forward = (rot * Vec3d(0.0, 0.0, 1.0)).normalized();
-                const Vec3d left    = (rot * Vec3d(1.0, 0.0, 0.0)).normalized();
-                const Vec3d n       = (rot * Vec3d(0.0, 1.0, 0.0)).normalized();
-
-                const Vec3d planePos        = toolPlaneGeom->getPosition();
-                const Vec3d planeNormal     = n;
-                const double planeHalfWidth = toolPlaneGeom->getWidth() * 0.5;
-
-                std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = tissueMesh->getVertexPositions();
-                std::shared_ptr<VecDataArray<int, 4>> tissueIndicesPtr     = tissueMesh->getTetrahedraIndices();
-                VecDataArray<double, 3>& tissueVertices = *tissueVerticesPtr;
-                VecDataArray<int, 4>& tissueIndices     = *tissueIndicesPtr;
-
-                // Compute which tets should be removed
-                std::unordered_set<int> removedTets;
-                for (int i = 0; i < tissueIndices.size(); i++)
+                if (hapticDeviceClient->getButton(0))
                 {
-                    Vec4i& tet = tissueIndices[i];
-                    std::array<Vec3d, 4> tetVerts;
-                    tetVerts[0] = tissueVertices[tet[0]];
-                    tetVerts[1] = tissueVertices[tet[1]];
-                    tetVerts[2] = tissueVertices[tet[2]];
-                    tetVerts[3] = tissueVertices[tet[3]];
+                    auto tissueMesh    = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
+                    auto toolPlaneGeom = std::dynamic_pointer_cast<Plane>(toolObj->getCollidingGeometry());
 
-                    if (splitTest(tetVerts, planePos, left, planeHalfWidth, forward, planeHalfWidth, n))
+                    // Default config of the tool is pointing downwards on y
+                    const Mat3d rot     = toolPlaneGeom->getOrientation().toRotationMatrix();
+                    const Vec3d forward = (rot * Vec3d(0.0, 0.0, 1.0)).normalized();
+                    const Vec3d left    = (rot * Vec3d(1.0, 0.0, 0.0)).normalized();
+                    const Vec3d n       = (rot * Vec3d(0.0, 1.0, 0.0)).normalized();
+
+                    const Vec3d planePos        = toolPlaneGeom->getPosition();
+                    const Vec3d planeNormal     = n;
+                    const double planeHalfWidth = toolPlaneGeom->getWidth() * 0.5;
+
+                    std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = tissueMesh->getVertexPositions();
+                    std::shared_ptr<VecDataArray<int, 4>> tissueIndicesPtr     = tissueMesh->getTetrahedraIndices();
+                    VecDataArray<double, 3>& tissueVertices = *tissueVerticesPtr;
+                    VecDataArray<int, 4>& tissueIndices     = *tissueIndicesPtr;
+
+                    // Compute which tets should be removed
+                    std::unordered_set<int> removedTets;
+                    for (int i = 0; i < tissueIndices.size(); i++)
                     {
-                        // Remove the tet being split
-                        removedTets.insert(i);
-                    }
-                }
+                        Vec4i& tet = tissueIndices[i];
+                        std::array<Vec3d, 4> tetVerts;
+                        tetVerts[0] = tissueVertices[tet[0]];
+                        tetVerts[1] = tissueVertices[tet[1]];
+                        tetVerts[2] = tissueVertices[tet[2]];
+                        tetVerts[3] = tissueVertices[tet[3]];
 
-                // Deal with diffs
-                std::shared_ptr<PbdConstraintContainer> constraintsPtr = tissueObj->getPbdModel()->getConstraints();
-                const std::vector<std::shared_ptr<PbdConstraint>>& constraints = constraintsPtr->getConstraints();
-
-                // First process all removed tets by removing the constraints and setting the element to the dummy vertex
-                for (auto i : removedTets)
-                {
-                    Vec4i& tet = tissueIndices[i];
-
-                    // Find and remove the associated constraints
-                    for (auto j = constraints.begin(); j != constraints.end(); j++)
-                    {
-                        std::vector<size_t>& vertexIds = (*j)->getVertexIds();
-                        bool isSameTet = true;
-                        for (int k = 0; k < 4; k++)
+                        if (splitTest(tetVerts, planePos, left, planeHalfWidth, forward, planeHalfWidth, n))
                         {
-                            if (vertexIds[k] != tet[k])
+                            // Remove the tet being split
+                            removedTets.insert(i);
+                        }
+                    }
+
+                    // Deal with diffs
+                    std::shared_ptr<PbdConstraintContainer> constraintsPtr = tissueObj->getPbdModel()->getConstraints();
+                    const std::vector<std::shared_ptr<PbdConstraint>>& constraints = constraintsPtr->getConstraints();
+
+                    // First process all removed tets by removing the constraints and setting the element to the dummy vertex
+                    for (auto i : removedTets)
+                    {
+                        Vec4i& tet = tissueIndices[i];
+
+                        // Find and remove the associated constraints
+                        for (auto j = constraints.begin(); j != constraints.end(); j++)
+                        {
+                            std::vector<size_t>& vertexIds = (*j)->getVertexIds();
+                            bool isSameTet = true;
+                            for (int k = 0; k < 4; k++)
                             {
-                                isSameTet = false;
+                                if (vertexIds[k] != tet[k])
+                                {
+                                    isSameTet = false;
+                                    break;
+                                }
+                            }
+                            if (isSameTet)
+                            {
+                                constraintsPtr->eraseConstraint(j);
                                 break;
                             }
                         }
-                        if (isSameTet)
-                        {
-                            constraintsPtr->eraseConstraint(j);
-                            break;
-                        }
+
+                        // Set removed tet to dummy vertex
+                        tet = Vec4i(0, 0, 0, 0);
                     }
 
-                    // Set removed tet to dummy vertex
-                    tet = Vec4i(0, 0, 0, 0);
+                    if (removedTets.size() > 0)
+                    {
+                        tissueIndicesPtr->postModified();
+                        tissueMesh->postModified();
+                    }
                 }
-
-                if (removedTets.size() > 0)
-                {
-                    tissueIndicesPtr->postModified();
-                    tissueMesh->postModified();
-                }
-            }
         });
 
         // Add mouse and keyboard controls to the viewer

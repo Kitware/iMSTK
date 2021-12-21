@@ -47,10 +47,10 @@ parallelFor(const IndexType beginIdx, const IndexType endIdx, Function&& functio
     {
         tbb::parallel_for(tbb::blocked_range<IndexType>(beginIdx, endIdx),
             [&](const tbb::blocked_range<IndexType>& r) {
-                    for (IndexType i = r.begin(), iEnd = r.end(); i < iEnd; ++i)
-                    {
-                        function(i);
-                    }
+                for (IndexType i = r.begin(), iEnd = r.end(); i < iEnd; ++i)
+                {
+                    function(i);
+                }
             });
     }
     else
@@ -84,10 +84,10 @@ parallelFor2Dx(const IndexType beginX, const IndexType endX,
 {
     parallelFor(beginX, endX,
         [&](IndexType i) {
-                for (IndexType j = beginY; j < endY; ++j)
-                {
-                    function(i, j);
-                }
+            for (IndexType j = beginY; j < endY; ++j)
+            {
+                function(i, j);
+            }
         });
 }
 
@@ -103,10 +103,10 @@ parallelFor2Dy(const IndexType beginX, const IndexType endX,
 {
     parallelFor(beginY, endY,
         [&](IndexType j) {
-                for (IndexType i = beginX; i < endX; ++i)
-                {
-                    function(i, j);
-                }
+            for (IndexType i = beginX; i < endX; ++i)
+            {
+                function(i, j);
+            }
         });
 }
 
@@ -123,13 +123,13 @@ parallelFor3Dx(const IndexType beginX, const IndexType endX,
 {
     parallelFor(beginX, endX,
         [&](IndexType i) {
-                for (IndexType j = beginY; j < endY; ++j)
+            for (IndexType j = beginY; j < endY; ++j)
+            {
+                for (IndexType k = beginZ; k < endZ; ++k)
                 {
-                    for (IndexType k = beginZ; k < endZ; ++k)
-                    {
-                        function(i, j, k);
-                    }
+                    function(i, j, k);
                 }
+            }
         });
 }
 
@@ -146,13 +146,13 @@ parallelFor3Dy(const IndexType beginX, const IndexType endX,
 {
     parallelFor(beginY, endY,
         [&](IndexType j) {
-                for (IndexType i = beginX; i < endX; ++i)
+            for (IndexType i = beginX; i < endX; ++i)
+            {
+                for (IndexType k = beginZ; k < endZ; ++k)
                 {
-                    for (IndexType k = beginZ; k < endZ; ++k)
-                    {
-                        function(i, j, k);
-                    }
+                    function(i, j, k);
                 }
+            }
     });
 }
 
@@ -169,13 +169,13 @@ parallelFor3Dz(const IndexType beginX, const IndexType endX,
 {
     parallelFor(beginX, endX,
         [&](IndexType i) {
-                for (IndexType j = beginY; j < endY; ++j)
+            for (IndexType j = beginY; j < endY; ++j)
+            {
+                for (IndexType k = beginZ; k < endZ; ++k)
                 {
-                    for (IndexType k = beginZ; k < endZ; ++k)
-                    {
-                        function(i, j, k);
-                    }
+                    function(i, j, k);
                 }
+            }
     });
 }
 } // end namespace ParallelUtils

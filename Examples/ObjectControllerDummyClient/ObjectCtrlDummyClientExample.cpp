@@ -74,9 +74,9 @@ main()
         double t = 0.0;
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
-        {
-            t += sceneManager->getDt();
-            client->setPosition(Vec3d(cos(t) * 2.0, 0.0, 0.0));
+            {
+                t += sceneManager->getDt();
+                client->setPosition(Vec3d(cos(t) * 2.0, 0.0, 0.0));
             });
 
         imstkNew<SimulationManager> driver;

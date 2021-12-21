@@ -215,33 +215,33 @@ main()
 
         // Queue keypress to be called after scene thread
         queueConnect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, sceneManager, [&](KeyEvent* e)
-        {
-            // When i is pressed replace the PBD cloth with a subdivided one
-            if (e->m_key == 'i')
             {
-                // This has a number of issues that make it not physically realistic
-                // - Mass is not conservative when interpolated from subdivide
-                // - Constraint resting lengths are not correctly reinited
-                std::shared_ptr<SurfaceMesh> clothMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
-                imstkNew<SurfaceMeshSubdivide> subdiv;
-                subdiv->setInputMesh(clothMesh);
-                subdiv->setNumberOfSubdivisions(1);
-                subdiv->setSubdivisionType(SurfaceMeshSubdivide::Type::LINEAR);
-                subdiv->update();
-                std::shared_ptr<SurfaceMesh> newClothMesh = subdiv->getOutputMesh();
+                // When i is pressed replace the PBD cloth with a subdivided one
+                if (e->m_key == 'i')
+                {
+                    // This has a number of issues that make it not physically realistic
+                    // - Mass is not conservative when interpolated from subdivide
+                    // - Constraint resting lengths are not correctly reinited
+                    std::shared_ptr<SurfaceMesh> clothMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
+                    imstkNew<SurfaceMeshSubdivide> subdiv;
+                    subdiv->setInputMesh(clothMesh);
+                    subdiv->setNumberOfSubdivisions(1);
+                    subdiv->setSubdivisionType(SurfaceMeshSubdivide::Type::LINEAR);
+                    subdiv->update();
+                    std::shared_ptr<SurfaceMesh> newClothMesh = subdiv->getOutputMesh();
 
-                // RenderDelegates cannot visually have entire geometries swapped yet, so even though we could just set the geometry
-                // on the model, you would not visually see it. Instead we replace the vertex and index buffers of the existing one
-                // Another issue here is that initial geometry is not remapped so reset will not reset to undeformed config
-                clothMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newClothMesh->getVertexPositions()));
-                clothMesh->setVertexPositions(newClothMesh->getVertexPositions());
-                clothMesh->setTriangleIndices(newClothMesh->getTriangleIndices());
-                clothMesh->setVertexAttribute("Velocities", newClothMesh->getVertexAttribute("Velocities"));
-                clothMesh->postModified();
+                    // RenderDelegates cannot visually have entire geometries swapped yet, so even though we could just set the geometry
+                    // on the model, you would not visually see it. Instead we replace the vertex and index buffers of the existing one
+                    // Another issue here is that initial geometry is not remapped so reset will not reset to undeformed config
+                    clothMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newClothMesh->getVertexPositions()));
+                    clothMesh->setVertexPositions(newClothMesh->getVertexPositions());
+                    clothMesh->setTriangleIndices(newClothMesh->getTriangleIndices());
+                    clothMesh->setVertexAttribute("Velocities", newClothMesh->getVertexAttribute("Velocities"));
+                    clothMesh->postModified();
 
-                // Re-setup the constraints on the object
-                clothObj->initialize();
-            }
+                    // Re-setup the constraints on the object
+                    clothObj->initialize();
+                }
         });
 
         driver->start();

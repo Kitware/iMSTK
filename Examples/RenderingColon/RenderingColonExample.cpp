@@ -250,45 +250,45 @@ main()
         // Advance the camera along the line
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
-        {
-            t += sceneManager->getDt();
+            {
+                t += sceneManager->getDt();
 
-            const double velocity = 0.1;
-            const double dist     = std::min(t * velocity, totalLength);
-            const Vec3d eyePos    = getSplinePositionFromLineMesh(dist, colonMedialMesh);
-            const Vec3d focalPt   = getSplinePositionFromLineMesh(dist + 0.07, colonMedialMesh);
+                const double velocity = 0.1;
+                const double dist     = std::min(t * velocity, totalLength);
+                const Vec3d eyePos    = getSplinePositionFromLineMesh(dist, colonMedialMesh);
+                const Vec3d focalPt   = getSplinePositionFromLineMesh(dist + 0.07, colonMedialMesh);
 
-            cam->setPosition(eyePos);
-            cam->setFocalPoint(focalPt);
-            light->setPosition(eyePos);
-            light->setFocalPoint(focalPt);
+                cam->setPosition(eyePos);
+                cam->setFocalPoint(focalPt);
+                light->setPosition(eyePos);
+                light->setFocalPoint(focalPt);
             });
 
         connect<Event>(driver, &SimulationManager::starting, [&](Event*)
-        {
-            vtkSmartPointer<vtkRenderer> ren = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer())->getVtkRenderer();
-            vtkSmartPointer<vtkOpenGLRenderer> oRen = vtkOpenGLRenderer::SafeDownCast(ren);
-            vtkNew<vtkJPEGReader> reader;
-            reader->SetFileName(iMSTK_DATA_ROOT "/Organs/Colon/colon_irradiance_environment_map.jpg");
-            reader->Update();
+            {
+                vtkSmartPointer<vtkRenderer> ren = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer())->getVtkRenderer();
+                vtkSmartPointer<vtkOpenGLRenderer> oRen = vtkOpenGLRenderer::SafeDownCast(ren);
+                vtkNew<vtkJPEGReader> reader;
+                reader->SetFileName(iMSTK_DATA_ROOT "/Organs/Colon/colon_irradiance_environment_map.jpg");
+                reader->Update();
 
-            vtkNew<vtkTexture> texture;
-            // Enable mipmapping to handle HDR image
-            texture->MipmapOn();
-            texture->InterpolateOn();
-            texture->SetInputData(reader->GetOutput());
-            texture->SetColorModeToDirectScalars();
-            texture->SetCubeMap(false);
-            texture->Update();
+                vtkNew<vtkTexture> texture;
+                // Enable mipmapping to handle HDR image
+                texture->MipmapOn();
+                texture->InterpolateOn();
+                texture->SetInputData(reader->GetOutput());
+                texture->SetColorModeToDirectScalars();
+                texture->SetCubeMap(false);
+                texture->Update();
 
-            /* vtkNew<vtkSkybox> skybox;
-             skybox->SetTexture(texture);
-             ren->AddActor(skybox);*/
+                /* vtkNew<vtkSkybox> skybox;
+                 skybox->SetTexture(texture);
+                 ren->AddActor(skybox);*/
 
-            ren->AutomaticLightCreationOff();
-            oRen->UseSphericalHarmonicsOff();
-            ren->UseImageBasedLightingOn();
-            ren->SetEnvironmentTexture(texture);
+                ren->AutomaticLightCreationOff();
+                oRen->UseSphericalHarmonicsOff();
+                ren->UseImageBasedLightingOn();
+                ren->SetEnvironmentTexture(texture);
             });
 
         driver->start();

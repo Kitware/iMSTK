@@ -19,8 +19,6 @@
 
 =========================================================================*/
 
-#pragma once
-
 #include "imstkPbdPointPointConstraint.h"
 
 namespace imstk

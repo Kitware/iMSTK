@@ -229,67 +229,67 @@ main()
         // Perform picking on to figure out which sphere was clicked
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
             [&](MouseEvent* e)
-        {
-            if (e->m_buttonId == 0)
             {
-                // Get mouse position (0, 1) with origin at bot left of screen
-                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-                // To NDC coordinates
-                const Vec3d rayDir = scene->getActiveCamera()->getEyeRayDir(
-                        Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
-                const Vec3d rayStart = scene->getActiveCamera()->getPosition();
-
-                double minDist = IMSTK_DOUBLE_MAX;     // Use the closest picked sphere
-                for (int i = 0; i < rbdObjCount; i++)
+                if (e->m_buttonId == 0)
                 {
-                    auto sphere = std::dynamic_pointer_cast<Sphere>(rigidObjects[i]->getPhysicsGeometry());
-                    Vec3d iPt;
-                    if (CollisionUtils::testRayToSphere(rayStart, rayDir,
-                            sphere->getCenter(), sphere->getRadius(), iPt))
+                    // Get mouse position (0, 1) with origin at bot left of screen
+                    const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                    // To NDC coordinates
+                    const Vec3d rayDir = scene->getActiveCamera()->getEyeRayDir(
+                        Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
+                    const Vec3d rayStart = scene->getActiveCamera()->getPosition();
+
+                    double minDist = IMSTK_DOUBLE_MAX; // Use the closest picked sphere
+                    for (int i = 0; i < rbdObjCount; i++)
                     {
-                        const double dist = (iPt - rayStart).norm();
-                        if (dist < minDist)
+                        auto sphere = std::dynamic_pointer_cast<Sphere>(rigidObjects[i]->getPhysicsGeometry());
+                        Vec3d iPt;
+                        if (CollisionUtils::testRayToSphere(rayStart, rayDir,
+                            sphere->getCenter(), sphere->getRadius(), iPt))
                         {
-                            minDist = dist;
-                            sphereSelected = i;
-                            planePos       = sphere->getCenter();
+                            const double dist = (iPt - rayStart).norm();
+                            if (dist < minDist)
+                            {
+                                minDist = dist;
+                                sphereSelected = i;
+                                planePos       = sphere->getCenter();
+                            }
                         }
                     }
                 }
-            }
             });
         // Unselect/drop the sphere
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
             [&](MouseEvent* e)
-        {
-            if (e->m_buttonId == 0)
             {
-                sphereSelected = -1;
-            }
+                if (e->m_buttonId == 0)
+                {
+                    sphereSelected = -1;
+                }
             });
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
-        {
-            // Keep cube updating at real time
-            std::shared_ptr<RigidBodyModel2> rbdModel = rigidObjects[0]->getRigidBodyModel2(); // All bodies share a model
-            rbdModel->getConfig()->m_dt = sceneManager->getDt();
-
-            if (sphereSelected != -1)
             {
-                // Get mouses current position
-                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-                const Vec3d rayDir   = scene->getActiveCamera()->getEyeRayDir(
-                    Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
-                const Vec3d rayStart = scene->getActiveCamera()->getPosition();
+                // Keep cube updating at real time
+                std::shared_ptr<RigidBodyModel2> rbdModel = rigidObjects[0]->getRigidBodyModel2(); // All bodies share a model
+                rbdModel->getConfig()->m_dt = sceneManager->getDt();
 
-                // Exert a force to bring it to the mouse position on the plane
-                auto sphere = std::dynamic_pointer_cast<Sphere>(rigidObjects[sphereSelected]->getPhysicsGeometry());
-                Vec3d iPt;
-                CollisionUtils::testRayToPlane(rayStart, rayDir, planePos, scene->getActiveCamera()->getForward(), iPt);
-                const Vec3d fS = (iPt - sphere->getPosition()) * 100.0;                                   // Spring force
-                const Vec3d fD = -rigidObjects[sphereSelected]->getRigidBody()->getVelocity() * 10.0;     // Spring damping
-                *rigidObjects[sphereSelected]->getRigidBody()->m_force += (fS + fD);
-            }
+                if (sphereSelected != -1)
+                {
+                    // Get mouses current position
+                    const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                    const Vec3d rayDir   = scene->getActiveCamera()->getEyeRayDir(
+                    Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
+                    const Vec3d rayStart = scene->getActiveCamera()->getPosition();
+
+                    // Exert a force to bring it to the mouse position on the plane
+                    auto sphere = std::dynamic_pointer_cast<Sphere>(rigidObjects[sphereSelected]->getPhysicsGeometry());
+                    Vec3d iPt;
+                    CollisionUtils::testRayToPlane(rayStart, rayDir, planePos, scene->getActiveCamera()->getForward(), iPt);
+                    const Vec3d fS = (iPt - sphere->getPosition()) * 100.0;                               // Spring force
+                    const Vec3d fD = -rigidObjects[sphereSelected]->getRigidBody()->getVelocity() * 10.0; // Spring damping
+                    *rigidObjects[sphereSelected]->getRigidBody()->m_force += (fS + fD);
+                }
         });
 
         driver->start();
