@@ -200,30 +200,30 @@ TEST(imstkSimulationManagerTest, TestSceneSwitchWithRendering)
     // After 4s switch scenes, after 8s switch back, after 12s stop
     double elapsedTime = 0.0;
     connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-    {
-        elapsedTime += sceneManager->getDt();
-        if (elapsedTime > 12.0)
         {
-            driver->requestStatus(ModuleDriverStopped);
-        }
-        else if (elapsedTime > 8.0)
-        {
-            if (sceneManager->getActiveScene() != scene1)
+            elapsedTime += sceneManager->getDt();
+            if (elapsedTime > 12.0)
             {
-                LOG(INFO) << "Switching to scene1";
-                sceneManager->setActiveScene(scene1);
-                viewer->setActiveScene(scene1);
+                driver->requestStatus(ModuleDriverStopped);
             }
-        }
-        else if (elapsedTime > 4.0)
-        {
-            if (sceneManager->getActiveScene() != scene2)
+            else if (elapsedTime > 8.0)
             {
-                LOG(INFO) << "Switching to scene2";
-                sceneManager->setActiveScene(scene2);
-                viewer->setActiveScene(scene2);
+                if (sceneManager->getActiveScene() != scene1)
+                {
+                    LOG(INFO) << "Switching to scene1";
+                    sceneManager->setActiveScene(scene1);
+                    viewer->setActiveScene(scene1);
+                }
             }
-        }
+            else if (elapsedTime > 4.0)
+            {
+                if (sceneManager->getActiveScene() != scene2)
+                {
+                    LOG(INFO) << "Switching to scene2";
+                    sceneManager->setActiveScene(scene2);
+                    viewer->setActiveScene(scene2);
+                }
+            }
         });
 
     driver->start();
@@ -251,28 +251,28 @@ TEST(imstkSimulationManagerTest, TestSceneSwitchWithoutRendering)
     // After 4s switch scenes, after 8s switch back, after 12s stop
     double elapsedTime = 0.0;
     connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-    {
-        elapsedTime += sceneManager->getDt();
-        if (elapsedTime > 6.0)
         {
-            driver->requestStatus(ModuleDriverStopped);
-        }
-        else if (elapsedTime > 4.0)
-        {
-            if (sceneManager->getActiveScene() != scene1)
+            elapsedTime += sceneManager->getDt();
+            if (elapsedTime > 6.0)
             {
-                LOG(INFO) << "Switching to scene1";
-                sceneManager->setActiveScene(scene1);
+                driver->requestStatus(ModuleDriverStopped);
             }
-        }
-        else if (elapsedTime > 2.0)
-        {
-            if (sceneManager->getActiveScene() != scene2)
+            else if (elapsedTime > 4.0)
             {
-                LOG(INFO) << "Switching to scene2";
-                sceneManager->setActiveScene(scene2);
+                if (sceneManager->getActiveScene() != scene1)
+                {
+                    LOG(INFO) << "Switching to scene1";
+                    sceneManager->setActiveScene(scene1);
+                }
             }
-        }
+            else if (elapsedTime > 2.0)
+            {
+                if (sceneManager->getActiveScene() != scene2)
+                {
+                    LOG(INFO) << "Switching to scene2";
+                    sceneManager->setActiveScene(scene2);
+                }
+            }
         });
 
     driver->start();

@@ -174,34 +174,34 @@ main()
     // Adds a custom physics step to print out maximum velocity
     connect<Event>(scene, &Scene::configureTaskGraph,
         [&](Event*)
-    {
-        // Get the graph
-        std::shared_ptr<TaskGraph> graph = scene->getTaskGraph();
-
-        // First write the graph before we make modifications, just to show the changes
-        imstkNew<TaskGraphVizWriter> writer;
-        writer->setInput(graph);
-        writer->setFileName("taskGraphConfigureExampleOld.svg");
-        writer->write();
-
-        // This node computes displacements and sets the color to the magnitude
-        std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
         {
-            const VecDataArray<double, 3>& velocities =
-                *std::dynamic_pointer_cast<VecDataArray<double, 3>>(clothGeometry->getVertexAttribute("Velocities"));
-            DataArray<double>& scalars = *scalarsPtr;
-            for (int i = 0; i < velocities.size(); i++)
-            {
-                scalars[i] = velocities[i].norm();
-            }
+            // Get the graph
+            std::shared_ptr<TaskGraph> graph = scene->getTaskGraph();
+
+            // First write the graph before we make modifications, just to show the changes
+            imstkNew<TaskGraphVizWriter> writer;
+            writer->setInput(graph);
+            writer->setFileName("taskGraphConfigureExampleOld.svg");
+            writer->write();
+
+            // This node computes displacements and sets the color to the magnitude
+            std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
+                {
+                    const VecDataArray<double, 3>& velocities =
+                        *std::dynamic_pointer_cast<VecDataArray<double, 3>>(clothGeometry->getVertexAttribute("Velocities"));
+                    DataArray<double>& scalars = *scalarsPtr;
+                    for (int i = 0; i < velocities.size(); i++)
+                    {
+                        scalars[i] = velocities[i].norm();
+                    }
         }, "ComputeVelocityScalars");
 
-        // After IntegratePosition
-        graph->insertAfter(clothObj->getUpdateGeometryNode(), computeVelocityScalars);
+            // After IntegratePosition
+            graph->insertAfter(clothObj->getUpdateGeometryNode(), computeVelocityScalars);
 
-        // Write the modified graph
-        writer->setFileName("taskGraphConfigureExampleNew.svg");
-        writer->write();
+            // Write the modified graph
+            writer->setFileName("taskGraphConfigureExampleNew.svg");
+            writer->write();
     });
 
     // Run the simulation

@@ -38,7 +38,7 @@ makeTypeCheck()
 {
     return [](Base* p) {
                return (dynamic_cast<Target*>(p) != nullptr);
-    };
+           };
 }
 
 ///

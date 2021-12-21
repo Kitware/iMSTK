@@ -159,36 +159,36 @@ main()
         Vec3d initPos[3] = { (*pbdVerticesPtr)[0], (*pbdVerticesPtr)[1], (*pbdVerticesPtr)[2] };
         connect<Event>(scene, &Scene::configureTaskGraph,
             [&](Event*)
-        {
-            // Add a manual constraint after the pbd solve
-            scene->getTaskGraph()->insertAfter(pbdObject->getPbdModel()->getSolveNode(),
-                        std::make_shared<TaskNode>([&]()
             {
-                // Constrain the position of the 3 vertices of the triangle
-                // too their original locations
-                // Completely rigid, if there is jitter it will be very noticable
+                // Add a manual constraint after the pbd solve
+                scene->getTaskGraph()->insertAfter(pbdObject->getPbdModel()->getSolveNode(),
+                        std::make_shared<TaskNode>([&]()
+                        {
+                            // Constrain the position of the 3 vertices of the triangle
+                            // too their original locations
+                            // Completely rigid, if there is jitter it will be very noticable
 
-                // We prented it fully converged as a distance constraint
-                (*pbdVerticesPtr)[0] = initPos[0];
-                (*pbdVerticesPtr)[1] = initPos[1];
-                (*pbdVerticesPtr)[2] = initPos[2];
+                            // We prented it fully converged as a distance constraint
+                            (*pbdVerticesPtr)[0] = initPos[0];
+                            (*pbdVerticesPtr)[1] = initPos[1];
+                            (*pbdVerticesPtr)[2] = initPos[2];
                 }));
             });
 
         // Move the point
         connect<Event>(sceneManager, SceneManager::preUpdate,
             [&](Event*)
-        {
-            if (viewer->getKeyboardDevice()->getButton('s') == KEY_PRESS)
             {
-                pointGeom->translate(Vec3d(0.0, -0.01, 0.0));
-                pointGeom->postModified();
-            }
-            else if (viewer->getKeyboardDevice()->getButton('w') == KEY_PRESS)
-            {
-                pointGeom->translate(Vec3d(0.0, 0.01, 0.0));
-                pointGeom->postModified();
-            }
+                if (viewer->getKeyboardDevice()->getButton('s') == KEY_PRESS)
+                {
+                    pointGeom->translate(Vec3d(0.0, -0.01, 0.0));
+                    pointGeom->postModified();
+                }
+                else if (viewer->getKeyboardDevice()->getButton('w') == KEY_PRESS)
+                {
+                    pointGeom->translate(Vec3d(0.0, 0.01, 0.0));
+                    pointGeom->postModified();
+                }
             });
 
         // Add mouse and keyboard controls to the viewer

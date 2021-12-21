@@ -581,7 +581,7 @@ ReducedStVK::getFunction()
                                                         *m_currentStateReduced,
                                                         m_updateType);
                return m_Feff;
-    };
+           };
 
 #pragma warning(pop)
 }
@@ -597,7 +597,7 @@ ReducedStVK::getFunctionGradient()
                                        *m_currentStateReduced,
                                        m_updateType);
                return m_Keff;
-    };
+           };
 
 #pragma warning(pop)
 }
@@ -609,7 +609,7 @@ ReducedStVK::getUpdateFunction()
     return [&, this](const Vectord& q, const bool fullyImplicit) -> void {
                (fullyImplicit) ? this->updateBodyIntermediateStates(q, m_updateType)
                : this->updateBodyStates(q, m_updateType);
-    };
+           };
 }
 
 NonLinearSystem<Matrixd>::UpdatePrevStateFunctionType

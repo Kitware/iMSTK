@@ -124,36 +124,36 @@ main()
         cdDebugObj->debugUpdate();
 
         connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, [&](KeyEvent* e)
-        {
-            const double s = 0.05;
-            if (e->m_key == 'i')
             {
-                triangleMesh2->translate(Vec3d(0.0, 0.0, 1.0) * s);
-            }
-            else if (e->m_key == 'k')
-            {
-                triangleMesh2->translate(Vec3d(0.0, 0.0, -1.0) * s);
-            }
-            else if (e->m_key == 'j')
-            {
-                triangleMesh2->translate(Vec3d(-1.0, 0.0, 0.0) * s);
-            }
-            else if (e->m_key == 'l')
-            {
-                triangleMesh2->translate(Vec3d(1.0, 0.0, 0.0) * s);
-            }
-            else if (e->m_key == 'u')
-            {
-                triangleMesh2->translate(Vec3d(0.0, -1.0, 0.0) * s);
-            }
-            else if (e->m_key == 'o')
-            {
-                triangleMesh2->translate(Vec3d(0.0, 1.0, 0.0) * s);
-            }
-            triangleMesh2->postModified();
-            cd->update();
-            sceneManager->update();
-            cdDebugObj->debugUpdate();
+                const double s = 0.05;
+                if (e->m_key == 'i')
+                {
+                    triangleMesh2->translate(Vec3d(0.0, 0.0, 1.0) * s);
+                }
+                else if (e->m_key == 'k')
+                {
+                    triangleMesh2->translate(Vec3d(0.0, 0.0, -1.0) * s);
+                }
+                else if (e->m_key == 'j')
+                {
+                    triangleMesh2->translate(Vec3d(-1.0, 0.0, 0.0) * s);
+                }
+                else if (e->m_key == 'l')
+                {
+                    triangleMesh2->translate(Vec3d(1.0, 0.0, 0.0) * s);
+                }
+                else if (e->m_key == 'u')
+                {
+                    triangleMesh2->translate(Vec3d(0.0, -1.0, 0.0) * s);
+                }
+                else if (e->m_key == 'o')
+                {
+                    triangleMesh2->translate(Vec3d(0.0, 1.0, 0.0) * s);
+                }
+                triangleMesh2->postModified();
+                cd->update();
+                sceneManager->update();
+                cdDebugObj->debugUpdate();
         });
 
         imstkNew<SimulationManager> driver;

@@ -261,35 +261,35 @@ main()
 
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
-        {
-            //needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-            sutureThreadObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+            {
+                //needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+                sutureThreadObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
             });
         Vec3d clampOffset = Vec3d(-0.009, 0.01, 0.001);
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
-        {
-            // Constrain the first two vertices of the string to the needle
-            auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getPhysicsGeometry());
-            auto sutureLineMesh = std::dynamic_pointer_cast<LineMesh>(sutureThreadObj->getPhysicsGeometry());
-            (*sutureLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
-            (*sutureLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
+            {
+                // Constrain the first two vertices of the string to the needle
+                auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getPhysicsGeometry());
+                auto sutureLineMesh = std::dynamic_pointer_cast<LineMesh>(sutureThreadObj->getPhysicsGeometry());
+                (*sutureLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
+                (*sutureLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
 
-            // Transform the clamps relative to the needle
-            clampsObj->getVisualGeometry()->setTransform(
+                // Transform the clamps relative to the needle
+                clampsObj->getVisualGeometry()->setTransform(
                     needleObj->getVisualGeometry()->getTransform() *
                     mat4dTranslate(clampOffset) *
                     mat4dRotation(Rotd(PI, Vec3d(0.0, 1.0, 0.0))));
-            clampsObj->getVisualGeometry()->postModified();
+                clampsObj->getVisualGeometry()->postModified();
 
-            // Transform the ghost tool to show the real tool location
-            ghostClampsObj->getVisualGeometry()->setTransform(
+                // Transform the ghost tool to show the real tool location
+                ghostClampsObj->getVisualGeometry()->setTransform(
                 mat4dTranslate(controller->getPosition()) * mat4dRotation(controller->getOrientation()) *
                 mat4dTranslate(clampOffset) *
                 mat4dRotation(Rotd(PI, Vec3d(0.0, 1.0, 0.0))));
-            ghostClampsObj->getVisualGeometry()->updatePostTransformData();
-            ghostClampsObj->getVisualGeometry()->postModified();
-            ghostClampsObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 5.0));
+                ghostClampsObj->getVisualGeometry()->updatePostTransformData();
+                ghostClampsObj->getVisualGeometry()->postModified();
+                ghostClampsObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 5.0));
             });
 
         // Add mouse and keyboard controls to the viewer

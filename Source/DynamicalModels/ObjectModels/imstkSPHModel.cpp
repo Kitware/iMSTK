@@ -124,14 +124,14 @@ SPHModel::SPHModel() : DynamicalModel<SPHState>(DynamicalModelType::SmoothedPart
 
     m_updateVelocityNode =
         m_taskGraph->addFunction("SPHModel_UpdateVelocity", [&]()
-        {
-            updateVelocity(getTimeStep());
+            {
+                updateVelocity(getTimeStep());
         });
 
     m_moveParticlesNode =
         m_taskGraph->addFunction("SPHModel_MoveParticles", [&]()
-        {
-            moveParticles(getTimeStep());
+            {
+                moveParticles(getTimeStep());
         });
 
     //m_computePositionNode =

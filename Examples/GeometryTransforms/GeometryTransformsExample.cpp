@@ -138,9 +138,9 @@ main()
         // Rotate after every scene update
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
-        {
-            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * sceneManager->getDt());
-            surfaceMesh->postModified();
+            {
+                surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * sceneManager->getDt());
+                surfaceMesh->postModified();
         });
 
         // Add mouse and keyboard controls to the viewer

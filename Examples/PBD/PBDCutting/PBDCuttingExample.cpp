@@ -220,12 +220,12 @@ main()
         // Queue haptic button press to be called after scene thread
         queueConnect<ButtonEvent>(client, &HapticDeviceClient::buttonStateChanged, sceneManager,
             [&](ButtonEvent* e)
-        {
-            // When button 0 is pressed replace the PBD cloth with a cut one
-            if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
             {
-                cuttingInteraction->apply();
-            }
+                // When button 0 is pressed replace the PBD cloth with a cut one
+                if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
+                {
+                    cuttingInteraction->apply();
+                }
             });
 
         std::cout << "================================================\n";

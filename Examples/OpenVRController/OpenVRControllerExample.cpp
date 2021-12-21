@@ -159,54 +159,54 @@ main()
         bool blade10InHand = true;
         queueConnect<ButtonEvent>(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER), &OpenVRDeviceClient::buttonStateChanged, sceneManager,
             [&](ButtonEvent* e)
-        {
-            // When any button pressed, swap blade
-            if (e->m_buttonState == BUTTON_PRESSED)
             {
-                const Vec3d& posControl = viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER)->getPosition();
-                if (blade10InHand)
+                // When any button pressed, swap blade
+                if (e->m_buttonState == BUTTON_PRESSED)
                 {
-                    // Swap to blade 15 only if it's close in space
-                    Vec3d min, max;
-                    scalpelBlade15->getVisualGeometry()->computeBoundingBox(min, max);
-                    const Vec3d posBlade = (min + max) * 0.5;
-                    const double dist    = (posControl - posBlade).norm();
-                    LOG(INFO) << "Dist: " << dist;
-                    if (dist < 2.0)
+                    const Vec3d& posControl = viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER)->getPosition();
+                    if (blade10InHand)
                     {
-                        const Vec3d t = scalpelBlade15->getVisualGeometry()->getTranslation();
-                        const Mat3d r = scalpelBlade15->getVisualGeometry()->getRotation();
+                        // Swap to blade 15 only if it's close in space
+                        Vec3d min, max;
+                        scalpelBlade15->getVisualGeometry()->computeBoundingBox(min, max);
+                        const Vec3d posBlade = (min + max) * 0.5;
+                        const double dist    = (posControl - posBlade).norm();
+                        LOG(INFO) << "Dist: " << dist;
+                        if (dist < 2.0)
+                        {
+                            const Vec3d t = scalpelBlade15->getVisualGeometry()->getTranslation();
+                            const Mat3d r = scalpelBlade15->getVisualGeometry()->getRotation();
 
-                        // Set the new blade to move
-                        controller2->setControlledSceneObject(scalpelBlade15);
-                        blade10InHand = false;
+                            // Set the new blade to move
+                            controller2->setControlledSceneObject(scalpelBlade15);
+                            blade10InHand = false;
 
-                        scalpelBlade10->getVisualGeometry()->setTranslation(t);
-                        scalpelBlade10->getVisualGeometry()->setRotation(r);
+                            scalpelBlade10->getVisualGeometry()->setTranslation(t);
+                            scalpelBlade10->getVisualGeometry()->setRotation(r);
+                        }
+                    }
+                    else
+                    {
+                        // Swap to blade 10 only if it's close in space
+                        Vec3d min, max;
+                        scalpelBlade10->getVisualGeometry()->computeBoundingBox(min, max);
+                        const Vec3d posBlade = (min + max) * 0.5;
+                        const double dist    = (posControl - posBlade).norm();
+                        LOG(INFO) << "Dist: " << dist;
+                        if (dist < 2.0)
+                        {
+                            const Vec3d t = scalpelBlade10->getVisualGeometry()->getTranslation();
+                            const Mat3d r = scalpelBlade10->getVisualGeometry()->getRotation();
+
+                            controller2->setControlledSceneObject(scalpelBlade10);
+                            blade10InHand = true;
+
+                            // Swap transforms of the blades
+                            scalpelBlade15->getVisualGeometry()->setTranslation(t);
+                            scalpelBlade15->getVisualGeometry()->setRotation(r);
+                        }
                     }
                 }
-                else
-                {
-                    // Swap to blade 10 only if it's close in space
-                    Vec3d min, max;
-                    scalpelBlade10->getVisualGeometry()->computeBoundingBox(min, max);
-                    const Vec3d posBlade = (min + max) * 0.5;
-                    const double dist    = (posControl - posBlade).norm();
-                    LOG(INFO) << "Dist: " << dist;
-                    if (dist < 2.0)
-                    {
-                        const Vec3d t = scalpelBlade10->getVisualGeometry()->getTranslation();
-                        const Mat3d r = scalpelBlade10->getVisualGeometry()->getRotation();
-
-                        controller2->setControlledSceneObject(scalpelBlade10);
-                        blade10InHand = true;
-
-                        // Swap transforms of the blades
-                        scalpelBlade15->getVisualGeometry()->setTranslation(t);
-                        scalpelBlade15->getVisualGeometry()->setRotation(r);
-                    }
-                }
-            }
         });
 
         driver->start();

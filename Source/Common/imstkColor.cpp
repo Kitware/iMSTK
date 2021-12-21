@@ -58,19 +58,22 @@ Color::Color()
     rgba[3] = 1.0;
 }
 
-Color::Color(const double r, const double g, const double b, const double a)
+Color::Color(const double red,
+             const double green,
+             const double blue,
+             const double alpha)
 {
-    setValue(r, g, b, a);
+    setValue(red, green, blue, alpha);
 }
 
-Color::Color(const double* rgba)
+Color::Color(const double* rgba_color)
 {
-    setValue(rgba[0], rgba[1], rgba[2], rgba[3]);
+    setValue(rgba_color[0], rgba_color[1], rgba_color[2], rgba_color[3]);
 }
 
-Color::Color(const Color& color, const double a)
+Color::Color(const Color& color, const double alpha)
 {
-    setValue(color.r, color.g, color.b, a);
+    setValue(color.r, color.g, color.b, alpha);
 }
 
 Color&

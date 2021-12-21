@@ -396,40 +396,40 @@ main()
         scene->addController(controller);
 #else
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-            const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
+            {
+                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
 
-            const Vec3d fS = (worldPos - toolObj->getRigidBody()->getPosition()) * 1000.0;     // Spring force
-            const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                  // Spring damping
+                const Vec3d fS = (worldPos - toolObj->getRigidBody()->getPosition()) * 1000.0; // Spring force
+                const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;              // Spring damping
 
-            (*toolObj->getRigidBody()->m_force) += (fS + fD);
+                (*toolObj->getRigidBody()->m_force) += (fS + fD);
             });
 #endif
 
         // Toggle collision interaction in scene with key y
         connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
             [&](KeyEvent* e)
-        {
-            if (e->m_key == 'y')
             {
-                if (scene->getSceneObject(interaction->getName()) != nullptr)
+                if (e->m_key == 'y')
                 {
-                    scene->removeSceneObject(interaction);
+                    if (scene->getSceneObject(interaction->getName()) != nullptr)
+                    {
+                        scene->removeSceneObject(interaction);
+                    }
+                    else
+                    {
+                        scene->addInteraction(interaction);
+                    }
+                    scene->buildTaskGraph();
+                    scene->initTaskGraph();
                 }
-                else
-                {
-                    scene->addInteraction(interaction);
-                }
-                scene->buildTaskGraph();
-                scene->initTaskGraph();
-            }
             });
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            // Keep the tool moving in real time
-            toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+            {
+                // Keep the tool moving in real time
+                toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
         });
 
         // Add mouse and keyboard controls to the viewer

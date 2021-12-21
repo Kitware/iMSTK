@@ -73,9 +73,6 @@ TetraToPointSetCD::computeCollisionDataAB(
                     && bCoord[2] >= -eps
                     && bCoord[3] >= -eps)
                 {
-                    const double coordSum = bCoord[0] + bCoord[1] + bCoord[2] + bCoord[3];
-                    assert(coordSum <= 1.0 + eps2 && coordSum >= 1.0 - eps2);
-
                     CellIndexElement elemA;
                     elemA.ids[0]   = tetIdA;
                     elemA.idCount  = 1;

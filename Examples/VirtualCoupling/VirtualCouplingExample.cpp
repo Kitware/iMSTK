@@ -154,9 +154,9 @@ main()
         driver->setDesiredDt(0.001);
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            // Run the rbd model in real time
-            rbdObj->getRigidBodyModel2()->getConfig()->m_dt = driver->getDt();
+            {
+                // Run the rbd model in real time
+                rbdObj->getRigidBodyModel2()->getConfig()->m_dt = driver->getDt();
             });
 
         // Add mouse and keyboard controls to the viewer

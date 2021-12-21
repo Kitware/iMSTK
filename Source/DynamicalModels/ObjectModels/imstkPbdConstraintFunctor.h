@@ -267,12 +267,12 @@ struct PbdFemTetConstraintFunctor : public PbdConstraintFunctor
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
-            {
-                const Vec4i& tet = elements[k];
-                auto c = std::make_shared<PbdFEMTetConstraint>(m_matType);
-                c->initConstraint(vertices,
+                {
+                    const Vec4i& tet = elements[k];
+                    auto c = std::make_shared<PbdFEMTetConstraint>(m_matType);
+                    c->initConstraint(vertices,
                     tet[0], tet[1], tet[2], tet[3], m_femConfig);
-                constraints.addConstraint(c);
+                    constraints.addConstraint(c);
             }, elements.size() > 100);
         }
 
@@ -314,12 +314,12 @@ struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
-            {
-                auto& tet = elements[k];
-                auto c    = std::make_shared<PbdVolumeConstraint>();
-                c->initConstraint(vertices,
+                {
+                    auto& tet = elements[k];
+                    auto c    = std::make_shared<PbdVolumeConstraint>();
+                    c->initConstraint(vertices,
                     tet[0], tet[1], tet[2], tet[3], m_stiffness);
-                constraints.addConstraint(c);
+                    constraints.addConstraint(c);
             });
         }
 
@@ -357,11 +357,11 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
-            {
-                auto& tri = elements[k];
-                auto c    = std::make_shared<PbdAreaConstraint>();
-                c->initConstraint(vertices, tri[0], tri[1], tri[2], m_stiffness);
-                constraints.addConstraint(c);
+                {
+                    auto& tri = elements[k];
+                    auto c    = std::make_shared<PbdAreaConstraint>();
+                    c->initConstraint(vertices, tri[0], tri[1], tri[2], m_stiffness);
+                    constraints.addConstraint(c);
             });
         }
 

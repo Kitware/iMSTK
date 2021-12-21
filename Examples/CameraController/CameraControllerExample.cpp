@@ -121,29 +121,29 @@ main()
         // Change the spot angle when haptic button is pressed
         connect<ButtonEvent>(deviceClient, &HapticDeviceClient::buttonStateChanged,
             [&](ButtonEvent* e)
-        {
-            if (e->m_buttonState == BUTTON_PRESSED)
             {
-                if (e->m_button == 0)
+                if (e->m_buttonState == BUTTON_PRESSED)
                 {
-                    light->setSpotAngle(light->getSpotAngle() + 5.0);
+                    if (e->m_button == 0)
+                    {
+                        light->setSpotAngle(light->getSpotAngle() + 5.0);
+                    }
+                    else if (e->m_button == 1)
+                    {
+                        light->setSpotAngle(light->getSpotAngle() - 5.0);
+                    }
                 }
-                else if (e->m_button == 1)
-                {
-                    light->setSpotAngle(light->getSpotAngle() - 5.0);
-                }
-            }
             });
 
         // Manually make the light follow the camera controller
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
-        {
-            const Vec3d pos = camController->getPosition();
-            const Quatd orientation = camController->getOrientation();
+            {
+                const Vec3d pos = camController->getPosition();
+                const Quatd orientation = camController->getOrientation();
 
-            light->setPosition(pos);
-            light->setFocalPoint(pos - orientation.toRotationMatrix().col(2));
+                light->setPosition(pos);
+                light->setFocalPoint(pos - orientation.toRotationMatrix().col(2));
             });
 
         driver->start();

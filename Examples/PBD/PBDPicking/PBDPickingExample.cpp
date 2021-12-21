@@ -264,35 +264,35 @@ main()
         }
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            // Simulate the cloth in real time
-            clothObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+            {
+                // Simulate the cloth in real time
+                clothObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
         });
 
         connect<Event>(controller, &LaparoscopicToolController::JawClosed,
             [&](Event*)
-        {
-            LOG(INFO) << "Jaw Closed!";
+            {
+                LOG(INFO) << "Jaw Closed!";
 
-            upperJawCollision->getCollisionDetectionNode()->setEnabled(false);
-            upperJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
-            upperJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
-            lowerJawCollision->getCollisionDetectionNode()->setEnabled(false);
-            lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
-            lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
+                upperJawCollision->getCollisionDetectionNode()->setEnabled(false);
+                upperJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
+                upperJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
+                lowerJawCollision->getCollisionDetectionNode()->setEnabled(false);
+                lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
+                lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
 
-            upperJawPicking->beginPick();
-            lowerJawPicking->beginPick();
+                upperJawPicking->beginPick();
+                lowerJawPicking->beginPick();
             });
         connect<Event>(controller, &LaparoscopicToolController::JawOpened,
             [&](Event*)
-        {
-            LOG(INFO) << "Jaw Opened!";
+            {
+                LOG(INFO) << "Jaw Opened!";
 
-            upperJawCollision->getCollisionDetectionNode()->setEnabled(true);
-            lowerJawCollision->getCollisionDetectionNode()->setEnabled(true);
-            upperJawPicking->endPick();
-            lowerJawPicking->endPick();
+                upperJawCollision->getCollisionDetectionNode()->setEnabled(true);
+                lowerJawCollision->getCollisionDetectionNode()->setEnabled(true);
+                upperJawPicking->endPick();
+                lowerJawPicking->endPick();
             });
 
         driver->start();

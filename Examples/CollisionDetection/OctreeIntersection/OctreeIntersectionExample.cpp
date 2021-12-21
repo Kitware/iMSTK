@@ -264,10 +264,10 @@ main()
 
         // Update debug visual representation every render
         connect<Event>(viewer, &Viewer::preUpdate, [&](Event*)
-        {
-            // Update debug rendering data
-            // Involves a larger buffer update so we only do it before rendering
-            debugOctreeObj->debugUpdate(8, true);
+            {
+                // Update debug rendering data
+                // Involves a larger buffer update so we only do it before rendering
+                debugOctreeObj->debugUpdate(8, true);
             });
 
         // Add mouse and keyboard controls to the viewer

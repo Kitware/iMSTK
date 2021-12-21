@@ -192,42 +192,42 @@ main()
         std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
         const Vec3d                           dx = scene->getActiveCamera()->getPosition() - scene->getActiveCamera()->getFocalPoint();
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            Vec3d extForce  = Vec3d(0.0, 0.0, 0.0);
-            Vec3d extTorque = Vec3d(0.0, 0.0, 0.0);
-            // If w down, move forward
-            if (keyDevice->getButton('i') == KEY_PRESS)
             {
-                extForce += Vec3d(0.0, 0.0, -900.0);
-            }
-            if (keyDevice->getButton('k') == KEY_PRESS)
-            {
-                extForce += Vec3d(0.0, 0.0, 900.0);
-            }
-            if (keyDevice->getButton('j') == KEY_PRESS)
-            {
-                extForce += Vec3d(-900.0, 0.0, 0.0);
-            }
-            if (keyDevice->getButton('l') == KEY_PRESS)
-            {
-                extForce += Vec3d(900.0, 0.0, 0.0);
-            }
-            if (keyDevice->getButton('u') == KEY_PRESS)
-            {
-                extTorque += Vec3d(0.0, 1.5, 0.0);
-            }
-            if (keyDevice->getButton('o') == KEY_PRESS)
-            {
-                extTorque += Vec3d(0.0, -1.5, 0.0);
-            }
-            *cubeObj->getRigidBody()->m_force  = extForce;
-            *cubeObj->getRigidBody()->m_torque = extTorque;
-            scene->getActiveCamera()->setFocalPoint(cubeObj->getRigidBody()->getPosition());
-            scene->getActiveCamera()->setPosition(cubeObj->getRigidBody()->getPosition() + dx);
+                Vec3d extForce  = Vec3d(0.0, 0.0, 0.0);
+                Vec3d extTorque = Vec3d(0.0, 0.0, 0.0);
+                // If w down, move forward
+                if (keyDevice->getButton('i') == KEY_PRESS)
+                {
+                    extForce += Vec3d(0.0, 0.0, -900.0);
+                }
+                if (keyDevice->getButton('k') == KEY_PRESS)
+                {
+                    extForce += Vec3d(0.0, 0.0, 900.0);
+                }
+                if (keyDevice->getButton('j') == KEY_PRESS)
+                {
+                    extForce += Vec3d(-900.0, 0.0, 0.0);
+                }
+                if (keyDevice->getButton('l') == KEY_PRESS)
+                {
+                    extForce += Vec3d(900.0, 0.0, 0.0);
+                }
+                if (keyDevice->getButton('u') == KEY_PRESS)
+                {
+                    extTorque += Vec3d(0.0, 1.5, 0.0);
+                }
+                if (keyDevice->getButton('o') == KEY_PRESS)
+                {
+                    extTorque += Vec3d(0.0, -1.5, 0.0);
+                }
+                *cubeObj->getRigidBody()->m_force  = extForce;
+                *cubeObj->getRigidBody()->m_torque = extTorque;
+                scene->getActiveCamera()->setFocalPoint(cubeObj->getRigidBody()->getPosition());
+                scene->getActiveCamera()->setPosition(cubeObj->getRigidBody()->getPosition() + dx);
         });
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            cubeObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+            {
+                cubeObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
         });
 
         driver->start();

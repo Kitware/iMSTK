@@ -262,114 +262,114 @@ main()
 
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
             [&](MouseEvent* e)
-        {
-            if (e->m_buttonId == 0)
             {
-                // Get mouse position (0, 1) with origin at bot left of screen
-                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-                // To NDC coordinates
-                const Vec3d rayDir = scene->getActiveCamera()->getEyeRayDir(
-                        Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
-                const Vec3d rayStart = scene->getActiveCamera()->getPosition();
-
-                auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
-                std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
-                const VecDataArray<double, 3>& vertices = *verticesPtr;
-                std::shared_ptr<VecDataArray<int, 3>> indicesPtr = surfMesh->getTriangleIndices();
-                const VecDataArray<int, 3>& indices = *indicesPtr;
-
-                // Comptue the nearest triangle intersection along the picking ray
-                double minDist   = IMSTK_DOUBLE_MAX;
-                triangleSelected = -1;
-                for (int i = 0; i < indices.size(); i++)
+                if (e->m_buttonId == 0)
                 {
-                    const Vec3d& a = vertices[indices[i][0]];
-                    const Vec3d& b = vertices[indices[i][1]];
-                    const Vec3d& c = vertices[indices[i][2]];
-                    if (CollisionUtils::testSegmentTriangle(rayStart, rayStart + rayDir * 1000.0, a, b, c, triangleSelectionPtUvw))
-                    {
-                        Vec3d iPt =
-                            a * triangleSelectionPtUvw[0] +
-                            b * triangleSelectionPtUvw[1] +
-                            c * triangleSelectionPtUvw[2];
-                        double dist = (rayStart - iPt).norm();
+                    // Get mouse position (0, 1) with origin at bot left of screen
+                    const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                    // To NDC coordinates
+                    const Vec3d rayDir = scene->getActiveCamera()->getEyeRayDir(
+                        Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
+                    const Vec3d rayStart = scene->getActiveCamera()->getPosition();
 
-                        if (dist < minDist)
+                    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
+                    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
+                    const VecDataArray<double, 3>& vertices = *verticesPtr;
+                    std::shared_ptr<VecDataArray<int, 3>> indicesPtr = surfMesh->getTriangleIndices();
+                    const VecDataArray<int, 3>& indices = *indicesPtr;
+
+                    // Comptue the nearest triangle intersection along the picking ray
+                    double minDist   = IMSTK_DOUBLE_MAX;
+                    triangleSelected = -1;
+                    for (int i = 0; i < indices.size(); i++)
+                    {
+                        const Vec3d& a = vertices[indices[i][0]];
+                        const Vec3d& b = vertices[indices[i][1]];
+                        const Vec3d& c = vertices[indices[i][2]];
+                        if (CollisionUtils::testSegmentTriangle(rayStart, rayStart + rayDir * 1000.0, a, b, c, triangleSelectionPtUvw))
                         {
-                            minDist = dist;
-                            triangleSelected = i;
+                            Vec3d iPt =
+                                a * triangleSelectionPtUvw[0] +
+                                b * triangleSelectionPtUvw[1] +
+                                c * triangleSelectionPtUvw[2];
+                            double dist = (rayStart - iPt).norm();
+
+                            if (dist < minDist)
+                            {
+                                minDist = dist;
+                                triangleSelected = i;
+                            }
                         }
                     }
                 }
-            }
             });
         // Unselect/drop the sphere
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
             [&](MouseEvent* e)
-        {
-            if (e->m_buttonId == 0)
             {
-                triangleSelected = -1;
-            }
+                if (e->m_buttonId == 0)
+                {
+                    triangleSelected = -1;
+                }
             });
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            // Run the model in real time
-            clothObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+            {
+                // Run the model in real time
+                clothObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
             });
 
         auto updatePickingFunc = std::make_shared<TaskNode>([&]()
-        {
-            if (triangleSelected != -1)
             {
-                // Get mouses current position
-                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-                const Vec3d rayDir   = scene->getActiveCamera()->getEyeRayDir(
+                if (triangleSelected != -1)
+                {
+                    // Get mouses current position
+                    const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                    const Vec3d rayDir   = scene->getActiveCamera()->getEyeRayDir(
                         Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
-                const Vec3d rayStart = scene->getActiveCamera()->getPosition();
+                    const Vec3d rayStart = scene->getActiveCamera()->getPosition();
 
-                // Compute new intersection point along view plane this is the location to move too
-                Vec3d curr_iPt;
-                CollisionUtils::testRayToPlane(rayStart, rayDir, plane->getPosition(),
+                    // Compute new intersection point along view plane this is the location to move too
+                    Vec3d curr_iPt;
+                    CollisionUtils::testRayToPlane(rayStart, rayDir, plane->getPosition(),
                         plane->getNormal(), curr_iPt);
 
-                clickSphere1->setPosition(curr_iPt);
-                clickSphere1->updatePostTransformData();
+                    clickSphere1->setPosition(curr_iPt);
+                    clickSphere1->updatePostTransformData();
 
-                auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
-                std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
-                VecDataArray<double, 3>& vertices = *verticesPtr;
-                std::shared_ptr<VecDataArray<int, 3>> indicesPtr = surfMesh->getTriangleIndices();
-                const VecDataArray<int, 3>& indices = *indicesPtr;
+                    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
+                    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
+                    VecDataArray<double, 3>& vertices = *verticesPtr;
+                    std::shared_ptr<VecDataArray<int, 3>> indicesPtr = surfMesh->getTriangleIndices();
+                    const VecDataArray<int, 3>& indices = *indicesPtr;
 
-                Vec3d& a       = vertices[indices[triangleSelected][0]];
-                Vec3d& b       = vertices[indices[triangleSelected][0]];
-                Vec3d& c       = vertices[indices[triangleSelected][0]];
-                Vec3d prev_iPt =
-                    a * triangleSelectionPtUvw[0] +
-                    b * triangleSelectionPtUvw[1] +
-                    c * triangleSelectionPtUvw[2];
+                    Vec3d& a       = vertices[indices[triangleSelected][0]];
+                    Vec3d& b       = vertices[indices[triangleSelected][0]];
+                    Vec3d& c       = vertices[indices[triangleSelected][0]];
+                    Vec3d prev_iPt =
+                        a * triangleSelectionPtUvw[0] +
+                        b * triangleSelectionPtUvw[1] +
+                        c * triangleSelectionPtUvw[2];
 
-                clickSphere2->setPosition(prev_iPt);
-                clickSphere2->updatePostTransformData();
+                    clickSphere2->setPosition(prev_iPt);
+                    clickSphere2->updatePostTransformData();
 
-                double stiffness = 0.1;
-                Vec3d diff       = curr_iPt - prev_iPt;
+                    double stiffness = 0.1;
+                    Vec3d diff       = curr_iPt - prev_iPt;
 
-                a += diff * stiffness;
-                b += diff * stiffness;
-                c += diff * stiffness;
-            }
+                    a += diff * stiffness;
+                    b += diff * stiffness;
+                    c += diff * stiffness;
+                }
             }, "PickingUpdate");
 
         // Insert a step into the model
         // Another, possibly better solution would be to add an internal constraint for it
         connect<Event>(scene, &Scene::configureTaskGraph, [&](Event*)
-        {
-            std::shared_ptr<TaskGraph> taskGraph = scene->getTaskGraph();
-            // Compute picking update position after internal solve, but before velocities are updated
-            taskGraph->insertAfter(clothObj->getPbdModel()->getSolveNode(), updatePickingFunc);
+            {
+                std::shared_ptr<TaskGraph> taskGraph = scene->getTaskGraph();
+                // Compute picking update position after internal solve, but before velocities are updated
+                taskGraph->insertAfter(clothObj->getPbdModel()->getSolveNode(), updatePickingFunc);
             });
 
         driver->start();

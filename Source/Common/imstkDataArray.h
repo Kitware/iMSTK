@@ -162,7 +162,7 @@ public:
         m_size = m_capacity = static_cast<int>(list.size());
     }
 
-    DataArray(const DataArray& other)
+    DataArray(const DataArray& other) : AbstractDataArray(other)
     {
         // Copy the buffer instead of the pointer
         m_mapped     = other.m_mapped;

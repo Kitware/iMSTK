@@ -107,20 +107,20 @@ main()
         centralGrad.setFunction(sdf);
         centralGrad.setDx(sdf->getImage()->getSpacing());
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        {
-            const Vec3d pos = client->getPosition() * 0.1 + Vec3d(0.0, 0.1, 10.0);
-
-            client->update();
-            axesMesh->setTranslation(pos);
-            axesMesh->setRotation(client->getOrientation());
-            axesMesh->postModified();
-
-            double dx = sdf->getFunctionValue(pos);
-            if (dx < 0.0)
             {
-                const Vec3d g = centralGrad(pos);
-                client->setForce(-g.normalized() * dx * 4.0);
-            }
+                const Vec3d pos = client->getPosition() * 0.1 + Vec3d(0.0, 0.1, 10.0);
+
+                client->update();
+                axesMesh->setTranslation(pos);
+                axesMesh->setRotation(client->getOrientation());
+                axesMesh->postModified();
+
+                double dx = sdf->getFunctionValue(pos);
+                if (dx < 0.0)
+                {
+                    const Vec3d g = centralGrad(pos);
+                    client->setForce(-g.normalized() * dx * 4.0);
+                }
             });
 
         // Add mouse and keyboard controls to the viewer

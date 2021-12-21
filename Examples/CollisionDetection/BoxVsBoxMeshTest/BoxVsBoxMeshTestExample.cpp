@@ -110,53 +110,53 @@ main()
         cdDebugObj->debugUpdate();
 
         connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, [&](KeyEvent* e)
-        {
-            const double s = 0.05;
-            if (e->m_key == 'i')
             {
-                box2Mesh->translate(Vec3d(0.0, 0.0, 1.0) * s);
-            }
-            else if (e->m_key == 'k')
-            {
-                box2Mesh->translate(Vec3d(0.0, 0.0, -1.0) * s);
-            }
-            else if (e->m_key == 'j')
-            {
-                box2Mesh->translate(Vec3d(-1.0, 0.0, 0.0) * s);
-            }
-            else if (e->m_key == 'l')
-            {
-                box2Mesh->translate(Vec3d(1.0, 0.0, 0.0) * s);
-            }
-            else if (e->m_key == 'u')
-            {
-                box2Mesh->translate(Vec3d(0.0, -1.0, 0.0) * s);
-            }
-            else if (e->m_key == 'o')
-            {
-                box2Mesh->translate(Vec3d(0.0, 1.0, 0.0) * s);
-            }
-            else if (e->m_key == '1')
-            {
-                box2Mesh->rotate(Vec3d(0.0, 0.0, 1.0), 0.1);
-            }
-            else if (e->m_key == '2')
-            {
-                box2Mesh->rotate(Vec3d(0.0, 0.0, 1.0), -0.1);
-            }
-            else if (e->m_key == '3')
-            {
-                box2Mesh->rotate(Vec3d(0.0, 1.0, 0.0), 0.1);
-            }
-            else if (e->m_key == '4')
-            {
-                box2Mesh->rotate(Vec3d(0.0, 1.0, 0.0), -0.1);
-            }
-            box2Mesh->postModified();
-            box2Mesh->updatePostTransformData();
-            cd->update();
-            sceneManager->update();
-            cdDebugObj->debugUpdate();
+                const double s = 0.05;
+                if (e->m_key == 'i')
+                {
+                    box2Mesh->translate(Vec3d(0.0, 0.0, 1.0) * s);
+                }
+                else if (e->m_key == 'k')
+                {
+                    box2Mesh->translate(Vec3d(0.0, 0.0, -1.0) * s);
+                }
+                else if (e->m_key == 'j')
+                {
+                    box2Mesh->translate(Vec3d(-1.0, 0.0, 0.0) * s);
+                }
+                else if (e->m_key == 'l')
+                {
+                    box2Mesh->translate(Vec3d(1.0, 0.0, 0.0) * s);
+                }
+                else if (e->m_key == 'u')
+                {
+                    box2Mesh->translate(Vec3d(0.0, -1.0, 0.0) * s);
+                }
+                else if (e->m_key == 'o')
+                {
+                    box2Mesh->translate(Vec3d(0.0, 1.0, 0.0) * s);
+                }
+                else if (e->m_key == '1')
+                {
+                    box2Mesh->rotate(Vec3d(0.0, 0.0, 1.0), 0.1);
+                }
+                else if (e->m_key == '2')
+                {
+                    box2Mesh->rotate(Vec3d(0.0, 0.0, 1.0), -0.1);
+                }
+                else if (e->m_key == '3')
+                {
+                    box2Mesh->rotate(Vec3d(0.0, 1.0, 0.0), 0.1);
+                }
+                else if (e->m_key == '4')
+                {
+                    box2Mesh->rotate(Vec3d(0.0, 1.0, 0.0), -0.1);
+                }
+                box2Mesh->postModified();
+                box2Mesh->updatePostTransformData();
+                cd->update();
+                sceneManager->update();
+                cdDebugObj->debugUpdate();
         });
 
         imstkNew<SimulationManager> driver;
