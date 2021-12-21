@@ -241,9 +241,9 @@ TEST(imstkTaskGraphTest, RemoveNodesWithEdgesAndRedirect)
         taskGraph->addNode(node2);
 
         // *INDENT-OFF*
-        /// source - node1 - sink
-        ///                \
-        ///                 node2
+        /* source - node1 - sink
+                        \
+                        node2 */
         // *INDENT-ON*
         taskGraph->addEdge(source, node1);
         taskGraph->addEdge(node1, node2);
@@ -266,9 +266,9 @@ TEST(imstkTaskGraphTest, RemoveNodesWithEdgesAndRedirect)
         taskGraph->addNode(node3);
 
         // *INDENT-OFF*
-        /// source - node1 - sink
-        ///        /         \
-        /// node2            node3
+        /* source - node1 - sink
+                /         \
+          node2            node3 */
         // *INDENT-ON*
         taskGraph->addEdge(source, node1);
         taskGraph->addEdge(node2, node1);
@@ -297,9 +297,9 @@ TEST(imstkTaskGraphTest, InsertBefore)
     taskGraph->addNode(node1);
     taskGraph->addNode(node2);
     // *INDENT-OFF*
-    /// source - node1 - sink
-    ///                /
-    ///          node2
+    /* source - node1 - sink
+                      /
+                node2 */
     // *INDENT-ON*
     taskGraph->addEdge(source, node1);
     taskGraph->addEdge(node2, node1);
@@ -327,9 +327,9 @@ TEST(imstkTaskGraphTest, InsertAfter)
     taskGraph->addNode(node1);
     taskGraph->addNode(node2);
     // *INDENT-OFF*
-    /// source - node1 - sink
-    ///                \
-    ///                 node2
+    /* source - node1 - sink
+                       \
+                        node2 */
     // *INDENT-ON*
     taskGraph->addEdge(source, node1);
     taskGraph->addEdge(node1, node2);
@@ -353,10 +353,12 @@ TEST(imstkTaskGraphTest, AddSubGraph)
         auto source = subGraph->getSource();
         auto sink   = subGraph->getSink();
 
+        // *INDENT-OFF*
         /// Diamond Pattern
-        /// source - innerNode1 - sink
-        ///        \            /
-        ///          innerNode2
+        /* source - innerNode1 - sink
+                 \            /
+                   innerNode2 */
+        // *INDENT-ON*
         subGraph->addNodes({ innerNode1, innerNode2 });
         subGraph->addEdges({
             { source, innerNode1 },

@@ -45,8 +45,7 @@ PointSetToSphereCD::computeCollisionDataAB(
     std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomB);
 
     const Vec3d& spherePos = sphere->getPosition();
-    const double r    = sphere->getRadius();
-    const double rSqr = r * r;
+    const double r = sphere->getRadius();
 
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
@@ -89,8 +88,7 @@ PointSetToSphereCD::computeCollisionDataA(
     std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomB);
 
     const Vec3d& spherePos = sphere->getPosition();
-    const double r    = sphere->getRadius();
-    const double rSqr = r * r;
+    const double r = sphere->getRadius();
 
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;
@@ -127,8 +125,7 @@ PointSetToSphereCD::computeCollisionDataB(
     std::shared_ptr<Sphere>   sphere   = std::dynamic_pointer_cast<Sphere>(geomB);
 
     const Vec3d& spherePos = sphere->getPosition();
-    const double r    = sphere->getRadius();
-    const double rSqr = r * r;
+    const double r = sphere->getRadius();
 
     std::shared_ptr<VecDataArray<double, 3>> vertexData = pointSet->getVertexPositions();
     const VecDataArray<double, 3>&           vertices   = *vertexData;

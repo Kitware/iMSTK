@@ -45,8 +45,7 @@ TetraToPointSetCD::computeCollisionDataAB(
     m_hashTableB.clear();
     m_hashTableB.insertPoints(*pointSet->getVertexPositions());
 
-    constexpr const double eps  = IMSTK_DOUBLE_EPS;
-    const double           eps2 = 1.0e-10;
+    constexpr const double eps = IMSTK_DOUBLE_EPS;
 
     //const VecDataArray<double, 3>& verticesMeshA = *m_tetMesh->getVertexPositions();
     std::shared_ptr<VecDataArray<double, 3>> verticesMeshBPtr = pointSet->getVertexPositions();

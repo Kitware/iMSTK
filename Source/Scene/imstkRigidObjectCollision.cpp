@@ -150,10 +150,10 @@ RigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shar
     else
     {
         // Note: ComputeTenative and RbdModel may be the same
-        // ComputeTenative Velocities 1   CollidingObject Source
-        //                   Collision Detection
-        //       Collision Handling         \
-        //       Rbd Solve 1               CollidingObject Update
+        /* ComputeTenative Velocities 1   CollidingObject Source
+                           Collision Detection
+               Collision Handling         \
+               Rbd Solve 1               CollidingObject Update */
         m_taskGraph->addEdge(rbdModel1->getComputeTentativeVelocitiesNode(), m_collisionDetectionNode);
         m_taskGraph->addEdge(m_objB->getTaskGraph()->getSource(), m_collisionDetectionNode);
 

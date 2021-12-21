@@ -223,7 +223,7 @@ RigidBodyCH::handleRbdStaticOneWay(
         {
             const Vec3d& p = verticesA[elemA.ids[0]];
 
-            Vec3i tri;
+            Vec3i tri = Vec3i::Zero();
             if (elemB.idCount == 1)
             {
                 tri = (*dynamic_cast<SurfaceMesh*>(geomB.get())->getTriangleIndices().get())[elemB.ids[0]];
@@ -253,7 +253,7 @@ RigidBodyCH::handleRbdStaticOneWay(
         // Edge vs Edge
         else if (elemA.cellType == IMSTK_EDGE && elemB.cellType == IMSTK_EDGE)
         {
-            Vec2i edgeA;
+            Vec2i edgeA = Vec2i::Zero();
             if (elemA.idCount == 1)
             {
                 edgeA = (*dynamic_cast<LineMesh*>(geomA.get())->getLinesIndices().get())[elemA.ids[0]];
@@ -262,7 +262,7 @@ RigidBodyCH::handleRbdStaticOneWay(
             {
                 edgeA = Vec2i(elemA.ids[0], elemA.ids[1]);
             }
-            Vec2i edgeB;
+            Vec2i edgeB = Vec2i::Zero();
             if (elemB.idCount == 1)
             {
                 edgeB = (*dynamic_cast<LineMesh*>(geomB.get())->getLinesIndices().get())[elemB.ids[0]];
@@ -292,7 +292,7 @@ RigidBodyCH::handleRbdStaticOneWay(
         // Edge vs Vertex
         else if (elemA.cellType == IMSTK_EDGE && elemB.cellType == IMSTK_VERTEX)
         {
-            Vec2i edge;
+            Vec2i edge = Vec2i::Zero();
             if (elemA.idCount == 1)
             {
                 edge = (*dynamic_cast<LineMesh*>(geomA.get())->getLinesIndices().get())[elemA.ids[0]];
@@ -319,11 +319,8 @@ RigidBodyCH::handleRbdStaticOneWay(
             const double l     = diff1.norm();
             if (l > 0.0)
             {
-                const Vec3d  n = diff1 / l;
-                const double u = p / length;
-
+                const Vec3d n = diff1 / l;
                 const Vec3d contactPt = pt - n * l;
-
                 addConstraint(rbdObj, contactPt, n, l);
             }
         }
@@ -331,7 +328,7 @@ RigidBodyCH::handleRbdStaticOneWay(
         {
             const Vec3d& pt = verticesA[elemA.ids[0]];
 
-            Vec2i edge;
+            Vec2i edge = Vec2i::Zero();
             if (elemB.idCount == 1)
             {
                 edge = (*dynamic_cast<LineMesh*>(geomB.get())->getLinesIndices().get())[elemB.ids[0]];
@@ -356,12 +353,8 @@ RigidBodyCH::handleRbdStaticOneWay(
             const double l     = diff1.norm();
             if (l > 0.0)
             {
-                const Vec3d  n = diff1 / l;
-                const double u = p / length;
-
+                const Vec3d n = diff1 / l;
                 const Vec3d contactPt = pt + n * l;
-                //std::cout << "n: " << n[0] << ", " << n[1] << ", " << n[2] << std::endl;
-
                 addConstraint(rbdObj, contactPt, -n, l);
             }
         }
