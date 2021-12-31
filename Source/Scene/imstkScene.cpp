@@ -157,6 +157,11 @@ Scene::buildTaskGraph()
         }
     }
 
+    // Remove any possible unused nodes
+    m_taskGraph = TaskGraph::removeUnusedNodes(m_taskGraph);
+    // Resolve criticals across objects
+    m_taskGraph = TaskGraph::resolveCriticalNodes(m_taskGraph);
+
 #ifdef IMSTK_USE_PHYSX
     // Gather all the physX rigid bodies
     std::list<std::shared_ptr<SceneObject>> rigidBodies;
@@ -205,13 +210,19 @@ Scene::initTaskGraph()
         m_taskGraphController = std::make_shared<SequentialTaskGraphController>();
     }
 
-    // Reduce the graph, removing nonfunctional nodes, and redundant edges
-    m_taskGraph = TaskGraph::removeUnusedNodes(m_taskGraph);
     if (TaskGraph::isCyclic(m_taskGraph))
     {
+        if (m_config->writeTaskGraph)
+        {
+            TaskGraphVizWriter writer;
+            writer.setInput(m_taskGraph);
+            writer.setFileName("sceneTaskGraph.svg");
+            writer.write();
+        }
         LOG(FATAL) << "Scene TaskGraph is cyclic, cannot proceed";
         return;
     }
+    // Clean up graph if user wants
     if (m_config->graphReductionEnabled)
     {
         m_taskGraph = TaskGraph::reduce(m_taskGraph);

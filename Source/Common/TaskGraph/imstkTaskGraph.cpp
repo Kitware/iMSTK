@@ -458,41 +458,44 @@ TaskGraph::resolveCriticalNodes(std::shared_ptr<TaskGraph> graph)
     CHECK(graph != nullptr) << "Graph is nullptr";
     std::shared_ptr<TaskGraph> results = std::make_shared<TaskGraph>(*graph);
 
-    const TaskNodeAdjList& adjList = graph->getAdjList();
-    const TaskNodeVector&  nodes   = graph->getNodes();
+    const TaskNodeAdjList& adjList = results->getAdjList();
+    const TaskNodeVector&  nodes   = results->getNodes();
 
     // Compute the levels of each node via DFS
     std::unordered_map<std::shared_ptr<TaskNode>, int> depths;
-    {
-        std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
-
-        // DFS for the dependencies
-        std::stack<std::shared_ptr<TaskNode>> nodeStack;
-        depths[graph->getSource()] = 0;
-        nodeStack.push(graph->getSource());
-        while (!nodeStack.empty())
+    auto                                               computeDepths =
+        [&]()
         {
-            std::shared_ptr<TaskNode> currNode  = nodeStack.top();
-            int                       currLevel = depths[currNode];
-            nodeStack.pop();
+            std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
 
-            // Add children to stack if not yet visited
-            if (adjList.count(currNode) != 0)
+            // DFS for the dependencies
+            std::stack<std::shared_ptr<TaskNode>> nodeStack;
+            depths[results->getSource()] = 0;
+            nodeStack.push(results->getSource());
+            while (!nodeStack.empty())
             {
-                const TaskNodeSet& outputNodes = adjList.at(currNode);
-                for (TaskNodeSet::const_iterator i = outputNodes.begin(); i != outputNodes.end(); i++)
+                std::shared_ptr<TaskNode> currNode  = nodeStack.top();
+                int                       currLevel = depths[currNode];
+                nodeStack.pop();
+
+                // Add children to stack if not yet visited
+                if (adjList.count(currNode) != 0)
                 {
-                    std::shared_ptr<TaskNode> childNode = *i;
-                    if (visitedNodes.count(childNode) == 0)
+                    const TaskNodeSet& outputNodes = adjList.at(currNode);
+                    for (TaskNodeSet::const_iterator i = outputNodes.begin(); i != outputNodes.end(); i++)
                     {
-                        visitedNodes.insert(childNode);
-                        depths[childNode] = currLevel + 1;
-                        nodeStack.push(childNode);
+                        std::shared_ptr<TaskNode> childNode = *i;
+                        if (visitedNodes.count(childNode) == 0)
+                        {
+                            visitedNodes.insert(childNode);
+                            depths[childNode] = currLevel + 1;
+                            nodeStack.push(childNode);
+                        }
                     }
                 }
             }
-        }
-    }
+        };
+    computeDepths();
 
     // Identify the set of critical nodes
     TaskNodeVector critNodes;
@@ -505,43 +508,56 @@ TaskGraph::resolveCriticalNodes(std::shared_ptr<TaskGraph> graph)
     }
 
     // Compute the critical adjacency list
+    // That is, the set of critical nodes that can be reached
+    // from a given critical node, think of it as a subgraph
     TaskNodeAdjList critAdjList;
-    for (size_t i = 0; i < critNodes.size(); i++)
-    {
-        std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
-
-        // DFS for the dependencies
-        std::stack<std::shared_ptr<TaskNode>> nodeStack;
-        nodeStack.push(critNodes[i]);
-        while (!nodeStack.empty())
+    auto            computeCritList =
+        [&]()
         {
-            std::shared_ptr<TaskNode> currNode = nodeStack.top();
-            nodeStack.pop();
+            critAdjList.clear();
 
-            // If you can reach one critical node from the other then they are adjacent
-            if (currNode->m_isCritical)
+            // For every critical node
+            for (size_t i = 0; i < critNodes.size(); i++)
             {
-                critAdjList[critNodes[i]].insert(currNode);
-            }
+                std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
 
-            // Add children to stack if not yet visited
-            if (adjList.count(currNode) != 0)
-            {
-                const TaskNodeSet& outputNodes = adjList.at(currNode);
-                for (TaskNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
+                // DFS for the dependencies (try to reach another critical)
+                std::stack<std::shared_ptr<TaskNode>> nodeStack;
+                nodeStack.push(critNodes[i]);
+                while (!nodeStack.empty())
                 {
-                    std::shared_ptr<TaskNode> childNode = *j;
-                    if (visitedNodes.count(childNode) == 0)
+                    std::shared_ptr<TaskNode> currNode = nodeStack.top();
+                    nodeStack.pop();
+
+                    // If you can reach one critical node from the other then they are adjacent
+                    if (currNode->m_isCritical)
                     {
-                        visitedNodes.insert(childNode);
-                        nodeStack.push(childNode);
+                        critAdjList[critNodes[i]].insert(currNode);
+                    }
+
+                    // Add children to stack if not yet visited
+                    if (adjList.count(currNode) != 0)
+                    {
+                        const TaskNodeSet& outputNodes = adjList.at(currNode);
+                        for (TaskNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
+                        {
+                            std::shared_ptr<TaskNode> childNode = *j;
+                            if (visitedNodes.count(childNode) == 0)
+                            {
+                                visitedNodes.insert(childNode);
+                                nodeStack.push(childNode);
+                            }
+                        }
                     }
                 }
             }
-        }
-    }
+        };
+    computeCritList();
 
     // Now we know which critical nodes depend on each other (we are interested in those that aren't)
+    // Because if a critical node depends on another, then it must not be running in parallel to another
+    // critical node
+
     // For every critical pair
     for (size_t i = 0; i < critNodes.size(); i++)
     {
@@ -565,6 +581,8 @@ TaskGraph::resolveCriticalNodes(std::shared_ptr<TaskGraph> graph)
                 {
                     results->addEdge(srcNode, destNode);
                 }
+                computeDepths();
+                computeCritList();
             }
         }
     }

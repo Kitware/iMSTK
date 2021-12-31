@@ -24,6 +24,8 @@
 
 #include "imstkTaskGraph.h"
 
+#include <array>
+
 using namespace imstk;
 using testing::UnorderedElementsAre;
 using testing::ElementsAre;
@@ -625,4 +627,108 @@ TEST(imstkTaskGraphTest, RemoveUnusedNodes)
         auto result = taskGraph->removeUnusedNodes(taskGraph);
         EXPECT_EQ(0, result->getNodes().size());
     }
+}
+
+TEST(imstkTaskGraphTest, ResolveCriticalNodes0)
+{
+    /*
+    *   A
+    *   |
+    *   B
+    *  /|\
+    * C D E   (c, d, & e are critical)
+    *  \| |
+    *   F |
+    *   |/
+    *   G
+    */
+
+    auto taskGraph = std::make_shared<TaskGraph>();
+
+    std::shared_ptr<TaskNode> nodeA = taskGraph->getSource();
+    auto                      nodeB = std::make_shared<TaskNode>();
+    auto                      nodeC = std::make_shared<TaskNode>([]() {}, "c", true);
+    auto                      nodeD = std::make_shared<TaskNode>([]() {}, "d", true);
+    auto                      nodeE = std::make_shared<TaskNode>([]() {}, "e", true);
+    auto                      nodeF = std::make_shared<TaskNode>();
+    std::shared_ptr<TaskNode> nodeG = taskGraph->getSink();
+
+    taskGraph->addNodes({ nodeA, nodeB, nodeC, nodeD, nodeE, nodeF });
+
+    taskGraph->addEdge(nodeA, nodeB);
+    taskGraph->addEdge(nodeA, nodeE);
+    taskGraph->addEdge(nodeB, nodeC);
+    taskGraph->addEdge(nodeB, nodeD);
+    taskGraph->addEdge(nodeC, nodeF);
+    taskGraph->addEdge(nodeD, nodeF);
+    taskGraph->addEdge(nodeF, nodeG);
+    taskGraph->addEdge(nodeE, nodeG);
+
+    taskGraph = TaskGraph::resolveCriticalNodes(taskGraph);
+
+    std::array<std::shared_ptr<TaskNode>, 3> critNodes = { nodeC, nodeD, nodeE };
+
+    // Assert that C, D, & E are connected in some sort of chain
+    // Assert that two of the 3 nodes have critical inputs (1 should be head)
+    const TaskNodeAdjList& invAdjList     = taskGraph->getInvAdjList();
+    int                    critInputCount = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        const TaskNodeSet& inputNodes     = invAdjList.at(critNodes[i]);
+        bool               critInputFound = false;
+        for (TaskNodeSet::const_iterator j = inputNodes.begin(); j != inputNodes.end(); j++)
+        {
+            if ((*j)->m_isCritical)
+            {
+                critInputFound = true;
+            }
+        }
+        critInputCount += static_cast<int>(critInputFound);
+    }
+    EXPECT_EQ(critInputCount, 2) << "Nodes C, D, & E should be connected in some sort of sequence";
+}
+
+TEST(imstkTaskGraphTest, ResolveCriticalNodes1)
+{
+    /*
+    *   A
+    *  / \
+    * B   C   (b & c critical)
+    *  \ /
+    *   D
+    *  / \
+    * E   F (e & f critical)
+    *  \ /
+    *   G
+    */
+
+    auto taskGraph = std::make_shared<TaskGraph>();
+
+    std::shared_ptr<TaskNode> nodeA = taskGraph->getSource();
+    auto                      nodeB = std::make_shared<TaskNode>([]() {}, "b", true);
+    auto                      nodeC = std::make_shared<TaskNode>([]() {}, "c", true);
+    auto                      nodeD = std::make_shared<TaskNode>();
+    auto                      nodeE = std::make_shared<TaskNode>([]() {}, "e", true);
+    auto                      nodeF = std::make_shared<TaskNode>([]() {}, "f", true);
+    std::shared_ptr<TaskNode> nodeG = taskGraph->getSink();
+
+    taskGraph->addNodes({ nodeA, nodeB, nodeC, nodeD, nodeE, nodeF });
+
+    taskGraph->addEdge(nodeA, nodeB);
+    taskGraph->addEdge(nodeA, nodeC);
+    taskGraph->addEdge(nodeB, nodeD);
+    taskGraph->addEdge(nodeC, nodeD);
+    taskGraph->addEdge(nodeD, nodeE);
+    taskGraph->addEdge(nodeD, nodeF);
+    taskGraph->addEdge(nodeE, nodeG);
+    taskGraph->addEdge(nodeF, nodeG);
+
+    taskGraph = TaskGraph::resolveCriticalNodes(taskGraph);
+
+    // There should now exist an edge between B->C, & E->F
+    // direction does not matter
+    EXPECT_TRUE(taskGraph->containsEdge(nodeB, nodeC) || taskGraph->containsEdge(nodeC, nodeB)) <<
+        "There should exist an edge between B & C";
+    EXPECT_TRUE(taskGraph->containsEdge(nodeE, nodeF) || taskGraph->containsEdge(nodeF, nodeE)) <<
+        "There should exist an edge between E & F";
 }
