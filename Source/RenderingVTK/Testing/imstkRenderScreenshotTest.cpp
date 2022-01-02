@@ -41,7 +41,7 @@ TEST(imstkRenderScreenshotTest, ScreenshotTest)
     if (vtksys::SystemTools::FileExists(screenshotFileName))
     {
         const vtksys::Status fileStatus = vtksys::SystemTools::RemoveFile(screenshotFileName);
-        EXPECT_FALSE(fileStatus.IsSuccess()) << "Failed to remove existing screenshot file before screenshotTest";
+        EXPECT_TRUE(fileStatus.IsSuccess()) << "Failed to remove existing screenshot file before screenshotTest";
         if (!fileStatus.IsSuccess())
         {
             return;
