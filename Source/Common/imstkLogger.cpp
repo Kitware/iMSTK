@@ -67,7 +67,7 @@ stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
     const auto message = logEntry.get().message();
 
 #ifndef WIN32
-    auto color = GetColor(level);
+    auto color = static_cast<int>(GetColor(level));
     std::cout << "\033[" << color << "m"
               << message
               << "\033[m" << std::endl;
