@@ -29,7 +29,7 @@ namespace imstk
 /// \class SPHBoundaryConditions
 /// \brief Class that holds methods and members for boundary conditions
 ///
-class SPHBoundaryConditions
+class SphBoundaryConditions
 {
 public:
     enum class ParticleType
@@ -42,7 +42,7 @@ public:
     };
 
 public:
-    SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,
+    SphBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,
                           const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const double inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
                           StdVectorOfVec3d& mainParticlePositions,
                           const StdVectorOfVec3d& wallParticlePositions);

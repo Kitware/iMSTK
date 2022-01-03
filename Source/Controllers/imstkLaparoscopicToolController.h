@@ -40,7 +40,7 @@ class LaparoscopicToolController : public TrackingDeviceControl
 public:
     enum class JawState
     {
-        Closed,
+        Close,
         Open
     };
 

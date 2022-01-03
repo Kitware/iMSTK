@@ -43,9 +43,9 @@ public:
         m_vel(std::make_shared<VecDataArray<double, 3>>(numElements)),
         m_acc(std::make_shared<VecDataArray<double, 3>>(numElements))
     {
-        std::fill_n(m_pos->getPointer(), numElements, Vec3d(0.0, 0.0, 0.0));
-        std::fill_n(m_vel->getPointer(), numElements, Vec3d(0.0, 0.0, 0.0));
-        std::fill_n(m_acc->getPointer(), numElements, Vec3d(0.0, 0.0, 0.0));
+        std::fill_n(m_pos->getPointer(), numElements, Vec3d::Zero());
+        std::fill_n(m_vel->getPointer(), numElements, Vec3d::Zero());
+        std::fill_n(m_acc->getPointer(), numElements, Vec3d::Zero());
     }
 
     virtual ~PbdState() = default;

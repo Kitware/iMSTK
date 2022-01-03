@@ -27,7 +27,7 @@ limitations under the License.
 
 namespace imstk
 {
-SPHModelConfig::SPHModelConfig(const double particleRadius)
+SphModelConfig::SphModelConfig(const double particleRadius)
 {
     // \todo Warning in all paths?
     if (std::abs(particleRadius) > 1.0e-6)
@@ -43,7 +43,7 @@ SPHModelConfig::SPHModelConfig(const double particleRadius)
     initialize();
 }
 
-SPHModelConfig::SPHModelConfig(const double particleRadius, const double speedOfSound, const double restDensity)
+SphModelConfig::SphModelConfig(const double particleRadius, const double speedOfSound, const double restDensity)
 {
     if (std::abs(particleRadius) > 1.0e-6)
     {
@@ -77,7 +77,7 @@ SPHModelConfig::SPHModelConfig(const double particleRadius, const double speedOf
 }
 
 void
-SPHModelConfig::initialize()
+SphModelConfig::initialize()
 {
     // Compute the derived quantities
     m_particleRadiusSqr = m_particleRadius * m_particleRadius;
@@ -92,35 +92,35 @@ SPHModelConfig::initialize()
     m_pressureStiffness = m_restDensity * m_speedOfSound * m_speedOfSound / 7.0;
 }
 
-SPHModel::SPHModel() : DynamicalModel<SPHState>(DynamicalModelType::SmoothedParticleHydrodynamics)
+SphModel::SphModel() : DynamicalModel<SphState>(DynamicalModelType::SmoothedParticleHydrodynamics)
 {
     m_validGeometryTypes = { "PointSet" };
 
-    m_findParticleNeighborsNode = m_taskGraph->addFunction("SPHModel_Partition", std::bind(&SPHModel::findParticleNeighbors, this));
+    m_findParticleNeighborsNode = m_taskGraph->addFunction("SPHModel_Partition", std::bind(&SphModel::findParticleNeighbors, this));
     m_computeDensityNode = m_taskGraph->addFunction("SPHModel_ComputeDensity", [&]()
         {
             computeNeighborRelativePositions();
             computeDensity();
         });
 
-    m_normalizeDensityNode = m_taskGraph->addFunction("SPHModel_NormalizeDensity", std::bind(&SPHModel::normalizeDensity, this));
+    m_normalizeDensityNode = m_taskGraph->addFunction("SPHModel_NormalizeDensity", std::bind(&SphModel::normalizeDensity, this));
 
-    m_collectNeighborDensityNode = m_taskGraph->addFunction("SPHModel_CollectNeighborDensity", std::bind(&SPHModel::collectNeighborDensity, this));
+    m_collectNeighborDensityNode = m_taskGraph->addFunction("SPHModel_CollectNeighborDensity", std::bind(&SphModel::collectNeighborDensity, this));
 
     m_computeTimeStepSizeNode =
-        m_taskGraph->addFunction("SPHModel_ComputeTimestep", std::bind(&SPHModel::computeTimeStepSize, this));
+        m_taskGraph->addFunction("SPHModel_ComputeTimestep", std::bind(&SphModel::computeTimeStepSize, this));
 
     m_computePressureAccelNode =
-        m_taskGraph->addFunction("SPHModel_ComputePressureAccel", std::bind(&SPHModel::computePressureAcceleration, this));
+        m_taskGraph->addFunction("SPHModel_ComputePressureAccel", std::bind(&SphModel::computePressureAcceleration, this));
 
     m_computeSurfaceTensionNode =
-        m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SPHModel::computeSurfaceTension, this));
+        m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SphModel::computeSurfaceTension, this));
 
     m_computeViscosityNode =
-        m_taskGraph->addFunction("SPHModel_ComputeViscosity", std::bind(&SPHModel::computeViscosity, this));
+        m_taskGraph->addFunction("SPHModel_ComputeViscosity", std::bind(&SphModel::computeViscosity, this));
 
     m_integrateNode =
-        m_taskGraph->addFunction("SPHModel_Integrate", std::bind(&SPHModel::sumAccels, this));
+        m_taskGraph->addFunction("SPHModel_Integrate", std::bind(&SphModel::sumAccels, this));
 
     m_updateVelocityNode =
         m_taskGraph->addFunction("SPHModel_UpdateVelocity", [&]()
@@ -142,15 +142,15 @@ SPHModel::SPHModel() : DynamicalModel<SPHState>(DynamicalModelType::SmoothedPart
 }
 
 bool
-SPHModel::initialize()
+SphModel::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
     m_pointSetGeometry = std::dynamic_pointer_cast<PointSet>(m_geometry);
     const int numParticles = m_pointSetGeometry->getNumVertices();
 
     // Allocate init and current state
-    m_initialState = std::make_shared<SPHState>(numParticles);
-    m_currentState = std::make_shared<SPHState>(numParticles);
+    m_initialState = std::make_shared<SphState>(numParticles);
+    m_currentState = std::make_shared<SphState>(numParticles);
 
     // If there were initial velocities (set them)
     if (m_initialVelocities != nullptr)
@@ -169,7 +169,7 @@ SPHModel::initialize()
     m_kernels.initialize(m_modelParameters->m_kernelRadius);
 
     // Initialize neighbor searcher
-    m_neighborSearcher = std::make_shared<NeighborSearch>(m_modelParameters->m_NeighborSearchMethod,
+    m_neighborSearcher = std::make_shared<NeighborSearch>(m_modelParameters->m_neighborSearchMethod,
       m_modelParameters->m_kernelRadius);
 
     m_pressureAccels = std::make_shared<VecDataArray<double, 3>>(numParticles);
@@ -202,7 +202,7 @@ SPHModel::initialize()
 }
 
 void
-SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+SphModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
     m_taskGraph->addEdge(source, m_findParticleNeighborsNode);
@@ -227,19 +227,19 @@ SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
 }
 
 void
-SPHModel::computeTimeStepSize()
+SphModel::computeTimeStepSize()
 {
     m_dt = (this->m_timeStepSizeType == TimeSteppingType::Fixed) ? m_defaultDt : computeCFLTimeStepSize();
 }
 
 double
-SPHModel::computeCFLTimeStepSize()
+SphModel::computeCFLTimeStepSize()
 {
     auto maxVel = ParallelUtils::findMaxL2Norm(*getCurrentState()->getFullStepVelocities());
 
     // dt = CFL * 2r / (speed of sound + max{|| v ||})
     double timestep = maxVel > 1.0e-6 ?
-                      m_modelParameters->m_CFLFactor * (2.0 * m_modelParameters->m_particleRadius / (m_modelParameters->m_speedOfSound + maxVel)) :
+                      m_modelParameters->m_cflFactor * (2.0 * m_modelParameters->m_particleRadius / (m_modelParameters->m_speedOfSound + maxVel)) :
                       m_modelParameters->m_maxTimestep;
 
     // clamp the time step size to be within a given range
@@ -255,7 +255,7 @@ SPHModel::computeCFLTimeStepSize()
 }
 
 void
-SPHModel::findParticleNeighbors()
+SphModel::findParticleNeighbors()
 {
     m_neighborSearcher->getNeighbors(getCurrentState()->getFluidNeighborLists(), *getCurrentState()->getPositions());
 
@@ -268,7 +268,7 @@ SPHModel::findParticleNeighbors()
 }
 
 void
-SPHModel::computeNeighborRelativePositions()
+SphModel::computeNeighborRelativePositions()
 {
     auto computeRelativePositions = [&](const Vec3d& ppos, const std::vector<size_t>& neighborList,
                                         const VecDataArray<double, 3>& allPositions, std::vector<NeighborInfo>& neighborInfo)
@@ -290,7 +290,7 @@ SPHModel::computeNeighborRelativePositions()
         [&](const size_t p)
         {
             if (m_sphBoundaryConditions
-                && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer)
+                && m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Buffer)
             {
                 return;
             }
@@ -310,7 +310,7 @@ SPHModel::computeNeighborRelativePositions()
 }
 
 void
-SPHModel::collectNeighborDensity()
+SphModel::collectNeighborDensity()
 {
     // After computing particle densities, cache them into neighborInfo variable, next to relative positions
     // this is useful because relative positions and densities are accessed together multiple times
@@ -319,12 +319,12 @@ SPHModel::collectNeighborDensity()
     DataArray<double>&                 densities    = *densitiesPtr;
 
     const std::vector<std::vector<size_t>>&                 neighborLists = getCurrentState()->getFluidNeighborLists();
-    const std::vector<SPHBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
+    const std::vector<SphBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
 
     ParallelUtils::parallelFor(getCurrentState()->getNumParticles(),
         [&](const size_t p)
         {
-            if (m_sphBoundaryConditions && particleTypes[p] == SPHBoundaryConditions::ParticleType::Buffer)
+            if (m_sphBoundaryConditions && particleTypes[p] == SphBoundaryConditions::ParticleType::Buffer)
             {
                 return;
             }
@@ -345,7 +345,7 @@ SPHModel::collectNeighborDensity()
 }
 
 void
-SPHModel::computeDensity()
+SphModel::computeDensity()
 {
     std::shared_ptr<DataArray<double>> densitiesPtr = getCurrentState()->getDensities();
     DataArray<double>&                 densities    = *densitiesPtr;
@@ -355,7 +355,7 @@ SPHModel::computeDensity()
     ParallelUtils::parallelFor(getCurrentState()->getNumParticles(),
         [&](const size_t p)
         {
-            if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer)
+            if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Buffer)
             {
                 return;
             }
@@ -369,7 +369,7 @@ SPHModel::computeDensity()
             double pdensity = 0.0;
             for (const auto& qInfo : neighborInfo)
             {
-                pdensity += m_kernels.W(qInfo.xpq);
+                pdensity += m_kernels.W(qInfo.relativePos);
             }
             pdensity    *= m_modelParameters->m_particleMass;
             densities[p] = pdensity;
@@ -389,7 +389,7 @@ SPHModel::computeDensity()
 //}
 
 void
-SPHModel::normalizeDensity()
+SphModel::normalizeDensity()
 {
     if (!m_modelParameters->m_bNormalizeDensity)
     {
@@ -401,12 +401,12 @@ SPHModel::normalizeDensity()
 
     const std::vector<std::vector<size_t>>&                 neighborLists = getCurrentState()->getFluidNeighborLists();
     const std::vector<std::vector<NeighborInfo>>&           neighborInfos = getCurrentState()->getNeighborInfo();
-    const std::vector<SPHBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
+    const std::vector<SphBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
 
     ParallelUtils::parallelFor(getCurrentState()->getNumParticles(),
         [&](const size_t p)
         {
-            if (m_sphBoundaryConditions && particleTypes[p] == SPHBoundaryConditions::ParticleType::Buffer)
+            if (m_sphBoundaryConditions && particleTypes[p] == SphBoundaryConditions::ParticleType::Buffer)
             {
                 return;
             }
@@ -427,7 +427,7 @@ SPHModel::normalizeDensity()
                 // because we're not done with density computation, qInfo does not contain desity of particle q yet
                 const auto q = fluidNeighborList[i];
                 const auto qdensity = densities[q];
-                tmp += m_kernels.W(qInfo.xpq) / qdensity;
+                tmp += m_kernels.W(qInfo.relativePos) / qdensity;
             }
 
             densities[p] /= (tmp * m_modelParameters->m_particleMass);
@@ -435,19 +435,19 @@ SPHModel::normalizeDensity()
 }
 
 void
-SPHModel::computePressureAcceleration()
+SphModel::computePressureAcceleration()
 {
     std::shared_ptr<DataArray<double>> densitiesPtr   = getCurrentState()->getDensities();
     const DataArray<double>&           densities      = *densitiesPtr;
     VecDataArray<double, 3>&           pressureAccels = *m_pressureAccels;
 
     const std::vector<std::vector<NeighborInfo>>&           neighborInfos = getCurrentState()->getNeighborInfo();
-    const std::vector<SPHBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
+    const std::vector<SphBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
 
     ParallelUtils::parallelFor(getCurrentState()->getNumParticles(),
         [&](const size_t p)
         {
-            if (m_sphBoundaryConditions && particleTypes[p] == SPHBoundaryConditions::ParticleType::Buffer)
+            if (m_sphBoundaryConditions && particleTypes[p] == SphBoundaryConditions::ParticleType::Buffer)
             {
                 return;
             }
@@ -461,14 +461,14 @@ SPHModel::computePressureAcceleration()
             }
 
             const auto pdensity  = densities[p];
-            const auto ppressure = particlePressure(pdensity);
+            const auto ppressure = getParticlePressure(pdensity);
 
             for (size_t idx = 0; idx < neighborInfo.size(); ++idx)
             {
                 const auto& qInfo    = neighborInfo[idx];
-                const auto r         = qInfo.xpq;
+                const auto r         = qInfo.relativePos;
                 const auto qdensity  = qInfo.density;
-                const auto qpressure = particlePressure(qdensity);
+                const auto qpressure = getParticlePressure(qdensity);
                 // pressure forces
                 accel += -(ppressure / (pdensity * pdensity) + qpressure / (qdensity * qdensity)) * m_kernels.gradW(r);
             }
@@ -481,7 +481,7 @@ SPHModel::computePressureAcceleration()
 }
 
 void
-SPHModel::computeViscosity()
+SphModel::computeViscosity()
 {
     VecDataArray<double, 3>&       viscousAccels      = *m_viscousAccels;
     VecDataArray<double, 3>&       neighborVelContr   = *m_neighborVelContr;
@@ -495,8 +495,8 @@ SPHModel::computeViscosity()
         [&](const size_t p)
         {
             if (m_sphBoundaryConditions
-                && (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer
-                    || m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Wall))
+                && (m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Buffer
+                    || m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Wall))
             {
                 return;
             }
@@ -522,7 +522,7 @@ SPHModel::computeViscosity()
                 const auto q        = fluidNeighborList[i];
                 const auto& qvel    = halfStepVelocities[q];
                 const auto& qInfo   = neighborInfo[i];
-                const auto r        = qInfo.xpq;
+                const auto r        = qInfo.relativePos;
                 const auto qdensity = qInfo.density;
                 diffuseFluid       += (1.0 / qdensity) * m_kernels.laplace(r) * (qvel - pvel);
 
@@ -543,7 +543,7 @@ SPHModel::computeViscosity()
 }
 
 void
-SPHModel::computeSurfaceTension()
+SphModel::computeSurfaceTension()
 {
     VecDataArray<double, 3>& surfaceNormals = *getCurrentState()->getNormals();
 
@@ -553,7 +553,7 @@ SPHModel::computeSurfaceTension()
     ParallelUtils::parallelFor(getCurrentState()->getNumParticles(),
         [&](const size_t p)
         {
-            if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer)
+            if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Buffer)
             {
                 return;
             }
@@ -569,7 +569,7 @@ SPHModel::computeSurfaceTension()
             for (size_t i = 0; i < neighborInfo.size(); ++i)
             {
                 const auto& qInfo   = neighborInfo[i];
-                const auto r        = qInfo.xpq;
+                const auto r        = qInfo.relativePos;
                 const auto qdensity = qInfo.density;
                 n += (1.0 / qdensity) * m_kernels.gradW(r);
             }
@@ -588,8 +588,8 @@ SPHModel::computeSurfaceTension()
         [&](const size_t p)
         {
             if (m_sphBoundaryConditions
-                && (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer
-                    || m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Wall))
+                && (m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Buffer
+                    || m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Wall))
             {
                 return;
             }
@@ -619,7 +619,7 @@ SPHModel::computeSurfaceTension()
                 const double K_ij = 2.0 * m_modelParameters->m_restDensity / (pdensity + qdensity);
 
                 // Cohesion acc
-                const Vec3d& r  = qInfo.xpq;
+                const Vec3d& r  = qInfo.relativePos;
                 const double d2 = r.squaredNorm();
                 if (d2 > 1.0e-20)
                 {
@@ -638,7 +638,7 @@ SPHModel::computeSurfaceTension()
 }
 
 void
-SPHModel::sumAccels()
+SphModel::sumAccels()
 {
     const VecDataArray<double, 3>& pressureAccels       = *m_pressureAccels;
     const VecDataArray<double, 3>& surfaceTensionAccels = *m_surfaceTensionAccels;
@@ -649,8 +649,8 @@ SPHModel::sumAccels()
         [&](const size_t p)
         {
             if (m_sphBoundaryConditions
-                && (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer
-                    || m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Wall))
+                && (m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Buffer
+                    || m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Wall))
             {
                 return;
             }
@@ -660,7 +660,7 @@ SPHModel::sumAccels()
 }
 
 void
-SPHModel::updateVelocity(const double timestep)
+SphModel::updateVelocity(const double timestep)
 {
     VecDataArray<double, 3>&       halfStepVelocities = *getCurrentState()->getHalfStepVelocities();
     VecDataArray<double, 3>&       fullStepVelocities = *getCurrentState()->getFullStepVelocities();
@@ -671,8 +671,8 @@ SPHModel::updateVelocity(const double timestep)
         [&](const size_t p)
         {
             if (m_sphBoundaryConditions
-                && (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer
-                    || m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Wall))
+                && (m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Buffer
+                    || m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Wall))
             {
                 return;
             }
@@ -688,7 +688,7 @@ SPHModel::updateVelocity(const double timestep)
                 halfStepVelocities[p] += (m_modelParameters->m_gravity + accels[p]) * timestep;
                 fullStepVelocities[p]  = halfStepVelocities[p] + (m_modelParameters->m_gravity + accels[p]) * timestep * 0.5;
             }
-            if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Inlet)
+            if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Inlet)
             {
                 halfStepVelocities[p] = m_sphBoundaryConditions->computeParabolicInletVelocity(positions[p]);
                 fullStepVelocities[p] = m_sphBoundaryConditions->computeParabolicInletVelocity(positions[p]);
@@ -697,7 +697,7 @@ SPHModel::updateVelocity(const double timestep)
 }
 
 void
-SPHModel::moveParticles(const double timestep)
+SphModel::moveParticles(const double timestep)
 {
     //ParallelUtils::parallelFor(getState().getNumParticles(),
     //  [&](const size_t p) {
@@ -711,8 +711,8 @@ SPHModel::moveParticles(const double timestep)
     for (int p = 0; p < static_cast<int>(getCurrentState()->getNumParticles()); p++)
     {
         if (m_sphBoundaryConditions
-            && (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer
-                || m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Wall))
+            && (m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Buffer
+                || m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Wall))
         {
             continue;
         }
@@ -724,40 +724,40 @@ SPHModel::moveParticles(const double timestep)
 
         if (m_sphBoundaryConditions)
         {
-            std::vector<SPHBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
-            if (particleTypes[p] == SPHBoundaryConditions::ParticleType::Inlet
+            std::vector<SphBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
+            if (particleTypes[p] == SphBoundaryConditions::ParticleType::Inlet
                 && !m_sphBoundaryConditions->isInInletDomain(newPosition))
             {
                 // change particle type to fluid
-                particleTypes[p] = SPHBoundaryConditions::ParticleType::Fluid;
+                particleTypes[p] = SphBoundaryConditions::ParticleType::Fluid;
                 // insert particle into inlet domain from buffer domain
                 // todo: come up with a better way to find buffer indices
                 // right now, the buffer index is limiting the parallel ability of this function
                 const size_t bufferParticleIndex = m_sphBoundaryConditions->getBufferIndices().back();
                 m_sphBoundaryConditions->getBufferIndices().pop_back();
-                particleTypes[bufferParticleIndex] = SPHBoundaryConditions::ParticleType::Inlet;
+                particleTypes[bufferParticleIndex] = SphBoundaryConditions::ParticleType::Inlet;
 
                 positions[bufferParticleIndex] = m_sphBoundaryConditions->placeParticleAtInlet(oldPosition);
                 halfStepVelocities[bufferParticleIndex] = m_sphBoundaryConditions->computeParabolicInletVelocity(positions[bufferParticleIndex]);
                 fullStepVelocities[bufferParticleIndex] = m_sphBoundaryConditions->computeParabolicInletVelocity(positions[bufferParticleIndex]);
             }
-            else if (particleTypes[p] == SPHBoundaryConditions::ParticleType::Outlet
+            else if (particleTypes[p] == SphBoundaryConditions::ParticleType::Outlet
                      && !m_sphBoundaryConditions->isInOutletDomain(newPosition))
             {
-                particleTypes[p] = SPHBoundaryConditions::ParticleType::Buffer;
+                particleTypes[p] = SphBoundaryConditions::ParticleType::Buffer;
                 // insert particle into buffer domain after it leaves outlet domain
                 positions[p] = m_sphBoundaryConditions->getBufferCoord();
                 m_sphBoundaryConditions->getBufferIndices().push_back(p);
             }
-            else if (particleTypes[p] == SPHBoundaryConditions::ParticleType::Fluid
+            else if (particleTypes[p] == SphBoundaryConditions::ParticleType::Fluid
                      && m_sphBoundaryConditions->isInOutletDomain(newPosition))
             {
-                particleTypes[p] = SPHBoundaryConditions::ParticleType::Outlet;
+                particleTypes[p] = SphBoundaryConditions::ParticleType::Outlet;
             }
-            else if (particleTypes[p] == SPHBoundaryConditions::ParticleType::Fluid
+            else if (particleTypes[p] == SphBoundaryConditions::ParticleType::Fluid
                      && !m_sphBoundaryConditions->isInFluidDomain(newPosition))
             {
-                particleTypes[p] = SPHBoundaryConditions::ParticleType::Buffer;
+                particleTypes[p] = SphBoundaryConditions::ParticleType::Buffer;
                 positions[p]     = m_sphBoundaryConditions->getBufferCoord();
                 m_sphBoundaryConditions->getBufferIndices().push_back(p);
             }
@@ -767,7 +767,7 @@ SPHModel::moveParticles(const double timestep)
 }
 
 double
-SPHModel::particlePressure(const double density)
+SphModel::getParticlePressure(const double density)
 {
     const double d     = density / m_modelParameters->m_restDensity;
     const double d2    = d * d;
@@ -778,15 +778,15 @@ SPHModel::particlePressure(const double density)
 }
 
 void
-SPHModel::setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocity)
+SphModel::setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocity)
 {
     m_initialVelocities->clear();
     m_initialVelocities->reserve(static_cast<int>(numParticles));
     for (size_t p = 0; p < numParticles; p++)
     {
         if (m_sphBoundaryConditions
-            && (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer
-                || m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Wall))
+            && (m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Buffer
+                || m_sphBoundaryConditions->getParticleTypes()[p] == SphBoundaryConditions::ParticleType::Wall))
         {
             m_initialVelocities->push_back(Vec3d::Zero());
         }
@@ -798,7 +798,7 @@ SPHModel::setInitialVelocities(const size_t numParticles, const Vec3d& initialVe
 }
 
 void
-SPHModel::findNearestParticleToVertex(const VecDataArray<double, 3>& points, const std::vector<std::vector<size_t>>& indices)
+SphModel::findNearestParticleToVertex(const VecDataArray<double, 3>& points, const std::vector<std::vector<size_t>>& indices)
 {
     const VecDataArray<double, 3>& positions = *getCurrentState()->getPositions();
     for (size_t i = 0; i < static_cast<size_t>(points.size()); i++)

@@ -26,7 +26,7 @@
 
 namespace imstk
 {
-namespace SPH
+namespace sph
 {
 ///
 /// \class Poly6Kernel
@@ -48,8 +48,8 @@ public:
     ///
     void setRadius(const double radius)
     {
-        m_radius  = radius;
-        m_radius2 = m_radius * m_radius;
+        m_radius = radius;
+        m_radiusSquared = m_radius * m_radius;
 
 #ifdef WIN32
 #pragma warning(push)
@@ -79,8 +79,8 @@ public:
     double W(const double r) const
     {
         const double r2 = r * r;
-        const double rd = m_radius2 - r2;
-        return (r2 <= m_radius2) ? rd * rd * rd * m_k : 0.0;
+        const double rd = m_radiusSquared - r2;
+        return (r2 <= m_radiusSquared) ? rd * rd * rd * m_k : 0.0;
     }
 
     ///
@@ -90,8 +90,8 @@ public:
     double W(const VecXd& r) const
     {
         const double r2 = r.squaredNorm();
-        const double rd = m_radius2 - r2;
-        return (r2 <= m_radius2) ? rd * rd * rd * m_k : 0.0;
+        const double rd = m_radiusSquared - r2;
+        return (r2 <= m_radiusSquared) ? rd * rd * rd * m_k : 0.0;
     }
 
     ///
@@ -107,9 +107,9 @@ public:
     {
         VecXd        res = VecXd::Zero();
         const double r2  = r.squaredNorm();
-        if (r2 <= m_radius2 && r2 > 1.0e-12)
+        if (r2 <= m_radiusSquared && r2 > 1.0e-12)
         {
-            double tmp = m_radius2 - r2;
+            double tmp = m_radiusSquared - r2;
             res = m_l * tmp * tmp * r;
         }
 
@@ -124,10 +124,10 @@ public:
     {
         double       res = 0.;
         const double r2  = r.squaredNorm();
-        if (r2 <= m_radius2)
+        if (r2 <= m_radiusSquared)
         {
-            double tmp  = m_radius2 - r2;
-            double tmp2 = 3.0 * m_radius2 - 7.0 * r2;
+            double tmp  = m_radiusSquared - r2;
+            double tmp2 = 3.0 * m_radiusSquared - 7.0 * r2;
             res = m_m * tmp * tmp2;
         }
 
@@ -135,12 +135,12 @@ public:
     }
 
 protected:
-    double m_radius;  ///> Kernel radius
-    double m_radius2; ///> Kernel radius squared
-    double m_k;       ///> Kernel coefficient for W()
-    double m_l;       ///> Kernel coefficient for gradW()
-    double m_m;       ///> Kernel coefficient for laplacian()
-    double m_W0;      ///> Precomputed W(0)
+    double m_radius;        ///> Kernel radius
+    double m_radiusSquared; ///> Kernel radius squared
+    double m_k;             ///> Kernel coefficient for W()
+    double m_l;             ///> Kernel coefficient for gradW()
+    double m_m;             ///> Kernel coefficient for laplacian()
+    double m_W0;            ///> Precomputed W(0)
 };
 
 ///
@@ -163,8 +163,8 @@ public:
     ///
     void setRadius(const double radius)
     {
-        m_radius  = radius;
-        m_radius2 = m_radius * m_radius;
+        m_radius = radius;
+        m_radiusSquared = m_radius * m_radius;
 
 #ifdef WIN32
 #pragma warning(push)
@@ -206,7 +206,7 @@ public:
     {
         const double r2 = r.squaredNorm();
         const double rd = m_radius - std::sqrt(r2);
-        return (r2 <= m_radius2) ? rd * rd * rd * m_k : 0.0;
+        return (r2 <= m_radiusSquared) ? rd * rd * rd * m_k : 0.0;
     }
 
     ///
@@ -222,7 +222,7 @@ public:
     {
         VecXd      res = VecXd::Zero();
         const auto r2  = r.squaredNorm();
-        if (r2 <= m_radius2 && r2 > 1.0e-12)
+        if (r2 <= m_radiusSquared && r2 > 1.0e-12)
         {
             const double rl  = std::sqrt(r2);
             const double hr  = m_radius - rl;
@@ -234,11 +234,11 @@ public:
     }
 
 protected:
-    double m_radius;  ///> Kernel radius
-    double m_radius2; ///> Kernel radius squared
-    double m_k;       ///> Kernel coefficient for W()
-    double m_l;       ///> Kernel coefficient for gradW()
-    double m_W0;      ///> Precomputed W(0)
+    double m_radius;        ///> Kernel radius
+    double m_radiusSquared; ///> Kernel radius squared
+    double m_k;             ///> Kernel coefficient for W()
+    double m_l;             ///> Kernel coefficient for gradW()
+    double m_W0;            ///> Precomputed W(0)
 };
 
 ///
@@ -261,8 +261,8 @@ public:
     ///
     void setRadius(const double radius)
     {
-        m_radius  = radius;
-        m_radius2 = m_radius * m_radius;
+        m_radius = radius;
+        m_radiusSquared = m_radius * m_radius;
 
 #ifdef WIN32
 #pragma warning(push)
@@ -286,7 +286,7 @@ public:
     {
         double       res = 0.;
         const double r2  = r * r;
-        if (r2 <= m_radius2)
+        if (r2 <= m_radiusSquared)
         {
             const double r1 = std::sqrt(r2);
             const double r3 = r2 * r1;
@@ -312,7 +312,7 @@ public:
     {
         double       res = 0.;
         const double r2  = r.squaredNorm();
-        if (r2 <= m_radius2)
+        if (r2 <= m_radiusSquared)
         {
             const double r1 = std::sqrt(r2);
             const double r3 = r2 * r1;
@@ -336,11 +336,11 @@ public:
     double W0() const { return m_W0; }
 
 protected:
-    double m_radius;  ///> Kernel radius
-    double m_radius2; ///> Kernel radius squared
-    double m_k;       ///> Kernel coefficient for W()
-    double m_c;       ///> Kernel coefficient for W()
-    double m_W0;      ///> Precomputed W(0)
+    double m_radius;        ///> Kernel radius
+    double m_radiusSquared; ///> Kernel radius squared
+    double m_k;             ///> Kernel coefficient for W()
+    double m_c;             ///> Kernel coefficient for W()
+    double m_W0;            ///> Precomputed W(0)
 };
 
 ///
@@ -363,8 +363,8 @@ public:
     ///
     void setRadius(const double radius)
     {
-        m_radius  = radius;
-        m_radius2 = m_radius * m_radius;
+        m_radius = radius;
+        m_radiusSquared = m_radius * m_radius;
 
         CHECK(N != 2) << "Unimplemented function";
 
@@ -380,7 +380,7 @@ public:
     {
         double       res = 0.;
         const double r2  = r * r;
-        if (r2 <= m_radius2)
+        if (r2 <= m_radiusSquared)
         {
             const double r = std::sqrt(r2);
             if (r > 0.5 * m_radius)
@@ -399,7 +399,7 @@ public:
     {
         double       res = 0.;
         const double r2  = r.squaredNorm();
-        if (r2 <= m_radius2)
+        if (r2 <= m_radiusSquared)
         {
             const double r = std::sqrt(r2);
             if (r > 0.5 * m_radius)
@@ -416,10 +416,10 @@ public:
     double W0() const { return m_W0; }
 
 protected:
-    double m_radius;  ///> Kernel radius
-    double m_radius2; ///> Kernel radius squared
-    double m_k;       ///> Kernel coefficient for W()
-    double m_W0;      ///> Precomputed W(0)
+    double m_radius;        ///> Kernel radius
+    double m_radiusSquared; ///> Kernel radius squared
+    double m_k;             ///> Kernel coefficient for W()
+    double m_W0;            ///> Precomputed W(0)
 };
 
 ///
@@ -442,9 +442,9 @@ public:
     ///
     void setRadius(const double radius)
     {
-        m_radius  = radius;
-        m_radius2 = radius * radius;
-        m_k       = (45.0 / PI) / (m_radius2 * m_radius2 * m_radius2);
+        m_radius = radius;
+        m_radiusSquared = radius * radius;
+        m_k = (45.0 / PI) / (m_radiusSquared * m_radiusSquared * m_radiusSquared);
     }
 
     ///
@@ -455,7 +455,7 @@ public:
     {
         double       res = 0.;
         const double r2  = r.squaredNorm();
-        if (r2 <= m_radius2)
+        if (r2 <= m_radiusSquared)
         {
             const double d = std::sqrt(r2);
             res = m_k * (m_radius - d);
@@ -464,9 +464,9 @@ public:
     }
 
 protected:
-    double m_radius;  ///> Kernel radius
-    double m_radius2; ///> Kernel radius squared
-    double m_k;       ///> Kernel coefficient for laplacian()
+    double m_radius;        ///> Kernel radius
+    double m_radiusSquared; ///> Kernel radius squared
+    double m_k;             ///> Kernel coefficient for laplacian()
 };
 } // end namespace SPH
 
@@ -474,7 +474,7 @@ protected:
 /// \brief Class contains SPH kernels for time integration,
 /// using different kernel for different purposes
 ///
-class SPHSimulationKernels
+class SphSimulationKernels
 {
 public:
     ///
@@ -514,9 +514,9 @@ public:
     double cohesionW(const Vec3d& r) const { return m_cohesion.W(r); }
 
 protected:
-    SPH::Poly6Kernel<3>     m_poly6;
-    SPH::SpikyKernel<3>     m_spiky;
-    SPH::ViscosityKernel<3> m_viscosity;
-    SPH::CohesionKernel<3>  m_cohesion;
+    sph::Poly6Kernel<3>     m_poly6;
+    sph::SpikyKernel<3>     m_spiky;
+    sph::ViscosityKernel<3> m_viscosity;
+    sph::CohesionKernel<3>  m_cohesion;
 };
 } // end namespace imstk

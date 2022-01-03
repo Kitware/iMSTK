@@ -33,7 +33,7 @@
 namespace imstk
 {
 std::shared_ptr<VolumeRenderMaterial>
-VolumeRenderMaterialPresets::getPreset(const int p)
+VolumeRenderMaterialPresets::getPreset(Presets p)
 {
     auto mat     = std::make_shared<VolumeRenderMaterial>();
     auto volProp = mat->getVolumeProperty();
@@ -46,7 +46,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
     switch (p)
     {
-    case VolumeRenderMaterialPresets::CT_AAA:
+    case Presets::CT_AAA:
     {
         // color
         ctf->AddRGBPoint(-3024, 0.0, 0.0, 0.0);
@@ -81,7 +81,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_AAA2:
+    case Presets::CT_AAA2:
     {
         // color
         ctf->AddRGBPoint(-3024, 0, 0, 0);
@@ -120,7 +120,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_BONE:
+    case Presets::CT_BONE:
     {
         // color
         ctf->AddRGBPoint(-3024, 0, 0, 0);
@@ -151,7 +151,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_BONES:
+    case Presets::CT_BONES:
     {
         // color
         ctf->AddRGBPoint(-1000, 0.3, 0.3, 1);
@@ -182,7 +182,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_CARDIAC:
+    case Presets::CT_CARDIAC:
     {
         // color
         ctf->AddRGBPoint(-3024, 0, 0, 0);
@@ -217,7 +217,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_CARDIAC2:
+    case Presets::CT_CARDIAC2:
     {
         // color
         ctf->AddRGBPoint(-3024, 0, 0, 0);
@@ -252,7 +252,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_CARDIAC3:
+    case Presets::CT_CARDIAC3:
     {
         // color
         ctf->AddRGBPoint(-3024, 0, 0, 0);
@@ -289,7 +289,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_CHEST_CONTRAST_ENHANCED:
+    case Presets::CT_CHEST_CONTRAST_ENHANCED:
     {
         // color
         ctf->AddRGBPoint(-3024, 0, 0, 0);
@@ -322,7 +322,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_CHEST_VESSELS:
+    case Presets::CT_CHEST_VESSELS:
     {
         // color
         ctf->AddRGBPoint(-3024, 0, 0, 0);
@@ -355,7 +355,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_CORONARY_ARTERIES:
+    case Presets::CT_CORONARY_ARTERIES:
     {
         // color
         ctf->AddRGBPoint(-2048, 0, 0, 0);
@@ -390,7 +390,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_CORONARY_ARTERIES_2:
+    case Presets::CT_CORONARY_ARTERIES_2:
     {
         // color
         ctf->AddRGBPoint(-2048, 0, 0, 0);
@@ -427,7 +427,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_CORONARY_ARTERIES_3:
+    case Presets::CT_CORONARY_ARTERIES_3:
     {
         // color
         ctf->AddRGBPoint(-2048, 0, 0, 0);
@@ -464,7 +464,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_VOLUME_BONE:
+    case Presets::CT_VOLUME_BONE:
     {
         // color
         ctf->AddRGBPoint(-2048, 0, 0, 0);
@@ -497,7 +497,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_FAT:
+    case Presets::CT_FAT:
     {
         // color
         ctf->AddRGBPoint(-1000, 0.3, 0.3, 1);
@@ -536,7 +536,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_LIVER_VASCULATURE:
+    case Presets::CT_LIVER_VASCULATURE:
     {
         // color
         ctf->AddRGBPoint(-2048, 0, 0, 0);
@@ -573,7 +573,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_LUNG:
+    case Presets::CT_LUNG:
     {
         // color
         ctf->AddRGBPoint(-1000, 0.3, 0.3, 1);
@@ -608,7 +608,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_MIP:
+    case Presets::CT_MIP:
     {
         // color
         ctf->AddRGBPoint(-3024, 0, 0, 0);
@@ -639,7 +639,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_MUSCLE:
+    case Presets::CT_MUSCLE:
     {
         // color
         ctf->AddRGBPoint(-3024, 0, 0, 0);
@@ -672,7 +672,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_PULMONARY_ARTERIES:
+    case Presets::CT_PULMONARY_ARTERIES:
     {
         // color
         ctf->AddRGBPoint(-2048, 0, 0, 0);
@@ -709,7 +709,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_SOFT_TISSUE:
+    case Presets::CT_SOFT_TISSUE:
     {
         // color
         ctf->AddRGBPoint(-2048, 0, 0, 0);
@@ -742,7 +742,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_AIR:
+    case Presets::CT_AIR:
     {
         // color
         ctf->AddRGBPoint(-3024, 1, 1, 1);
@@ -773,7 +773,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::CT_X_RAY:
+    case Presets::CT_X_RAY:
     {
         // color
         ctf->AddRGBPoint(-3024, 1, 1, 1);
@@ -802,7 +802,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::MR_ANGIO:
+    case Presets::MR_ANGIO:
     {
         // color
         ctf->AddRGBPoint(-2048, 0, 0, 0);
@@ -837,7 +837,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::MR_DEFAULT:
+    case Presets::MR_DEFAULT:
     {
         // color
         ctf->AddRGBPoint(0, 0, 0, 0);
@@ -872,7 +872,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::MR_MIP:
+    case Presets::MR_MIP:
     {
         // color
         ctf->AddRGBPoint(0, 1, 1, 1);
@@ -903,7 +903,7 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 
         break;
     }
-    case VolumeRenderMaterialPresets::MR_T2_BRAIN:
+    case Presets::MR_T2_BRAIN:
     {
         // color
         ctf->AddRGBPoint(0, 0, 0, 0);
@@ -941,9 +941,9 @@ VolumeRenderMaterialPresets::getPreset(const int p)
 }
 
 const char*
-VolumeRenderMaterialPresets::getPresetName(int p)
+VolumeRenderMaterialPresets::getPresetName(Presets p)
 {
-    if (p >= VolumeRenderMaterialPresets::NUM_PRESETS)
+    if (p >= Presets::NUM_PRESETS)
     {
         return "";
     }
@@ -975,6 +975,6 @@ VolumeRenderMaterialPresets::getPresetName(int p)
         "MR_MIP",
         "MR_T2_BRAIN",
     };
-    return presets[p];
+    return presets[static_cast<int>(p)];
 }
 }

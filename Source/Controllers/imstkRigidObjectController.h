@@ -58,13 +58,13 @@ public:
     /// \brief Set/Get the linear damping coefficient. Default 10000.0
     ///
     double getLinearKd() const { return m_linearKd; }
-    void setLinearKd(double kd) { m_linearKd = kd; }
+    void setLinearKd(const double kd) { m_linearKd = kd; }
 
     ///
     /// \brief Set/Get the angular damping coefficient. Default 10000.0
     ///
     double getAngularKd() const { return m_angularKd; }
-    void setAngularKd(double kd) { m_angularKd = kd; }
+    void setAngularKd(const double kd) { m_angularKd = kd; }
 
     ///
     /// \brief Set/Get the linear spring coefficient. Default (8000000.0, 8000000.0, 8000000.0)
@@ -135,8 +135,8 @@ protected:
     Vec3d  m_linearKs  = Vec3d(8000000.0, 8000000.0, 8000000.0); ///> Spring coefficient, linear
     Vec3d  m_angularKs = Vec3d(10000.0, 10000.0, 10000.0);       ///> Spring coefficient, rotational
 
-    Vec3d fS = Vec3d(0.0, 0.0, 0.0);
-    Vec3d tS = Vec3d(0.0, 0.0, 0.0);
+    Vec3d fS = Vec3d::Zero();
+    Vec3d tS = Vec3d::Zero();
 
     double m_forceScaling = 0.0000075;
     bool   m_useSpring    = true; ///> Controller has ability to toggle to from springs

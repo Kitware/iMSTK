@@ -131,7 +131,7 @@ protected:
     /// for this port is optional and may be omitted
     ///
     template<typename T>
-    void setOptionalInputType(size_t port)
+    void setOptionalInputType(const size_t port)
     {
         CHECK(m_requiredTypeChecks.find(port) == m_requiredTypeChecks.end())
             << "There is already a required type for port " << port << " , can't assign another one.";
@@ -152,8 +152,8 @@ protected:
     using GeometryCheck      = std::function<bool (Geometry*)>;
     using TypeCheckContainer = std::unordered_map<size_t, GeometryCheck>;
 
-    std::unordered_map<size_t, GeometryCheck> m_requiredTypeChecks;
-    std::unordered_map<size_t, GeometryCheck> m_optionalTypeChecks;
+    TypeCheckContainer m_requiredTypeChecks;
+    TypeCheckContainer m_optionalTypeChecks;
 
 private:
 
@@ -161,7 +161,7 @@ private:
     std::unordered_map<size_t, std::shared_ptr<Geometry>> m_outputs;
 
     //bool m_modified = true;
-    size_t m_NumberOfInputPorts  = 1;
-    size_t m_NumberOfOutputPorts = 1;
+    size_t m_NumInputPorts  = 1;
+    size_t m_NumOutputPorts = 1;
 };
 }

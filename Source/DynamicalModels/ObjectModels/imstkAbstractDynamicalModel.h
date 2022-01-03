@@ -86,8 +86,8 @@ public:
     ///
     /// \brief Returns the number of degrees of freedom
     ///
-    std::size_t getNumDegreeOfFreedom() const { return m_numDOF; }
-    void setNumDegreeOfFreedom(const size_t nDof) { m_numDOF = nDof; }
+    std::size_t getNumDegreeOfFreedom() const { return m_numDof; }
+    void setNumDegreeOfFreedom(const size_t nDof) { m_numDof = nDof; }
 
     std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
