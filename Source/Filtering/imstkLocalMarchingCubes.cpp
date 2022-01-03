@@ -360,10 +360,10 @@ lerp(double val1, double val2, double isovalue, double spacing)
 
 LocalMarchingCubes::LocalMarchingCubes()
 {
-    setNumberOfInputPorts(1);
+    setNumInputPorts(1);
     setRequiredInputType<ImageData>(0);
 
-    setNumberOfOutputPorts(0);
+    setNumOutputPorts(0);
 }
 
 std::shared_ptr<SurfaceMesh>
@@ -392,7 +392,7 @@ LocalMarchingCubes::setNumberOfChunks(const Vec3i& numChunks)
 {
     m_chunkCount = numChunks[0] * numChunks[1] * numChunks[2];
     m_numChunks  = numChunks;
-    setNumberOfOutputPorts(m_chunkCount);
+    setNumOutputPorts(m_chunkCount);
     for (size_t i = 0; i < m_chunkCount; i++)
     {
         setOutput(std::make_shared<SurfaceMesh>(), i);

@@ -202,10 +202,10 @@ computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh>
 
 SurfaceMeshDistanceTransform::SurfaceMeshDistanceTransform()
 {
-    setNumberOfInputPorts(1);
+    setNumInputPorts(1);
     setRequiredInputType<SurfaceMesh>(0);
 
-    setNumberOfOutputPorts(1);
+    setNumOutputPorts(1);
     setOutput(std::make_shared<ImageData>(), 0);
 }
 

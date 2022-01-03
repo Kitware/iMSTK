@@ -47,7 +47,7 @@ GeometryAlgorithm::setOutput(std::shared_ptr<Geometry> outputGeometry, const siz
 }
 
 void
-GeometryAlgorithm::setNumberOfInputPorts(const size_t numPorts)
+GeometryAlgorithm::setNumInputPorts(const size_t numPorts)
 {
     this->m_NumInputPorts = numPorts;
     // Add entries in the map for it
@@ -61,7 +61,7 @@ GeometryAlgorithm::setNumberOfInputPorts(const size_t numPorts)
 }
 
 void
-GeometryAlgorithm::setNumberOfOutputPorts(const size_t numPorts)
+GeometryAlgorithm::setNumOutputPorts(const size_t numPorts)
 {
     this->m_NumOutputPorts = numPorts;
     // Add entries in the map for it

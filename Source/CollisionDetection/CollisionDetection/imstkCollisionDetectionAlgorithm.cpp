@@ -29,7 +29,7 @@ namespace imstk
 CollisionDetectionAlgorithm::CollisionDetectionAlgorithm() : GeometryAlgorithm(),
     m_colData(std::make_shared<CollisionData>())
 {
-    setNumberOfInputPorts(2);
+    setNumInputPorts(2);
 }
 
 bool

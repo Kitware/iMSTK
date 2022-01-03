@@ -107,12 +107,12 @@ protected:
     ///
     /// \brief Sets the amount of input ports
     ///
-    void setNumberOfInputPorts(const size_t numPorts);
+    void setNumInputPorts(const size_t numPorts);
 
     ///
     /// \brief Sets the amount of output ports
     ///
-    void setNumberOfOutputPorts(const size_t numPorts);
+    void setNumOutputPorts(const size_t numPorts);
 
     ///
     /// \brief Declares the type for the port with the given number, also defines that

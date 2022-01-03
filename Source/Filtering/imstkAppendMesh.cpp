@@ -30,15 +30,15 @@ namespace imstk
 {
 AppendMesh::AppendMesh()
 {
-    setNumberOfInputPorts(1);
-    setNumberOfOutputPorts(1);
+    setNumInputPorts(1);
+    setNumOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());
 }
 
 void
 AppendMesh::addInputMesh(std::shared_ptr<SurfaceMesh> inputMesh)
 {
-    setNumberOfInputPorts(getNumInputPorts() + 1);
+    setNumInputPorts(getNumInputPorts() + 1);
     setInput(inputMesh, getNumInputPorts() - 1);
 }
 
