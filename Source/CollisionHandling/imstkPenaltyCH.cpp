@@ -114,7 +114,7 @@ PenaltyCH::computeContactForcesDiscreteDeformable(
     }
 
     // Get current force vector
-    std::shared_ptr<FEMDeformableBodyModel> model     = deformableObj->getFEMModel();
+    std::shared_ptr<FemDeformableBodyModel> model     = deformableObj->getFEMModel();
     Vectord&                                force     = model->getContactForce();
     const Vectord&                          velVector = model->getCurrentState()->getQDot();
 

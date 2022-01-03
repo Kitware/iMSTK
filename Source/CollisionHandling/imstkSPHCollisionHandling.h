@@ -27,7 +27,7 @@ namespace imstk
 {
 class CollisionData;
 class CollisionDetectionAlgorithm;
-class SPHObject;
+class SphObject;
 
 ///
 /// \class SPHCollisionHandling
@@ -36,16 +36,16 @@ class SPHObject;
 /// to resolve positions and correct velocities of SPH particles. It does
 /// not correct pressures/densities.
 ///
-class SPHCollisionHandling : public CollisionHandling
+class SphCollisionHandling : public CollisionHandling
 {
 public:
-    SPHCollisionHandling() = default;
-    virtual ~SPHCollisionHandling() override = default;
+    SphCollisionHandling() = default;
+    virtual ~SphCollisionHandling() override = default;
 
     virtual const std::string getTypeName() const override { return "SPHCollisionHandling"; }
 
 public:
-    void setInputSPHObject(std::shared_ptr<SPHObject> sphObj);
+    void setInputSphObject(std::shared_ptr<SphObject> sphObj);
 
     ///
     /// \brief How many times to resolve and correct position. This is useful when colliding

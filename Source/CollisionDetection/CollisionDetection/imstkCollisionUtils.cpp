@@ -26,7 +26,7 @@ namespace imstk
 namespace CollisionUtils
 {
 bool
-testLineToLineAABB(const double x1, const double y1, const double z1,
+testLineToLineAabb(const double x1, const double y1, const double z1,
                    const double x2, const double y2, const double z2,
                    const double x3, const double y3, const double z3,
                    const double x4, const double y4, const double z4,
@@ -102,7 +102,7 @@ testLineToLineAABB(const double x1, const double y1, const double z1,
         max2_z = z3;
     }
 
-    return testAABBToAABB(min1_x - prox1, max1_x + prox1, min1_y - prox1, max1_y + prox1,
+    return testAabbToAabb(min1_x - prox1, max1_x + prox1, min1_y - prox1, max1_y + prox1,
                           min1_z - prox1, max1_z + prox1, min2_x - prox2, max2_x + prox2,
                           min2_y - prox2, max2_y + prox2, min2_z - prox2, max2_z + prox2);
 }

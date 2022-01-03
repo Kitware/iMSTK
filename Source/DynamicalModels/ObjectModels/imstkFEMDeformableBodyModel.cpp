@@ -46,7 +46,7 @@ DISABLE_WARNING_POP
 
 namespace imstk
 {
-FEMDeformableBodyModel::FEMDeformableBodyModel() :
+FemDeformableBodyModel::FemDeformableBodyModel() :
     DynamicalModel(DynamicalModelType::ElastoDynamics)
 {
     m_fixedNodeIds.reserve(1000);
@@ -56,17 +56,17 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
     m_solveNode = m_taskGraph->addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
 }
 
-FEMDeformableBodyModel::~FEMDeformableBodyModel()
+FemDeformableBodyModel::~FemDeformableBodyModel()
 {
     // Get vega to destruct first (before the shared pointer to the vega mesh is cleaned up)
     m_internalForceModel = nullptr;
 }
 
 void
-FEMDeformableBodyModel::configure(const std::string& configFileName)
+FemDeformableBodyModel::configure(const std::string& configFileName)
 {
     // Configure the FEMModelConfig
-    m_FEModelConfig = std::make_shared<FEMModelConfig>();
+    m_FEModelConfig = std::make_shared<FemModelConfig>();
 
     char femMethod[256];
     char invertibleMaterial[256];
@@ -101,24 +101,24 @@ FEMDeformableBodyModel::configure(const std::string& configFileName)
     // Set fem method
     if (std::strcmp(femMethod, "StVK") == 0)
     {
-        m_FEModelConfig->m_femMethod = FEMMethodType::StVK;
+        m_FEModelConfig->m_femMethod = FeMethodType::StVK;
     }
     else if (std::strcmp(femMethod, "CLFEM") == 0)
     {
-        m_FEModelConfig->m_femMethod = FEMMethodType::Corotational;
+        m_FEModelConfig->m_femMethod = FeMethodType::Corotational;
     }
     else if (std::strcmp(femMethod, "Linear") == 0)
     {
-        m_FEModelConfig->m_femMethod = FEMMethodType::Linear;
+        m_FEModelConfig->m_femMethod = FeMethodType::Linear;
     }
     else if (std::strcmp(femMethod, "InvertibleFEM") == 0)
     {
-        m_FEModelConfig->m_femMethod = FEMMethodType::Invertible;
+        m_FEModelConfig->m_femMethod = FeMethodType::Invertible;
     }
     else
     {
         LOG(WARNING) << "FE method not assigned; will default to StVK";
-        m_FEModelConfig->m_femMethod = FEMMethodType::StVK;
+        m_FEModelConfig->m_femMethod = FeMethodType::StVK;
     }
 
     // Set up hyperelastic material type
@@ -145,13 +145,13 @@ FEMDeformableBodyModel::configure(const std::string& configFileName)
 }
 
 void
-FEMDeformableBodyModel::configure(std::shared_ptr<FEMModelConfig> config)
+FemDeformableBodyModel::configure(std::shared_ptr<FemModelConfig> config)
 {
     m_FEModelConfig = config;
 }
 
 bool
-FEMDeformableBodyModel::initialize()
+FemDeformableBodyModel::initialize()
 {
     // prerequisite of for successfully initializing
     CHECK(m_geometry != nullptr && m_FEModelConfig != nullptr) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
@@ -206,33 +206,33 @@ FEMDeformableBodyModel::initialize()
 
     this->loadInitialStates();
 
-    m_Feff.resize(m_numDOF);
-    m_Finternal.resize(m_numDOF);
+    m_Feff.resize(m_numDof);
+    m_Finternal.resize(m_numDof);
     m_Finternal.setConstant(0.0);
-    m_Fcontact.resize(m_numDOF);
+    m_Fcontact.resize(m_numDof);
     m_Fcontact.setConstant(0.0);
-    m_qSol.resize(m_numDOF);
+    m_qSol.resize(m_numDof);
     m_qSol.setConstant(0.0);
 
     return true;
 }
 
 void
-FEMDeformableBodyModel::loadInitialStates()
+FemDeformableBodyModel::loadInitialStates()
 {
-    if (m_numDOF == 0)
+    if (m_numDof == 0)
     {
         LOG(WARNING) << "Number of degree of freedom is zero!";
     }
 
     // For now the initial states are set to zero
-    m_initialState  = std::make_shared<kinematicState>(m_numDOF);
-    m_previousState = std::make_shared<kinematicState>(m_numDOF);
-    m_currentState  = std::make_shared<kinematicState>(m_numDOF);
+    m_initialState  = std::make_shared<kinematicState>(m_numDof);
+    m_previousState = std::make_shared<kinematicState>(m_numDof);
+    m_currentState  = std::make_shared<kinematicState>(m_numDof);
 }
 
 bool
-FEMDeformableBodyModel::loadBoundaryConditions()
+FemDeformableBodyModel::loadBoundaryConditions()
 {
     auto fileName = m_FEModelConfig->m_fixedDOFFilename;
 
@@ -284,35 +284,35 @@ FEMDeformableBodyModel::loadBoundaryConditions()
 }
 
 bool
-FEMDeformableBodyModel::initializeForceModel()
+FemDeformableBodyModel::initializeForceModel()
 {
     const double g = m_FEModelConfig->m_gravity;
     // Since vega 4.0 doesn't add gravity correcntly in all cases, we do it ourselves; see \ref initializeGravityForce
     // const bool   isGravityPresent = (g > 0) ? true : false;
     const bool isGravityPresent = false;
 
-    m_numDOF = (size_t)m_vegaPhysicsMesh->getNumVertices() * 3;
+    m_numDof = (size_t)m_vegaPhysicsMesh->getNumVertices() * 3;
 
     switch (m_FEModelConfig->m_femMethod)
     {
-    case FEMMethodType::StVK:
+    case FeMethodType::StVK:
 
-        m_internalForceModel = std::make_shared<StVKForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
+        m_internalForceModel = std::make_shared<StvkForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
         break;
 
-    case FEMMethodType::Linear:
+    case FeMethodType::Linear:
 
-        m_internalForceModel = std::make_shared<LinearFEMForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
+        m_internalForceModel = std::make_shared<LinearFemForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
         break;
 
-    case FEMMethodType::Corotational:
+    case FeMethodType::Corotational:
 
-        m_internalForceModel = std::make_shared<CorotationalFEMForceModel>(m_vegaPhysicsMesh);
+        m_internalForceModel = std::make_shared<CorotationalFemForceModel>(m_vegaPhysicsMesh);
         break;
 
-    case FEMMethodType::Invertible:
+    case FeMethodType::Invertible:
 
-        m_internalForceModel = std::make_shared<IsotropicHyperelasticFEForceModel>(
+        m_internalForceModel = std::make_shared<IsotropicHyperelasticFeForceModel>(
                                         m_FEModelConfig->m_hyperElasticMaterialType,
                                         m_vegaPhysicsMesh,
                                         -MAX_D,
@@ -329,7 +329,7 @@ FEMDeformableBodyModel::initializeForceModel()
 }
 
 bool
-FEMDeformableBodyModel::initializeMassMatrix()
+FemDeformableBodyModel::initializeMassMatrix()
 {
     CHECK(m_geometry != nullptr) << "Force model geometry not set!";
 
@@ -346,7 +346,7 @@ FEMDeformableBodyModel::initializeMassMatrix()
 }
 
 bool
-FEMDeformableBodyModel::initializeDampingMatrix()
+FemDeformableBodyModel::initializeDampingMatrix()
 {
     auto dampingLaplacianCoefficient = m_FEModelConfig->m_dampingLaplacianCoefficient;
     auto dampingMassCoefficient      = m_FEModelConfig->m_dampingMassCoefficient;
@@ -396,7 +396,7 @@ FEMDeformableBodyModel::initializeDampingMatrix()
 }
 
 bool
-FEMDeformableBodyModel::initializeTangentStiffness()
+FemDeformableBodyModel::initializeTangentStiffness()
 {
     CHECK(m_internalForceModel != nullptr)
         << "Tangent stiffness cannot be initialized without force model";
@@ -433,9 +433,9 @@ FEMDeformableBodyModel::initializeTangentStiffness()
 }
 
 bool
-FEMDeformableBodyModel::initializeGravityForce()
+FemDeformableBodyModel::initializeGravityForce()
 {
-    m_Fgravity.resize(m_numDOF);
+    m_Fgravity.resize(m_numDof);
     m_Fgravity.setZero();
     const double gravity = m_FEModelConfig->m_gravity;
 
@@ -445,7 +445,7 @@ FEMDeformableBodyModel::initializeGravityForce()
 }
 
 void
-FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
+FemDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
                                                  kinematicState&       newState,
                                                  const StateUpdateType updateType)
 {
@@ -484,7 +484,7 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
 }
 
 void
-FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       stateAtT,
+FemDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       stateAtT,
                                                      kinematicState&       newState,
                                                      const StateUpdateType updateType)
 {
@@ -523,7 +523,7 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
 }
 
 void
-FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& imstkNotUsed(stateAtT),
+FemDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& imstkNotUsed(stateAtT),
                                                  kinematicState&       newState,
                                                  const StateUpdateType updateType)
 {
@@ -551,7 +551,7 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& imstkNotU
 }
 
 void
-FEMDeformableBodyModel::computeSemiImplicitSystemRHSAndLHS(kinematicState&       stateAtT,
+FemDeformableBodyModel::computeSemiImplicitSystemRHSAndLHS(kinematicState&       stateAtT,
                                                            kinematicState&       newState,
                                                            const StateUpdateType updateType)
 {
@@ -595,7 +595,7 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHSAndLHS(kinematicState&      
 }
 
 void
-FEMDeformableBodyModel::computeImplicitSystemRHSAndLHS(kinematicState&       stateAtT,
+FemDeformableBodyModel::computeImplicitSystemRHSAndLHS(kinematicState&       stateAtT,
                                                        kinematicState&       newState,
                                                        const StateUpdateType updateType)
 {
@@ -642,16 +642,16 @@ FEMDeformableBodyModel::computeImplicitSystemRHSAndLHS(kinematicState&       sta
 }
 
 bool
-FEMDeformableBodyModel::initializeExplicitExternalForces()
+FemDeformableBodyModel::initializeExplicitExternalForces()
 {
-    m_FexplicitExternal.resize(m_numDOF);
+    m_FexplicitExternal.resize(m_numDof);
     m_FexplicitExternal.setZero();
 
     return true;
 }
 
 void
-FEMDeformableBodyModel::updateDampingMatrix()
+FemDeformableBodyModel::updateDampingMatrix()
 {
     if (m_damped)
     {
@@ -675,7 +675,7 @@ FEMDeformableBodyModel::updateDampingMatrix()
 }
 
 void
-FEMDeformableBodyModel::applyBoundaryConditions(SparseMatrixd& M, const bool withCompliance) const
+FemDeformableBodyModel::applyBoundaryConditions(SparseMatrixd& M, const bool withCompliance) const
 {
     double compliance = withCompliance ? 1.0 : 0.0;
 
@@ -706,7 +706,7 @@ FEMDeformableBodyModel::applyBoundaryConditions(SparseMatrixd& M, const bool wit
 }
 
 void
-FEMDeformableBodyModel::applyBoundaryConditions(Vectord& x) const
+FemDeformableBodyModel::applyBoundaryConditions(Vectord& x) const
 {
     for (auto& index : m_fixedNodeIds)
     {
@@ -716,13 +716,13 @@ FEMDeformableBodyModel::applyBoundaryConditions(Vectord& x) const
 }
 
 void
-FEMDeformableBodyModel::updateMassMatrix()
+FemDeformableBodyModel::updateMassMatrix()
 {
     // Do nothing for now as topology changes are not supported yet!
 }
 
 void
-FEMDeformableBodyModel::updatePhysicsGeometry()
+FemDeformableBodyModel::updatePhysicsGeometry()
 {
     auto                                     volMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
     auto&                                    u       = m_currentState->getQ();
@@ -740,21 +740,21 @@ FEMDeformableBodyModel::updatePhysicsGeometry()
 }
 
 void
-FEMDeformableBodyModel::updateBodyPreviousStates()
+FemDeformableBodyModel::updateBodyPreviousStates()
 {
     m_previousState->setU(m_currentState->getQ());
     m_previousState->setV(m_currentState->getQDot());
 }
 
 void
-FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const StateUpdateType updateType)
+FemDeformableBodyModel::updateBodyStates(const Vectord& solution, const StateUpdateType updateType)
 {
     this->updateBodyPreviousStates();
     this->updateBodyIntermediateStates(solution, updateType);
 }
 
 void
-FEMDeformableBodyModel::updateBodyIntermediateStates(
+FemDeformableBodyModel::updateBodyIntermediateStates(
     const Vectord&        solution,
     const StateUpdateType updateType)
 {
@@ -784,7 +784,7 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
 }
 
 NonLinearSystem<SparseMatrixd>::VectorFunctionType
-FEMDeformableBodyModel::getFunction()
+FemDeformableBodyModel::getFunction()
 {
 #ifdef WIN32
 #pragma warning( push )
@@ -809,7 +809,7 @@ FEMDeformableBodyModel::getFunction()
 }
 
 NonLinearSystem<SparseMatrixd>::MatrixFunctionType
-FEMDeformableBodyModel::getFunctionGradient()
+FemDeformableBodyModel::getFunctionGradient()
 {
 #ifdef WIN32
 #pragma warning( push )
@@ -832,7 +832,7 @@ FEMDeformableBodyModel::getFunctionGradient()
 }
 
 NonLinearSystem<SparseMatrixd>::VectorMatrixFunctionType
-FEMDeformableBodyModel::getFunctionAndGradient()
+FemDeformableBodyModel::getFunctionAndGradient()
 {
 #ifdef WIN32
 #pragma warning( push )
@@ -859,7 +859,7 @@ FEMDeformableBodyModel::getFunctionAndGradient()
 }
 
 NonLinearSystem<SparseMatrixd>::UpdateFunctionType
-FEMDeformableBodyModel::getUpdateFunction()
+FemDeformableBodyModel::getUpdateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord& q, const bool fullyImplicit) -> void
@@ -871,7 +871,7 @@ FEMDeformableBodyModel::getUpdateFunction()
 }
 
 NonLinearSystem<SparseMatrixd>::UpdatePrevStateFunctionType
-FEMDeformableBodyModel::getUpdatePrevStateFunction()
+FemDeformableBodyModel::getUpdatePrevStateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this]() -> void
@@ -881,7 +881,7 @@ FEMDeformableBodyModel::getUpdatePrevStateFunction()
 }
 
 void
-FEMDeformableBodyModel::initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix,
+FemDeformableBodyModel::initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix,
                                                             SparseMatrixd&            eigenMatrix)
 {
     auto rowLengths    = vegaMatrix.GetRowLengths();
@@ -903,26 +903,26 @@ FEMDeformableBodyModel::initializeEigenMatrixFromVegaMatrix(const vega::SparseMa
 }
 
 void
-FEMDeformableBodyModel::setFixedSizeTimeStepping()
+FemDeformableBodyModel::setFixedSizeTimeStepping()
 {
     m_timeStepSizeType = TimeSteppingType::Fixed;
     m_timeIntegrator->setTimestepSizeToDefault();
 }
 
 void
-FEMDeformableBodyModel::setTimeStep(const double timeStep)
+FemDeformableBodyModel::setTimeStep(const double timeStep)
 {
     m_timeIntegrator->setTimestepSize(timeStep);
 }
 
 double
-FEMDeformableBodyModel::getTimeStep() const
+FemDeformableBodyModel::getTimeStep() const
 {
     return m_timeIntegrator->getTimestepSize();
 };
 
 void
-FEMDeformableBodyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+FemDeformableBodyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
     m_taskGraph->addEdge(source, m_solveNode);

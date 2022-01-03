@@ -37,20 +37,20 @@ namespace imstk
 ///
 /// \brief Force model for corotational based finite elements formulation
 ///
-class CorotationalFEMForceModel : public InternalForceModel
+class CorotationalFemForceModel : public InternalForceModel
 {
 public:
     ///
     /// \brief Constructor using \p mesh
     /// \param warp if use warp
     ///
-    explicit CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp = 1);
-    CorotationalFEMForceModel() = delete;
+    explicit CorotationalFemForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp = 1);
+    CorotationalFemForceModel() = delete;
 
     ///
     /// \brief
     ///
-    virtual ~CorotationalFEMForceModel() = default;
+    virtual ~CorotationalFemForceModel() = default;
 
     ///
     /// \brief Compute internal force \p internalForce at state \p u
@@ -83,7 +83,7 @@ public:
     void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override;
 
 protected:
-    std::shared_ptr<vega::CorotationalLinearFEM> m_corotationalLinearFEM;
+    std::shared_ptr<vega::CorotationalLinearFEM> m_corotationalLinearFem;
     std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
     int m_warp;
 };

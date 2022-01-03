@@ -34,7 +34,7 @@ DISABLE_WARNING_POP
 
 namespace imstk
 {
-LinearFEMForceModel::LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
+LinearFemForceModel::LinearFemForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
                                          const bool withGravity, const double gravity) : InternalForceModel()
 {
     auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
@@ -55,7 +55,7 @@ LinearFEMForceModel::LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> m
     free(zero);
 };
 
-LinearFEMForceModel::~LinearFEMForceModel()
+LinearFemForceModel::~LinearFemForceModel()
 {
     if (m_stiffnessMatrixRawPtr)
     {

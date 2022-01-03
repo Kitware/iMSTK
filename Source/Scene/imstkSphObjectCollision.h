@@ -25,7 +25,7 @@ limitations under the License.
 
 namespace imstk
 {
-class SPHObject;
+class SphObject;
 
 ///
 /// \class SphObjectCollision
@@ -36,14 +36,12 @@ class SPHObject;
 class SphObjectCollision : public CollisionInteraction
 {
 public:
-    SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::shared_ptr<CollidingObject> obj2,
+    SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<CollidingObject> obj2,
                        std::string cdType  = "ImplicitGeometryToPointSetCD");
     virtual ~SphObjectCollision() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "SphObjectCollision"; }
 
-public:
     ///
     /// \brief Setup connectivity of task graph
     ///

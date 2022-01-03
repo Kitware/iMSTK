@@ -39,7 +39,7 @@ namespace imstk
 ///
 /// \class InternalForceModel
 ///
-/// \brief Base class for internal force model within the following context:
+/// \brief Base class for internal force model within the following context
 ///
 ///
 class InternalForceModel

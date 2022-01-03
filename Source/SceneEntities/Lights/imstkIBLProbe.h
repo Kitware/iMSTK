@@ -38,7 +38,7 @@ class Texture;
 /// lookup table (LUT) texture. The cubemaps should be preintegrated using
 /// split-sum approximation.
 ///
-class IBLProbe
+class IblProbe
 {
 public:
     ///
@@ -48,7 +48,7 @@ public:
     /// \param radianceCubemapPath path to .dds radiance (specular) cubemap
     /// \param brdfLUTPath path to BRDF LUT (shouldn't be .dds)
     ///
-    IBLProbe(std::string irradianceCubemapPath,
+    IblProbe(std::string irradianceCubemapPath,
              std::string radianceCubemapPath, std::string brdfLUTPath);
 
     /// \brief TODO

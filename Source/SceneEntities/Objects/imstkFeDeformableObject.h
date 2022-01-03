@@ -26,7 +26,7 @@
 
 namespace imstk
 {
-class FEMDeformableBodyModel;
+class FemDeformableBodyModel;
 
 ///
 /// \class FeDeformableObject
@@ -39,7 +39,6 @@ public:
     FeDeformableObject(const std::string& name) : DynamicObject(name) { }
     virtual ~FeDeformableObject() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "FeDeformableObject"; }
 
     ///
@@ -47,9 +46,9 @@ public:
     ///
     bool initialize() override;
 
-    std::shared_ptr<FEMDeformableBodyModel> getFEMModel();
+    std::shared_ptr<FemDeformableBodyModel> getFEMModel();
 
 protected:
-    std::shared_ptr<FEMDeformableBodyModel> m_femModel = nullptr;
+    std::shared_ptr<FemDeformableBodyModel> m_femModel = nullptr;
 };
 } // imstk

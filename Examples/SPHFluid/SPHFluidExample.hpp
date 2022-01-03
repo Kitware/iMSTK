@@ -74,7 +74,7 @@ main(int argc, char* argv[])
     imstkNew<Scene> scene("SPH Fluid");
 
     // Generate fluid and solid objects
-    std::shared_ptr<SPHObject> fluidObj                  = generateFluid(particleRadius);
+    std::shared_ptr<SphObject> fluidObj                  = generateFluid(particleRadius);
     std::vector<std::shared_ptr<CollidingObject>> solids = generateSolids(scene);
 
     scene->addSceneObject(fluidObj);
@@ -113,7 +113,7 @@ main(int argc, char* argv[])
             [&](Event*)
             {
                 statusManager->setCustomStatus("Number of particles: " +
-                    std::to_string(fluidObj->getSPHModel()->getCurrentState()->getNumParticles()) +
+                    std::to_string(fluidObj->getSphModel()->getCurrentState()->getNumParticles()) +
                     "\nNumber of solids: " + std::to_string(solids.size()));
             });
 

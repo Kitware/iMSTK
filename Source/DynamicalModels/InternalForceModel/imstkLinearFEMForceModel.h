@@ -32,23 +32,23 @@ class VolumetricMesh;
 namespace imstk
 {
 ///
-/// \class LinearFEMForceModel
+/// \class LinearFemForceModel
 ///
 /// \brief Force model for linear finite element formulation
 ///
-class LinearFEMForceModel : public InternalForceModel
+class LinearFemForceModel : public InternalForceModel
 {
 public:
     ///
     /// \brief Constructor
     ///
-    LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
+    LinearFemForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
                         const bool withGravity = true, const double gravity = -9.81);
 
     ///
     /// \brief Destructor
     ///
-    virtual ~LinearFEMForceModel() override;
+    virtual ~LinearFemForceModel() override;
 
     ///
     /// \brief Compute the internal force

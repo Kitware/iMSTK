@@ -159,7 +159,7 @@ initializeNonZeroVelocities(const int numParticles)
     return initVelocitiesPtr;
 }
 
-std::shared_ptr<SPHObject>
+std::shared_ptr<SphObject>
 generateFluid(const double particleRadius)
 {
     std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
@@ -185,7 +185,7 @@ generateFluid(const double particleRadius)
     geometry->initialize(particles);
 
     // Create a fluids object
-    imstkNew<SPHObject> fluidObj("SPHSphere");
+    imstkNew<SphObject> fluidObj("SPHSphere");
 
     // Create a visual model
     imstkNew<VisualModel> visualModel(geometry.get());
@@ -205,11 +205,11 @@ generateFluid(const double particleRadius)
     visualModel->setRenderMaterial(material);
 
     // Create a physics model
-    imstkNew<SPHModel> sphModel;
+    imstkNew<SphModel> sphModel;
     sphModel->setModelGeometry(geometry);
 
     // Configure model
-    imstkNew<SPHModelConfig> sphParams(particleRadius);
+    imstkNew<SphModelConfig> sphParams(particleRadius);
     sphParams->m_bNormalizeDensity = true;
     if (SCENE_ID == 2)   // highly viscous fluid
     {

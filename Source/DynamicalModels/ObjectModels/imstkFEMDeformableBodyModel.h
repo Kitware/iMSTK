@@ -44,9 +44,9 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \strut FEMModelConfig
 /// \brief Parameters for finite element model
-struct FEMModelConfig
+struct FemModelConfig
 {
-    FEMMethodType m_femMethod = FEMMethodType::Invertible;
+    FeMethodType m_femMethod = FeMethodType::Invertible;
     HyperElasticMaterialType m_hyperElasticMaterialType = HyperElasticMaterialType::StVK;
 
     // file names (remove from here?)
@@ -69,7 +69,7 @@ struct FEMModelConfig
 /// \note Vega specifics will removed in future when the inertial and damping calculations
 /// are done with in-house code
 ///
-class FEMDeformableBodyModel : public DynamicalModel<FeDeformBodyState>
+class FemDeformableBodyModel : public DynamicalModel<FeDeformBodyState>
 {
 public:
     using kinematicState = FeDeformBodyState;
@@ -79,19 +79,19 @@ public:
     ///
     /// \brief Constructor
     ///
-    FEMDeformableBodyModel();
+    FemDeformableBodyModel();
 
     ///
     /// \brief Destructor
     ///
-    ~FEMDeformableBodyModel() override;
+    ~FemDeformableBodyModel() override;
 
 public:
     ///
     /// \brief Configure the force model from external file
     ///
     void configure(const std::string& configFileName);
-    void configure(std::shared_ptr<FEMModelConfig> config = std::make_shared<FEMModelConfig>());
+    void configure(std::shared_ptr<FemModelConfig> config = std::make_shared<FemModelConfig>());
 
     ///
     /// \brief Initialize the deformable body model
@@ -101,8 +101,8 @@ public:
     ///
     /// \brief Set/Get force model configuration
     ///
-    void setForceModelConfiguration(std::shared_ptr<FEMModelConfig> fmConfig) { this->m_FEModelConfig = fmConfig; }
-    std::shared_ptr<FEMModelConfig> getForceModelConfiguration() const { return m_FEModelConfig; }
+    void setForceModelConfiguration(std::shared_ptr<FemModelConfig> fmConfig) { this->m_FEModelConfig = fmConfig; }
+    std::shared_ptr<FemModelConfig> getForceModelConfiguration() const { return m_FEModelConfig; }
 
     ///
     /// \brief Set/Get internal force model
@@ -299,13 +299,12 @@ protected:
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-protected:
     std::shared_ptr<SolverBase> m_solver = nullptr;
     std::shared_ptr<InternalForceModel> m_internalForceModel = nullptr;          ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator     = nullptr;          ///> Time integrator
     std::shared_ptr<NonLinearSystem<SparseMatrixd>> m_nonLinearSystem = nullptr; ///> Nonlinear system resulting from TI and force model
 
-    std::shared_ptr<FEMModelConfig> m_FEModelConfig = nullptr;
+    std::shared_ptr<FemModelConfig> m_FEModelConfig = nullptr;
 
     /// Matrices typical to a elastodynamics and 2nd order analogous systems
     SparseMatrixd m_M;                                                            ///> Mass matrix

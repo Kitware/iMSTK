@@ -25,9 +25,9 @@ namespace imstk
 {
 ///
 /// \enum class
-/// \brief Finite element material type
+/// \brief Finite element method type
 ///
-enum class FEMMethodType
+enum class FeMethodType
 {
     StVK,
     Corotational,

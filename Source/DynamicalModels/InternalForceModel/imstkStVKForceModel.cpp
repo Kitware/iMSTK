@@ -33,7 +33,7 @@ DISABLE_WARNING_POP
 
 namespace imstk
 {
-StVKForceModel::StVKForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
+StvkForceModel::StvkForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
                                const bool withGravity, const double gravity) : InternalForceModel()
 {
     auto                   tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
