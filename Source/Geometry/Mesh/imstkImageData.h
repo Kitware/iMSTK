@@ -51,7 +51,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "ImageData"; }
 
-public:
     ///
     /// \brief Print the image data info
     ///

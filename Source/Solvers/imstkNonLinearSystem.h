@@ -43,7 +43,6 @@ public:
     using UpdateFunctionType          = std::function<void (const Vectord&, const bool)>;
     using UpdatePrevStateFunctionType = std::function<void ()>;
 
-public:
     ///
     /// \brief default Constructor/Destructor
     ///
@@ -133,7 +132,6 @@ public:
         return *m_DynamicLinearProjConstraints;
     }*/
 
-public:
     VectorFunctionType       m_F;  ///> Nonlinear function
     MatrixFunctionType       m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
     VectorMatrixFunctionType m_F_dF;

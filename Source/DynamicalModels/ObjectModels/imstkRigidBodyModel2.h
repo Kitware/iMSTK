@@ -56,7 +56,6 @@ class RigidBodyModel2 : public DynamicalModel<RigidBodyState2>
 public:
     using StorageIndex = Eigen::SparseMatrix<double>::StorageIndex;
 
-public:
     ///
     /// \brief Constructor
     ///
@@ -67,7 +66,6 @@ public:
     ///
     virtual ~RigidBodyModel2() override = default;
 
-public:
     ///
     /// \brief Set the time step size
     ///
@@ -140,14 +138,12 @@ protected:
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-protected:
     std::shared_ptr<RigidBodyModel2Config> m_config;
 
     std::shared_ptr<TaskNode> m_computeTentativeVelocities;
     std::shared_ptr<TaskNode> m_solveNode;
     std::shared_ptr<TaskNode> m_integrateNode;
 
-protected:
     std::shared_ptr<ProjectedGaussSeidelSolver<double>> m_pgsSolver;
     Eigen::SparseMatrix<double> m_Minv;
     std::list<std::shared_ptr<RbdConstraint>>    m_constraints;

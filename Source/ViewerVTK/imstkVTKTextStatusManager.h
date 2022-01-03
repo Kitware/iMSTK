@@ -66,11 +66,9 @@ public:
         LowerRight
     };
 
-public:
     explicit VTKTextStatusManager();
     virtual ~VTKTextStatusManager();
 
-public:
     ///
     /// \brief Return the text actor at index i
     ///

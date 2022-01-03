@@ -37,7 +37,6 @@ public:
     AnimationObject(const std::string& name) : SceneObject(name) { }
     virtual ~AnimationObject() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "AnimationObject"; }
 
     ///

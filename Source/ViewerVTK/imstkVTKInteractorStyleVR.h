@@ -52,7 +52,6 @@ public:
     std::shared_ptr<imstk::OpenVRDeviceClient> getRightControllerDeviceClient() const { return m_rightControllerDeviceClient; }
     std::shared_ptr<imstk::OpenVRDeviceClient> getHmdDeviceClient() const { return m_hmdDeviceClient; }
 
-public:
     vtkInteractorStyleVR();
 
 protected:

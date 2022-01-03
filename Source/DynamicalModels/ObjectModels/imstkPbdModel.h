@@ -137,7 +137,6 @@ public:
     ///
     virtual ~PbdModel() override = default;
 
-public:
     ///
     /// \brief Set simulation parameters
     ///

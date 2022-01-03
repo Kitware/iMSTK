@@ -48,7 +48,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "HexahedralMesh"; }
 
-public:
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  hexahedra connectivity
@@ -76,7 +75,6 @@ public:
     bool isMesh() const override { return true; }
 
 // Accessors
-public:
     ///
     /// \brief Sets/Returns the hexahedral connectivity
     ///

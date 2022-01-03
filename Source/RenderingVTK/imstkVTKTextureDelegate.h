@@ -46,7 +46,6 @@ public:
 
     virtual ~VTKTextureDelegate() override = default;
 
-public:
     ///
     /// \brief Gets the VTK texture coupled to the imstk texture
     ///
@@ -69,7 +68,6 @@ public:
 protected:
     void textureModified(Event* e);
 
-protected:
     vtkSmartPointer<vtkTexture> m_vtkTexture; ///< VTK texture
     std::shared_ptr<Texture>    m_texture;    ///< iMSTK texture
     std::string m_textureName;                ///< VTK texture unique name

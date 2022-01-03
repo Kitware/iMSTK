@@ -42,7 +42,6 @@ protected:
 public:
     virtual ~Light() override = default;
 
-public:
     ///
     /// \brief Set the light focal point
     ///

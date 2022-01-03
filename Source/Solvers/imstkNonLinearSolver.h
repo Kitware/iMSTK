@@ -41,7 +41,6 @@ public:
     using UpdateIterateType = std::function<void (const Vectord&, Vectord&)>;
     using FunctionType      = NonLinearSystem<SparseMatrixd>::VectorFunctionType;
 
-public:
     ///
     /// \brief Default Constructor/Destructor
     ///

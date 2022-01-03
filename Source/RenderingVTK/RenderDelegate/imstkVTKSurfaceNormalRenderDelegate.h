@@ -81,7 +81,6 @@ protected:
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr,
         std::shared_ptr<VecDataArray<int, 3>> indicesPtr);
 
-protected:
     std::shared_ptr<VecDataArray<double, 3>> m_surfMeshVertices;
     std::shared_ptr<VecDataArray<int, 3>>    m_surfMeshIndices;
 

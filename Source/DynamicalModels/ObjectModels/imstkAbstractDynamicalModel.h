@@ -78,7 +78,6 @@ protected:
 public:
     virtual ~AbstractDynamicalModel() = default;
 
-public:
     ///
     /// \brief Reset the current state to the initial state
     ///

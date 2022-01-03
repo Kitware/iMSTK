@@ -39,7 +39,6 @@ public:
     CleanMesh();
     virtual ~CleanMesh() override = default;
 
-public:
     std::shared_ptr<SurfaceMesh> getOutputMesh() const;
 
     ///

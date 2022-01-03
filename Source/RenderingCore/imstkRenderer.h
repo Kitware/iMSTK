@@ -67,7 +67,6 @@ public:
     Renderer() : m_config(std::make_shared<RendererConfig>()) { }
     virtual ~Renderer() = default;
 
-public:
     ///
     /// \brief Set rendering mode
     ///

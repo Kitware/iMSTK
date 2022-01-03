@@ -41,17 +41,14 @@ public:
     RigidObjectCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
     virtual ~RigidObjectCollision() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "RigidObjectCollision"; }
 
-public:
     void setStiffness(double stiffness);
     const double getStiffness() const;
 
     void setFriction(double frictionalCoefficient);
     const double getFriction() const;
 
-public:
     ///
     /// \brief Setup connectivity of task graph
     ///
@@ -61,7 +58,6 @@ public:
 
     void measureDisplacementFromPrevious();
 
-public:
     std::shared_ptr<VecDataArray<double, 3>> m_prevVertices;
 
 protected:

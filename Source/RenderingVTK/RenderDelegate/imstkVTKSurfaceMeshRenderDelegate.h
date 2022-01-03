@@ -80,7 +80,6 @@ protected:
     ///
     void texturesModified(Event* e);
 
-protected:
     void setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices);
     void setNormalBuffer(std::shared_ptr<VecDataArray<double, 3>> normals);
     void setIndexBuffer(std::shared_ptr<VecDataArray<int, 3>> indices);
@@ -88,7 +87,6 @@ protected:
     void setCellScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
     void setTextureCoordinateBuffer(std::shared_ptr<AbstractDataArray> textureCoordinates);
 
-protected:
     std::shared_ptr<SurfaceMesh> m_geometry;
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
     std::shared_ptr<VecDataArray<double, 3>> m_normals;

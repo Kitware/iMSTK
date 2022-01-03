@@ -54,7 +54,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "Cylinder"; }
 
-public:
     ///
     /// \brief Print the cylinder info
     ///

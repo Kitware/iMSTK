@@ -33,13 +33,12 @@ namespace imstk
 ///
 class ImplicitGeometry : public Geometry
 {
-public:
-    virtual ~ImplicitGeometry() override = default;
-
 protected:
     ImplicitGeometry(std::string name = "") : Geometry(name) { }
 
 public:
+    virtual ~ImplicitGeometry() override = default;
+
     ///
     /// \brief Returns function value given position
     ///

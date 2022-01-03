@@ -39,7 +39,6 @@ public:
 
     virtual const std::string getTypeName() const override { return "IdentityMap"; }
 
-public:
     ///
     /// \brief Compute the map
     ///

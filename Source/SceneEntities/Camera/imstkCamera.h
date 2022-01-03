@@ -82,7 +82,6 @@ public:
     ///
     friend class VTKRenderer;
 
-public:
     ///
     /// \brief Get camera view matrix
     /// \returns Camera view matrix reference
@@ -256,7 +255,6 @@ protected:
     double m_nearZ       = 0.01; ///> near plane of the camera
     double m_farZ = 1000.0;      ///> far plane of the camera
 
-protected:
     // Lookat camera parameters
     Vec3d m_position   = Vec3d(0.0, 0.0, 0.0); ///> camera position
     Vec3d m_focalPoint = -Vec3d::UnitZ();      ///> camera focal point

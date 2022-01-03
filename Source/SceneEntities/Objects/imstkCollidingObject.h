@@ -40,7 +40,6 @@ public:
     CollidingObject(const std::string& name) : SceneObject(name) { }
     virtual ~CollidingObject() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "CollidingObject"; }
 
     ///

@@ -42,7 +42,6 @@ public:
 
     virtual ~RigidObject2() = default;
 
-public:
     virtual const std::string getTypeName() const override { return "RigidObject2"; }
 
     ///

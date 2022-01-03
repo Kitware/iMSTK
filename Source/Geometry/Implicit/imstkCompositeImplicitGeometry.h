@@ -43,7 +43,6 @@ public:
 
     using GeometryBoolPair = std::pair<std::shared_ptr<ImplicitGeometry>, GeometryBoolType>;
 
-public:
     ///
     /// \brief Constructor
     ///
@@ -59,7 +58,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "CompositeImplicitGeometry"; }
 
-public:
     ///
     /// \brief Returns signed distance to surface at pos
     ///

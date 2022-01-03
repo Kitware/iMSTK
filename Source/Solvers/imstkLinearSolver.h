@@ -47,7 +47,6 @@ public:
         None
     };
 
-public:
     ///
     /// \brief Default constructor/destructor
     ///

@@ -41,10 +41,8 @@ public:
     PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
     virtual ~PbdObjectPicking() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "PbdObjectPicking"; }
 
-public:
     ///
     /// \brief Remove all picking nodes and constraints
     ///

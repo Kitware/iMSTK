@@ -64,7 +64,6 @@ public:
     VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR);
     virtual ~VTKRenderer() override = default;
 
-public:
     ///
     /// \brief Set the rendering mode to display debug actors or not
     ///
@@ -145,7 +144,6 @@ protected:
     ///
     void setConfig(std::shared_ptr<RendererConfig> config) override;
 
-protected:
     ///
     /// \brief Adds a SceneObject to be rendered
     ///
@@ -162,7 +160,6 @@ protected:
     ///
     void sceneModifed(Event* e);
 
-protected:
     ///
     /// \brief Add a VisualModel to be rendered, creates a delegate for it
     ///
@@ -184,7 +181,6 @@ protected:
     ///
     void sceneObjectModified(std::shared_ptr<SceneObject> sceneObject);
 
-protected:
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
 
     // Camera

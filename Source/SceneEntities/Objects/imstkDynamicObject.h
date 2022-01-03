@@ -97,7 +97,6 @@ protected:
     ///
     virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-protected:
     ///
     /// \brief Constructor
     ///

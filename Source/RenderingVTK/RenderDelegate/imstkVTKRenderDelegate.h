@@ -49,7 +49,6 @@ class VTKRenderDelegate : public EventObject
 public:
     virtual ~VTKRenderDelegate() override = default;
 
-public:
     ///
     /// \brief Instantiate proper render delegate
     ///
@@ -104,7 +103,6 @@ protected:
 
     vtkSmartPointer<vtkTexture> getVTKTexture(std::shared_ptr<Texture> texture);
 
-protected:
     vtkSmartPointer<vtkTransform> m_transform;
 
     // VTK data members used to create the rendering pipeline

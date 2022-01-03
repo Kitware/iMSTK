@@ -39,7 +39,6 @@ public:
     CollisionDataDebugObject() : DebugGeometryObject() { }
     virtual ~CollisionDataDebugObject() = default;
 
-public:
     ///
     /// \brief Append visual representation to the debug meshes for the given contact and geometry
     ///

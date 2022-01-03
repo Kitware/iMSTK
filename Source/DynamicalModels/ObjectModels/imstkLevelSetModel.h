@@ -61,7 +61,6 @@ public:
     ///
     virtual ~LevelSetModel() override = default;
 
-public:
     ///
     /// \brief Set the time step size
     ///
@@ -108,7 +107,6 @@ protected:
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-protected:
     std::shared_ptr<ImplicitGeometry> m_mesh = nullptr; ///> Geometry on which the levelset evolves with
 
     std::vector<std::shared_ptr<TaskNode>> m_evolveQuantitiesNodes;

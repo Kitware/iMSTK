@@ -45,7 +45,6 @@ public:
     VTKOpenVRViewer(std::string name = "VTKOpenVRViewer");
     ~VTKOpenVRViewer() override      = default;
 
-public:
     ///
     /// \brief Destructor
     ///
@@ -81,7 +80,6 @@ protected:
 
     void updateModule() override;
 
-protected:
     ///> The VR controllers are tied to the view
     std::list<std::shared_ptr<OpenVRDeviceClient>> m_vrDeviceClients;
 };

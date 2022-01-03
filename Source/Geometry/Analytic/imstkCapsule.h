@@ -56,7 +56,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "Capsule"; }
 
-public:
     ///
     /// \brief Print the capsule info
     ///

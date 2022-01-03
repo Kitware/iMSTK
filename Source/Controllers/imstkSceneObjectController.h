@@ -41,7 +41,6 @@ public:
     SceneObjectController() = delete;
     virtual ~SceneObjectController() override = default;
 
-public:
     ///
     /// \brief Update controlled scene object using latest tracking information
     ///

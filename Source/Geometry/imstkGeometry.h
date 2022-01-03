@@ -81,11 +81,10 @@ public:
     ///
     virtual const std::string getTypeName() const = 0;
 
-public:
     // *INDENT-OFF*
     SIGNAL(Geometry, modified);
     // *INDENT-ON*
-public:
+
     ///
     /// \brief Print
     ///

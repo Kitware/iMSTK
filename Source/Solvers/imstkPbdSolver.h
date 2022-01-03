@@ -65,7 +65,6 @@ public:
     PbdSolver();
     virtual ~PbdSolver() override = default;
 
-public:
     ///
     /// \brief Set Iterations. The number of nonlinear iterations.
     ///
@@ -130,7 +129,6 @@ public:
     PbdCollisionSolver();
     virtual ~PbdCollisionSolver() override = default;
 
-public:
     ///
     /// \brief Get CollisionIterations
     ///

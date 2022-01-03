@@ -66,7 +66,6 @@ protected:
 
     virtual void updateRenderProperties() override;
 
-protected:
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
 
     vtkSmartPointer<vtkPolyData> m_polydata;

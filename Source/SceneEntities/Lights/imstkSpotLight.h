@@ -36,7 +36,6 @@ public:
     SpotLight() : m_spotAngle(10.0) { }
     virtual ~SpotLight() override = default;
 
-public:
     const std::string getTypeName() const override { return "SpotLight"; }
 
     ///

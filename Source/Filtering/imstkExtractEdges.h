@@ -38,7 +38,6 @@ public:
     ExtractEdges();
     virtual ~ExtractEdges() override = default;
 
-public:
     std::shared_ptr<LineMesh> getOutputMesh() const;
 
     void setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);

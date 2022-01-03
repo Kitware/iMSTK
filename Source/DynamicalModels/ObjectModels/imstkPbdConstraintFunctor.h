@@ -54,7 +54,6 @@ struct PbdConstraintFunctor
         PbdConstraintFunctor() = default;
         virtual ~PbdConstraintFunctor() = default;
 
-    public:
         ///
         /// \brief Appends a set of constraint to the container given a geometry
         ///
@@ -70,7 +69,6 @@ struct PbdConstraintFunctor
 
         void setGeometry(std::shared_ptr<PointSet> geom) { m_geom = geom; }
 
-    public:
         std::shared_ptr<PointSet> m_geom = nullptr;
 };
 
@@ -86,7 +84,6 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
         PbdDistanceConstraintFunctor() = default;
         ~PbdDistanceConstraintFunctor() override = default;
 
-    public:
         ///
         /// \brief Create the distance constraint
         ///
@@ -251,7 +248,6 @@ struct PbdFemTetConstraintFunctor : public PbdConstraintFunctor
         PbdFemTetConstraintFunctor() = default;
         ~PbdFemTetConstraintFunctor() override = default;
 
-    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // Check for correct mesh type
@@ -298,7 +294,6 @@ struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
         PbdVolumeConstraintFunctor() = default;
         ~PbdVolumeConstraintFunctor() override = default;
 
-    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // Check for correct mesh type
@@ -341,7 +336,6 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
         PbdAreaConstraintFunctor() = default;
         ~PbdAreaConstraintFunctor() override = default;
 
-    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // Check for correct mesh type
@@ -436,7 +430,6 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
         PbdBendConstraintFunctor() = default;
         ~PbdBendConstraintFunctor() override = default;
 
-    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // Check for correct mesh type
@@ -503,7 +496,6 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
         PbdDihedralConstraintFunctor() = default;
         ~PbdDihedralConstraintFunctor() override = default;
 
-    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // Check for correct mesh type
@@ -702,7 +694,6 @@ struct PbdConstantDensityConstraintFunctor : public PbdConstraintFunctor
         PbdConstantDensityConstraintFunctor() = default;
         ~PbdConstantDensityConstraintFunctor() override = default;
 
-    public:
         virtual void operator()(PbdConstraintContainer& constraints) override
         {
             // Check for correct mesh type

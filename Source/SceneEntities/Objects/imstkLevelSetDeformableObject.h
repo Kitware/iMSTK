@@ -39,7 +39,6 @@ public:
     LevelSetDeformableObject(const std::string& name) : DynamicObject(name) { }
     virtual ~LevelSetDeformableObject() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "LevelSetDeformableObject"; }
 
     ///

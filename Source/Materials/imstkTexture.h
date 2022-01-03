@@ -100,14 +100,12 @@ public:
     ///
     virtual ~Texture() = default;
 
-public:
     // *INDENT-OFF*
     SIGNAL(Texture, modified);
     // *INDENT-ON*
 
     void postModified() { this->postEvent(Event(modified())); }
 
-public:
     ///
     /// \brief Get type
     ///

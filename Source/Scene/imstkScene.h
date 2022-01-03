@@ -81,7 +81,6 @@ public:
     Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
     virtual ~Scene() override = default;
 
-public:
     // *INDENT-OFF*
     SIGNAL(Scene, configureTaskGraph);
     ///
@@ -91,7 +90,6 @@ public:
     SIGNAL(Scene, modified);
     // *INDENT-ON*
 
-public:
     ///
     /// \brief Initialize the scene
     ///

@@ -72,11 +72,9 @@ public:
         MinimumIntensity
     };
 
-public:
     RenderMaterial();
     virtual ~RenderMaterial() = default;
 
-public:
     // *INDENT-OFF*
     ///
     /// \brief Posted when material parameters are modified
@@ -89,7 +87,6 @@ public:
     SIGNAL(RenderMaterial, texturesModified);
     // *INDENT-ON*
 
-public:
     ///
     /// \brief Get/Set the material name
     ///
