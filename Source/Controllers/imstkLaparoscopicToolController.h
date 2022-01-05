@@ -40,8 +40,8 @@ class LaparoscopicToolController : public TrackingDeviceControl
 public:
     enum class JawState
     {
-        Close,
-        Open
+        Closed,
+        Opened
     };
 
 public:
@@ -110,7 +110,7 @@ protected:
     double   m_jawAngle    = PI / 6.0;                      ///< Angle of the jaws
     double   m_change      = 6.0e-5;                        ///< Amount of change in jaw angle per frame
     double   m_maxJawAngle = PI / 6.0;                      ///< Maximum angle of the jaws
-    JawState m_jawState    = JawState::Open;
+    JawState m_jawState    = JawState::Opened;
 
     Vec3d m_jawRotationAxis;                                ///< Angle of the jaws
 

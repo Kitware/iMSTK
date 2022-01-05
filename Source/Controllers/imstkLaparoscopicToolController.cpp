@@ -105,16 +105,16 @@ LaparoscopicToolController::update(const double dt)
     m_upperJaw->getVisualGeometry()->postModified();
 
     // Check for transition closed/open
-    if (m_jawState == JawState::Open && m_jawAngle <= 0.0)
+    if (m_jawState == JawState::Opened && m_jawAngle <= 0.0)
     {
-        m_jawState = JawState::Close;
+        m_jawState = JawState::Closed;
         this->postEvent(Event(JawClosed()));
     }
     // When the jaw angle surpasses this degree it is considered open
     const double openingDegree = 5.0;
-    if (m_jawState == JawState::Close && m_jawAngle >= openingDegree * PI / 180.0)
+    if (m_jawState == JawState::Closed && m_jawAngle >= openingDegree * PI / 180.0)
     {
-        m_jawState = JawState::Open;
+        m_jawState = JawState::Opened;
         this->postEvent(Event(JawOpened()));
     }
 }

@@ -34,8 +34,8 @@ template<typename T, int N> class VecDataArray;
 ///
 struct NeighborInfo
 {
-    Vec3d relativePos;      ///> relative position: xpq = x_p - x_q
-    double density;         ///> density of neighbor particle q
+    Vec3d relativePos;      ///> relative position
+    double density;         ///> density of neighbor particle
 };
 
 ///
