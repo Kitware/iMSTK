@@ -193,7 +193,7 @@ public:
     ///
     /// \brief Topological sort of all nodes within graph
     ///
-    static std::shared_ptr<TaskNodeList> topologicalSort(std::shared_ptr<const TaskGraph> graph);
+    static std::shared_ptr<TaskNodeList> topologicalSort(std::shared_ptr<TaskGraph> graph);
 
     ///
     /// \brief Makes sure no two *critical nodes* run at the same time by establishing an edge between them.

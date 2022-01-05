@@ -655,14 +655,16 @@ TEST(imstkTaskGraphTest, ResolveCriticalNodes0)
 
     taskGraph->addNodes({ nodeA, nodeB, nodeC, nodeD, nodeE, nodeF });
 
-    taskGraph->addEdge(nodeA, nodeB);
-    taskGraph->addEdge(nodeA, nodeE);
-    taskGraph->addEdge(nodeB, nodeC);
-    taskGraph->addEdge(nodeB, nodeD);
-    taskGraph->addEdge(nodeC, nodeF);
-    taskGraph->addEdge(nodeD, nodeF);
-    taskGraph->addEdge(nodeF, nodeG);
-    taskGraph->addEdge(nodeE, nodeG);
+    taskGraph->addEdges({
+        { nodeA, nodeB },
+        { nodeA, nodeE },
+        { nodeB, nodeC },
+        { nodeB, nodeD },
+        { nodeC, nodeF },
+        { nodeD, nodeF },
+        { nodeF, nodeG },
+        { nodeE, nodeG }
+        });
 
     taskGraph = TaskGraph::resolveCriticalNodes(taskGraph);
 
@@ -674,16 +676,16 @@ TEST(imstkTaskGraphTest, ResolveCriticalNodes0)
     int                    critInputCount = 0;
     for (int i = 0; i < 3; i++)
     {
-        const TaskNodeSet& inputNodes     = invAdjList.at(critNodes[i]);
-        bool               critInputFound = false;
-        for (TaskNodeSet::const_iterator j = inputNodes.begin(); j != inputNodes.end(); j++)
-        {
-            if ((*j)->m_isCritical)
+        const TaskNodeSet& inputNodes = invAdjList.at(critNodes[i]);
+        auto               found      = std::find_if(inputNodes.begin(), inputNodes.end(),
+            [](auto& node)
             {
-                critInputFound = true;
-            }
+                return node->m_isCritical;
+            });
+        if (found != inputNodes.end())
+        {
+            critInputCount++;
         }
-        critInputCount += static_cast<int>(critInputFound);
     }
     EXPECT_EQ(critInputCount, 2) << "Nodes C, D, & E should be connected in some sort of sequence";
 }
@@ -714,14 +716,16 @@ TEST(imstkTaskGraphTest, ResolveCriticalNodes1)
 
     taskGraph->addNodes({ nodeA, nodeB, nodeC, nodeD, nodeE, nodeF });
 
-    taskGraph->addEdge(nodeA, nodeB);
-    taskGraph->addEdge(nodeA, nodeC);
-    taskGraph->addEdge(nodeB, nodeD);
-    taskGraph->addEdge(nodeC, nodeD);
-    taskGraph->addEdge(nodeD, nodeE);
-    taskGraph->addEdge(nodeD, nodeF);
-    taskGraph->addEdge(nodeE, nodeG);
-    taskGraph->addEdge(nodeF, nodeG);
+    taskGraph->addEdges({
+        { nodeA, nodeB },
+        { nodeA, nodeC },
+        { nodeB, nodeD },
+        { nodeC, nodeD },
+        { nodeD, nodeE },
+        { nodeD, nodeF },
+        { nodeE, nodeG },
+        { nodeF, nodeG }
+        });
 
     taskGraph = TaskGraph::resolveCriticalNodes(taskGraph);
 
