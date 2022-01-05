@@ -120,7 +120,14 @@ TaskGraphVizWriter::write()
             }
             else
             {
-                file << " color=cornflowerblue";
+                if (nodes[i]->m_isCritical)
+                {
+                    file << " color=\"#8B2610\"";
+                }
+                else
+                {
+                    file << " color=cornflowerblue";
+                }
             }
             file << "];" << std::endl;
         }

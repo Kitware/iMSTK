@@ -24,6 +24,8 @@
 
 #include "imstkTaskGraph.h"
 
+#include <array>
+
 using namespace imstk;
 using testing::UnorderedElementsAre;
 using testing::ElementsAre;
@@ -625,4 +627,112 @@ TEST(imstkTaskGraphTest, RemoveUnusedNodes)
         auto result = taskGraph->removeUnusedNodes(taskGraph);
         EXPECT_EQ(0, result->getNodes().size());
     }
+}
+
+TEST(imstkTaskGraphTest, ResolveCriticalNodes0)
+{
+    /*
+    *   A
+    *   |
+    *   B
+    *  /|\
+    * C D E   (c, d, & e are critical)
+    *  \| |
+    *   F |
+    *   |/
+    *   G
+    */
+
+    auto taskGraph = std::make_shared<TaskGraph>();
+
+    std::shared_ptr<TaskNode> nodeA = taskGraph->getSource();
+    auto                      nodeB = std::make_shared<TaskNode>();
+    auto                      nodeC = std::make_shared<TaskNode>([]() {}, "c", true);
+    auto                      nodeD = std::make_shared<TaskNode>([]() {}, "d", true);
+    auto                      nodeE = std::make_shared<TaskNode>([]() {}, "e", true);
+    auto                      nodeF = std::make_shared<TaskNode>();
+    std::shared_ptr<TaskNode> nodeG = taskGraph->getSink();
+
+    taskGraph->addNodes({ nodeA, nodeB, nodeC, nodeD, nodeE, nodeF });
+
+    taskGraph->addEdges({
+        { nodeA, nodeB },
+        { nodeA, nodeE },
+        { nodeB, nodeC },
+        { nodeB, nodeD },
+        { nodeC, nodeF },
+        { nodeD, nodeF },
+        { nodeF, nodeG },
+        { nodeE, nodeG }
+        });
+
+    taskGraph = TaskGraph::resolveCriticalNodes(taskGraph);
+
+    std::array<std::shared_ptr<TaskNode>, 3> critNodes = { nodeC, nodeD, nodeE };
+
+    // Assert that C, D, & E are connected in some sort of chain
+    // Assert that two of the 3 nodes have critical inputs (1 should be head)
+    const TaskNodeAdjList& invAdjList     = taskGraph->getInvAdjList();
+    int                    critInputCount = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        const TaskNodeSet& inputNodes = invAdjList.at(critNodes[i]);
+        auto               found      = std::find_if(inputNodes.begin(), inputNodes.end(),
+            [](auto& node)
+            {
+                return node->m_isCritical;
+            });
+        if (found != inputNodes.end())
+        {
+            critInputCount++;
+        }
+    }
+    EXPECT_EQ(critInputCount, 2) << "Nodes C, D, & E should be connected in some sort of sequence";
+}
+
+TEST(imstkTaskGraphTest, ResolveCriticalNodes1)
+{
+    /*
+    *   A
+    *  / \
+    * B   C   (b & c critical)
+    *  \ /
+    *   D
+    *  / \
+    * E   F (e & f critical)
+    *  \ /
+    *   G
+    */
+
+    auto taskGraph = std::make_shared<TaskGraph>();
+
+    std::shared_ptr<TaskNode> nodeA = taskGraph->getSource();
+    auto                      nodeB = std::make_shared<TaskNode>([]() {}, "b", true);
+    auto                      nodeC = std::make_shared<TaskNode>([]() {}, "c", true);
+    auto                      nodeD = std::make_shared<TaskNode>();
+    auto                      nodeE = std::make_shared<TaskNode>([]() {}, "e", true);
+    auto                      nodeF = std::make_shared<TaskNode>([]() {}, "f", true);
+    std::shared_ptr<TaskNode> nodeG = taskGraph->getSink();
+
+    taskGraph->addNodes({ nodeA, nodeB, nodeC, nodeD, nodeE, nodeF });
+
+    taskGraph->addEdges({
+        { nodeA, nodeB },
+        { nodeA, nodeC },
+        { nodeB, nodeD },
+        { nodeC, nodeD },
+        { nodeD, nodeE },
+        { nodeD, nodeF },
+        { nodeE, nodeG },
+        { nodeF, nodeG }
+        });
+
+    taskGraph = TaskGraph::resolveCriticalNodes(taskGraph);
+
+    // There should now exist an edge between B->C, & E->F
+    // direction does not matter
+    EXPECT_TRUE(taskGraph->containsEdge(nodeB, nodeC) || taskGraph->containsEdge(nodeC, nodeB)) <<
+        "There should exist an edge between B & C";
+    EXPECT_TRUE(taskGraph->containsEdge(nodeE, nodeF) || taskGraph->containsEdge(nodeF, nodeE)) <<
+        "There should exist an edge between E & F";
 }
