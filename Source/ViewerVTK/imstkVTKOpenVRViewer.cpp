@@ -141,9 +141,6 @@ VTKOpenVRViewer::setRenderingMode(const Renderer::Mode mode)
 
     // Setup renderer
     this->getActiveRenderer()->setMode(mode, true);
-
-    // Render to update displayed actors
-    m_vtkRenderWindow->Render();
 }
 
 bool
