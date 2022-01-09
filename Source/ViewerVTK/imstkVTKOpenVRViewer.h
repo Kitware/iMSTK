@@ -76,6 +76,12 @@ public:
     ///
     const std::list<std::shared_ptr<OpenVRDeviceClient>>& getVRDeviceClients() const { return m_vrDeviceClients; }
 
+    ///
+    /// \brief VTKOpenVRViewer overrides to provide a non-rendering
+    /// event processing loop (to deal with vsync blockage)
+    /// 
+    void processEvents() override;
+
 protected:
     bool initModule() override;
 
