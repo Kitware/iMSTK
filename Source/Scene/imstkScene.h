@@ -35,7 +35,7 @@ namespace imstk
 {
 class Camera;
 class CameraController;
-class IBLProbe;
+class IblProbe;
 class Light;
 class ObjectInteractionPair;
 class SceneObject;
@@ -81,7 +81,6 @@ public:
     Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
     virtual ~Scene() override = default;
 
-public:
     // *INDENT-OFF*
     SIGNAL(Scene, configureTaskGraph);
     ///
@@ -91,7 +90,6 @@ public:
     SIGNAL(Scene, modified);
     // *INDENT-ON*
 
-public:
     ///
     /// \brief Initialize the scene
     ///
@@ -201,12 +199,12 @@ public:
     ///
     /// \brief Set global IBL probe
     ///
-    void setGlobalIBLProbe(std::shared_ptr<IBLProbe> newIBLProbe) { m_globalIBLProbe = newIBLProbe; }
+    void setGlobalIBLProbe(std::shared_ptr<IblProbe> newIBLProbe) { m_globalIBLProbe = newIBLProbe; }
 
     ///
     /// \brief Return global IBL probe
     ///
-    std::shared_ptr<IBLProbe> getGlobalIBLProbe() { return m_globalIBLProbe; }
+    std::shared_ptr<IblProbe> getGlobalIBLProbe() { return m_globalIBLProbe; }
 
     ///
     /// \brief Get the name of the scene
@@ -285,7 +283,7 @@ protected:
     std::string m_name; ///> Name of the scene
     std::unordered_set<std::shared_ptr<SceneObject>> m_sceneObjects;
     std::unordered_map<std::string, std::shared_ptr<Light>> m_lightsMap;
-    std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
+    std::shared_ptr<IblProbe> m_globalIBLProbe = nullptr;
 
     std::unordered_map<std::string, std::shared_ptr<Camera>> m_cameras;
     std::shared_ptr<Camera> m_activeCamera;

@@ -89,7 +89,6 @@ protected:
     ///
     void updateCHB();
 
-protected:
     std::shared_ptr<CollidingObject> m_objA = nullptr;
     std::shared_ptr<CollidingObject> m_objB = nullptr;
 

@@ -35,7 +35,6 @@ public:
     VolumeRenderMaterial();
     ~VolumeRenderMaterial() override = default;
 
-public:
     ///
     /// \brief Get the volume property
     ///

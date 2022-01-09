@@ -43,7 +43,6 @@ public:
     VTKInteractorStyle();
     virtual ~VTKInteractorStyle() override;
 
-public:
     ///
     /// \brief Slot for key pressed
     ///

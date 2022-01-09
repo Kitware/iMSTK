@@ -105,11 +105,11 @@ baryInterpolate(T v1, T v2, T v3, Vec3d uvw)
 
 SurfaceMeshTextureProject::SurfaceMeshTextureProject()
 {
-    setNumberOfInputPorts(2);
+    setNumInputPorts(2);
     setRequiredInputType<SurfaceMesh>(0);
     setRequiredInputType<SurfaceMesh>(1);
 
-    setNumberOfOutputPorts(1);
+    setNumOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>(), 0);
 }
 

@@ -52,12 +52,9 @@ public:
         STL
     };
 
-public:
-
     SimulationManager() = default;
     virtual ~SimulationManager() override = default;
 
-public:
     // *INDENT-OFF*
     ///
     /// \brief Called after initialization but before starting the loop
@@ -70,7 +67,6 @@ public:
     SIGNAL(SimulationManager, ending);
     // *INDENT-ON*
 
-public:
     void start() override;
 
     ///
@@ -115,7 +111,6 @@ protected:
 
     void runModuleParallel(std::shared_ptr<Module> module);
 
-protected:
     std::vector<std::shared_ptr<Viewer>> m_viewers;
 
     std::unordered_map<Module*, bool> m_running;

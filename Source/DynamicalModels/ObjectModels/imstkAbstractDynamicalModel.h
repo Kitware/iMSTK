@@ -78,7 +78,6 @@ protected:
 public:
     virtual ~AbstractDynamicalModel() = default;
 
-public:
     ///
     /// \brief Reset the current state to the initial state
     ///
@@ -87,8 +86,8 @@ public:
     ///
     /// \brief Returns the number of degrees of freedom
     ///
-    std::size_t getNumDegreeOfFreedom() const { return m_numDOF; }
-    void setNumDegreeOfFreedom(const size_t nDof) { m_numDOF = nDof; }
+    std::size_t getNumDegreeOfFreedom() const { return m_numDof; }
+    void setNumDegreeOfFreedom(const size_t nDof) { m_numDof = nDof; }
 
     std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
@@ -149,10 +148,9 @@ protected:
     ///
     virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
 
-protected:
     DynamicalModelType m_type;                      ///> Mathematical model type
 
-    std::size_t m_numDOF;                           ///> Total number of degree of freedom
+    std::size_t m_numDof;                           ///> Total number of degree of freedom
 
     std::shared_ptr<Geometry> m_geometry = nullptr; ///> Physics geometry of the model
     std::set<std::string>     m_validGeometryTypes; ///> Valid geometry types of this model

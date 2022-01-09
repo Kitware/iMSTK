@@ -50,7 +50,6 @@ public:
 
     virtual const std::string getTypeName() const override { return "TetraTriangleMap"; }
 
-public:
     ///
     /// \brief Compute the tetra-triangle mesh map
     ///

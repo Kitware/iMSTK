@@ -52,7 +52,6 @@ protected:
 public:
     virtual ~TrackingDeviceControl() override = default;
 
-public:
     ///
     /// \brief Apply forces to the haptic device
     ///

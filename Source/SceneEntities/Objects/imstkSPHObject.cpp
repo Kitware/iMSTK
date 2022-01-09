@@ -25,10 +25,10 @@
 namespace imstk
 {
 bool
-SPHObject::initialize()
+SphObject::initialize()
 {
-    m_SPHModel = std::dynamic_pointer_cast<SPHModel>(m_dynamicalModel);
-    if (m_SPHModel == nullptr)
+    m_sphModel = std::dynamic_pointer_cast<SphModel>(m_dynamicalModel);
+    if (m_sphModel == nullptr)
     {
         LOG(FATAL) << "Dynamics pointer cast failure in SPHObject::initialize()";
         return false;
@@ -36,15 +36,15 @@ SPHObject::initialize()
 
     // why are we initializing twice?
     DynamicObject::initialize();
-    m_SPHModel->initialize();
+    m_sphModel->initialize();
 
     return true;
 }
 
-std::shared_ptr<SPHModel>
-SPHObject::getSPHModel()
+std::shared_ptr<SphModel>
+SphObject::getSphModel()
 {
-    m_SPHModel = std::dynamic_pointer_cast<SPHModel>(m_dynamicalModel);
-    return m_SPHModel;
+    m_sphModel = std::dynamic_pointer_cast<SphModel>(m_dynamicalModel);
+    return m_sphModel;
 }
 } // end namespace imstk

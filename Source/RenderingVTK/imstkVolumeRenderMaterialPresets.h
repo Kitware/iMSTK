@@ -34,7 +34,7 @@ class VolumeRenderMaterial;
 class VolumeRenderMaterialPresets
 {
 public:
-    enum Presets
+    enum class Presets
     {
         CT_AAA = 0,
         CT_AAA2,
@@ -68,9 +68,9 @@ public:
     ///
     /// \brief TODO
     ///
-    static std::shared_ptr<VolumeRenderMaterial> getPreset(int p = CT_BONES);
+    static std::shared_ptr<VolumeRenderMaterial> getPreset(Presets p = Presets::CT_BONES);
 
     // Convenience API to get preset names
-    static const char* getPresetName(int p);
+    static const char* getPresetName(Presets p);
 };
 }

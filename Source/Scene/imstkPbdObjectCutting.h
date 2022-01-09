@@ -46,10 +46,8 @@ public:
     PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj);
     virtual ~PbdObjectCutting() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "PbdObjectCutting"; }
 
-public:
     ///
     /// \brief Applies the cut when called
     ///
@@ -84,7 +82,6 @@ protected:
                          std::shared_ptr<std::vector<size_t>> elementIndices,
                          std::shared_ptr<VecDataArray<int, 3>> elements);
 
-protected:
     std::shared_ptr<PbdObject>       m_objA = nullptr;
     std::shared_ptr<CollidingObject> m_objB = nullptr;
 

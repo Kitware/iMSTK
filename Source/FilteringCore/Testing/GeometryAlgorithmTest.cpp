@@ -47,7 +47,7 @@ class EmptyAlgorithm : public MockAlgorithm
 public:
     EmptyAlgorithm()
     {
-        setNumberOfInputPorts(4);
+        setNumInputPorts(4);
     }
 };
 
@@ -56,7 +56,7 @@ class ExpectingAlgorithm : public MockAlgorithm
 public:
     ExpectingAlgorithm()
     {
-        setNumberOfInputPorts(4);
+        setNumInputPorts(4);
         setRequiredInputType<SurfaceMesh>(1);
     }
 };
@@ -66,7 +66,7 @@ class ExpectingOptional : public MockAlgorithm
 public:
     ExpectingOptional()
     {
-        setNumberOfInputPorts(4);
+        setNumInputPorts(4);
         setOptionalInputType<SurfaceMesh>(1);
     }
 };
@@ -76,7 +76,7 @@ class ExpectingAllKinds : public MockAlgorithm
 public:
     ExpectingAllKinds()
     {
-        setNumberOfInputPorts(5);
+        setNumInputPorts(5);
         setRequiredInputType<SurfaceMesh>(1);
         setRequiredInputType<Sphere>(2);
         setOptionalInputType<SurfaceMesh>(3);

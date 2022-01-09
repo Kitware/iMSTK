@@ -55,7 +55,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "Plane"; }
 
-public:
     ///
     /// \brief Returns the normal of the plane
     ///
@@ -95,7 +94,6 @@ public:
 protected:
     void applyTransform(const Mat4d& m) override;
 
-protected:
     Vec3d m_normal;
     mutable Vec3d m_normalPostTransform;
     double m_width; ///> Width of plane, only used for visual purposes

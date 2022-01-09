@@ -94,11 +94,11 @@ generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> sp
     return particles;
 }
 
-static std::shared_ptr<SPHObject>
+static std::shared_ptr<SphObject>
 makeSPHObject(const std::string& name, const double particleRadius, const double particleSpacing)
 {
     // Create the sph object
-    imstkNew<SPHObject> fluidObj(name);
+    imstkNew<SphObject> fluidObj(name);
 
     // Setup the Geometry
     auto spawnMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/legs/femoralArteryCut.stl");
@@ -109,14 +109,14 @@ makeSPHObject(const std::string& name, const double particleRadius, const double
     fluidGeometry->initialize(particles);
 
     // Setup the Parameters
-    imstkNew<SPHModelConfig> sphParams(particleRadius);
+    imstkNew<SphModelConfig> sphParams(particleRadius);
     sphParams->m_bNormalizeDensity = true;
     sphParams->m_kernelOverParticleRadiusRatio = 6.0;
     sphParams->m_surfaceTensionStiffness       = 5.0;
     sphParams->m_frictionBoundary = 0.1;
 
     // Setup the Model
-    imstkNew<SPHModel> sphModel;
+    imstkNew<SphModel> sphModel;
     sphModel->setModelGeometry(fluidGeometry);
     sphModel->configure(sphParams);
     sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
@@ -227,7 +227,7 @@ main()
         scene->getActiveCamera()->setViewUp(-0.66, 0.01, 0.75);
 
         // SPH fluid box overtop the dragon
-        std::shared_ptr<SPHObject> sphObj = makeSPHObject("Fluid", 0.004, 0.0035);
+        std::shared_ptr<SphObject> sphObj = makeSPHObject("Fluid", 0.004, 0.0035);
         scene->addSceneObject(sphObj);
 
         // Interaction

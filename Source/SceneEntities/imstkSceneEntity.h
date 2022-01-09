@@ -38,7 +38,6 @@ class SceneEntity : public EventObject
 public:
     virtual ~SceneEntity() = default;
 
-public:
     ///
     /// \brief Get ID (ALWAYS query the ID in your code, DO NOT hardcode it)
     /// \returns ID of entity

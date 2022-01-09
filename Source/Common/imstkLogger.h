@@ -36,7 +36,7 @@ struct stdSink
 {
     // Linux xterm color
     // http://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
-    enum FontColor
+    enum class FontColor
     {
         Yellow = 33,
         Red = 31,

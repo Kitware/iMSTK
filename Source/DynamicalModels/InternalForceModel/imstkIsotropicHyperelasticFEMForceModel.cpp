@@ -28,7 +28,7 @@ limitations under the License.
 
 namespace imstk
 {
-IsotropicHyperelasticFEForceModel::IsotropicHyperelasticFEForceModel(const HyperElasticMaterialType materialType,
+IsotropicHyperelasticFeForceModel::IsotropicHyperelasticFeForceModel(const HyperElasticMaterialType materialType,
                                                                      std::shared_ptr<vega::VolumetricMesh> mesh,
                                                                      const double inversionThreshold, const bool withGravity, const double gravity) : InternalForceModel()
 {
@@ -64,7 +64,7 @@ IsotropicHyperelasticFEForceModel::IsotropicHyperelasticFEForceModel(const Hyper
         break;
     }
 
-    m_isotropicHyperelasticFEM = std::make_shared<vega::IsotropicHyperelasticFEM>(
+    m_isotropicHyperelasticFem = std::make_shared<vega::IsotropicHyperelasticFEM>(
         tetMesh.get(),
         m_isotropicMaterial.get(),
         inversionThreshold,

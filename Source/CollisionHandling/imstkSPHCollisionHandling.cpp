@@ -29,18 +29,18 @@
 namespace imstk
 {
 void
-SPHCollisionHandling::setInputSPHObject(std::shared_ptr<SPHObject> sphObj)
+SphCollisionHandling::setInputSphObject(std::shared_ptr<SphObject> sphObj)
 {
     setInputObjectA(sphObj);
 }
 
 void
-SPHCollisionHandling::handle(
+SphCollisionHandling::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& imstkNotUsed(elementsB))
 {
-    std::shared_ptr<SPHObject> obj      = std::dynamic_pointer_cast<SPHObject>(getInputObjectA());
-    std::shared_ptr<SPHModel>  sphModel = obj->getSPHModel();
+    std::shared_ptr<SphObject> obj      = std::dynamic_pointer_cast<SphObject>(getInputObjectA());
+    std::shared_ptr<SphModel>  sphModel = obj->getSphModel();
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
     LOG_IF(FATAL, (!sphModel)) << "SPH model was not initialized";
 #endif
@@ -51,7 +51,7 @@ SPHCollisionHandling::handle(
         << "Invalid boundary friction coefficient (value must be in [0, 1])";
 #endif
 
-    std::shared_ptr<SPHState>                state = sphModel->getCurrentState();
+    std::shared_ptr<SphState>                state = sphModel->getCurrentState();
     std::shared_ptr<VecDataArray<double, 3>> positionsPtr  = state->getPositions();
     std::shared_ptr<VecDataArray<double, 3>> velocitiesPtr = state->getVelocities();
     VecDataArray<double, 3>&                 positions     = *positionsPtr;
@@ -84,7 +84,7 @@ SPHCollisionHandling::handle(
 }
 
 void
-SPHCollisionHandling::solve(Vec3d& pos, Vec3d& velocity, const Vec3d& penetrationVector)
+SphCollisionHandling::solve(Vec3d& pos, Vec3d& velocity, const Vec3d& penetrationVector)
 {
     // Correct particle position
     pos -= penetrationVector;

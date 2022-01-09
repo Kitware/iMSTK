@@ -35,11 +35,11 @@ namespace imstk
 {
 SurfaceMeshImageMask::SurfaceMeshImageMask()
 {
-    setNumberOfInputPorts(2);
+    setNumInputPorts(2);
     setRequiredInputType<SurfaceMesh>(0);
     setOptionalInputType<ImageData>(1);
 
-    setNumberOfOutputPorts(1);
+    setNumOutputPorts(1);
     setOutput(std::make_shared<ImageData>(), 0);
 }
 

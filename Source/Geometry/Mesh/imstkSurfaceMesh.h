@@ -76,7 +76,6 @@ class SurfaceMesh : public PointSet
 public:
     using NeighborsType = std::set<size_t>;
 
-public:
     ///
     /// \brief Constructor
     ///
@@ -92,7 +91,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "SurfaceMesh"; }
 
-public:
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  triangle connectivity
@@ -185,7 +183,6 @@ public:
     bool isMesh() const override { return true; }
 
 // Accessors
-public:
     ///
     /// \brief Get/Set triangle connectivity
     ///
@@ -221,7 +218,6 @@ public:
     const std::vector<NeighborsType>& getVertexNeighborVertices() { return m_vertexNeighborVertices; }
 
 // Attributes
-public:
     ///
     /// \brief Set a data array holding some per cell data
     ///
@@ -274,8 +270,6 @@ public:
 protected:
     void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
                                 const int expectedNumComponents, const ScalarTypeId expectedScalarType);
-
-protected:
     std::shared_ptr<VecDataArray<int, 3>> m_triangleIndices;
     std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices
     std::vector<NeighborsType> m_vertexNeighborVertices;  ///> Neighbor vertices to vertices

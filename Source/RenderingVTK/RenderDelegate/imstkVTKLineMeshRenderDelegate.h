@@ -67,13 +67,11 @@ protected:
     ///
     void geometryModified(Event* e);
 
-protected:
     void setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices);
     void setIndexBuffer(std::shared_ptr<VecDataArray<int, 2>> indices);
     void setVertexScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
     void setCellScalarBuffer(std::shared_ptr<AbstractDataArray> scalars);
 
-protected:
     std::shared_ptr<LineMesh> m_geometry;
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
     std::shared_ptr<VecDataArray<int, 2>>    m_indices;

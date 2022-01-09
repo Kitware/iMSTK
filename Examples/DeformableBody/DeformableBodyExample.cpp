@@ -152,8 +152,8 @@ makeFEDeformableObject(std::shared_ptr<TetrahedralMesh> tetMesh)
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     // Configure dynamic model
-    imstkNew<FEMDeformableBodyModel> dynaModel;
-    imstkNew<FEMModelConfig>         config;
+    imstkNew<FemDeformableBodyModel> dynaModel;
+    imstkNew<FemModelConfig>         config;
     config->m_fixedNodeIds = input.fixedNodeIds;
     dynaModel->configure(config);
     //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");

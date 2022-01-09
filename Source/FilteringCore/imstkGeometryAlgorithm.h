@@ -99,27 +99,27 @@ protected:
     ///
     /// \brief Set the output at the port
     ///
-    void setOutput(std::shared_ptr<Geometry> inputGeometry, size_t port = 0);
+    void setOutput(std::shared_ptr<Geometry> inputGeometry, const size_t port = 0);
 
-    imstkGetMacro(NumberOfInputPorts, size_t);
-    imstkGetMacro(NumberOfOutputPorts, size_t);
+    imstkGetMacro(NumInputPorts, size_t);
+    imstkGetMacro(NumOutputPorts, size_t);
 
     ///
     /// \brief Sets the amount of input ports
     ///
-    void setNumberOfInputPorts(size_t numPorts);
+    void setNumInputPorts(const size_t numPorts);
 
     ///
     /// \brief Sets the amount of output ports
     ///
-    void setNumberOfOutputPorts(size_t numPorts);
+    void setNumOutputPorts(const size_t numPorts);
 
     ///
     /// \brief Declares the type for the port with the given number, also defines that
     /// the give port is required for the filter to run correctly
     ///
     template<typename T>
-    void setRequiredInputType(size_t port)
+    void setRequiredInputType(const size_t port)
     {
         CHECK(m_optionalTypeChecks.find(port) == m_optionalTypeChecks.end())
             << "There is already an optional type for this port " << port << ", can't assign another one.";
@@ -131,7 +131,7 @@ protected:
     /// for this port is optional and may be omitted
     ///
     template<typename T>
-    void setOptionalInputType(size_t port)
+    void setOptionalInputType(const size_t port)
     {
         CHECK(m_requiredTypeChecks.find(port) == m_requiredTypeChecks.end())
             << "There is already a required type for port " << port << " , can't assign another one.";
@@ -152,8 +152,8 @@ protected:
     using GeometryCheck      = std::function<bool (Geometry*)>;
     using TypeCheckContainer = std::unordered_map<size_t, GeometryCheck>;
 
-    std::unordered_map<size_t, GeometryCheck> m_requiredTypeChecks;
-    std::unordered_map<size_t, GeometryCheck> m_optionalTypeChecks;
+    TypeCheckContainer m_requiredTypeChecks;
+    TypeCheckContainer m_optionalTypeChecks;
 
 private:
 
@@ -161,7 +161,7 @@ private:
     std::unordered_map<size_t, std::shared_ptr<Geometry>> m_outputs;
 
     //bool m_modified = true;
-    size_t m_NumberOfInputPorts  = 1;
-    size_t m_NumberOfOutputPorts = 1;
+    size_t m_NumInputPorts  = 1;
+    size_t m_NumOutputPorts = 1;
 };
 }

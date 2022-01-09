@@ -41,10 +41,8 @@ public:
     RigidObjectLevelSetCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2);
     virtual ~RigidObjectLevelSetCollision() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "RigidObjectLevelSetCollision"; }
 
-public:
     ///
     /// \brief Setup connectivity of task graph
     ///
@@ -53,7 +51,6 @@ public:
     void copyVertsToPrevious();
     void measureDisplacementFromPrevious();
 
-public:
     std::shared_ptr<VecDataArray<double, 3>> m_prevVertices;
 
 protected:

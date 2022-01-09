@@ -30,16 +30,16 @@ namespace imstk
 {
 AppendMesh::AppendMesh()
 {
-    setNumberOfInputPorts(1);
-    setNumberOfOutputPorts(1);
+    setNumInputPorts(1);
+    setNumOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());
 }
 
 void
 AppendMesh::addInputMesh(std::shared_ptr<SurfaceMesh> inputMesh)
 {
-    setNumberOfInputPorts(getNumberOfInputPorts() + 1);
-    setInput(inputMesh, getNumberOfInputPorts() - 1);
+    setNumInputPorts(getNumInputPorts() + 1);
+    setInput(inputMesh, getNumInputPorts() - 1);
 }
 
 std::shared_ptr<SurfaceMesh>
@@ -52,7 +52,7 @@ void
 AppendMesh::requestUpdate()
 {
     vtkNew<vtkAppendPolyData> filter;
-    for (size_t i = 0; i < getNumberOfInputPorts(); i++)
+    for (size_t i = 0; i < getNumInputPorts(); i++)
     {
         std::shared_ptr<SurfaceMesh> inputMesh = std::dynamic_pointer_cast<SurfaceMesh>(getInput(0));
         if (inputMesh == nullptr)

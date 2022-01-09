@@ -46,12 +46,10 @@ public:
         Rotate
     };
 
-public:
     MouseSceneControl() = default;
     MouseSceneControl(std::shared_ptr<MouseDeviceClient> device);
     ~MouseSceneControl() override = default;
 
-public:
     ///
     /// \brief Set the scroll controlled zoom speed
     ///
@@ -83,7 +81,6 @@ public:
     ///
     bool getEnabled() const;
 
-public:
     void printControls() override;
 
     ///

@@ -96,11 +96,11 @@ generateBoxShapeFluid(const double particleRadius, const Vec3d& boxCenter, const
 /// \param shift/position of the fluid box
 /// \parma dimensions of the fluid box
 ///
-std::shared_ptr<SPHObject>
+std::shared_ptr<SphObject>
 makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec3d& boxShift, const Vec3d& boxSize)
 {
     // Create the sph object
-    imstkNew<SPHObject> fluidObj(name);
+    imstkNew<SphObject> fluidObj(name);
 
     // Setup the Geometry
     std::shared_ptr<VecDataArray<double, 3>> particles = generateBoxShapeFluid(particleRadius, boxShift, boxSize);
@@ -109,13 +109,13 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
     fluidGeometry->initialize(particles);
 
     // Setup the Parameters
-    imstkNew<SPHModelConfig> sphParams(particleRadius);
+    imstkNew<SphModelConfig> sphParams(particleRadius);
     sphParams->m_bNormalizeDensity = true;
     sphParams->m_kernelOverParticleRadiusRatio = 6.0;
     sphParams->m_surfaceTensionStiffness       = 5.0;
 
     // Setup the Model
-    imstkNew<SPHModel> sphModel;
+    imstkNew<SphModel> sphModel;
     sphModel->setModelGeometry(fluidGeometry);
     sphModel->configure(sphParams);
     sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
@@ -154,11 +154,11 @@ makeFEDragonObject(const std::string& name, const Vec3d& position)
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     // Setup the Parameters
-    imstkNew<FEMModelConfig> config;
+    imstkNew<FemModelConfig> config;
     config->m_fixedNodeIds = { 50, 126, 177 };
 
     // Setup the Model
-    imstkNew<FEMDeformableBodyModel> dynaModel;
+    imstkNew<FemDeformableBodyModel> dynaModel;
     dynaModel->configure(config);
     dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
     dynaModel->setModelGeometry(tetMesh);
@@ -256,7 +256,7 @@ main()
         scene->addSceneObject(feDragon);
 
         // SPH fluid box overtop the dragon
-        std::shared_ptr<SPHObject> sphFluidBox = makeSPHBoxObject("Box", 0.1, Vec3d(5.0, 7.0, 0.0), Vec3d(3.0, 7.0, 3.0));
+        std::shared_ptr<SphObject> sphFluidBox = makeSPHBoxObject("Box", 0.1, Vec3d(5.0, 7.0, 0.0), Vec3d(3.0, 7.0, 3.0));
         scene->addSceneObject(sphFluidBox);
 
         // Light

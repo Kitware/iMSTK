@@ -46,7 +46,6 @@ public:
     DebugGeometryObject();
     virtual ~DebugGeometryObject() = default;
 
-public:
     ///
     /// \brief Adds a line to the debug lines with default color
     ///
@@ -101,7 +100,6 @@ public:
     void clear();
 
 /// Accessors
-public:
     std::shared_ptr<RenderMaterial> getPointMaterial() const;
     std::shared_ptr<RenderMaterial> getLineMaterial() const;
     std::shared_ptr<RenderMaterial> getFaceMaterial() const;

@@ -50,7 +50,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "Sphere"; }
 
-public:
     ///
     /// \brief Print the sphere info
     ///

@@ -27,25 +27,25 @@
 
 namespace vega
 {
-class StVKInternalForces;
+class StvkInternalForces;
 class VolumetricMesh;
 }
 
 namespace imstk
 {
-class StVKForceModel : public InternalForceModel
+class StvkForceModel : public InternalForceModel
 {
 public:
     ///
     /// \brief Constructor
     ///
-    StVKForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
+    StvkForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
                    const bool withGravity = true, const double gravity = 10.0);
 
     ///
     /// \brief Destructor
     ///
-    virtual ~StVKForceModel() override = default;
+    virtual ~StvkForceModel() override = default;
 
     ///
     /// \brief Get the internal force

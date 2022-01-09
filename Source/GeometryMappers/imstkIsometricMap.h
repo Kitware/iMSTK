@@ -45,7 +45,6 @@ public:
 
     virtual const std::string getTypeName() const override { return "IsometricMap"; }
 
-public:
     ///
     /// \brief Compute the map
     ///

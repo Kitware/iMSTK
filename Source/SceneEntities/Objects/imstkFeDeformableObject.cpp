@@ -28,7 +28,7 @@ namespace imstk
 bool
 FeDeformableObject::initialize()
 {
-    m_femModel = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_dynamicalModel);
+    m_femModel = std::dynamic_pointer_cast<FemDeformableBodyModel>(m_dynamicalModel);
     if (m_femModel == nullptr)
     {
         LOG(FATAL) << "Dynamics pointer cast failure in DeformableObject::initialize()";
@@ -41,10 +41,10 @@ FeDeformableObject::initialize()
     return true;
 }
 
-std::shared_ptr<FEMDeformableBodyModel>
+std::shared_ptr<FemDeformableBodyModel>
 FeDeformableObject::getFEMModel()
 {
-    m_femModel = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_dynamicalModel);
+    m_femModel = std::dynamic_pointer_cast<FemDeformableBodyModel>(m_dynamicalModel);
     return m_femModel;
 }
 } // imstk

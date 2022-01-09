@@ -35,7 +35,6 @@ class AnalyticalGeometry : public ImplicitGeometry
 public:
     virtual ~AnalyticalGeometry() override = default;
 
-public:
     ///
     /// \brief Print
     ///

@@ -32,17 +32,17 @@ stdSink::GetColor(const LEVELS level) const
 {
     if (level.value == WARNING.value)
     {
-        return Yellow;
+        return FontColor::Yellow;
     }
     if (level.value == DEBUG.value)
     {
-        return Green;
+        return FontColor::Green;
     }
     if (level.value == FATAL.value)
     {
-        return Red;
+        return FontColor::Red;
     }
-    return White;
+    return FontColor::White;
 }
 
 #ifdef WIN32
@@ -67,7 +67,7 @@ stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
     const auto message = logEntry.get().message();
 
 #ifndef WIN32
-    auto color = GetColor(level);
+    auto color = static_cast<int>(GetColor(level));
     std::cout << "\033[" << color << "m"
               << message
               << "\033[m" << std::endl;

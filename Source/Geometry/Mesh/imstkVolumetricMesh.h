@@ -40,7 +40,6 @@ public:
     ///
     virtual ~VolumetricMesh() override = default;
 
-public:
     ///
     /// \brief Compute the conforming surface mesh
     ///

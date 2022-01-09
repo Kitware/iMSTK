@@ -240,7 +240,7 @@ InflatableObject::findAffectedConstraint(const Vec3d& toolTip, const double radi
 
     Vec3d min, max;
     m_objectTetMesh->computeBoundingBox(min, max);
-    if (!CollisionUtils::testAABBToAABB(toolTip[0], toolTip[0], toolTip[1], toolTip[1], toolTip[2], toolTip[2],
+    if (!CollisionUtils::testAabbToAabb(toolTip[0], toolTip[0], toolTip[1], toolTip[1], toolTip[2], toolTip[2],
         min[0], max[0], min[1], max[1], min[2], max[2]))
     {
         return;

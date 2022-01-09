@@ -37,7 +37,6 @@ public:
     AppendMesh();
     virtual ~AppendMesh() override = default;
 
-public:
     void addInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
     std::shared_ptr<SurfaceMesh> getOutputMesh() const;
 

@@ -77,7 +77,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "RenderParticles"; }
 
-public:
     ///
     /// \brief Set size of particle
     /// \param size Particle size, this determines how much each keyframe

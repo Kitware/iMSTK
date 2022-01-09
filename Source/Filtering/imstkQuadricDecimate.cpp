@@ -33,8 +33,8 @@ QuadricDecimate::QuadricDecimate() :
 {
     setRequiredInputType<SurfaceMesh>(0);
 
-    setNumberOfInputPorts(1);
-    setNumberOfOutputPorts(1);
+    setNumInputPorts(1);
+    setNumOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());
 }
 

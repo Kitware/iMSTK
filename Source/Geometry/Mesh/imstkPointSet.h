@@ -55,7 +55,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "PointSet"; }
 
-public:
     ///
     /// \brief Initializes the data structure given vertex positions
     ///
@@ -77,7 +76,6 @@ public:
     virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) override;
 
 // Accessors
-public:
     ///
     /// \brief Sets initial positions from an array
     ///
@@ -132,7 +130,6 @@ public:
     int getMaxNumVertices() const { return m_maxNumVertices; }
 
 // Attributes
-public:
     ///
     /// \brief Set a data array holding some per vertex data
     ///

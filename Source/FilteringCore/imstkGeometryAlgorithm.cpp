@@ -30,26 +30,26 @@ GeometryAlgorithm::setInput(std::shared_ptr<Geometry> inputGeometry, size_t port
 {
     if (m_inputs.count(port) == 0)
     {
-        LOG(WARNING) << "Tried to set input " << port << " on filter with " << m_NumberOfInputPorts << " ports";
+        LOG(WARNING) << "Tried to set input " << port << " on filter with " << m_NumInputPorts << " ports";
     }
 
     m_inputs[port] = inputGeometry;
 }
 
 void
-GeometryAlgorithm::setOutput(std::shared_ptr<Geometry> outputGeometry, size_t port)
+GeometryAlgorithm::setOutput(std::shared_ptr<Geometry> outputGeometry, const size_t port)
 {
     if (m_outputs.count(port) == 0)
     {
-        LOG(WARNING) << "Tried to set output " << port << " on filter with " << m_NumberOfOutputPorts << " ports";
+        LOG(WARNING) << "Tried to set output " << port << " on filter with " << m_NumOutputPorts << " ports";
     }
     m_outputs[port] = outputGeometry;
 }
 
 void
-GeometryAlgorithm::setNumberOfInputPorts(size_t numPorts)
+GeometryAlgorithm::setNumInputPorts(const size_t numPorts)
 {
-    this->m_NumberOfInputPorts = numPorts;
+    this->m_NumInputPorts = numPorts;
     // Add entries in the map for it
     for (size_t i = 0; i < numPorts; i++)
     {
@@ -61,9 +61,9 @@ GeometryAlgorithm::setNumberOfInputPorts(size_t numPorts)
 }
 
 void
-GeometryAlgorithm::setNumberOfOutputPorts(size_t numPorts)
+GeometryAlgorithm::setNumOutputPorts(const size_t numPorts)
 {
-    this->m_NumberOfOutputPorts = numPorts;
+    this->m_NumOutputPorts = numPorts;
     // Add entries in the map for it
     for (size_t i = 0; i < numPorts; i++)
     {

@@ -45,7 +45,6 @@ public:
     ///
     TextureManager() = default;
 
-public:
     ///
     /// \brief Add texture
     ///

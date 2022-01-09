@@ -45,7 +45,7 @@ isIntersect(const double a, const double b, const double c, const double d)
 /// \brief Check if two AABBs are intersecting
 ///
 inline bool
-testAABBToAABB(const double min1_x, const double max1_x,
+testAabbToAabb(const double min1_x, const double max1_x,
                const double min1_y, const double max1_y,
                const double min1_z, const double max1_z,
                const double min2_x, const double max2_x,
@@ -61,7 +61,7 @@ testAABBToAABB(const double min1_x, const double max1_x,
 /// \brief Check if triangle and point are intersecting with AABB test
 ///
 inline bool
-testPointToTriAABB(const double x1, const double y1, const double z1,
+testPointToTriAabb(const double x1, const double y1, const double z1,
                    const double x2, const double y2, const double z2,
                    const double x3, const double y3, const double z3,
                    const double x4, const double y4, const double z4,
@@ -74,7 +74,7 @@ testPointToTriAABB(const double x1, const double y1, const double z1,
     const auto min_z = std::min({ z2, z3, z4 });
     const auto max_z = std::max({ z2, z3, z4 });
 
-    return testAABBToAABB(x1 - prox1, x1 + prox1, y1 - prox1, y1 + prox1,
+    return testAabbToAabb(x1 - prox1, x1 + prox1, y1 - prox1, y1 + prox1,
         z1 - prox1, z1 + prox1, min_x - prox2, max_x + prox2,
         min_y - prox2, max_y + prox2, min_z - prox2, max_z + prox2);
 }
@@ -88,7 +88,7 @@ testPointToTriAABB(const double x1, const double y1, const double z1,
 /// \param prox1 Round-off precision for the test
 /// \param prox2 Round-off precision for the test
 ///
-bool testLineToLineAABB(const double x1, const double y1, const double z1,
+bool testLineToLineAabb(const double x1, const double y1, const double z1,
                         const double x2, const double y2, const double z2,
                         const double x3, const double y3, const double z3,
                         const double x4, const double y4, const double z4,
@@ -104,7 +104,7 @@ bool testLineToLineAABB(const double x1, const double y1, const double z1,
 /// \param prox2 Round-off precision for the test
 ///
 inline bool
-testLineToLineAABB(const Vec3d& p1A, const Vec3d& p1B,
+testLineToLineAabb(const Vec3d& p1A, const Vec3d& p1B,
                    const Vec3d& p2A, const Vec3d& p2B,
                    const double prox1 = VERY_SMALL_EPSILON_D, const double prox2 = VERY_SMALL_EPSILON_D)
 {
@@ -112,7 +112,7 @@ testLineToLineAABB(const Vec3d& p1A, const Vec3d& p1B,
     const double* p1Bptr = &p1B[0];
     const double* p2Aptr = &p2A[0];
     const double* p2Bptr = &p2B[0];
-    return testLineToLineAABB(p1Aptr[0], p1Aptr[1], p1Aptr[2],
+    return testLineToLineAabb(p1Aptr[0], p1Aptr[1], p1Aptr[2],
         p1Bptr[0], p1Bptr[1], p1Bptr[2],
         p2Aptr[0], p2Aptr[1], p2Aptr[2],
         p2Bptr[0], p2Bptr[1], p2Bptr[2],

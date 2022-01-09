@@ -40,7 +40,6 @@ public:
     ConsoleModule(std::string name = "ConsoleModule");
     ~ConsoleModule() override      = default;
 
-public:
     std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const { return m_keyboardDeviceClient; }
 
 protected:
@@ -51,7 +50,6 @@ protected:
     ///
     void updateModule() override;
 
-protected:
     std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;
 };
 }

@@ -52,7 +52,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "TetrahedralMesh"; }
 
-public:
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  tetrahedra connectivity
@@ -91,7 +90,6 @@ public:
     bool isMesh() const override { return true; }
 
 // Accessors
-public:
     ///
     /// \brief set the vector of array of IDs for the mesh
     ///

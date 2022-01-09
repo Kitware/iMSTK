@@ -33,10 +33,10 @@ namespace imstk
 {
 ImageResample::ImageResample()
 {
-    setNumberOfInputPorts(1);
+    setNumInputPorts(1);
     setRequiredInputType<ImageData>(0);
 
-    setNumberOfOutputPorts(1);
+    setNumOutputPorts(1);
     setOutput(std::make_shared<ImageData>());
 }
 

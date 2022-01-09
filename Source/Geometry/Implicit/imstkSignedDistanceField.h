@@ -58,7 +58,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "SignedDistanceField"; }
 
-public:
     ///
     /// \brief Returns signed distance to surface at pos, returns clamped/nearest if out of bounds
     ///

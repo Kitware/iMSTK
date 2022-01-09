@@ -656,7 +656,7 @@ MeshToMeshBruteForceCD::doBroadPhaseCollisionCheck(
     min2 -= m_padding;
     max2 += m_padding;
 
-    return CollisionUtils::testAABBToAABB(
+    return CollisionUtils::testAabbToAabb(
         min1[0], max1[0],
         min1[1], max1[1],
         min1[2], max1[2],

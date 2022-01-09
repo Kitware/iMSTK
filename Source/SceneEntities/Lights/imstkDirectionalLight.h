@@ -43,7 +43,6 @@ public:
 
     virtual ~DirectionalLight() override = default;
 
-public:
     const std::string getTypeName() const override { return "DirectionalLight"; }
 
     ///

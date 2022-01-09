@@ -39,7 +39,6 @@ public:
     PointLight() = default;
     virtual ~PointLight() override = default;
 
-public:
     const std::string getTypeName() const override { return "PointLight"; }
 
     const Vec3d getPosition() const { return m_position; }

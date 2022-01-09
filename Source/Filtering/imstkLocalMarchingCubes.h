@@ -50,7 +50,6 @@ public:
     LocalMarchingCubes();
     virtual ~LocalMarchingCubes() override = default;
 
-public:
     std::shared_ptr<SurfaceMesh> getOutputMesh(const int i) const;
 
     void setInputImage(std::shared_ptr<ImageData> inputImage);

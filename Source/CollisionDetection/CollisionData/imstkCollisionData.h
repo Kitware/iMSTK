@@ -35,7 +35,7 @@ enum class CollisionElementType
     CellVertex,
     CellIndex,
     PointDirection,
-    PointIndexDirection,
+    PointIndexDirection
 };
 
 // iMSTK collision data (not contacts) are broken down into the following:

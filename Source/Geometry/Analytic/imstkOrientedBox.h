@@ -33,8 +33,10 @@ namespace imstk
 class OrientedBox : public AnalyticalGeometry
 {
 public:
-    OrientedBox(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d extents = Vec3d(0.5, 0.5, 0.5), const Quatd& orientation = Quatd::Identity(),
-                const std::string& name = std::string("defaultOrientedBox")) : AnalyticalGeometry(name)
+    OrientedBox(const Vec3d& pos         = Vec3d::Zero(),
+                const Vec3d extents      = Vec3d(0.5, 0.5, 0.5),
+                const Quatd& orientation = Quatd::Identity(),
+                const std::string& name  = std::string("defaultOrientedBox")) : AnalyticalGeometry(name)
     {
         setPosition(pos);
         setOrientation(orientation);
@@ -48,7 +50,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "OrientedBox"; }
 
-public:
     ///
     /// \brief Print the cube info
     ///

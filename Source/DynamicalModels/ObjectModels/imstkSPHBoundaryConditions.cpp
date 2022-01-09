@@ -25,7 +25,7 @@ limitations under the License.
 
 namespace imstk
 {
-SPHBoundaryConditions::SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,
+SphBoundaryConditions::SphBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,
                                              const Vec3d& inletNormal, const StdVectorOfVec3d&, const double inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
                                              StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions) :
     m_inletDomain(inletCoords), m_outletDomain(outletCoords),
@@ -43,7 +43,7 @@ SPHBoundaryConditions::SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoord
 }
 
 bool
-SPHBoundaryConditions::isInInletDomain(const Vec3d& position)
+SphBoundaryConditions::isInInletDomain(const Vec3d& position)
 {
     if (position.x() >= m_inletDomain.first.x() && position.y() >= m_inletDomain.first.y() && position.z() >= m_inletDomain.first.z()
         && position.x() <= m_inletDomain.second.x() && position.y() <= m_inletDomain.second.y() && position.z() <= m_inletDomain.second.z())
@@ -55,7 +55,7 @@ SPHBoundaryConditions::isInInletDomain(const Vec3d& position)
 }
 
 bool
-SPHBoundaryConditions::isInOutletDomain(const Vec3d& position)
+SphBoundaryConditions::isInOutletDomain(const Vec3d& position)
 {
     for (const auto& i : m_outletDomain)
     {
@@ -70,7 +70,7 @@ SPHBoundaryConditions::isInOutletDomain(const Vec3d& position)
 }
 
 bool
-SPHBoundaryConditions::isInFluidDomain(const Vec3d& position)
+SphBoundaryConditions::isInFluidDomain(const Vec3d& position)
 {
     const double error = 0.1;
     if (position.x() >= m_fluidDomain.first.x() - error && position.y() >= m_fluidDomain.first.y() - error && position.z() >= m_fluidDomain.first.z() - error
@@ -86,7 +86,7 @@ SPHBoundaryConditions::isInFluidDomain(const Vec3d& position)
 /// \brief set particle type (fluid, wall, inlet, outlet, buffer)
 ///
 void
-SPHBoundaryConditions::setParticleTypes(const StdVectorOfVec3d& mainParticlePositions, const size_t numWallParticles)
+SphBoundaryConditions::setParticleTypes(const StdVectorOfVec3d& mainParticlePositions, const size_t numWallParticles)
 {
     m_particleTypes.reserve(mainParticlePositions.size() + numWallParticles + m_numBufferParticles);
 
@@ -115,7 +115,7 @@ SPHBoundaryConditions::setParticleTypes(const StdVectorOfVec3d& mainParticlePosi
 }
 
 Vec3d
-SPHBoundaryConditions::computeParabolicInletVelocity(const Vec3d& particlePosition)
+SphBoundaryConditions::computeParabolicInletVelocity(const Vec3d& particlePosition)
 {
     // compute distance of point
     const Vec3d  inletRegionCenterPoint = (Vec3d(1.0, 1.0, 1.0) + m_inletNormal).array() * m_inletCenterPoint.array() + particlePosition.dot(m_inletNormal) * m_inletNormal.array();
@@ -133,20 +133,20 @@ SPHBoundaryConditions::computeParabolicInletVelocity(const Vec3d& particlePositi
 }
 
 void
-SPHBoundaryConditions::addBoundaryParticles(StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions)
+SphBoundaryConditions::addBoundaryParticles(StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions)
 {
     mainParticlePositions.insert(mainParticlePositions.end(), wallParticlePositions.begin(), wallParticlePositions.end());
     mainParticlePositions.insert(mainParticlePositions.end(), m_numBufferParticles, Vec3d(100.0, 0.0, 0.0));
 }
 
 void
-SPHBoundaryConditions::setInletVelocity(const double flowRate)
+SphBoundaryConditions::setInletVelocity(const double flowRate)
 {
     m_inletVelocity = -m_inletNormal * (flowRate / m_inletCrossSectionalArea * 2.0);
 }
 
 Vec3d
-SPHBoundaryConditions::placeParticleAtInlet(const Vec3d& position)
+SphBoundaryConditions::placeParticleAtInlet(const Vec3d& position)
 {
     const Vec3d inletPosition = (Vec3d(1.0, 1.0, 1.0) + m_inletNormal).cwiseProduct(position) - m_inletCenterPoint.cwiseProduct(m_inletNormal);
     return inletPosition;

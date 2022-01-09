@@ -31,7 +31,7 @@ limitations under the License.
 namespace imstk
 {
 // Pbd Collision will be tested before any step of pbd, then resolved after the solve steps of the two objects
-SphObjectCollision::SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::shared_ptr<CollidingObject> obj2,
+SphObjectCollision::SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<CollidingObject> obj2,
                                        std::string cdType) :
     CollisionInteraction("SphObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2)
 {
@@ -43,7 +43,7 @@ SphObjectCollision::SphObjectCollision(std::shared_ptr<SPHObject> obj1, std::sha
     setCollisionDetection(cd);
 
     // Setup the handler
-    std::shared_ptr<SPHCollisionHandling> ch = std::make_shared<SPHCollisionHandling>();
+    std::shared_ptr<SphCollisionHandling> ch = std::make_shared<SphCollisionHandling>();
     ch->setInputObjectA(obj1);
     ch->setInputCollisionData(cd->getCollisionData());
     ch->setDetection(cd);
@@ -62,7 +62,7 @@ SphObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
 {
     CollisionInteraction::initGraphEdges(source, sink);
 
-    auto sphObj1 = std::dynamic_pointer_cast<SPHObject>(m_objA);
+    auto sphObj1 = std::dynamic_pointer_cast<SphObject>(m_objA);
 
     //
     // ...SPH steps...

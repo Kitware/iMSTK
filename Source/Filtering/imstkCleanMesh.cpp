@@ -31,10 +31,10 @@ namespace imstk
 {
 CleanMesh::CleanMesh()
 {
-    setNumberOfInputPorts(1);
+    setNumInputPorts(1);
     setRequiredInputType<SurfaceMesh>(0);
 
-    setNumberOfOutputPorts(1);
+    setNumOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());
 }
 

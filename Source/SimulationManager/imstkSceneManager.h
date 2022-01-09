@@ -45,11 +45,9 @@ public:
         Debug
     };
 
-public:
     SceneManager(std::string name    = "SceneManager");
     virtual ~SceneManager() override = default;
 
-public:
     ///
     /// \brief Get the scene that the scene manager is managing
     ///
@@ -106,7 +104,6 @@ public:
     ///
     void removeScene(std::string name);
 
-public:
     ///
     /// \brief Initialize the thread
     ///

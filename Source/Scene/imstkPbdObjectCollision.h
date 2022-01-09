@@ -43,17 +43,14 @@ public:
                        std::string cdType  = "MeshToMeshBruteForceCD");
     virtual ~PbdObjectCollision() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "PbdObjectCollision"; }
 
-public:
     void setRestitution(const double restitution);
     const double getRestitution() const;
 
     void setFriction(const double friction);
     const double getFriction() const;
 
-public:
     ///
     /// \brief Setup connectivity of task graph
     ///

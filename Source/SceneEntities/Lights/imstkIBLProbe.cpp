@@ -24,7 +24,7 @@
 
 namespace imstk
 {
-IBLProbe::IBLProbe(std::string irradianceCubemapPath,
+IblProbe::IblProbe(std::string irradianceCubemapPath,
                    std::string radianceCubemapPath, std::string brdfLUTPath) :
     m_irradianceCubemapPath(irradianceCubemapPath),
     m_radianceCubemapPath(radianceCubemapPath),
@@ -38,19 +38,19 @@ IBLProbe::IBLProbe(std::string irradianceCubemapPath,
 }
 
 std::shared_ptr<Texture>
-IBLProbe::getIrradianceCubemapTexture()
+IblProbe::getIrradianceCubemapTexture()
 {
     return m_irradianceCubemapTexture;
 }
 
 std::shared_ptr<Texture>
-IBLProbe::getRadianceCubemapTexture()
+IblProbe::getRadianceCubemapTexture()
 {
     return m_radianceCubemapTexture;
 }
 
 std::shared_ptr<Texture>
-IBLProbe::getBrdfLUTTexture()
+IblProbe::getBrdfLUTTexture()
 {
     return m_brdfLUTTexture;
 }

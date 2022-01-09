@@ -39,7 +39,6 @@ class NewtonSolver : public NonLinearSolver<SystemMatrix>
 public:
     using LinearSolverType = LinearSolver<SystemMatrix>;
 
-public:
     ///
     /// \brief Constructors\Destructors
     ///

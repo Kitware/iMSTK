@@ -43,7 +43,6 @@ public:
     ///
     virtual const std::string getTypeName() const = 0;
 
-public:
     ///
     /// \brief Compute the map
     ///

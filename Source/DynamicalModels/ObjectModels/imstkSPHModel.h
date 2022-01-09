@@ -32,22 +32,22 @@ namespace imstk
 class PointSet;
 
 ///
-/// \class SPHModelConfig
+/// \class SphModelConfig
 /// \brief Class that holds the SPH model parameters
 ///
-class SPHModelConfig
+class SphModelConfig
 {
 private:
     void initialize();
 
 public:
-    explicit SPHModelConfig(const double particleRadius);
-    explicit SPHModelConfig(const double particleRadius, const double speedOfSound, const double restDensity);
+    explicit SphModelConfig(const double particleRadius);
+    explicit SphModelConfig(const double particleRadius, const double speedOfSound, const double restDensity);
 
     /// \todo Move this to solver or time integrator in the future
     double m_minTimestep = 1.0e-6;
     double m_maxTimestep = 1.0e-3;
-    double m_CFLFactor   = 1.0;
+    double m_cflFactor   = 1.0;
 
     // particle parameters
     double m_particleRadius    = 0.0;
@@ -85,31 +85,30 @@ public:
     double m_speedOfSound = 18.7;
 
     // neighbor search
-    NeighborSearch::Method m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
+    NeighborSearch::Method m_neighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
 };
 
 ///
 /// \class SPHModel
 /// \brief SPH fluid model
 ///
-class SPHModel : public DynamicalModel<SPHState>
+class SphModel : public DynamicalModel<SphState>
 {
 public:
     ///
     /// \brief Constructor
     ///
-    SPHModel();
+    SphModel();
 
     ///
     /// \brief Destructor
     ///
-    virtual ~SPHModel() override = default;
+    virtual ~SphModel() override = default;
 
-public:
     ///
     /// \brief Set simulation parameters
     ///
-    void configure(const std::shared_ptr<SPHModelConfig>& params) { m_modelParameters = params; }
+    void configure(const std::shared_ptr<SphModelConfig>& params) { m_modelParameters = params; }
 
     ///
     /// \brief Initialize the dynamical model
@@ -124,7 +123,7 @@ public:
     ///
     /// \brief Get the simulation parameters
     ///
-    const std::shared_ptr<SPHModelConfig>& getParameters() const
+    const std::shared_ptr<SphModelConfig>& getParameters() const
     {
         assert(m_modelParameters);
         return m_modelParameters;
@@ -149,7 +148,7 @@ public:
 
     void setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocities);
 
-    double particlePressure(const double density);
+    double getParticlePressure(const double density);
 
     ///
     /// \brief Write the state to external file
@@ -157,8 +156,8 @@ public:
     ///
     void findNearestParticleToVertex(const VecDataArray<double, 3>& points, const std::vector<std::vector<size_t>>& indices);
 
-    void setBoundaryConditions(std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
-    std::shared_ptr<SPHBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }
+    void setBoundaryConditions(std::shared_ptr<SphBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
+    std::shared_ptr<SphBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }
 
     void setRestDensity(const double restDensity) { m_modelParameters->m_restDensity = restDensity; }
 
@@ -270,8 +269,8 @@ private:
     double m_dt = 0.0;                                  ///> time step size
     double m_defaultDt;                                 ///> default time step size
 
-    SPHSimulationKernels m_kernels;                     ///> SPH kernels (must be initialized during model initialization)
-    std::shared_ptr<SPHModelConfig> m_modelParameters;  ///> SPH Model parameters (must be set before simulation)
+    SphSimulationKernels m_kernels;                     ///> SPH kernels (must be initialized during model initialization)
+    std::shared_ptr<SphModelConfig> m_modelParameters;  ///> SPH Model parameters (must be set before simulation)
     std::shared_ptr<NeighborSearch> m_neighborSearcher; ///> Neighbor Search (must be initialized during model initialization)
 
     std::shared_ptr<VecDataArray<double, 3>> m_pressureAccels       = nullptr;
@@ -285,7 +284,7 @@ private:
 
     int m_timeStepCount = 0;
 
-    std::shared_ptr<SPHBoundaryConditions> m_sphBoundaryConditions = nullptr;
+    std::shared_ptr<SphBoundaryConditions> m_sphBoundaryConditions = nullptr;
 
     std::vector<size_t> m_minIndices;
 };

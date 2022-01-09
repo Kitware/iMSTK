@@ -94,12 +94,12 @@ main()
                               // Change view background to black every other frame
                               std::cout << "Displaying with volume material preset: " << currMatId << std::endl;
                               // Query for a volume material preset
-                              std::shared_ptr<VolumeRenderMaterial> volumeMaterial = VolumeRenderMaterialPresets::getPreset(currMatId);
+                              std::shared_ptr<VolumeRenderMaterial> volumeMaterial = VolumeRenderMaterialPresets::getPreset(static_cast<VolumeRenderMaterialPresets::Presets>(currMatId));
                               // Apply the preset to the visual object
                               volumeObj->getVisualModel(0)->setRenderMaterial(volumeMaterial);
 
                               std::ostringstream ss;
-                              ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(currMatId);
+                              ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(static_cast<VolumeRenderMaterialPresets::Presets>(currMatId));
                               statusManager->setCustomStatus(ss.str());
                           }
                       };

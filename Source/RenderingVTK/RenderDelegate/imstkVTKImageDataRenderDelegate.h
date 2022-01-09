@@ -47,7 +47,6 @@ public:
     ///
     virtual ~VTKImageDataRenderDelegate() override = default;
 
-public:
     ///
     /// \brief Update render delegate source based on the internal data
     ///
@@ -64,7 +63,6 @@ protected:
     ///
     void imageScalarsModified(Event* e);
 
-protected:
     std::shared_ptr<AbstractDataArray> m_scalarArray;
     vtkSmartPointer<vtkImageData>      imageDataVtk;
 };

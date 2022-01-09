@@ -52,7 +52,6 @@ protected:
 public:
     virtual ~AbstractVTKViewer() override = default;
 
-public:
     ///
     /// \brief Get the current renderer mode
     ///
@@ -101,7 +100,6 @@ protected:
 
     void uninitModule() override;
 
-protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     vtkSmartPointer<vtkInteractorStyle> m_vtkInteractorStyle;
     vtkSmartPointer<vtkCallbackCommand> exitCallback;

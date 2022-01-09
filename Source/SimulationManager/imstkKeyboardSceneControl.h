@@ -44,7 +44,6 @@ public:
     KeyboardSceneControl(std::shared_ptr<KeyboardDeviceClient> keyDevice);
     virtual ~KeyboardSceneControl() override = default;
 
-public:
     ///
     /// \brief The driver is used to stop the simulation
     ///
@@ -55,7 +54,6 @@ public:
     ///
     void setSceneManager(std::weak_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
 
-public:
     void printControls() override;
 
     void OnKeyPress(const char key) override;

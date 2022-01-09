@@ -52,7 +52,6 @@ public:
     ///
     virtual const std::string getTypeName() const override { return "LineMesh"; }
 
-public:
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  line connectivity
@@ -75,7 +74,6 @@ public:
     bool isMesh() const override { return true; }
 
 // Accessors
-public:
     ///
     /// \brief Get the number of segments/cells
     ///
@@ -98,7 +96,6 @@ public:
     Vec2i& getLineIndices(const size_t pos);
 
 // Attributes
-public:
     ///
     /// \brief Set a data array holding some per cell data
     ///
@@ -136,7 +133,6 @@ protected:
     void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
                                 const int expectedNumComponents, const ScalarTypeId expectedScalarType);
 
-protected:
     std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;   ///> line connectivity
 
     std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> m_cellAttributes;

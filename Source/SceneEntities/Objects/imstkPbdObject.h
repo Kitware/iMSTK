@@ -39,7 +39,6 @@ public:
     PbdObject(const std::string& name) : DynamicObject(name) { }
     virtual ~PbdObject() override = default;
 
-public:
     virtual const std::string getTypeName() const override { return "PbdObject"; }
 
     ///

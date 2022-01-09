@@ -32,49 +32,49 @@
 
 namespace imstk
 {
-CorotationalFEMForceModel::CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp) : InternalForceModel(), m_warp(warp)
+CorotationalFemForceModel::CorotationalFemForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp) : InternalForceModel(), m_warp(warp)
 {
     auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
-    m_corotationalLinearFEM = std::make_shared<vega::CorotationalLinearFEM>(tetMesh.get());
+    m_corotationalLinearFem = std::make_shared<vega::CorotationalLinearFEM>(tetMesh.get());
 }
 
 void
-CorotationalFEMForceModel::getInternalForce(const Vectord& u, Vectord& internalForce)
+CorotationalFemForceModel::getInternalForce(const Vectord& u, Vectord& internalForce)
 {
     double* data = const_cast<double*>(u.data());
-    m_corotationalLinearFEM->ComputeEnergyAndForceAndStiffnessMatrix(data, nullptr, internalForce.data(), nullptr, m_warp);
+    m_corotationalLinearFem->ComputeEnergyAndForceAndStiffnessMatrix(data, nullptr, internalForce.data(), nullptr, m_warp);
 }
 
 void
-CorotationalFEMForceModel::getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
+CorotationalFemForceModel::getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
 {
     double* data = const_cast<double*>(u.data());
-    m_corotationalLinearFEM->ComputeEnergyAndForceAndStiffnessMatrix(data, nullptr, nullptr, m_vegaTangentStiffnessMatrix.get(), m_warp);
+    m_corotationalLinearFem->ComputeEnergyAndForceAndStiffnessMatrix(data, nullptr, nullptr, m_vegaTangentStiffnessMatrix.get(), m_warp);
     InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
 }
 
 void
-CorotationalFEMForceModel::getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
+CorotationalFemForceModel::getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
 {
-    m_corotationalLinearFEM->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
+    m_corotationalLinearFem->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
 }
 
 void
-CorotationalFEMForceModel::getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
+CorotationalFemForceModel::getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
 {
     double* data = const_cast<double*>(u.data());
-    m_corotationalLinearFEM->ComputeEnergyAndForceAndStiffnessMatrix(data, nullptr, internalForce.data(), m_vegaTangentStiffnessMatrix.get(), m_warp);
+    m_corotationalLinearFem->ComputeEnergyAndForceAndStiffnessMatrix(data, nullptr, internalForce.data(), m_vegaTangentStiffnessMatrix.get(), m_warp);
     InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
 }
 
 void
-CorotationalFEMForceModel::setWarp(const int warp)
+CorotationalFemForceModel::setWarp(const int warp)
 {
     m_warp = warp;
 }
 
 void
-CorotationalFEMForceModel::setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K)
+CorotationalFemForceModel::setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K)
 {
     m_vegaTangentStiffnessMatrix = K;
 }

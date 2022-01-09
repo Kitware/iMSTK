@@ -43,7 +43,6 @@ public:
     VTKViewer(std::string name = "VTKViewer");
     ~VTKViewer() override      = default;
 
-public:
     ///
     /// \brief Set the rendering mode. In debug, debug actors will be shown.
     ///
@@ -97,7 +96,6 @@ protected:
 
     void updateModule() override;
 
-protected:
     std::chrono::high_resolution_clock::time_point m_pre;           ///> time point pre-rendering
     std::chrono::high_resolution_clock::time_point m_post;          ///> time point post-rendering
     std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///> time point for last framerate display update

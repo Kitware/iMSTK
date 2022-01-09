@@ -137,7 +137,6 @@ public:
     ///
     virtual ~PbdModel() override = default;
 
-public:
     ///
     /// \brief Set simulation parameters
     ///
@@ -235,21 +234,18 @@ protected:
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-protected:
-    size_t m_partitionThreshold = 16;                                                     ///> Threshold for constraint partitioning
+    size_t m_partitionThreshold = 16;                                                 ///> Threshold for constraint partitioning
 
-    std::shared_ptr<PbdSolver> m_pbdSolver       = nullptr;                               ///> PBD solver
-    std::shared_ptr<PointSet>  m_mesh            = nullptr;                               ///> PointSet on which the pbd model operates on
-    std::shared_ptr<DataArray<double>> m_mass    = nullptr;                               ///> Mass of nodes
-    std::shared_ptr<DataArray<double>> m_invMass = nullptr;                               ///> Inverse of mass of nodes
-    std::shared_ptr<std::unordered_map<size_t, double>> m_fixedNodeInvMass = nullptr;     ///> Map for archiving fixed nodes' mass.
+    std::shared_ptr<PbdSolver> m_pbdSolver       = nullptr;                           ///> PBD solver
+    std::shared_ptr<PointSet>  m_mesh            = nullptr;                           ///> PointSet on which the pbd model operates on
+    std::shared_ptr<DataArray<double>> m_mass    = nullptr;                           ///> Mass of nodes
+    std::shared_ptr<DataArray<double>> m_invMass = nullptr;                           ///> Inverse of mass of nodes
+    std::shared_ptr<std::unordered_map<size_t, double>> m_fixedNodeInvMass = nullptr; ///> Map for archiving fixed nodes' mass.
 
-    std::shared_ptr<PbdModelConfig> m_config = nullptr;                                   ///> Model parameters, must be set before simulation
+    std::shared_ptr<PbdModelConfig> m_config = nullptr;                               ///> Model parameters, must be set before simulation
 
-protected:
-    std::shared_ptr<PbdConstraintContainer> m_constraints;         ///> The set of constraints to update/use
+    std::shared_ptr<PbdConstraintContainer> m_constraints;                            ///> The set of constraints to update/use
 
-protected:
     // Computational Nodes
     std::shared_ptr<TaskNode> m_integrationPositionNode = nullptr;
     std::shared_ptr<TaskNode> m_solveConstraintsNode    = nullptr;

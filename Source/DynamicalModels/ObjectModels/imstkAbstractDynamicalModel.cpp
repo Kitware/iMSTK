@@ -26,7 +26,7 @@
 namespace imstk
 {
 AbstractDynamicalModel::AbstractDynamicalModel(DynamicalModelType type) :
-    m_type(type), m_numDOF(0), m_taskGraph(std::make_shared<TaskGraph>("AbstractDynamicalModel_Source", "AbstractDynamicalModel_Sink"))
+    m_type(type), m_numDof(0), m_taskGraph(std::make_shared<TaskGraph>("AbstractDynamicalModel_Source", "AbstractDynamicalModel_Sink"))
 {
 }
 
