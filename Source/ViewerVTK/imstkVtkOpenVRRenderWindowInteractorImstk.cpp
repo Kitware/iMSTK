@@ -21,7 +21,7 @@
 #include "vtkOpenGLState.h"
 #include "vtkOpenVROverlay.h"
 #include "vtkOpenVRRenderWindow.h"
-#include "imstkVtkOpenVRRenderWindowInteractor2.h"
+#include "imstkVtkOpenVRRenderWindowInteractorImstk.h"
 #include "vtkRendererCollection.h"
 #include "vtkVRRenderWindow.h"
 
@@ -38,16 +38,16 @@
 #include "vtkTransform.h"
 #include <vtksys/SystemTools.hxx>
 
-vtkStandardNewMacro(vtkOpenVRRenderWindowInteractor2);
+vtkStandardNewMacro(vtkOpenVRRenderWindowInteractorImstk);
 
-void (*vtkOpenVRRenderWindowInteractor2::ClassExitMethod)(void*) = (void (*)(void*)) nullptr;
-void* vtkOpenVRRenderWindowInteractor2::ClassExitMethodArg = (void*)nullptr;
-void (*vtkOpenVRRenderWindowInteractor2::ClassExitMethodArgDelete)(
+void (*vtkOpenVRRenderWindowInteractorImstk::ClassExitMethod)(void*) = (void (*)(void*)) nullptr;
+void* vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArg = (void*)nullptr;
+void (*vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArgDelete)(
     void*) = (void (*)(void*)) nullptr;
 
 //------------------------------------------------------------------------------
 // Construct object so that light follows camera motion.
-vtkOpenVRRenderWindowInteractor2::vtkOpenVRRenderWindowInteractor2()
+vtkOpenVRRenderWindowInteractorImstk::vtkOpenVRRenderWindowInteractorImstk()
 {
     vtkNew<vtkOpenVRInteractorStyle> style;
     this->SetInteractorStyle(style);
@@ -61,34 +61,34 @@ vtkOpenVRRenderWindowInteractor2::vtkOpenVRRenderWindowInteractor2()
 }
 
 //------------------------------------------------------------------------------
-vtkOpenVRRenderWindowInteractor2::~vtkOpenVRRenderWindowInteractor2() = default;
+vtkOpenVRRenderWindowInteractorImstk::~vtkOpenVRRenderWindowInteractorImstk() = default;
 
-void vtkOpenVRRenderWindowInteractor2::SetPhysicalScale(double scale)
+void vtkOpenVRRenderWindowInteractorImstk::SetPhysicalScale(double scale)
 {
     vtkVRRenderWindow* win = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
     win->SetPhysicalScale(scale);
 }
 
-double vtkOpenVRRenderWindowInteractor2::GetPhysicalScale()
+double vtkOpenVRRenderWindowInteractorImstk::GetPhysicalScale()
 {
     vtkVRRenderWindow* win = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
     return win->GetPhysicalScale();
 }
 
-void vtkOpenVRRenderWindowInteractor2::SetPhysicalTranslation(
+void vtkOpenVRRenderWindowInteractorImstk::SetPhysicalTranslation(
     vtkCamera*, double t1, double t2, double t3)
 {
     vtkVRRenderWindow* win = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
     win->SetPhysicalTranslation(t1, t2, t3);
 }
 
-double* vtkOpenVRRenderWindowInteractor2::GetPhysicalTranslation(vtkCamera*)
+double* vtkOpenVRRenderWindowInteractorImstk::GetPhysicalTranslation(vtkCamera*)
 {
     vtkVRRenderWindow* win = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
     return win->GetPhysicalTranslation();
 }
 
-void vtkOpenVRRenderWindowInteractor2::ConvertOpenVRPoseToMatrices(
+void vtkOpenVRRenderWindowInteractorImstk::ConvertOpenVRPoseToMatrices(
     const vr::TrackedDevicePose_t & tdPose, vtkMatrix4x4 * poseMatrixWorld,
     vtkMatrix4x4 * poseMatrixPhysical /*=nullptr*/)
 {
@@ -119,7 +119,7 @@ void vtkOpenVRRenderWindowInteractor2::ConvertOpenVRPoseToMatrices(
     }
 }
 
-void vtkOpenVRRenderWindowInteractor2::ConvertPoseToWorldCoordinates(
+void vtkOpenVRRenderWindowInteractorImstk::ConvertPoseToWorldCoordinates(
     const vr::TrackedDevicePose_t & tdPose,
     double pos[3],  // Output world position
     double wxyz[4], // Output world orientation quaternion
@@ -132,7 +132,7 @@ void vtkOpenVRRenderWindowInteractor2::ConvertPoseToWorldCoordinates(
         tdPose.mDeviceToAbsoluteTracking.m, pos, wxyz, ppos, wdir);
 }
 
-void vtkOpenVRRenderWindowInteractor2::ConvertPoseMatrixToWorldCoordinates(
+void vtkOpenVRRenderWindowInteractorImstk::ConvertPoseMatrixToWorldCoordinates(
     const float poseMatrix[3][4],
     double pos[3],  // Output world position
     double wxyz[4], // Output world orientation quaternion
@@ -243,7 +243,7 @@ bool GetDigitalActionState(
 }
 
 //------------------------------------------------------------------------------
-void vtkOpenVRRenderWindowInteractor2::StartEventLoop()
+void vtkOpenVRRenderWindowInteractorImstk::StartEventLoop()
 {
     this->StartedMessageLoop = 1;
     this->Done = false;
@@ -258,7 +258,7 @@ void vtkOpenVRRenderWindowInteractor2::StartEventLoop()
     }
 }
 
-void vtkOpenVRRenderWindowInteractor2::ProcessEvents()
+void vtkOpenVRRenderWindowInteractorImstk::ProcessEvents()
 {
     vtkOpenVRRenderWindow* renWin = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
 
@@ -266,7 +266,7 @@ void vtkOpenVRRenderWindowInteractor2::ProcessEvents()
     this->DoOneEvent(renWin, ren, true);
 }
 
-void vtkOpenVRRenderWindowInteractor2::DoOneEvent(vtkOpenVRRenderWindow* renWin, vtkRenderer* ren, bool doRender)
+void vtkOpenVRRenderWindowInteractorImstk::DoOneEvent(vtkOpenVRRenderWindow* renWin, vtkRenderer* ren, bool doRender)
 {
     if (!renWin || !ren)
     {
@@ -354,7 +354,7 @@ void vtkOpenVRRenderWindowInteractor2::DoOneEvent(vtkOpenVRRenderWindow* renWin,
         actionSet.ulActionSet = this->ActionsetVTK;
         vr::VRInput()->UpdateActionState(&actionSet, sizeof(actionSet), 1);
 
-        for (int tracker = 0; tracker < vtkOpenVRRenderWindowInteractor2::NumberOfTrackers; tracker++)
+        for (int tracker = 0; tracker < vtkOpenVRRenderWindowInteractorImstk::NumberOfTrackers; tracker++)
         {
             vr::InputOriginInfo_t originInfo;
             vr::EVRInputError evriError = vr::VRInput()->GetOriginTrackedDeviceInfo(
@@ -534,7 +534,7 @@ void vtkOpenVRRenderWindowInteractor2::DoOneEvent(vtkOpenVRRenderWindow* renWin,
     }
 }
 
-void vtkOpenVRRenderWindowInteractor2::HandleGripEvents(vtkEventData * ed)
+void vtkOpenVRRenderWindowInteractorImstk::HandleGripEvents(vtkEventData * ed)
 {
     vtkEventDataDevice3D* edata = ed->GetAsEventDataDevice3D();
     if (!edata)
@@ -592,7 +592,7 @@ void vtkOpenVRRenderWindowInteractor2::HandleGripEvents(vtkEventData * ed)
 }
 
 //------------------------------------------------------------------------------
-void vtkOpenVRRenderWindowInteractor2::RecognizeComplexGesture(vtkEventDataDevice3D*)
+void vtkOpenVRRenderWindowInteractorImstk::RecognizeComplexGesture(vtkEventDataDevice3D*)
 {
     // Recognize gesture only if one button is pressed per controller
     int lhand = static_cast<int>(vtkEventDataDevice::LeftController);
@@ -729,7 +729,7 @@ void vtkOpenVRRenderWindowInteractor2::RecognizeComplexGesture(vtkEventDataDevic
 }
 
 //------------------------------------------------------------------------------
-void vtkOpenVRRenderWindowInteractor2::AddAction(
+void vtkOpenVRRenderWindowInteractorImstk::AddAction(
     std::string path, vtkCommand::EventIds eid, bool isAnalog)
 {
     auto& am = this->ActionMap[path];
@@ -744,7 +744,7 @@ void vtkOpenVRRenderWindowInteractor2::AddAction(
     }
 }
 
-void vtkOpenVRRenderWindowInteractor2::AddAction(
+void vtkOpenVRRenderWindowInteractorImstk::AddAction(
     std::string path, bool isAnalog, std::function<void(vtkEventData*)> func)
 {
     auto& am = this->ActionMap[path];
@@ -758,7 +758,7 @@ void vtkOpenVRRenderWindowInteractor2::AddAction(
 }
 
 //------------------------------------------------------------------------------
-void vtkOpenVRRenderWindowInteractor2::Initialize()
+void vtkOpenVRRenderWindowInteractorImstk::Initialize()
 {
     // make sure we have a RenderWindow and camera
     if (!this->RenderWindow)
@@ -810,7 +810,7 @@ void vtkOpenVRRenderWindowInteractor2::Initialize()
 }
 
 //------------------------------------------------------------------------------
-int vtkOpenVRRenderWindowInteractor2::InternalCreateTimer(
+int vtkOpenVRRenderWindowInteractorImstk::InternalCreateTimer(
     int vtkNotUsed(timerId), int vtkNotUsed(timerType), unsigned long vtkNotUsed(duration))
 {
     // todo
@@ -818,7 +818,7 @@ int vtkOpenVRRenderWindowInteractor2::InternalCreateTimer(
 }
 
 //------------------------------------------------------------------------------
-int vtkOpenVRRenderWindowInteractor2::InternalDestroyTimer(int vtkNotUsed(platformTimerId))
+int vtkOpenVRRenderWindowInteractorImstk::InternalDestroyTimer(int vtkNotUsed(platformTimerId))
 {
     // todo
     return 0;
@@ -827,20 +827,20 @@ int vtkOpenVRRenderWindowInteractor2::InternalDestroyTimer(int vtkNotUsed(platfo
 //------------------------------------------------------------------------------
 // Specify the default function to be called when an interactor needs to exit.
 // This callback is overridden by an instance ExitMethod that is defined.
-void vtkOpenVRRenderWindowInteractor2::SetClassExitMethod(void (*f)(void*), void* arg)
+void vtkOpenVRRenderWindowInteractorImstk::SetClassExitMethod(void (*f)(void*), void* arg)
 {
-    if (f != vtkOpenVRRenderWindowInteractor2::ClassExitMethod ||
-        arg != vtkOpenVRRenderWindowInteractor2::ClassExitMethodArg)
+    if (f != vtkOpenVRRenderWindowInteractorImstk::ClassExitMethod ||
+        arg != vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArg)
     {
         // delete the current arg if there is a delete method
-        if ((vtkOpenVRRenderWindowInteractor2::ClassExitMethodArg) &&
-            (vtkOpenVRRenderWindowInteractor2::ClassExitMethodArgDelete))
+        if ((vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArg) &&
+            (vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArgDelete))
         {
-            (*vtkOpenVRRenderWindowInteractor2::ClassExitMethodArgDelete)(
-                vtkOpenVRRenderWindowInteractor2::ClassExitMethodArg);
+            (*vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArgDelete)(
+                vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArg);
         }
-        vtkOpenVRRenderWindowInteractor2::ClassExitMethod = f;
-        vtkOpenVRRenderWindowInteractor2::ClassExitMethodArg = arg;
+        vtkOpenVRRenderWindowInteractorImstk::ClassExitMethod = f;
+        vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArg = arg;
 
         // no call to this->Modified() since this is a class member function
     }
@@ -848,41 +848,41 @@ void vtkOpenVRRenderWindowInteractor2::SetClassExitMethod(void (*f)(void*), void
 
 //------------------------------------------------------------------------------
 // Set the arg delete method.  This is used to free user memory.
-void vtkOpenVRRenderWindowInteractor2::SetClassExitMethodArgDelete(void (*f)(void*))
+void vtkOpenVRRenderWindowInteractorImstk::SetClassExitMethodArgDelete(void (*f)(void*))
 {
-    if (f != vtkOpenVRRenderWindowInteractor2::ClassExitMethodArgDelete)
+    if (f != vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArgDelete)
     {
-        vtkOpenVRRenderWindowInteractor2::ClassExitMethodArgDelete = f;
+        vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArgDelete = f;
 
         // no call to this->Modified() since this is a class member function
     }
 }
 
 //------------------------------------------------------------------------------
-void vtkOpenVRRenderWindowInteractor2::PrintSelf(ostream & os, vtkIndent indent)
+void vtkOpenVRRenderWindowInteractorImstk::PrintSelf(ostream & os, vtkIndent indent)
 {
     this->Superclass::PrintSelf(os, indent);
     os << indent << "StartedMessageLoop: " << this->StartedMessageLoop << endl;
 }
 
 //------------------------------------------------------------------------------
-void vtkOpenVRRenderWindowInteractor2::ExitCallback()
+void vtkOpenVRRenderWindowInteractorImstk::ExitCallback()
 {
     if (this->HasObserver(vtkCommand::ExitEvent))
     {
         this->InvokeEvent(vtkCommand::ExitEvent, nullptr);
     }
-    else if (vtkOpenVRRenderWindowInteractor2::ClassExitMethod)
+    else if (vtkOpenVRRenderWindowInteractorImstk::ClassExitMethod)
     {
-        (*vtkOpenVRRenderWindowInteractor2::ClassExitMethod)(
-            vtkOpenVRRenderWindowInteractor2::ClassExitMethodArg);
+        (*vtkOpenVRRenderWindowInteractorImstk::ClassExitMethod)(
+            vtkOpenVRRenderWindowInteractorImstk::ClassExitMethodArg);
     }
 
     this->TerminateApp();
 }
 
 //------------------------------------------------------------------------------
-vtkEventDataDevice vtkOpenVRRenderWindowInteractor2::GetPointerDevice()
+vtkEventDataDevice vtkOpenVRRenderWindowInteractorImstk::GetPointerDevice()
 {
     if (this->PointerIndex == 0)
     {
@@ -896,7 +896,7 @@ vtkEventDataDevice vtkOpenVRRenderWindowInteractor2::GetPointerDevice()
 }
 
 //------------------------------------------------------------------------------
-void vtkOpenVRRenderWindowInteractor2::GetStartingPhysicalToWorldMatrix(
+void vtkOpenVRRenderWindowInteractorImstk::GetStartingPhysicalToWorldMatrix(
     vtkMatrix4x4 * startingPhysicalToWorldMatrix)
 {
     if (!startingPhysicalToWorldMatrix)

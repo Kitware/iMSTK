@@ -17,11 +17,13 @@
  * @brief   implements OpenVR specific functions
  * required by vtkOpenVRRenderWindowInteractor2.
  *
- *
+ * Note: This class was introduced by iMSTK fixing the DoOneEvent to allow
+ * processing of VR events without render calls. Please remove this class
+ * when fixed in VTK
  */
 
-#ifndef vtkOpenVRRenderWindowInteractor2_h
-#define vtkOpenVRRenderWindowInteractor2_h
+#ifndef vtkOpenVRRenderWindowInteractorImstk_h
+#define vtkOpenVRRenderWindowInteractorImstk_h
 
 #include "vtkEventData.h" // for ivar
 #include "vtkNew.h"       // ivars
@@ -38,15 +40,15 @@ class vtkMatrix4x4;
 class vtkOpenVROverlay;
 class vtkOpenVRRenderWindow;
 
-class vtkOpenVRRenderWindowInteractor2 : public vtkRenderWindowInteractor3D
+class vtkOpenVRRenderWindowInteractorImstk : public vtkRenderWindowInteractor3D
 {
 public:
     /**
      * Construct object so that light follows camera motion.
      */
-    static vtkOpenVRRenderWindowInteractor2* New();
+    static vtkOpenVRRenderWindowInteractorImstk* New();
 
-    vtkTypeMacro(vtkOpenVRRenderWindowInteractor2, vtkRenderWindowInteractor3D);
+    vtkTypeMacro(vtkOpenVRRenderWindowInteractorImstk, vtkRenderWindowInteractor3D);
     void PrintSelf(ostream& os, vtkIndent indent);
 
     /**
@@ -161,8 +163,8 @@ public:
     ///@}
 
 protected:
-    vtkOpenVRRenderWindowInteractor2();
-    ~vtkOpenVRRenderWindowInteractor2() override;
+    vtkOpenVRRenderWindowInteractorImstk();
+    ~vtkOpenVRRenderWindowInteractorImstk() override;
 
     ///@{
     /**
@@ -240,8 +242,8 @@ protected:
     void HandleGripEvents(vtkEventData* ed);
 
 private:
-    vtkOpenVRRenderWindowInteractor2(const vtkOpenVRRenderWindowInteractor2&) = delete;
-    void operator=(const vtkOpenVRRenderWindowInteractor2&) = delete;
+    vtkOpenVRRenderWindowInteractorImstk(const vtkOpenVRRenderWindowInteractorImstk&) = delete;
+    void operator=(const vtkOpenVRRenderWindowInteractorImstk&) = delete;
 };
 
 #endif

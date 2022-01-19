@@ -28,9 +28,8 @@
 #include "imstkVTKInteractorStyleVR.h"
 #include "imstkVTKRenderer.h"
 
-#include "imstkVtkOpenVRRenderWindowInteractor2.h"
+#include "imstkVtkOpenVRRenderWindowInteractorImstk.h"
 
-//#include <vtkOpenVRRenderWindowInteractor.h>
 #include <vtkMatrix4x4.h>
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRRenderWindow.h>
@@ -45,7 +44,7 @@ VTKOpenVRViewer::VTKOpenVRViewer(std::string name) : AbstractVTKViewer(name)
     m_vtkInteractorStyle = vrInteractorStyle;
 
     // Create the interactor
-    auto iren = vtkSmartPointer<vtkOpenVRRenderWindowInteractor2>::New();
+    auto iren = vtkSmartPointer<vtkOpenVRRenderWindowInteractorImstk>::New();
     iren->SetInteractorStyle(m_vtkInteractorStyle);
 
     // Create the RenderWindow
@@ -149,7 +148,7 @@ void
 VTKOpenVRViewer::processEvents()
 {
     // Custom call to only process input events, do not perform a render
-    auto iren = vtkOpenVRRenderWindowInteractor2::SafeDownCast(m_vtkRenderWindow->GetInteractor());
+    auto iren = vtkOpenVRRenderWindowInteractorImstk::SafeDownCast(m_vtkRenderWindow->GetInteractor());
     auto ren = std::dynamic_pointer_cast<imstk::VTKRenderer>(getActiveRenderer());
     iren->DoOneEvent(vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow), ren->getVtkRenderer(), false);
 
@@ -170,7 +169,7 @@ VTKOpenVRViewer::initModule()
 
     // VR interactor doesn't support timers, here we throw timer event every update
     // another option would be to conform VTKs VR interactor
-    auto iren = vtkOpenVRRenderWindowInteractor2::SafeDownCast(m_vtkRenderWindow->GetInteractor());
+    auto iren = vtkOpenVRRenderWindowInteractorImstk::SafeDownCast(m_vtkRenderWindow->GetInteractor());
     //iren->Start(); // Cannot use
     if (iren->HasObserver(vtkCommand::StartEvent))
     {
