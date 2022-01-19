@@ -149,7 +149,7 @@ VTKOpenVRViewer::processEvents()
 {
     // Custom call to only process input events, do not perform a render
     auto iren = vtkOpenVRRenderWindowInteractorImstk::SafeDownCast(m_vtkRenderWindow->GetInteractor());
-    auto ren = std::dynamic_pointer_cast<imstk::VTKRenderer>(getActiveRenderer());
+    auto ren  = std::dynamic_pointer_cast<imstk::VTKRenderer>(getActiveRenderer());
     iren->DoOneEvent(vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow), ren->getVtkRenderer(), false);
 
     // Update all controls

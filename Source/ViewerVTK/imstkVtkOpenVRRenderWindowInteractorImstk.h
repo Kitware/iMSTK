@@ -25,8 +25,8 @@
 #ifndef vtkOpenVRRenderWindowInteractorImstk_h
 #define vtkOpenVRRenderWindowInteractorImstk_h
 
-#include "vtkEventData.h" // for ivar
-#include "vtkNew.h"       // ivars
+#include "vtkEventData.h"             // for ivar
+#include "vtkNew.h"                   // ivars
 #include "vtkRenderWindowInteractor3D.h"
 #include "vtkRenderingOpenVRModule.h" // For export macro
 #include <functional>                 // for ivar
@@ -63,8 +63,8 @@ public:
      * provided as a means to control how an interactor is exited given
      * the various language bindings (Win32, etc.).
      */
-    static void SetClassExitMethod(void (*f)(void*), void* arg);
-    static void SetClassExitMethodArgDelete(void (*f)(void*));
+    static void SetClassExitMethod(void (* f)(void*), void* arg);
+    static void SetClassExitMethodArgDelete(void (* f)(void*));
     ///@}
 
     /**
@@ -110,7 +110,7 @@ public:
      * \param poseMatrixWorld    Optional output pose matrix in world frame
      */
     void ConvertOpenVRPoseToMatrices(const vr::TrackedDevicePose_t& tdPose,
-        vtkMatrix4x4* poseMatrixWorld, vtkMatrix4x4* poseMatrixPhysical = nullptr);
+                                     vtkMatrix4x4* poseMatrixWorld, vtkMatrix4x4* poseMatrixPhysical = nullptr);
 
     /*
      * Convert a device pose to a world coordinate position and orientation
@@ -120,7 +120,7 @@ public:
      * \param wdir Output world view direction (-Z)
      */
     void ConvertPoseToWorldCoordinates(const vr::TrackedDevicePose_t& tdPose, double pos[3],
-        double wxyz[4], double ppos[3], double wdir[3]);
+                                       double wxyz[4], double ppos[3], double wdir[3]);
     void ConvertPoseMatrixToWorldCoordinates(
         const float poseMatrix[3][4], double pos[3], double wxyz[4], double ppos[3], double wdir[3]);
 
@@ -128,12 +128,12 @@ public:
     /**
      * Get the latest touchpad or joystick position for a device
      */
-     // void GetTouchPadPosition(vtkEventDataDevice, vtkEventDataDeviceInput, float[3]) override;
-     ///@}
+    // void GetTouchPadPosition(vtkEventDataDevice, vtkEventDataDeviceInput, float[3]) override;
+    ///@}
 
-     /*
-      * Return starting physical to world matrix
-      */
+    /*
+     * Return starting physical to world matrix
+     */
     void GetStartingPhysicalToWorldMatrix(vtkMatrix4x4* startingPhysicalToWorldMatrix);
 
     ///@{
@@ -160,7 +160,7 @@ public:
      */
     vtkGetMacro(ActionSetName, std::string);
     vtkSetMacro(ActionSetName, std::string);
-    ///@}
+///@}
 
 protected:
     vtkOpenVRRenderWindowInteractorImstk();
@@ -172,8 +172,8 @@ protected:
      * (used to set different exit methods for various language bindings,
      * i.e. java, Win32)
      */
-    static void (*ClassExitMethod)(void*);
-    static void (*ClassExitMethodArgDelete)(void*);
+    static void  (* ClassExitMethod)(void*);
+    static void  (* ClassExitMethodArgDelete)(void*);
     static void* ClassExitMethodArg;
     ///@}
 
@@ -212,7 +212,7 @@ protected:
         vtkCommand::EventIds EventId;
         std::function<void(vtkEventData*)> Function;
         bool UseFunction = false;
-        bool IsAnalog = false;
+        bool IsAnalog    = false;
     };
 
     std::map<std::string, ActionData> ActionMap;

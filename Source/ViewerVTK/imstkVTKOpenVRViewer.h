@@ -79,7 +79,7 @@ public:
     ///
     /// \brief VTKOpenVRViewer overrides to provide a non-rendering
     /// event processing loop (to deal with vsync blockage)
-    /// 
+    ///
     void processEvents() override;
 
 protected:
