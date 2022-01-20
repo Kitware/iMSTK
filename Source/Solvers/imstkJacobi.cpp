@@ -130,4 +130,4 @@ Jacobi::print() const
     LOG(INFO) << "Tolerance: " << m_tolerance;
     LOG(INFO) << "max. iterations: " << m_maxIterations;
 }
-}
+} // namespace imstk

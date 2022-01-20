@@ -108,4 +108,4 @@ protected:
 private:
     std::shared_ptr<VecDataArray<double, 3>> m_childVerts;
 };
-}
+} // namespace imstk

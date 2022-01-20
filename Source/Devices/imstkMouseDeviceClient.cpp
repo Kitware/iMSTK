@@ -28,4 +28,4 @@ MouseDeviceClient::New()
 {
     return std::shared_ptr<MouseDeviceClient>(new MouseDeviceClient());
 }
-}
+} // namespace imstk

@@ -90,4 +90,4 @@ protected:
     //
     static size_t numElemNodes(const ElemType& elType);
 };
-}
+} // namespace imstk

@@ -85,4 +85,4 @@ protected:
     vtkSmartPointer<vtkDataArray>   m_mappedCellScalarArray;   ///> Mapped array of scalars
     vtkSmartPointer<vtkCellArray>   m_cellArray;               ///> Array of cells
 };
-}
+} // namespace imstk

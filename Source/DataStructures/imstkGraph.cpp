@@ -231,4 +231,4 @@ Graph::doColoringGreedy(bool print /*= false*/) const
 
     return std::make_pair(colors, numColors);
 }
-}
+} // namespace imstk

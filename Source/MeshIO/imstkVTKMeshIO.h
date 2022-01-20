@@ -131,4 +131,4 @@ protected:
     ///
     static bool writeMetaImageData(std::shared_ptr<ImageData> imageData, const std::string& filePath);
 };
-}
+} // namespace imstk

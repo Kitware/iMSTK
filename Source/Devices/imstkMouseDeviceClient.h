@@ -179,4 +179,4 @@ protected:
     Vec2d m_prevPos;
     Vec2d m_pos;
 };
-}
+} // namespace imstk

@@ -924,4 +924,4 @@ TaskGraph::getCriticalPath(std::shared_ptr<TaskGraph> graph)
     results.push_front(graph->getSource());
     return results;
 }
-}
+} // namespace imstk

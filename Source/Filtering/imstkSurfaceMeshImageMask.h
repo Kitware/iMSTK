@@ -77,4 +77,4 @@ private:
     int   m_BorderExtent  = 1;
     bool  m_CheckManifold = true;
 };
-}
+} // namespace imstk

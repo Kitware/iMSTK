@@ -165,4 +165,4 @@ private:
     size_t m_NumInputPorts  = 1;
     size_t m_NumOutputPorts = 1;
 };
-}
+} // namespace imstk

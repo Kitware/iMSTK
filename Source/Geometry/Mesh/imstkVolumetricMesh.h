@@ -45,4 +45,4 @@ public:
 protected:
     VolumetricMesh(const std::string& name = std::string("")) : PointSet(name) {}
 };
-}
+} // namespace imstk

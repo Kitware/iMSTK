@@ -216,4 +216,4 @@ VTKTetrahedralMeshRenderDelegate::setIndexBuffer(std::shared_ptr<VecDataArray<in
     m_cellArray->Modified();
     m_mesh->Modified();
 }
-}
+} // namespace imstk

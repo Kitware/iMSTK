@@ -46,4 +46,4 @@ public:
 protected:
     vtkSmartPointer<vtkPlaneSource> m_planeSource;
 };
-}
+} // namespace imstk

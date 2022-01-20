@@ -49,4 +49,4 @@ public:
 protected:
     Vec3d m_position = Vec3d::Zero();
 };
-}
+} // namespace imstk

@@ -104,4 +104,4 @@ protected:
     ///
     bool isKeyDown(const char key) const;
 };
-}
+} // namespace imstk

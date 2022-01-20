@@ -196,4 +196,4 @@ PbdPickingCH::generatePBDConstraints(const std::vector<CollisionElement>& elemen
         }
     }
 }
-}
+} // namespace imstk

@@ -75,7 +75,7 @@
 %shared_ptr(imstk::PbdObject)
 %shared_ptr(imstk::PbdModelConfig)
 %shared_ptr(imstk::PbdCollisionConstraintConfig)
-%shared_ptr(imstk::PbdFEMConstraintConfig)
+%shared_ptr(imstk::PbdFemConstraintConfig)
 %shared_ptr(imstk::PbdSolver)
 %shared_ptr(imstk::FeDeformBodyState)
 %shared_ptr(imstk::FemModelConfig)

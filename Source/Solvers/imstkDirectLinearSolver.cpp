@@ -99,4 +99,4 @@ DirectLinearSolver<Matrixd>::solve(Vectord& x)
     auto b = m_linearSystem->getRHSVector();
     x = m_solver.solve(b);
 }
-}
+} // namespace imstk

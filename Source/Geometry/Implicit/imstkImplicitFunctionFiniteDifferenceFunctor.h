@@ -296,4 +296,4 @@ struct ImplicitStructuredCurvature
     protected:
         Vec3i m_dxi;
 };
-}
+} // namespace imstk

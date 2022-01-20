@@ -196,4 +196,4 @@ ConjugateGradient::solve(Vectord& x, const double tolerance)
     this->setTolerance(tolerance);
     this->solve(x);
 }
-}
+} // namespace imstk

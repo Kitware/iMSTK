@@ -101,4 +101,4 @@ protected:
     std::shared_ptr<TaskNode> m_collisionHandleBNode        = nullptr;
     std::shared_ptr<TaskNode> m_collisionGeometryUpdateNode = nullptr;
 };
-}
+} // namespace imstk

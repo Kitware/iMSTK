@@ -49,4 +49,4 @@ public:
 protected:
     vtkSmartPointer<vtkCapsuleSource> m_capsuleSource;
 };
-}
+} // namespace imstk

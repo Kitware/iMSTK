@@ -219,4 +219,4 @@ protected:
 
     bool m_debugActorsVisible;
 };
-}
+} // namespace imstk

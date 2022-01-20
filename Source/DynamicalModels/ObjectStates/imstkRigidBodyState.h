@@ -75,4 +75,4 @@ private:
 
     // Can add linear velocity and angular velocity too.
 };
-}
+} // namespace imstk

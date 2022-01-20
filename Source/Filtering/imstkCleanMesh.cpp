@@ -90,4 +90,4 @@ CleanMesh::requestUpdate()
         setOutput(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));
     }
 }
-}
+} // namespace imstk

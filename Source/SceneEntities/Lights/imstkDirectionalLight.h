@@ -50,4 +50,4 @@ public:
     void setDirection(const double x, const double y, const double z) { setFocalPoint(Vec3d(x, y, z)); }
     ///@}
 };
-}
+} // namespace imstk

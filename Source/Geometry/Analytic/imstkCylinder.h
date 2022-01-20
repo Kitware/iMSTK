@@ -96,4 +96,4 @@ protected:
     mutable double m_radiusPostTransform = 1.0; ///> Radius of the cylinder oncee transform applied
     mutable double m_lengthPostTransform = 1.0; ///> Length of the cylinder onc transform applied
 };
-}
+} // namespace imstk

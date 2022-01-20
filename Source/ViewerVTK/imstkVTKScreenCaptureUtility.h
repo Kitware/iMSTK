@@ -54,4 +54,4 @@ protected:
     vtkSmartPointer<vtkPNGWriter> m_pngWriter; //> using vtk's png writer to save the screenshots
     vtkRenderWindow* m_renderWindow;           //> render window whose screen shot will be taken
 };
-}
+} // namespace imstk

@@ -151,4 +151,4 @@ SphBoundaryConditions::placeParticleAtInlet(const Vec3d& position)
     const Vec3d inletPosition = (Vec3d(1.0, 1.0, 1.0) + m_inletNormal).cwiseProduct(position) - m_inletCenterPoint.cwiseProduct(m_inletNormal);
     return inletPosition;
 }
-}
+} // namespace imstk

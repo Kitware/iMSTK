@@ -165,4 +165,4 @@ protected:
     std::shared_ptr<ViewerConfig> m_config;
     int m_infoLevel = 0; ///> Info level
 };
-}
+} // namespace imstk

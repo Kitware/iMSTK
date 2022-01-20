@@ -128,4 +128,4 @@ Capsule::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(pa
     min = p1.cwiseMin(p2);
     max = p1.cwiseMax(p2);
 }
-}
+} // namespace imstk

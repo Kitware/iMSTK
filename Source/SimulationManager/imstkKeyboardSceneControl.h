@@ -64,4 +64,4 @@ protected:
     std::weak_ptr<ModuleDriver> m_driver;
     std::weak_ptr<SceneManager> m_sceneManager;
 };
-}
+} // namespace imstk

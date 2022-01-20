@@ -72,4 +72,4 @@ OpenVRDeviceClient::emitButtonRelease(const int buttonId)
         this->postEvent(ButtonEvent(OpenVRDeviceClient::buttonStateChanged(), buttonId, BUTTON_RELEASED));
     }
 }
-}
+} // namespace imstk

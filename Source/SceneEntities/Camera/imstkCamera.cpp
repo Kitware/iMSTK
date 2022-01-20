@@ -30,4 +30,4 @@ Camera::print()
     std::cout << "FocalPoint: " << m_focalPoint[0] << ", " << m_focalPoint[1] << ", " << m_focalPoint[2] << std::endl;
     std::cout << "Up: " << m_viewUp[0] << ", " << m_viewUp[1] << ", " << m_viewUp[2] << std::endl;
 }
-}
+} // namespace imstk

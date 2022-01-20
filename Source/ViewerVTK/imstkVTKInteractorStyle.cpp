@@ -115,4 +115,4 @@ VTKInteractorStyle::OnMouseWheelBackward()
     // \todo: VTK provides no scroll amount?
     m_mouseDeviceClient->emitScroll(0.2);
 }
-}
+} // namespace imstk

@@ -88,7 +88,7 @@ struct hash<EdgePair>
         return (k.edgeAId ^ (k.edgeBId << 16));
     }
 };
-}
+} // namespace std
 
 namespace imstk
 {
@@ -227,4 +227,4 @@ SurfaceMeshToSurfaceMeshCD::computeCollisionDataAB(
         }
     }
 }
-}
+} // namespace imstk

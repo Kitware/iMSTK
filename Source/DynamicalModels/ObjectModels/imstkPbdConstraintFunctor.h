@@ -740,4 +740,4 @@ struct PbdConstantDensityConstraintFunctor : public PbdConstraintFunctor
     protected:
         double m_stiffness = 0.0;
 };
-}
+} // namespace imstk

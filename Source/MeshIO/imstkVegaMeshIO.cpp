@@ -199,4 +199,4 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
         return nullptr;
     }
 }
-}
+} // namespace imstk

@@ -105,4 +105,4 @@ protected:
     vtkSmartPointer<vtkCallbackCommand> exitCallback;
     bool m_useVsync = true;
 };
-}
+} // namespace imstk

@@ -68,4 +68,4 @@ protected:
     std::shared_ptr<StateType> m_currentState;  ///> Current state
     std::shared_ptr<StateType> m_previousState; ///> Previous state
 };
-}
+} // namespace imstk

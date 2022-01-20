@@ -111,4 +111,4 @@ protected:
 
     std::weak_ptr<TextureManager<VTKTextureDelegate>> m_textureManager;
 };
-}
+} // namespace imstk

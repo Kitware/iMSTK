@@ -435,4 +435,4 @@ RigidBodyCH::addConstraint(
         addConstraint(rbdObjB, contactPt, -contactNormal, contactDepth);
     }
 }
-}
+} // namespace imstk

@@ -164,4 +164,4 @@ PbdRigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::s
         m_taskGraph->addEdge(m_pbdCollisionSolveNode, rbdObj->getRigidBodyModel2()->getIntegrateNode());
     }
 }
-}
+} // namespace imstk

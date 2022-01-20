@@ -348,4 +348,4 @@ protected:
 
     bool m_renderPointsAsSpheres = false;
 };
-}
+} // namespace imstk

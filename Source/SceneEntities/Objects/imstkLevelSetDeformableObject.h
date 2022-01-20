@@ -54,4 +54,4 @@ public:
 protected:
     std::shared_ptr<LevelSetModel> m_levelSetModel = nullptr; ///> LevelSet mathematical model
 };
-}
+} // namespace imstk

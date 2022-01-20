@@ -112,4 +112,4 @@ protected:
 
     std::vector<Vec3d> m_dcdx;
 };
-}
+} // namespace imstk

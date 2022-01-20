@@ -201,4 +201,4 @@ RigidObjectLevelSetCollision::measureDisplacementFromPrevious()
             });
     }
 }
-}
+} // namespace imstk

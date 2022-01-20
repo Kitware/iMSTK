@@ -138,4 +138,4 @@ SceneManager::removeScene(std::string name)
         m_sceneMap.erase(name);
     }
 }
-}
+} // namespace imstk

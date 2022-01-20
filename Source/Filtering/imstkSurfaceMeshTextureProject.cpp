@@ -203,4 +203,4 @@ SurfaceMeshTextureProject::requestUpdate()
         outputTexCoords[i] = val;
     }
 }
-}
+} // namespace imstk

@@ -122,4 +122,4 @@ PbdObjectPicking::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_p
     m_taskGraph->addEdge(pickingObj->getUpdateGeometryNode(), m_pickingNode);
     m_taskGraph->addEdge(m_pickingNode, pickingObj->getTaskGraph()->getSink());
 }
-}
+} // namespace imstk

@@ -175,4 +175,4 @@ Color operator-=(const Color& color_rhs, const double intensity_lhs);
 ///
 bool operator==(const Color& color_lhs, const Color& color_rhs);
 bool operator!=(const Color& color_lhs, const Color& color_rhs);
-}
+} // namespace imstk

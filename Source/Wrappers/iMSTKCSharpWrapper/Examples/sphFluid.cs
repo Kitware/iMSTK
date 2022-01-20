@@ -19,7 +19,7 @@ public class PbdCloth
 
         Scene scene = new Scene("SPH Fluid");
 
-        SPHObject fluidObj = generateFluid(particleRadius);
+        SphObject fluidObj = generateFluid(particleRadius);
         CollidingObject[] solids = generateSolids(scene);
         scene.addSceneObject(fluidObj);
         for (int i = 0; i < solids.Length; i++)
@@ -57,7 +57,7 @@ public class PbdCloth
                 (KeyEvent e) =>
                 {
                     statusManager.setCustomStatus(
-                        "Number of particles: " + fluidObj.getSPHModel().getCurrentState().getNumParticles().ToString() +
+                        "Number of particles: " + fluidObj.getSphModel().getCurrentState().getNumParticles().ToString() +
                         "\nNumber of Solids: " + solids.Length);
                 });
 
@@ -86,7 +86,7 @@ public class PbdCloth
         }
     }
 
-    public static SPHObject generateFluid(double particleRadius)
+    public static SphObject generateFluid(double particleRadius)
     {
         VecDataArray3d particles = new VecDataArray3d();
         switch (SCENE_ID)
@@ -111,7 +111,7 @@ public class PbdCloth
         geometry.initialize(particles);
 
         // Create a fluids object
-        SPHObject fluidObj = new SPHObject("Sphere");
+        SphObject fluidObj = new SphObject("Sphere");
 
         // Create a visual model
         VisualModel visualModel = new VisualModel(geometry);
@@ -131,11 +131,11 @@ public class PbdCloth
         visualModel.setRenderMaterial(material);
 
         // Create a physics model
-        SPHModel sphModel = new SPHModel();
+        SphModel sphModel = new SphModel();
         sphModel.setModelGeometry(geometry);
 
         // Configure model
-        SPHModelConfig sphParams = new SPHModelConfig(particleRadius);
+        SphModelConfig sphParams = new SphModelConfig(particleRadius);
         sphParams.m_bNormalizeDensity = true;
         if (SCENE_ID == 2)   // highly viscous fluid
         {

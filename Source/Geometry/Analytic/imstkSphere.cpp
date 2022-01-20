@@ -98,4 +98,4 @@ Sphere::updatePostTransformData() const
     m_radiusPostTransform = s0 * m_radius;
     m_transformApplied    = true;
 }
-}
+} // namespace imstk

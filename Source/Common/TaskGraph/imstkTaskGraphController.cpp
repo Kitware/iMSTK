@@ -45,4 +45,4 @@ TaskGraphController::initialize()
     init();
     return true;
 }
-}
+} // namespace imstk

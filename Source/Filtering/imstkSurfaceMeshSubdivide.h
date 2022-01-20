@@ -64,4 +64,4 @@ private:
     Type m_SubdivisionType      = Type::LINEAR;
     int  m_NumberOfSubdivisions = 1;
 };
-}
+} // namespace imstk

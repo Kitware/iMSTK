@@ -125,4 +125,4 @@ protected:
 
     void updatePostTransformData() const override {}
 };
-}
+} // namespace imstk

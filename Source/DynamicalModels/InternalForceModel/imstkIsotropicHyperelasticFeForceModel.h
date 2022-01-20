@@ -100,4 +100,4 @@ protected:
     std::shared_ptr<vega::IsotropicMaterial> m_isotropicMaterial;               ///>
     std::shared_ptr<vega::SparseMatrix>      m_vegaTangentStiffnessMatrix;      ///>
 };
-}
+} // namespace imstk

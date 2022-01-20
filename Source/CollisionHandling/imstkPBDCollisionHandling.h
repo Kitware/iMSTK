@@ -135,4 +135,4 @@ private:
     double m_restitution = 0.0; ///> Coefficient of restitution (1.0 = perfect elastic, 0.0 = inelastic)
     double m_friction    = 0.1; ///> Coefficient of friction (1.0 = full frictional force, 0.0 = none)
 };
-}
+} // namespace imstk

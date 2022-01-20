@@ -47,4 +47,4 @@ public:
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 };
-}
+} // namespace imstk

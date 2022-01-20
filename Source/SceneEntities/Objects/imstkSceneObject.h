@@ -157,4 +157,4 @@ private:
     std::shared_ptr<TaskNode> m_updateNode = nullptr;
     std::shared_ptr<TaskNode> m_updateGeometryNode = nullptr;
 };
-}
+} // namespace imstk

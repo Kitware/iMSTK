@@ -46,4 +46,4 @@ public:
 protected:
     vtkSmartPointer<vtkCylinderSource> m_cylinderSource;
 };
-}
+} // namespace imstk

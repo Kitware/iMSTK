@@ -58,4 +58,4 @@ public:
         double& c,
         std::vector<Vec3d>& dcdx) const override;
 };
-}
+} // namespace imstk

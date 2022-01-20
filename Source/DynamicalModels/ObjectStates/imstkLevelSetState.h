@@ -52,4 +52,4 @@ public:
     ///
     void setState(std::shared_ptr<LevelSetState> rhs) {}
 };
-}
+} // namespace imstk

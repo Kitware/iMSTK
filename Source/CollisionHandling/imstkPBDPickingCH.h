@@ -89,4 +89,4 @@ private:
 
     std::vector<std::shared_ptr<PbdPointPointConstraint>> m_constraints; ///> List of PBD constraints
 };
-}
+} // namespace imstk

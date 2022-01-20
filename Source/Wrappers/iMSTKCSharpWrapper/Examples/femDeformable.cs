@@ -118,8 +118,8 @@ public class FeDeformable
         // surfMesh.flipNormals();
 
         // Configure dynamic model
-        FEMDeformableBodyModel dynaModel = new FEMDeformableBodyModel();
-        FEMModelConfig config = new FEMModelConfig();
+        FemDeformableBodyModel dynaModel = new FemDeformableBodyModel();
+        FemModelConfig config = new FemModelConfig();
         config.m_fixedNodeIds = input.fixedNodeIds;
         dynaModel.configure(config);
         //dynaModel.configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");

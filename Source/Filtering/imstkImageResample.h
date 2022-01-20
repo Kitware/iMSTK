@@ -53,4 +53,4 @@ protected:
 private:
     Vec3i m_Dimensions;
 };
-}
+} // namespace imstk

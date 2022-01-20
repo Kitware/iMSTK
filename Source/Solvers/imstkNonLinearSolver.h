@@ -140,4 +140,4 @@ protected:
     UpdateIterateType m_updateIterate;                                ///< Update iteration function
     bool m_isSemiImplicit = false;                                    ///> Semi-Implicit solver
 };
-}
+} // namespace imstk

@@ -72,7 +72,7 @@ case typeN: { using IMSTK_TT = type; call; }; break
              (std::is_same<templateType, double>::value ? IMSTK_DOUBLE :             \
               (std::is_same<templateType, long long>::value ? IMSTK_LONG_LONG :      \
                (std::is_same<templateType, unsigned long long>::value ? IMSTK_UNSIGNED_LONG_LONG : 0))))))))))))
-}
+} // namespace imstk
 
 // See https://www.fluentcpp.com/2019/08/30/how-to-disable-a-warning-in-cpp/
 // When adding new warnings remember to add the DISABLE_ macro

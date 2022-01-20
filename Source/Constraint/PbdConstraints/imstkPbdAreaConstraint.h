@@ -60,4 +60,4 @@ public:
 public:
     double m_restArea = 0.;  ///> Area at the rest position
 };
-}
+} // namespace imstk

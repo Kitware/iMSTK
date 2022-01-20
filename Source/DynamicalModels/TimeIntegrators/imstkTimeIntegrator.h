@@ -83,4 +83,4 @@ protected:
     double m_dT;   ///> Delta T
     double m_defaultDt;
 };
-}
+} // namespace imstk

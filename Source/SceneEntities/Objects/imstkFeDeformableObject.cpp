@@ -47,4 +47,4 @@ FeDeformableObject::getFEMModel()
     m_femModel = std::dynamic_pointer_cast<FemDeformableBodyModel>(m_dynamicalModel);
     return m_femModel;
 }
-}
+} // namespace imstk

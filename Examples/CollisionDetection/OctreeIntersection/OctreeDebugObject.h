@@ -64,4 +64,4 @@ protected:
     int  m_maxDisplayDepth; ///> Maximum level of nodes that will be rendered during debug rendering
     bool m_drawNonEmptyParents;
 };
-}
+} // namespace imstk

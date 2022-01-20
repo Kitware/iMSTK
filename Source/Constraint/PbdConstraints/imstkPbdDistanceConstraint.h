@@ -60,4 +60,4 @@ public:
 public:
     double m_restLength = 0.0; ///> Rest length between the nodes
 };
-}
+} // namespace imstk

@@ -37,7 +37,7 @@ VecDataArray<double, 3> doubleArray = {
 
 DataArray<int>    intScalars    = { 1, 2, 3, 4 };
 DataArray<double> doubleScalars = { 1.0, 2.0, 3.0, 4.0 };
-}
+} // namespace
 
 TEST(imstkImageDataTest, Cast)
 {

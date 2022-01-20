@@ -85,4 +85,4 @@ protected:
     double m_stiffness = 5.0e5; ///> Stiffness of contact
     double m_damping   = 0.5;   ///> Damping of the contact
 };
-}
+} // namespace imstk

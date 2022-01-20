@@ -244,4 +244,4 @@ protected:
     std::shared_ptr<TaskNode> m_solveConstraintsNode    = nullptr;
     std::shared_ptr<TaskNode> m_updateVelocityNode      = nullptr;
 };
-}
+} // namespace imstk

@@ -163,4 +163,4 @@ VTKFluidRenderDelegate::updateRenderProperties()
     mapper->SetRefractiveIndex(1.5f);
     mapper->SetRefractionScale(0.07f);
 }
-}
+} // namespace imstk

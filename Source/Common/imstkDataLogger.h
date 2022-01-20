@@ -115,4 +115,4 @@ private:
     std::thread m_thread;
     std::condition_variable m_condition;
 };
-}
+} // namespace imstk

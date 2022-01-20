@@ -275,5 +275,5 @@ std::vector<size_t> reorderConnectivity(const std::vector<NeighborContainer>& ne
 ///
 template<typename ElemConn>
 std::vector<size_t> reorderConnectivity(const std::vector<ElemConn>& conn, const size_t numVerts, const MeshNodeRenumberingStrategy& method = MeshNodeRenumberingStrategy::ReverseCuthillMckee);
-}
-}
+} // namespace GeometryUtils
+} // namespace imstk

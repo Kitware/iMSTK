@@ -33,7 +33,7 @@ namespace imstk
 namespace ParallelUtils
 {
 class SpinLock;
-}
+} // namespace ParallelUtils
 
 ///
 /// \class Geometry
@@ -220,4 +220,4 @@ protected:
 
     Mat4d m_transform;                      ///> Transformation matrix
 };
-}
+} // namespace imstk

@@ -188,4 +188,4 @@ VTKHexahedralMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
     }
     m_mappedVertexArray->Modified();
 }
-}
+} // namespace imstk

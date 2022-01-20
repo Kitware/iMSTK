@@ -139,4 +139,4 @@ PbdObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
         m_taskGraph->addEdge(m_collisionDetectionNode, obj2->getTaskGraph()->getSink());
     }
 }
-}
+} // namespace imstk

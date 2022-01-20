@@ -51,4 +51,4 @@ public:
         std::vector<CollisionElement>& elementsA,
         std::vector<CollisionElement>& elementsB) override;
 };
-}
+} // namespace imstk

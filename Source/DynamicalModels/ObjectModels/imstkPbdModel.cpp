@@ -416,4 +416,4 @@ PbdModel::updateVelocity()
             }, m_mesh->getNumVertices() > 50);
     }
 }
-}
+} // namespace imstk

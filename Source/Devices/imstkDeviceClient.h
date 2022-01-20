@@ -185,4 +185,4 @@ protected:
     ParallelUtils::SpinLock m_forceLock;        /// > Used for devices filling data from other threads
     mutable ParallelUtils::SpinLock m_dataLock; /// > Used for button and analog data
 };
-}
+} // namespace imstk

@@ -35,4 +35,4 @@ class TbbTaskGraphController : public TaskGraphController
 public:
     void execute() override;
 };
-};
+}; // namespace imstk

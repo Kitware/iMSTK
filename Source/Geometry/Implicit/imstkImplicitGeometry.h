@@ -44,4 +44,4 @@ public:
     ///
     virtual double getFunctionValue(const Vec3d& pos) const = 0;
 };
-}
+} // namespace imstk

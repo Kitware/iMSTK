@@ -60,4 +60,4 @@ KeyboardControl::keyReleaseEvent(KeyEvent* keyPressEvent)
 {
     OnKeyRelease(keyPressEvent->m_key);
 }
-}
+} // namespace imstk

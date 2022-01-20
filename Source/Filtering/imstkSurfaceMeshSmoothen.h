@@ -72,4 +72,4 @@ private:
     bool   m_FeatureEdgeSmoothing = false;
     bool   m_BoundarySmoothing    = true;
 };
-}
+} // namespace imstk

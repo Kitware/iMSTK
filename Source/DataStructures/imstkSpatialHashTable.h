@@ -50,4 +50,4 @@ protected:
 
     double m_cellSize[3];
 };
-}
+} // namespace imstk

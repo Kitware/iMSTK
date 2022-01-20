@@ -190,4 +190,4 @@ PbdConstraintContainer::partitionConstraints(const int partitionedThreshold)
             << constraintGraph.size() << std::endl;
     }*/
 }
-}
+} // namespace imstk

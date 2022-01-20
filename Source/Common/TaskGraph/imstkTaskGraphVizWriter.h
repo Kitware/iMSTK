@@ -84,4 +84,4 @@ private:
     bool m_writeNodeComputeTimesColor = false;
     bool m_writeNodeComputeTimesText  = false;
 };
-}
+} // namespace imstk

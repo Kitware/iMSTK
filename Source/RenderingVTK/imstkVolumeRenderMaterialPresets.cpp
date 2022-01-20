@@ -974,4 +974,4 @@ VolumeRenderMaterialPresets::getPresetName(Presets p)
     };
     return presets[static_cast<int>(p)];
 }
-}
+} // namespace imstk

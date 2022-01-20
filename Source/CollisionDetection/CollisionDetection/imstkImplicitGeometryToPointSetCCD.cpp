@@ -386,4 +386,4 @@ ImplicitGeometryToPointSetCCD::computeCollisionDataB(
         }
     }
 }
-}
+} // namespace imstk

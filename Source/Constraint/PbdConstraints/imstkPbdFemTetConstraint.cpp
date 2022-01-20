@@ -179,4 +179,4 @@ PbdFemTetConstraint::computeValueAndGradient(
 
     return true;
 }
-}
+} // namespace imstk

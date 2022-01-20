@@ -216,4 +216,4 @@ VTKPointSetRenderDelegate::setVertexScalarBuffer(std::shared_ptr<AbstractDataArr
         static_cast<vtkIdType>(m_vertexScalars->size()), 1);
     m_mappedVertexScalarArray->Modified();
 }
-}
+} // namespace imstk

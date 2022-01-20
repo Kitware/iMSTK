@@ -195,7 +195,7 @@ protected:
     // Use interpolation when texturing?
     bool m_interpolation = true;
 };
-}
+} // namespace imstk
 
 namespace std
 {
@@ -236,4 +236,4 @@ template<> struct less<std::shared_ptr<imstk::Texture>>
         return false;
     }
 };
-}
+} // namespace std

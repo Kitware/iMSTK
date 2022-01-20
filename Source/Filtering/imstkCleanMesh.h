@@ -76,4 +76,4 @@ private:
     double m_AbsoluteTolerance = 1.0;
     bool   m_UseAbsolute       = false;
 };
-}
+} // namespace imstk

@@ -126,4 +126,4 @@ ImageDistanceTransform::requestUpdate()
 
     setOutput(GeometryUtils::copyToImageData(addImageFilter->GetOutput()));
 }
-}
+} // namespace imstk

@@ -129,4 +129,4 @@ GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, 
             }
     });
 }
-}
+} // namespace imstk

@@ -59,4 +59,4 @@ protected:
     std::shared_ptr<AbstractDataArray> m_scalarArray;
     vtkSmartPointer<vtkImageData>      imageDataVtk;
 };
-}
+} // namespace imstk

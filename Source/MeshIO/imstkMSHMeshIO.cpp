@@ -414,4 +414,4 @@ MshMeshIO::read(const std::string& filePath, const MeshFileType meshType)
         return nullptr;
     }
 }
-}
+} // namespace imstk

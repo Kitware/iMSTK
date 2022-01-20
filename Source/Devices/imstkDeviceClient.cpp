@@ -107,4 +107,4 @@ DeviceClient::getAnalog() const
     m_dataLock.unlock();
     return result;
 }
-}
+} // namespace imstk

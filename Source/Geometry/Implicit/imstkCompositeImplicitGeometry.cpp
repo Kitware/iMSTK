@@ -47,4 +47,4 @@ CompositeImplicitGeometry::getFunctionValue(const Vec3d& pos) const
     }
     return distA;
 }
-}
+} // namespace imstk

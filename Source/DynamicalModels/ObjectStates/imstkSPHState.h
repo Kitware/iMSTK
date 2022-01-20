@@ -153,4 +153,4 @@ private:
     std::vector<std::vector<size_t>>       m_boundaryParticleNeighborLists; ///>  store a list of boundary particle neighbors for each particle, updated each time step
     std::vector<std::vector<NeighborInfo>> m_neighborInfo;                  ///>  store a list of Vec4d(Vec3d(relative position), density) for neighbors, including boundary particle
 };
-}
+} // namespace imstk

@@ -114,4 +114,4 @@ protected:
     // If 1.0, completely resist normal movement
     double m_normalFriction = 0.0;
 };
-}
+} // namespace imstk

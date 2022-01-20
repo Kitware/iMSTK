@@ -121,4 +121,4 @@ protected:
     bool   m_muteUpdateEvents     = false;                   // Avoid posting pre/post update, useful when running modules at extremely fast rates
     double m_sleepDelay = 0.0;                               // ms sleep for the module, useful for throttling some modules
 };
-}
+} // namespace imstk

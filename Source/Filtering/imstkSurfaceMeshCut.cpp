@@ -667,4 +667,4 @@ SurfaceMeshCut::pointProjectionInSurface(const Vec3d& pt, std::shared_ptr<Surfac
     }
     return inSurface;
 }
-}
+} // namespace imstk

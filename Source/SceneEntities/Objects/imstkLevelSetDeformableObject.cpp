@@ -48,4 +48,4 @@ LevelSetDeformableObject::initialize()
 
     return true;
 }
-}
+} // namespace imstk

@@ -556,4 +556,4 @@ VTKSurfaceMeshRenderDelegate::initializeTextures()
         currentUnit++;
     }
 }
-}
+} // namespace imstk

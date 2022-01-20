@@ -136,4 +136,4 @@ protected:
     size_t m_originalNumLines = 0;
     size_t m_maxNumLines      = 0;
 };
-}
+} // namespace imstk

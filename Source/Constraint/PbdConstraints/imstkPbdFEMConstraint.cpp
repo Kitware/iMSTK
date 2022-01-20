@@ -33,4 +33,4 @@ PbdFemConstraint::PbdFemConstraint(const unsigned int cardinality,
     m_vertexIds.resize(cardinality);
     m_dcdx.resize(cardinality);
 }
-}
+} // namespace imstk

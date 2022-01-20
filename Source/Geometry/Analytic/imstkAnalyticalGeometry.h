@@ -92,4 +92,4 @@ protected:
     Quatd m_orientation;                      ///> orientation
     mutable Quatd m_orientationPostTransform; ///> orientation once transform is applied
 };
-}
+} // namespace imstk

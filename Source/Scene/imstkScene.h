@@ -298,4 +298,4 @@ protected:
 
     std::atomic<bool> m_resetRequested = ATOMIC_VAR_INIT(false);
 };
-}
+} // namespace imstk

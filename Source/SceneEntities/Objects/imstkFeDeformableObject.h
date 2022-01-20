@@ -51,4 +51,4 @@ public:
 protected:
     std::shared_ptr<FemDeformableBodyModel> m_femModel = nullptr;
 };
-}
+} // namespace imstk

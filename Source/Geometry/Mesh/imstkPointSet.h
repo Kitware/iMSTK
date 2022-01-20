@@ -217,4 +217,4 @@ protected:
     int    m_maxNumVertices      = 0;
     int    m_originalNumVertices = 0;
 };
-}
+} // namespace imstk

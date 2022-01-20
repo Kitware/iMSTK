@@ -225,4 +225,4 @@ RigidObjectCollision::measureDisplacementFromPrevious()
             });
     }
 }
-}
+} // namespace imstk

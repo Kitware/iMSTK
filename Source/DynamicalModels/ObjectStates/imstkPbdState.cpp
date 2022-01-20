@@ -32,4 +32,4 @@ PbdState::setState(std::shared_ptr<PbdState> rhs)
 
     m_pos->postModified();
 }
-}
+} // namespace imstk

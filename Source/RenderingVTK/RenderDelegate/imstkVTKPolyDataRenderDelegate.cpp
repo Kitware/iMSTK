@@ -171,4 +171,4 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
 
     m_actor->SetVisibility(m_visualModel->isVisible() ? 1 : 0);
 }
-}
+} // namespace imstk

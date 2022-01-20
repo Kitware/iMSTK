@@ -91,4 +91,4 @@ IterativeLinearSolver::solve(Vectord& imstkNotUsed(x))
     }
     */
 }
-}
+} // namespace imstk

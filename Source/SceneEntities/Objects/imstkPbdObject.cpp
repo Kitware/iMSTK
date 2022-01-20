@@ -46,4 +46,4 @@ PbdObject::initialize()
 
     return true;
 }
-}
+} // namespace imstk

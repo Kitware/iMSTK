@@ -114,4 +114,4 @@ GeometryAlgorithm::areInputsValid()
     }
     return true;
 }
-}
+} // namespace imstk

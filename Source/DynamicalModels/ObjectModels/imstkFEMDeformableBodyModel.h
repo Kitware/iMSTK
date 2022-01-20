@@ -31,7 +31,7 @@
 namespace vega
 {
 class VolumetricMesh;
-}
+} // namespace vega
 
 namespace imstk
 {
@@ -337,4 +337,4 @@ protected:
 private:
     std::shared_ptr<TaskNode> m_solveNode = nullptr;
 };
-}
+} // namespace imstk

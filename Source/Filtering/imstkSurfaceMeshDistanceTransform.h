@@ -100,4 +100,4 @@ private:
     bool m_NarrowBanded = false;
     int  m_DilateSize   = 4; ///< Only for narrow banded
 };
-}
+} // namespace imstk

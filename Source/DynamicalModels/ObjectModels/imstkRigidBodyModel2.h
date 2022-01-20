@@ -147,4 +147,4 @@ protected:
 
     Eigen::VectorXd F;               // Reaction forces
 };
-}
+} // namespace imstk

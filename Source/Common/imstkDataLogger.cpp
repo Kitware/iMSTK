@@ -178,4 +178,4 @@ DataLogger::shutdown()
     m_condition.wait(ul, [this] { return !m_changed; });
     ul.unlock();
 }
-}
+} // namespace imstk

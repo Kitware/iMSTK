@@ -107,4 +107,4 @@ private:
     void operator=(const imstkNew<T>&) = delete;
     std::shared_ptr<T> object;
 };
-}
+} // namespace imstk

@@ -93,4 +93,4 @@ public:
 protected:
     std::shared_ptr<VecDataArray<int, 8>> m_hexahedraIndices;   ///< indices of the hexahedra
 };
-}
+} // namespace imstk

@@ -64,4 +64,4 @@ public:
 protected:
     std::shared_ptr<AnimationModel> m_animationModel;
 };
-}
+} // namespace imstk

@@ -535,4 +535,4 @@ disconnect(EventObject* sender, std::shared_ptr<EventObject> reciever, std::stri
 #ifdef WIN32
 #pragma warning(pop)
 #endif
-}
+} // namespace imstk

@@ -86,4 +86,4 @@ public:
 protected:
     std::unordered_map<int, bool> m_buttons;
 };
-}
+} // namespace imstk

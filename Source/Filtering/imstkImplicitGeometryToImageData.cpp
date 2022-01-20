@@ -90,4 +90,4 @@ ImplicitGeometryToImageData::requestUpdate()
 
     setOutput(outputImage);
 }
-}
+} // namespace imstk

@@ -51,4 +51,4 @@ public:
 protected:
     double m_spotAngle = 45.0;
 };
-}
+} // namespace imstk

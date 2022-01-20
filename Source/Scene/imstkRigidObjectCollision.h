@@ -64,4 +64,4 @@ protected:
     std::shared_ptr<TaskNode> m_copyVertToPrevNode      = nullptr;
     std::shared_ptr<TaskNode> m_computeDisplacementNode = nullptr;
 };
-}
+} // namespace imstk

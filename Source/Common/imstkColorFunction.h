@@ -71,4 +71,4 @@ protected:
     Vec2d      m_range;
     ColorSpace m_colorSpace;
 };
-}
+} // namespace imstk

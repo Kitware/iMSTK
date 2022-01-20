@@ -38,4 +38,4 @@ ConsoleModule::updateModule()
     m_keyboardDeviceClient->emitKeyDown(c);
     m_keyboardDeviceClient->emitKeyUp(c);
 }
-}
+} // namespace imstk

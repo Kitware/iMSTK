@@ -34,4 +34,4 @@ VolumeRenderMaterial::getVolumeProperty()
 {
     return this->m_property;
 }
-}
+} // namespace imstk

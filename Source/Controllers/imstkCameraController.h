@@ -53,4 +53,4 @@ public:
 protected:
     std::shared_ptr<Camera> m_camera; ///< Camera controlled by the external device
 };
-}
+} // namespace imstk

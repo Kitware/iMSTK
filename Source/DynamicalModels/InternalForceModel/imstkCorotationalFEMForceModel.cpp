@@ -78,4 +78,4 @@ CorotationalFemForceModel::setTangentStiffness(std::shared_ptr<vega::SparseMatri
 {
     m_vegaTangentStiffnessMatrix = K;
 }
-}
+} // namespace imstk

@@ -123,4 +123,4 @@ private:
     Eigen::Matrix<Scalar, -1, 1> m_x;      ///> Results
     Eigen::SparseMatrix<Scalar>* m_A = nullptr;
 };
-}
+} // namespace imstk

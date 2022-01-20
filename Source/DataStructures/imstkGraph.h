@@ -91,4 +91,4 @@ protected:
     std::vector<edgeType> m_adjList;    ///< A array of std::vectors to represent adjacency list
     ColoringMethod m_ColoringMethod = ColoringMethod::WelshPowell;
 };
-}
+} // namespace imstk

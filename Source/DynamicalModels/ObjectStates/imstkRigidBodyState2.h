@@ -113,4 +113,4 @@ private:
 
     std::vector<bool> m_isStatic;
 };
-}
+} // namespace imstk

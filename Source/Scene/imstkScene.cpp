@@ -560,4 +560,4 @@ Scene::unlockComputeTimes()
 {
     m_computeTimesLock->unlock();
 }
-}
+} // namespace imstk

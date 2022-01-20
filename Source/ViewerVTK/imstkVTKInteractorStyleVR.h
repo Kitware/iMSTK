@@ -25,7 +25,7 @@
 namespace imstk
 {
 class OpenVRDeviceClient;
-}
+} // namespace imstk
 
 ///
 /// \class vtkInteractorStyleVR

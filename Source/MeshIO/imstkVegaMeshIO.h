@@ -28,7 +28,7 @@
 namespace vega
 {
 class VolumetricMesh;
-}
+} // namespace vega
 
 namespace imstk
 {
@@ -84,4 +84,4 @@ protected:
     template<size_t dim>
     static void copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh, VecDataArray<int, dim>& cells);
 };
-}
+} // namespace imstk

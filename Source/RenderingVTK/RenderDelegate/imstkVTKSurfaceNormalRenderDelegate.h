@@ -86,4 +86,4 @@ protected:
     vtkSmartPointer<vtkDataArray> m_mappedVertexArray;  ///> Mapped array of vertices
     vtkSmartPointer<vtkDataArray> m_mappedNormalsArray; ///> Mapped array of orientations
 };
-}
+} // namespace imstk

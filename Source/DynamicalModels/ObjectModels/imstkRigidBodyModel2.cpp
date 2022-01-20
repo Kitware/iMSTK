@@ -447,4 +447,4 @@ RigidBodyModel2::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_pt
     m_taskGraph->addEdge(m_solveNode, m_integrateNode);
     m_taskGraph->addEdge(m_integrateNode, sink);
 }
-}
+} // namespace imstk

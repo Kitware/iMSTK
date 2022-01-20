@@ -222,4 +222,4 @@ public:
     std::shared_ptr<Geometry>     geomA;
     std::shared_ptr<Geometry>     geomB;
 };
-}
+} // namespace imstk

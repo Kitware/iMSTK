@@ -683,4 +683,4 @@ VTKRenderer::setDebugActorsVisible(const bool debugActorsVisible)
         debugActors->SetVisibility(debugActorsVisible);
     }
 }
-}
+} // namespace imstk

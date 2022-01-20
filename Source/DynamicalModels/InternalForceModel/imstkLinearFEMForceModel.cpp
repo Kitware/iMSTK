@@ -62,4 +62,4 @@ LinearFemForceModel::~LinearFemForceModel()
         delete m_stiffnessMatrixRawPtr;
     }
 }
-}
+} // namespace imstk

@@ -40,4 +40,4 @@ ModuleDriver::waitForInit()
         }
     }
 }
-}
+} // namespace imstk

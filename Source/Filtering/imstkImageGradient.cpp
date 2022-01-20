@@ -76,4 +76,4 @@ ImageGradient::requestUpdate()
         setOutput(GeometryUtils::copyToImageData(gradients->GetOutput()));
     }
 }
-}
+} // namespace imstk

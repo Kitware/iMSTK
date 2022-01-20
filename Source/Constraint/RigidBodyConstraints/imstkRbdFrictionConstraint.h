@@ -52,4 +52,4 @@ private:
     double m_contactDepth;
     double m_frictionCoefficient;
 };
-}
+} // namespace imstk

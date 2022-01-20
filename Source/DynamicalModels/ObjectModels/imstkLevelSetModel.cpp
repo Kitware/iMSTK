@@ -335,4 +335,4 @@ LevelSetModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<
         m_taskGraph->addEdge(m_evolveQuantitiesNodes[i], sink);
     }
 }
-}
+} // namespace imstk

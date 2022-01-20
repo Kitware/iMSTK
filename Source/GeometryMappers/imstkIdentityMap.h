@@ -65,4 +65,4 @@ public:
     ///
     const RigidTransform3d getTransform() const;
 };
-}
+} // namespace imstk

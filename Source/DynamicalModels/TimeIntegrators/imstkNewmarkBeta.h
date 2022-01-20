@@ -68,4 +68,4 @@ protected:
 //    std::array<double, 3> m_beta = { { 1, -1, 0 } };
 //    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
 };
-}
+} // namespace imstk

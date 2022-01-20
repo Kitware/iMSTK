@@ -87,4 +87,4 @@ ImageReslice::requestUpdate()
 
     setOutput(GeometryUtils::copyToImageData(reslice->GetOutput()));
 }
-}
+} // namespace imstk

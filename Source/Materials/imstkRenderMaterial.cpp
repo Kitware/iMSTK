@@ -389,4 +389,4 @@ RenderMaterial::setScalarVisibility(const bool scalarVisibility)
         postModified();
     }
 }
-}
+} // namespace imstk

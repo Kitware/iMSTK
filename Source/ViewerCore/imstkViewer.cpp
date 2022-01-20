@@ -62,4 +62,4 @@ Viewer::updateModule()
     }
     this->postEvent(Event(Module::postUpdate()));
 }
-}
+} // namespace imstk

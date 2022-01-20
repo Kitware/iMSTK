@@ -68,4 +68,4 @@ protected:
     std::shared_ptr<Texture>    m_texture;    ///< iMSTK texture
     std::string m_textureName;                ///< VTK texture unique name
 };
-}
+} // namespace imstk

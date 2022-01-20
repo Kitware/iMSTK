@@ -46,4 +46,4 @@ public:
 protected:
     vtkSmartPointer<vtkSphereSource> m_sphereSource;
 };
-}
+} // namespace imstk

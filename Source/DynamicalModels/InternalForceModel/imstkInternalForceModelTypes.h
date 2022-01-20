@@ -44,4 +44,4 @@ enum class HyperElasticMaterialType
     MooneyRivlin,
     none
 };
-}
+} // namespace imstk

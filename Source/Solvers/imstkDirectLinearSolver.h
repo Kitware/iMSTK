@@ -122,4 +122,4 @@ public:
 private:
     Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;
 };
-}
+} // namespace imstk

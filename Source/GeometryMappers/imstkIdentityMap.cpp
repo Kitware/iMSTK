@@ -47,4 +47,4 @@ IdentityMap::getTransform() const
 {
     return RigidTransform3d::Identity();
 }
-}
+} // namespace imstk

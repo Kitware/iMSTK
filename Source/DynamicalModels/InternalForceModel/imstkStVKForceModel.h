@@ -29,7 +29,7 @@ namespace vega
 {
 class StvkInternalForces;
 class VolumetricMesh;
-}
+} // namespace vega
 
 namespace imstk
 {
@@ -86,4 +86,4 @@ protected:
     std::shared_ptr<vega::StVKStiffnessMatrix> m_vegaStVKStiffnessMatrix;
     bool ownStiffnessMatrix;
 };
-}
+} // namespace imstk

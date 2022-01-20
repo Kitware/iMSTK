@@ -140,4 +140,4 @@ CollisionDetectionAlgorithm::requestUpdate()
         }
     }
 }
-}
+} // namespace imstk

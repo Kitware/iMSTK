@@ -88,4 +88,4 @@ protected:
 
     std::priority_queue<Node, std::vector<Node>, NodeComparator> m_queue;
 };
-}
+} // namespace imstk

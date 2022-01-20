@@ -63,4 +63,4 @@ private:
     bool   m_InsideOut  = false;
     std::shared_ptr<DataArray<unsigned char>> m_IsInsideMask = nullptr;
 };
-}
+} // namespace imstk

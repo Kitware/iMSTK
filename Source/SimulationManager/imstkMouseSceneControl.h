@@ -109,4 +109,4 @@ protected:
 
     bool m_enabled = false;
 };
-}
+} // namespace imstk

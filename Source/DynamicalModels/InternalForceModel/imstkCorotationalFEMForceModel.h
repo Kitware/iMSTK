@@ -28,7 +28,7 @@ namespace vega
 class VolumetricMesh;
 class CorotationalLinearFEM;
 class SparseMatrix;
-}
+} // namespace vega
 
 namespace imstk
 {
@@ -83,4 +83,4 @@ protected:
     std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
     int m_warp;
 };
-}
+} // namespace imstk

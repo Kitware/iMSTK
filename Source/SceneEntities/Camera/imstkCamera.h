@@ -260,4 +260,4 @@ protected:
     Vec3d m_focalPoint = -Vec3d::UnitZ();      ///> camera focal point
     Vec3d m_viewUp     = Vec3d::UnitY();       ///> camera up vector
 };
-}
+} // namespace imstk

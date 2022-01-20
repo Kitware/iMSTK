@@ -64,4 +64,4 @@ protected:
 protected:
     std::shared_ptr<TaskGraph> m_graph = nullptr;
 };
-}
+} // namespace imstk

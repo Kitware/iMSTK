@@ -460,4 +460,4 @@ private:
     int      m_vecCapacity;
     VecType* m_dataCast;
 };
-}
+} // namespace imstk

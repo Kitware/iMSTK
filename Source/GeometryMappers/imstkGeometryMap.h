@@ -112,4 +112,4 @@ protected:
     std::shared_ptr<Geometry> m_parentGeom; ///> the geometry which dictates the configuration
     std::shared_ptr<Geometry> m_childGeom;  ///> the geometry which follows the parent
 };
-}
+} // namespace imstk

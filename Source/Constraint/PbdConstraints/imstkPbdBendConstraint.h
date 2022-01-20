@@ -74,4 +74,4 @@ public:
 public:
     double m_restLength = 0.; ///> Rest length
 };
-}
+} // namespace imstk

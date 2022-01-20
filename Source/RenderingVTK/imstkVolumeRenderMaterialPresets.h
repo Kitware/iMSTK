@@ -72,4 +72,4 @@ public:
     // Convenience API to get preset names
     static const char* getPresetName(Presets p);
 };
-}
+} // namespace imstk

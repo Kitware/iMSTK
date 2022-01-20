@@ -818,4 +818,4 @@ SurfaceMesh::setCellActiveAttribute(std::string& activeAttributeName, std::strin
     }
     activeAttributeName = attributeName;
 }
-}
+} // namespace imstk

@@ -38,4 +38,4 @@ AnimationModel::setGeometry(std::shared_ptr<Geometry> geometry)
 {
     m_geometry = geometry;
 }
-}
+} // namespace imstk

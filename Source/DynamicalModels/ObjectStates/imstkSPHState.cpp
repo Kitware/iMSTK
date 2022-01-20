@@ -72,4 +72,4 @@ SphState::getNumParticles() const
 {
     return m_positions->size();
 }
-}
+} // namespace imstk

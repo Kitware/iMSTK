@@ -107,4 +107,4 @@ protected:
 
     double m_epsilon = IMSTK_DOUBLE_EPS;                        // Tolerance for considering two points equivalent
 };
-}
+} // namespace imstk

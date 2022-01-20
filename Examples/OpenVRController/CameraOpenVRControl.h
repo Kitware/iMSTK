@@ -29,7 +29,7 @@ namespace imstk
 class Camera;
 class OpenVRDeviceClient;
 class SceneManager;
-}
+} // namespace imstk
 
 using namespace imstk;
 

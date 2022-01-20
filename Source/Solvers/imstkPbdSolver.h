@@ -149,4 +149,4 @@ private:
 
     std::shared_ptr<std::list<std::vector<PbdCollisionConstraint*>*>> m_collisionConstraints = nullptr; ///> Collision contraints charged to this solver
 };
-}
+} // namespace imstk

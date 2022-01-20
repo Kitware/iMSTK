@@ -227,4 +227,4 @@ SpatialHashTableSeparateChaining::rehash()
 {
     m_table->rehash(m_table->bucket_count());
 }
-}
+} // namespace imstk

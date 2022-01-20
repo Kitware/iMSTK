@@ -63,4 +63,4 @@ public:
         return true;
     }
 };
-}
+} // namespace imstk

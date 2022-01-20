@@ -70,4 +70,4 @@ public:
 protected:
     std::list<GeometryBoolPair> geometries;
 };
-}
+} // namespace imstk

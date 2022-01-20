@@ -97,4 +97,4 @@ protected:
     double m_length = 1.0;                      ///> Length between the centers of two hemispheres
     mutable double m_lengthPostTransform = 1.0; ///> Length after transform
 };
-}
+} // namespace imstk

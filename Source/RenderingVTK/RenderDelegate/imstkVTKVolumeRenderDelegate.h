@@ -43,4 +43,4 @@ protected:
     ///
     void updateRenderProperties() override;
 };
-}
+} // namespace imstk

@@ -102,4 +102,4 @@ protected:
 
     std::shared_ptr<RendererConfig> m_config;
 };
-}
+} // namespace imstk

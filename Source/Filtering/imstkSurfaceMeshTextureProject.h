@@ -58,4 +58,4 @@ public:
 protected:
     void requestUpdate() override;
 };
-}
+} // namespace imstk

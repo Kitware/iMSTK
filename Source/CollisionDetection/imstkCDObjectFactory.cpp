@@ -74,4 +74,4 @@ CDObjectFactory::makeCollisionDetection(const std::string collisionTypeName)
         return cdObjCreationMap.at(collisionTypeName)();
     }
 }
-}
+} // namespace imstk

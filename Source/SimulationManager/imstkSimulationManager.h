@@ -124,4 +124,4 @@ protected:
     double m_dt       = 0.0;    // Actual timestep
     int    m_numSteps = 0;
 };
-};
+}; // namespace imstk

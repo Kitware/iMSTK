@@ -68,4 +68,4 @@ LinearProjectionConstraint::reset()
     m_projection = Mat3d::Identity();
     m_value      = Vec3d(0.0, 0.0, 0.0);
 }
-}
+} // namespace imstk

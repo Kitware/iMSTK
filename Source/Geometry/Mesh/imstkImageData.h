@@ -182,4 +182,4 @@ protected:
     Vec3d m_invSpacing = Vec3d(1.0, 1.0, 1.0);
     Vec6d m_bounds;
 };
-}
+} // namespace imstk

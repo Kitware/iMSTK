@@ -367,4 +367,4 @@ PointSet::setActiveVertexAttribute(std::string& activeAttributeName, std::string
     }
     activeAttributeName = attributeName;
 }
-}
+} // namespace imstk

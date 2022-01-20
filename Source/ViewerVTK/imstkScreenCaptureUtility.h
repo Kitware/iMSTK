@@ -72,4 +72,4 @@ protected:
     unsigned int m_screenShotNumber = 0; ///< screen shot number is added to the file prefix, and incremented everytime a screen shot is taken
     std::string  m_screenShotPrefix;     ///< the prefix for the screenshots to be saved
 };
-}
+} // namespace imstk

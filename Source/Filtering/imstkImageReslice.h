@@ -72,4 +72,4 @@ private:
     Mat4d m_Transform;
     InterpolateType m_InterpolationType = InterpolateType::Linear;
 };
-}
+} // namespace imstk

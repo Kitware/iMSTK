@@ -74,4 +74,4 @@ CollidingObject::updateGeometries()
     }
     SceneObject::updateGeometries();
 }
-}
+} // namespace imstk

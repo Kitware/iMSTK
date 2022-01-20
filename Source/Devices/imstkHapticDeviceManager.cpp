@@ -56,4 +56,4 @@ HapticDeviceManager::uninitModule()
         client->disable();
     }
 }
-}
+} // namespace imstk

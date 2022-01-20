@@ -27,7 +27,7 @@ using namespace imstk;
 
 namespace
 {
-}
+} // namespace
 
 struct imstkCollisionElementTest : public ::testing::Test
 {

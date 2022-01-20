@@ -139,4 +139,4 @@ public:
     /*std::vector<LinearProjectionConstraint>  *m_LinearProjConstraints;
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;*/
 };
-}
+} // namespace imstk

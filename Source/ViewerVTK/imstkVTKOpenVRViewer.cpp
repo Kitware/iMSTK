@@ -243,4 +243,4 @@ VTKOpenVRViewer::getVRDeviceClient(int deviceType)
         });
     return (iter == m_vrDeviceClients.end()) ? nullptr : *iter;
 }
-}
+} // namespace imstk

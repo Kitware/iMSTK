@@ -58,4 +58,4 @@ protected:
     SpatialHashTableSeparateChaining m_hashTableA; ///> Spatial hash table
     SpatialHashTableSeparateChaining m_hashTableB; ///> Spatial hash table
 };
-}
+} // namespace imstk

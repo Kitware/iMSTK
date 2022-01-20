@@ -62,4 +62,4 @@ protected:
     std::shared_ptr<TaskNode> m_pbdCollisionSolveNode = nullptr;
     std::shared_ptr<TaskNode> m_correctVelocitiesNode = nullptr;
 };
-}
+} // namespace imstk

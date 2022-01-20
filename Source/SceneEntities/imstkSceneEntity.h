@@ -55,4 +55,4 @@ protected:
 
     EntityID m_ID;                        ///< unique ID of entity
 };
-}
+} // namespace imstk

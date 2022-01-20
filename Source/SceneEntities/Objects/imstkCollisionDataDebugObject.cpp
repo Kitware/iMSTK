@@ -223,4 +223,4 @@ CollisionDataDebugObject::debugUpdate()
         }
     }
 }
-}
+} // namespace imstk

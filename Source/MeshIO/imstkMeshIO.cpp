@@ -179,4 +179,4 @@ MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::strin
     LOG(FATAL) << "Error: file type not supported for input " << filePath;
     return false;
 }
-}
+} // namespace imstk

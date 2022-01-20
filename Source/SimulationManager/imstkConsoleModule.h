@@ -52,4 +52,4 @@ protected:
 
     std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;
 };
-}
+} // namespace imstk

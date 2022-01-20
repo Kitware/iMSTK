@@ -99,7 +99,7 @@ makeRect()
 
     return mesh;
 }
-}
+} // namespace
 
 TEST(imstkSurfaceMeshTest, CellNormalAttributes)
 {

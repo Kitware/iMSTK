@@ -224,4 +224,4 @@ private:
     bool   m_useArmijo;                               ///> True if Armijo liner search is desired
     std::vector<double> m_fnorms;                     ///> Consecutive function norms
 };
-}
+} // namespace imstk

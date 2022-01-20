@@ -60,4 +60,4 @@ public:
 protected:
     std::shared_ptr<TaskNode> m_pickingNode = nullptr;
 };
-}
+} // namespace imstk

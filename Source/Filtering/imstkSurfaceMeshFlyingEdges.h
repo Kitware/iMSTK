@@ -59,4 +59,4 @@ protected:
 private:
     double m_IsoValue = 0.0;
 };
-}
+} // namespace imstk

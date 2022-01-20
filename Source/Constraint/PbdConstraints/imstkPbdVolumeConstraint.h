@@ -63,4 +63,4 @@ public:
 protected:
     double m_restVolume = 0.0; ///> Rest volume
 };
-}
+} // namespace imstk

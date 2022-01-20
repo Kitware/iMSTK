@@ -32,7 +32,7 @@ namespace imstk
 {
 class PbdObject;
 class TetraToLineMeshCD;
-}
+} // namespace imstk
 
 ///
 /// \class NeedleInteraction

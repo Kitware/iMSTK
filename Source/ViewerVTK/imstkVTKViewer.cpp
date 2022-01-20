@@ -297,4 +297,4 @@ VTKViewer::updateModule()
     // Render
     m_vtkRenderWindow->Render();
 }
-}
+} // namespace imstk

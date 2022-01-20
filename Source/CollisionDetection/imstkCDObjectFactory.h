@@ -77,4 +77,4 @@ public:
     }
 };
 #define REGISTER_COLLISION_DETECTION(cdType) CDObjectRegistrar<cdType> __register ## cdType(#cdType)
-}
+} // namespace imstk

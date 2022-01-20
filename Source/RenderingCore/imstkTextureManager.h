@@ -58,4 +58,4 @@ TextureManager<T>::getTextureDelegate(std::shared_ptr<Texture> texture)
     }
     return m_textureMap[texture];
 }
-}
+} // namespace imstk

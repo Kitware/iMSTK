@@ -42,4 +42,4 @@ public:
 protected:
     TextureDelegate() = default;
 };
-}
+} // namespace imstk

@@ -148,4 +148,4 @@ private:
     std::shared_ptr<std::unordered_set<size_t>> m_AddConstraintVertices    = nullptr;
     double m_Epsilon = 1;
 };
-}
+} // namespace imstk

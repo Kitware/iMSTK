@@ -56,4 +56,4 @@ public:
 protected:
     std::shared_ptr<SceneObject> m_sceneObject; ///< SceneObject controlled by the Tracker
 };
-}
+} // namespace imstk

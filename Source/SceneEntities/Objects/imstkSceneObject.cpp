@@ -74,4 +74,4 @@ SceneObject::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Ta
     m_taskGraph->addEdge(m_updateNode, m_updateGeometryNode);
     m_taskGraph->addEdge(m_updateGeometryNode, sink);
 }
-}
+} // namespace imstk

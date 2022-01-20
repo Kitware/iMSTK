@@ -91,4 +91,4 @@ public:
 private:
     VRPNDeviceType m_type;
 };
-}
+} // namespace imstk

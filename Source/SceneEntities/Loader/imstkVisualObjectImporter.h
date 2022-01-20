@@ -78,4 +78,4 @@ private:
         const std::string& delimiter,
         const bool         lastInstance = false);
 };
-}
+} // namespace imstk

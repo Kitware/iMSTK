@@ -77,4 +77,4 @@ protected:
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
     vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
 };
-}
+} // namespace imstk

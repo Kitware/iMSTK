@@ -72,4 +72,4 @@ public:
 public:
     std::shared_ptr<DeviceClient> m_deviceClient;
 };
-}
+} // namespace imstk

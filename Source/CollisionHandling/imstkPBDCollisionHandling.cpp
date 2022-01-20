@@ -557,4 +557,4 @@ PbdCollisionHandling::addPPConstraint(
     constraint->initConstraint(ptA, ptB, stiffnessA, stiffnessB);
     m_PPConstraintPool.push_back(constraint);
 }
-}
+} // namespace imstk

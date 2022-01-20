@@ -127,4 +127,4 @@ private:
     std::vector<bool> m_vertexInside;
     Vec3d m_padding = Vec3d(0.001, 0.001, 0.001);
 };
-}
+} // namespace imstk

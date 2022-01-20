@@ -136,4 +136,4 @@ private:
 
     VTKViewer* m_viewer;                                                                // Used for dimensions
 };
-}
+} // namespace imstk

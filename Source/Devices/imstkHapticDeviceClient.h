@@ -91,4 +91,4 @@ private:
     HDSchedulerHandle m_schedulerHandle = 0;
     std::vector<std::pair<int, int>> m_events;
 };
-}
+} // namespace imstk

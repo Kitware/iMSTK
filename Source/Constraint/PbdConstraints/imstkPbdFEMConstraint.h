@@ -26,7 +26,7 @@
 namespace imstk
 {
 ///
-/// \class PbdFemConstraintConfig
+/// \struct PbdFemConstraintConfig
 ///
 /// \brief Either mu/lambda used, may be computed from youngs modulus and poissons ratio
 ///
@@ -72,4 +72,4 @@ public:
 
     std::shared_ptr<PbdFemConstraintConfig> m_config = nullptr;
 };
-}
+} // namespace imstk

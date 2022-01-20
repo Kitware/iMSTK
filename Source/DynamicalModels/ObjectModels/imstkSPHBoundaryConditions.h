@@ -95,4 +95,4 @@ private:
     const size_t m_numBufferParticles = 10000;
     std::vector<size_t> m_bufferIndices;
 };
-}
+} // namespace imstk

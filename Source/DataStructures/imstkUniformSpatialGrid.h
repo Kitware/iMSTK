@@ -262,4 +262,4 @@ private:
 
     std::vector<CellData> m_CellData;         ///> Data stored for each cell
 };
-}
+} // namespace imstk

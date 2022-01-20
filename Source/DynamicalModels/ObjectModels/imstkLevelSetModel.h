@@ -122,4 +122,4 @@ protected:
 
     ImplicitStructuredCurvature m_curvature;
 };
-}
+} // namespace imstk

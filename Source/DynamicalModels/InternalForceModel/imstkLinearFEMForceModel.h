@@ -27,7 +27,7 @@ namespace vega
 {
 class StVKInternalForces;
 class VolumetricMesh;
-}
+} // namespace vega
 
 namespace imstk
 {
@@ -92,4 +92,4 @@ protected:
     // tmp
     vega::SparseMatrix* m_stiffnessMatrixRawPtr;
 };
-}
+} // namespace imstk

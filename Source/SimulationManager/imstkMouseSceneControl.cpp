@@ -172,4 +172,4 @@ MouseSceneControl::getEnabled() const
 {
     return (m_sceneManager->getMode() == SceneManager::Mode::Debug) || m_enabled;
 }
-}
+} // namespace imstk

@@ -225,4 +225,4 @@ BoneDrillingCH::handle(
     m_initialStep = false;
     m_prevPos     = devicePosition;
 }
-}
+} // namespace imstk

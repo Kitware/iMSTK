@@ -73,4 +73,4 @@ PbdConstraint::projectConstraint(const DataArray<double>& invMasses, const doubl
         }
     }
 }
-}
+} // namespace imstk

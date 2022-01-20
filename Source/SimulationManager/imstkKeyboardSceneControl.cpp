@@ -151,4 +151,4 @@ void
 KeyboardSceneControl::OnKeyRelease(const char imstkNotUsed(key))
 {
 }
-}
+} // namespace imstk

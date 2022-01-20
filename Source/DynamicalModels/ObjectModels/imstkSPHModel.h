@@ -282,4 +282,4 @@ private:
 
     std::vector<size_t> m_minIndices;
 };
-}
+} // namespace imstk

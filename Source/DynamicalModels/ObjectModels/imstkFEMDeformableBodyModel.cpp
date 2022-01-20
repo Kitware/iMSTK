@@ -928,4 +928,4 @@ FemDeformableBodyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::sh
     m_taskGraph->addEdge(source, m_solveNode);
     m_taskGraph->addEdge(m_solveNode, sink);
 }
-}
+} // namespace imstk

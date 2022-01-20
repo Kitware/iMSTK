@@ -122,4 +122,4 @@ private:
     std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;
     std::shared_ptr<MouseDeviceClient>    m_mouseDeviceClient;
 };
-}
+} // namespace imstk

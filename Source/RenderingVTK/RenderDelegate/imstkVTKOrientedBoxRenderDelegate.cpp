@@ -80,4 +80,4 @@ VTKOrientedCubeRenderDelegate::processEvents()
     T.matrix().transposeInPlace();
     m_transform->SetMatrix(T.data());
 }
-}
+} // namespace imstk

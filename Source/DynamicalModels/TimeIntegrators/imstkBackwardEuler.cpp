@@ -58,4 +58,4 @@ BackwardEuler::updateStateGivenU(std::shared_ptr<FeDeformBodyState> prevState,
     currentState->getQ()    = u;
     currentState->getQDot() = (currentState->getQ() - prevState->getQ()) / m_dT;
 }
-}
+} // namespace imstk

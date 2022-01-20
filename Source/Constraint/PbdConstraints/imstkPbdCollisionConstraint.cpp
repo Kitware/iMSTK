@@ -118,4 +118,4 @@ PbdCollisionConstraint::correctVelocity(const double friction, const double rest
         }
     }
 }
-}
+} // namespace imstk

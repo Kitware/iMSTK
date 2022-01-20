@@ -105,4 +105,4 @@ protected:
     double  m_kernelSigma   = 1.0;
     double* m_kernelWeights = nullptr;
 };
-}
+} // namespace imstk

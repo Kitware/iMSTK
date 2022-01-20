@@ -29,7 +29,7 @@ namespace imstk
 {
 class LocalMarchingCubes;
 class TaskNode;
-}
+} // namespace imstk
 
 using namespace imstk;
 

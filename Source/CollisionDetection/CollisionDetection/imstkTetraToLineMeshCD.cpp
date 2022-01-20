@@ -87,4 +87,4 @@ TetraToLineMeshCD::computeCollisionDataAB(
             }
         });
 }
-}
+} // namespace imstk

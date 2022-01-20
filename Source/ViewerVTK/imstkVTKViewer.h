@@ -105,4 +105,4 @@ protected:
     bool   m_displayFps = false;                                    ///> hide or display framerate
     double m_lastFps;                                               ///> last framerate value used for moving average estimate
 };
-}
+} // namespace imstk

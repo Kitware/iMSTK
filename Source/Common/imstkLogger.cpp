@@ -110,4 +110,4 @@ Logger::initialize()
     m_g3logWorker = g3::LogWorker::createLogWorker();
     g3::initializeLogging(m_g3logWorker.get());
 }
-}
+} // namespace imstk

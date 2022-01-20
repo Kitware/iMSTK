@@ -150,4 +150,4 @@ protected:
     std::deque<Vec3d> m_forces;
     Vec3d m_forceSum = Vec3d::Zero();
 };
-}
+} // namespace imstk

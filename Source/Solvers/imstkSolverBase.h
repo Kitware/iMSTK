@@ -38,4 +38,4 @@ public:
 
     virtual void solve() = 0;
 };
-}
+} // namespace imstk

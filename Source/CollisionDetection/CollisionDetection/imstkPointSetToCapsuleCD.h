@@ -69,4 +69,4 @@ protected:
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsB) override;
 };
-}
+} // namespace imstk

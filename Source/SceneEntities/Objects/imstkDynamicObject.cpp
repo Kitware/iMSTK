@@ -122,4 +122,4 @@ DynamicObject::reset()
     m_dynamicalModel->resetToInitialState();
     this->updateGeometries();
 };
-}
+} // namespace imstk

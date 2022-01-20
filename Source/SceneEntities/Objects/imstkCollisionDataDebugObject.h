@@ -91,4 +91,4 @@ protected:
     int  m_frameCounter     = 0;
     bool m_countEmptyFrames = true;
 };
-}
+} // namespace imstk

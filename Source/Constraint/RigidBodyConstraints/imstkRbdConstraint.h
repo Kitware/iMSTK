@@ -140,4 +140,4 @@ public:
     // Which object to solve for
     Side m_side = Side::AB;
 };
-}
+} // namespace imstk

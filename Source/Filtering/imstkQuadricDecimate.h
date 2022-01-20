@@ -64,4 +64,4 @@ private:
     bool   m_VolumePreserving;
     double m_TargetReduction;
 };
-}
+} // namespace imstk

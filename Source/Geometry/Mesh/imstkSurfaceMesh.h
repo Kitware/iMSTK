@@ -38,7 +38,7 @@ struct NormalGroup
     Vec3d position;
     Vec3d normal;
 };
-}
+} // namespace imstk
 
 namespace std
 {
@@ -65,7 +65,7 @@ template<> struct less<imstk::NormalGroup>
         return false;
     }
 };
-}
+} // namespace std
 
 namespace imstk
 {
@@ -283,4 +283,4 @@ protected:
     std::string m_activeCellTangents = "";
     std::string m_activeCellScalars  = "";
 };
-}
+} // namespace imstk

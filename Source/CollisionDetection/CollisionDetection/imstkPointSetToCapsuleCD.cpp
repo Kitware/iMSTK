@@ -161,4 +161,4 @@ PointSetToCapsuleCD::computeCollisionDataB(
             }
                 }, vertices.size() > 100);
 }
-}
+} // namespace imstk

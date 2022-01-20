@@ -71,4 +71,4 @@ ExtractEdges::requestUpdate()
 
     setOutput(GeometryUtils::copyToLineMesh(triangleFilter->GetOutput()));
 }
-}
+} // namespace imstk

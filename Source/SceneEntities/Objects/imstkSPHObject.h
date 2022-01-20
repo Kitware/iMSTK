@@ -54,4 +54,4 @@ public:
 protected:
     std::shared_ptr<SphModel> m_sphModel = nullptr;
 };
-}
+} // namespace imstk

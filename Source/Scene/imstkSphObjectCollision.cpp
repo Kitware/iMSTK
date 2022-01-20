@@ -79,4 +79,4 @@ SphObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     m_taskGraph->addEdge(m_collisionHandleANode, sphObj1->getTaskGraph()->getSink());
     m_taskGraph->addEdge(m_collisionHandleANode, m_objB->getTaskGraph()->getSink());
 }
-}
+} // namespace imstk

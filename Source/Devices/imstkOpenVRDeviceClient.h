@@ -84,4 +84,4 @@ private:
     DeviceType m_deviceType;
     Vec2d      m_trackpadPosition;
 };
-}
+} // namespace imstk

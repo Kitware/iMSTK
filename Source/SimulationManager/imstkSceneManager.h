@@ -120,4 +120,4 @@ protected:
     Mode m_mode;
     std::string m_prevCamName;
 };
-}
+} // namespace imstk

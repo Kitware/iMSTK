@@ -54,4 +54,4 @@ public:
 protected:
     std::shared_ptr<PbdModel> m_pbdModel = nullptr; ///> Pbd mathematical model
 };
-}
+} // namespace imstk

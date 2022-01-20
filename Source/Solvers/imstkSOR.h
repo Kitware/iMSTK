@@ -139,4 +139,4 @@ private:
     std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;
     std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
-}
+} // namespace imstk

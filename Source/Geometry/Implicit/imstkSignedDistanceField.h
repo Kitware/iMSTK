@@ -109,4 +109,4 @@ protected:
 
     std::shared_ptr<DataArray<double>> m_scalars;
 };
-}
+} // namespace imstk

@@ -88,4 +88,4 @@ private:
     std::shared_ptr<VecDataArray<double, 3>> m_vel;   ///> Nodal velocities
     std::shared_ptr<VecDataArray<double, 3>> m_acc;   ///> Nodal acelerations
 };
-}
+} // namespace imstk

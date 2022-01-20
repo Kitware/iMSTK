@@ -473,7 +473,7 @@ protected:
     double m_radiusSquared; ///> Kernel radius squared
     double m_k;             ///> Kernel coefficient for laplacian()
 };
-}
+} // namespace sph
 
 ///
 /// \class SphSimulationKernels
@@ -526,4 +526,4 @@ protected:
     sph::ViscosityKernel<3> m_viscosity;
     sph::CohesionKernel<3>  m_cohesion;
 };
-}
+} // namespace imstk

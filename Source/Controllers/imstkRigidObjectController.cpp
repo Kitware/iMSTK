@@ -155,4 +155,4 @@ RigidObjectController::applyForces()
         m_deviceClient->setForce(Vec3d(0.0, 0.0, 0.0));
     }
 }
-}
+} // namespace imstk

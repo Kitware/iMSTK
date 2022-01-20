@@ -19,31 +19,4 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkVTKPolyDataRenderDelegate.h"
-
-class vtkCubeSource;
-
-namespace imstk
-{
-///
-/// \class VTKOrientedCubeRenderDelegate
-///
-/// \brief Oriented box render delegate with VTK backend
-///
-class VTKOrientedCubeRenderDelegate : public VTKPolyDataRenderDelegate
-{
-public:
-    VTKOrientedCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-    ~VTKOrientedCubeRenderDelegate() override = default;
-
-    ///
-    /// \brief Update cube source based on the cube geometry
-    ///
-    void processEvents() override;
-
-protected:
-    vtkSmartPointer<vtkCubeSource> m_cubeSource;
-};
-} // namespace imstk
+#include "imstkRenderer.h"

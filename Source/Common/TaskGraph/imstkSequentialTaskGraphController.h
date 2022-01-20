@@ -48,4 +48,4 @@ private:
     // The current nodes to execute, ordered
     std::shared_ptr<std::list<std::shared_ptr<TaskNode>>> m_executionOrderedNodes;
 };
-};
+}; // namespace imstk

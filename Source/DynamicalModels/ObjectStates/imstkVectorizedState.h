@@ -96,4 +96,4 @@ protected:
     Vectord m_qDot;      // Derivative of state w.r.t time
     Vectord m_qDotDot;   // Double derivative of state w.r.t time
 };
-}
+} // namespace imstk

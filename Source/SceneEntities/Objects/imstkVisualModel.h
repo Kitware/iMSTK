@@ -99,4 +99,4 @@ protected:
     bool m_isVisible = true;              ///< true if mesh is shown, false if mesh is hidden
     std::unordered_map<Renderer*, bool> m_renderDelegateCreated;
 };
-}
+} // namespace imstk

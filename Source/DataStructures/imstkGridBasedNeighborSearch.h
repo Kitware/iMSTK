@@ -87,4 +87,4 @@ private:
     };
     UniformSpatialGrid<CellData> m_Grid;
 };
-}
+} // namespace imstk

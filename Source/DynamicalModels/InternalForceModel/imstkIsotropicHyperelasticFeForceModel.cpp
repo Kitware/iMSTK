@@ -71,4 +71,4 @@ IsotropicHyperelasticFeForceModel::IsotropicHyperelasticFeForceModel(const Hyper
         withGravity,
         gravity);
 }
-}
+} // namespace imstk

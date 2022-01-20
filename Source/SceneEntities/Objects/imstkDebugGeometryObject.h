@@ -146,4 +146,4 @@ protected:
     std::shared_ptr<VecDataArray<unsigned char, 3>> m_pointColorsPtr;
     bool m_ptsChanged;
 };
-}
+} // namespace imstk

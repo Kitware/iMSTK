@@ -57,4 +57,4 @@ protected:
 private:
     bool m_ComputeMagnitude;
 };
-}
+} // namespace imstk

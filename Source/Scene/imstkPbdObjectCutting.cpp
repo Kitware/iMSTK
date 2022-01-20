@@ -187,4 +187,4 @@ PbdObjectCutting::modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
         m_addConstraintVertices->insert(newTri[2]);
     }
 }
-}
+} // namespace imstk
