@@ -148,11 +148,6 @@ SimulationManager::start()
 
             // Actual game loop
             {
-                for (auto viewer : m_viewers)
-                {
-                    viewer->processEvents();
-                }
-
                 for (auto syncModule : m_syncModules)
                 {
                     syncModule->setDt(m_dt);
@@ -164,6 +159,11 @@ SimulationManager::start()
                     adaptiveModule->setDt(m_dt);
                     for (int currStep = 0; currStep < m_numSteps; currStep++)
                     {
+                        // Process system & input events (ie: VR, hmd pose, mkd, OS msgs updates)
+                        for (auto viewer : m_viewers)
+                        {
+                            viewer->processEvents();
+                        }
                         adaptiveModule->update();
                     }
                 }

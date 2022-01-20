@@ -137,7 +137,7 @@ main()
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(0.01);
+        driver->setDesiredDt(0.01); // Spend less time updating & more time rendering
 
         // Add a VR controller for the scalpel handle
         imstkNew<SceneObjectController> controller1(scalpelHandle, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));

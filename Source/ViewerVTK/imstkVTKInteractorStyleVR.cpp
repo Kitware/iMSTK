@@ -26,7 +26,7 @@
 #include <vtkMath.h>
 #include <vtkEventData.h>
 #include <vtkObjectFactory.h>
-#include <vtkOpenVRRenderWindowInteractor.h>
+#include "imstkVtkOpenVRRenderWindowInteractorImstk.h"
 
 vtkStandardNewMacro(vtkInteractorStyleVR);
 
@@ -72,8 +72,8 @@ vtkInteractorStyleVR::OnButtonPress(vtkEventData* data, int buttonId)
 void
 vtkInteractorStyleVR::addMovementActions()
 {
-    vtkOpenVRRenderWindowInteractor* iren =
-        vtkOpenVRRenderWindowInteractor::SafeDownCast(GetInteractor());
+    vtkOpenVRRenderWindowInteractorImstk* iren =
+        vtkOpenVRRenderWindowInteractorImstk::SafeDownCast(GetInteractor());
     CHECK(iren->GetInitialized()) << "Cannot addMovementActions to style until "
         "interactor has been initialized";
     iren->AddAction("/actions/vtk/in/LeftGripMovement", true,
@@ -95,8 +95,8 @@ vtkInteractorStyleVR::addMovementActions()
 void
 vtkInteractorStyleVR::addButtonActions()
 {
-    vtkOpenVRRenderWindowInteractor* iren =
-        vtkOpenVRRenderWindowInteractor::SafeDownCast(GetInteractor());
+    vtkOpenVRRenderWindowInteractorImstk* iren =
+        vtkOpenVRRenderWindowInteractorImstk::SafeDownCast(GetInteractor());
     CHECK(iren->GetInitialized()) << "Cannot addButtonActions to style until "
         "interactor has been initialized";
 
