@@ -115,8 +115,8 @@ Scene::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double p
     {
         for (const auto& visualModel : obj->getVisualModels())
         {
-            Vec3d min = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
-            Vec3d max = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
+            Vec3d                     min  = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
+            Vec3d                     max  = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
             std::shared_ptr<Geometry> geom = visualModel->getGeometry();
             if (geom != nullptr)
             {

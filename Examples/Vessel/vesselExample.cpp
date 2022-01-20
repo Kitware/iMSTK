@@ -122,7 +122,7 @@ makeSPHObject(const std::string& name, const double particleRadius, const double
     sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Setup the VisualModel
-    imstkNew<VisualModel>    fluidVisualModel;
+    imstkNew<VisualModel> fluidVisualModel;
     fluidVisualModel->setGeometry(fluidGeometry);
     imstkNew<RenderMaterial> fluidMaterial;
     fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
@@ -153,7 +153,7 @@ makeLegs(const std::string& name)
     auto collisionMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/legs/femoralArteryCut.stl");
 
     // Setup the Legs VisualModel
-    imstkNew<VisualModel>    legsMeshModel;
+    imstkNew<VisualModel> legsMeshModel;
     legsMeshModel->setGeometry(legsMesh);
     imstkNew<RenderMaterial> legsMaterial;
     legsMaterial->setDisplayMode(RenderMaterial::DisplayMode::Surface);
@@ -162,7 +162,7 @@ makeLegs(const std::string& name)
     legsMeshModel->setRenderMaterial(legsMaterial);
 
     // Setup the Bones VisualModel
-    imstkNew<VisualModel>    bonesMeshModel;
+    imstkNew<VisualModel> bonesMeshModel;
     bonesMeshModel->setGeometry(bonesMesh);
     imstkNew<RenderMaterial> bonesMaterial;
     bonesMaterial->setDisplayMode(RenderMaterial::DisplayMode::Surface);
@@ -170,7 +170,7 @@ makeLegs(const std::string& name)
     bonesMeshModel->setRenderMaterial(bonesMaterial);
 
     // Setup the Femoral VisualModel
-    imstkNew<VisualModel>    femoralMeshModel;
+    imstkNew<VisualModel> femoralMeshModel;
     femoralMeshModel->setGeometry(femoralMesh);
     imstkNew<RenderMaterial> femoralMaterial;
     femoralMaterial->setDisplayMode(RenderMaterial::DisplayMode::Surface);

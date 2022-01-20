@@ -49,7 +49,7 @@ makeHandleObject()
     toolHandleMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
     toolHandleMesh->scale(0.06, Geometry::TransformType::ApplyToData);
 
-    imstkNew<VisualModel>    toolHandleModel;
+    imstkNew<VisualModel> toolHandleModel;
     toolHandleModel->setGeometry(toolHandleMesh);
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
@@ -76,7 +76,7 @@ makeBlade(std::string filename)
     blade10Mesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
     blade10Mesh->scale(0.06, Geometry::TransformType::ApplyToData);
 
-    imstkNew<VisualModel>    blade10Model;
+    imstkNew<VisualModel> blade10Model;
     blade10Model->setGeometry(blade10Mesh);
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);

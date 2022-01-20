@@ -118,7 +118,7 @@ main()
             subdivide->update();
 
             // Create the visual model
-            imstkNew<VisualModel>    visualModel;
+            imstkNew<VisualModel> visualModel;
             visualModel->setGeometry(subdivide->getOutputMesh());
             imstkNew<RenderMaterial> mat;
             mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);

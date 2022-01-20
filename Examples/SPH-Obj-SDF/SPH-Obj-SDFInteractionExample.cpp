@@ -108,7 +108,7 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
     sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Setup the VisualModel
-    imstkNew<VisualModel>    fluidVisualModel;
+    imstkNew<VisualModel> fluidVisualModel;
     fluidVisualModel->setGeometry(fluidGeometry);
     imstkNew<RenderMaterial> fluidMaterial;
     fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);

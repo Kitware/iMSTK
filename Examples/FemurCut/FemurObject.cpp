@@ -98,7 +98,7 @@ FemurObject::createVisualModels()
         auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_isoExtract->getOutput(i));
         if (surfMesh->getNumVertices() > 0 && m_chunksGenerated.count(i) == 0)
         {
-            imstkNew<VisualModel>    surfMeshModel;
+            imstkNew<VisualModel> surfMeshModel;
             surfMeshModel->setGeometry(m_isoExtract->getOutput(i));
             imstkNew<RenderMaterial> material;
             material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
