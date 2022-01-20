@@ -84,7 +84,8 @@ main()
     imstkNew<SceneObject> sceneObj("Mesh");
     // Create the eroded visual model
     {
-        imstkNew<VisualModel>    surfMeshModel(reduce->getOutput());
+        imstkNew<VisualModel>    surfMeshModel;
+        surfMeshModel->setGeometry(reduce->getOutput());
         imstkNew<RenderMaterial> material;
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setLineWidth(4.0);
@@ -94,7 +95,8 @@ main()
     }
     // Create the original mesh visual model
     {
-        imstkNew<VisualModel>    surfMeshModel(coarseSurfMesh);
+        imstkNew<VisualModel>    surfMeshModel;
+        surfMeshModel->setGeometry(coarseSurfMesh);
         imstkNew<RenderMaterial> material;
         material->setColor(Color::Red);
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);

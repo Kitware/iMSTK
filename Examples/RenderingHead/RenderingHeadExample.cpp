@@ -59,7 +59,8 @@ main()
         material->addTexture(std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_AO.png", Texture::Type::AmbientOcclusion));
         material->setRecomputeVertexNormals(false);
 
-        imstkNew<VisualModel> surfMeshModel(surfaceMesh);
+        imstkNew<VisualModel> surfMeshModel;
+        surfMeshModel->setGeometry(surfaceMesh);
         surfMeshModel->setRenderMaterial(material);
 
         imstkNew<SceneObject> headObject("head");

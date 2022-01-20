@@ -163,7 +163,8 @@ main()
 
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Organs/Colon/colon.obj");
 
-        imstkNew<VisualModel> visualModel(surfMesh);
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(surfMesh);
         visualModel->setRenderMaterial(colonMaterial);
         colonObject->addVisualModel(visualModel);
     }

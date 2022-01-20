@@ -171,7 +171,8 @@ makeClothObj(const std::string& name,
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     setFleshTextures(material);
-    imstkNew<VisualModel> visualModel(clothMesh);
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(clothMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object

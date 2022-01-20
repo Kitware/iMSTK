@@ -38,7 +38,8 @@ RenderTest::SetUp()
 
     ASSERT_TRUE(geom != nullptr) << "ERROR: No geometry";
 
-    visualModel = std::make_shared<VisualModel>(geom);
+    visualModel = std::make_shared<VisualModel>();
+    visualModel->setGeometry(geom);
     visualModel->setRenderMaterial(renderMaterial);
 
     sceneObj = std::make_shared<SceneObject>("SceneObject");

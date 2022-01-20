@@ -129,7 +129,8 @@ makeClothObj(const std::string& name,
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
-    imstkNew<VisualModel> visualModel(clothMesh);
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(clothMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object

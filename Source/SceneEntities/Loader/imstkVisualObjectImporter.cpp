@@ -155,7 +155,8 @@ ObjectIO::importSceneObject(
                 copyMesh->initialize(std::make_shared<VecDataArray<double, 3>>(*meshes[meshIndex]->getVertexPositions()));
             }
 
-            auto visualModel = std::make_shared<VisualModel>(copyMesh);
+            auto visualModel = std::make_shared<VisualModel>();
+            visualModel->setGeometry(copyMesh);
             visualModel->setName(std::string(currNode->mName.C_Str()));
 
             copyMesh->transform(currWorldTransform, Geometry::TransformType::ApplyToData);

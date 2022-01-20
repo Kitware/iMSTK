@@ -52,7 +52,9 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
 {
     if (m_visualModels.empty())
     {
-        m_visualModels.push_back(std::make_shared<VisualModel>(geometry));
+        auto visualModel = std::make_shared<VisualModel>();
+        visualModel->setGeometry(geometry);
+        m_visualModels.push_back(visualModel);
     }
     else
     {

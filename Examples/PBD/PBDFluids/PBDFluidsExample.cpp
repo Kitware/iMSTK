@@ -52,7 +52,8 @@ createPbdFluid(const std::string& tetMeshName)
     imstkNew<PointSet> fluidMesh;
     fluidMesh->initialize(tetMesh->getInitialVertexPositions());
 
-    imstkNew<VisualModel> fluidVisualModel(fluidMesh.get());
+    imstkNew<VisualModel> fluidVisualModel;
+    fluidVisualModel->setGeometry(fluidMesh);
 
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Fluid);

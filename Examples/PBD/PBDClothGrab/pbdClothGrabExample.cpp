@@ -174,7 +174,8 @@ makeClothObj(const std::string& name,
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     setFleshTextures(material);
-    imstkNew<VisualModel> visualModel(clothMesh);
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(clothMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
@@ -221,8 +222,12 @@ main()
     imstkNew<SceneObject> clickObj("clickObj");
     imstkNew<Sphere>      clickSphere1(Vec3d(0.0, 0.0, 0.0), 0.1);
     imstkNew<Sphere>      clickSphere2(Vec3d(0.0, 0.0, 0.0), 0.1);
-    clickObj->addVisualModel(std::make_shared<VisualModel>(clickSphere1));
-    clickObj->addVisualModel(std::make_shared<VisualModel>(clickSphere2));
+    imstkNew<VisualModel> clickSphere1Model;
+    clickSphere1Model->setGeometry(clickSphere1);
+    imstkNew<VisualModel> clickSphere2Model;
+    clickSphere2Model->setGeometry(clickSphere2);
+    clickObj->addVisualModel(clickSphere1Model);
+    clickObj->addVisualModel(clickSphere2Model);
     clickObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::None);
     clickObj->getVisualModel(1)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::None);
     clickObj->getVisualModel(1)->getRenderMaterial()->setColor(Color::Red);

@@ -168,12 +168,11 @@ makeFEDeformableObject(std::shared_ptr<TetrahedralMesh> tetMesh)
     mat->setPointSize(10.0);
     mat->setLineWidth(2.0);
     mat->setEdgeColor(Color::Orange);
-    imstkNew<VisualModel> surfMeshModel(surfMesh);
-    surfMeshModel->setRenderMaterial(mat);
 
     // Scene object 1: Dragon
     imstkNew<FeDeformableObject> deformableObj("Dragon");
-    deformableObj->addVisualModel(surfMeshModel);
+    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->getVisualModel(0)->setRenderMaterial(mat);
     deformableObj->setPhysicsGeometry(tetMesh);
     // Map simulated geometry to visual
     deformableObj->setPhysicsToVisualMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));

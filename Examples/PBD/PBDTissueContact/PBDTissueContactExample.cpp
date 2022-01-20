@@ -258,12 +258,14 @@ makeTissueObj(const std::string& name,
     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
 
     // Add a visual model to render the surface of the tet mesh
-    imstkNew<VisualModel> visualModel(surfMesh);
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(surfMesh);
     visualModel->setRenderMaterial(material);
     clothObj->addVisualModel(visualModel);
 
     // Add a visual model to render the normals of the surface
-    imstkNew<VisualModel> normalsVisualModel(surfMesh);
+    imstkNew<VisualModel> normalsVisualModel;
+    normalsVisualModel->setGeometry(surfMesh);
     normalsVisualModel->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::SurfaceNormals);
     normalsVisualModel->getRenderMaterial()->setPointSize(0.5);
     clothObj->addVisualModel(normalsVisualModel);

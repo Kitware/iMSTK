@@ -60,7 +60,8 @@ createMeshObject(const std::string& objectName,
     surfMesh->initialize(verticesPtr, indicesPtr);
 
     // Create a visual model
-    imstkNew<VisualModel>    visualModel(surfMesh.get());
+    imstkNew<VisualModel>    visualModel;
+    visualModel->setGeometry(surfMesh);
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setColor(color); // Wireframe color

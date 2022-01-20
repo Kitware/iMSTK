@@ -108,11 +108,12 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
     sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Setup the VisualModel
-    imstkNew<VisualModel>    fluidVisualModel(fluidGeometry.get());
+    imstkNew<VisualModel>    fluidVisualModel;
+    fluidVisualModel->setGeometry(fluidGeometry);
     imstkNew<RenderMaterial> fluidMaterial;
     fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
     fluidMaterial->setVertexColor(Color::Orange);
-    fluidMaterial->setPointSize(static_cast<float>(particleRadius));
+    fluidMaterial->setPointSize(particleRadius);
     fluidVisualModel->setRenderMaterial(fluidMaterial);
 
     // Setup the Object
@@ -142,7 +143,8 @@ makeDragonCollidingObject(const std::string& name, const Vec3d& position)
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    imstkNew<VisualModel> surfMeshModel(dragonSurfMesh);
+    imstkNew<VisualModel> surfMeshModel;
+    surfMeshModel->setGeometry(dragonSurfMesh);
     surfMeshModel->setRenderMaterial(material);
 
     // Setup the Object

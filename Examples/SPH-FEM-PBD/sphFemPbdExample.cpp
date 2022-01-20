@@ -121,7 +121,8 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
     sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Setup the VisualModel
-    imstkNew<VisualModel>    fluidVisualModel(fluidGeometry.get());
+    imstkNew<VisualModel>    fluidVisualModel;
+    fluidVisualModel->setGeometry(fluidGeometry);
     imstkNew<RenderMaterial> fluidMaterial;
     fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
     fluidMaterial->setVertexColor(Color::Orange);
@@ -218,7 +219,8 @@ makePBDDragonObject(const std::string& name, const Vec3d& position)
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    imstkNew<VisualModel> surfMeshModel(highResSurfMesh);
+    imstkNew<VisualModel> surfMeshModel;
+    surfMeshModel->setGeometry(highResSurfMesh);
     surfMeshModel->setRenderMaterial(material);
 
     // Setup the Object

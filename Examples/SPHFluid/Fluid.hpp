@@ -188,7 +188,8 @@ generateFluid(const double particleRadius)
     imstkNew<SphObject> fluidObj("SPHSphere");
 
     // Create a visual model
-    imstkNew<VisualModel> visualModel(geometry.get());
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(geometry);
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
     //material->setDisplayMode(RenderMaterial::DisplayMode::Points);
