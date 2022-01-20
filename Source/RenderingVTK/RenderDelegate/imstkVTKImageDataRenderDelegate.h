@@ -37,15 +37,8 @@ class AbstractDataArray;
 class VTKImageDataRenderDelegate : public VTKVolumeRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit VTKImageDataRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKImageDataRenderDelegate() override = default;
+    VTKImageDataRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    ~VTKImageDataRenderDelegate() override = default;
 
     ///
     /// \brief Update render delegate source based on the internal data
@@ -66,4 +59,4 @@ protected:
     std::shared_ptr<AbstractDataArray> m_scalarArray;
     vtkSmartPointer<vtkImageData>      imageDataVtk;
 };
-} // imstk
+}

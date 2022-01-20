@@ -160,4 +160,4 @@ HapticDeviceClient::hapticCallback(void* pData)
 
     return HD_CALLBACK_CONTINUE;
 }
-} // imstk
+}

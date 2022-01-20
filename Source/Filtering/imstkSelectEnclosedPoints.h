@@ -38,7 +38,7 @@ class SelectEnclosedPoints : public GeometryAlgorithm
 {
 public:
     SelectEnclosedPoints();
-    virtual ~SelectEnclosedPoints() override = default;
+    ~SelectEnclosedPoints() override = default;
 
 public:
     void setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);

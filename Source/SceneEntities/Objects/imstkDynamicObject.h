@@ -37,34 +37,35 @@ class AbstractDynamicalModel;
 class DynamicObject : public CollidingObject
 {
 public:
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~DynamicObject() override = default;
+    ~DynamicObject() override = default;
 
     ///
     /// \brief Set/Get the geometry used for Physics computations
-    ///
+    ///@{
     std::shared_ptr<Geometry> getPhysicsGeometry() const { return m_physicsGeometry; }
     virtual void setPhysicsGeometry(std::shared_ptr<Geometry> geometry) { m_physicsGeometry = geometry; }
+    ///@}
 
     ///
     /// \brief Set/Get the Physics-to-Collision map
-    ///
+    ///@{
     std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const { return m_physicsToCollidingGeomMap; }
     void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map) { m_physicsToCollidingGeomMap = map; }
+    ///@}
 
     ///
     /// \brief Set/Get the Physics-to-Visual map
-    ///
+    ///@{
     std::shared_ptr<GeometryMap> getPhysicsToVisualMap() const { return m_physicsToVisualGeomMap; }
     void setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map) { m_physicsToVisualGeomMap = map; }
+    ///@}
 
     ///
     /// \brief Set/Get dynamical model
-    ///
+    ///@{
     virtual std::shared_ptr<AbstractDynamicalModel> getDynamicalModel() const { return m_dynamicalModel; }
     virtual void setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaModel) { m_dynamicalModel = dynaModel; }
+    ///@}
 
     ///
     /// \brief Returns the number of degree of freedom
@@ -84,22 +85,19 @@ public:
     ///
     /// \brief Initialize the scene object
     ///
-    virtual bool initialize() override;
+    bool initialize() override;
 
     ///
     /// \brief Reset the dynamic object by reseting the respective DynamicalModel and Geometry
     ///
-    virtual void reset() override;
+    void reset() override;
 
 protected:
     ///
     /// \brief Setup connectivity of task graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-    ///
-    /// \brief Constructor
-    ///
     DynamicObject(const std::string& name) : CollidingObject(name) { }
 
     std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel = nullptr; ///> Dynamical model
@@ -110,4 +108,4 @@ protected:
     std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap    = nullptr; ///> Maps from Physics to visual geometry
     bool m_updateVisualFromPhysicsGeometry = true;                      ///> Defines if visual is updated from colliding mapping or physics mapping
 };
-} // imstk
+}

@@ -41,30 +41,29 @@ class Renderer;
 class VisualModel : public EventObject
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VisualModel(std::shared_ptr<Geometry> geometry);
     VisualModel(std::shared_ptr<Geometry>       geometry,
                 std::shared_ptr<RenderMaterial> renderMaterial);
     VisualModel();
-    virtual ~VisualModel() override = default;
+    ~VisualModel() override = default;
 
     // *INDENT-OFF*
     SIGNAL(VisualModel, modified);
     // *INDENT-ON*
 
     ///
-    /// \brief Get/set geometry
-    ///
+    /// \brief Get/Set geometry
+    ///@{
     std::shared_ptr<Geometry> getGeometry() const { return m_geometry; }
     void setGeometry(std::shared_ptr<Geometry> geometry) { m_geometry = geometry; }
+    ///@}
 
     ///
     /// \brief Get/Set name
-    ///
+    ///@{
     const std::string& getName() { return m_name; }
     void setName(std::string name) { m_name = name; }
+    ///@}
 
     ///
     /// \brief Set/Get render material
@@ -75,23 +74,23 @@ public:
 
     ///
     /// \brief Visibility functions
-    ///
+    ///@{
     void show() { setIsVisible(true); }
     void hide() { setIsVisible(false); }
     bool isVisible() const { return m_isVisible; }
     void setIsVisible(const bool visible);
+    ///@}
 
     ///
     /// \brief Get/Set whether the delegate has been created
-    ///
+    ///@{
     bool getRenderDelegateCreated(Renderer* ren);
     void setRenderDelegateCreated(Renderer* ren, bool created) { m_renderDelegateCreated[ren] = created; }
+    ///@}
 
     void postModified() { this->postEvent(Event(VisualModel::modified())); }
 
 protected:
-    friend class VTKRenderer;
-
     std::string m_name = "";
 
     std::shared_ptr<Geometry>       m_geometry = nullptr;

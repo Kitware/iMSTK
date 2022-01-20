@@ -113,4 +113,4 @@ AnalyticalGeometry::updatePostTransformData() const
     m_positionPostTransform    = (m_transform * Vec4d(m_position[0], m_position[1], m_position[2], 1.0)).head<3>();
     m_orientationPostTransform = (Quatd(getRotation()) * m_orientation).normalized();
 }
-} // imstk
+}

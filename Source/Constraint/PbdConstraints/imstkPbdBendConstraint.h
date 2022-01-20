@@ -33,9 +33,6 @@ namespace imstk
 class PbdBendConstraint : public PbdConstraint
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     PbdBendConstraint() : PbdConstraint()
     {
         m_vertexIds.resize(3);
@@ -77,4 +74,4 @@ public:
 public:
     double m_restLength = 0.; ///> Rest length
 };
-} //imstk
+}

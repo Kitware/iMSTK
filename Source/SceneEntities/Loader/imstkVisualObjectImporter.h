@@ -77,5 +77,5 @@ private:
         const std::string& input,
         const std::string& delimiter,
         const bool         lastInstance = false);
-};  // VisualObjectImporter
-} // imstk
+};
+}

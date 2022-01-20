@@ -40,20 +40,13 @@ template<typename T, int N> class VecDataArray;
 class PointSet : public Geometry
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     PointSet(const std::string& name = std::string(""));
-
-    ///
-    /// \brief Deconstructor
-    ///
-    virtual ~PointSet() override = default;
+    ~PointSet() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "PointSet"; }
+    const std::string getTypeName() const override { return "PointSet"; }
 
     ///
     /// \brief Initializes the data structure given vertex positions
@@ -108,9 +101,10 @@ public:
 
     ///
     /// \brief Returns the position of a vertex given its index
-    ///
+    ///@{
     const Vec3d& getVertexPosition(const size_t vertNum, DataType type = DataType::PostTransform) const;
     Vec3d& getVertexPosition(const size_t vertNum, DataType type       = DataType::PostTransform);
+    ///@}
 
     ///
     /// \brief Returns the number of total vertices in the mesh
@@ -118,11 +112,12 @@ public:
     int getNumVertices() const;
 
     ///
-    /// \brief Set load factor
+    /// \brief Get/Set load factor
     /// \param loadFactor the maximum number of vertices; a multiple of the original vertex count
-    ///
+    ///@{
     virtual void setLoadFactor(const double loadFactor);
     virtual double getLoadFactor() const { return m_loadFactor; }
+    ///@}
 
     ///
     /// \brief Get the maximum number of vertices
@@ -157,35 +152,39 @@ public:
 
     ///
     /// \brief Get/Set the active scalars
-    ///
+    ///@{
     void setVertexScalars(const std::string& arrayName, std::shared_ptr<AbstractDataArray> scalars);
     void setVertexScalars(const std::string& arrayName);
     std::string getActiveVertexScalars() const { return m_activeVertexScalars; }
     std::shared_ptr<AbstractDataArray> getVertexScalars() const;
+    ///@}
 
     ///
     /// \brief Get/Set the active normals
-    ///
+    ///@{
     void setVertexNormals(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> normals);
     void setVertexNormals(const std::string& arrayName);
     std::string getActiveVertexNormals() const { return m_activeVertexNormals; }
     std::shared_ptr<VecDataArray<double, 3>> getVertexNormals() const;
+    ///@}
 
     ///
     /// \brief Get/Set the active tangents
-    ///
+    ///@{
     void setVertexTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<float, 3>> tangents);
     void setVertexTangents(const std::string& arrayName);
     std::string getActiveVertexTangents() const { return m_activeVertexTangents; }
     std::shared_ptr<VecDataArray<float, 3>> getVertexTangents() const;
+    ///@}
 
     ///
     /// \brief Get/Set the active tcoords
-    ///
+    ///@{
     void setVertexTCoords(const std::string& arrayName, std::shared_ptr<VecDataArray<float, 2>> tcoords);
     void setVertexTCoords(const std::string& arrayName);
     std::string getActiveVertexTCoords() const { return m_activeVertexTCoords; }
     std::shared_ptr<VecDataArray<float, 2>> getVertexTCoords() const;
+    ///@}
 
     ///
     /// \brief Applies the geometries member transform to produce currPositions
@@ -218,4 +217,4 @@ protected:
     int    m_maxNumVertices      = 0;
     int    m_originalNumVertices = 0;
 };
-} // imstk
+}

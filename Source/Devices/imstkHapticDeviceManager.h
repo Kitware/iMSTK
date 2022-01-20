@@ -71,4 +71,4 @@ private:
 
     std::vector<std::shared_ptr<HapticDeviceClient>> m_deviceClients; ///< list of all the device clients
 };
-} // imstk
+}

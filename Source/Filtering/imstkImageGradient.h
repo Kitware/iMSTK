@@ -35,7 +35,7 @@ class ImageGradient : public GeometryAlgorithm
 {
 public:
     ImageGradient();
-    virtual ~ImageGradient() override = default;
+    ~ImageGradient() override = default;
 
 public:
     ///
@@ -44,10 +44,12 @@ public:
     void setInputImage(std::shared_ptr<ImageData> inputImage);
 
     ///
-    /// \brief If on, a single channel magnitude image is output, if off, a 3 component gradient is produced
-    ///
+    /// \brief Get/Set whether to compute the magnitude
+    /// If on, a single channel magnitude image is output, if off, a 3 component gradient is produced
+    ///@{
     imstkSetMacro(ComputeMagnitude, bool);
     imstkGetMacro(ComputeMagnitude, bool);
+///@}
 
 protected:
     void requestUpdate() override;

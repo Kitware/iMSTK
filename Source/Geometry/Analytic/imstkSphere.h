@@ -28,7 +28,7 @@ namespace imstk
 ///
 /// \class Sphere
 ///
-/// \brief Sphere geometry
+/// \brief Represents a sphere via its position & radius
 ///
 class Sphere : public AnalyticalGeometry
 {
@@ -43,12 +43,12 @@ public:
         setRadius(radius);
     }
 
-    virtual ~Sphere() override = default;
+    ~Sphere() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "Sphere"; }
+    const std::string getTypeName() const override { return "Sphere"; }
 
     ///
     /// \brief Print the sphere info
@@ -61,19 +61,16 @@ public:
     double getVolume() override { return 4.0 / 3.0 * PI * m_radius * m_radius * m_radius; }
 
     ///
-    /// \brief Returns the radius of the sphere
-    ///
+    /// \brief Get/Set the radius of the sphere
+    ///@{
     double getRadius(DataType type = DataType::PostTransform);
-
-    ///
-    /// \brief Sets the radius of the sphere
-    ///
     void setRadius(const double r);
+    ///@}
 
     ///
     /// \brief Get the min, max of the AABB around the sphere
     ///
-    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) override;
+    void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) override;
 
     ///
     /// \brief Returns signed distance to surface given position
@@ -91,4 +88,4 @@ protected:
     double m_radius = 1.0;                      ///> Radius of the sphere
     mutable double m_radiusPostTransform = 1.0; ///> Radius of the sphere once transform applied
 };
-} // imstk
+}

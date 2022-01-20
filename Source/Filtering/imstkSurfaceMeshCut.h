@@ -99,7 +99,7 @@ class SurfaceMeshCut : public GeometryAlgorithm
 {
 public:
     SurfaceMeshCut();
-    virtual ~SurfaceMeshCut() override = default;
+    ~SurfaceMeshCut() override = default;
 
 public:
     std::shared_ptr<SurfaceMesh> getOutputMesh();

@@ -39,12 +39,8 @@ class VTKTextureDelegate;
 class VTKTextureDelegate : public TextureDelegate
 {
 public:
-    ///
-    /// \brief Default constructor
-    ///
     VTKTextureDelegate(std::shared_ptr<Texture> texture);
-
-    virtual ~VTKTextureDelegate() override = default;
+    ~VTKTextureDelegate() override = default;
 
     ///
     /// \brief Gets the VTK texture coupled to the imstk texture

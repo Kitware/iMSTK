@@ -328,4 +328,4 @@ VTKLineMeshRenderDelegate::setCellScalarBuffer(std::shared_ptr<AbstractDataArray
         static_cast<vtkIdType>(m_cellScalars->size()), 1);
     m_mappedCellScalarArray->Modified();
 }
-} // imstk
+}

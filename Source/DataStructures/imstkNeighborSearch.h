@@ -46,7 +46,7 @@ public:
     /// \brief Constructor
     /// \param The selected search method
     ///
-    explicit NeighborSearch(Method searchMethod, double searchRadius = 0.0);
+    NeighborSearch(Method searchMethod, double searchRadius = 0.0);
 
     ///
     /// \brief Set the search radius
@@ -87,4 +87,4 @@ private:
     std::shared_ptr<GridBasedNeighborSearch> m_GridBasedSearcher;
     std::shared_ptr<SpatialHashTableSeparateChaining> m_SpatialHashSearcher;
 };
-} // end namespace imstk
+}

@@ -29,6 +29,8 @@
 namespace imstk
 {
 ///
+/// \struct NormalGroup
+///
 /// \brief Helper class for indentifying duplicate points
 ///
 struct NormalGroup
@@ -41,7 +43,8 @@ struct NormalGroup
 namespace std
 {
 ///
-/// \struct less
+/// \struct less<imstk::NormalGroup>
+///
 /// \brief This method is defined to allow for the map to be properly indexed by Texture objects
 ///
 template<> struct less<imstk::NormalGroup>
@@ -69,22 +72,16 @@ namespace imstk
 ///
 /// \class SurfaceMesh
 ///
-/// \brief Surface triangular mesh
+/// \brief Represents a set of triangles & vertices via an array of
+/// Vec3d double vertices & Vec3i integer indices
 ///
 class SurfaceMesh : public PointSet
 {
 public:
     using NeighborsType = std::set<size_t>;
 
-    ///
-    /// \brief Constructor
-    ///
     SurfaceMesh(const std::string& name = std::string(""));
-
-    ///
-    /// \brief Deconstructor
-    ///
-    virtual ~SurfaceMesh() override = default;
+    ~SurfaceMesh() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
@@ -185,15 +182,17 @@ public:
 // Accessors
     ///
     /// \brief Get/Set triangle connectivity
-    ///
+    ///@{
     void setTriangleIndices(std::shared_ptr<VecDataArray<int, 3>> indices) { m_triangleIndices = indices; }
     std::shared_ptr<VecDataArray<int, 3>> getTriangleIndices() const { return m_triangleIndices; }
+    ///@}
 
     ///
     /// \brief Return connectivity of a triangle
-    ///
+    ///@{
     const Vec3i& getTriangleIndices(const int triangleNum) const;
     Vec3i& getTriangleIndices(const int triangleNum);
+    ///@}
 
     ///
     /// \brief Returns the number of triangles
@@ -245,27 +244,30 @@ public:
 
     ///
     /// \brief Get/Set the active scalars
-    ///
+    ///@{
     void setCellScalars(const std::string& arrayName, std::shared_ptr<AbstractDataArray> scalars);
     void setCellScalars(const std::string& arrayName);
     std::string getActiveCellScalars() const { return m_activeCellScalars; }
     std::shared_ptr<AbstractDataArray> getCellScalars() const;
+    ///@}
 
     ///
     /// \brief Get/Set the active normals
-    ///
+    ///@{
     void setCellNormals(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> normals);
     void setCellNormals(const std::string& arrayName);
     std::string getActiveCellNormals() const { return m_activeCellNormals; }
     std::shared_ptr<VecDataArray<double, 3>> getCellNormals() const;
+    ///@}
 
     ///
     /// \brief Get/Set the active tangents
-    ///
+    ///@{
     void setCellTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> tangents);
     void setCellTangents(const std::string& arrayName);
     std::string getActiveCellTangents() const { return m_activeCellTangents; }
     std::shared_ptr<VecDataArray<double, 3>> getCellTangents() const;
+///@}
 
 protected:
     void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
@@ -281,4 +283,4 @@ protected:
     std::string m_activeCellTangents = "";
     std::string m_activeCellScalars  = "";
 };
-} // imstk
+}

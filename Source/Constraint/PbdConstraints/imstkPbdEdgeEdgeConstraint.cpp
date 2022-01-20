@@ -98,4 +98,4 @@ PbdEdgeEdgeConstraint::computeValueAndGradient(double&             c,
 
     return true;
 }
-} // imstk
+}

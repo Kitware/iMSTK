@@ -33,9 +33,6 @@ namespace imstk
 class Capsule : public AnalyticalGeometry
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     Capsule(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 0.5, const double length = 1.0, const Quatd orientation = Quatd::Identity(),
             const std::string& name = std::string("defaultCapsule")) :
         AnalyticalGeometry(name)
@@ -46,15 +43,12 @@ public:
         setLength(length);
     }
 
-    ///
-    /// \brief Deconstructor
-    ///
-    virtual ~Capsule() override = default;
+    ~Capsule() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "Capsule"; }
+    const std::string getTypeName() const override { return "Capsule"; }
 
     ///
     /// \brief Print the capsule info
@@ -67,24 +61,18 @@ public:
     double getVolume() override { return PI * m_radius * m_radius * (m_length + 4.0 / 3.0 * m_radius); }
 
     ///
-    /// \brief Returns the radius of the capsule
-    ///
+    /// \brief Get/Set the radius of the capsule
+    ///@{
     double getRadius(DataType type = DataType::PostTransform);
-
-    ///
-    /// \brief Sets the radius of the capsule
-    ///
     void setRadius(const double r);
+    ///@}
 
     ///
-    /// \brief Returns the length of the capsule
-    ///
+    /// \brief Get/Set the length of the capsule
+    ///@{
     double getLength(DataType type = DataType::PostTransform);
-
-    ///
-    /// \brief Sets the length of the capsule
-    ///
     void setLength(const double l);
+    ///@}
 
     ///
     /// \brief Returns the signed distance to the capsule
@@ -109,4 +97,4 @@ protected:
     double m_length = 1.0;                      ///> Length between the centers of two hemispheres
     mutable double m_lengthPostTransform = 1.0; ///> Length after transform
 };
-} // imstk
+}

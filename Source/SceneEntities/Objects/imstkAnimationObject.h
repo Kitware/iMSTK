@@ -35,15 +35,16 @@ class AnimationObject : public SceneObject
 {
 public:
     AnimationObject(const std::string& name) : SceneObject(name) { }
-    virtual ~AnimationObject() override = default;
+    ~AnimationObject() override = default;
 
-    virtual const std::string getTypeName() const override { return "AnimationObject"; }
+    const std::string getTypeName() const override { return "AnimationObject"; }
 
     ///
-    /// \brief Set/get animation model
-    ///
+    /// \brief Set/Get animation model
+    ///@{
     std::shared_ptr<AnimationModel> getAnimationModel() const;
     void setAnimationModel(std::shared_ptr<AnimationModel> model);
+    ///@}
 
     ///
     /// \brief Initialize the scene object
@@ -63,4 +64,4 @@ public:
 protected:
     std::shared_ptr<AnimationModel> m_animationModel;
 };
-} // imstk
+}

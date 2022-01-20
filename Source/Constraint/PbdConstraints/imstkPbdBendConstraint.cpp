@@ -79,4 +79,4 @@ PbdBendConstraint::computeValueAndGradient(
 
     return true;
 }
-} // imstk
+}

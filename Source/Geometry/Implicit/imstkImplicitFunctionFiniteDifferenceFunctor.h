@@ -27,6 +27,8 @@
 namespace imstk
 {
 ///
+/// \struct ImplicitFunctionGradient
+///
 /// \brief Base struct for gradient functors
 ///
 struct ImplicitFunctionGradient
@@ -54,12 +56,14 @@ struct ImplicitFunctionGradient
 };
 
 ///
+/// \struct ImplicitFunctionCentralGradient
+///
 /// \brief Gradient given by central finite differences
 ///
 struct ImplicitFunctionCentralGradient : public ImplicitFunctionGradient
 {
     public:
-        virtual ~ImplicitFunctionCentralGradient() = default;
+        ~ImplicitFunctionCentralGradient() override = default;
 
         Vec3d operator()(const Vec3d& pos) const override
         {
@@ -71,6 +75,8 @@ struct ImplicitFunctionCentralGradient : public ImplicitFunctionGradient
         }
 };
 
+///
+/// \struct StructuredCentralGradient
 ///
 /// \brief Gradient given by central finite differences
 ///
@@ -101,6 +107,8 @@ struct StructuredCentralGradient : public ImplicitFunctionGradient
 };
 
 ///
+/// \struct ImplicitFunctionForwardGradient
+///
 /// \brief Gradient given by forward finite differences
 ///
 struct ImplicitFunctionForwardGradient : public ImplicitFunctionGradient
@@ -120,6 +128,8 @@ struct ImplicitFunctionForwardGradient : public ImplicitFunctionGradient
         }
 };
 
+///
+/// \struct ImplicitFunctionBackwardGradient
 ///
 /// \brief Gradient given by backward finite differences
 ///
@@ -142,6 +152,8 @@ struct ImplicitFunctionBackwardGradient : public ImplicitFunctionGradient
         }
 };
 
+///
+/// \struct StructuredForwardGradient
 ///
 /// \brief Gradient given by forward finite differences
 ///
@@ -175,6 +187,8 @@ struct StructuredForwardGradient : public ImplicitFunctionGradient
 };
 
 ///
+/// \struct StructuredBackwardGradient
+///
 /// \brief Gradient given by backward finite differences
 ///
 struct StructuredBackwardGradient : public ImplicitFunctionGradient
@@ -206,6 +220,8 @@ struct StructuredBackwardGradient : public ImplicitFunctionGradient
         Vec3i m_dxi;
 };
 
+///
+/// \struct ImplicitStructuredCurvature
 ///
 /// \brief Curvature given in structured coordinates
 ///

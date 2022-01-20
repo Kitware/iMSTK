@@ -39,16 +39,9 @@ namespace imstk
 class LinearFemForceModel : public InternalForceModel
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     LinearFemForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
                         const bool withGravity = true, const double gravity = -9.81);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~LinearFemForceModel() override;
+    ~LinearFemForceModel() override;
 
     ///
     /// \brief Compute the internal force
@@ -99,4 +92,4 @@ protected:
     // tmp
     vega::SparseMatrix* m_stiffnessMatrixRawPtr;
 };
-} // imstk
+}

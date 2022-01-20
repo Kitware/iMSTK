@@ -213,4 +213,4 @@ VTKRenderDelegate::getVTKTexture(std::shared_ptr<Texture> texture)
 
     return vtktexture;
 }
-} // imstk
+}

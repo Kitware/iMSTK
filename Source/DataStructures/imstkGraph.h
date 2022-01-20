@@ -40,11 +40,8 @@ public:
         WelshPowell
     };
 
-    ///
-    /// \brief Constructor/destructor
-    ///
     Graph(const size_t size) { m_adjList.resize(size); }
-    ~Graph() = default;
+    virtual ~Graph() = default;
 
     ///
     /// \brief Add edge to the graph

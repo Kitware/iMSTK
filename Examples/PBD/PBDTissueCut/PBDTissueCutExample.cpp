@@ -203,7 +203,7 @@ makeTissueObj(const std::string& name,
     // Use FEMTet constraints
     pbdParams->m_femParams->m_YoungModulus = 50.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.4;
-    pbdParams->enableFEMConstraint(PbdFEMConstraint::MaterialType::StVK);
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
     pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 0.1;
     pbdParams->m_gravity    = Vec3d(0.0, -0.2, 0.0);

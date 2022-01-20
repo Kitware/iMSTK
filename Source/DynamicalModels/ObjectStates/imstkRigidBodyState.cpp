@@ -29,4 +29,4 @@ RigidBodyState::initialize(const Vec3d position, const RigidTransform3d rotation
     m_position    = position;
     m_orientation = rotationMat;
 }
-} // imstk
+}

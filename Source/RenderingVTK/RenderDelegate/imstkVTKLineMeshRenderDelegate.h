@@ -43,7 +43,7 @@ class VTKLineMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-    virtual ~VTKLineMeshRenderDelegate() override = default;
+    ~VTKLineMeshRenderDelegate() override = default;
 
     ///
     /// \brief Event handler

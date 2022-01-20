@@ -40,10 +40,10 @@ public:
     /// \brief Constructor for PbdObject-PbdObject or PbdObject-CollidingObject collisions
     ///
     PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                       std::string cdType  = "MeshToMeshBruteForceCD");
-    virtual ~PbdObjectCollision() override = default;
+                       std::string cdType = "MeshToMeshBruteForceCD");
+    ~PbdObjectCollision() override = default;
 
-    virtual const std::string getTypeName() const override { return "PbdObjectCollision"; }
+    const std::string getTypeName() const override { return "PbdObjectCollision"; }
 
     void setRestitution(const double restitution);
     const double getRestitution() const;
@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Setup connectivity of task graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     // Steps introduced in interaction

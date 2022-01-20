@@ -77,4 +77,4 @@ VTKCylinderRenderDelegate::processEvents()
     T.matrix().transposeInPlace();
     m_transform->SetMatrix(T.data());
 }
-} // imstk
+}

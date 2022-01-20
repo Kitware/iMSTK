@@ -234,4 +234,4 @@ Geometry::getUniqueID()
     s_GeomGlobalLock.unlock();
     return idx;
 }
-} // imstk
+}

@@ -47,4 +47,4 @@ SphObject::getSphModel()
     m_sphModel = std::dynamic_pointer_cast<SphModel>(m_dynamicalModel);
     return m_sphModel;
 }
-} // end namespace imstk
+}

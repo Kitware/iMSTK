@@ -43,7 +43,7 @@ public:
 
     ~IsometricMap() override = default;
 
-    virtual const std::string getTypeName() const override { return "IsometricMap"; }
+    const std::string getTypeName() const override { return "IsometricMap"; }
 
     ///
     /// \brief Compute the map
@@ -63,4 +63,4 @@ public:
         return true;
     }
 };
-} // imstk
+}

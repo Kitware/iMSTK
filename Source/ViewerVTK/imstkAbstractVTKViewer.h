@@ -50,12 +50,12 @@ public:
 protected:
     AbstractVTKViewer(std::string name);
 public:
-    virtual ~AbstractVTKViewer() override = default;
+    ~AbstractVTKViewer() override = default;
 
     ///
     /// \brief Get the current renderer mode
     ///
-    virtual Renderer::Mode getRenderingMode() const override;
+    Renderer::Mode getRenderingMode() const override;
 
     ///
     /// \brief Get pointer to the vtkRenderWindow rendering
@@ -105,4 +105,4 @@ protected:
     vtkSmartPointer<vtkCallbackCommand> exitCallback;
     bool m_useVsync = true;
 };
-} // imstk
+}

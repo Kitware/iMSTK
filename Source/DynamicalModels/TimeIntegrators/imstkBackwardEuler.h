@@ -27,21 +27,14 @@ namespace imstk
 {
 ///
 /// \class BackwardEuler
+///
 /// \brief Backward Euler time integration
 ///
 class BackwardEuler : public TimeIntegrator
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    BackwardEuler(const double dT = 0.01) : TimeIntegrator(Type::BackwardEuler, dT)
-    {}
-
-    ///
-    /// \brief Destructor
-    ///
-    ~BackwardEuler() = default;
+    BackwardEuler(const double dT = 0.01) : TimeIntegrator(Type::BackwardEuler, dT) { }
+    ~BackwardEuler() override     = default;
 
     ///
     /// \brief Update state given change in velocity
@@ -77,4 +70,4 @@ protected:
 //    std::array<double, 3> m_beta = { { 1, -1, 0 } };
 //    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
 };
-} // imstk
+}

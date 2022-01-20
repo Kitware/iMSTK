@@ -41,77 +41,79 @@ public:
     vtkTypeMacro(VTKInteractorStyle, vtkInteractorStyleTrackballCamera);
 
     VTKInteractorStyle();
-    virtual ~VTKInteractorStyle() override;
+    ~VTKInteractorStyle() override;
 
     ///
     /// \brief Slot for key pressed
     ///
-    virtual void OnKeyPress() override;
+    void OnKeyPress() override;
 
     ///
     /// \brief Slot for key released
     ///
-    virtual void OnKeyRelease() override;
+    void OnKeyRelease() override;
 
     ///
     /// \brief Filter out these events
-    ///
-    virtual void OnKeyDown() override { }
-    virtual void OnKeyUp() override { }
-    virtual void OnChar() override { }
+    ///@{
+    void OnKeyDown() override { }
+    void OnKeyUp() override { }
+    void OnChar() override { }
+    ///@}
 
     ///
     /// \brief Slot for moved mouse cursor
     ///
-    virtual void OnMouseMove() override;
+    void OnMouseMove() override;
 
     ///
     /// \brief Slot for mouse left button clicked
     ///
-    virtual void OnLeftButtonDown() override;
+    void OnLeftButtonDown() override;
 
     ///
     /// \brief Slot for mouse left button released
     ///
-    virtual void OnLeftButtonUp() override;
+    void OnLeftButtonUp() override;
 
     ///
     /// \brief Slot for mouse middle button clicked
     ///
-    virtual void OnMiddleButtonDown() override;
+    void OnMiddleButtonDown() override;
 
     ///
     /// \brief Slot for mouse middle button released
     ///
-    virtual void OnMiddleButtonUp() override;
+    void OnMiddleButtonUp() override;
 
     ///
     /// \brief Slot for mouse right button clicked
     ///
-    virtual void OnRightButtonDown() override;
+    void OnRightButtonDown() override;
 
     ///
     /// \brief Slot for mouse right button released
     ///
-    virtual void OnRightButtonUp() override;
+    void OnRightButtonUp() override;
 
     ///
     /// \brief Slot for mouse wheel rolled forward
     ///
-    virtual void OnMouseWheelForward() override;
+    void OnMouseWheelForward() override;
 
     ///
     /// \brief Slot for mouse wheel rolled backward
     ///
-    virtual void OnMouseWheelBackward() override;
+    void OnMouseWheelBackward() override;
 
     ///
     /// \brief Not implemented
-    ///
-    virtual void OnFourthButtonDown() override {}
-    virtual void OnFifthButtonDown() override {}
-    virtual void OnFourthButtonUp() override {}
-    virtual void OnFifthButtonUp() override {}
+    ///@{
+    void OnFourthButtonDown() override {}
+    void OnFifthButtonDown() override {}
+    void OnFourthButtonUp() override {}
+    void OnFifthButtonUp() override {}
+    ///@}
 
     std::shared_ptr<KeyboardDeviceClient> getKeyboardDeviceClient() const { return m_keyboardDeviceClient; }
     std::shared_ptr<MouseDeviceClient> getMouseDeviceClient() const { return m_mouseDeviceClient; }
@@ -120,4 +122,4 @@ private:
     std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;
     std::shared_ptr<MouseDeviceClient>    m_mouseDeviceClient;
 };
-} // imstk
+}

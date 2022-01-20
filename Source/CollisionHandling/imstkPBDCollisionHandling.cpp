@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkPBDCollisionHandling.h"
+#include "imstkPbdCollisionHandling.h"
 #include "imstkCollisionData.h"
 #include "imstkGeometryMap.h"
 #include "imstkOneToOneMap.h"
@@ -146,12 +146,12 @@ getTriangle(const CollisionElement& elem, const MeshSide& side)
     return results;
 }
 
-PBDCollisionHandling::PBDCollisionHandling() :
+PbdCollisionHandling::PbdCollisionHandling() :
     m_pbdCollisionSolver(std::make_shared<PbdCollisionSolver>())
 {
 }
 
-PBDCollisionHandling::~PBDCollisionHandling()
+PbdCollisionHandling::~PbdCollisionHandling()
 {
     for (const auto ptr: m_EEConstraintPool)
     {
@@ -172,7 +172,7 @@ PBDCollisionHandling::~PBDCollisionHandling()
 }
 
 void
-PBDCollisionHandling::handle(
+PbdCollisionHandling::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
@@ -226,7 +226,7 @@ PBDCollisionHandling::handle(
 }
 
 void
-PBDCollisionHandling::generateMeshNonMeshConstraints(
+PbdCollisionHandling::generateMeshNonMeshConstraints(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
@@ -352,7 +352,7 @@ PBDCollisionHandling::generateMeshNonMeshConstraints(
 }
 
 void
-PBDCollisionHandling::generateMeshMeshConstraints(
+PbdCollisionHandling::generateMeshMeshConstraints(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
@@ -507,7 +507,7 @@ PBDCollisionHandling::generateMeshMeshConstraints(
 }
 
 void
-PBDCollisionHandling::correctVelocities()
+PbdCollisionHandling::correctVelocities()
 {
     for (int i = 0; i < m_PBDConstraints.size(); i++)
     {
@@ -516,7 +516,7 @@ PBDCollisionHandling::correctVelocities()
 }
 
 void
-PBDCollisionHandling::addVTConstraint(
+PbdCollisionHandling::addVTConstraint(
     VertexMassPair ptA,
     VertexMassPair ptB1, VertexMassPair ptB2, VertexMassPair ptB3,
     double stiffnessA, double stiffnessB)
@@ -527,7 +527,7 @@ PBDCollisionHandling::addVTConstraint(
 }
 
 void
-PBDCollisionHandling::addEEConstraint(
+PbdCollisionHandling::addEEConstraint(
     VertexMassPair ptA1, VertexMassPair ptA2,
     VertexMassPair ptB1, VertexMassPair ptB2,
     double stiffnessA, double stiffnessB)
@@ -538,7 +538,7 @@ PBDCollisionHandling::addEEConstraint(
 }
 
 void
-PBDCollisionHandling::addPEConstraint(
+PbdCollisionHandling::addPEConstraint(
     VertexMassPair ptA1,
     VertexMassPair ptB1, VertexMassPair ptB2,
     double stiffnessA, double stiffnessB)
@@ -549,7 +549,7 @@ PBDCollisionHandling::addPEConstraint(
 }
 
 void
-PBDCollisionHandling::addPPConstraint(
+PbdCollisionHandling::addPPConstraint(
     VertexMassPair ptA, VertexMassPair ptB,
     double stiffnessA, double stiffnessB)
 {

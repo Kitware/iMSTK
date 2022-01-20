@@ -33,6 +33,7 @@ class PointSet;
 
 ///
 /// \class SphModelConfig
+///
 /// \brief Class that holds the SPH model parameters
 ///
 class SphModelConfig
@@ -41,8 +42,8 @@ private:
     void initialize();
 
 public:
-    explicit SphModelConfig(const double particleRadius);
-    explicit SphModelConfig(const double particleRadius, const double speedOfSound, const double restDensity);
+    SphModelConfig(const double particleRadius);
+    SphModelConfig(const double particleRadius, const double speedOfSound, const double restDensity);
 
     /// \todo Move this to solver or time integrator in the future
     double m_minTimestep = 1.0e-6;
@@ -95,15 +96,8 @@ public:
 class SphModel : public DynamicalModel<SphState>
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     SphModel();
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~SphModel() override = default;
+    ~SphModel() override = default;
 
     ///
     /// \brief Set simulation parameters
@@ -113,12 +107,12 @@ public:
     ///
     /// \brief Initialize the dynamical model
     ///
-    virtual bool initialize() override;
+    bool initialize() override;
 
     ///
     /// \brief Reset the current state to the initial state
     ///
-    virtual void resetToInitialState() override { this->m_currentState->setState(this->m_initialState); }
+    void resetToInitialState() override { this->m_currentState->setState(this->m_initialState); }
 
     ///
     /// \brief Get the simulation parameters
@@ -133,7 +127,7 @@ public:
     /// \brief Set the default time step size,
     /// valid only if using a fixed time step for integration
     ///
-    virtual void setTimeStep(const double timeStep) override { setDefaultTimeStep(timeStep); }
+    void setTimeStep(const double timeStep) override { setDefaultTimeStep(timeStep); }
 
     ///
     /// \brief Set the default time step size,
@@ -144,7 +138,7 @@ public:
     ///
     /// \brief Returns the time step size
     ///
-    virtual double getTimeStep() const override { return m_dt; }
+    double getTimeStep() const override { return m_dt; }
 
     void setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocities);
 
@@ -176,7 +170,7 @@ protected:
     ///
     /// \brief Setup SPH compute graph connectivity
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 private:
     ///
@@ -288,4 +282,4 @@ private:
 
     std::vector<size_t> m_minIndices;
 };
-} // end namespace imstk
+}

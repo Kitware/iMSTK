@@ -37,7 +37,7 @@
 %ignore imstk::CollisionGraph::getInteractionPairMap();
 
 %ignore imstk::FeDeformableObject::getFEMModel();
-%ignore imstk::FEMDeformableBodyModel::initializeEigenMatrixFromVegaMatrix;
+%ignore imstk::FemDeformableBodyModel::initializeEigenMatrixFromVegaMatrix;
 
 %ignore imstk::RbdConstraint;
 %ignore imstk::CollisionHandling::getTaskNode();

@@ -43,12 +43,12 @@ public:
         setExtents(extents);
     }
 
-    virtual ~OrientedBox() override = default;
+    ~OrientedBox() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "OrientedBox"; }
+    const std::string getTypeName() const override { return "OrientedBox"; }
 
     ///
     /// \brief Print the cube info
@@ -58,7 +58,7 @@ public:
     ///
     /// \brief Returns the volume of the cube
     ///
-    virtual double getVolume() override { return m_extents[0] * m_extents[1] * m_extents[2] * 8.0; }
+    double getVolume() override { return m_extents[0] * m_extents[1] * m_extents[2] * 8.0; }
 
     ///
     /// \brief Returns the extents of the cube

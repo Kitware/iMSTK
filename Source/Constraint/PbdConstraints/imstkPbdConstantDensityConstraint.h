@@ -36,16 +36,13 @@ namespace imstk
 class PbdConstantDensityConstraint : public PbdConstraint
 {
 public:
-    ///
-    /// \brief constructor
-    ///
     PbdConstantDensityConstraint() : PbdConstraint()
     {
         setMaxNeighborDistance(m_maxDist);
     }
 
     ///
-    /// \Constant Density Constraint Initialization
+    /// \brief Constant Density Constraint Initialization
     ///
     void initConstraint(const VecDataArray<double, 3>& initVertexPositions, const double k);
 

@@ -33,18 +33,9 @@ namespace imstk
 class FeDeformBodyState
 {
 public:
-
-    ///
-    /// \brief Constructor
-    ///
     FeDeformBodyState() = default;
-    explicit FeDeformBodyState(const size_t size) { initialize(size); }
-    //ProblemState(const Vectord& u, const Vectord& v, const Vectord& a);
-
-    ///
-    /// \brief Destructor
-    ///
-    ~FeDeformBodyState() = default;
+    FeDeformBodyState(const size_t size) { initialize(size); }
+    virtual ~FeDeformBodyState() = default;
 
     ///
     /// \brief Initialize the problem state
@@ -105,4 +96,4 @@ protected:
     Vectord m_qDot;      // Derivative of state w.r.t time
     Vectord m_qDotDot;   // Double derivative of state w.r.t time
 };
-} // imstk
+}

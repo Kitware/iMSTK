@@ -42,7 +42,7 @@ class KeyboardSceneControl : public KeyboardControl
 public:
     KeyboardSceneControl() = default;
     KeyboardSceneControl(std::shared_ptr<KeyboardDeviceClient> keyDevice);
-    virtual ~KeyboardSceneControl() override = default;
+    ~KeyboardSceneControl() override = default;
 
     ///
     /// \brief The driver is used to stop the simulation

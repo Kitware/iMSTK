@@ -24,7 +24,7 @@
 #include "imstkCameraController.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkFeDeformableObject.h"
-#include "imstkFEMDeformableBodyModel.h"
+#include "imstkFemDeformableBodyModel.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
@@ -560,4 +560,4 @@ Scene::unlockComputeTimes()
 {
     m_computeTimesLock->unlock();
 }
-} // imstk
+}

@@ -33,9 +33,6 @@ namespace imstk
 class Cylinder : public AnalyticalGeometry
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     Cylinder(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const double length = 1.0,
              const Quatd& orientation = Quatd::Identity(), const std::string& name = std::string("defaultCylinder")) :
         AnalyticalGeometry(name)
@@ -47,12 +44,12 @@ public:
         updatePostTransformData();
     }
 
-    virtual ~Cylinder() override = default;
+    ~Cylinder() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "Cylinder"; }
+    const std::string getTypeName() const override { return "Cylinder"; }
 
     ///
     /// \brief Print the cylinder info
@@ -65,24 +62,18 @@ public:
     double getVolume() override { return PI * m_radius * m_radius * m_length; }
 
     ///
-    /// \brief Returns the radius of the cylinder
-    ///
+    /// \brief Get/Set the radius of the cylinder
+    ///@{
     double getRadius(DataType type = DataType::PostTransform);
-
-    ///
-    /// \brief Sets the radius of the cylinder
-    ///
     void setRadius(const double r);
+    ///@}
 
     ///
-    /// \brief Returns the length of the cylinder
-    ///
+    /// \brief Get/Set the length of the cylinder
+    ///@{
     double getLength(DataType type = DataType::PostTransform);
-
-    ///
-    /// \brief Sets the length of the cylinder
-    ///
     void setLength(const double r);
+    ///@}
 
     ///
     /// \brief Get the min, max of the AABB around the cylinder
@@ -105,4 +96,4 @@ protected:
     mutable double m_radiusPostTransform = 1.0; ///> Radius of the cylinder oncee transform applied
     mutable double m_lengthPostTransform = 1.0; ///> Length of the cylinder onc transform applied
 };
-} // imstk
+}

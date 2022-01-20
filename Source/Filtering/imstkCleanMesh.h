@@ -37,7 +37,7 @@ class CleanMesh : public GeometryAlgorithm
 {
 public:
     CleanMesh();
-    virtual ~CleanMesh() override = default;
+    ~CleanMesh() override = default;
 
     std::shared_ptr<SurfaceMesh> getOutputMesh() const;
 
@@ -46,24 +46,27 @@ public:
     ///
     void setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
 
-    imstkGetMacro(Tolerance, double);
-    imstkGetMacro(AbsoluteTolerance, double);
     imstkGetMacro(UseAbsolute, bool);
 
     ///
-    /// \brief Set the tolerance for point merging, fraction of bounding box length
-    ///
+    /// \brief Get/Set the tolerance for point merging, fraction of bounding box length
+    ///@{
     void setTolerance(const double tolerance)
     {
         this->m_Tolerance = tolerance;
         m_UseAbsolute     = false;
     }
 
+    imstkGetMacro(Tolerance, double);
+    ///@}
+
     void setAbsoluteTolerance(const double tolerance)
     {
         this->m_AbsoluteTolerance = tolerance;
         m_UseAbsolute = true;
     }
+
+    imstkGetMacro(AbsoluteTolerance, double);
 
 protected:
     void requestUpdate() override;

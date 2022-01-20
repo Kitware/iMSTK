@@ -65,7 +65,7 @@ SphObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     auto sphObj1 = std::dynamic_pointer_cast<SphObject>(m_objA);
 
     //
-    // ...SPH steps...
+    // ...Sph steps...
     // Update Geometry A                  Update Geometry B
     //                 Collision Detection
     //                 Collision Handling A

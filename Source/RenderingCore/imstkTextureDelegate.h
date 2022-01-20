@@ -40,10 +40,6 @@ public:
     virtual ~TextureDelegate() = default;
 
 protected:
-    ///
-    /// \brief Constructor
-    /// \param texture The texture
-    ///
     TextureDelegate() = default;
 };
 }

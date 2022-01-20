@@ -8,8 +8,6 @@ imstk_add_library(RenderingCore
     imstkRenderer.h
     imstkTextureManager.h
     imstkTextureDelegate.h
-  CPP_FILES
-    imstkRenderer.cpp
   DEPENDS
     Scene)
 

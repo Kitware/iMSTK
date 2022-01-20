@@ -101,18 +101,19 @@ protected:
     ///
     void setOutput(std::shared_ptr<Geometry> inputGeometry, const size_t port = 0);
 
-    imstkGetMacro(NumInputPorts, size_t);
-    imstkGetMacro(NumOutputPorts, size_t);
-
     ///
-    /// \brief Sets the amount of input ports
-    ///
+    /// \brief Get/Set the amount of input ports
+    ///@{
     void setNumInputPorts(const size_t numPorts);
+    imstkGetMacro(NumInputPorts, size_t);
+    ///@}
 
     ///
-    /// \brief Sets the amount of output ports
-    ///
+    /// \brief Get/Set the amount of output ports
+    ///@{
     void setNumOutputPorts(const size_t numPorts);
+    imstkGetMacro(NumOutputPorts, size_t);
+    ///@}
 
     ///
     /// \brief Declares the type for the port with the given number, also defines that

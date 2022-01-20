@@ -35,10 +35,7 @@ class SurfaceMesh;
 class VolumetricMesh : public PointSet
 {
 public:
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VolumetricMesh() override = default;
+    ~VolumetricMesh() override = default;
 
     ///
     /// \brief Compute the conforming surface mesh
@@ -48,4 +45,4 @@ public:
 protected:
     VolumetricMesh(const std::string& name = std::string("")) : PointSet(name) {}
 };
-} // imstk
+}

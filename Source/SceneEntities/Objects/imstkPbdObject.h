@@ -37,7 +37,7 @@ class PbdObject : public DynamicObject
 {
 public:
     PbdObject(const std::string& name) : DynamicObject(name) { }
-    virtual ~PbdObject() override = default;
+    ~PbdObject() override = default;
 
     virtual const std::string getTypeName() const override { return "PbdObject"; }
 
@@ -47,11 +47,11 @@ public:
     std::shared_ptr<PbdModel> getPbdModel();
 
     ///
-    /// \brief Initialize the pbd scene object
+    /// \brief Initialize the Pbd scene object
     ///
     bool initialize() override;
 
 protected:
-    std::shared_ptr<PbdModel> m_pbdModel = nullptr;  ///> PBD mathematical model
+    std::shared_ptr<PbdModel> m_pbdModel = nullptr; ///> Pbd mathematical model
 };
-} // imstk
+}

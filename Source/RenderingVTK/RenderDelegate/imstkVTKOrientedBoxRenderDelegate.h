@@ -35,15 +35,8 @@ namespace imstk
 class VTKOrientedCubeRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VTKOrientedCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKOrientedCubeRenderDelegate() override = default;
+    ~VTKOrientedCubeRenderDelegate() override = default;
 
     ///
     /// \brief Update cube source based on the cube geometry
@@ -53,4 +46,4 @@ public:
 protected:
     vtkSmartPointer<vtkCubeSource> m_cubeSource;
 };
-} // imstk
+}

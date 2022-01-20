@@ -22,7 +22,7 @@
 #include "imstkMeshIO.h"
 #include "imstkAssimpMeshIO.h"
 #include "imstkLogger.h"
-#include "imstkMSHMeshIO.h"
+#include "imstkMshMeshIO.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVegaMeshIO.h"
@@ -92,7 +92,7 @@ MeshIO::read(const std::string& filePath)
         return VegaMeshIO::read(filePath, meshType);
         break;
     case MeshFileType::MSH:
-        return MSHMeshIO::read(filePath, meshType);
+        return MshMeshIO::read(filePath, meshType);
         break;
     case MeshFileType::UNKNOWN:
     default:
@@ -179,4 +179,4 @@ MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::strin
     LOG(FATAL) << "Error: file type not supported for input " << filePath;
     return false;
 }
-} // imstk
+}

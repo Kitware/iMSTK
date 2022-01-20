@@ -58,4 +58,4 @@ ScreenCaptureUtility::resetScreenShotNumber()
 {
     m_screenShotNumber = 0;
 }
-} // imstk
+}

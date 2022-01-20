@@ -28,14 +28,11 @@ namespace imstk
 ///
 /// \class Plane
 ///
-/// \brief Plane geometry
+/// \brief Represents and infinite plane, width can be used for visual purposes
 ///
 class Plane : public AnalyticalGeometry
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     Plane(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d& normal = Vec3d(0.0, 1.0, 0.0),
           const std::string& name = std::string("defaultPlane")) :
         AnalyticalGeometry(name), m_width(1.0)
@@ -45,36 +42,27 @@ public:
         updatePostTransformData();
     }
 
-    ///
-    /// \brief Deconstructor
-    ///
-    virtual ~Plane() override = default;
+    ~Plane() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "Plane"; }
+    const std::string getTypeName() const override { return "Plane"; }
 
     ///
-    /// \brief Returns the normal of the plane
-    ///
+    /// \brief Get/Set the normal to the plane
+    ///@{
     Vec3d getNormal(DataType type = DataType::PostTransform);
-
-    ///
-    /// \brief Sets the normal to the plane
-    ///
     void setNormal(const Vec3d n);
     void setNormal(const double x, const double y, const double z);
+    ///@}
 
     ///
-    /// \brief Returns the width of the plane
-    ///
+    /// \brief Get/Set the width of the plane, only used for visual purposes
+    ///@{
     double getWidth();
-
-    ///
-    /// \brief Sets the width of the plane, only used for visual purposes
-    ///
     void setWidth(const double w);
+    ///@}
 
     ///
     /// \brief Returns signed distance to surface at pos
@@ -98,4 +86,4 @@ protected:
     mutable Vec3d m_normalPostTransform;
     double m_width; ///> Width of plane, only used for visual purposes
 };
-} // imstk
+}

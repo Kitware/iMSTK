@@ -127,4 +127,4 @@ protected:
     Mat4d m_upperJawLocalTransform = Mat4d::Identity();     // upperJawWorldTransform = m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawVisual/CollidingTransform
     Mat4d m_lowerJawLocalTransform = Mat4d::Identity();     // lowerJawWorldTransform = m_controllerWorldTransform * m_lowerJawLocalTransform * m_lowerJawVisual/CollidingTransform
 };
-} // imstk
+}

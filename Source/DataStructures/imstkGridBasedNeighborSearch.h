@@ -39,7 +39,7 @@ public:
     /// \brief Construct class with search radius
     /// \param radius The search radius
     ///
-    explicit GridBasedNeighborSearch(const double radius) : m_SearchRadius(radius), m_SearchRadiusSqr(radius * radius) {}
+    GridBasedNeighborSearch(const double radius) : m_SearchRadius(radius), m_SearchRadiusSqr(radius * radius) {}
 
     ///
     /// \brief Set the search radius
@@ -87,4 +87,4 @@ private:
     };
     UniformSpatialGrid<CellData> m_Grid;
 };
-} // end namespace imstk
+}

@@ -818,4 +818,4 @@ SphModel::findNearestParticleToVertex(const VecDataArray<double, 3>& points, con
         m_minIndices[i] = minIndex;
     }
 }
-} // end namespace imstk
+}

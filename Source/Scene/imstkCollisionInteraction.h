@@ -38,7 +38,7 @@ class CollidingObject;
 class CollisionInteraction : public SceneObject
 {
 public:
-    virtual ~CollisionInteraction() override = default;
+    ~CollisionInteraction() override = default;
 
 protected:
     CollisionInteraction(std::string objName,

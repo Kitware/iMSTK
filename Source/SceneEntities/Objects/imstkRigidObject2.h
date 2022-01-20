@@ -39,10 +39,9 @@ class RigidObject2 : public DynamicObject
 {
 public:
     RigidObject2(const std::string& name) : DynamicObject(name) { }
+    ~RigidObject2() override = default;
 
-    virtual ~RigidObject2() = default;
-
-    virtual const std::string getTypeName() const override { return "RigidObject2"; }
+    const std::string getTypeName() const override { return "RigidObject2"; }
 
     ///
     /// \brief Initialize the rigid scene object
@@ -75,4 +74,4 @@ protected:
     std::shared_ptr<RigidBodyModel2> m_rigidBodyModel2;
     std::shared_ptr<RigidBody>       m_rigidBody; ///> Gives the actual body within the model
 };
-} // imstk
+}

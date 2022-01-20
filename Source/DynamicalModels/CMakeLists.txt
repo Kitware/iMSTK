@@ -37,6 +37,8 @@ else()
   list(APPEND ExclusionFiles
     ObjectModels/imstkRigidBodyModel.h
     ObjectModels/imstkRigidBodyModel.cpp
+    ObjectModels/imstkRigidBodyState.h
+    ObjectModels/imstkRigidBodyState.cpp
     ObjectModels/imstkRigidBodyWorld.h
     ObjectModels/imstkRigidBodyWorld.cpp
     )

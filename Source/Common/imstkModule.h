@@ -49,7 +49,7 @@ public:
 
 public:
     Module() = default;
-    virtual ~Module() override = default;
+    ~Module() override = default;
 
 public:
     // *INDENT-OFF*

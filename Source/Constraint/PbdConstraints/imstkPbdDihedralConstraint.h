@@ -33,9 +33,6 @@ namespace imstk
 class PbdDihedralConstraint : public PbdConstraint
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     PbdDihedralConstraint() : PbdConstraint()
     {
         m_vertexIds.resize(4);
@@ -83,4 +80,4 @@ public:
 public:
     double m_restAngle = 0.0; ///> Rest angle
 };
-} //imstk
+}

@@ -47,7 +47,7 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
     setCollisionDetection(cd);
 
     // Setup the handler to resolve obj1
-    auto pbdCH = std::make_shared<PBDCollisionHandling>();
+    auto pbdCH = std::make_shared<PbdCollisionHandling>();
     pbdCH->setInputObjectA(obj1);
     pbdCH->setInputObjectB(obj2);
     pbdCH->setInputCollisionData(cd->getCollisionData());
@@ -63,14 +63,14 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
     // Setup compute node for collision solver (true/critical node)
     m_pbdCollisionSolveNode = std::make_shared<TaskNode>([&]()
         {
-            std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->getCollisionSolver()->solve();
+            std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->getCollisionSolver()->solve();
         },
         obj1->getName() + "_vs_" + obj2->getName() + "_PBDCollisionSolver", true);
     m_taskGraph->addNode(m_pbdCollisionSolveNode);
 
     m_correctVelocitiesNode = std::make_shared<TaskNode>([&]()
         {
-            std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->correctVelocities();
+            std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->correctVelocities();
         },
         obj1->getName() + "_vs_" + obj2->getName() + "_PBDVelocityCorrect", true);
     m_taskGraph->addNode(m_correctVelocitiesNode);
@@ -94,25 +94,25 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
 void
 PbdRigidObjectCollision::setRestitution(const double restitution)
 {
-    std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->setRestitution(restitution);
+    std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->setRestitution(restitution);
 }
 
 const double
 PbdRigidObjectCollision::getRestitution() const
 {
-    return std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->getRestitution();
+    return std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->getRestitution();
 }
 
 void
 PbdRigidObjectCollision::setFriction(const double friction)
 {
-    std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->setFriction(friction);
+    std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->setFriction(friction);
 }
 
 const double
 PbdRigidObjectCollision::getFriction() const
 {
-    return std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->getFriction();
+    return std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->getFriction();
 }
 
 void

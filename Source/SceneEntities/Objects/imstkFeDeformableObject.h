@@ -37,9 +37,9 @@ class FeDeformableObject : public DynamicObject
 {
 public:
     FeDeformableObject(const std::string& name) : DynamicObject(name) { }
-    virtual ~FeDeformableObject() override = default;
+    ~FeDeformableObject() override = default;
 
-    virtual const std::string getTypeName() const override { return "FeDeformableObject"; }
+    const std::string getTypeName() const override { return "FeDeformableObject"; }
 
     ///
     /// \brief Initialize the deformable object
@@ -51,4 +51,4 @@ public:
 protected:
     std::shared_ptr<FemDeformableBodyModel> m_femModel = nullptr;
 };
-} // imstk
+}

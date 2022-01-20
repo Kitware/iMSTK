@@ -33,12 +33,12 @@ namespace imstk
 class AnalyticalGeometry : public ImplicitGeometry
 {
 public:
-    virtual ~AnalyticalGeometry() override = default;
+    ~AnalyticalGeometry() override = default;
 
     ///
     /// \brief Print
     ///
-    virtual void print() const override;
+    void print() const override;
 
     // Accessors
 
@@ -49,9 +49,10 @@ public:
 
     ///
     /// \brief Set the local position
-    ///
+    ///@{
     void setPosition(const Vec3d p);
     void setPosition(const double x, const double y, const double z);
+    ///@}
 
     ///
     /// \brief Get the local or global orientation (post transformed)
@@ -84,11 +85,11 @@ protected:
     /// \brief Apply a user transform directly to (pre-transformed) parameters producing
     /// new parameters.
     ///
-    virtual void applyTransform(const Mat4d& m) override;
+    void applyTransform(const Mat4d& m) override;
 
     Vec3d m_position;                         ///> position
     mutable Vec3d m_positionPostTransform;    ///> position once transform applied
     Quatd m_orientation;                      ///> orientation
     mutable Quatd m_orientationPostTransform; ///> orientation once transform is applied
 };
-} //imstk
+}

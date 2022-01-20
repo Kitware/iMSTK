@@ -44,7 +44,7 @@ class SceneObject : public SceneEntity
 {
 public:
     SceneObject(const std::string& name);
-    virtual ~SceneObject() override = default;
+    ~SceneObject() override = default;
 
     // *INDENT-OFF*
     SIGNAL(SceneObject, modified);
@@ -157,4 +157,4 @@ private:
     std::shared_ptr<TaskNode> m_updateNode = nullptr;
     std::shared_ptr<TaskNode> m_updateGeometryNode = nullptr;
 };
-} // imstk
+}

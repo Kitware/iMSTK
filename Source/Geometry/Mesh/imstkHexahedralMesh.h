@@ -33,20 +33,13 @@ namespace imstk
 class HexahedralMesh : public VolumetricMesh
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     HexahedralMesh(const std::string& name = std::string(""));
-
-    ///
-    /// \brief Deconstructor
-    ///
-    virtual ~HexahedralMesh() override = default;
+    ~HexahedralMesh() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "HexahedralMesh"; }
+    const std::string getTypeName() const override { return "HexahedralMesh"; }
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
@@ -76,10 +69,11 @@ public:
 
 // Accessors
     ///
-    /// \brief Sets/Returns the hexahedral connectivity
-    ///
+    /// \brief Get/Set the hexahedral connectivity
+    ///@{
     void setHexahedraIndices(std::shared_ptr<VecDataArray<int, 8>> hexahedra) { m_hexahedraIndices = hexahedra; }
     std::shared_ptr<VecDataArray<int, 8>> getHexahedraIndices() const { return m_hexahedraIndices; }
+    ///@}
 
     ///
     /// \brief Returns the connectivity of a hexahedron given its index
@@ -99,4 +93,4 @@ public:
 protected:
     std::shared_ptr<VecDataArray<int, 8>> m_hexahedraIndices;   ///< indices of the hexahedra
 };
-} // imstk
+}

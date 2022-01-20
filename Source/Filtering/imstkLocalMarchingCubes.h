@@ -48,7 +48,7 @@ class LocalMarchingCubes : public GeometryAlgorithm
 {
 public:
     LocalMarchingCubes();
-    virtual ~LocalMarchingCubes() override = default;
+    ~LocalMarchingCubes() override = default;
 
     std::shared_ptr<SurfaceMesh> getOutputMesh(const int i) const;
 

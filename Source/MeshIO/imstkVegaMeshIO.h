@@ -44,15 +44,8 @@ template<typename T, int N> class VecDataArray;
 class VegaMeshIO
 {
 public:
-    ///
-    /// \brief Default constructor
-    ///
     VegaMeshIO() = default;
-
-    ///
-    /// \brief Default destructor
-    ///
-    ~VegaMeshIO() = default;
+    virtual ~VegaMeshIO() = default;
 
     ///
     /// \brief Read and generate volumetric mesh given a external vega mesh file
@@ -91,4 +84,4 @@ protected:
     template<size_t dim>
     static void copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh, VecDataArray<int, dim>& cells);
 };
-} // imstk
+}

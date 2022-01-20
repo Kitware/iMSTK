@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkMSHMeshIO.h"
+#include "imstkMshMeshIO.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkLogger.h"
 #include "imstkTetrahedralMesh.h"
@@ -30,7 +30,7 @@
 namespace imstk
 {
 std::shared_ptr<imstk::VolumetricMesh>
-MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
+MshMeshIO::read(const std::string& filePath, const MeshFileType meshType)
 {
     CHECK(meshType == MeshFileType::MSH) << "Error: file type other than .msh not supported for input " << filePath;
 
@@ -414,4 +414,4 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
         return nullptr;
     }
 }
-} // iMSTK
+}

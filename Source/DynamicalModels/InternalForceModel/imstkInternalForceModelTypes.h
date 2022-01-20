@@ -25,6 +25,7 @@ namespace imstk
 {
 ///
 /// \enum class
+///
 /// \brief Finite element method type
 ///
 enum class FeMethodType
@@ -43,4 +44,4 @@ enum class HyperElasticMaterialType
     MooneyRivlin,
     none
 };
-} //imstk
+}

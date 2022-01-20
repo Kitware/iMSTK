@@ -35,31 +35,20 @@
 namespace imstk
 {
 ///
-/// \class IsotropicHyperelasticFEForceModel
+/// \class IsotropicHyperelasticFeForceModel
 ///
 /// \brief Force model for the isotropic hyperelastic material
 ///
 class IsotropicHyperelasticFeForceModel : public InternalForceModel
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     IsotropicHyperelasticFeForceModel(const HyperElasticMaterialType        materialType,
                                       std::shared_ptr<vega::VolumetricMesh> mesh,
                                       const double                          inversionThreshold,
                                       const bool                            withGravity = true,
                                       const double                          gravity     = 10.0);
-
-    ///
-    /// \brief Constructor type that is not allowed
-    ///
     IsotropicHyperelasticFeForceModel() = delete;
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~IsotropicHyperelasticFeForceModel() override = default;
+    ~IsotropicHyperelasticFeForceModel() override = default;
 
     ///
     /// \brief Get the internal force
@@ -111,4 +100,4 @@ protected:
     std::shared_ptr<vega::IsotropicMaterial> m_isotropicMaterial;               ///>
     std::shared_ptr<vega::SparseMatrix>      m_vegaTangentStiffnessMatrix;      ///>
 };
-} // imstk
+}

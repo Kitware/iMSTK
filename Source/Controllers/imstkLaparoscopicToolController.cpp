@@ -118,4 +118,4 @@ LaparoscopicToolController::update(const double dt)
         this->postEvent(Event(JawOpened()));
     }
 }
-} // imstk
+}

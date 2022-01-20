@@ -28,23 +28,24 @@ namespace imstk
 class LinearProjectionConstraint;
 
 ///
+/// \class Jacobi
+///
 /// \brief Jacobi sparse linear solver
 ///
 class Jacobi : public IterativeLinearSolver
 {
 public:
-    ///
-    /// \brief Constructors/Destructor
-    ///
     Jacobi() { m_type = Type::Jacobi; };
     Jacobi(const SparseMatrixd& A, const Vectord& rhs);
     virtual ~Jacobi() override = default;
 
     ///
-    /// \brief Remove specific constructor signatures
+    /// \brief Dissallow copy & move
     ///
-    Jacobi(const Jacobi&) = delete;
-    Jacobi& operator=(const Jacobi&) = delete;
+    Jacobi(const Jacobi&)  = delete;
+    Jacobi(const Jacobi&&) = delete;
+    Jacobi& operator=(const Jacobi&)  = delete;
+    Jacobi& operator=(const Jacobi&&) = delete;
 
     ///
     /// \brief Do one iteration of the method.
@@ -125,8 +126,7 @@ public:
     }
 
 private:
-
     std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;
     std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
-} // imstk
+}

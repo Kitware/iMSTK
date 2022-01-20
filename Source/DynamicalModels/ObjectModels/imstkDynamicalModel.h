@@ -28,21 +28,15 @@ namespace imstk
 ///
 /// \class DynamicalModel
 ///
-/// \brief Base class for mathematical model of the physics governing the dynamic object
+/// \brief Base class for mathematical model of the physics governing the
+/// dynamic object.
 ///
 template<class StateType>
 class DynamicalModel : public AbstractDynamicalModel
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     DynamicalModel(DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalModel(type) {}
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~DynamicalModel() = default;
+    ~DynamicalModel() override = default;
 
     ///
     /// \brief Return the initial state of the problem
@@ -74,4 +68,4 @@ protected:
     std::shared_ptr<StateType> m_currentState;  ///> Current state
     std::shared_ptr<StateType> m_previousState; ///> Previous state
 };
-} // imstk
+}

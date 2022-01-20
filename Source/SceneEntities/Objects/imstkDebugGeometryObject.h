@@ -44,7 +44,7 @@ class DebugGeometryObject : public SceneObject
 {
 public:
     DebugGeometryObject();
-    virtual ~DebugGeometryObject() = default;
+    ~DebugGeometryObject() override = default;
 
     ///
     /// \brief Adds a line to the debug lines with default color

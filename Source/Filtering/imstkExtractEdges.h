@@ -36,7 +36,7 @@ class ExtractEdges : public GeometryAlgorithm
 {
 public:
     ExtractEdges();
-    virtual ~ExtractEdges() override = default;
+    ~ExtractEdges() override = default;
 
     std::shared_ptr<LineMesh> getOutputMesh() const;
 

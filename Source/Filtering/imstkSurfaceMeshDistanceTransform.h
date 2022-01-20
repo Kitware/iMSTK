@@ -41,7 +41,7 @@ class SurfaceMeshDistanceTransform : public GeometryAlgorithm
 {
 public:
     SurfaceMeshDistanceTransform();
-    virtual ~SurfaceMeshDistanceTransform() override = default;
+    ~SurfaceMeshDistanceTransform() override = default;
 
 public:
     ///

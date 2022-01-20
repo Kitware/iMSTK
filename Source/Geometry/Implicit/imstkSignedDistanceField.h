@@ -47,16 +47,12 @@ public:
     /// \param geometry name
     ///
     SignedDistanceField(std::shared_ptr<ImageData> imageData, std::string name = "");
-
-    ///
-    /// \brief Deconstructor
-    ///
-    virtual ~SignedDistanceField() override = default;
+    ~SignedDistanceField() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "SignedDistanceField"; }
+    const std::string getTypeName() const override { return "SignedDistanceField"; }
 
     ///
     /// \brief Returns signed distance to surface at pos, returns clamped/nearest if out of bounds

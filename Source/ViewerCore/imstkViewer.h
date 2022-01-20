@@ -58,7 +58,7 @@ class Viewer : public Module
 protected:
     Viewer(std::string name);
 public:
-    virtual ~Viewer() = default;
+    ~Viewer() override = default;
 
 public:
     ///
@@ -153,7 +153,7 @@ public:
     virtual void processEvents() = 0;
 
 protected:
-    virtual void updateModule() override;
+    void updateModule() override;
 
     std::vector<std::shared_ptr<DeviceControl>> m_controls; ///> Set of controls updated on the viewer thread
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;

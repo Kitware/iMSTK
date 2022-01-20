@@ -20,15 +20,12 @@
 =========================================================================*/
 
 #include "imstkVolumeRenderMaterialPresets.h"
-
-// imstk
 #include "imstkVolumeRenderMaterial.h"
 
-// vtk
-#include <vtkVolumeProperty.h>
-#include <vtkSmartPointer.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkSmartPointer.h>
+#include <vtkVolumeProperty.h>
 
 namespace imstk
 {

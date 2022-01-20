@@ -47,7 +47,7 @@ class VisualModel;
 class VTKRenderDelegate : public EventObject
 {
 public:
-    virtual ~VTKRenderDelegate() override = default;
+    ~VTKRenderDelegate() override = default;
 
     ///
     /// \brief Instantiate proper render delegate
@@ -86,9 +86,6 @@ public:
     virtual void updateRenderProperties() = 0;
 
 protected:
-    ///
-    /// \brief Default constructor (protected)
-    ///
     VTKRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///

@@ -142,4 +142,4 @@ ImageData::clear()
     //this->m_dataTransform->Identity();
     this->postModified();
 }
-} // imstk
+}

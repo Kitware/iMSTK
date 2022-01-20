@@ -50,19 +50,12 @@ struct Color
         };
     };
 
-    ///
-    /// \brief Constructor
-    ///
     Color();
     Color(const double red,
           const double green,
           const double blue,
           const double alpha = 1.0);
     Color(const double* rgba_color);
-
-    ///
-    /// \brief Constructor overwrites the alpha component
-    ///
     Color(const Color& color, const double alpha);
 
     ///

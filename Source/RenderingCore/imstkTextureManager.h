@@ -40,14 +40,8 @@ class TextureManager
 static_assert(std::is_base_of<TextureDelegate, T>::value, "T isn't a subclass of TextureDelegate");
 
 public:
-    ///
-    /// \brief Constructor
-    ///
     TextureManager() = default;
 
-    ///
-    /// \brief Add texture
-    ///
     std::shared_ptr<T> getTextureDelegate(std::shared_ptr<Texture> texture);
 
 protected:

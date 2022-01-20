@@ -27,6 +27,7 @@ namespace imstk
 {
 ///
 /// \class SPHBoundaryConditions
+///
 /// \brief Class that holds methods and members for boundary conditions
 ///
 class SphBoundaryConditions
@@ -94,4 +95,4 @@ private:
     const size_t m_numBufferParticles = 10000;
     std::vector<size_t> m_bufferIndices;
 };
-} // end namespace imstk
+}

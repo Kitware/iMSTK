@@ -34,18 +34,17 @@ class PbdPointPointConstraint;
 class PbdPointTriangleConstraint;
 
 ///
-/// \class PBDCollisionHandling
+/// \class PbdCollisionHandling
 ///
 /// \brief Implements PBD based collision handling
-/// \todo:
 ///
-class PBDCollisionHandling : public CollisionHandling
+class PbdCollisionHandling : public CollisionHandling
 {
 public:
-    PBDCollisionHandling();
-    virtual ~PBDCollisionHandling() override;
+    PbdCollisionHandling();
+    virtual ~PbdCollisionHandling() override;
 
-    virtual const std::string getTypeName() const override { return "PBDCollisionHandling"; }
+    virtual const std::string getTypeName() const override { return "PbdCollisionHandling"; }
 
 public:
     ///

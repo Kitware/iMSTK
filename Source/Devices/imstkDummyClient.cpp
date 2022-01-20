@@ -33,4 +33,4 @@ DummyClient::setButton(const unsigned int buttonId, const bool buttonStatus)
         x->second = buttonStatus;
     }
 }
-} // imstk
+}

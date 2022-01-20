@@ -28,6 +28,11 @@
 
 namespace imstk
 {
+///
+/// \class FastMarch
+///
+/// \brief
+///
 class FastMarch
 {
 protected:

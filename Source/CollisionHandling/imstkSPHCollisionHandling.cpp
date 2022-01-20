@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkSPHCollisionHandling.h"
+#include "imstkSphCollisionHandling.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkParallelFor.h"

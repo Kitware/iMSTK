@@ -68,4 +68,4 @@ NonLinearSystem<Matrix>::evaluateJacobian(const Vectord& x)
 
 template class NonLinearSystem<SparseMatrixd>;
 template class NonLinearSystem<Matrixd>;
-} //imstk
+}

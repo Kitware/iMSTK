@@ -43,25 +43,18 @@ public:
 
     using GeometryBoolPair = std::pair<std::shared_ptr<ImplicitGeometry>, GeometryBoolType>;
 
-    ///
-    /// \brief Constructor
-    ///
     CompositeImplicitGeometry(std::string name = "") : ImplicitGeometry(name) { }
-
-    ///
-    /// \brief Deconstructor
-    ///
-    virtual ~CompositeImplicitGeometry() override = default;
+    ~CompositeImplicitGeometry() override      = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "CompositeImplicitGeometry"; }
+    const std::string getTypeName() const override { return "CompositeImplicitGeometry"; }
 
     ///
     /// \brief Returns signed distance to surface at pos
     ///
-    virtual double getFunctionValue(const Vec3d& pos) const override;
+    double getFunctionValue(const Vec3d& pos) const override;
 
     ///
     /// \brief Add an implicit geometry to have boolean operations done with

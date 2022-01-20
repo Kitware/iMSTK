@@ -68,9 +68,6 @@ public:
 class DeviceClient : public EventObject
 {
 public:
-    ///
-    /// \brief Destructor
-    ///
     virtual ~DeviceClient() = default;
 
     // *INDENT-OFF*
@@ -79,47 +76,49 @@ public:
 
     ///
     /// \brief Get/Set the device IP
-    ///
+    ///@{
     const std::string& getIp() { return m_ip; }
     void setIp(const std::string& ip) { m_ip = ip; }
+    ///@}
 
     ///
     /// \brief Get/Set the device name
-    ///
+    ///@{
     const std::string& getDeviceName() { return m_deviceName; }
     void setDeviceName(const std::string& deviceName) { m_deviceName = deviceName; }
+    ///@}
 
     ///
     /// \brief Get/Set what listeners to enable on the device: tracking, analogic, force, buttons.
     ///
-    const bool getTrackingEnabled() const { return m_trackingEnabled; }
+    bool getTrackingEnabled() const { return m_trackingEnabled; }
     void setTrackingEnabled(const bool status) { m_trackingEnabled = status; }
-    const bool getAnalogicEnabled() const { return m_analogicEnabled; }
+    bool getAnalogicEnabled() const { return m_analogicEnabled; }
     void setAnalogicEnabled(const bool status) { m_analogicEnabled = status; }
-    const bool getButtonsEnabled() const { return m_buttonsEnabled; }
+    bool getButtonsEnabled() const { return m_buttonsEnabled; }
     void setButtonsEnabled(const bool status) { m_buttonsEnabled = status; }
-    const bool getForceEnabled() const { return m_forceEnabled; }
+    bool getForceEnabled() const { return m_forceEnabled; }
     void setForceEnabled(const bool status) { m_forceEnabled = status; }
 
     ///
     /// \brief Get the device position
     ///
-    const Vec3d getPosition();
+    Vec3d getPosition();
 
     ///
     /// \brief Get the device velocity
     ///
-    const Vec3d getVelocity();
+    Vec3d getVelocity();
 
     ///
     /// \brief Get the device angular velocity
     ///
-    const Vec3d getAngularVelocity();
+    Vec3d getAngularVelocity();
 
     ///
     /// \brief Get the device orientation
     ///
-    const Quatd getOrientation();
+    Quatd getOrientation();
 
     ///
     /// \brief Get offset from position for device end effector
@@ -128,9 +127,10 @@ public:
 
     ///
     /// \brief Get/Set the device force
-    ///
-    const Vec3d getForce();
+    ///@{
+    Vec3d getForce();
     void setForce(Vec3d force);
+    ///@}
 
     ///
     /// \brief Get button map
@@ -141,7 +141,7 @@ public:
     /// \brief Get the state of a button
     /// returns 0 if can't find button
     ///
-    const int getButton(const int buttonId)
+    int getButton(const int buttonId)
     {
         int result = 0;
         m_dataLock.lock();
@@ -153,7 +153,7 @@ public:
         return result;
     }
 
-    const std::vector<double> getAnalog() const;
+    std::vector<double> getAnalog() const;
 
     ///
     /// \brief Do runtime logic
@@ -184,6 +184,5 @@ protected:
     ParallelUtils::SpinLock m_transformLock;    /// > Used for devices filling data from other threads
     ParallelUtils::SpinLock m_forceLock;        /// > Used for devices filling data from other threads
     mutable ParallelUtils::SpinLock m_dataLock; /// > Used for button and analog data
-private:
 };
 }

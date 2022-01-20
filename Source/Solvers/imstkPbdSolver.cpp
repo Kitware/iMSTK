@@ -117,4 +117,4 @@ PbdCollisionSolver::solve()
         m_collisionConstraints->clear();
     }
 }
-} // end namespace imstk
+}

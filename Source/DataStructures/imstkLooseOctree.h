@@ -566,7 +566,7 @@ protected:
     /// otherwise only nodes containing primitives are rendered
     bool m_bDrawNonEmptyParent = true;
 };
-} // end namespace imstk
+}
 #ifdef WIN32
 #pragma warning(default : 4201)
 #endif

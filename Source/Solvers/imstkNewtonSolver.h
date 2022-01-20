@@ -27,11 +27,13 @@
 namespace imstk
 {
 ///
+/// \class NewtonSolver
+///
 /// \brief Newton method. This version of the newton method is based on the work
-///     by Tim Kelly and others at NC State University. The algorithm is globally convergent
-///     in the sense that for any initial iterate the iteration either converge to a
-///     root of F or fails. Global convergence is achieved using a line search sub-process
-///     and the Armijo rule
+/// by Tim Kelly and others at NC State University. The algorithm is globally convergent
+/// in the sense that for any initial iterate the iteration either converge to a
+/// root of F or fails. Global convergence is achieved using a line search sub-process
+/// and the Armijo rule
 ///
 template<typename SystemMatrix>
 class NewtonSolver : public NonLinearSolver<SystemMatrix>
@@ -39,14 +41,16 @@ class NewtonSolver : public NonLinearSolver<SystemMatrix>
 public:
     using LinearSolverType = LinearSolver<SystemMatrix>;
 
-    ///
-    /// \brief Constructors\Destructors
-    ///
     NewtonSolver();
-    NewtonSolver(const NewtonSolver& other) = delete;
-    virtual ~NewtonSolver() override = default;
+    ~NewtonSolver() override = default;
 
-    NewtonSolver& operator=(const NewtonSolver& other) = delete;
+    ///
+    /// \brief Dissallow copy & move
+    ///
+    NewtonSolver(const NewtonSolver& other)  = delete;
+    NewtonSolver(const NewtonSolver&& other) = delete;
+    NewtonSolver& operator=(const NewtonSolver& other)  = delete;
+    NewtonSolver& operator=(const NewtonSolver&& other) = delete;
 
     ///
     /// \brief Solve the non linear system of equations G(x)=0 using Newton's method
@@ -195,7 +199,7 @@ public:
     ///
     /// \brief Set the Newton solver to be fully implicit
     ///
-    virtual void setToFullyImplicit() override
+    void setToFullyImplicit() override
     {
         this->m_isSemiImplicit = false;
     }
@@ -203,7 +207,7 @@ public:
     ///
     /// \brief Set the Newton solver to be fully implicit
     ///
-    virtual void setToSemiImplicit() override
+    void setToSemiImplicit() override
     {
         this->m_isSemiImplicit = true;
         m_maxIterations = 1;
@@ -220,4 +224,4 @@ private:
     bool   m_useArmijo;                               ///> True if Armijo liner search is desired
     std::vector<double> m_fnorms;                     ///> Consecutive function norms
 };
-} // imstk
+}

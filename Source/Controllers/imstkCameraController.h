@@ -30,7 +30,8 @@ class Camera;
 ///
 /// \class CameraController
 ///
-/// \brief \todo ??
+/// \brief Directly controls a camera given the device client pose, could be
+/// unsmooth depending on device. Rigid body should be preferred for smoothness
 ///
 class CameraController : public TrackingDeviceControl
 {
@@ -50,7 +51,6 @@ public:
     void update(const double dt) override;
 
 protected:
-
     std::shared_ptr<Camera> m_camera; ///< Camera controlled by the external device
 };
-} // imstk
+}

@@ -44,9 +44,9 @@ class PbdObjectCutting : public SceneObject
 {
 public:
     PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj);
-    virtual ~PbdObjectCutting() override = default;
+    ~PbdObjectCutting() override = default;
 
-    virtual const std::string getTypeName() const override { return "PbdObjectCutting"; }
+    const std::string getTypeName() const override { return "PbdObjectCutting"; }
 
     ///
     /// \brief Applies the cut when called

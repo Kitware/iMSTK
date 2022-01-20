@@ -39,6 +39,8 @@ namespace imstk
 template<typename MatrixType> class DirectLinearSolver;
 
 ///
+/// \class DirectLinearSolver
+///
 /// \brief Dense direct solvers. Solves a dense system of equations using Cholesky
 ///     decomposition.
 ///
@@ -46,17 +48,9 @@ template<>
 class DirectLinearSolver<Matrixd>: public LinearSolver<Matrixd>
 {
 public:
-    ///
-    /// \brief Default constructor/destructor.
-    ///
-    // DirectLinearSolver() = delete;
     DirectLinearSolver() { }
-    ~DirectLinearSolver() override { }
-
-    ///
-    /// \brief Constructor
-    ///
     DirectLinearSolver(const Matrixd& A, const Vectord& b);
+    ~DirectLinearSolver() override { }
 
     ///
     /// \brief Solve the system of equations.
@@ -103,7 +97,7 @@ public:
     /// \brief Default constructor/destructor
     ///
     DirectLinearSolver() = default;
-    virtual ~DirectLinearSolver() override = default;
+    ~DirectLinearSolver() override = default;
 
     ///
     /// \brief Constructor
@@ -126,6 +120,6 @@ public:
     void solve(const Vectord& rhs, Vectord& x);
 
 private:
-    Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;  //?
+    Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;
 };
-} // imstk
+}

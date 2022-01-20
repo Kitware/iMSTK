@@ -41,7 +41,8 @@ struct HDstate
 };
 
 ///
-/// \class HDAPIDeviceClient
+/// \class HapticDeviceClient
+///
 /// \brief Subclass of DeviceClient for phantom omni
 /// Holds and updates the data sync or on its own thread
 /// Holder of data

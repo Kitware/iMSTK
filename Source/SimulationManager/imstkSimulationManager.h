@@ -53,7 +53,7 @@ public:
     };
 
     SimulationManager() = default;
-    virtual ~SimulationManager() override = default;
+    ~SimulationManager() override = default;
 
     // *INDENT-OFF*
     ///

@@ -21,29 +21,26 @@
 
 #pragma once
 
-#include "imstkPbdFEMConstraint.h"
+#include "imstkPbdFemConstraint.h"
 
 namespace imstk
 {
 ///
-/// \class PbdFEMTetConstraint
+/// \class PbdFemTetConstraint
 ///
 /// \brief The FEMTetConstraint class class for constraint as the elastic energy
 /// computed by linear shape functions with tetrahedral mesh.
 ///
-class PbdFEMTetConstraint : public PbdFEMConstraint
+class PbdFemTetConstraint : public PbdFemConstraint
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    PbdFEMTetConstraint(MaterialType mtype = MaterialType::StVK) :
-        PbdFEMConstraint(4, mtype) {}
+    PbdFemTetConstraint(MaterialType mType = MaterialType::StVK) :
+        PbdFemConstraint(4, mType) {}
 
     ///
-    /// \brief Get the type of FEM constraint
+    /// \brief Get the type of Fem constraint
     ///
-    std::string getType() const override { return "FEMTet"; }
+    std::string getType() const override { return "FemTet"; }
 
     ///
     /// \brief Initialize the tetrahedral FEM constraint
@@ -51,7 +48,7 @@ public:
     bool initConstraint(const VecDataArray<double, 3>& initVertexPositions,
                         const size_t& pIdx1, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4,
-                        std::shared_ptr<PbdFEMConstraintConfig> config);
+                        std::shared_ptr<PbdFemConstraintConfig> config);
 
     ///
     /// \brief Compute the value and gradient of constraint
@@ -61,4 +58,4 @@ public:
         double& c,
         std::vector<Vec3d>& dcdx) const override;
 };
-} // imstk
+}

@@ -31,23 +31,24 @@ namespace imstk
 class LinearProjectionConstraint;
 
 ///
+/// \class SOR
+///
 /// \brief Successive Over Relaxation (SOR) sparse linear solver
 ///
 class SOR : public IterativeLinearSolver
 {
 public:
-    ///
-    /// \brief Constructors/Destructor
-    ///
     SOR(const double relaxationFactor = 0.5) : m_relaxationFactor(relaxationFactor) { m_type = Type::SuccessiveOverRelaxation; };
     SOR(const SparseMatrixd& A, const Vectord& rhs);
-    virtual ~SOR() override = default;
+    ~SOR() override = default;
 
     ///
-    /// \brief Remove specific constructor signatures
+    /// \brief Dissallow copy & move
     ///
-    SOR(const SOR&) = delete;
-    SOR& operator=(const SOR&) = delete;
+    SOR(const SOR&)  = delete;
+    SOR(const SOR&&) = delete;
+    SOR& operator=(const SOR&)  = delete;
+    SOR& operator=(const SOR&&) = delete;
 
     ///
     /// \brief Do one iteration of the method.
@@ -83,7 +84,7 @@ public:
     ///
     /// \brief set/get the maximum number of iterations for the iterative solver.
     ///
-    virtual void setMaxNumIterations(const size_t maxIter) override;
+    void setMaxNumIterations(const size_t maxIter) override;
 
     ///
     /// \brief Set solver tolerance
@@ -138,4 +139,4 @@ private:
     std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;
     std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
-} // imstk
+}

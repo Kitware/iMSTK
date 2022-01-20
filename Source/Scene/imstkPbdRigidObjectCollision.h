@@ -43,9 +43,9 @@ public:
     PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<RigidObject2> obj2,
                             std::string cdType = "MeshToMeshBruteForceCD");
 
-    virtual ~PbdRigidObjectCollision() override = default;
+    ~PbdRigidObjectCollision() override = default;
 
-    virtual const std::string getTypeName() const override { return "PbdRigidObjectCollision"; }
+    const std::string getTypeName() const override { return "PbdRigidObjectCollision"; }
 
     void setRestitution(const double restitution);
     const double getRestitution() const;
@@ -56,7 +56,7 @@ public:
     ///
     /// \brief Setup connectivity of task graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     std::shared_ptr<TaskNode> m_pbdCollisionSolveNode = nullptr;

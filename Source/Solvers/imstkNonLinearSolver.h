@@ -31,6 +31,8 @@
 namespace imstk
 {
 ///
+/// \class NonLinearSolver
+///
 /// \brief Base class for non-linear solvers
 ///
 template<typename SystemMatrix>
@@ -41,11 +43,8 @@ public:
     using UpdateIterateType = std::function<void (const Vectord&, Vectord&)>;
     using FunctionType      = NonLinearSystem<SparseMatrixd>::VectorFunctionType;
 
-    ///
-    /// \brief Default Constructor/Destructor
-    ///
     NonLinearSolver();
-    virtual ~NonLinearSolver() override = default;
+    ~NonLinearSolver() override = default;
 
     ///
     /// \brief Main solve routine.
@@ -141,4 +140,4 @@ protected:
     UpdateIterateType m_updateIterate;                                ///< Update iteration function
     bool m_isSemiImplicit = false;                                    ///> Semi-Implicit solver
 };
-} // imstk
+}

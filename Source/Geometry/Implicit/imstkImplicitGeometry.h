@@ -37,7 +37,7 @@ protected:
     ImplicitGeometry(std::string name = "") : Geometry(name) { }
 
 public:
-    virtual ~ImplicitGeometry() override = default;
+    ~ImplicitGeometry() override = default;
 
     ///
     /// \brief Returns function value given position

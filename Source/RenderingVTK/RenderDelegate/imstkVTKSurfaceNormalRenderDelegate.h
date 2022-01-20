@@ -39,15 +39,8 @@ template<typename T, int N> class VecDataArray;
 class VTKSurfaceNormalRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VTKSurfaceNormalRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKSurfaceNormalRenderDelegate() override = default;
+    ~VTKSurfaceNormalRenderDelegate() override = default;
 
     ///
     /// \brief Update polydata source based on the mesh geometry

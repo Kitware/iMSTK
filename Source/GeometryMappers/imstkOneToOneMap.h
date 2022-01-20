@@ -41,9 +41,9 @@ public:
         this->setChildGeometry(child);
     }
 
-    virtual ~OneToOneMap() override = default;
+    ~OneToOneMap() override = default;
 
-    virtual const std::string getTypeName() const override { return "OneToOneMap"; }
+    const std::string getTypeName() const override { return "OneToOneMap"; }
 
     ///
     /// \brief Compute the tetra-triangle mesh map
@@ -107,4 +107,4 @@ protected:
 
     double m_epsilon = IMSTK_DOUBLE_EPS;                        // Tolerance for considering two points equivalent
 };
-} // imstk
+}

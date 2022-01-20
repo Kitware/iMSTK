@@ -207,7 +207,7 @@ makeTissueObj(const std::string& name,
     //    gives complete bulk where its rigid
     //  - Youngs modulus then gives the scaling of the above in pressure
     //    (pascals).
-    pbdParams->enableFEMConstraint(PbdFEMConstraint::MaterialType::StVK);
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
     pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 100.0;
     pbdParams->m_dt = 0.001; // realtime used in update calls later in main

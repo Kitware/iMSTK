@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-// forward declarations
 class VolumeRenderMaterial;
 
 ///

@@ -39,20 +39,17 @@ class ImplicitGeometry;
 class LevelSetState : public ImplicitGeometry
 {
 public:
-    ///
-    /// \brief Default constructor/destructor
-    ///
     LevelSetState() = default;
-    virtual ~LevelSetState() override = default;
+    ~LevelSetState() override = default;
 
     ///
     /// \brief Initialize the pbd state
     ///
-    void initialize(std::shared_ptr<ImplicitGeometry> geometry);
+    void initialize(std::shared_ptr<ImplicitGeometry> geometry) {}
 
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(std::shared_ptr<LevelSetState> rhs);
+    void setState(std::shared_ptr<LevelSetState> rhs) {}
 };
-} // imstk
+}

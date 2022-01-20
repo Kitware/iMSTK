@@ -28,7 +28,7 @@ namespace imstk
 class SphModel;
 
 ///
-/// \class SPHObject
+/// \class SphObject
 ///
 /// \brief Base class for scene objects that move and/or deform under
 /// smooth particle hydrodynamics
@@ -37,21 +37,21 @@ class SphObject : public DynamicObject
 {
 public:
     SphObject(const std::string& name) : DynamicObject(name) { }
-    virtual ~SphObject() override = default;
+    ~SphObject() override = default;
 
-    virtual const std::string getTypeName() const override { return "SPHObject"; }
+    const std::string getTypeName() const override { return "SphObject"; }
 
     ///
-    /// \brief Get the model governing the SPH fluid dynamics of this object
+    /// \brief Get the model governing the Sph fluid dynamics of this object
     ///
     std::shared_ptr<SphModel> getSphModel();
 
     ///
-    /// \brief Initialize the SPH scene object
+    /// \brief Initialize the SphObject
     ///
     bool initialize() override;
 
 protected:
     std::shared_ptr<SphModel> m_sphModel = nullptr;
 };
-} // end namespace imstk
+}

@@ -41,15 +41,8 @@ class VTKScreenCaptureUtility : public ScreenCaptureUtility
 public:
     using ScreenCaptureUtility::saveScreenShot;
 
-    ///
-    /// \brief Constructor
-    ///
-    explicit VTKScreenCaptureUtility(vtkRenderWindow* const rw, const std::string prefix = "Screenshot-");
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKScreenCaptureUtility() override = default;
+    VTKScreenCaptureUtility(vtkRenderWindow* const rw, const std::string prefix = "Screenshot-");
+    ~VTKScreenCaptureUtility() override = default;
 
     ///
     /// \brief Saves the screenshot as a png file
@@ -61,4 +54,4 @@ protected:
     vtkSmartPointer<vtkPNGWriter> m_pngWriter; //> using vtk's png writer to save the screenshots
     vtkRenderWindow* m_renderWindow;           //> render window whose screen shot will be taken
 };
-} // imstk
+}

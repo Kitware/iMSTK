@@ -36,20 +36,13 @@ class AbstractDataArray;
 class ImageData : public PointSet
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     ImageData(const std::string& name = std::string(""));
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~ImageData() override = default;
+    ~ImageData() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "ImageData"; }
+    const std::string getTypeName() const override { return "ImageData"; }
 
     ///
     /// \brief Print the image data info
@@ -78,9 +71,10 @@ public:
 
     ///
     /// \brief Returns index of data in scalar array given structured image coordinate, does no bounds checking
-    ///
+    ///@{
     inline size_t getScalarIndex(int x, int y, int z = 0) { return getScalarIndex(x, y, z, m_dims, m_numComps); }
     inline size_t getScalarIndex(const Vec3i& imgCoord) { return getScalarIndex(imgCoord[0], imgCoord[1], imgCoord[2], m_dims, m_numComps); }
+    ///@}
 
     ///
     /// \brief Returns index of data in scalar array given structured image coordinate, dimensions, and number of components
@@ -89,16 +83,6 @@ public:
     inline static size_t getScalarIndex(int x, int y, int z, const Vec3i& dims, int numComps) { return (x + dims[0] * (y + z * dims[1])) * numComps; }
 
     std::shared_ptr<ImageData> cast(ScalarTypeId type);
-
-    ///
-    /// \brief Returns the origin of the image
-    ///
-    const Vec3d& getOrigin() const { return m_origin; }
-
-    ///
-    /// \brief Returns the spacing of the image
-    ///
-    const Vec3d& getSpacing() const { return m_spacing; }
 
     ///
     /// \brief Returns inv spacing of the image
@@ -138,28 +122,30 @@ public:
     }
 
     ///
-    /// \brief Returns point data scalars
-    ///
+    /// \brief Get/Set the scalars
+    ///@{
     std::shared_ptr<AbstractDataArray> getScalars() const { return m_scalarArray; }
-
-    ///
-    /// \brief Sets the scalars
-    ///
     void setScalars(std::shared_ptr<AbstractDataArray> scalars, const int numComps, int* dim);
+    ///@}
 
     ///
-    /// \brief Sets the origin of the image
-    ///
+    /// \brief Get/Set the origin of the image
+    ///@{
+    const Vec3d& getOrigin() const { return m_origin; }
     void setOrigin(const Vec3d& origin) { m_origin = origin; }
+    ///@}
 
     ///
-    /// \brief Sets the spacing between pixels/voxels of the image
-    ///
+    /// \brief Get/Set the spacing between pixels/voxels of the image
+    ///@{
+    const Vec3d& getSpacing() const { return m_spacing; }
     void setSpacing(const Vec3d& spacing)
     {
         m_spacing    = spacing;
         m_invSpacing = Vec3d(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
     }
+
+    ///@}
 
     ///
     /// \brief Allocate image by type
@@ -196,4 +182,4 @@ protected:
     Vec3d m_invSpacing = Vec3d(1.0, 1.0, 1.0);
     Vec6d m_bounds;
 };
-} // imstk
+}

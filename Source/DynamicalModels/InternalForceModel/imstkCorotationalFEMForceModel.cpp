@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkCorotationalFEMForceModel.h"
+#include "imstkCorotationalFemForceModel.h"
 
 #ifdef WIN32
 #pragma warning( push )

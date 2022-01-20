@@ -35,15 +35,8 @@ namespace imstk
 class VTKCylinderRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKCylinderRenderDelegate() override = default;
+    ~VTKCylinderRenderDelegate() override = default;
 
     ///
     /// \brief Process the event queue
@@ -53,4 +46,4 @@ public:
 protected:
     vtkSmartPointer<vtkCylinderSource> m_cylinderSource;
 };
-} // imstk
+}

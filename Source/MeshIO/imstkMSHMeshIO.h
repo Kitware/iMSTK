@@ -29,23 +29,16 @@ class VolumetricMesh;
 class SurfaceMesh;
 
 ///
-/// \class MSHMeshIO
+/// \class MshMeshIO
 ///
 /// \brief Contains utility to generate imstk::VolumetricMesh from mesh given in msh
 /// file format. Only works for tet meshes.
 ///
-class MSHMeshIO
+class MshMeshIO
 {
 public:
-    ///
-    /// \brief Defualt Constructor
-    ///
-    MSHMeshIO() = default;
-
-    ///
-    /// \brief Default Destructor
-    ///
-    ~MSHMeshIO() = default;
+    MshMeshIO() = default;
+    virtual ~MshMeshIO() = default;
 
     ///
     /// \brief Read and generate a volumetric mesh given a external msh file

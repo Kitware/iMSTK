@@ -34,7 +34,7 @@ DeviceClient::DeviceClient(const std::string& name, const std::string& ip) :
 {
 }
 
-const Vec3d
+Vec3d
 DeviceClient::getPosition()
 {
     Vec3d pos;
@@ -44,7 +44,7 @@ DeviceClient::getPosition()
     return pos;
 }
 
-const Vec3d
+Vec3d
 DeviceClient::getVelocity()
 {
     Vec3d vel;
@@ -54,7 +54,7 @@ DeviceClient::getVelocity()
     return vel;
 }
 
-const Vec3d
+Vec3d
 DeviceClient::getAngularVelocity()
 {
     Vec3d angVel;
@@ -64,7 +64,7 @@ DeviceClient::getAngularVelocity()
     return angVel;
 }
 
-const Quatd
+Quatd
 DeviceClient::getOrientation()
 {
     Quatd orientation;
@@ -74,7 +74,7 @@ DeviceClient::getOrientation()
     return orientation;
 }
 
-const Vec3d
+Vec3d
 DeviceClient::getForce()
 {
     Vec3d force;
@@ -98,7 +98,7 @@ DeviceClient::getButtons() const
     return m_buttons;
 }
 
-const std::vector<double>
+std::vector<double>
 DeviceClient::getAnalog() const
 {
     std::vector<double> result;
@@ -107,4 +107,4 @@ DeviceClient::getAnalog() const
     m_dataLock.unlock();
     return result;
 }
-} // imstk
+}

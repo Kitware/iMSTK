@@ -28,9 +28,7 @@ namespace imstk
 ///
 /// \class DirectionalLight
 ///
-/// \brief Directional light class
-///
-/// A directional light has no position or range. The focal point is the
+/// \brief A directional light has no position or range. The focal point is the
 /// direction.
 ///
 class DirectionalLight : public Light
@@ -41,14 +39,15 @@ public:
         this->setFocalPoint(-1.0, -1.0, -1.0);
     }
 
-    virtual ~DirectionalLight() override = default;
+    ~DirectionalLight() override = default;
 
     const std::string getTypeName() const override { return "DirectionalLight"; }
 
     ///
-    /// \brief Direction of the light
-    ///
+    /// \brief Set the direction of the light
+    ///@{
     void setDirection(const Vec3d& dir) { setFocalPoint(dir); }
     void setDirection(const double x, const double y, const double z) { setFocalPoint(Vec3d(x, y, z)); }
+    ///@}
 };
-} // imstk
+}

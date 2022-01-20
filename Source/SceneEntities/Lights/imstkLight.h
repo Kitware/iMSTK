@@ -40,14 +40,15 @@ protected:
     Light() = default;
 
 public:
-    virtual ~Light() override = default;
+    ~Light() override = default;
 
     ///
-    /// \brief Set the light focal point
-    ///
+    /// \brief Get/Set the light focal point
+    ///@{
     void setFocalPoint(const Vec3d& p) { m_focalPoint = p; }
     void setFocalPoint(const double x, const double y, const double z) { setFocalPoint(Vec3d(x, y, z)); }
     const Vec3d& getFocalPoint() const { return m_focalPoint; }
+    ///@}
 
     ///
     /// \brief Get the status (On/off) of the light
@@ -105,4 +106,4 @@ protected:
     Vec3d  m_focalPoint  = Vec3d::Zero();
     Vec3d  m_attenuation = Vec3d(1.0, 0.0, 0.0); ///> c, b, a (ax^2+bx+c)
 };
-} // imstk
+}

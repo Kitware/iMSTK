@@ -129,4 +129,4 @@ Cylinder::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(p
     min = (p1 - e).cwiseMin(p2 - e);
     max = (p1 + e).cwiseMax(p2 + e);
 }
-} // imstk
+}

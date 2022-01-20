@@ -45,7 +45,7 @@ public:
 
 public:
     SurfaceMeshSubdivide();
-    virtual ~SurfaceMeshSubdivide() override = default;
+    ~SurfaceMeshSubdivide() override = default;
 
 public:
     std::shared_ptr<SurfaceMesh> getOutputMesh();

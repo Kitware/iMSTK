@@ -50,14 +50,7 @@ public:
         hours
     };
 
-    ///
-    /// \brief Constructor
-    ///
     StopWatch() : state(TimerState::stopped) {};
-
-    ///
-    /// \brief Destructor
-    ///
     ~StopWatch() = default;
 
 public:

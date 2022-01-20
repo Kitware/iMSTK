@@ -29,11 +29,11 @@ namespace imstk
 class Texture;
 
 ///
-/// \class IBLProbe
+/// \class IblProbe
 ///
 /// \brief Image-based lighting probe
 ///
-/// Image-based lighting (IBL) probes are used to provide global illumination
+/// Image-based lighting (Ibl) probes are used to provide global illumination
 /// using special cubemaps. The cubemaps are prefiltered and evaluated using a
 /// lookup table (LUT) texture. The cubemaps should be preintegrated using
 /// split-sum approximation.
@@ -51,11 +51,19 @@ public:
     IblProbe(std::string irradianceCubemapPath,
              std::string radianceCubemapPath, std::string brdfLUTPath);
 
+    ///
     /// \brief TODO
+    ///
     std::shared_ptr<Texture> getIrradianceCubemapTexture();
+
+    ///
     /// \brief TODO
+    ///
     std::shared_ptr<Texture> getRadianceCubemapTexture();
+
+    ///
     /// \brief TODO
+    ///
     std::shared_ptr<Texture> getBrdfLUTTexture();
 
 protected:

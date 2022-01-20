@@ -28,6 +28,8 @@ class OpenVRDeviceClient;
 }
 
 ///
+/// \class vtkInteractorStyleVR
+///
 /// \brief VTK Interactor style for VR
 ///
 class vtkInteractorStyleVR : public vtkInteractorStyle3D

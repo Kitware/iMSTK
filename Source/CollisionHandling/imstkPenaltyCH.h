@@ -33,7 +33,7 @@ class RigidObject2;
 ///
 /// \class PenaltyCH
 ///
-/// \brief Implements penalty collision handling between FEM and Rigid models
+/// \brief Implements penalty collision handling between Fem and Rigid models
 ///
 class PenaltyCH : public CollisionHandling
 {

@@ -36,7 +36,7 @@ class SurfaceMeshSmoothen : public GeometryAlgorithm
 {
 public:
     SurfaceMeshSmoothen();
-    virtual ~SurfaceMeshSmoothen() override = default;
+    ~SurfaceMeshSmoothen() override = default;
 
 public:
     imstkGetMacro(NumberOfIterations, int);

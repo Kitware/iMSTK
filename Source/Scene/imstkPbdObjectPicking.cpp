@@ -25,7 +25,7 @@ limitations under the License.
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPBDPickingCH.h"
+#include "imstkPbdPickingCH.h"
 #include "imstkPbdSolver.h"
 #include "imstkTaskGraph.h"
 
@@ -42,7 +42,7 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
     setCollisionDetection(cd);
 
     // Setup the handler
-    auto ch = std::make_shared<PBDPickingCH>();
+    auto ch = std::make_shared<PbdPickingCH>();
     ch->setInputObjectA(obj1);
     ch->setInputObjectB(obj2);
     ch->setInputCollisionData(getCollisionDetection()->getCollisionData());
@@ -57,7 +57,7 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
             getCollisionDetection()->update();
 
             // Then do handling
-            auto pickingCH = std::dynamic_pointer_cast<PBDPickingCH>(getCollisionHandlingA());
+            auto pickingCH = std::dynamic_pointer_cast<PbdPickingCH>(getCollisionHandlingA());
             pickingCH->update();
         }, "PbdPickingCD_and_CH", true);
     m_taskGraph->addNode(m_pickingNode);
@@ -75,7 +75,7 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
 void
 PbdObjectPicking::endPick()
 {
-    auto ch = std::dynamic_pointer_cast<PBDPickingCH>(getCollisionHandlingA());
+    auto ch = std::dynamic_pointer_cast<PbdPickingCH>(getCollisionHandlingA());
     if (ch == nullptr)
     {
         LOG(FATAL) << "PbdObjectPicking ending pick, but PBDPickingCH/handlerA is nullptr";
@@ -90,7 +90,7 @@ PbdObjectPicking::endPick()
 void
 PbdObjectPicking::beginPick()
 {
-    auto ch = std::dynamic_pointer_cast<PBDPickingCH>(getCollisionHandlingA());
+    auto ch = std::dynamic_pointer_cast<PbdPickingCH>(getCollisionHandlingA());
     if (ch == nullptr)
     {
         LOG(FATAL) << "PbdObjectPicking beginning pick, but PBDPickingCH/handlerA is nullptr";

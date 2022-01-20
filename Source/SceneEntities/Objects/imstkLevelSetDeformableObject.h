@@ -28,7 +28,7 @@ namespace imstk
 class LevelSetModel;
 
 ///
-/// \class PbdObject
+/// \class LevelSetDeformableObject
 ///
 /// \brief Base class for scene objects that move and/or deform under position
 /// based dynamics formulation, implements the PbdModel and PbdSolver
@@ -37,21 +37,21 @@ class LevelSetDeformableObject : public DynamicObject
 {
 public:
     LevelSetDeformableObject(const std::string& name) : DynamicObject(name) { }
-    virtual ~LevelSetDeformableObject() override = default;
+    ~LevelSetDeformableObject() override = default;
 
-    virtual const std::string getTypeName() const override { return "LevelSetDeformableObject"; }
+    const std::string getTypeName() const override { return "LevelSetDeformableObject"; }
 
     ///
-    /// \biref Get the Pbd model of the object
+    /// \biref Get the LevelSet model of the object
     ///
     std::shared_ptr<LevelSetModel> getLevelSetModel();
 
     ///
-    /// \brief Initialize the pbd scene object
+    /// \brief Initialize the LevelSet scene object
     ///
     bool initialize() override;
 
 protected:
-    std::shared_ptr<LevelSetModel> m_levelSetModel = nullptr;  ///> PBD mathematical model
+    std::shared_ptr<LevelSetModel> m_levelSetModel = nullptr; ///> LevelSet mathematical model
 };
-} // imstk
+}

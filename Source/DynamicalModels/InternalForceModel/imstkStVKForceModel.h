@@ -33,19 +33,17 @@ class VolumetricMesh;
 
 namespace imstk
 {
+///
+/// \class StvkForceModel
+///
+/// \brief
+///
 class StvkForceModel : public InternalForceModel
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     StvkForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
                    const bool withGravity = true, const double gravity = 10.0);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~StvkForceModel() override = default;
+    ~StvkForceModel() override = default;
 
     ///
     /// \brief Get the internal force
@@ -88,4 +86,4 @@ protected:
     std::shared_ptr<vega::StVKStiffnessMatrix> m_vegaStVKStiffnessMatrix;
     bool ownStiffnessMatrix;
 };
-} // imstk
+}

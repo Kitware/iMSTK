@@ -68,4 +68,4 @@ FeDeformBodyState::setState(std::shared_ptr<FeDeformBodyState> rhs)
     m_qDot    = rhs->getQDot();
     m_qDotDot = rhs->getQDotDot();
 }
-} // imstk
+}

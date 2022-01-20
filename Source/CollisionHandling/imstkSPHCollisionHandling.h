@@ -30,9 +30,9 @@ class CollisionDetectionAlgorithm;
 class SphObject;
 
 ///
-/// \class SPHCollisionHandling
+/// \class SphCollisionHandling
 ///
-/// \brief The SPHCollisionHandler consumes PointIndexDirection contact data
+/// \brief The SphCollisionHandling consumes PointIndexDirection contact data
 /// to resolve positions and correct velocities of SPH particles. It does
 /// not correct pressures/densities.
 ///
@@ -42,7 +42,7 @@ public:
     SphCollisionHandling() = default;
     virtual ~SphCollisionHandling() override = default;
 
-    virtual const std::string getTypeName() const override { return "SPHCollisionHandling"; }
+    virtual const std::string getTypeName() const override { return "SphCollisionHandling"; }
 
 public:
     void setInputSphObject(std::shared_ptr<SphObject> sphObj);

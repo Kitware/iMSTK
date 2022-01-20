@@ -45,8 +45,8 @@ public:
         Debug
     };
 
-    SceneManager(std::string name    = "SceneManager");
-    virtual ~SceneManager() override = default;
+    SceneManager(std::string name = "SceneManager");
+    ~SceneManager() override      = default;
 
     ///
     /// \brief Get the scene that the scene manager is managing
@@ -120,4 +120,4 @@ protected:
     Mode m_mode;
     std::string m_prevCamName;
 };
-} // imstk
+}

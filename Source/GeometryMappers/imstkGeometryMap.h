@@ -82,15 +82,17 @@ public:
 
     ///
     /// \brief Get/Set parent geometry
-    ///
+    ///@{
     virtual void setParentGeometry(std::shared_ptr<Geometry> parent);
     virtual std::shared_ptr<Geometry> getParentGeometry() const;
+    ///@}
 
     ///
     /// \brief Get/Set child geometry
-    ///
+    ///@{
     virtual void setChildGeometry(std::shared_ptr<Geometry> child);
     virtual std::shared_ptr<Geometry> getChildGeometry() const;
+    ///@}
 
     ///
     /// \brief getMapIdx

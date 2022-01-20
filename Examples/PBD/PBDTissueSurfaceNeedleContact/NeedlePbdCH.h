@@ -21,79 +21,81 @@
 
 #pragma once
 
-#include "imstkPBDCollisionHandling.h"
+#include "imstkPbdCollisionHandling.h"
 #include "NeedleObject.h"
 
 using namespace imstk;
 
 ///
+/// \class NeedlePbdCH
+///
 /// \brief Surface collision disabled upon puncture
 ///
-class NeedlePbdCH : public PBDCollisionHandling
+class NeedlePbdCH : public PbdCollisionHandling
 {
 public:
     NeedlePbdCH() = default;
     ~NeedlePbdCH() override = default;
 
-    virtual const std::string getTypeName() const override { return "NeedlePbdCH"; }
+    const std::string getTypeName() const override { return "NeedlePbdCH"; }
 
 protected:
     ///
     /// \brief Add a vertex-triangle constraint
     ///
-    virtual void addVTConstraint(
+    void addVTConstraint(
         VertexMassPair ptA,
         VertexMassPair ptB1, VertexMassPair ptB2, VertexMassPair ptB3,
-        double stiffnessA, double stiffnessB)
+        double stiffnessA, double stiffnessB) override
     {
         auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
         if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
         {
-            PBDCollisionHandling::addVTConstraint(ptA, ptB1, ptB2, ptB3, stiffnessA, stiffnessB);
+            PbdCollisionHandling::addVTConstraint(ptA, ptB1, ptB2, ptB3, stiffnessA, stiffnessB);
         }
     }
 
     ///
     /// \brief Add an edge-edge constraint
     ///
-    virtual void addEEConstraint(
+    void addEEConstraint(
         VertexMassPair ptA1, VertexMassPair ptA2,
         VertexMassPair ptB1, VertexMassPair ptB2,
-        double stiffnessA, double stiffnessB)
+        double stiffnessA, double stiffnessB) override
     {
         auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
         if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
         {
-            PBDCollisionHandling::addEEConstraint(ptA1, ptA2, ptB1, ptB2, stiffnessA, stiffnessB);
+            PbdCollisionHandling::addEEConstraint(ptA1, ptA2, ptB1, ptB2, stiffnessA, stiffnessB);
         }
     }
 
     ///
     /// \brief Add a point-edge constraint
     ///
-    virtual void addPEConstraint(
+    void addPEConstraint(
         VertexMassPair ptA1,
         VertexMassPair ptB1, VertexMassPair ptB2,
-        double stiffnessA, double stiffnessB)
+        double stiffnessA, double stiffnessB) override
     {
         auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
         if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
         {
-            PBDCollisionHandling::addPEConstraint(ptA1, ptB1, ptB2, stiffnessA, stiffnessB);
+            PbdCollisionHandling::addPEConstraint(ptA1, ptB1, ptB2, stiffnessA, stiffnessB);
         }
     }
 
     ///
     /// \brief Add a point-point constraint
     ///
-    virtual void addPPConstraint(
+    void addPPConstraint(
         VertexMassPair ptA, VertexMassPair ptB,
-        double stiffnessA, double stiffnessB)
+        double stiffnessA, double stiffnessB) override
     {
         auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
         if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
         {
-            PBDCollisionHandling::addPPConstraint(ptA, ptB, stiffnessA, stiffnessB);
+            PbdCollisionHandling::addPPConstraint(ptA, ptB, stiffnessA, stiffnessB);
         }
     }
 };
