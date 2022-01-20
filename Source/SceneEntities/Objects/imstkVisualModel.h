@@ -61,7 +61,7 @@ public:
     const std::string& getName() { return m_name; }
     void setName(std::string name) { m_name = name; }
     ///@}
-
+    
     ///
     /// \brief Set/Get render material
     ///@{
