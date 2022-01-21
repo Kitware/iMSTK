@@ -22,26 +22,12 @@
 #include "imstkVTKRenderDelegate.h"
 #include "imstkLogger.h"
 #include "imstkPointSet.h"
+#include "imstkRenderDelegateObjectFactory.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 
-// VTK render delegates
-#include "imstkVTKCapsuleRenderDelegate.h"
-#include "imstkVTKCylinderRenderDelegate.h"
-#include "imstkVTKFluidRenderDelegate.h"
-#include "imstkVTKHexahedralMeshRenderDelegate.h"
-#include "imstkVTKImageDataRenderDelegate.h"
-#include "imstkVTKLineMeshRenderDelegate.h"
-#include "imstkVTKOrientedBoxRenderDelegate.h"
-#include "imstkVTKPlaneRenderDelegate.h"
-#include "imstkVTKPointSetRenderDelegate.h"
-#include "imstkVTKSphereRenderDelegate.h"
-#include "imstkVTKSurfaceMeshRenderDelegate.h"
-#include "imstkVTKSurfaceNormalRenderDelegate.h"
-#include "imstkVTKTetrahedralMeshRenderDelegate.h"
-
+#include <vtkAbstractMapper.h>
 #include <vtkActor.h>
-#include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkTexture.h>
@@ -66,83 +52,7 @@ VTKRenderDelegate::VTKRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
 std::shared_ptr<VTKRenderDelegate>
 VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
 {
-    const std::string geomType = visualModel->getGeometry()->getTypeName();
-
-    // Two edge cases
-    if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Fluid)
-    {
-        if (std::dynamic_pointer_cast<PointSet>(visualModel->getGeometry()) != nullptr)
-        {
-            return std::make_shared<VTKFluidRenderDelegate>(visualModel);
-        }
-    }
-    if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::SurfaceNormals)
-    {
-        if (std::dynamic_pointer_cast<PointSet>(visualModel->getGeometry()) != nullptr)
-        {
-            return std::make_shared<VTKSurfaceNormalRenderDelegate>(visualModel);
-        }
-    }
-
-    if (visualModel->getGeometry()->isMesh())
-    {
-        if (geomType == "SurfaceMesh")
-        {
-            return std::make_shared<VTKSurfaceMeshRenderDelegate>(visualModel);
-        }
-        else if (geomType == "TetrahedralMesh")
-        {
-            return std::make_shared<VTKTetrahedralMeshRenderDelegate>(visualModel);
-        }
-        else if (geomType == "LineMesh")
-        {
-            return std::make_shared<VTKLineMeshRenderDelegate>(visualModel);
-        }
-        else if (geomType == "HexahedralMesh")
-        {
-            return std::make_shared<VTKHexahedralMeshRenderDelegate>(visualModel);
-        }
-    }
-    else
-    {
-        if (geomType == "PointSet")
-        {
-            return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
-        }
-        else if (geomType == "Plane")
-        {
-            return std::make_shared<VTKPlaneRenderDelegate>(visualModel);
-        }
-        else if (geomType == "Sphere")
-        {
-            return std::make_shared<VTKSphereRenderDelegate>(visualModel);
-        }
-        else if (geomType == "Capsule")
-        {
-            return std::make_shared<VTKCapsuleRenderDelegate>(visualModel);
-        }
-        else if (geomType == "OrientedBox")
-        {
-            return std::make_shared<VTKOrientedCubeRenderDelegate>(visualModel);
-        }
-        else if (geomType == "Cylinder")
-        {
-            return std::make_shared<VTKCylinderRenderDelegate>(visualModel);
-        }
-        else if (geomType == "ImageData")
-        {
-            if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Points)
-            {
-                return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
-            }
-            else
-            {
-                return std::make_shared<VTKImageDataRenderDelegate>(visualModel);
-            }
-        }
-    }
-    LOG(FATAL) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
-    return nullptr;
+    return RenderDelegateObjectFactory::makeRenderDelegate(visualModel);
 }
 
 void

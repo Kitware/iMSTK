@@ -61,7 +61,7 @@ protected:
     ///
     /// \brief Updates the actor and mapper properties from the currently set VisualModel
     ///
-    virtual void updateRenderProperties() override;
+    void updateRenderProperties() override;
 
     ///
     /// \brief Computes triangle centers from the current geometry

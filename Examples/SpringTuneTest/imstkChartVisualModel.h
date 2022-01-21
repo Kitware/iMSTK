@@ -21,29 +21,45 @@
 
 #pragma once
 
-#include "imstkVTKPolyDataRenderDelegate.h"
-
-class vtkCapsuleSource;
+#include "imstkVisualModel.h"
+#include "imstkColor.h"
 
 namespace imstk
 {
+class AbstractDataArray;
+}
+
+using namespace imstk;
+
+struct Plot2d
+{
+    public:
+        std::shared_ptr<AbstractDataArray> m_xVals;
+        std::shared_ptr<AbstractDataArray> m_yVals;
+
+        Color m_lineColor  = Color::Red;
+        double m_lineWidth = 1.0;
+};
+
 ///
-/// \class VTKCapsuleRenderDelegate
+/// \class ChartVisualModel
 ///
-/// \brief Render capsule object with vtk backend
+/// \brief Class for graphing 2d charts, only supports 2d data
 ///
-class VTKCapsuleRenderDelegate : public VTKPolyDataRenderDelegate
+class ChartVisualModel : public VisualModel
 {
 public:
-    VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-    ~VTKCapsuleRenderDelegate() override = default;
+    ChartVisualModel();
+    virtual ~ChartVisualModel() override = default;
 
-    ///
-    /// \brief Update capsule source based on the capsule geometry
-    ///
-    void processEvents() override;
+    void addPlot(Plot2d plot) { m_plots.push_back(std::make_shared<Plot2d>(plot)); }
+
+    const std::vector<std::shared_ptr<Plot2d>>& getPlots() const { return m_plots; }
+
+    void setViewBounds(const Vec4d& bounds) { m_viewBounds = bounds; }
+    Vec4d getViewBounds() const { return m_viewBounds; }
 
 protected:
-    vtkSmartPointer<vtkCapsuleSource> m_capsuleSource;
+    std::vector<std::shared_ptr<Plot2d>> m_plots;
+    Vec4d m_viewBounds;
 };
-} // namespace imstk

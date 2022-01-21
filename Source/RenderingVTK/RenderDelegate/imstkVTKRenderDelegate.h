@@ -29,7 +29,7 @@
 #include <vtkSmartPointer.h>
 
 class vtkAbstractMapper;
-class vtkProp3D;
+class vtkProp;
 class vtkTransform;
 class vtkTexture;
 
@@ -62,7 +62,7 @@ public:
     ///
     /// \brief Get VTK actor
     ///
-    vtkSmartPointer<vtkProp3D> getVtkActor() { return m_actor; }
+    vtkSmartPointer<vtkProp> getVtkActor() const { return m_actor; }
 
     ///
     /// \brief Set the TextureManager
@@ -103,7 +103,7 @@ protected:
     vtkSmartPointer<vtkTransform> m_transform;
 
     // VTK data members used to create the rendering pipeline
-    vtkSmartPointer<vtkProp3D> m_actor;
+    vtkSmartPointer<vtkProp> m_actor;
     vtkSmartPointer<vtkAbstractMapper> m_mapper;
 
     std::shared_ptr<VisualModel>    m_visualModel; ///< imstk visual model (contains data (geometry) and render specification (render material))

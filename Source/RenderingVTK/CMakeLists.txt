@@ -5,6 +5,7 @@
 include(imstkAddLibrary)
 imstk_add_library(RenderingVTK
   H_FILES
+    imstkRenderDelegateObjectFactory.h
     imstkVolumeRenderMaterial.h
     imstkVolumeRenderMaterialPresets.h
     imstkVTKRenderer.h
@@ -26,6 +27,7 @@ imstk_add_library(RenderingVTK
     RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.h
     RenderDelegate/imstkVTKVolumeRenderDelegate.h
   CPP_FILES
+    imstkRenderDelegateObjectFactory.cpp
     imstkVolumeRenderMaterial.cpp
     imstkVolumeRenderMaterialPresets.cpp
     imstkVTKRenderer.cpp

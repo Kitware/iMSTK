@@ -43,7 +43,7 @@ class VTKPointSetRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-    virtual ~VTKPointSetRenderDelegate() override = default;
+    ~VTKPointSetRenderDelegate() override = default;
 
     ///
     /// \brief Update polydata source based on the mesh geometry
