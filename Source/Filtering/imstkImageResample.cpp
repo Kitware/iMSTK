@@ -70,4 +70,4 @@ ImageResample::requestUpdate()
 
     setOutput(GeometryUtils::copyToImageData(resample->GetOutput()));
 }
-}
+} // namespace imstk

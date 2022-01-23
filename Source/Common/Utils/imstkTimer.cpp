@@ -183,4 +183,4 @@ UPSCounter::setEndPointOfUpdate()
         m_accumulatedTimer = 0.;
     }
 }
-}
+} // namespace imstk

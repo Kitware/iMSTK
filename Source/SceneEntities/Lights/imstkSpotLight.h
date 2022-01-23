@@ -34,7 +34,7 @@ class SpotLight : public PointLight
 {
 public:
     SpotLight() : m_spotAngle(10.0) { }
-    virtual ~SpotLight() override = default;
+    ~SpotLight() override = default;
 
     const std::string getTypeName() const override { return "SpotLight"; }
 
@@ -51,4 +51,4 @@ public:
 protected:
     double m_spotAngle = 45.0;
 };
-} // imstk
+} // namespace imstk

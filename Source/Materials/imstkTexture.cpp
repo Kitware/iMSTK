@@ -71,4 +71,4 @@ Texture::getFileType()
 
     return textureType;
 }
-}
+} // namespace imstk

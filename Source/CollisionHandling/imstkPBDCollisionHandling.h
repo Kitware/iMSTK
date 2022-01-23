@@ -34,18 +34,17 @@ class PbdPointPointConstraint;
 class PbdPointTriangleConstraint;
 
 ///
-/// \class PBDCollisionHandling
+/// \class PbdCollisionHandling
 ///
 /// \brief Implements PBD based collision handling
-/// \todo:
 ///
-class PBDCollisionHandling : public CollisionHandling
+class PbdCollisionHandling : public CollisionHandling
 {
 public:
-    PBDCollisionHandling();
-    virtual ~PBDCollisionHandling() override;
+    PbdCollisionHandling();
+    virtual ~PbdCollisionHandling() override;
 
-    virtual const std::string getTypeName() const override { return "PBDCollisionHandling"; }
+    virtual const std::string getTypeName() const override { return "PbdCollisionHandling"; }
 
 public:
     ///
@@ -136,4 +135,4 @@ private:
     double m_restitution = 0.0; ///> Coefficient of restitution (1.0 = perfect elastic, 0.0 = inelastic)
     double m_friction    = 0.1; ///> Coefficient of friction (1.0 = full frictional force, 0.0 = none)
 };
-}
+} // namespace imstk

@@ -35,7 +35,7 @@ class QuadricDecimate : public GeometryAlgorithm
 {
 public:
     QuadricDecimate();
-    virtual ~QuadricDecimate() override = default;
+    ~QuadricDecimate() override = default;
 
 public:
     ///
@@ -43,18 +43,19 @@ public:
     ///
     void setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
 
-    imstkGetMacro(VolumePreserving, bool);
-    imstkGetMacro(TargetReduction, double);
-
     ///
-    /// \brief Set whether to preserve volume or not, default on
-    ///
+    /// \brief Get/Set whether to preserve volume or not, default on
+    ///@{
     imstkSetMacro(VolumePreserving, bool);
+    imstkGetMacro(VolumePreserving, bool);
+    ///@}
 
     ///
     /// \brief Set the target reduction ratio
-    ///
+    ///@{
     imstkSetMacro(TargetReduction, double);
+    imstkGetMacro(TargetReduction, double);
+///@}
 
 protected:
     void requestUpdate() override;
@@ -63,4 +64,4 @@ private:
     bool   m_VolumePreserving;
     double m_TargetReduction;
 };
-}
+} // namespace imstk

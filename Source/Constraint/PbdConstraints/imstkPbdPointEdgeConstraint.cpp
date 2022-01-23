@@ -87,4 +87,4 @@ PbdPointEdgeConstraint::computeValueAndGradient(double&             cc,
 
     return true;
 }
-} // imstk
+} // namespace imstk

@@ -54,4 +54,4 @@ IblProbe::getBrdfLUTTexture()
 {
     return m_brdfLUTTexture;
 }
-}
+} // namespace imstk

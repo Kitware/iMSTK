@@ -19,18 +19,18 @@
 
 =========================================================================*/
 
-#include "imstkPbdFEMConstraint.h"
+#include "imstkPbdFemConstraint.h"
 
 namespace imstk
 {
-PbdFEMConstraint::PbdFEMConstraint(const unsigned int cardinality,
-                                   MaterialType       mtype /*= MaterialType::StVK*/) :
+PbdFemConstraint::PbdFemConstraint(const unsigned int cardinality,
+                                   MaterialType       mType /*= MaterialType::StVK*/) :
     PbdConstraint(),
     m_elementVolume(0),
-    m_material(mtype),
+    m_material(mType),
     m_invRestMat(Mat3d::Identity())
 {
     m_vertexIds.resize(cardinality);
     m_dcdx.resize(cardinality);
 }
-} // imstk
+} // namespace imstk

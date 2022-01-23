@@ -39,15 +39,8 @@ template<typename T, int N> class VecDataArray;
 class VTKSurfaceNormalRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VTKSurfaceNormalRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKSurfaceNormalRenderDelegate() override = default;
+    ~VTKSurfaceNormalRenderDelegate() override = default;
 
     ///
     /// \brief Update polydata source based on the mesh geometry
@@ -93,4 +86,4 @@ protected:
     vtkSmartPointer<vtkDataArray> m_mappedVertexArray;  ///> Mapped array of vertices
     vtkSmartPointer<vtkDataArray> m_mappedNormalsArray; ///> Mapped array of orientations
 };
-}
+} // namespace imstk

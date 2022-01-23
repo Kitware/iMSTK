@@ -75,4 +75,4 @@ CollisionHandling::getHandlingGeometryB()
 {
     return (m_inputObjectB == nullptr) ? nullptr : m_inputObjectB->getCollidingGeometry();
 }
-}
+} // namespace imstk

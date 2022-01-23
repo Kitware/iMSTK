@@ -364,4 +364,4 @@ ObjectIO::getSubstringGivenString(
 
     return input.substr(0, index);
 }
-} // imstk
+} // namespace imstk

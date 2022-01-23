@@ -143,4 +143,4 @@ private:
 
     std::shared_ptr<g3::LogWorker> m_g3logWorker;
 };
-}
+} // namespace imstk

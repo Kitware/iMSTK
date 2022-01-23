@@ -34,7 +34,7 @@ public:
 
     const std::string getTypeName() const override { return "MockGeometry"; }
 };
-}
+} // namespace
 
 TEST(imstkGeometryTest, GetSetScaling)
 {

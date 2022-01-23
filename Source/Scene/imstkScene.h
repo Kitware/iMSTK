@@ -263,14 +263,11 @@ public:
     const std::unordered_map<std::string, double>& getTaskComputeTimes() const { return m_nodeComputeTimes; }
 
     ///
-    /// \brief Lock the compute times resource
-    ///
+    /// \brief Lock/Unlock the compute times resource
+    ///@{
     void lockComputeTimes();
-
-    ///
-    /// \brief Unlock the compute times resource
-    ///
     void unlockComputeTimes();
+    ///@}
 
     ///
     /// \brief Get the configuration
@@ -301,4 +298,4 @@ protected:
 
     std::atomic<bool> m_resetRequested = ATOMIC_VAR_INIT(false);
 };
-} // imstk
+} // namespace imstk

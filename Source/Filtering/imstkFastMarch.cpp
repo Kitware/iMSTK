@@ -213,4 +213,4 @@ FastMarch::solveNode(Vec3i coord, int index)
         m_queue.push(Node(index, solution, coord));
     }
 }
-}
+} // namespace imstk

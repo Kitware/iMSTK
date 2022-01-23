@@ -24,6 +24,8 @@
 namespace imstk
 {
 ///
+/// \class SolverBase
+///
 /// \brief Base class for solvers
 ///
 class SolverBase
@@ -36,4 +38,4 @@ public:
 
     virtual void solve() = 0;
 };
-} // imstk
+} // namespace imstk

@@ -112,7 +112,7 @@ createSoftBodyScene(std::string sceneName)
     pbdConfig->m_femParams->m_YoungModulus = 1000000.0;
     pbdConfig->m_femParams->m_PoissonRatio = 0.3;
     pbdConfig->m_fixedNodeIds = { 51, 127, 178 };
-    pbdConfig->enableFEMConstraint(PbdFEMConstraint::MaterialType::StVK);
+    pbdConfig->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
     pbdConfig->m_uniformMassValue = 1.0;
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_iterations = 5;

@@ -66,4 +66,4 @@ public:
 protected:
     std::function<void()> m_func = nullptr; ///> Don't allow user to call directly (must use execute)
 };
-}
+} // namespace imstk

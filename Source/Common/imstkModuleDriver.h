@@ -70,4 +70,4 @@ protected:
 
     std::atomic<ModuleDriverStatus> simState = { ModuleDriverRunning };
 };
-};
+}; // namespace imstk

@@ -83,4 +83,4 @@ LinearSystem<SystemMatrixType>::getSize()
 {
     return m_A.size();
 }
-} //imstk
+} // namespace imstk

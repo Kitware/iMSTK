@@ -261,4 +261,4 @@ SimulationManager::requestStop(Event* e)
         m_running[module] = false;
     }
 }
-}
+} // namespace imstk

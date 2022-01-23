@@ -36,7 +36,7 @@ class SurfaceMeshSmoothen : public GeometryAlgorithm
 {
 public:
     SurfaceMeshSmoothen();
-    virtual ~SurfaceMeshSmoothen() override = default;
+    ~SurfaceMeshSmoothen() override = default;
 
 public:
     imstkGetMacro(NumberOfIterations, int);
@@ -72,4 +72,4 @@ private:
     bool   m_FeatureEdgeSmoothing = false;
     bool   m_BoundarySmoothing    = true;
 };
-}
+} // namespace imstk

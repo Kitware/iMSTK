@@ -28,12 +28,12 @@ namespace vega
 class VolumetricMesh;
 class CorotationalLinearFEM;
 class SparseMatrix;
-}
+} // namespace vega
 
 namespace imstk
 {
 ///
-/// \class CorotationalFEMForceModel
+/// \class CorotationalFemForceModel
 ///
 /// \brief Force model for corotational based finite elements formulation
 ///
@@ -44,13 +44,9 @@ public:
     /// \brief Constructor using \p mesh
     /// \param warp if use warp
     ///
-    explicit CorotationalFemForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp = 1);
+    CorotationalFemForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp = 1);
     CorotationalFemForceModel() = delete;
-
-    ///
-    /// \brief
-    ///
-    virtual ~CorotationalFemForceModel() = default;
+    ~CorotationalFemForceModel() override = default;
 
     ///
     /// \brief Compute internal force \p internalForce at state \p u
@@ -87,4 +83,4 @@ protected:
     std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
     int m_warp;
 };
-} // imstk
+} // namespace imstk

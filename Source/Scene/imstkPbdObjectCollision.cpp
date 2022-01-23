@@ -23,7 +23,7 @@ limitations under the License.
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
-#include "imstkPBDCollisionHandling.h"
+#include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
@@ -44,7 +44,7 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
     setCollisionDetection(cd);
 
     // Setup the handler
-    std::shared_ptr<PBDCollisionHandling> ch = std::make_shared<PBDCollisionHandling>();
+    std::shared_ptr<PbdCollisionHandling> ch = std::make_shared<PbdCollisionHandling>();
     ch->setInputObjectA(obj1);
     ch->setInputObjectB(obj2);
     ch->setInputCollisionData(cd->getCollisionData());
@@ -82,25 +82,25 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
 void
 PbdObjectCollision::setRestitution(const double restitution)
 {
-    std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->setRestitution(restitution);
+    std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->setRestitution(restitution);
 }
 
 const double
 PbdObjectCollision::getRestitution() const
 {
-    return std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->getRestitution();
+    return std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->getRestitution();
 }
 
 void
 PbdObjectCollision::setFriction(const double friction)
 {
-    std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->setFriction(friction);
+    std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->setFriction(friction);
 }
 
 const double
 PbdObjectCollision::getFriction() const
 {
-    return std::dynamic_pointer_cast<PBDCollisionHandling>(getCollisionHandlingA())->getFriction();
+    return std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->getFriction();
 }
 
 void
@@ -139,4 +139,4 @@ PbdObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
         m_taskGraph->addEdge(m_collisionDetectionNode, obj2->getTaskGraph()->getSink());
     }
 }
-}
+} // namespace imstk

@@ -75,4 +75,4 @@ CameraController::setOffsetUsingCurrentCameraPose()
     rot.col(2)       = viewNormal;
     m_rotationOffset = Quatd(rot);
 }
-}
+} // namespace imstk

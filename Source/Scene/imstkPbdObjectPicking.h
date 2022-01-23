@@ -39,9 +39,9 @@ class PbdObjectPicking : public CollisionInteraction
 {
 public:
     PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
-    virtual ~PbdObjectPicking() override = default;
+    ~PbdObjectPicking() override = default;
 
-    virtual const std::string getTypeName() const override { return "PbdObjectPicking"; }
+    const std::string getTypeName() const override { return "PbdObjectPicking"; }
 
     ///
     /// \brief Remove all picking nodes and constraints
@@ -53,11 +53,11 @@ public:
     ///
     void beginPick();
 
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
     std::shared_ptr<TaskNode> getPickingNode() const { return m_pickingNode; }
 
 protected:
     std::shared_ptr<TaskNode> m_pickingNode = nullptr;
 };
-}
+} // namespace imstk

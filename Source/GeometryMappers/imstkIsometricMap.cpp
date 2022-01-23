@@ -43,4 +43,4 @@ IsometricMap::apply()
 
     m_childGeom->setTransform(m_parentGeom->getTransform());
 }
-} // imstk
+} // namespace imstk

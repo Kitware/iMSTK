@@ -62,7 +62,7 @@ class VTKRenderer : public Renderer
 {
 public:
     VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR);
-    virtual ~VTKRenderer() override = default;
+    ~VTKRenderer() override = default;
 
     ///
     /// \brief Set the rendering mode to display debug actors or not
@@ -71,9 +71,10 @@ public:
 
     ///
     /// \brief Change the debug axes length
-    ///
+    ///@{
     void setAxesLength(const double x, const double y, const double z);
     void setAxesLength(const Vec3d& len);
+    ///@}
 
     ///
     /// \brief Get the debug axes length
@@ -82,13 +83,10 @@ public:
 
     ///
     /// \brief Change the visibility of the debug axes
-    ///
+    ///@{
     void setAxesVisibility(const bool visible);
-
-    ///
-    /// \brief Returns whether the debug axes is visible or not
-    ///
     bool getAxesVisibility() const;
+    ///@}
 
     ///
     /// \brief Sets the benchmarking table using unordered_map
@@ -221,4 +219,4 @@ protected:
 
     bool m_debugActorsVisible;
 };
-}
+} // namespace imstk

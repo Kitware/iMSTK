@@ -1007,5 +1007,5 @@ edgeToEdgeClosestPoints(
     ptB = b0 + s * bDiff;
     return caseType;
 }
-}
-}
+} // namespace CollisionUtils
+} // namespace imstk

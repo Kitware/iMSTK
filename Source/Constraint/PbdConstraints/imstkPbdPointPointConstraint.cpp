@@ -59,4 +59,4 @@ PbdPointPointConstraint::computeValueAndGradient(double&             c,
 
     return true;
 }
-} // imstk
+} // namespace imstk

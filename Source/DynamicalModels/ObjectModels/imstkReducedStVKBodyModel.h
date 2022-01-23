@@ -34,7 +34,7 @@ class VolumetricMesh;
 class ReducedStVKForceModel;
 class StVKReducedInternalForces;
 class ModalMatrix;
-}
+} // namespace vega
 
 namespace imstk
 {

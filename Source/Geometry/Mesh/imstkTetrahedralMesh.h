@@ -32,25 +32,19 @@ class SurfaceMesh;
 ///
 /// \class TetrahedralMesh
 ///
-/// \brief Tetrahedral mesh
+/// \brief Represents a set of tetrahedrons & vertices via an array of
+/// Vec3d double vertices & Vec4i integer indices
 ///
 class TetrahedralMesh : public VolumetricMesh
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     TetrahedralMesh(const std::string& name = std::string(""));
-
-    ///
-    /// \brief Deconstructor
-    ///
-    virtual ~TetrahedralMesh() override = default;
+    ~TetrahedralMesh() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "TetrahedralMesh"; }
+    const std::string getTypeName() const override { return "TetrahedralMesh"; }
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
@@ -102,9 +96,10 @@ public:
 
     ///
     /// \brief Return the array of IDs for a given tetrahedron
-    ///
+    ///@{
     const Vec4i& getTetrahedronIndices(const size_t tetId) const;
     Vec4i& getTetrahedronIndices(const size_t tetId);
+    ///@}
 
     ///
     /// \brief Returns the number of tetrahedra
@@ -113,9 +108,10 @@ public:
 
     ///
     /// \brief Get/set method for removed elements from the mesh
-    ///
+    ///@{
     void setTetrahedraAsRemoved(const unsigned int tetId) { m_removedMeshElems[tetId] = true; }
     const std::vector<bool>& getRemovedTetrahedra() const { return m_removedMeshElems; }
+    ///@}
 
     ///
     /// \brief Compute and return the volume of the tetrahedral mesh
@@ -127,4 +123,4 @@ protected:
 
     std::vector<bool> m_removedMeshElems;
 };
-}
+} // namespace imstk

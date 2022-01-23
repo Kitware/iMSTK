@@ -134,4 +134,4 @@ OctreeDebugObject::debugUpdate(int maxDisplayDepth, bool drawNonEmptyParents)
         updateGeom(m_looseOctree->getRootNode());
     }
 }
-}
+} // namespace imstk

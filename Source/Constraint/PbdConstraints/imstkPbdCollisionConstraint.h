@@ -90,4 +90,4 @@ protected:
     std::vector<Vec3d> m_dcdxA;                                        ///> Constraint gradients (per vertex)
     std::vector<Vec3d> m_dcdxB;                                        ///> Constraint gradients (per vertex)
 };
-}
+} // namespace imstk

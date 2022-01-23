@@ -76,4 +76,4 @@ MouseControl::mouseMoveEvent(MouseEvent* imstkNotUsed(e))
 {
     OnMouseMove(m_mouseDeviceClient->getPos());
 }
-}
+} // namespace imstk

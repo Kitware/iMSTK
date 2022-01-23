@@ -33,7 +33,7 @@ namespace imstk
 namespace ParallelUtils
 {
 class SpinLock;
-}
+} // namespace ParallelUtils
 
 ///
 /// \class Geometry
@@ -65,16 +65,10 @@ public:
     };
 
 protected:
-    ///
-    /// \brief Constructor
-    ///
     Geometry(const std::string& name = std::string(""));
 
 public:
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~Geometry() override = default;
+    ~Geometry() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
@@ -113,22 +107,25 @@ public:
 
     ///
     /// \brief Translate the geometry in Cartesian space
-    ///
+    ///@{
     void translate(const Vec3d& t, TransformType type = TransformType::ConcatenateToTransform);
     void translate(double x, double y, double z, TransformType type = TransformType::ConcatenateToTransform);
+    ///@}
 
     ///
     /// \brief Rotate the geometry in Cartesian space
-    ///
+    ///@{
     void rotate(const Quatd& q, TransformType type = TransformType::ConcatenateToTransform);
     void rotate(const Mat3d& m, TransformType type = TransformType::ConcatenateToTransform);
     void rotate(const Vec3d& axis, double radians, TransformType type = TransformType::ConcatenateToTransform);
+    ///@}
 
     ///
     /// \brief Scale in Cartesian directions
-    ///
+    ///@{
     void scale(const Vec3d& scaling, TransformType type = TransformType::ConcatenateToTransform);
     void scale(const double scaling, TransformType type = TransformType::ConcatenateToTransform);
+    ///@}
 
     ///
     /// \brief Applies a rigid transform to the geometry
@@ -137,35 +134,40 @@ public:
 
     ///
     /// \brief Get/Set translation
-    ///
+    ///@{
     Vec3d getTranslation() const;
     void setTranslation(const Vec3d& t);
     void setTranslation(const double x, const double y, const double z);
+    ///@}
 
     ///
     /// \brief Get/Set rotation
-    ///
+    ///@{
     Mat3d getRotation() const;
     void setRotation(const Mat3d& m);
     void setRotation(const Quatd& q);
     void setRotation(const Vec3d& axis, const double angle);
+    ///@}
 
     ///
     /// \brief Get/Set scaling
-    ///
+    ///@{
     Vec3d getScaling() const;
     void setScaling(const Vec3d& s);
     void setScaling(const double s);
+    ///@}
 
     ///
     /// \brief Get/Set the transform
-    ///
+    ///@{
     const Mat4d& getTransform() const { return m_transform; }
     void setTransform(const Mat4d& m)
     {
         m_transform = m;
         m_transformApplied = false;
     }
+
+    ///@}
 
     ///
     /// \brief Get name of the geometry
@@ -206,9 +208,6 @@ protected:
     /// Total number of geometries that have been created in this program
     static uint32_t s_NumGeneratedGegometries;
 
-    friend class VTKRenderer;
-    friend class VTKRenderDelegate;
-
     ///
     /// \brief Directly apply transform to data
     ///
@@ -221,4 +220,4 @@ protected:
 
     Mat4d m_transform;                      ///> Transformation matrix
 };
-} //imstk
+} // namespace imstk

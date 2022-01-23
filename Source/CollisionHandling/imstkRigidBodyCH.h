@@ -132,4 +132,4 @@ protected:
     double m_frictionalCoefficient = 2.0;
     bool   m_useFriction = false;
 };
-}
+} // namespace imstk

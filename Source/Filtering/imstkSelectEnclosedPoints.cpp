@@ -109,4 +109,4 @@ SelectEnclosedPoints::requestUpdate()
         }
     }
 }
-}
+} // namespace imstk

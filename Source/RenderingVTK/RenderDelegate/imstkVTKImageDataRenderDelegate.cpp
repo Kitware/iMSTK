@@ -145,4 +145,4 @@ VTKImageDataRenderDelegate::imageScalarsModified(Event* imstkNotUsed(e))
     }
     volumeMapper->GetInput()->Modified();
 }
-} // imstk
+} // namespace imstk

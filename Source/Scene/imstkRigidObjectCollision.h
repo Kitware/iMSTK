@@ -39,9 +39,9 @@ class RigidObjectCollision : public CollisionInteraction
 {
 public:
     RigidObjectCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
-    virtual ~RigidObjectCollision() override = default;
+    ~RigidObjectCollision() override = default;
 
-    virtual const std::string getTypeName() const override { return "RigidObjectCollision"; }
+    const std::string getTypeName() const override { return "RigidObjectCollision"; }
 
     void setStiffness(double stiffness);
     const double getStiffness() const;
@@ -52,7 +52,7 @@ public:
     ///
     /// \brief Setup connectivity of task graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
     void copyVertsToPrevious();
 
@@ -64,4 +64,4 @@ protected:
     std::shared_ptr<TaskNode> m_copyVertToPrevNode      = nullptr;
     std::shared_ptr<TaskNode> m_computeDisplacementNode = nullptr;
 };
-}
+} // namespace imstk

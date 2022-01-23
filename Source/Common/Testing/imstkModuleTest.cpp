@@ -40,7 +40,7 @@ protected:
     void updateModule() override { }
     void uninitModule() override { }
 };
-}
+} // namespace imstk
 
 using namespace imstk;
 

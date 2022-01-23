@@ -94,4 +94,4 @@ RbdFrictionConstraint::compute(double imstkNotUsed(dt))
         range[1] = fu;
     }*/
 }
-}
+} // namespace imstk

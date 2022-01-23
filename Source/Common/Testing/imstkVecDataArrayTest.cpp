@@ -48,7 +48,7 @@ isEqualTo(const VecDataArray<T, N>& original, std::initializer_list<Eigen::Matri
     }
     return true;
 }
-}
+} // namespace
 
 TEST(imstkVecDataArrayTest, Constructors)
 {

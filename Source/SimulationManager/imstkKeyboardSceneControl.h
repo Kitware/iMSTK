@@ -42,7 +42,7 @@ class KeyboardSceneControl : public KeyboardControl
 public:
     KeyboardSceneControl() = default;
     KeyboardSceneControl(std::shared_ptr<KeyboardDeviceClient> keyDevice);
-    virtual ~KeyboardSceneControl() override = default;
+    ~KeyboardSceneControl() override = default;
 
     ///
     /// \brief The driver is used to stop the simulation
@@ -64,4 +64,4 @@ protected:
     std::weak_ptr<ModuleDriver> m_driver;
     std::weak_ptr<SceneManager> m_sceneManager;
 };
-}
+} // namespace imstk

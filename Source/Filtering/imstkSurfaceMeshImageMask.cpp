@@ -148,4 +148,4 @@ SurfaceMeshImageMask::requestUpdate()
     // Set the output
     setOutput(GeometryUtils::copyToImageData(imgStencil->GetOutput()));
 }
-}
+} // namespace imstk

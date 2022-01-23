@@ -51,25 +51,15 @@ struct LevelSetModelConfig
 class LevelSetModel : public DynamicalModel<LevelSetState>
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     LevelSetModel();
+    ~LevelSetModel() override = default;
 
     ///
-    /// \brief Destructor
-    ///
-    virtual ~LevelSetModel() override = default;
-
-    ///
-    /// \brief Set the time step size
-    ///
-    virtual void setTimeStep(const double timeStep) override { m_config->m_dt = timeStep; }
-
-    ///
-    /// \brief Returns the time step size
-    ///
-    virtual double getTimeStep() const override { return m_config->m_dt; }
+    /// \brief Get/Set the time step size
+    ///@{
+    void setTimeStep(const double timeStep) override { m_config->m_dt = timeStep; }
+    double getTimeStep() const override { return m_config->m_dt; }
+    ///@}
 
     std::shared_ptr<LevelSetModelConfig> getConfig() const { return m_config; }
 
@@ -132,4 +122,4 @@ protected:
 
     ImplicitStructuredCurvature m_curvature;
 };
-}
+} // namespace imstk

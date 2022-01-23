@@ -44,26 +44,26 @@ public:
 
 public:
     ImageReslice();
-
-    virtual ~ImageReslice() override = default;
+    ~ImageReslice() override = default;
 
 public:
     std::shared_ptr<ImageData> getOutputImage() const;
 
     void setInputImage(std::shared_ptr<ImageData> inputData);
 
-    imstkGetMacro(Transform, const Mat4d&);
-    imstkGetMacro(InterpolationType, const InterpolateType&);
-
     ///
-    /// \brief Set the transformation matrix
-    ///
+    /// \brief Get/Set the transformation matrix
+    ///@{
     imstkSetMacro(Transform, const Mat4d&);
+    imstkGetMacro(Transform, const Mat4d&);
+    ///@}
 
     ///
     /// \brief Set the interpolation type to use when resampling
-    ///
-    imstkSetMacro(InterpolationType, const InterpolateType&);
+    ///@{
+    imstkSetMacro(InterpolationType, InterpolateType);
+    imstkGetMacro(InterpolationType, InterpolateType);
+///@}
 
 protected:
     void requestUpdate() override;
@@ -72,4 +72,4 @@ private:
     Mat4d m_Transform;
     InterpolateType m_InterpolationType = InterpolateType::Linear;
 };
-}
+} // namespace imstk

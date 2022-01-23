@@ -75,4 +75,4 @@ TbbTaskGraphController::execute()
     start.try_put(continue_msg());
     g.wait_for_all();
 }
-}
+} // namespace imstk

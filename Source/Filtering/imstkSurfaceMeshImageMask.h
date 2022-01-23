@@ -39,7 +39,7 @@ class SurfaceMeshImageMask : public GeometryAlgorithm
 {
 public:
     SurfaceMeshImageMask();
-    virtual ~SurfaceMeshImageMask() override = default;
+    ~SurfaceMeshImageMask() override = default;
 
 public:
     ///
@@ -49,19 +49,20 @@ public:
     void setInputMesh(std::shared_ptr<SurfaceMesh> mesh);
     std::shared_ptr<ImageData> getOutputImage() const;
 
-    imstkGetMacro(BorderExtent, int);
-    imstkGetMacro(Dimensions, const Vec3i&);
-
     ///
-    /// \brief Adds a border around the generated image of pixel amount
+    /// \brief Get/Set a border around the generated image of pixel amount
     /// border exists outside of bounds
-    ///
+    ///@{
     imstkSetMacro(BorderExtent, int);
+    imstkGetMacro(BorderExtent, int);
+    ///@}
 
     ///
     /// \brief The dimensions of the image to generate
-    ///
+    ///@{
     imstkSetMacro(Dimensions, const Vec3i&);
+    imstkGetMacro(Dimensions, const Vec3i&);
+    ///@}
 
     ///
     /// \brief The dimensions of the image to generate
@@ -76,4 +77,4 @@ private:
     int   m_BorderExtent  = 1;
     bool  m_CheckManifold = true;
 };
-}
+} // namespace imstk

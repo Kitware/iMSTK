@@ -33,20 +33,14 @@ namespace imstk
 class VTKVolumeRenderDelegate : public VTKRenderDelegate
 {
 public:
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKVolumeRenderDelegate() override = default;
+    ~VTKVolumeRenderDelegate() override = default;
 
 protected:
-    ///
-    /// \brief Constructor
-    ///
     VTKVolumeRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKRenderDelegate(visualModel) { }
 
     ///
     /// \brief Updates the actor and mapper properties from the currently set VisualModel
     ///
-    virtual void updateRenderProperties() override;
+    void updateRenderProperties() override;
 };
-} // imstk
+} // namespace imstk

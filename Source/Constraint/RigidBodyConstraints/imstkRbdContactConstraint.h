@@ -57,4 +57,4 @@ private:
     double m_contactDepth;
     double m_beta = 0.05;
 };
-}
+} // namespace imstk

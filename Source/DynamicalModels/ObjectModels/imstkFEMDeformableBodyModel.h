@@ -31,7 +31,7 @@
 namespace vega
 {
 class VolumetricMesh;
-}
+} // namespace vega
 
 namespace imstk
 {
@@ -42,8 +42,10 @@ class VegaMeshIO;
 template<typename T, int N> class VecDataArray;
 
 ///
-/// \strut FEMModelConfig
+/// \struct FemModelConfig
+///
 /// \brief Parameters for finite element model
+///
 struct FemModelConfig
 {
     FeMethodType m_femMethod = FeMethodType::Invertible;
@@ -63,7 +65,7 @@ struct FemModelConfig
 };
 
 ///
-/// \class FEMDeformableBodyModel
+/// \class FemDeformableBodyModel
 ///
 /// \brief Mathematical model of the physics governing the dynamic deformable object
 /// \note Vega specifics will removed in future when the inertial and damping calculations
@@ -76,14 +78,7 @@ public:
     using System = NonLinearSystem<SparseMatrixd>;
 
 public:
-    ///
-    /// \brief Constructor
-    ///
     FemDeformableBodyModel();
-
-    ///
-    /// \brief Destructor
-    ///
     ~FemDeformableBodyModel() override;
 
 public:
@@ -99,22 +94,25 @@ public:
     bool initialize() override;
 
     ///
-    /// \brief Set/Get force model configuration
-    ///
+    /// \brief Get/Set force model configuration
+    ///@{
     void setForceModelConfiguration(std::shared_ptr<FemModelConfig> fmConfig) { this->m_FEModelConfig = fmConfig; }
     std::shared_ptr<FemModelConfig> getForceModelConfiguration() const { return m_FEModelConfig; }
+    ///@}
 
     ///
-    /// \brief Set/Get internal force model
-    ///
+    /// \brief Get/Set internal force model
+    ///@{
     void setInternalForceModel(std::shared_ptr<InternalForceModel> fm) { m_internalForceModel = fm; }
     std::shared_ptr<InternalForceModel> getInternalForceModel() const { return m_internalForceModel; }
+    ///@}
 
     ///
-    /// \brief Set/Get time integrator
-    ///
+    /// \brief Get/Set time integrator
+    ///@{
     void setTimeIntegrator(std::shared_ptr<TimeIntegrator> timeIntegrator) { this->m_timeIntegrator = timeIntegrator; }
     std::shared_ptr<TimeIntegrator> getTimeIntegrator() const { return m_timeIntegrator; }
+    ///@}
 
     ///
     /// \brief Load the initial conditions of the deformable object
@@ -254,10 +252,11 @@ public:
     Vectord& getUnknownVec() { return m_qSol; }
 
     ///
-    /// \brief Set/Get the update type
-    ///
+    /// \brief Get/Set the update type
+    ///@{
     void setUpdateType(const StateUpdateType& updateType) { m_updateType = updateType; }
     const StateUpdateType& getUpdateType() const { return m_updateType; }
+    ///@}
 
     /// \brief Returns the unknown vectors
     ///
@@ -289,9 +288,10 @@ public:
 
     ///
     /// \brief Get/Set the solver pointer
-    ///
+    ///@{
     std::shared_ptr<SolverBase> getSolver() const { return m_solver; }
     void setSolver(std::shared_ptr<SolverBase> solver) { this->m_solver = solver; }
+///@}
 
 protected:
     ///
@@ -337,4 +337,4 @@ protected:
 private:
     std::shared_ptr<TaskNode> m_solveNode = nullptr;
 };
-} // imstk
+} // namespace imstk

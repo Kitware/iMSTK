@@ -47,7 +47,7 @@ correctlyRemoved(std::shared_ptr<TaskGraph> graph, std::shared_ptr<TaskNode> a)
 {
     return !graph->containsNode(a) && graph->getAdjList().count(a) == 0 && graph->getInvAdjList().count(a) == 0;
 }
-}
+} // namespace
 
 TEST(imstkTaskGraphTest, Constructor)
 {

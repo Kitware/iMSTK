@@ -39,11 +39,7 @@ public:
     /// \brief Constructor
     ///
     VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief destructor
-    ///
-    virtual ~VTKCapsuleRenderDelegate() override = default;
+    ~VTKCapsuleRenderDelegate() override = default;
 
     ///
     /// \brief Update capsule source based on the capsule geometry
@@ -53,4 +49,4 @@ public:
 protected:
     vtkSmartPointer<vtkCapsuleSource> m_capsuleSource;
 };
-} // imstk
+} // namespace imstk

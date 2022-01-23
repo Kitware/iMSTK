@@ -915,4 +915,4 @@ LooseOctree::deallocateMemoryPool()
     m_NumAllocatedNodes       = 1u; // root node still remains
     m_NumAvaiableBlocksInPool = 0u;
 }
-} // end namespace imstk
+} // namespace imstk

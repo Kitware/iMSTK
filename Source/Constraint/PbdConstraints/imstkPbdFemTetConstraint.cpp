@@ -19,15 +19,15 @@
 
 =========================================================================*/
 
-#include "imstkPbdFEMTetConstraint.h"
+#include "imstkPbdFemTetConstraint.h"
 
-namespace  imstk
+namespace imstk
 {
 bool
-PbdFEMTetConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
+PbdFemTetConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
                                     const size_t& pIdx0, const size_t& pIdx1,
                                     const size_t& pIdx2, const size_t& pIdx3,
-                                    std::shared_ptr<PbdFEMConstraintConfig> config)
+                                    std::shared_ptr<PbdFemConstraintConfig> config)
 {
     m_vertexIds[0] = pIdx0;
     m_vertexIds[1] = pIdx1;
@@ -59,7 +59,7 @@ PbdFEMTetConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPos
 }
 
 bool
-PbdFEMTetConstraint::computeValueAndGradient(
+PbdFemTetConstraint::computeValueAndGradient(
     const VecDataArray<double, 3>& currVertexPositions,
     double& cval,
     std::vector<Vec3d>& dcdx) const
@@ -179,4 +179,4 @@ PbdFEMTetConstraint::computeValueAndGradient(
 
     return true;
 }
-} // imstk
+} // namespace imstk

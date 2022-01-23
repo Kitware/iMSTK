@@ -281,4 +281,4 @@ SurfaceMeshDistanceTransform::requestUpdate()
 
     //printf("time: %f\n", timer.getTimeElapsed());
 }
-}
+} // namespace imstk

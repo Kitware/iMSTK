@@ -68,4 +68,4 @@ public:
     ///
     static unsigned int getDefaultPostProcessSteps();
 };
-}
+} // namespace imstk

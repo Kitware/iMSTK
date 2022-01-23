@@ -94,4 +94,4 @@ protected:
 
     std::shared_ptr<const CollisionData> m_colData = nullptr; ///< Collision data
 };
-}
+} // namespace imstk

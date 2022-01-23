@@ -33,17 +33,15 @@ namespace imstk
 class AnimationModel
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit AnimationModel(std::shared_ptr<Geometry> geometry);
+    AnimationModel(std::shared_ptr<Geometry> geometry);
     AnimationModel() = delete;
 
     ///
     /// \brief Get/set geometry
-    ///
+    ///@{
     std::shared_ptr<Geometry> getGeometry();
     virtual void setGeometry(std::shared_ptr<Geometry> geometry);
+    ///@}
 
     ///
     /// \brief Update animation
@@ -56,8 +54,6 @@ public:
     virtual void reset() {};
 
 protected:
-    friend class VTKRenderer;
-
     std::shared_ptr<Geometry> m_geometry = nullptr;
 };
-} // imstk
+} // namespace imstk

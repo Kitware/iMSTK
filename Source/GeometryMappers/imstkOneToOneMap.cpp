@@ -175,4 +175,4 @@ OneToOneMap::getMapIdx(const size_t& idx)
 #endif
     return m_oneToOneMap[idx];
 }
-} // imstk
+} // namespace imstk

@@ -52,4 +52,4 @@ protected:
     bool   m_useAutoSample  = true;
     double m_sampleDistance = 0.0;
 };
-}
+} // namespace imstk

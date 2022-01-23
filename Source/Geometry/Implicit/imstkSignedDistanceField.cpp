@@ -119,4 +119,4 @@ SignedDistanceField::computeBoundingBox(Vec3d& min, Vec3d& max, const double pad
 {
     return m_imageDataSdf->computeBoundingBox(min, max, paddingPercent);
 }
-}
+} // namespace imstk

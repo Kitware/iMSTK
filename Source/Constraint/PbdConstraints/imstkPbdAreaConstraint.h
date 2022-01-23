@@ -33,9 +33,6 @@ namespace imstk
 class PbdAreaConstraint : public PbdConstraint
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     PbdAreaConstraint() : PbdConstraint()
     {
         m_vertexIds.resize(3);
@@ -63,4 +60,4 @@ public:
 public:
     double m_restArea = 0.;  ///> Area at the rest position
 };
-} // imstk
+} // namespace imstk

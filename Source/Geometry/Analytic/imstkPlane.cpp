@@ -114,4 +114,4 @@ Plane::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(padd
     max = max.cwiseMax(p3);
     max = max.cwiseMax(p4);
 }
-} // imstk
+} // namespace imstk

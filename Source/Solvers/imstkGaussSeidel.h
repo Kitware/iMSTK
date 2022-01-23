@@ -28,23 +28,24 @@ namespace imstk
 class LinearProjectionConstraint;
 
 ///
+/// \class GaussSeidel
+///
 /// \brief Gauss-Seidel sparse linear solver
 ///
 class GaussSeidel : public IterativeLinearSolver
 {
 public:
-    ///
-    /// \brief Constructors/Destructor
-    ///
     GaussSeidel() { m_type = Type::GaussSeidel; };
     GaussSeidel(const SparseMatrixd& A, const Vectord& rhs);
-    virtual ~GaussSeidel() override = default;
+    ~GaussSeidel() override = default;
 
     ///
-    /// \brief Remove specific constructor signatures
+    /// \brief Dissallow copy & move
     ///
-    GaussSeidel(const GaussSeidel&) = delete;
-    GaussSeidel& operator=(const GaussSeidel&) = delete;
+    GaussSeidel(const GaussSeidel&)  = delete;
+    GaussSeidel(const GaussSeidel&&) = delete;
+    GaussSeidel& operator=(const GaussSeidel&)  = delete;
+    GaussSeidel& operator=(const GaussSeidel&&) = delete;
 
     ///
     /// \brief Do one iteration of the method.
@@ -125,8 +126,7 @@ public:
     }
 
 private:
-
     std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;
     std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
-} // imstk
+} // namespace imstk

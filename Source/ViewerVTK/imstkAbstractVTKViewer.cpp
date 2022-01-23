@@ -158,4 +158,4 @@ AbstractVTKViewer::uninitModule()
     // Terminate the interactor
     m_vtkRenderWindow->GetInteractor()->TerminateApp();
 }
-}
+} // namespace imstk

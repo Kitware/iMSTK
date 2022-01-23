@@ -38,15 +38,8 @@ template<typename T, int N> class VecDataArray;
 class VTKFluidRenderDelegate : public VTKVolumeRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKFluidRenderDelegate() override = default;
+    VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    ~VTKFluidRenderDelegate() override = default;
 
     ///
     /// \brief Update polydata source based on the mesh geometry
@@ -70,6 +63,6 @@ protected:
 
     vtkSmartPointer<vtkPolyData> m_polydata;
 
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
 };
-}
+} // namespace imstk

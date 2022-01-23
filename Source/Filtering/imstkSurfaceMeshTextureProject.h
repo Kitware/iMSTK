@@ -37,7 +37,7 @@ class SurfaceMeshTextureProject : public GeometryAlgorithm
 {
 public:
     SurfaceMeshTextureProject();
-    virtual ~SurfaceMeshTextureProject() override = default;
+    ~SurfaceMeshTextureProject() override = default;
 
 public:
     ///
@@ -58,4 +58,4 @@ public:
 protected:
     void requestUpdate() override;
 };
-}
+} // namespace imstk

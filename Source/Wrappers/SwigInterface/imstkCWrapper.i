@@ -77,15 +77,15 @@
 #include "imstkPbdModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkBackwardEuler.h"
-#include "imstkPbdFEMConstraint.h"
+#include "imstkPbdFemConstraint.h"
 #include "imstkPbdCollisionConstraint.h"
-#include "imstkSPHBoundaryConditions.h"
+#include "imstkSphBoundaryConditions.h"
 #include "imstkInternalForceModelTypes.h"
-#include "imstkFEMDeformableBodyModel.h"
+#include "imstkFemDeformableBodyModel.h"
 #include "imstkRigidBodyState2.h"
 #include "imstkRigidBodyModel2.h"
-#include "imstkSPHState.h"
-#include "imstkSPHModel.h"
+#include "imstkSphState.h"
+#include "imstkSphModel.h"
 
 /* 
  * Rendering
@@ -113,7 +113,7 @@
 #include "imstkDirectionalLight.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkRigidObject2.h"
-#include "imstkSPHObject.h"
+#include "imstkSphObject.h"
 
 /*
  * CollisionDetection
@@ -292,7 +292,7 @@ namespace std
  */
 %include "../../Constraint/PbdConstraints/imstkPbdConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
-%include "../../Constraint/PbdConstraints/imstkPbdFEMConstraint.h"
+%include "../../Constraint/PbdConstraints/imstkPbdFemConstraint.h"
 %include "../../Constraint/RigidBodyConstraints/imstkRbdConstraint.h"
 
 /*
@@ -307,16 +307,16 @@ namespace std
 %include "../../DynamicalModels/ObjectModels/imstkPbdModel.h"
 %template(DynamicalModelFeDeformBodyState) imstk::DynamicalModel<imstk::FeDeformBodyState>;
 %include "../../DynamicalModels/InternalForceModel/imstkInternalForceModelTypes.h"
-%include "../../DynamicalModels/ObjectModels/imstkFEMDeformableBodyModel.h"
-%include "../../DynamicalModels/ObjectModels/imstkSPHBoundaryConditions.h"
+%include "../../DynamicalModels/ObjectModels/imstkFemDeformableBodyModel.h"
+%include "../../DynamicalModels/ObjectModels/imstkSphBoundaryConditions.h"
 %include "../../DynamicalModels/TimeIntegrators/imstkTimeIntegrator.h"
 %include "../../DynamicalModels/TimeIntegrators/imstkBackwardEuler.h"
 %include "../../DynamicalModels/ObjectStates/imstkRigidBodyState2.h"
 %template(DynamicalModelRigidBodyState2) imstk::DynamicalModel<imstk::RigidBodyState2>;
 %include "../../DynamicalModels/ObjectModels/imstkRigidBodyModel2.h"
-%include "../../DynamicalModels/ObjectStates/imstkSPHState.h"
-%template(DynamicalModelSPHState) imstk::DynamicalModel<imstk::SPHState>;
-%include "../../DynamicalModels/ObjectModels/imstkSPHModel.h"
+%include "../../DynamicalModels/ObjectStates/imstkSphState.h"
+%template(DynamicalModelSphState) imstk::DynamicalModel<imstk::SphState>;
+%include "../../DynamicalModels/ObjectModels/imstkSphModel.h"
 
 /* 
  * Rendering 
@@ -335,7 +335,7 @@ namespace std
 %include "../../SceneEntities/Objects/imstkVisualModel.h";
 %include "../../SceneEntities/Objects/imstkFeDeformableObject.h";
 %include "../../SceneEntities/Objects/imstkRigidObject2.h";
-%include "../../SceneEntities/Objects/imstkSPHObject.h";
+%include "../../SceneEntities/Objects/imstkSphObject.h";
 %include "../../SceneEntities/Camera/imstkCamera.h";
 %include "../../SceneEntities/Lights/imstkLight.h";
 %include "../../SceneEntities/Lights/imstkDirectionalLight.h";

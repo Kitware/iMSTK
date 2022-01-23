@@ -99,7 +99,7 @@ class SurfaceMeshCut : public GeometryAlgorithm
 {
 public:
     SurfaceMeshCut();
-    virtual ~SurfaceMeshCut() override = default;
+    ~SurfaceMeshCut() override = default;
 
 public:
     std::shared_ptr<SurfaceMesh> getOutputMesh();
@@ -148,4 +148,4 @@ private:
     std::shared_ptr<std::unordered_set<size_t>> m_AddConstraintVertices    = nullptr;
     double m_Epsilon = 1;
 };
-}
+} // namespace imstk

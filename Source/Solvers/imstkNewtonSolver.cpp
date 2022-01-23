@@ -222,4 +222,4 @@ NewtonSolver<SystemMatrix>::getAbsoluteTolerance() const
 
 template class NewtonSolver<SparseMatrixd>;
 template class NewtonSolver<Matrixd>;
-} // imstk
+} // namespace imstk

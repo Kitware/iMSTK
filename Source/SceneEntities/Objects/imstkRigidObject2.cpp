@@ -86,4 +86,4 @@ RigidObject2::updatePhysicsGeometry()
 
     DynamicObject::updatePhysicsGeometry();
 }
-} // imstk
+} // namespace imstk

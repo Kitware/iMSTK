@@ -40,7 +40,7 @@ make_unique(Args&& ... args)
 {
     return std::unique_ptr<T>(new T(std::forward<Args>(args) ...));
 }
-}
+} // namespace std
 #endif
 
 namespace imstk
@@ -312,4 +312,4 @@ symCantor(const T a, const T b)
     const T min = std::min<T>(a, b);
     return max * (max + 1) / 2 + min;
 }
-}
+} // namespace imstk

@@ -27,6 +27,7 @@
 namespace imstk
 {
 class PointSet;
+
 ///
 /// \class PbdState
 ///
@@ -35,9 +36,6 @@ class PointSet;
 class PbdState
 {
 public:
-    ///
-    /// \brief Default constructor/destructor
-    ///
     PbdState(const int numElements) :
         m_pos(std::make_shared<VecDataArray<double, 3>>(numElements)),
         m_vel(std::make_shared<VecDataArray<double, 3>>(numElements)),
@@ -90,4 +88,4 @@ private:
     std::shared_ptr<VecDataArray<double, 3>> m_vel;   ///> Nodal velocities
     std::shared_ptr<VecDataArray<double, 3>> m_acc;   ///> Nodal acelerations
 };
-} // imstk
+} // namespace imstk

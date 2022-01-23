@@ -56,15 +56,8 @@ class RigidBodyModel2 : public DynamicalModel<RigidBodyState2>
 public:
     using StorageIndex = Eigen::SparseMatrix<double>::StorageIndex;
 
-    ///
-    /// \brief Constructor
-    ///
     RigidBodyModel2();
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~RigidBodyModel2() override = default;
+    ~RigidBodyModel2() override = default;
 
     ///
     /// \brief Set the time step size
@@ -134,7 +127,7 @@ public:
 
 protected:
     ///
-    /// \brief Setup the task graph of the LSM
+    /// \brief Setup the task graph of the RigidBodyModel
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
@@ -154,4 +147,4 @@ protected:
 
     Eigen::VectorXd F;               // Reaction forces
 };
-}
+} // namespace imstk

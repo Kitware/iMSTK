@@ -34,10 +34,9 @@ class IdentityMap : public GeometryMap
 {
 public:
     IdentityMap() { }
-
     ~IdentityMap() override = default;
 
-    virtual const std::string getTypeName() const override { return "IdentityMap"; }
+    const std::string getTypeName() const override { return "IdentityMap"; }
 
     ///
     /// \brief Compute the map
@@ -66,4 +65,4 @@ public:
     ///
     const RigidTransform3d getTransform() const;
 };
-} // imstk
+} // namespace imstk

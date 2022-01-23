@@ -72,4 +72,4 @@ protected:
 private:
     ImplicitFunctionCentralGradient m_centralGrad;
 };
-}
+} // namespace imstk

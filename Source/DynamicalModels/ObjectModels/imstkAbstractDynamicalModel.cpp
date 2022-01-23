@@ -84,4 +84,4 @@ AbstractDynamicalModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::sh
 {
     m_taskGraph->addEdge(source, sink);
 }
-} // imstk
+} // namespace imstk

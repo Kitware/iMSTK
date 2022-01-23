@@ -47,15 +47,8 @@ public:
     };
 
 public:
-    ///
-    /// \brief Constructor
-    ///
     TimeIntegrator(Type type, double dT) : m_type(type), m_dT(dT), m_defaultDt(dT) {}
-
-    ///
-    /// \brief Destructor
-    ///
-    ~TimeIntegrator() = default;
+    virtual ~TimeIntegrator() = default;
 
     ///
     /// \brief Return the type of the time integrator
@@ -63,17 +56,19 @@ public:
     TimeIntegrator::Type getType() const { return m_type; }
 
     ///
-    /// \brief Set/Get the time step size
-    ///
+    /// \brief Get/Set the time step size
+    ///@{
     void setTimestepSize(const double dT) { m_dT = dT; }
     double getTimestepSize() const { return m_dT; }
     void setTimestepSizeToDefault() { m_dT = m_defaultDt; }
+    ///@}
 
     ///
     /// \brief Set/Get the time step size
-    ///
+    ///@{
     void setDefaultTimestepSize(const double dT) { m_defaultDt = dT; }
     double getDefaultTimestepSize() const { return m_defaultDt; }
+    ///@}
 
     ///
     /// \brief Update states given the updates in different forms
@@ -88,4 +83,4 @@ protected:
     double m_dT;   ///> Delta T
     double m_defaultDt;
 };
-} // imstk
+} // namespace imstk

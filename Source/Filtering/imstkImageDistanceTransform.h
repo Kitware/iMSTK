@@ -54,4 +54,4 @@ protected:
 private:
     bool m_UseUnsigned = false;
 };
-}
+} // namespace imstk

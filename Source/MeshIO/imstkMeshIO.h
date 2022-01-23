@@ -62,15 +62,8 @@ enum class MeshFileType
 class MeshIO
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     MeshIO() = default;
-
-    ///
-    /// \brief Destructor
-    ///
-    ~MeshIO() = default;
+    virtual ~MeshIO() = default;
 
     ///
     /// \brief Read external file
@@ -96,4 +89,4 @@ public:
     ///
     static const MeshFileType getFileType(const std::string& filePath);
 };
-} // imstk
+} // namespace imstk

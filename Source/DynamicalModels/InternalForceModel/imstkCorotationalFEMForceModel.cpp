@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkCorotationalFEMForceModel.h"
+#include "imstkCorotationalFemForceModel.h"
 
 #ifdef WIN32
 #pragma warning( push )
@@ -78,4 +78,4 @@ CorotationalFemForceModel::setTangentStiffness(std::shared_ptr<vega::SparseMatri
 {
     m_vegaTangentStiffnessMatrix = K;
 }
-}
+} // namespace imstk

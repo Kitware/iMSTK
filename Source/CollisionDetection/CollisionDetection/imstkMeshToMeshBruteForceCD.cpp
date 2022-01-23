@@ -76,7 +76,7 @@ struct EdgePair
     uint32_t edgeB[2];
     uint32_t edgeBId;
 };
-}
+} // namespace imstk
 
 namespace std
 {
@@ -97,7 +97,7 @@ struct hash<imstk::EdgePair>
         return (k.edgeAId ^ (k.edgeBId << 16));
     }
 };
-}
+} // namespace std
 
 namespace imstk
 {
@@ -664,4 +664,4 @@ MeshToMeshBruteForceCD::doBroadPhaseCollisionCheck(
         min2[1], max2[1],
         min2[2], max2[2]);
 }
-}
+} // namespace imstk

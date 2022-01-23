@@ -155,4 +155,4 @@ LineMesh::setCellActiveAttribute(std::string& activeAttributeName, std::string a
     }
     activeAttributeName = attributeName;
 }
-} // imstk
+} // namespace imstk

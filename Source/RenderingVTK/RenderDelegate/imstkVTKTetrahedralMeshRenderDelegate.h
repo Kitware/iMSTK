@@ -41,15 +41,8 @@ template<typename T, int N> class VecDataArray;
 class VTKTetrahedralMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VTKTetrahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKTetrahedralMeshRenderDelegate() override = default;
+    ~VTKTetrahedralMeshRenderDelegate() override = default;
 
     ///
     /// \brief Process handling of messages recieved
@@ -80,4 +73,4 @@ protected:
     vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
     vtkSmartPointer<vtkCellArray>   m_cellArray;               ///> Array of cells
 };
-} // imstk
+} // namespace imstk

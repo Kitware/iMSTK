@@ -38,7 +38,7 @@ class ImplicitGeometryToImageData : public GeometryAlgorithm
 {
 public:
     ImplicitGeometryToImageData();
-    virtual ~ImplicitGeometryToImageData() override = default;
+    ~ImplicitGeometryToImageData() override = default;
 
 public:
     std::shared_ptr<ImageData> getOutputImage() const;
@@ -61,4 +61,4 @@ private:
     Vec3i m_Dimensions;
     Vec6d m_Bounds;
 };
-}
+} // namespace imstk

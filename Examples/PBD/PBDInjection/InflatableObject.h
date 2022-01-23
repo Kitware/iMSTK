@@ -30,7 +30,7 @@ class ImageData;
 class SurfaceMesh;
 class TetrahedralMesh;
 class Texture;
-};
+}; // namespace imstk
 
 using namespace imstk;
 

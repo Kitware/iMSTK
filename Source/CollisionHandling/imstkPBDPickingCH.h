@@ -33,20 +33,20 @@ class PbdObject;
 class CollisionData;
 
 ///
-/// \class PBDPickingCH
+/// \class PbdPickingCH
 ///
-/// \brief Implements nodal picking for PBD object via PointPointCollisionConstraints
+/// \brief Implements nodal picking for Pbd object via PointPointCollisionConstraints
 /// All points inside the pickObj are constrained with PointPointConstraints keeping
 /// them relative to their initial position when they were picked. Their invMasses are
 /// also set to 0 to treat as infinite mass.
 ///
-class PBDPickingCH : public CollisionHandling
+class PbdPickingCH : public CollisionHandling
 {
 public:
-    PBDPickingCH();
-    ~PBDPickingCH() override = default;
+    PbdPickingCH();
+    ~PbdPickingCH() override = default;
 
-    virtual const std::string getTypeName() const override { return "PBDPickingCH"; }
+    virtual const std::string getTypeName() const override { return "PbdPickingCH"; }
 
 public:
     ///
@@ -89,4 +89,4 @@ private:
 
     std::vector<std::shared_ptr<PbdPointPointConstraint>> m_constraints; ///> List of PBD constraints
 };
-}
+} // namespace imstk

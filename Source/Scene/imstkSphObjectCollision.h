@@ -37,14 +37,14 @@ class SphObjectCollision : public CollisionInteraction
 {
 public:
     SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                       std::string cdType  = "ImplicitGeometryToPointSetCD");
-    virtual ~SphObjectCollision() override = default;
+                       std::string cdType = "ImplicitGeometryToPointSetCD");
+    ~SphObjectCollision() override = default;
 
-    virtual const std::string getTypeName() const override { return "SphObjectCollision"; }
+    const std::string getTypeName() const override { return "SphObjectCollision"; }
 
     ///
     /// \brief Setup connectivity of task graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 };
-}
+} // namespace imstk

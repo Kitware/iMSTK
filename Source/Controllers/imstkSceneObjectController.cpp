@@ -64,4 +64,4 @@ SceneObjectController::update(const double dt)
     m_sceneObject->getVisualGeometry()->setRotation(getOrientation());
     m_sceneObject->getVisualGeometry()->postModified();
 }
-}
+} // namespace imstk

@@ -43,14 +43,11 @@ public:
     using UpdateFunctionType          = std::function<void (const Vectord&, const bool)>;
     using UpdatePrevStateFunctionType = std::function<void ()>;
 
-    ///
-    /// \brief default Constructor/Destructor
-    ///
-    NonLinearSystem() {};
+    NonLinearSystem() { }
     NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF);
     NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF, const VectorMatrixFunctionType& F_dF);
 
-    virtual ~NonLinearSystem() {};
+    virtual ~NonLinearSystem() { }
 
     ///
     /// \brief Set nonlinear method that evaluates the nonlinear function.
@@ -142,4 +139,4 @@ public:
     /*std::vector<LinearProjectionConstraint>  *m_LinearProjConstraints;
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;*/
 };
-} // imstk
+} // namespace imstk

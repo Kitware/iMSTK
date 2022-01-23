@@ -258,4 +258,4 @@ protected:
     std::shared_ptr<TaskNode> m_source = nullptr;
     std::shared_ptr<TaskNode> m_sink   = nullptr;
 };
-}
+} // namespace imstk

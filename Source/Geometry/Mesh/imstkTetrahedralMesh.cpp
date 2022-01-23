@@ -288,4 +288,4 @@ TetrahedralMesh::getNumTetrahedra() const
 {
     return m_tetrahedraIndices->size();
 }
-}  // namespace imstk
+} // namespace imstk

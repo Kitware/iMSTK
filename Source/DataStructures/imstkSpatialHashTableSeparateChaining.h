@@ -35,7 +35,7 @@ struct PointEntry
     unsigned long ID;
     double* cellSize;
 };
-}
+} // namespace imstk
 
 namespace std
 {
@@ -76,7 +76,7 @@ template<> struct equal_to<imstk::PointEntry>
         return true;
     }
 };
-}
+} // namespace std
 
 namespace imstk
 {
@@ -167,4 +167,4 @@ protected:
     unsigned long m_currentID = 0;
     std::shared_ptr<std::unordered_set<PointEntry>> m_table;
 };
-}
+} // namespace imstk

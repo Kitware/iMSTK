@@ -34,4 +34,4 @@ AnimationObject::setAnimationModel(std::shared_ptr<AnimationModel> model)
 {
     m_animationModel = model;
 }
-} // imstk
+} // namespace imstk

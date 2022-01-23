@@ -61,4 +61,4 @@ protected:
     std::vector<std::pair<int, int>> m_intersectingPairs;
     int m_maxNumContacts = 1000;
 };
-}
+} // namespace imstk

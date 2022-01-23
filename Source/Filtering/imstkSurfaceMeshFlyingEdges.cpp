@@ -71,4 +71,4 @@ SurfaceMeshFlyingEdges::requestUpdate()
 
     std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0))->deepCopy(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));
 }
-}
+} // namespace imstk

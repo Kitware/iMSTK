@@ -51,4 +51,4 @@ InternalForceModel::getForceAndMatrix(const Vectord& u, Vectord& internalForce, 
     this->getInternalForce(u, internalForce);
     this->getTangentStiffnessMatrix(u, tangentStiffnessMatrix);
 }
-} // imstk
+} // namespace imstk

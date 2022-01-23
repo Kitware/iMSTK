@@ -307,4 +307,4 @@ DebugGeometryObject::getNumTriangles() const
 {
     return m_debugSurfMesh->getNumTriangles();
 }
-}
+} // namespace imstk

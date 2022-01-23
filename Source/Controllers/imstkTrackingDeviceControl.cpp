@@ -273,4 +273,4 @@ TrackingDeviceControl::setInversionFlags(const unsigned char f)
 {
     m_invertFlags = f;
 }
-} // imstk
+} // namespace imstk

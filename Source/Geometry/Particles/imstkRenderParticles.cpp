@@ -97,4 +97,4 @@ RenderParticles::applyTransform(const Mat4d& imstkNotUsed(m))
 {
     LOG(WARNING) << "applyTransform Not implemented!";
 }
-}
+} // namespace imstk

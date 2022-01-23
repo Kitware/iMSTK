@@ -35,15 +35,8 @@ namespace imstk
 class VTKPlaneRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit VTKPlaneRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKPlaneRenderDelegate() override = default;
+    VTKPlaneRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    ~VTKPlaneRenderDelegate() override = default;
 
     ///
     /// \brief Update plane source based on the plane geometry
@@ -53,4 +46,4 @@ public:
 protected:
     vtkSmartPointer<vtkPlaneSource> m_planeSource;
 };
-} // imstk
+} // namespace imstk

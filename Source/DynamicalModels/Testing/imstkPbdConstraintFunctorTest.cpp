@@ -170,8 +170,8 @@ TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGeneration)
 
     // Create functor
     PbdFemTetConstraintFunctor constraintFunctor;
-    constraintFunctor.setMaterialType(PbdFEMTetConstraint::MaterialType::Corotation);
-    auto FeConfig = std::make_shared<PbdFEMConstraintConfig>(0.0, 0.0, 1000.0, 0.2);
+    constraintFunctor.setMaterialType(PbdFemTetConstraint::MaterialType::Corotation);
+    auto FeConfig = std::make_shared<PbdFemConstraintConfig>(0.0, 0.0, 1000.0, 0.2);
     constraintFunctor.setFemConfig(FeConfig);
     constraintFunctor.setGeometry(tetMesh);
 
@@ -183,12 +183,12 @@ TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGeneration)
     EXPECT_EQ(container.getConstraints().size(), 1);
 
     // Check that correct constraint type got generated
-    auto constraint = std::dynamic_pointer_cast<PbdFEMTetConstraint>(container.getConstraints()[0]);
+    auto constraint = std::dynamic_pointer_cast<PbdFemTetConstraint>(container.getConstraints()[0]);
     EXPECT_NE(constraint, nullptr);
 
     // Check constraint generated between correct elements and with correct values
-    EXPECT_EQ(constraint->getType(), "FEMTet");
-    EXPECT_EQ(constraint->m_material, PbdFEMTetConstraint::MaterialType::Corotation);
+    EXPECT_EQ(constraint->getType(), "FemTet");
+    EXPECT_EQ(constraint->m_material, PbdFemTetConstraint::MaterialType::Corotation);
     EXPECT_EQ(constraint->m_config->m_mu, 0.0);
     EXPECT_EQ(constraint->m_config->m_lambda, 0.0);
     EXPECT_EQ(constraint->m_config->m_YoungModulus, 1000.0);

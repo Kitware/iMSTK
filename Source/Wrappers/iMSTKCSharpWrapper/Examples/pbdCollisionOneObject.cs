@@ -51,7 +51,7 @@ public class PbdCollisionOneObject
                 PbdModelConfig pbdParams = new PbdModelConfig();
                 pbdParams.m_femParams.m_YoungModulus = youngModulus;
                 pbdParams.m_femParams.m_PoissonRatio = poissonRatio;
-                pbdParams.enableFEMConstraint(PbdFEMConstraint.MaterialType.Corotation);
+                pbdParams.enableFemConstraint(PbdFemConstraint.MaterialType.Corotation);
                 pbdParams.m_uniformMassValue = 1.0;
                 pbdParams.m_gravity = new Vec3d(0, -10.0, 0);
                 pbdParams.m_dt = timeStep;

@@ -127,4 +127,4 @@ HexahedralMesh::getNumHexahedra() const
 {
     return m_hexahedraIndices->size();
 }
-} // imstk
+} // namespace imstk

@@ -33,9 +33,6 @@ namespace imstk
 class PbdVolumeConstraint : public PbdConstraint
 {
 public:
-    ///
-    /// \brief constructor
-    ///
     PbdVolumeConstraint()
     {
         m_vertexIds.resize(4);
@@ -66,4 +63,4 @@ public:
 protected:
     double m_restVolume = 0.0; ///> Rest volume
 };
-} // imstk
+} // namespace imstk

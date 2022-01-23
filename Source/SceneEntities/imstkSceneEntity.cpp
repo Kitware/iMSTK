@@ -36,4 +36,4 @@ SceneEntity::getID() const
 {
     return m_ID;
 }
-}
+} // namespace imstk

@@ -118,4 +118,4 @@ CollisionInteraction::updateCollisionGeometry()
         dynObj2->updateGeometries();
     }
 }
-}
+} // namespace imstk

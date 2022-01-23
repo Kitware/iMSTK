@@ -41,15 +41,17 @@ public:
 
     ///
     /// \brief Initialize the rigid body state
-    ///
+    ///@{
     void initialize(const Vec3d position, const RigidTransform3d rotationMat);
     void initialize() {}
+    ///@}
 
     ///
     /// \brief Get/Set object position
-    ///
+    ///@{
     Vec3d& getPosition() { return m_position; };
     void setPosition(const Vec3d& p) { m_position = p; };
+    ///@}
 
     ///
     /// \brief Set the state to a given one
@@ -62,14 +64,15 @@ public:
 
     ///
     /// \brief Get/Set object rotation matrix
-    ///
+    ///@{
     RigidTransform3d& getRotation() { return m_orientation; };
     void setRotation(const RigidTransform3d& r) { m_orientation = r; };
+///@}
 
 private:
     RigidTransform3d m_orientation = RigidTransform3d::Identity(); ///> Rotation
     Vec3d m_position = Vec3d::Zero();                              ///> position
 
-    //Can add linear velocity and angular velocity too.
+    // Can add linear velocity and angular velocity too.
 };
-} // imstk
+} // namespace imstk

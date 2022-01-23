@@ -19,7 +19,7 @@ limitations under the License.
 
 ======================================================================== = */
 
-#include "imstkIsotropicHyperelasticFEMForceModel.h"
+#include "imstkIsotropicHyperelasticFeForceModel.h"
 #include "imstkLogger.h"
 
 #include <MooneyRivlinIsotropicMaterial.h>
@@ -71,4 +71,4 @@ IsotropicHyperelasticFeForceModel::IsotropicHyperelasticFeForceModel(const Hyper
         withGravity,
         gravity);
 }
-}
+} // namespace imstk

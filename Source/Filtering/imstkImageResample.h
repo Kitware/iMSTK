@@ -36,8 +36,7 @@ class ImageResample : public GeometryAlgorithm
 {
 public:
     ImageResample();
-
-    virtual ~ImageResample() override = default;
+    ~ImageResample() override = default;
 
 public:
     std::shared_ptr<ImageData> getOutputImage() const;
@@ -54,4 +53,4 @@ protected:
 private:
     Vec3i m_Dimensions;
 };
-}
+} // namespace imstk

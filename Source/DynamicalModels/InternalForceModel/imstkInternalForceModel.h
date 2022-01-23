@@ -45,14 +45,7 @@ namespace imstk
 class InternalForceModel
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     InternalForceModel() = default;
-
-    ///
-    /// \brief Destructor
-    ///
     virtual ~InternalForceModel() = default;
 
     ///
@@ -86,4 +79,4 @@ public:
     ///
     virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) = 0;
 };
-} //imstk
+} // namespace imstk

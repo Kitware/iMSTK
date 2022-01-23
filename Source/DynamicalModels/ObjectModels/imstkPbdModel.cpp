@@ -24,7 +24,6 @@
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
-//#include "imstkPbdFEMTetConstraint.h"
 #include "imstkPbdSolver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
@@ -148,7 +147,7 @@ PbdModelConfig::enableBendConstraint(const double stiffness, const int stride)
 }
 
 void
-PbdModelConfig::enableFEMConstraint(PbdFEMConstraint::MaterialType material)
+PbdModelConfig::enableFemConstraint(PbdFemConstraint::MaterialType material)
 {
     auto& funcs = m_functors[ConstraintGenType::FemTet];
     if (funcs.size() == 0)
@@ -417,4 +416,4 @@ PbdModel::updateVelocity()
             }, m_mesh->getNumVertices() > 50);
     }
 }
-}
+} // namespace imstk

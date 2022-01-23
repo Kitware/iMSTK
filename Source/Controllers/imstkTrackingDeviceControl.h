@@ -177,4 +177,4 @@ protected:
     /// If true, will use current and previous rotations to produce angular velocity, if off, will ask device for angular velocity
     bool m_computeAngularVelocity = false;
 };
-} // imstk
+} // namespace imstk

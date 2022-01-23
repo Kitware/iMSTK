@@ -214,7 +214,7 @@ makeTissueObj(const std::string& name,
     // Use FEMTet constraints
     pbdParams->m_femParams->m_YoungModulus = 5.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.4;
-    pbdParams->enableFEMConstraint(PbdFEMConstraint::MaterialType::StVK);
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
 #else
     // Use volume+distance constraints, worse results. More performant (can use larger mesh)
     pbdParams->enableConstraint(PbdConstraint::Type::Volume, 0.9);

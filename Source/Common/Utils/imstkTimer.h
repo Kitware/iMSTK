@@ -50,14 +50,7 @@ public:
         hours
     };
 
-    ///
-    /// \brief Constructor
-    ///
     StopWatch() : state(TimerState::stopped) {};
-
-    ///
-    /// \brief Destructor
-    ///
     ~StopWatch() = default;
 
 public:
@@ -193,4 +186,4 @@ protected:
     unsigned int m_ups;                 ///> Most up-to-date ups
     unsigned int m_updateCount;         ///> Current update count
 };
-}
+} // namespace imstk

@@ -84,10 +84,11 @@ public:
     virtual void resetToInitialState() = 0;
 
     ///
-    /// \brief Returns the number of degrees of freedom
-    ///
+    /// \brief Get/Set the number of degrees of freedom
+    ///@{
     std::size_t getNumDegreeOfFreedom() const { return m_numDof; }
     void setNumDegreeOfFreedom(const size_t nDof) { m_numDof = nDof; }
+    ///@}
 
     std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
@@ -137,10 +138,11 @@ public:
     void initGraphEdges();
 
     ///
-    /// \brief Set the type of approach used to update the time step size after every frame
-    ///
+    /// \brief Get/Set the type of approach used to update the time step size after every frame
+    ///@{
     virtual void setTimeStepSizeType(const TimeSteppingType type) { m_timeStepSizeType = type; }
-    TimeSteppingType getTimeStepSizeType() { return m_timeStepSizeType; }
+    TimeSteppingType getTimeStepSizeType() const { return m_timeStepSizeType; }
+///@}
 
 protected:
     ///
@@ -159,4 +161,4 @@ protected:
 
     std::shared_ptr<TaskGraph> m_taskGraph = nullptr;
 };
-} // imstk
+} // namespace imstk

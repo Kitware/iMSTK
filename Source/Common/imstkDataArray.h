@@ -431,4 +431,4 @@ protected:
     bool m_mapped;
     T*   m_data;
 };
-}
+} // namespace imstk

@@ -204,7 +204,7 @@ makePBDDragonObject(const std::string& name, const Vec3d& position)
     pbdParams->m_femParams->m_YoungModulus = 1000.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.3;
     pbdParams->m_fixedNodeIds = { 50, 126, 177 };
-    pbdParams->enableFEMConstraint(PbdFEMConstraint::MaterialType::StVK);
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_dt         = 0.01;

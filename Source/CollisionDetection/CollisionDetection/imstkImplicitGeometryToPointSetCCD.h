@@ -91,4 +91,4 @@ private:
     // Penetration depths are clamped to this ratio * displacement of the vertex
     double m_depthRatioLimit = 0.3;
 };
-}
+} // namespace imstk

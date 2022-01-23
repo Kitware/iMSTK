@@ -71,4 +71,4 @@ VTKScreenCaptureUtility::saveScreenShot(const std::string& captureName)
 
     return filename;
 }
-} // imstk
+} // namespace imstk

@@ -89,4 +89,4 @@ NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const Vec
             });
     }
 }
-} // end namespace imstk
+} // namespace imstk

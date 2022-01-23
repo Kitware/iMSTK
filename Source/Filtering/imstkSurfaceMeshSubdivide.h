@@ -45,7 +45,7 @@ public:
 
 public:
     SurfaceMeshSubdivide();
-    virtual ~SurfaceMeshSubdivide() override = default;
+    ~SurfaceMeshSubdivide() override = default;
 
 public:
     std::shared_ptr<SurfaceMesh> getOutputMesh();
@@ -64,4 +64,4 @@ private:
     Type m_SubdivisionType      = Type::LINEAR;
     int  m_NumberOfSubdivisions = 1;
 };
-}
+} // namespace imstk

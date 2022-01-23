@@ -27,6 +27,7 @@ namespace imstk
 {
 ///
 /// \class LinearSystem
+///
 /// \brief Represents the linear system of the form \f$ Ax = b \f$
 ///
 template<typename SystemMatrixType>
@@ -35,11 +36,9 @@ class LinearSystem : public NonLinearSystem<SystemMatrixType>
 public:
     ///
     /// \brief Constructor/destructor(s). This class can't be constructed without
-    ///     a matrix and rhs. Also, avoid copying this system.
+    /// a matrix and rhs.
     ///
     LinearSystem() = delete;
-    LinearSystem(const LinearSystem&) = delete;
-    LinearSystem& operator=(const LinearSystem&) = delete;
     LinearSystem(const SystemMatrixType& matrix, const Vectord& b) : m_A(matrix), m_b(b)
     {
         /*if (m_A.size() == m_b.size())
@@ -59,10 +58,15 @@ public:
         };*/
     }
 
+    ~LinearSystem() override { }
+
     ///
-    /// \brief Destructor
+    /// \brief Dissallow copy & move
     ///
-    virtual ~LinearSystem() override {};
+    LinearSystem(const LinearSystem&)  = delete;
+    LinearSystem(const LinearSystem&&) = delete;
+    LinearSystem& operator=(const LinearSystem&)  = delete;
+    LinearSystem& operator=(const LinearSystem&&) = delete;
 
     ///
     ///  \brief Returns a reference to local right hand side vector.
@@ -140,4 +144,4 @@ private:
 
     Vectord m_f; ///> Scratch storage for matrix-vector operations
 };
-} // imstk
+} // namespace imstk

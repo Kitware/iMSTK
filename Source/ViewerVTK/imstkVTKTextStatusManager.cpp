@@ -193,4 +193,4 @@ VTKTextStatusManager::computeStatusLocation(const DisplayCorner corner, const in
 
     return location;
 }
-} // end namespace imstk
+} // namespace imstk

@@ -47,4 +47,4 @@ TaskNode::execute()
         m_computeTime = 0.0;
     }
 }
-}
+} // namespace imstk

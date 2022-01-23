@@ -35,7 +35,7 @@ class AppendMesh : public GeometryAlgorithm
 {
 public:
     AppendMesh();
-    virtual ~AppendMesh() override = default;
+    ~AppendMesh() override = default;
 
     void addInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
     std::shared_ptr<SurfaceMesh> getOutputMesh() const;
@@ -43,4 +43,4 @@ public:
 protected:
     void requestUpdate() override;
 };
-}
+} // namespace imstk

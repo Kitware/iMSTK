@@ -399,5 +399,5 @@ triangleToTriangle(
     }
     return contactType;
 }
-}
-}
+} // namespace CollisionUtils
+} // namespace imstk

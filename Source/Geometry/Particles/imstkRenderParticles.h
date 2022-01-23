@@ -69,13 +69,12 @@ public:
     /// \param mode Mode for emitter
     ///
     RenderParticles(const unsigned int maxNumParticles = 128, const std::string& name = std::string(""));
-
-    virtual ~RenderParticles() override = default;
+    ~RenderParticles() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "RenderParticles"; }
+    const std::string getTypeName() const override { return "RenderParticles"; }
 
     ///
     /// \brief Set size of particle
@@ -124,6 +123,6 @@ protected:
 
     void applyTransform(const Mat4d& m) override;
 
-    virtual void updatePostTransformData() const override {}
+    void updatePostTransformData() const override {}
 };
-}
+} // namespace imstk

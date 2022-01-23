@@ -63,4 +63,4 @@ KeyboardDeviceClient::isKeyDown(const char key) const
         return false;
     }
 }
-}
+} // namespace imstk

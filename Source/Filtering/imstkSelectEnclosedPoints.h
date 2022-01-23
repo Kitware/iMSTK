@@ -38,7 +38,7 @@ class SelectEnclosedPoints : public GeometryAlgorithm
 {
 public:
     SelectEnclosedPoints();
-    virtual ~SelectEnclosedPoints() override = default;
+    ~SelectEnclosedPoints() override = default;
 
 public:
     void setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
@@ -63,4 +63,4 @@ private:
     bool   m_InsideOut  = false;
     std::shared_ptr<DataArray<unsigned char>> m_IsInsideMask = nullptr;
 };
-}
+} // namespace imstk

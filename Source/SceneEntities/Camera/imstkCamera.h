@@ -114,7 +114,7 @@ public:
     /// \brief Gets the field of view
     /// \returns vertical field of view in degrees
     ///
-    const double getFieldOfView() const { return m_fieldOfView; }
+    double getFieldOfView() const { return m_fieldOfView; }
 
     ///
     /// \brief Sets the field of view
@@ -132,7 +132,7 @@ public:
     /// could cause z fighting
     ///
     void setNearZ(const double nearZ) { m_nearZ = nearZ; }
-    const double getNearZ() const { return m_nearZ; }
+    double getNearZ() const { return m_nearZ; }
 
     ///
     /// \brief Set clipping near
@@ -141,7 +141,7 @@ public:
     ///
     void setFarZ(const double farZ) { m_farZ = farZ; }
 
-    const double getFarZ() const { return m_farZ; }
+    double getFarZ() const { return m_farZ; }
 
     virtual void update()
     {
@@ -210,13 +210,13 @@ public:
     ///
     /// \brief Get the forward/look direction of the view
     ///
-    const Vec3d getForward() const { return m_view.col(2).head<3>(); }
+    Vec3d getForward() const { return m_view.col(2).head<3>(); }
 
     ///
     /// \brief Compute ray emanating from the camera position that travels
     /// through the point in normalized device coordinates (-1,1 on x and y view plane)
     ///
-    const Vec3d getEyeRayDir(const Vec2d& ndcPos) const
+    Vec3d getEyeRayDir(const Vec2d& ndcPos) const
     {
         const Vec4d worldPos = (m_proj * m_view).inverse() * Vec4d(ndcPos[0], ndcPos[1], 0.0, 1.0);
         return (worldPos.head<3>() / worldPos[3] - m_position).normalized();
@@ -260,4 +260,4 @@ protected:
     Vec3d m_focalPoint = -Vec3d::UnitZ();      ///> camera focal point
     Vec3d m_viewUp     = Vec3d::UnitY();       ///> camera up vector
 };
-}
+} // namespace imstk

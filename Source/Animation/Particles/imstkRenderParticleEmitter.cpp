@@ -307,4 +307,4 @@ RenderParticleEmitter::getRandomNormalizedFloat()
 {
     return (float)std::rand() / RAND_MAX;
 }
-}
+} // namespace imstk

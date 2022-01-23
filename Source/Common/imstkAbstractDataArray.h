@@ -109,4 +109,4 @@ protected:
     int m_size;     // Number of values
     int m_capacity; // Capacity of the vector
 };
-}
+} // namespace imstk

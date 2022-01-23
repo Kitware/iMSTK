@@ -33,9 +33,6 @@ namespace imstk
 class PbdDistanceConstraint : public PbdConstraint
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     PbdDistanceConstraint() : PbdConstraint()
     {
         m_vertexIds.resize(2);
@@ -63,4 +60,4 @@ public:
 public:
     double m_restLength = 0.0; ///> Rest length between the nodes
 };
-} // imstk
+} // namespace imstk

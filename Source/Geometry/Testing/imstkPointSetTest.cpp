@@ -58,7 +58,7 @@ std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> attributes =
     { "float3", floatArray3 }, { "double3", doubleArray3 },
     { "float2", floatArray2 }, { "double2", doubleArray2 }
 };
-}
+} // namespace
 
 TEST(imstkPointSetTest, VertexNormalAttributes)
 {

@@ -31,7 +31,7 @@ class EmbeddingConstraint;
 class Geometry;
 class PbdCollisionSolver;
 class PbdCollisionConstraint;
-}
+} // namespace imstk
 
 using namespace imstk;
 
@@ -86,7 +86,7 @@ struct hash<TriCell>
         return symCantor(r, static_cast<size_t>(k.vertexIds[2]));
     }
 };
-}
+} // namespace std
 
 ///
 /// \class NeedleEmbeddedCH

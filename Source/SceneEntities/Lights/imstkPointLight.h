@@ -28,16 +28,14 @@ namespace imstk
 ///
 /// \class PointLight
 ///
-/// \brief Point light class
-///
-/// A point light has a position, and it's range is determined by it's
+/// \brief A point light has a position, and it's range is determined by it's
 /// intensity.
 ///
 class PointLight : public Light
 {
 public:
     PointLight() = default;
-    virtual ~PointLight() override = default;
+    ~PointLight() override = default;
 
     const std::string getTypeName() const override { return "PointLight"; }
 
@@ -51,4 +49,4 @@ public:
 protected:
     Vec3d m_position = Vec3d::Zero();
 };
-} // imstk
+} // namespace imstk

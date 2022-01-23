@@ -155,4 +155,4 @@ VTKTextureDelegate::textureModified(Event* imstkNotUsed(e))
     //m_vtkTexture->GetInputDataObject();
     m_vtkTexture->Modified();
 }
-}
+} // namespace imstk

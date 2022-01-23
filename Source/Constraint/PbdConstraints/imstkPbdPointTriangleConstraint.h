@@ -62,4 +62,4 @@ public:
                                  std::vector<Vec3d>& dcdxA,
                                  std::vector<Vec3d>& dcdxB) const override;
 };
-}
+} // namespace imstk

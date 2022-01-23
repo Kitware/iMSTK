@@ -38,7 +38,7 @@ class CollidingObject;
 class CollisionInteraction : public SceneObject
 {
 public:
-    virtual ~CollisionInteraction() override = default;
+    ~CollisionInteraction() override = default;
 
 protected:
     CollisionInteraction(std::string objName,
@@ -101,4 +101,4 @@ protected:
     std::shared_ptr<TaskNode> m_collisionHandleBNode        = nullptr;
     std::shared_ptr<TaskNode> m_collisionGeometryUpdateNode = nullptr;
 };
-}
+} // namespace imstk

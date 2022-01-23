@@ -251,4 +251,4 @@ TetraTriangleMap::updateBoundingBox()
 
     m_boundingBoxAvailable = true;
 }
-}  // namespace imstk
+} // namespace imstk

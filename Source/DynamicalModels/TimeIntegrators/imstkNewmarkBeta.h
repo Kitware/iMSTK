@@ -27,21 +27,15 @@ namespace imstk
 {
 ///
 /// \class NewmarkBeta
+///
 /// \brief Newmark-beta time integration
 ///
 class NewmarkBeta : public TimeIntegrator
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     NewmarkBeta(const double dT, const double beta = 0.25, const double gamma = 0.5) : TimeIntegrator(Type::NewmarkBeta, dT), m_gamma(gamma), m_beta(beta)
     {}
-
-    ///
-    /// \brief Destructor
-    ///
-    ~NewmarkBeta() = default;
+    ~NewmarkBeta() override = default;
 
     void updateStateGivenDv(std::shared_ptr<FeDeformBodyState> prevState, std::shared_ptr<FeDeformBodyState> currentState, Vectord& dV)
     {
@@ -74,4 +68,4 @@ protected:
 //    std::array<double, 3> m_beta = { { 1, -1, 0 } };
 //    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
 };
-} // imstk
+} // namespace imstk

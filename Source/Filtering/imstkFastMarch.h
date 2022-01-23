@@ -28,6 +28,11 @@
 
 namespace imstk
 {
+///
+/// \class FastMarch
+///
+/// \brief
+///
 class FastMarch
 {
 protected:
@@ -83,4 +88,4 @@ protected:
 
     std::priority_queue<Node, std::vector<Node>, NodeComparator> m_queue;
 };
-}
+} // namespace imstk

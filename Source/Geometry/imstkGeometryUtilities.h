@@ -105,18 +105,20 @@ static std::unordered_map<ScalarTypeId, int> imstkToVtkScalarType =
 ///
 /// \brief Coupling functions, these create vtk data objects that point to our data objects
 /// thus no copying is done here.
-///
+///@{
 vtkSmartPointer<vtkDataArray> coupleVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray);
 vtkSmartPointer<vtkImageData> coupleVtkImageData(std::shared_ptr<ImageData> imstkImageData);
+///@}
 
 ///
 /// \brief Copy functions, these copy to/from vtk data objects
-///
+///@{
 vtkSmartPointer<vtkDataArray> copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray);
 std::shared_ptr<AbstractDataArray> copyToDataArray(vtkSmartPointer<vtkDataArray> vtkArray);
 
 std::shared_ptr<ImageData> copyToImageData(vtkSmartPointer<vtkImageData> imageDataVtk);
 vtkSmartPointer<vtkImageData> copyToVtkImageData(std::shared_ptr<ImageData> imageData);
+///@}
 
 ///
 /// \brief Converts vtk polydata into a imstk point set

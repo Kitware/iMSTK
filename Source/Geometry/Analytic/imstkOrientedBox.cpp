@@ -177,4 +177,4 @@ OrientedBox::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUse
         max = max.cwiseMax(pts[i]);
     }
 }
-} // imstk
+} // namespace imstk

@@ -37,7 +37,7 @@ class PbdConstraintContainer;
 class PbdSolver;
 
 ///
-/// \struct PBDModelConfig
+/// \struct PbdModelConfig
 ///
 /// \brief Gives parameters for PBD simulation
 ///
@@ -76,9 +76,9 @@ struct PbdModelConfig
         void enableBendConstraint(const double stiffness, const int stride);
 
         ///
-        /// \brief Enable a FEM constraint with the material provided
+        /// \brief Enable a Fem constraint with the material provided
         ///
-        void enableFEMConstraint(PbdFEMConstraint::MaterialType material);
+        void enableFemConstraint(PbdFemConstraint::MaterialType material);
 
         ///
         /// \brief If lame parameters (mu+lambda) are given in femParams, then youngs modulus and poissons ratio are computed
@@ -102,8 +102,8 @@ struct PbdModelConfig
         std::vector<std::size_t> m_fixedNodeIds;  ///> Nodal/vertex IDs of the nodes that are fixed
         Vec3d m_gravity = Vec3d(0.0, -9.81, 0.0); ///> Gravity acceleration
 
-        std::shared_ptr<PbdFEMConstraintConfig> m_femParams =
-            std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
+        std::shared_ptr<PbdFemConstraintConfig> m_femParams =
+            std::make_shared<PbdFemConstraintConfig>(PbdFemConstraintConfig
         {
             0.0,        // Lame constant, if constraint type is FEM
             0.0,        // Lame constant, if constraint type is FEM
@@ -127,15 +127,8 @@ struct PbdModelConfig
 class PbdModel : public DynamicalModel<PbdState>
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     PbdModel();
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~PbdModel() override = default;
+    ~PbdModel() override = default;
 
     ///
     /// \brief Set simulation parameters
@@ -230,7 +223,7 @@ public:
 
 protected:
     ///
-    /// \brief Setup the computational graph of PBD
+    /// \brief Setup the computational graph of Pbd
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
@@ -251,4 +244,4 @@ protected:
     std::shared_ptr<TaskNode> m_solveConstraintsNode    = nullptr;
     std::shared_ptr<TaskNode> m_updateVelocityNode      = nullptr;
 };
-} // imstk
+} // namespace imstk

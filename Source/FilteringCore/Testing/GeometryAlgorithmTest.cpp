@@ -83,7 +83,7 @@ public:
         setOptionalInputType<Sphere>(4);
     }
 };
-}
+} // namespace
 
 TEST(imstkGeometryAlgorithmTest, no_expectations)
 {

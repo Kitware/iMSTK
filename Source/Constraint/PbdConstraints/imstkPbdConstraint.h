@@ -36,20 +36,15 @@ class PbdConstraint
 public:
     ///
     /// \brief Type of solvers
+    ///
     enum class SolverType
     {
         xPBD = 0,
         PBD
     };
 
-    ///
-    /// \brief Constructor
-    ///
     PbdConstraint() = default;
 
-    ///
-    /// \brief Destructor
-    ///
     virtual ~PbdConstraint() = default;
 
     ///
@@ -117,4 +112,4 @@ protected:
 
     std::vector<Vec3d> m_dcdx;
 };
-}
+} // namespace imstk

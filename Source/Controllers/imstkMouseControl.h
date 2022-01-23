@@ -59,21 +59,25 @@ public:
 private:
     ///
     /// \brief Recieves button presses
+    ///
     virtual void mouseButtonPressEvent(MouseEvent* e);
 
     ///
     /// \brief Recieves button releases
+    ///
     virtual void mouseButtonReleaseEvent(MouseEvent* e);
 
     ///
     /// \brief Recieves scrolls
+    ///
     virtual void mouseScrollEvent(MouseEvent* e);
 
     ///
     /// \brief Recieves moves
+    ///
     virtual void mouseMoveEvent(MouseEvent* e);
 
 protected:
     std::shared_ptr<MouseDeviceClient> m_mouseDeviceClient;
 };
-}
+} // namespace imstk

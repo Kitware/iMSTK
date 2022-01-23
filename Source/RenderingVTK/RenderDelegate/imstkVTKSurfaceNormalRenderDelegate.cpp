@@ -214,4 +214,4 @@ VTKSurfaceNormalRenderDelegate::computeTriangleNormals(
     }
     return orientationsPtr;
 }
-} // imstk
+} // namespace imstk

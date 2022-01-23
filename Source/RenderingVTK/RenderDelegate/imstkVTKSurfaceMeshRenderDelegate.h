@@ -44,7 +44,7 @@ class VTKSurfaceMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-    virtual ~VTKSurfaceMeshRenderDelegate() override = default;
+    ~VTKSurfaceMeshRenderDelegate() override = default;
 
     ///
     /// \brief Event handler
@@ -105,4 +105,4 @@ protected:
     vtkSmartPointer<vtkDataArray>   m_mappedCellScalarArray;   ///> Mapped array of scalars
     vtkSmartPointer<vtkCellArray>   m_cellArray;               ///> Array of cells
 };
-}
+} // namespace imstk

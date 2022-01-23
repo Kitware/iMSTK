@@ -58,4 +58,4 @@ RbdDistanceConstraint::compute(double imstkNotUsed(dt))
         J(2, 0) = diff[2]; J(2, 1) = c[2];
     }
 }
-}
+} // namespace imstk

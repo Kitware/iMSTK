@@ -44,7 +44,7 @@ class DebugGeometryObject : public SceneObject
 {
 public:
     DebugGeometryObject();
-    virtual ~DebugGeometryObject() = default;
+    ~DebugGeometryObject() override = default;
 
     ///
     /// \brief Adds a line to the debug lines with default color
@@ -146,4 +146,4 @@ protected:
     std::shared_ptr<VecDataArray<unsigned char, 3>> m_pointColorsPtr;
     bool m_ptsChanged;
 };
-}
+} // namespace imstk

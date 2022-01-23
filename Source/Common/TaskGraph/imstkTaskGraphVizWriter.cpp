@@ -154,4 +154,4 @@ TaskGraphVizWriter::write()
         file.close();
     }
 }
-}
+} // namespace imstk

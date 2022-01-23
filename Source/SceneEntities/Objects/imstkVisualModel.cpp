@@ -66,4 +66,4 @@ VisualModel::getRenderDelegateCreated(Renderer* ren)
         return m_renderDelegateCreated[ren];
     }
 }
-}
+} // namespace imstk

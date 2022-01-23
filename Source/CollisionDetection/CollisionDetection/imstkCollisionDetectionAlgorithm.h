@@ -130,4 +130,4 @@ protected:
     bool m_computeColDataAImplemented = true;
     bool m_computeColDataBImplemented = true;
 };
-}
+} // namespace imstk

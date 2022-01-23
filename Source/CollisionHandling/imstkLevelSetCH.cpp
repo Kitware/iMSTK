@@ -221,4 +221,4 @@ LevelSetCH::maskAllPoints()
         m_ptIdMask.insert(i);
     }
 }
-}
+} // namespace imstk

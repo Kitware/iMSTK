@@ -72,4 +72,4 @@ PbdVolumeConstraint::computeValueAndGradient(
     c = (volume - m_restVolume);
     return true;
 }
-} // imstk
+} // namespace imstk

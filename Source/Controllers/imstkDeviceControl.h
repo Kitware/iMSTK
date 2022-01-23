@@ -51,9 +51,13 @@ public:
     // *INDENT-ON*
 
 public:
+    ///
+    /// \brief Set/Get the device client used in the control
+    ///
+    ///@{
     std::shared_ptr<DeviceClient> getDevice() const { return m_deviceClient; }
-
     virtual void setDevice(std::shared_ptr<DeviceClient> device) { m_deviceClient = device; }
+    ///@}
 
     ///
     /// \brief Prints the controls
@@ -68,4 +72,4 @@ public:
 public:
     std::shared_ptr<DeviceClient> m_deviceClient;
 };
-} // imstk
+} // namespace imstk

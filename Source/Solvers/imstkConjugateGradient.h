@@ -28,24 +28,26 @@
 namespace imstk
 {
 class LinearProjectionConstraint;
+
 ///
-/// \brief Conjugate gradient sparse linear solver for SPD matrices
+/// \class ConjugateGradient
+///
+/// \brief Conjugate gradient sparse linear solver for Spd matrices
 ///
 class ConjugateGradient : public IterativeLinearSolver
 {
 public:
-    ///
-    /// \brief Constructors/Destructor
-    ///
     ConjugateGradient();
     ConjugateGradient(const SparseMatrixd& A, const Vectord& rhs);
-    virtual ~ConjugateGradient() override = default;
+    ~ConjugateGradient() override = default;
 
     ///
-    /// \brief Remove specific constructor signatures
+    /// \brief Dissallow copy & move
     ///
-    ConjugateGradient(const ConjugateGradient&) = delete;
-    ConjugateGradient& operator=(const ConjugateGradient&) = delete;
+    ConjugateGradient(const ConjugateGradient&)  = delete;
+    ConjugateGradient(const ConjugateGradient&&) = delete;
+    ConjugateGradient& operator=(const ConjugateGradient&)  = delete;
+    ConjugateGradient& operator=(const ConjugateGradient&&) = delete;
 
     ///
     /// \brief Do one iteration of the method.
@@ -123,7 +125,6 @@ public:
     }
 
 private:
-
     ///
     /// \brief Modified Conjugate gradient solver
     ///
@@ -135,4 +136,4 @@ private:
     std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;
     std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
-} // imstk
+} // namespace imstk

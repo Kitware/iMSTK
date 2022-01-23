@@ -35,15 +35,8 @@ namespace imstk
 class VTKSphereRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VTKSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~VTKSphereRenderDelegate() override = default;
+    ~VTKSphereRenderDelegate() override = default;
 
     ///
     /// \brief Update sphere source based on the sphere geometry
@@ -53,4 +46,4 @@ public:
 protected:
     vtkSmartPointer<vtkSphereSource> m_sphereSource;
 };
-} // imstk
+} // namespace imstk

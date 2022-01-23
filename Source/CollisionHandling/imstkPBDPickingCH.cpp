@@ -19,7 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkPBDPickingCH.h"
+#include "imstkPbdPickingCH.h"
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCollisionData.h"
 #include "imstkParallelUtils.h"
@@ -32,7 +32,7 @@ limitations under the License.
 
 namespace imstk
 {
-PBDPickingCH::PBDPickingCH() :
+PbdPickingCH::PbdPickingCH() :
     m_isPicking(false),
     m_isPrevPicking(false)
 {
@@ -40,7 +40,7 @@ PBDPickingCH::PBDPickingCH() :
 }
 
 void
-PBDPickingCH::handle(
+PbdPickingCH::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& imstkNotUsed(elementsB))
 {
@@ -48,7 +48,7 @@ PBDPickingCH::handle(
     std::shared_ptr<CollidingObject> pickObj = getInputObjectB();
 
     CHECK(pbdObj != nullptr && pickObj != nullptr)
-        << "PBDPickingCH::handleCollision error: "
+        << "PbdPickingCH::handleCollision error: "
         << "no picking collision handling available the object";
 
     // If started picking
@@ -104,7 +104,7 @@ PBDPickingCH::handle(
 }
 
 void
-PBDPickingCH::addPickConstraints(const std::vector<CollisionElement>& elements,
+PbdPickingCH::addPickConstraints(const std::vector<CollisionElement>& elements,
                                  std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> pickObj)
 {
     CHECK(pbdObj != nullptr && pickObj != nullptr)
@@ -145,7 +145,7 @@ PBDPickingCH::addPickConstraints(const std::vector<CollisionElement>& elements,
 }
 
 void
-PBDPickingCH::generatePBDConstraints(const std::vector<CollisionElement>& elements)
+PbdPickingCH::generatePBDConstraints(const std::vector<CollisionElement>& elements)
 {
     // Only constraint when picking is on
     if (m_isPicking)
@@ -196,4 +196,4 @@ PBDPickingCH::generatePBDConstraints(const std::vector<CollisionElement>& elemen
         }
     }
 }
-}
+} // namespace imstk

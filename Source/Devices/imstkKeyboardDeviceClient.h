@@ -31,11 +31,16 @@ using KeyStateType = int;
 #define KEY_RELEASE 0
 #define KEY_PRESS 1
 
+///
+/// \class KeyEvent
+///
+/// \brief Provides the information of a key event (press, release, & which key)
+///
 class KeyEvent : public Event
 {
 public:
     KeyEvent(const std::string type, const char key, const KeyStateType keyPressType) : Event(type), m_keyPressType(keyPressType), m_key(key) { }
-    virtual ~KeyEvent() override = default;
+    ~KeyEvent() override = default;
 
 public:
     KeyStateType m_keyPressType;
@@ -61,7 +66,7 @@ protected:
     static std::shared_ptr<KeyboardDeviceClient> New();
 
 public:
-    virtual ~KeyboardDeviceClient() override = default;
+    ~KeyboardDeviceClient() override = default;
 
     // Only these classes may provide this object
     friend class VTKInteractorStyle;
@@ -99,4 +104,4 @@ protected:
     ///
     bool isKeyDown(const char key) const;
 };
-}
+} // namespace imstk

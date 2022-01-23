@@ -48,7 +48,7 @@ class LocalMarchingCubes : public GeometryAlgorithm
 {
 public:
     LocalMarchingCubes();
-    virtual ~LocalMarchingCubes() override = default;
+    ~LocalMarchingCubes() override = default;
 
     std::shared_ptr<SurfaceMesh> getOutputMesh(const int i) const;
 
@@ -99,4 +99,4 @@ private:
     Vec3i  m_numChunks  = Vec3i(0, 0, 0); // Number of chunks along x, y, z
     size_t m_chunkCount = 0;              ///> Total chunk count x * y * z
 };
-}
+} // namespace imstk

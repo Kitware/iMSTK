@@ -40,6 +40,8 @@ namespace imstk
 class VTKViewer;
 
 ///
+/// \class VTKTextStatusManager
+///
 /// \brief The VTKTextStatusManager class
 ///
 class VTKTextStatusManager
@@ -66,7 +68,7 @@ public:
         LowerRight
     };
 
-    explicit VTKTextStatusManager();
+    VTKTextStatusManager();
     virtual ~VTKTextStatusManager();
 
     ///
@@ -134,4 +136,4 @@ private:
 
     VTKViewer* m_viewer;                                                                // Used for dimensions
 };
-}
+} // namespace imstk

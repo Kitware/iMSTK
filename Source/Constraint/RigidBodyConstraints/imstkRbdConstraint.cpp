@@ -55,4 +55,4 @@ RigidBody::setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const doub
     results(1, 2)    = results(2, 1);
     m_intertiaTensor = results * m_mass * scale;
 }
-}
+} // namespace imstk

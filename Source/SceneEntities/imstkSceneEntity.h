@@ -31,12 +31,13 @@ using EntityID = unsigned long;
 
 ///
 /// \class SceneEntity
+///
 /// \brief Top-level class for iMSTK scene elements (scene objects, lights, camera)
 ///
 class SceneEntity : public EventObject
 {
 public:
-    virtual ~SceneEntity() = default;
+    ~SceneEntity() override = default;
 
     ///
     /// \brief Get ID (ALWAYS query the ID in your code, DO NOT hardcode it)
@@ -54,4 +55,4 @@ protected:
 
     EntityID m_ID;                        ///< unique ID of entity
 };
-}
+} // namespace imstk

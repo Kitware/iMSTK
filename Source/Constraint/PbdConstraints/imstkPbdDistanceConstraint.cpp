@@ -57,4 +57,4 @@ PbdDistanceConstraint::computeValueAndGradient(
 
     return true;
 }
-}
+} // namespace imstk

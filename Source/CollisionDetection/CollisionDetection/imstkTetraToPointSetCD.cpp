@@ -91,4 +91,4 @@ TetraToPointSetCD::computeCollisionDataAB(
             }
         });
 }
-}
+} // namespace imstk

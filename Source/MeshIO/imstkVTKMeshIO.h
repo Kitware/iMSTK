@@ -40,16 +40,8 @@ class VolumetricMesh;
 class VTKMeshIO
 {
 public:
-
-    ///
-    /// \brief Default constructor
-    ///
     VTKMeshIO() = default;
-
-    ///
-    /// \brief Default destructor
-    ///
-    ~VTKMeshIO() = default;
+    virtual ~VTKMeshIO() = default;
 
     ///
     /// \brief
@@ -139,4 +131,4 @@ protected:
     ///
     static bool writeMetaImageData(std::shared_ptr<ImageData> imageData, const std::string& filePath);
 };
-} // imstk
+} // namespace imstk

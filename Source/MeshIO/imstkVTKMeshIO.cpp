@@ -517,4 +517,4 @@ VTKMeshIO::writeMetaImageData(std::shared_ptr<ImageData> imageData, const std::s
     writer->Write();
     return true;
 }
-} // imstk
+} // namespace imstk

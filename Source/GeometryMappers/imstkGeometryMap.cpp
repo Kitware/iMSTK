@@ -79,4 +79,4 @@ GeometryMap::initialize()
 
     this->compute();
 }
-} // imstk
+} // namespace imstk

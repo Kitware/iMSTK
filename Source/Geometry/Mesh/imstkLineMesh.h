@@ -37,20 +37,13 @@ struct Color;
 class LineMesh : public PointSet
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     LineMesh(const std::string& name = std::string(""));
-
-    ///
-    /// \brief Deconstructor
-    ///
-    virtual ~LineMesh() override = default;
+    ~LineMesh() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual const std::string getTypeName() const override { return "LineMesh"; }
+    const std::string getTypeName() const override { return "LineMesh"; }
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
@@ -91,9 +84,10 @@ public:
 
     ///
     /// \brief Get the connectivity of a segment
-    ///
+    ///@{
     const Vec2i& getLineIndices(const size_t pos) const;
     Vec2i& getLineIndices(const size_t pos);
+    ///@}
 
 // Attributes
     ///
@@ -123,11 +117,12 @@ public:
 
     ///
     /// \brief Get/Set the active scalars
-    ///
+    ///@{
     void setCellScalars(const std::string& arrayName, std::shared_ptr<AbstractDataArray> scalars);
     void setCellScalars(const std::string& arrayName);
     std::string getActiveCellScalars() const { return m_activeCellScalars; }
     std::shared_ptr<AbstractDataArray> getCellScalars() const;
+///@}
 
 protected:
     void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
@@ -141,4 +136,4 @@ protected:
     size_t m_originalNumLines = 0;
     size_t m_maxNumLines      = 0;
 };
-} // imstk
+} // namespace imstk

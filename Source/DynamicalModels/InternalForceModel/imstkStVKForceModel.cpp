@@ -41,4 +41,4 @@ StvkForceModel::StvkForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
     m_stVKInternalForces      = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), precomputedIntegrals, withGravity, gravity);
     m_vegaStVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
 }
-}
+} // namespace imstk

@@ -46,9 +46,9 @@ public:
         this->setChildGeometry(child);
     }
 
-    virtual ~TetraTriangleMap() override = default;
+    ~TetraTriangleMap() override = default;
 
-    virtual const std::string getTypeName() const override { return "TetraTriangleMap"; }
+    const std::string getTypeName() const override { return "TetraTriangleMap"; }
 
     ///
     /// \brief Compute the tetra-triangle mesh map
@@ -108,4 +108,4 @@ protected:
 private:
     std::shared_ptr<VecDataArray<double, 3>> m_childVerts;
 };
-}  // namespace imstk
+} // namespace imstk

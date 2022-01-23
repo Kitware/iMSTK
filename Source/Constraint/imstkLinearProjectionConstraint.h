@@ -33,15 +33,9 @@ namespace imstk
 class LinearProjectionConstraint
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit LinearProjectionConstraint(const size_t& nodeId, const bool isFixed = false);
+    LinearProjectionConstraint(const size_t& nodeId, const bool isFixed = false);
     LinearProjectionConstraint() = delete;
 
-    ///
-    /// \brief Destructor
-    ///
     ~LinearProjectionConstraint() = default;
 
     ///

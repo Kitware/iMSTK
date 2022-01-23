@@ -30,6 +30,7 @@ namespace sph
 {
 ///
 /// \class Poly6Kernel
+///
 /// \brief The poly6 Kernel
 ///
 template<int N>
@@ -145,6 +146,7 @@ protected:
 
 ///
 /// \class SpikyKernel
+///
 /// \brief Spiky Kernel
 ///
 template<int N>
@@ -243,6 +245,7 @@ protected:
 
 ///
 /// \class CohesionKernel
+///
 /// \brief Cohesion Kernel
 ///
 template<int N>
@@ -345,6 +348,7 @@ protected:
 
 ///
 /// \class AdhesionKernel
+///
 /// \brief Adhesion kernel
 ///
 template<int N>
@@ -424,6 +428,7 @@ protected:
 
 ///
 /// \class ViscosityKernel
+///
 /// \brief Viscosity kernel
 ///
 template<int N>
@@ -468,8 +473,10 @@ protected:
     double m_radiusSquared; ///> Kernel radius squared
     double m_k;             ///> Kernel coefficient for laplacian()
 };
-} // end namespace SPH
+} // namespace sph
 
+///
+/// \class SphSimulationKernels
 ///
 /// \brief Class contains SPH kernels for time integration,
 /// using different kernel for different purposes
@@ -519,4 +526,4 @@ protected:
     sph::ViscosityKernel<3> m_viscosity;
     sph::CohesionKernel<3>  m_cohesion;
 };
-} // end namespace imstk
+} // namespace imstk

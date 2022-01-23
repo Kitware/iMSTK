@@ -34,6 +34,7 @@ class Texture;
 
 ///
 /// \class RenderMaterial
+///
 /// \brief Serves no function, just a database for render properties, emits events for
 /// others to observe its changes
 ///
@@ -89,121 +90,136 @@ public:
 
     ///
     /// \brief Get/Set the material name
-    ///
+    ///@{
     const std::string& getName() const { return m_name; }
     void setName(std::string name) { m_name = name; }
+    ///@}
 
     ///
     /// \brief Get/Set display mode
-    ///
-    const DisplayMode getDisplayMode() const { return m_displayMode; }
+    ///@{
+    DisplayMode getDisplayMode() const { return m_displayMode; }
     void setDisplayMode(const DisplayMode displayMode);
+    ///@}
 
     ///
     /// \brief Get/Set line width or the wireframe
-    ///
-    const double getLineWidth() const { return m_lineWidth; }
+    ///@{
+    double getLineWidth() const { return m_lineWidth; }
     void setLineWidth(const double width);
+    ///@}
 
     ///
     /// \brief Get/Set point radius
-    ///
-    const double getPointSize() const { return m_pointSize; }
+    ///@{
+    double getPointSize() const { return m_pointSize; }
     void setPointSize(const double size);
+    ///@}
 
     ///
     /// \brief Backface culling on/off
-    ///
-    const bool getBackFaceCulling() const { return m_backfaceCulling; }
+    ///@{
+    bool getBackFaceCulling() const { return m_backfaceCulling; }
     void setBackFaceCulling(const bool culling);
     void backfaceCullingOn();
     void backfaceCullingOff();
+    ///@}
 
     ///
     /// \brief Get/Set the color. This affects the diffuse color directly, but
     /// it affects the specular color in the case of metals.
-    ///
+    ///@{
     const Color& getDiffuseColor() const { return m_diffuseColor; }
     void setDiffuseColor(const Color& color);
     const Color& getColor() const { return this->getDiffuseColor(); }
     void setColor(const Color& color);
+    ///@}
 
     ///
     /// \brief Get/Set the specular color
-    ///
+    ///@{
     const Color& getSpecularColor() const { return m_specularColor; }
     void setSpecularColor(const Color& color);
+    ///@}
 
     ///
     /// \brief Get/Set the specular amount
-    ///
+    ///@{
     double getSpecular() const { return m_specular; }
-    void setSpecular(double specular) { m_specular = specular; }
+    void setSpecular(const double specular) { m_specular = specular; }
+    ///@}
 
     ///
     /// \brief Get/Set the ambient color
-    ///
+    ///@{
     const Color& getAmbientColor() const { return m_ambientColor; }
     void setAmbientColor(const Color& color);
+    ///@}
 
     ///
     /// \brief Get/Set the metalness
-    ///
-    const double getMetalness() const { return m_metalness; }
+    ///@{
+    double getMetalness() const { return m_metalness; }
     void setMetalness(const double metalness);
+    ///@}
 
     ///
     /// \brief Get/Set ambient light coefficient
-    ///
-    const double getAmbient() const { return m_ambient; };
-    void setAmbient(double ambient) { m_ambient = ambient; }
+    ///@{
+    double getAmbient() const { return m_ambient; };
+    void setAmbient(const double ambient) { m_ambient = ambient; }
+    ///@}
 
     ///
     /// \brief Get/Set diffuse light coefficient
-    ///
-    const double getDiffuse() const { return m_diffuse; }
-    void setDiffuse(double diffuse) { m_diffuse = diffuse; }
+    ///@{
+    double getDiffuse() const { return m_diffuse; }
+    void setDiffuse(const double diffuse) { m_diffuse = diffuse; }
+    ///@}
 
     ///
     /// \brief Get/Set ambient light coefficient
-    ///
-    const double getSpecularPower() const { return m_specularPower; }
+    ///@{
+    double getSpecularPower() const { return m_specularPower; }
     void setSpecularPower(const double p) { m_specularPower = p; }
+    ///@}
 
     ///
     /// \brief Get/Set the roughness
-    ///
-    const double getRoughness() const { return m_roughness; }
+    ///@{
+    double getRoughness() const { return m_roughness; }
     void setRoughness(const double roughness);
+    ///@}
 
     ///
     /// \brief Get/Set emissivity
-    ///
-    const double getEmissivity() const { return m_emissivity; }
+    ///@{
+    double getEmissivity() const { return m_emissivity; }
     void setEmissivity(const double emissivity);
+    ///@}
 
-    const double getAnisotropy() const { return m_anisotropy; }
+    double getAnisotropy() const { return m_anisotropy; }
     void setAnisotropy(const double anisotropy);
 
-    const double getAnisotropyRotation() const { return m_anisotropyRotation; }
+    double getAnisotropyRotation() const { return m_anisotropyRotation; }
     void setAnisotropyRotation(const double anisotropyRotation);
 
-    const double getBaseIOR() const { return m_baseIOR; }
+    double getBaseIOR() const { return m_baseIOR; }
     void setBaseIOR(const double baseIOR);
 
     const Color& getCoatColor() const { return m_coatColor; }
     void setCoatColor(const Color& coatColor);
 
-    const double getCoatIOR() const { return m_coatIOR; }
+    double getCoatIOR() const { return m_coatIOR; }
     void setCoatIOR(const double coatIOR);
 
-    const double getCoatNormalScale() const { return m_coatNormalScale; }
+    double getCoatNormalScale() const { return m_coatNormalScale; }
     void setCoatNormalScale(const double coatNormalScale);
 
-    const double getCoatRoughness() const { return m_coatRoughness; }
+    double getCoatRoughness() const { return m_coatRoughness; }
     void setCoatRoughness(const double coatRoughness);
 
-    const double getCoatStrength() const { return m_coatStrength; }
+    double getCoatStrength() const { return m_coatStrength; }
     void setCoatStrength(const double coatStrength);
 
     const Color& getEdgeTint() const { return m_edgeTint; }
@@ -211,28 +227,31 @@ public:
 
     ///
     /// \brief Add/Remove/Get texture
-    ///
+    ///@{
     void addTexture(std::shared_ptr<Texture> texture);
     void removeTexture(std::shared_ptr<Texture> texture);
     void removeTexture(Texture::Type type);
     std::shared_ptr<Texture> getTexture(Texture::Type type);
+    ///@}
 
     ///
     /// \brief Get/Set edge visibility
-    ///
+    ///@{
     void setEdgeVisibility(const bool visibility) { m_edgeVisibility = visibility; };
     bool getEdgeVisibility() const { return m_edgeVisibility; };
+    ///@}
 
     ///
     /// \brief Get/Set blend mode
     /// This function only works for volumes, particles and decals currently
     /// and the MAXIMUM_INTENSITY and MINIMUM_INTENSITY blend modes are only available for volumes
-    ///
+    ///@{
     virtual void setBlendMode(const BlendMode blendMode);
-    const BlendMode getBlendMode() const { return m_blendMode; }
+    BlendMode getBlendMode() const { return m_blendMode; }
+    ///@}
 
-    const DisplayMode getRenderMode() const { return m_displayMode; }
-    const ShadingModel getShadingModel() const { return m_shadingModel; }
+    DisplayMode getRenderMode() const { return m_displayMode; }
+    ShadingModel getShadingModel() const { return m_shadingModel; }
     void setShadingModel(const ShadingModel& model);
 
     double getOcclusionStrength() const { return m_occlusionStrength; }
@@ -247,30 +266,27 @@ public:
     const Color& getVertexColor() const { return m_vertexColor; }
     void setVertexColor(const Color& color);
 
-    const double getOpacity() const { return m_opacity; }
+    double getOpacity() const { return m_opacity; }
     void setOpacity(const double opacity);
 
-    const bool getBackfaceCulling() const { return m_backfaceCulling; }
+    bool getBackfaceCulling() const { return m_backfaceCulling; }
     void setBackfaceCulling(const bool c);
 
     std::shared_ptr<ColorFunction> getColorLookupTable() const { return m_lookupTable; }
     void setColorLookupTable(std::shared_ptr<ColorFunction> lut);
 
-    const bool getScalarVisibility() const { return m_scalarVisibility; }
+    bool getScalarVisibility() const { return m_scalarVisibility; }
     void setScalarVisibility(const bool scalarVisibility);
 
-    const bool getRecomputeVertexNormals() const { return m_recomputeVertexNormals; }
+    bool getRecomputeVertexNormals() const { return m_recomputeVertexNormals; }
     void setRecomputeVertexNormals(const bool recomputeVertexNormals) { m_recomputeVertexNormals = recomputeVertexNormals; }
 
-    const bool getRenderPointsAsSpheres() const { return m_renderPointsAsSpheres; }
+    bool getRenderPointsAsSpheres() const { return m_renderPointsAsSpheres; }
     void setRenderPointsAsSpheres(const bool renderPointsAsSpheres) { m_renderPointsAsSpheres = renderPointsAsSpheres; }
 
     void postModified() { this->postEvent(Event(RenderMaterial::modified())); }
 
 protected:
-    friend class VTKRenderDelegate;
-    friend class VTKdbgLinesRenderDelegate;
-
     std::string m_name = "";
 
     // Textures
@@ -332,4 +348,4 @@ protected:
 
     bool m_renderPointsAsSpheres = false;
 };
-}
+} // namespace imstk

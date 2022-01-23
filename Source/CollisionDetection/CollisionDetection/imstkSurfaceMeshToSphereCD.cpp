@@ -158,4 +158,4 @@ SurfaceMeshToSphereCD::computeCollisionDataAB(
             }
         });
 }
-}
+} // namespace imstk

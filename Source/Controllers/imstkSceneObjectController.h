@@ -48,11 +48,12 @@ public:
 
     ///
     /// \brief Get/Set controlled scene object
-    ///
+    ///@{
     std::shared_ptr<SceneObject> getControlledSceneObject() const { return m_sceneObject; }
     virtual void setControlledSceneObject(std::shared_ptr<SceneObject> so) { m_sceneObject = so; }
+///@}
 
 protected:
     std::shared_ptr<SceneObject> m_sceneObject; ///< SceneObject controlled by the Tracker
 };
-} // imstk
+} // namespace imstk

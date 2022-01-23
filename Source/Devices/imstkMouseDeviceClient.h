@@ -36,6 +36,12 @@ using MouseButtonType = int;
 #define RIGHT_BUTTON 1
 #define MIDDLE_BUTTON 2
 
+///
+/// \class MouseEvent
+///
+/// \brief Provides the information of a mouse event, this includes button
+/// presses/releases and scrolling
+///
 class MouseEvent : public Event
 {
 public:
@@ -54,7 +60,7 @@ public:
     {
     }
 
-    virtual ~MouseEvent() override = default;
+    ~MouseEvent() override = default;
 
 public:
     double m_scrollDx;          ///> Mouse scroll
@@ -81,7 +87,7 @@ protected:
     static std::shared_ptr<MouseDeviceClient> New();
 
 public:
-    virtual ~MouseDeviceClient() override = default;
+    ~MouseDeviceClient() override = default;
 
     // Only the viewer is allowed to provide these objects
     friend class VTKInteractorStyle;
@@ -123,7 +129,7 @@ public:
     ///
     /// \brief Query if the button is down
     ///
-    const bool isButtonDown(const MouseButtonType buttonId) const
+    bool isButtonDown(const MouseButtonType buttonId) const
     {
         if (m_buttons.find(buttonId) != m_buttons.end())
         {
@@ -173,4 +179,4 @@ protected:
     Vec2d m_prevPos;
     Vec2d m_pos;
 };
-}
+} // namespace imstk

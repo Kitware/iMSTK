@@ -21,9 +21,9 @@
 
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkConjugateGradient.h"
-#include "imstkCorotationalFEMForceModel.h"
-#include "imstkIsotropicHyperelasticFEMForceModel.h"
-#include "imstkLinearFEMForceModel.h"
+#include "imstkCorotationalFemForceModel.h"
+#include "imstkIsotropicHyperelasticFeForceModel.h"
+#include "imstkLinearFemForceModel.h"
 #include "imstkLogger.h"
 #include "imstkNewtonSolver.h"
 #include "imstkPointSet.h"
@@ -928,4 +928,4 @@ FemDeformableBodyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::sh
     m_taskGraph->addEdge(source, m_solveNode);
     m_taskGraph->addEdge(m_solveNode, sink);
 }
-} // imstk
+} // namespace imstk

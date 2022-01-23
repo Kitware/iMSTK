@@ -41,7 +41,7 @@ class SurfaceMeshDistanceTransform : public GeometryAlgorithm
 {
 public:
     SurfaceMeshDistanceTransform();
-    virtual ~SurfaceMeshDistanceTransform() override = default;
+    ~SurfaceMeshDistanceTransform() override = default;
 
 public:
     ///
@@ -100,4 +100,4 @@ private:
     bool m_NarrowBanded = false;
     int  m_DilateSize   = 4; ///< Only for narrow banded
 };
-}
+} // namespace imstk

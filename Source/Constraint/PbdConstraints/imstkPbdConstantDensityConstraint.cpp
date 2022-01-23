@@ -125,4 +125,4 @@ PbdConstantDensityConstraint::setMaxNeighborDistance(const double dist)
         m_NeighborSearcher->setSearchRadius(m_maxDist);
     }
 }
-} // imstk
+} // namespace imstk

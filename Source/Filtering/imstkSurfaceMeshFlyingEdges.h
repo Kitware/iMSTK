@@ -36,7 +36,7 @@ class SurfaceMeshFlyingEdges : public GeometryAlgorithm
 {
 public:
     SurfaceMeshFlyingEdges();
-    virtual ~SurfaceMeshFlyingEdges() override = default;
+    ~SurfaceMeshFlyingEdges() override = default;
 
 public:
     ///
@@ -46,12 +46,12 @@ public:
 
     std::shared_ptr<SurfaceMesh> getOutputMesh() const;
 
-    imstkGetMacro(IsoValue, double);
-
     ///
     /// \brief Get the value at which the surface should be produced
-    ///
+    ///@{
     imstkSetMacro(IsoValue, double);
+    imstkGetMacro(IsoValue, double);
+///@}
 
 protected:
     void requestUpdate() override;
@@ -59,4 +59,4 @@ protected:
 private:
     double m_IsoValue = 0.0;
 };
-}
+} // namespace imstk

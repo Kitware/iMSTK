@@ -241,4 +241,4 @@ AssimpMeshIO::getDefaultPostProcessSteps()
 
     return postProcessSteps;
 }
-}
+} // namespace imstk

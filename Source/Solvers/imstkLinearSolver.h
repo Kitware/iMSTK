@@ -27,6 +27,8 @@
 namespace imstk
 {
 ///
+/// \class LinearSolver
+///
 /// \brief Base class for linear solvers
 ///
 template<typename SystemMatrixType>
@@ -50,7 +52,7 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    LinearSolver() : m_linearSystem(nullptr) {};
+    LinearSolver() : m_linearSystem(nullptr) { }
     virtual ~LinearSolver() = default;
 
     ///
@@ -94,7 +96,7 @@ public:
     virtual void print() const
     {
         //LOG(INFO) << "Solver type (broad): Linear";
-    };
+    }
 
     ///
     /// \brief Returns true if the solver is iterative
@@ -104,11 +106,11 @@ public:
     ///
     /// \brief Return the type of the solver
     ///
-    Type getType() { return m_type; };
+    Type getType() { return m_type; }
 
 protected:
-    Type   m_type      = Type::None;                    ///> Type of the scene object
-    double m_tolerance = 1.0e-4;                        ///> default tolerance
-    std::shared_ptr<LinearSystemType> m_linearSystem;   ///> Linear system of equations
+    Type   m_type      = Type::None;                  ///> Type of the scene object
+    double m_tolerance = 1.0e-4;                      ///> default tolerance
+    std::shared_ptr<LinearSystemType> m_linearSystem; ///> Linear system of equations
 };
-} // imstk
+} // namespace imstk

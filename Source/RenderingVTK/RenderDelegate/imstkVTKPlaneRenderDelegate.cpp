@@ -70,4 +70,4 @@ VTKPlaneRenderDelegate::processEvents()
     T.matrix().transposeInPlace();
     m_transform->SetMatrix(T.data());
 }
-} // imstk
+} // namespace imstk

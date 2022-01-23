@@ -724,4 +724,4 @@ LocalMarchingCubes::requestUpdate()
         m_modifiedVoxels.clear();
     }
 }
-}
+} // namespace imstk

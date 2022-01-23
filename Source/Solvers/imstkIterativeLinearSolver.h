@@ -26,16 +26,15 @@
 namespace imstk
 {
 ///
+/// \class IterativeLinearSolver
+///
 /// \brief Base class for iterative linear solvers.
 ///
 class IterativeLinearSolver : public LinearSolver<SparseMatrixd>
 {
 public:
-    ///
-    /// \brief Default constructor/destructor
-    ///
     IterativeLinearSolver() = default;
-    virtual ~IterativeLinearSolver() override = default;
+    ~IterativeLinearSolver() override = default;
 
     ///
     /// \brief Do one iteration of the method.
@@ -75,10 +74,10 @@ public:
     bool isIterative() const override
     {
         return true;
-    };
+    }
 
 protected:
     size_t  m_maxIterations = 100;  ///> Maximum number of iterations to be performed.
     Vectord m_residual;             ///> Storage for residual vector.
 };
-} //imstk
+} // namespace imstk

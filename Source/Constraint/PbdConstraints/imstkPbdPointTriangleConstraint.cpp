@@ -83,4 +83,4 @@ PbdPointTriangleConstraint::computeValueAndGradient(double&             c,
 
     return true;
 }
-} // imstk
+} // namespace imstk

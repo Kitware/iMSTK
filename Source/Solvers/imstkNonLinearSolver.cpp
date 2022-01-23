@@ -191,4 +191,4 @@ NonLinearSolver<SystemMatrix>::getSystem() const
 
 template class NonLinearSolver<SparseMatrixd>;
 template class NonLinearSolver<Matrixd>;
-} // imstk
+} // namespace imstk

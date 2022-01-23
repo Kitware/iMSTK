@@ -142,4 +142,4 @@ EmbeddingConstraint::compute(double dt)
         J(2, 0) = -n[2]; J(2, 1) = 0.0;
     }
 }
-}
+} // namespace imstk

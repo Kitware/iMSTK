@@ -73,4 +73,4 @@ BidirectionalPlaneToSphereCD::computeCollisionDataAB(
         elementsB.push_back(elemB);
     }
 }
-}
+} // namespace imstk
