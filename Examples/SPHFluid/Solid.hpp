@@ -45,7 +45,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene1()
         geometry->setPosition(0.0, -6.0, 0.0);
         geometry->setNormal(Vec3d(0.0, 1.0, -0.5));
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         imstkNew<RenderMaterial> material;
         material->setColor(Color::DarkGray);
         visualModel->setRenderMaterial(material);
@@ -61,7 +62,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene1()
         geometry->setPosition(0.0, -6.0, 0.0);
         geometry->setNormal(Vec3d(0.0, 1.0, 1.0));
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         imstkNew<RenderMaterial> material;
         material->setColor(Color::LightGray);
         visualModel->setRenderMaterial(material);
@@ -76,7 +78,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene1()
         geometry->setRadius(2.0);
         geometry->setPosition(0.0, -6.0, 0.0);
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         imstkNew<RenderMaterial> material;
         material->setColor(Color::Red);
         visualModel->setRenderMaterial(material);
@@ -103,7 +106,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene2()
         geometry->setPosition(0.0, -6.0, 0.0);
         geometry->setNormal(Vec3d(0.0, 1.0, -0.5));
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         imstkNew<RenderMaterial> material;
         material->setColor(Color::DarkGray);
         visualModel->setRenderMaterial(material);
@@ -119,7 +123,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene2()
         geometry->setPosition(0.0, -6.0, 0.0);
         geometry->setNormal(Vec3d(0.0, 1.0, 1.0));
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         imstkNew<RenderMaterial> material;
         material->setColor(Color::LightGray);
         visualModel->setRenderMaterial(material);
@@ -149,7 +154,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene3()
         geometry->setPosition(0.0, -6.0, 0.0);
         geometry->setNormal(Vec3d(0.0, 1.0, 0.0));
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         imstkNew<RenderMaterial> material;
         material->setColor(Color(0.2, 0.2, 0.2, 1.0));
         visualModel->setRenderMaterial(material);
@@ -165,7 +171,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene3()
         geometry->setPosition(0.0, 0.0, -7.0);
         geometry->setNormal(Vec3d(0.0, 0.0, 1.0));
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         visualModel->setRenderMaterial(lightGrayMat);
 
         imstkNew<CollidingObject> obj("Back Wall");
@@ -179,7 +186,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene3()
         geometry->setPosition(0.0, 0.0, 7.0);
         geometry->setNormal(Vec3d(0.0, 0.0, -1.0));
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         visualModel->setRenderMaterial(lightGrayMat);
 
         imstkNew<CollidingObject> obj("Front Wall");
@@ -193,7 +201,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene3()
         geometry->setPosition(7.0, 0.0, 0.0);
         geometry->setNormal(Vec3d(-1.0, 0.0, 0.0));
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         visualModel->setRenderMaterial(lightGrayMat);
 
         imstkNew<CollidingObject> obj("Left Wall");
@@ -207,7 +216,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene3()
         geometry->setPosition(-7.0, 0.0, 0.0);
         geometry->setNormal(Vec3d(1.0, 0.0, 0.0));
 
-        imstkNew<VisualModel> visualModel(geometry.get());
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(geometry);
         visualModel->setRenderMaterial(lightGrayMat);
 
         imstkNew<CollidingObject> obj("Right Wall");
@@ -234,7 +244,8 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene4(const std::sh
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     material->setColor(Color(Color::Red, 0.1));
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
+    auto surfMeshModel = std::make_shared<VisualModel>();
+    surfMeshModel->setGeometry(surfMesh);
     surfMeshModel->setRenderMaterial(material);
     surfaceObject->addVisualModel(surfMeshModel);
 

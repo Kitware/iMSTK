@@ -70,7 +70,8 @@ main()
     planeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     planeMaterial->setPointSize(6.0);
     planeMaterial->setLineWidth(4.0);
-    imstkNew<VisualModel> planeVisualModel(planeGeom.get());
+    imstkNew<VisualModel> planeVisualModel;
+    planeVisualModel->setGeometry(planeGeom);
     planeVisualModel->setRenderMaterial(planeMaterial);
 
     imstkNew<SceneObject> planeObj("Plane");
@@ -90,7 +91,8 @@ main()
     redMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     redMaterial->setPointSize(6.0);
     redMaterial->setLineWidth(4.0);
-    imstkNew<VisualModel> cubeVisualModel(cubeGeom.get());
+    imstkNew<VisualModel> cubeVisualModel;
+    cubeVisualModel->setGeometry(cubeGeom);
     cubeVisualModel->setRenderMaterial(redMaterial);
 
     imstkNew<SceneObject> cubeObj("Cube");
@@ -105,7 +107,8 @@ main()
     cylinderGeom->rotate(Vec3d(1.0, 1.0, 0), PI_2, Geometry::TransformType::ApplyToData);
     cylinderGeom->translate(Vec3d(0.0, 0.0, -10.0));
 
-    imstkNew<VisualModel> cylVisualModel(cylinderGeom.get());
+    imstkNew<VisualModel> cylVisualModel;
+    cylVisualModel->setGeometry(cylinderGeom);
     cylVisualModel->setRenderMaterial(redMaterial);
 
     imstkNew<SceneObject> cylObj("Cylinder");

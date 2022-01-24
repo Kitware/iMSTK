@@ -118,7 +118,8 @@ main()
             subdivide->update();
 
             // Create the visual model
-            imstkNew<VisualModel>    visualModel(subdivide->getOutputMesh());
+            imstkNew<VisualModel> visualModel;
+            visualModel->setGeometry(subdivide->getOutputMesh());
             imstkNew<RenderMaterial> mat;
             mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
             mat->setLineWidth(2.0);

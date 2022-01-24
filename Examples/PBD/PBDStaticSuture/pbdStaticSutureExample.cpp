@@ -116,7 +116,8 @@ makePbdString(
     material->setPointSize(6.0);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
-    imstkNew<VisualModel> visualModel(stringMesh);
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(stringMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object

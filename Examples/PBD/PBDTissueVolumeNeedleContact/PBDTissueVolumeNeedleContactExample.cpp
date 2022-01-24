@@ -257,7 +257,8 @@ makeTissueObj(const std::string& name,
     material->setOpacity(0.5);
 
     // Add a visual model to render the surface of the tet mesh
-    imstkNew<VisualModel> visualModel(surfMesh);
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(surfMesh);
     visualModel->setRenderMaterial(material);
     clothObj->addVisualModel(visualModel);
 

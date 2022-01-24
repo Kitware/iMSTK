@@ -158,7 +158,8 @@ makeClothObj(const std::string& name,
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setColor(Color::Blue);
-    imstkNew<VisualModel> visualModel(clothMesh);
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(clothMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
@@ -200,7 +201,8 @@ main()
         collisionObj->setCollidingGeometry(capsule);
         for (int i = 0; i < 4; i++)
         {
-            auto visualModel = std::make_shared<VisualModel>(geometries[i]);
+            auto visualModel = std::make_shared<VisualModel>();
+            visualModel->setGeometry(geometries[i]);
             visualModel->getRenderMaterial()->setBackFaceCulling(false);
             visualModel->getRenderMaterial()->setOpacity(0.5);
             visualModel->hide();

@@ -41,9 +41,6 @@ class Renderer;
 class VisualModel : public EventObject
 {
 public:
-    VisualModel(std::shared_ptr<Geometry> geometry);
-    VisualModel(std::shared_ptr<Geometry>       geometry,
-                std::shared_ptr<RenderMaterial> renderMaterial);
     VisualModel();
     ~VisualModel() override = default;
 
@@ -67,10 +64,10 @@ public:
 
     ///
     /// \brief Set/Get render material
-    ///
+    ///@{
     void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial);
-
     std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_renderMaterial; }
+    ///@}
 
     ///
     /// \brief Visibility functions
@@ -91,12 +88,12 @@ public:
     void postModified() { this->postEvent(Event(VisualModel::modified())); }
 
 protected:
-    std::string m_name = "";
+    std::string m_name;
 
-    std::shared_ptr<Geometry>       m_geometry = nullptr;
+    std::shared_ptr<Geometry>       m_geometry;
     std::shared_ptr<RenderMaterial> m_renderMaterial;
 
-    bool m_isVisible = true;              ///< true if mesh is shown, false if mesh is hidden
+    bool m_isVisible; ///< true if mesh is shown, false if mesh is hidden
     std::unordered_map<Renderer*, bool> m_renderDelegateCreated;
 };
 } // namespace imstk

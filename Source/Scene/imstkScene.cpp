@@ -113,13 +113,17 @@ Scene::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double p
 
     for (const auto& obj : m_sceneObjects)
     {
-        for (auto visualModels : obj->getVisualModels())
+        for (const auto& visualModel : obj->getVisualModels())
         {
-            Vec3d min = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
-            Vec3d max = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
-            visualModels->getGeometry()->computeBoundingBox(min, max);
-            lowerCorner = lowerCorner.cwiseMin(min);
-            upperCorner = upperCorner.cwiseMax(max);
+            Vec3d                     min  = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
+            Vec3d                     max  = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
+            std::shared_ptr<Geometry> geom = visualModel->getGeometry();
+            if (geom != nullptr)
+            {
+                geom->computeBoundingBox(min, max);
+                lowerCorner = lowerCorner.cwiseMin(min);
+                upperCorner = upperCorner.cwiseMax(max);
+            }
         }
     }
     const Vec3d range = upperCorner - lowerCorner;

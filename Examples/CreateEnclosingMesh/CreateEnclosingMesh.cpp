@@ -60,7 +60,8 @@ main()
         imstkNew<RenderMaterial> material;
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setColor(Color::LightGray);
-        imstkNew<VisualModel> visualModel(surfMesh);
+        imstkNew<VisualModel> visualModel;
+        visualModel->setGeometry(surfMesh);
         visualModel->setRenderMaterial(material);
         surfObj->addVisualModel(visualModel);
 
@@ -77,7 +78,9 @@ main()
         tetMaterial->setColor(Color::Teal);
         tetMaterial->setPointSize(7.0);
         tetMaterial->setLineWidth(3.0);
-        imstkNew<VisualModel> tetVisualModel(tetMesh, tetMaterial);
+        imstkNew<VisualModel> tetVisualModel;
+        tetVisualModel->setGeometry(tetMesh);
+        tetVisualModel->setRenderMaterial(tetMaterial);
         volObject->addVisualModel(tetVisualModel);
 
         scene->addSceneObject(volObject);

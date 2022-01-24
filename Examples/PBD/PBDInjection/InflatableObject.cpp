@@ -98,7 +98,8 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
 
     // Add a visual model to render the surface of the tet mesh
-    imstkNew<VisualModel> visualModel(m_objectSurfMesh);
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(m_objectSurfMesh);
     visualModel->setRenderMaterial(material);
     addVisualModel(visualModel);
 

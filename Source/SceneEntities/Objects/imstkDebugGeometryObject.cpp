@@ -58,7 +58,8 @@ DebugGeometryObject::DebugGeometryObject() : SceneObject("DebugGeometryObject"),
     lineMaterial->setLineWidth(20.0);
     lineMaterial->setColor(Color::Blue);
 
-    auto lineModel = std::make_shared<VisualModel>(m_debugLineMesh);
+    auto lineModel = std::make_shared<VisualModel>();
+    lineModel->setGeometry(m_debugLineMesh);
     lineModel->setRenderMaterial(lineMaterial);
     addVisualModel(lineModel);
 
@@ -69,7 +70,8 @@ DebugGeometryObject::DebugGeometryObject() : SceneObject("DebugGeometryObject"),
     pointMaterial->setPointSize(10.0);
     pointMaterial->setColor(Color::Red);
 
-    auto pointModel = std::make_shared<VisualModel>(m_debugPointSet);
+    auto pointModel = std::make_shared<VisualModel>();
+    pointModel->setGeometry(m_debugPointSet);
     pointModel->setRenderMaterial(pointMaterial);
     addVisualModel(pointModel);
 
@@ -78,7 +80,8 @@ DebugGeometryObject::DebugGeometryObject() : SceneObject("DebugGeometryObject"),
     faceMaterial->setBackFaceCulling(false);
     faceMaterial->setColor(Color::Orange);
 
-    auto faceModel = std::make_shared<VisualModel>(m_debugSurfMesh);
+    auto faceModel = std::make_shared<VisualModel>();
+    faceModel->setGeometry(m_debugSurfMesh);
     faceModel->setRenderMaterial(faceMaterial);
     addVisualModel(faceModel);
 }

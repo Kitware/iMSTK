@@ -162,7 +162,8 @@ makeTissueObj(const std::string& name,
     auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshORM.jpg");
     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
 
-    imstkNew<VisualModel> visualModel(clothMesh);
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(clothMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
