@@ -114,7 +114,8 @@ public class PbdCloth
 
         setFleshTextures(material);
         // setFabricTextures(material);
-        VisualModel visualModel = new VisualModel(clothMesh);
+        VisualModel visualModel = new VisualModel();
+        visualModel.setGeometry(clothMesh);
         visualModel.setRenderMaterial(material);
 
         // Setup the Object

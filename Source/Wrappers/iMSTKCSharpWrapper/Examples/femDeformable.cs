@@ -134,7 +134,8 @@ public class FeDeformable
         mat.setPointSize(10.0f);
         mat.setLineWidth(2.0f);
         mat.setEdgeColor(Color.Orange);
-        VisualModel surfMeshModel = new VisualModel(surfMesh);
+        VisualModel surfMeshModel = new VisualModel();
+        surfMeshModel.setGeometry(surfMesh);
         surfMeshModel.setRenderMaterial(mat);
 
         // Scene object 1: Dragon
