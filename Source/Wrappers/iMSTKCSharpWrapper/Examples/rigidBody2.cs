@@ -50,7 +50,8 @@ public class RigidBody2
                 toSurfMesh.getOutputMesh().flipNormals();
 
                 // Create the visual model
-                VisualModel visualModel = new VisualModel(toSurfMesh.getOutputMesh());
+                VisualModel visualModel = new VisualModel();
+                visualModel.setGeometry(toSurfMesh.getOutputMesh());
 
                 // Create the object
                 planeObj.addVisualModel(visualModel);
@@ -72,7 +73,8 @@ public class RigidBody2
                 subdivide.update();
 
                 // Create the visual model
-                VisualModel visualModel = new VisualModel(subdivide.getOutputMesh());
+                VisualModel visualModel = new VisualModel();
+                visualModel.setGeometry(subdivide.getOutputMesh());
                 RenderMaterial mat = new RenderMaterial();
                 mat.setDisplayMode(RenderMaterial.DisplayMode.WireframeSurface);
                 mat.setLineWidth(2.0f);

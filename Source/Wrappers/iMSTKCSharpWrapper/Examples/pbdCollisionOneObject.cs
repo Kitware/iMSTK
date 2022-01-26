@@ -40,7 +40,8 @@ public class PbdCollisionOneObject
                 material.setLineWidth(0.5);
                 material.setEdgeColor(Color.Blue);
                 material.setShadingModel(RenderMaterial.ShadingModel.Phong);
-                VisualModel surfMeshModel = new VisualModel(highResSurfMesh);
+                VisualModel surfMeshModel = new VisualModel();
+                surfMeshModel.setGeometry(highResSurfMesh);
                 surfMeshModel.setRenderMaterial(material);
 
                 // Create model and object
