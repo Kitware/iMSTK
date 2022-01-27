@@ -109,16 +109,34 @@ public:
     ///@}
 
     ///
-    /// \brief Return the currently applied force
-    ///@{
-    Vec3d getForce() const { return fS * m_forceScaling; }
-    ///@}
+    /// \brief Return the device applied force (scaled)
+    ///
+    Vec3d getDeviceForce() const { return (m_fS + m_fD) * m_forceScaling; }
 
     ///
-    /// \brief Return the currently applied torque
-    ///@{
-    Vec3d getTorque() const { return tS; }
-///@}
+    /// \brief Returns spring force, without damper
+    /// 
+    Vec3d getSpringForce() const { return m_fS; }
+
+    ///
+    /// \brief Returns damper force
+    /// 
+    Vec3d getDamperForce() const { return m_fD; }
+
+    ///
+    /// \brief Return the device applied torque (scaled)
+    ///
+    Vec3d getDeviceTorque() const { return m_tS + m_tD; }
+
+    ///
+    /// \brief Returns spring torque, without damper
+    /// 
+    Vec3d getSpringTorque() const { return m_tS; }
+
+    ///
+    /// \brief Returns damper torque
+    ///
+    Vec3d getDamperTorque() const { return m_tD; }
 
 public:
     ///
@@ -139,8 +157,13 @@ protected:
     Vec3d  m_linearKs  = Vec3d(8000000.0, 8000000.0, 8000000.0); ///> Spring coefficient, linear
     Vec3d  m_angularKs = Vec3d(10000.0, 10000.0, 10000.0);       ///> Spring coefficient, rotational
 
-    Vec3d fS = Vec3d::Zero();
-    Vec3d tS = Vec3d::Zero();
+    // Linear spring force and damper force
+    Vec3d m_fS = Vec3d::Zero();
+    Vec3d m_fD = Vec3d::Zero();
+
+    // Angular spring force and damper force
+    Vec3d m_tS = Vec3d::Zero();
+    Vec3d m_tD = Vec3d::Zero();
 
     double m_forceScaling = 0.0000075;
     bool   m_useSpring    = true; ///> Controller has ability to toggle to from springs

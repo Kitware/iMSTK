@@ -290,7 +290,7 @@ main()
                 mat4dRotation(Rotd(PI, Vec3d(0.0, 1.0, 0.0))));
                 ghostClampsObj->getVisualGeometry()->updatePostTransformData();
                 ghostClampsObj->getVisualGeometry()->postModified();
-                ghostClampsObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 5.0));
+                ghostClampsObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 5.0));
             });
 
         // Add mouse and keyboard controls to the viewer
