@@ -416,6 +416,7 @@ namespace std
 %include "../../Devices/imstkDeviceClient.h"
 %include "../../Devices/imstkKeyboardDeviceClient.h"
 #ifdef iMSTK_USE_OpenHaptics
+#define HDCALLBACK
 %include "../../Devices/imstkHapticDeviceManager.h"
 %include "../../Devices/imstkHapticDeviceClient.h"
 #endif
