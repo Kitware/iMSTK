@@ -19,10 +19,7 @@
 
 =========================================================================*/
 
-// This example is haptic only
 #include "imstkCamera.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
@@ -33,6 +30,7 @@
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkRenderMaterial.h"
+#include "imstkRigidBodyModel2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -42,6 +40,13 @@
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
+
+#ifdef iMSTK_USE_OPENHAPTICS
+#include "imstkHapticDeviceManager.h"
+#include "imstkHapticDeviceClient.h"
+#else
+#include "imstkMouseDeviceClient3D.h"
+#endif
 
 using namespace imstk;
 
@@ -191,10 +196,12 @@ main()
 
     imstkNew<Scene> scene("PBDStaticSuture");
 
+    // Create the arc needle
     imstkNew<NeedleObject> needleObj;
     needleObj->setForceThreshold(2.0);
     scene->addSceneObject(needleObj);
 
+    // Create the suture pbd-based string
     const double               stringLength      = 0.2;
     const int                  stringVertexCount = 30;
     std::shared_ptr<PbdObject> sutureThreadObj   =
@@ -202,21 +209,25 @@ main()
             stringVertexCount, stringLength);
     scene->addSceneObject(sutureThreadObj);
 
+    // Create a static box for tissue
     std::shared_ptr<CollidingObject> tissueObj = makeTissueObj();
     scene->addSceneObject(tissueObj);
 
+    // Create clamps that follow the needle around
     std::shared_ptr<SceneObject> clampsObj = makeToolObj("Clamps");
     scene->addSceneObject(clampsObj);
 
-    // Ghost clamps to show real position of hand
+    // Create ghost clamps to show real position of hand under virtual coupling
     std::shared_ptr<SceneObject> ghostClampsObj = makeToolObj("GhostClamps");
     ghostClampsObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
     scene->addSceneObject(ghostClampsObj);
 
+    // Add point based collision between the tissue & suture thread
     auto interaction = std::make_shared<PbdObjectCollision>(sutureThreadObj, tissueObj, "ImplicitGeometryToPointSetCD");
     interaction->setFriction(0.0);
     scene->addInteraction(interaction);
 
+    // Add needle constraining behaviour between the tissue & arc needle
     auto needleInteraction = std::make_shared<NeedleInteraction>(tissueObj, needleObj);
     scene->addInteraction(needleInteraction);
 
@@ -237,6 +248,7 @@ main()
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
+        // Setup a simulation manager to manage renders & scene updates
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
@@ -244,12 +256,28 @@ main()
 
 #ifdef iMSTK_USE_OPENHAPTICS
         imstkNew<HapticDeviceManager>       hapticManager;
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
+        std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
-
-        imstkNew<RigidObjectController> controller(needleObj, hapticDeviceClient);
         controller->setTranslationOffset(Vec3d(0.05, -0.05, 0.0));
-        controller->setTranslationScaling(0.001);
+        const double translationScaling = 0.001;
+        const Vec3d  offset = Vec3d(0.05, -0.05, 0.0);
+#else
+        imstkNew<MouseDeviceClient3D> deviceClient(viewer->getMouseDevice());
+        deviceClient->setOrientation(Quatd(Rotd(1.57, Vec3d(0.0, 1.0, 0.0))));
+        const double translationScaling = 0.1;
+        const Vec3d  offset = Vec3d(-0.05, -0.1, -0.005);
+
+        connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseScroll,
+            [&](MouseEvent* e)
+            {
+                const Quatd delta = Quatd(Rotd(e->m_scrollDx * 0.1, Vec3d(0.0, 0.0, 1.0)));
+                deviceClient->setOrientation(deviceClient->getOrientation() * delta);
+            });
+#endif
+
+        imstkNew<RigidObjectController> controller(needleObj, deviceClient);
+        controller->setTranslationOffset(offset);
+        controller->setTranslationScaling(translationScaling);
         controller->setLinearKs(1000.0);
         controller->setLinearKd(50.0);
         controller->setAngularKs(10000000.0);
@@ -258,36 +286,42 @@ main()
         controller->setSmoothingKernelSize(5);
         controller->setUseForceSmoothening(true);
         scene->addController(controller);
-#endif
 
+        // Update the timesteps for real time
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
             {
-                //needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-                sutureThreadObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+                needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+                sutureThreadObj->getPbdModel()->getConfig()->m_dt  = sceneManager->getDt();
             });
-        Vec3d clampOffset = Vec3d(-0.009, 0.01, 0.001);
+        // Constrain the first two vertices of the string to the needle
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
             {
-                // Constrain the first two vertices of the string to the needle
                 auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getPhysicsGeometry());
                 auto sutureLineMesh = std::dynamic_pointer_cast<LineMesh>(sutureThreadObj->getPhysicsGeometry());
                 (*sutureLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
                 (*sutureLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
-
-                // Transform the clamps relative to the needle
+            });
+        // Transform the clamps relative to the needle
+        const Vec3d clampOffset = Vec3d(-0.009, 0.01, 0.001);
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+            {
                 clampsObj->getVisualGeometry()->setTransform(
                     needleObj->getVisualGeometry()->getTransform() *
                     mat4dTranslate(clampOffset) *
                     mat4dRotation(Rotd(PI, Vec3d(0.0, 1.0, 0.0))));
                 clampsObj->getVisualGeometry()->postModified();
-
-                // Transform the ghost tool to show the real tool location
+            });
+        // Transform the ghost tool clamps to show the real tool location
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+            {
                 ghostClampsObj->getVisualGeometry()->setTransform(
-                mat4dTranslate(controller->getPosition()) * mat4dRotation(controller->getOrientation()) *
-                mat4dTranslate(clampOffset) *
-                mat4dRotation(Rotd(PI, Vec3d(0.0, 1.0, 0.0))));
+                    mat4dTranslate(controller->getPosition()) * mat4dRotation(controller->getOrientation()) *
+                    mat4dTranslate(clampOffset) *
+                    mat4dRotation(Rotd(PI, Vec3d(0.0, 1.0, 0.0))));
                 ghostClampsObj->getVisualGeometry()->updatePostTransformData();
                 ghostClampsObj->getVisualGeometry()->postModified();
                 ghostClampsObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 5.0));
