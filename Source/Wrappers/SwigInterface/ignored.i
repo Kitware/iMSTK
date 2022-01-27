@@ -65,3 +65,10 @@
 
 %ignore imstk::CollisionElement::m_element;
 %ignore imstk::CollisionElement::m_type;
+
+%ignore imstk::HapticDeviceClient::hapticCallback;
+
+%ignore imstk::VRPNDeviceClient::trackerPositionChangeHandler;
+%ignore imstk::VRPNDeviceClient::trackerVelocityChangeHandler;
+%ignore imstk::VRPNDeviceClient::analogChangeHandler;
+%ignore imstk::VRPNDeviceClient::buttonChangeHandler;

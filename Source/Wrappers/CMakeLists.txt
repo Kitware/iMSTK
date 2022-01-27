@@ -44,15 +44,24 @@ endif()
 set_target_properties(iMSTKCWrapper PROPERTIES
     SWIG_COMPILE_OPTIONS "-namespace;Imstk"
     FOLDER Wrappers)
+
+set(imstk_SWIG_DEFINITIONS "")
+
+
+# Forward iMSTK variables to SWIG and the 
 if(iMSTK_SWIG_PINNED_ARRAY)
-    set_target_properties(iMSTKCWrapper PROPERTIES
-        SWIG_COMPILE_DEFINITIONS "SWIG_PINNED_ARRAY")
+    list(APPEND imstk_SWIG_DEFINITIONS "SWIG_PINNED_ARRAY")
 endif()
 if(iMSTK_USE_OpenHaptics)
-    set_target_properties(iMSTKCWrapper PROPERTIES
-        SWIG_COMPILE_DEFINITIONS "iMSTK_USE_OpenHaptics")
-	target_compile_definitions(iMSTKCWrapper PRIVATE iMSTK_USE_OpenHaptics)
+    list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_OpenHaptics")
 endif()
+if(iMSTK_USE_VRPN)
+    list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_VRPN")
+endif()
+
+set_property(TARGET iMSTKCWrapper PROPERTY SWIG_COMPILE_DEFINITIONS ${imstk_SWIG_DEFINITIONS})
+
+target_compile_definitions(iMSTKCWrapper PRIVATE  ${imstk_SWIG_DEFINITIONS})
 
 # Link C Wrapper to the imstk libraries
 target_link_libraries(iMSTKCWrapper PRIVATE
