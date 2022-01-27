@@ -115,12 +115,12 @@ public:
 
     ///
     /// \brief Returns spring force, without damper
-    /// 
+    ///
     Vec3d getSpringForce() const { return m_fS; }
 
     ///
     /// \brief Returns damper force
-    /// 
+    ///
     Vec3d getDamperForce() const { return m_fD; }
 
     ///
@@ -130,7 +130,7 @@ public:
 
     ///
     /// \brief Returns spring torque, without damper
-    /// 
+    ///
     Vec3d getSpringTorque() const { return m_tS; }
 
     ///
