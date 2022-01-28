@@ -186,7 +186,6 @@
 #include "imstkKeyboardDeviceClient.h"
 
 #ifdef iMSTK_USE_OpenHaptics
-static_assert(false);
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
 #endif
