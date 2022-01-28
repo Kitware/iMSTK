@@ -80,15 +80,19 @@ RigidObjectController::update(const double dt)
         // Uses non-relative force
         {
             // Compute linear force
-            fS = m_linearKs.cwiseProduct(devicePos - currPos - deviceOffset) + m_linearKd * (-currVelocity - currAngularVelocity.cross(deviceOffset));
+            m_fS = m_linearKs.cwiseProduct(devicePos - currPos - deviceOffset);
+            m_fD = m_linearKd * (-currVelocity - currAngularVelocity.cross(deviceOffset));
+            Vec3d force = m_fS + m_fD;
 
             //printf("Device velocity %f, %f, %f\n", deviceVelocity[0], deviceVelocity[1], deviceVelocity[2]);
             const Quatd dq = deviceOrientation * currOrientation.inverse();
             const Rotd  angleAxes = Rotd(dq);
-            tS = deviceOffset.cross(fS) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle()) + m_angularKd * -currAngularVelocity;
+            m_tS = deviceOffset.cross(force) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle());
+            m_tD = m_angularKd * -currAngularVelocity;
+            Vec3d torque = m_tS + m_tD;
 
-            currForce  += fS;
-            currTorque += tS;
+            currForce  += force;
+            currTorque += torque;
         }
         // Uses relative force
         //{
@@ -128,7 +132,7 @@ RigidObjectController::applyForces()
         // Apply force back to device
         if (m_rigidObject != nullptr && m_useSpring)
         {
-            const Vec3d force = -fS * m_forceScaling;
+            const Vec3d force = -getDeviceForce();
             if (m_forceSmoothening)
             {
                 m_forces.push_back(force);
