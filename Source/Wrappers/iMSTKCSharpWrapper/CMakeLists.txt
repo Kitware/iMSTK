@@ -12,6 +12,11 @@ file(GLOB SRC_FILES "${SWIG_OUTPUT_DIR}/*.cs")
 find_package(iMSTKCWrapper REQUIRED)
 
 add_library(iMSTKSharp SHARED ${SRC_FILES})
+
+if (iMSTK_SWIG_PINNED_ARRAY)
+    target_compile_options(iMSTKSharp PRIVATE "/unsafe")
+endif()
+
 set_property(TARGET iMSTKSharp PROPERTY VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.1")
 set_property(TARGET iMSTKSharp PROPERTY VS_DOTNET_REFERENCES "System")
 
