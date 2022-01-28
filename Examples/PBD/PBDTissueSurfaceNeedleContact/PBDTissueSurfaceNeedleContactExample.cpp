@@ -381,7 +381,7 @@ main()
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
-                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getForce().norm() / 15.0));
+                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
 
                 // Also apply controller transform to ghost geometry
                 toolGhostMesh->setTranslation(controller->getPosition());
