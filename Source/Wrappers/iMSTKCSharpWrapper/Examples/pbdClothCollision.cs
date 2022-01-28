@@ -25,7 +25,8 @@ public class PbdCloth
 
         for (int i = 0; i < 4; ++i)
         {
-            VisualModel visualModel = new VisualModel(geometries[i]);
+            VisualModel visualModel = new VisualModel();
+            visualModel.setGeometry(geometries[i]);
             visualModel.getRenderMaterial().setBackFaceCulling(false);
             visualModel.getRenderMaterial().setOpacity(0.5);
             visualModel.hide();
@@ -171,7 +172,8 @@ public class PbdCloth
         material.setColor(Color.Blue);
 
         // setFabricTextures(material);
-        VisualModel visualModel = new VisualModel(clothMesh);
+        VisualModel visualModel = new VisualModel();
+        visualModel.setGeometry(clothMesh);
         visualModel.setRenderMaterial(material);
 
         // Setup the Object

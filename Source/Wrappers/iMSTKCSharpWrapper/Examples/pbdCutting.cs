@@ -121,7 +121,8 @@ public class PbdCutting
         material.setBackFaceCulling(false);
         material.setDisplayMode(RenderMaterial.DisplayMode.WireframeSurface);
 
-        VisualModel visualModel = new VisualModel(clothMesh);
+        VisualModel visualModel = new VisualModel();
+        visualModel.setGeometry(clothMesh);
         visualModel.setRenderMaterial(material);
 
         // Setup the Object

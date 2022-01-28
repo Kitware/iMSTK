@@ -114,7 +114,8 @@ public class PbdCloth
         SphObject fluidObj = new SphObject("Sphere");
 
         // Create a visual model
-        VisualModel visualModel = new VisualModel(geometry);
+        VisualModel visualModel = new VisualModel();
+        visualModel.setGeometry(geometry);
         RenderMaterial material = new RenderMaterial();
         material.setDisplayMode(RenderMaterial.DisplayMode.Fluid);
         //material.setDisplayMode(RenderMaterial.DisplayMode.Points);
@@ -258,7 +259,8 @@ public class PbdCloth
             geometry.setPosition(0.0, -6.0, 0.0);
             geometry.setNormal(new Vec3d(0.0, 1.0, -0.5));
 
-            VisualModel visualModel = new VisualModel(geometry);
+            VisualModel visualModel = new VisualModel();
+            visualModel.setGeometry(geometry);
             RenderMaterial material = new RenderMaterial();
             material.setColor(Color.DarkGray);
             visualModel.setRenderMaterial(material);
@@ -274,7 +276,8 @@ public class PbdCloth
             geometry.setPosition(0.0, -6.0, 0.0);
             geometry.setNormal(new Vec3d(0.0, 1.0, 1.0));
 
-            VisualModel visualModel = new VisualModel(geometry);
+            VisualModel visualModel = new VisualModel();
+            visualModel.setGeometry(geometry);
             RenderMaterial material = new RenderMaterial();
             material.setColor(Color.LightGray);
             visualModel.setRenderMaterial(material);
@@ -289,7 +292,8 @@ public class PbdCloth
             geometry.setRadius(2.0);
             geometry.setPosition(0.0, -6.0, 0.0);
 
-            VisualModel visualModel = new VisualModel(geometry);
+            VisualModel visualModel = new VisualModel();
+            visualModel.setGeometry(geometry);
             RenderMaterial material = new RenderMaterial();
             material.setColor(Color.Red);
             visualModel.setRenderMaterial(material);
