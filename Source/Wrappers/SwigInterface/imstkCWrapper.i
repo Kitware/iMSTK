@@ -184,9 +184,15 @@
  */
 #include "imstkDeviceClient.h"
 #include "imstkKeyboardDeviceClient.h"
+
 #ifdef iMSTK_USE_OpenHaptics
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
+#endif
+
+#ifdef iMSTK_USE_VRPN
+#include "imstkVRPNDeviceManager.h"
+#include "imstkVRPNDeviceClient.h"
 #endif
 
 %} /* end of module */
@@ -415,7 +421,22 @@ namespace std
  */
 %include "../../Devices/imstkDeviceClient.h"
 %include "../../Devices/imstkKeyboardDeviceClient.h"
+
 #ifdef iMSTK_USE_OpenHaptics
-%include "../../Devices/imstkHapticDeviceManager.h"
-%include "../../Devices/imstkHapticDeviceClient.h"
+	#define HDCALLBACK
+	%include "../../Devices/imstkHapticDeviceManager.h"
+	%include "../../Devices/imstkHapticDeviceClient.h"
+#endif
+
+#ifdef iMSTK_USE_VRPN
+	// The static calls in DeviceClient are getting ignored anyway define these
+	// Rather than dealing with the correct includes for VRPN
+	#define VRPN_CALLBACK
+	#define _vrpn_TRACKERCB void*
+	#define _vrpn_TRACKERVELCB void*
+	#define _vrpn_ANALOGCB void*
+	#define _vrpn_BUTTONCB void*
+
+	%include "../../Devices/imstkVRPNDeviceManager.h"
+	%include "../../Devices/imstkVRPNDeviceClient.h"
 #endif

@@ -44,15 +44,24 @@ endif()
 set_target_properties(iMSTKCWrapper PROPERTIES
     SWIG_COMPILE_OPTIONS "-namespace;Imstk"
     FOLDER Wrappers)
+
+set(imstk_SWIG_DEFINITIONS "")
+
+
+# Forward iMSTK variables to SWIG and the 
 if(iMSTK_SWIG_PINNED_ARRAY)
-    set_target_properties(iMSTKCWrapper PROPERTIES
-        SWIG_COMPILE_DEFINITIONS "SWIG_PINNED_ARRAY")
+    list(APPEND imstk_SWIG_DEFINITIONS "SWIG_PINNED_ARRAY")
 endif()
 if(iMSTK_USE_OpenHaptics)
-    set_target_properties(iMSTKCWrapper PROPERTIES
-        SWIG_COMPILE_DEFINITIONS "iMSTK_USE_OpenHaptics")
-	target_compile_definitions(iMSTKCWrapper PRIVATE iMSTK_USE_OpenHaptics)
+    list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_OpenHaptics")
 endif()
+if(iMSTK_USE_VRPN)
+    list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_VRPN")
+endif()
+
+set_property(TARGET iMSTKCWrapper PROPERTY SWIG_COMPILE_DEFINITIONS ${imstk_SWIG_DEFINITIONS})
+
+target_compile_definitions(iMSTKCWrapper PRIVATE  ${imstk_SWIG_DEFINITIONS})
 
 # Link C Wrapper to the imstk libraries
 target_link_libraries(iMSTKCWrapper PRIVATE
@@ -81,7 +90,12 @@ target_compile_options(iMSTKCWrapper PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
         -Wall -Wno-unused-function>
     $<$<CXX_COMPILER_ID:MSVC>:
-        -W4 -MP -wd4505 /bigobj>)
+        -W4 -MP -wd4505 -wd4127 /bigobj>)
+
+# Ignoring warnings 
+# MSVC C4505 Unreferenced function has been removed
+# MSVC C4127 Caused by eigen "conditional expression is constant"
+
 
 # Install the c wrapper
 install( TARGETS iMSTKCWrapper EXPORT iMSTKCWrapperTargets
@@ -120,7 +134,9 @@ if (MSVC)
         CMAKE_CACHE_ARGS
             -DiMSTKCWrapper_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}
             -DSWIG_OUTPUT_DIR:PATH=${SWIG_CSHARP_OUTPUT_DIR}
-            -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_PREFIX_PATH})
+            -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_PREFIX_PATH}
+            -DiMSTK_SWIG_PINNED_ARRAY:BOOL=${iMSTK_SWIG_PINNED_ARRAY}
+        )
     set_target_properties (iMSTKSharp PROPERTIES
         FOLDER Wrappers)
 endif()

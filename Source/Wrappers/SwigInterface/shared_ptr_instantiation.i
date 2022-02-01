@@ -195,3 +195,5 @@
 %shared_ptr(imstk::KeyboardDeviceClient)
 %shared_ptr(imstk::HapticDeviceClient)
 %shared_ptr(imstk::HapticDeviceManager)
+%shared_ptr(imstk::VRPNDeviceClient)
+%shared_ptr(imstk::VRPNDeviceManager)

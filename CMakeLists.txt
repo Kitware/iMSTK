@@ -322,6 +322,9 @@ find_package( VegaFEM REQUIRED CONFIG )
 # VRPN
 if (${PROJECT_NAME}_USE_VRPN)
   find_package( VRPN REQUIRED )
+  add_definitions( -DiMSTK_USE_VRPN )
+else()
+  remove_definitions( -DiMSTK_USE_VRPN )
 endif()
 
 # OpenHaptics
