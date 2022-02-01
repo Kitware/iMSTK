@@ -258,7 +258,6 @@ main()
         imstkNew<HapticDeviceManager>       hapticManager;
         std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
-        controller->setTranslationOffset(Vec3d(0.05, -0.05, 0.0));
         const double translationScaling = 0.001;
         const Vec3d  offset = Vec3d(0.05, -0.05, 0.0);
 #else
