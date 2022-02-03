@@ -165,10 +165,9 @@ main()
 
         imstkNew<RigidObjectController> controller(rbdObj, hapticDeviceClient);
         {
-            controller->setLinearKd(1000.0);
             controller->setLinearKs(100000.0);
             controller->setAngularKs(300000000.0);
-            controller->setAngularKd(400000.0);
+            controller->setUseCritDamping(true);
             controller->setForceScaling(0.001);
 
             // The particular device we are using doesn't produce this quantity
@@ -180,9 +179,8 @@ main()
             controller->setTranslationScaling(0.0015);
             controller->setTranslationOffset(Vec3d(0.1, 0.9, 1.6));
             controller->setSmoothingKernelSize(30);
-
-            scene->addController(controller);
         }
+        scene->addController(controller);
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
