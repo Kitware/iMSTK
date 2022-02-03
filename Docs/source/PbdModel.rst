@@ -93,11 +93,11 @@ To setup a PbdModel we do:
 ::
 
     // Setup the config
-    imstkNew<PBDModelConfig> pbdConfig;
+    imstkNew<PbdModelConfig> pbdConfig;
 
     // Constraints
-    pbdConfig->enableConstraint(PbdConstraint::Type::Distance, 1e2);
-    pbdConfig->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
+    pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e2);
+    pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e1);
     pbdConfig->m_fixedNodeIds = { 0, 1 };
 
     // Other parameters
@@ -111,7 +111,7 @@ To setup a PbdModel we do:
     pbdModel->setModelGeometry(surfMesh);
     pbdModel->configure(pbdConfig);
 
-**Constraints**: Constraints of varying types may be used via ``PBDModelConfig::enableConstraint``, internally this uses PbdConstraintFunctor's which defines how to generate constraints. If one needs more hands on with constraints you may write your own ``PbdConstraintFunctor``. Implemented by subclassing PbdConstraintFunctor and overriding the operator() function. See existing functors in ``imstkPbdConstraintFunctor.h``.
+**Constraints**: Constraints of varying types may be used via ``PbdModelConfig::enableConstraint``, internally this uses PbdConstraintFunctor's which defines how to generate constraints. If one needs more hands on with constraints you may write your own ``PbdConstraintFunctor``. Implemented by subclassing PbdConstraintFunctor and overriding the operator() function. See existing functors in ``imstkPbdConstraintFunctor.h``.
 
 ::
 

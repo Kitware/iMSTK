@@ -34,6 +34,9 @@ iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.
 ### Documentation
 Click [here](https://imstk.readthedocs.io/en/latest/) for detailed documentation.
 
+### Dashboard
+Click [here](https://open.cdash.org/index.php?project=iMSTK) for nightly build & MR results.
+
 ### Discourse
 The iMSTK Users and Developers can post questions and discuss relevant topics at the [Discourse](https://discourse.kitware.com/c/imstk).
 
@@ -48,6 +51,7 @@ Designed more specifically for developers, the issue tracker allows developers t
 ## Prerequisites
 * Git
 * Git LFS
+* Python (if using Uncrustify, default on)
 * CMake 3.15 or higher
 
 ##### On Linux:
