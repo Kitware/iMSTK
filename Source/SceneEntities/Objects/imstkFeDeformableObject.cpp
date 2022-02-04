@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkFeDeformableObject.h"
-#include "imstkFEMDeformableBodyModel.h"
+#include "imstkFemDeformableBodyModel.h"
 #include "imstkLogger.h"
 
 namespace imstk

@@ -25,7 +25,7 @@
 #include "imstkSPHState.h"
 #include "imstkSPHKernels.h"
 #include "imstkNeighborSearch.h"
-#include "imstkSPHBoundaryConditions.h"
+#include "imstkSphBoundaryConditions.h"
 
 namespace imstk
 {

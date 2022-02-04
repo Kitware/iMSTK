@@ -23,7 +23,7 @@
 
 #include "imstkDynamicalModel.h"
 #include "imstkPbdCollisionConstraint.h"
-#include "imstkPbdFEMConstraint.h"
+#include "imstkPbdFemConstraint.h"
 #include "imstkPbdState.h"
 
 #include <unordered_map>

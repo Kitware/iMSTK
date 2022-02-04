@@ -63,7 +63,7 @@ VTKViewer::VTKViewer(std::string name) : AbstractVTKViewer(name),
     auto iren = vtkSmartPointer<vtkGenericRenderWindowInteractor>::New();
 #else
     vtkSmartPointer<vtkXRenderWindowInteractor> iren = vtkSmartPointer<vtkXRenderWindowInteractor>::New();
-    iren->SetInteractorStyle(m_vtkInteractorStyle.get());
+    iren->SetInteractorStyle(m_vtkInteractorStyle.Get());
 #endif
 #endif
     iren->SetInteractorStyle(m_vtkInteractorStyle);

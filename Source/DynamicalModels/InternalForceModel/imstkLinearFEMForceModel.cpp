@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkLinearFEMForceModel.h"
+#include "imstkLinearFemForceModel.h"
 
 #include "imstkMacros.h"
 

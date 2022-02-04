@@ -23,7 +23,7 @@ limitations under the License.
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
-#include "imstkPBDCollisionHandling.h"
+#include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"

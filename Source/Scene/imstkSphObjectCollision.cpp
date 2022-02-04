@@ -23,7 +23,7 @@ limitations under the License.
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
-#include "imstkSPHCollisionHandling.h"
+#include "imstkSphCollisionHandling.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkTaskGraph.h"

@@ -23,7 +23,7 @@
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
 #include "imstkFeDeformableObject.h"
-#include "imstkFEMDeformableBodyModel.h"
+#include "imstkFemDeformableBodyModel.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
