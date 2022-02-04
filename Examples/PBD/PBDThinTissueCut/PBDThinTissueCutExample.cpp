@@ -153,7 +153,7 @@ main()
     Logger::startLogger();
 
     // Scene
-    imstkNew<Scene> scene("PBDCutting");
+    imstkNew<Scene> scene("PBDThinTissueCut");
 
     // Create a cutting plane object in the scene
     std::shared_ptr<SurfaceMesh> cutGeom(makePlaneGeometry(40, 40, 2, 2));
@@ -163,6 +163,7 @@ main()
     cutObj->setVisualGeometry(cutGeom);
     cutObj->setCollidingGeometry(cutGeom);
     cutObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    cutObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
     scene->addSceneObject(cutObj);
 
     // Create a pbd cloth object in the scene

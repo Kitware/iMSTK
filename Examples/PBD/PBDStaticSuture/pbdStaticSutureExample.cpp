@@ -278,9 +278,8 @@ main()
         controller->setTranslationOffset(offset);
         controller->setTranslationScaling(translationScaling);
         controller->setLinearKs(1000.0);
-        controller->setLinearKd(50.0);
         controller->setAngularKs(10000000.0);
-        controller->setAngularKd(1000000.0);
+        controller->setUseCritDamping(true);
         controller->setForceScaling(0.2);
         controller->setSmoothingKernelSize(5);
         controller->setUseForceSmoothening(true);

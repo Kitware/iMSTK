@@ -17,17 +17,17 @@
 ###########################################################################
 if(iMSTK_USE_OpenHaptics)
 
-  project(Example-PBDCutting)
+  project(Example-PBDThinTissueCut)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
-  imstk_add_executable(${PROJECT_NAME} PBDCuttingExample.cpp)
+  imstk_add_executable(${PROJECT_NAME} PBDThinTissueCutExample.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
+  SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
   
   #-----------------------------------------------------------------------------
   # Link libraries to executable

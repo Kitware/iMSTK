@@ -72,8 +72,8 @@ makeRigidObj(const std::string& name)
         imstkNew<RenderMaterial> toolMaterial;
         toolMaterial->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         toolMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);
-        toolMaterial->setMetalness(0.9f);
-        toolMaterial->setRoughness(0.4f);
+        toolMaterial->setMetalness(0.9);
+        toolMaterial->setRoughness(0.4);
         toolMaterial->setDiffuseColor(Color(0.7, 0.7, 0.7));
 
         // Create the object

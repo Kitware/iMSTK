@@ -301,13 +301,17 @@ makeToolObj()
 
     std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
     rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-    rbdModel->getConfig()->m_maxNumIterations       = 8;
-    rbdModel->getConfig()->m_velocityDamping        = 1.0;
+    // Due to the lack of a compliance model between PBD-RBD a complete solve is performed
+    // resulting in the tool moving completely out of the PBD tissue. Meaning it is non-deformable
+    // or nearly.
+    // This can be cheated by not completely solving the RBD by lowering step size & iterations
+    rbdModel->getConfig()->m_maxNumIterations       = 7;
+    rbdModel->getConfig()->m_velocityDamping        = 0.95;
     rbdModel->getConfig()->m_angularVelocityDamping = 1.0;
     rbdModel->getConfig()->m_maxNumConstraints      = 40;
     toolObj->setDynamicalModel(rbdModel);
 
-    toolObj->getRigidBody()->m_mass = 1.0;
+    toolObj->getRigidBody()->m_mass = 0.2;
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
 #ifdef iMSTK_USE_OPENHAPTICS
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.8, 0.0);
@@ -333,7 +337,6 @@ main()
     scene->getActiveCamera()->setPosition(0.12, 4.51, 16.51);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
-    scene->getConfig()->writeTaskGraph = true;
 
     // Setup a tissue
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
@@ -379,7 +382,7 @@ main()
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(0.002);
+        driver->setDesiredDt(0.001);
 
 #ifdef iMSTK_USE_OPENHAPTICS
         imstkNew<HapticDeviceManager> hapticManager;
@@ -390,9 +393,8 @@ main()
         imstkNew<RigidObjectController> controller(toolObj, hapticDeviceClient);
         controller->setTranslationScaling(0.05);
         controller->setLinearKs(5000.0);
-        controller->setLinearKd(100.0);
         controller->setAngularKs(10000000.0);
-        controller->setAngularKd(500000.0);
+        controller->setUseCritDamping(true);
         controller->setForceScaling(0.0025);
         controller->setUseForceSmoothening(true);
         scene->addController(controller);

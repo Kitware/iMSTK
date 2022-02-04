@@ -179,7 +179,7 @@ protected:
     bool   m_useCriticalDamping = true; ///> If on, kd is automatically computed
 
     bool m_forceSmoothening    = true;
-    int  m_smoothingKernelSize = 25;
+    int  m_smoothingKernelSize = 15;
     std::deque<Vec3d> m_forces;
     Vec3d m_forceSum = Vec3d::Zero();
 };

@@ -43,7 +43,6 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-
 #include "imstkVTKRenderer.h"
 
 using namespace imstk;
@@ -112,11 +111,10 @@ main()
     // Create a virtual coupling controller
     imstkNew<RigidObjectController> controller(rbdObj, client);
     controller->setLinearKs(10000.0);
-    controller->setLinearKd(100.0);
     controller->setAngularKs(1000000000.0);
-    controller->setAngularKd(300000000.0);
     controller->setTranslationScaling(0.02);
     controller->setForceScaling(0.001);
+    controller->setUseCritDamping(true);
     //controller->setInversionFlags(RigidObjectController::InvertFlag::rotY);
     scene->addController(controller);
 

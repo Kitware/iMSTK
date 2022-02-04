@@ -291,7 +291,7 @@ makeToolObj()
     rbdModel->getConfig()->m_maxNumIterations = 2;
     toolObj->setDynamicalModel(rbdModel);
 
-    toolObj->getRigidBody()->m_mass = 0.5;
+    toolObj->getRigidBody()->m_mass = 0.3;
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 2.0, 0.0);
 
@@ -371,11 +371,10 @@ main()
         imstkNew<RigidObjectController> controller(toolObj, hapticDeviceClient);
         controller->setTranslationScaling(0.05);
         controller->setLinearKs(1000.0);
-        controller->setLinearKd(50.0);
         controller->setAngularKs(10000000.0);
-        controller->setAngularKd(500000.0);
-        controller->setForceScaling(0.005);
-        controller->setSmoothingKernelSize(20);
+        controller->setUseCritDamping(true);
+        controller->setForceScaling(0.0045);
+        controller->setSmoothingKernelSize(15);
         controller->setUseForceSmoothening(true);
         scene->addController(controller);
 
