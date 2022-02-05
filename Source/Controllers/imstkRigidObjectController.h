@@ -174,8 +174,8 @@ protected:
     Vec3d m_tS = Vec3d::Zero();
     Vec3d m_tD = Vec3d::Zero();
 
-    double m_forceScaling = 0.0000075;
-    bool   m_useSpring    = true; ///> If off, pos & orientation directly set
+    double m_forceScaling       = 0.0000075;
+    bool   m_useSpring          = true; ///> If off, pos & orientation directly set
     bool   m_useCriticalDamping = true; ///> If on, kd is automatically computed
 
     bool m_forceSmoothening    = true;

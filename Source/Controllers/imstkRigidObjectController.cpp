@@ -75,15 +75,15 @@ RigidObjectController::update(const double dt)
 
         const Vec3d& devicePos = getPosition();
         const Quatd& deviceOrientation = getOrientation();
-        const Vec3d& deviceOffset = Vec3d(0.0, 0.0, 0.0);
+        const Vec3d& deviceOffset      = Vec3d(0.0, 0.0, 0.0);
 
         // If using critical damping automatically compute kd
         if (m_useCriticalDamping)
         {
-            const double mass = m_rigidObject->getRigidBody()->getMass();
+            const double mass     = m_rigidObject->getRigidBody()->getMass();
             const double linearKs = m_linearKs.maxCoeff();
             m_linearKd = 2.0 * std::sqrt(mass * linearKs);
-            
+
             const Mat3d inertia = m_rigidObject->getRigidBody()->getIntertiaTensor();
             // Currently kd is not a 3d vector though it could be.
             // So here we make an approximation. Either:
@@ -92,10 +92,10 @@ RigidObjectController::update(const double dt)
             // Both may behave weird on anistropic inertia tensors
             //const double inertiaScale = inertia.eigenvalues().real().maxCoeff();
             const double inertiaScale = std::cbrt(inertia.determinant());
-            const double angularKs = m_angularKs.maxCoeff();
+            const double angularKs    = m_angularKs.maxCoeff();
             m_angularKd = 2.0 * std::sqrt(inertiaScale * angularKs);
         }
-        
+
         // If kd > 2 * sqrt(mass * ks); The system is overdamped (may be intentional)
         // If kd < 2 * sqrt(mass * ks); The system is underdamped (never intended)
 
