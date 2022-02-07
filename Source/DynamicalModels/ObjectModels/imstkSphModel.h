@@ -22,7 +22,7 @@
 #pragma once
 
 #include "imstkDynamicalModel.h"
-#include "imstkSPHState.h"
+#include "imstkSphState.h"
 #include "imstkSPHKernels.h"
 #include "imstkNeighborSearch.h"
 #include "imstkSphBoundaryConditions.h"

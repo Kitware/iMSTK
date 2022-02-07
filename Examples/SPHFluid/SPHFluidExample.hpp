@@ -27,7 +27,7 @@
 #include "imstkNew.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkSPHObject.h"
+#include "imstkSphObject.h"
 #include "imstkSphObjectCollision.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"

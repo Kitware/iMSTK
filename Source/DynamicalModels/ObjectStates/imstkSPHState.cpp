@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkSPHState.h"
+#include "imstkSphState.h"
 #include "imstkLogger.h"
 #include "imstkVecDataArray.h"
 
