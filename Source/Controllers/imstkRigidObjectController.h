@@ -101,6 +101,15 @@ public:
     ///@}
 
     ///
+    /// \brief Set/Get whether to use critical damping (default on)
+    /// Critical damping automatically computes linear & angular kd values. It may be turned
+    /// off as it is sometimes useful to overdamp depending on other factors.
+    ///@{
+    bool getUseCritDamping() const { return m_useCriticalDamping; }
+    void setUseCritDamping(const bool useCritDamping) { m_useCriticalDamping = useCritDamping; }
+    ///@}
+
+    ///
     /// \brief Set/Get the kernel size
     /// \todo: Vary with dt as performance of program will effect the size/number of samples
     ///@{
@@ -165,11 +174,12 @@ protected:
     Vec3d m_tS = Vec3d::Zero();
     Vec3d m_tD = Vec3d::Zero();
 
-    double m_forceScaling = 0.0000075;
-    bool   m_useSpring    = true; ///> Controller has ability to toggle to from springs
+    double m_forceScaling       = 0.0000075;
+    bool   m_useSpring          = true; ///> If off, pos & orientation directly set
+    bool   m_useCriticalDamping = true; ///> If on, kd is automatically computed
 
     bool m_forceSmoothening    = true;
-    int  m_smoothingKernelSize = 25;
+    int  m_smoothingKernelSize = 15;
     std::deque<Vec3d> m_forces;
     Vec3d m_forceSum = Vec3d::Zero();
 };

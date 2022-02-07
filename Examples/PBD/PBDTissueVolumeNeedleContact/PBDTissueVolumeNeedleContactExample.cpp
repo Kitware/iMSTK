@@ -399,14 +399,11 @@ main()
 
         imstkNew<RigidObjectController> controller(toolObj, hapticDeviceClient);
         controller->setTranslationScaling(0.001);
-        controller->setLinearKs(10000.0);
-        controller->setLinearKd(300.0);
-        controller->setAngularKs(10000000.0);
-        controller->setAngularKd(1000000.0);
-        /*controller->setAngularKs(0.0);
-        controller->setAngularKd(0.0);*/
-        controller->setForceScaling(0.08);
-        controller->setSmoothingKernelSize(5);
+        controller->setLinearKs(5000.0);
+        controller->setAngularKs(5000000.0);
+        controller->setUseCritDamping(true);
+        controller->setForceScaling(0.05);
+        controller->setSmoothingKernelSize(15);
         controller->setUseForceSmoothening(true);
         scene->addController(controller);
 

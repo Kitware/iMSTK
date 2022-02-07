@@ -25,6 +25,8 @@
 #include "imstkRbdConstraint.h"
 #include "imstkRigidObject2.h"
 
+#include <Eigen/EigenValues>
+
 namespace imstk
 {
 RigidObjectController::RigidObjectController(std::shared_ptr<RigidObject2> rigidObject,
@@ -60,7 +62,7 @@ RigidObjectController::update(const double dt)
         return;
     }
 
-    // Implementation based of otaduy lin's paper eq14
+    // Implementation partially from otaduy lin's paper eq14
     // "A Modular Haptic Rendering Algorithm for Stable and Transparent 6 - DOF Manipulation"
     if (m_deviceClient->getTrackingEnabled() && m_useSpring)
     {
@@ -73,18 +75,38 @@ RigidObjectController::update(const double dt)
 
         const Vec3d& devicePos = getPosition();
         const Quatd& deviceOrientation = getOrientation();
-        //const Vec3d& deviceVelocity        = getVelocity();
-        //const Vec3d& deviceAngularVelocity = getAngularVelocity();
-        const Vec3d& deviceOffset = Vec3d(0.0, 0.0, 0.0);
+        const Vec3d& deviceOffset      = Vec3d(0.0, 0.0, 0.0);
+
+        // If using critical damping automatically compute kd
+        if (m_useCriticalDamping)
+        {
+            const double mass     = m_rigidObject->getRigidBody()->getMass();
+            const double linearKs = m_linearKs.maxCoeff();
+            m_linearKd = 2.0 * std::sqrt(mass * linearKs);
+
+            const Mat3d inertia = m_rigidObject->getRigidBody()->getIntertiaTensor();
+            // Currently kd is not a 3d vector though it could be.
+            // So here we make an approximation. Either:
+            //  - Use one colums eigenvalue (maxCoeff)
+            //  - cbrt(eigenvalue0*eigenvalue1*eigenvalue2). (det)
+            // Both may behave weird on anistropic inertia tensors
+            //const double inertiaScale = inertia.eigenvalues().real().maxCoeff();
+            const double inertiaScale = std::cbrt(inertia.determinant());
+            const double angularKs    = m_angularKs.maxCoeff();
+            m_angularKd = 2.0 * std::sqrt(inertiaScale * angularKs);
+        }
+
+        // If kd > 2 * sqrt(mass * ks); The system is overdamped (may be intentional)
+        // If kd < 2 * sqrt(mass * ks); The system is underdamped (never intended)
 
         // Uses non-relative force
         {
-            // Compute linear force
+            // Compute force
             m_fS = m_linearKs.cwiseProduct(devicePos - currPos - deviceOffset);
             m_fD = m_linearKd * (-currVelocity - currAngularVelocity.cross(deviceOffset));
             Vec3d force = m_fS + m_fD;
 
-            //printf("Device velocity %f, %f, %f\n", deviceVelocity[0], deviceVelocity[1], deviceVelocity[2]);
+            // Computer torque
             const Quatd dq = deviceOrientation * currOrientation.inverse();
             const Rotd  angleAxes = Rotd(dq);
             m_tS = deviceOffset.cross(force) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle());
@@ -94,21 +116,26 @@ RigidObjectController::update(const double dt)
             currForce  += force;
             currTorque += torque;
         }
+
         // Uses relative force
         //{
-        //    // Compute force (?? Why does the spring use displacement, while damper uses velocity, these aren't relative, ie: fD could be larger than )
-        //    const Vec3d dx = devicePos - currPos - deviceOffset;
-        //    fS = m_linearKs.cwiseProduct(dx) + m_linearKd * (deviceVelocity - currVelocity - currAngularVelocity.cross(deviceOffset));
+        //    const Vec3d& deviceVelocity = getVelocity();
+        //    const Vec3d& deviceAngularVelocity = getAngularVelocity();
+
+        //    // Compute force
+        //    m_fS = m_linearKs.cwiseProduct(devicePos - currPos - deviceOffset);
+        //    m_fD = m_linearKd * (deviceVelocity - currVelocity - currAngularVelocity.cross(deviceOffset));
+        //    Vec3d force = m_fS + m_fD;
 
         //    // Compute torque
         //    const Quatd dq = deviceOrientation * currOrientation.inverse();
         //    const Rotd angleAxes = Rotd(dq);
-        //    tS = deviceOffset.cross(fS) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle()); + m_angularKd * (deviceAngularVelocity - currAngularVelocity);
+        //    m_tS = deviceOffset.cross(force) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle());
+        //    m_tD = m_angularKd * (deviceAngularVelocity - currAngularVelocity);
+        //    Vec3d torque = m_tS + m_tD;
 
-        //    // Apply to body
-        //    currForce += fS;
-        //    //std::cout << "fS: " << fS[0] << ", " << fS[1] << ", " << fS[2] << std::endl;
-        //    currTorque += tS;
+        //    currForce += force;
+        //    currTorque += torque;
         //}
     }
     else
