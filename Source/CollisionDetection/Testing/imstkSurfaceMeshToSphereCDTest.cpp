@@ -33,8 +33,6 @@ TEST(imstkSurfaceMeshToSphereCDTest, IntersectionTestAB_Vertex)
     // Vertex-to-sphere case
     auto sphere = std::make_shared<Sphere>(Vec3d::Zero(), 1.0);
 
-    // create mesh
-
     auto surfMesh    = std::make_shared<SurfaceMesh>();
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(3);
     (*verticesPtr)[0] = Vec3d(0.0, 0.5, 0.0);
@@ -45,7 +43,6 @@ TEST(imstkSurfaceMeshToSphereCDTest, IntersectionTestAB_Vertex)
     surfMesh->initialize(verticesPtr, indicesPtr);
 
     // manually test for collision
-    
     SurfaceMeshToSphereCD m_colDetect;
     m_colDetect.setInput(surfMesh, 0);
     m_colDetect.setInput(sphere, 1);
