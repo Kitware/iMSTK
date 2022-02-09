@@ -27,7 +27,6 @@ using namespace imstk;
 
 TEST(imstkCapsuleTest, SetGetRadius)
 {
-
    Capsule capsule;
 
    capsule.setRadius(2);
@@ -36,18 +35,14 @@ TEST(imstkCapsuleTest, SetGetRadius)
    capsule.setRadius(9000000);
    EXPECT_DOUBLE_EQ(9000000, capsule.getRadius());
 
-
    capsule.setRadius(0.0000002);
    EXPECT_DOUBLE_EQ(0.0000002, capsule.getRadius());
 
-
-   EXPECT_DEATH(capsule.setRadius(-50),"Capsule::setRadius error: radius should be positive.");
-
+   EXPECT_DEATH(capsule.setRadius(-50), "Capsule::setRadius error: radius should be positive.");
 }
 
 TEST(imstkCapsuleTest, SetGetLength)
 {
-
    Capsule capsule;
 
    capsule.setLength(10);
@@ -61,34 +56,30 @@ TEST(imstkCapsuleTest, SetGetLength)
 
    EXPECT_DEATH(capsule.setLength(0), "Capsule::setLength error: length should be positive.");
    EXPECT_DEATH(capsule.setLength(-10), "Capsule::setLength error: length should be positive.");
-
 }
 
 TEST(imstkCapsuleTest, GetVolume)
 {
-
-   Capsule capsule; 
+   Capsule capsule;
 
    capsule.setLength(2.0);
    capsule.setRadius(1.0);
    EXPECT_DOUBLE_EQ(
-      PI * capsule.getRadius() * capsule.getRadius() 
-      * (capsule.getLength() + 4.0 / 3.0 * capsule.getRadius()), 
+      PI * capsule.getRadius() * capsule.getRadius()
+      * (capsule.getLength() + 4.0 / 3.0 * capsule.getRadius()),
       capsule.getVolume());
 
    capsule.setLength(20000.0);
    capsule.setRadius(10000000.0);
    EXPECT_DOUBLE_EQ(
-      PI * capsule.getRadius() * capsule.getRadius() 
-      * (capsule.getLength() + 4.0 / 3.0 * capsule.getRadius()), 
+      PI * capsule.getRadius() * capsule.getRadius()
+      * (capsule.getLength() + 4.0 / 3.0 * capsule.getRadius()),
       capsule.getVolume());
-
 }
 
 TEST(imstkCapsuleTest, GetFunctionalValue)
 {
-
-   Capsule capsule; 
+   Capsule capsule;
 
    capsule.setLength(2.0);
    capsule.setRadius(1.0);
@@ -101,7 +92,7 @@ TEST(imstkCapsuleTest, GetFunctionalValue)
    EXPECT_DOUBLE_EQ(0.0, capsule.getFunctionValue(Vec3d(-1.0, 0.0, 0.0)));
    EXPECT_DOUBLE_EQ(0.0, capsule.getFunctionValue(Vec3d(0.0, 0.0, -1.0)));
    EXPECT_DOUBLE_EQ(0.0, capsule.getFunctionValue(Vec3d(0.0, -2.0, 0.0)));
-    
+
    EXPECT_DOUBLE_EQ(1.0, capsule.getFunctionValue(Vec3d(2.0, 0.0, 0.0)));
    EXPECT_DOUBLE_EQ(1.0, capsule.getFunctionValue(Vec3d(0.0, 0.0, 2.0)));
    EXPECT_DOUBLE_EQ(1.0, capsule.getFunctionValue(Vec3d(0.0, 3.0, 0.0)));
@@ -110,9 +101,7 @@ TEST(imstkCapsuleTest, GetFunctionalValue)
    EXPECT_DOUBLE_EQ(1.0, capsule.getFunctionValue(Vec3d(0.0, 0.0, -2.0)));
    EXPECT_DOUBLE_EQ(1.0, capsule.getFunctionValue(Vec3d(0.0, -3.0, 0.0)));
 
-
    EXPECT_DOUBLE_EQ(-0.5, capsule.getFunctionValue(Vec3d(0.5, 0.0, 0.0)));
    EXPECT_DOUBLE_EQ(-0.5, capsule.getFunctionValue(Vec3d(0.0, 0.0, 0.5)));
    EXPECT_DOUBLE_EQ(-1.0, capsule.getFunctionValue(Vec3d(0.0, 0.0, 0.0)));
-
 }
