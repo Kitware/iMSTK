@@ -19,7 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkSPHModel.h"
+#include "imstkSphModel.h"
 #include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkTaskGraph.h"

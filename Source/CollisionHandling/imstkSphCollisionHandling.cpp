@@ -23,8 +23,8 @@
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkParallelFor.h"
-#include "imstkSPHModel.h"
-#include "imstkSPHObject.h"
+#include "imstkSphModel.h"
+#include "imstkSphObject.h"
 
 namespace imstk
 {

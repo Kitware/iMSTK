@@ -22,10 +22,10 @@
 #pragma once
 
 #include "imstkDynamicalModel.h"
-#include "imstkSPHState.h"
+#include "imstkSphState.h"
 #include "imstkSPHKernels.h"
 #include "imstkNeighborSearch.h"
-#include "imstkSPHBoundaryConditions.h"
+#include "imstkSphBoundaryConditions.h"
 
 namespace imstk
 {

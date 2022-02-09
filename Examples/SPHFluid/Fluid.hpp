@@ -22,8 +22,8 @@
 #include "imstkPointSet.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSPHObject.h"
-#include "imstkSPHModel.h"
+#include "imstkSphObject.h"
+#include "imstkSphModel.h"
 #include "imstkVisualModel.h"
 
 using namespace imstk;

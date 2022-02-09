@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkFEMDeformableBodyModel.h"
+#include "imstkFemDeformableBodyModel.h"
 #include "imstkConjugateGradient.h"
 #include "imstkCorotationalFemForceModel.h"
 #include "imstkIsotropicHyperelasticFeForceModel.h"

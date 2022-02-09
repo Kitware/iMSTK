@@ -28,7 +28,9 @@ namespace imstk
 ///
 /// \class Capsule
 ///
-/// \brief Capsule geometry, default configuration is at origin with length running up the y axes
+/// \brief Capsule geometry, default configuration is centered
+///        at origin with length running up and down the y axes.
+///        The length refers to the length of the cylinder.
 ///
 class Capsule : public AnalyticalGeometry
 {
