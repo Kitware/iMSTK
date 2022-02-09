@@ -42,6 +42,7 @@ TEST(imstkSurfaceMeshToSphereCDTest, IntersectionTestAB_Vertex)
     (*indicesPtr)[0] = Vec3i(0, 1, 2);
     surfMesh->initialize(verticesPtr, indicesPtr);
 
+    // manually test for collision
     SurfaceMeshToSphereCD m_colDetect;
     m_colDetect.setInput(surfMesh, 0);
     m_colDetect.setInput(sphere, 1);

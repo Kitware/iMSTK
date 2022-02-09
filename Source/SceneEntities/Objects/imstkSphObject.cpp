@@ -19,8 +19,8 @@
 
 =========================================================================*/
 
-#include "imstkSPHObject.h"
-#include "imstkSPHModel.h"
+#include "imstkSphObject.h"
+#include "imstkSphModel.h"
 
 namespace imstk
 {
