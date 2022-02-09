@@ -15,6 +15,37 @@ A collision detection method in iMSTK is defined through the ``CollisionDetectio
    cdData->elementsB; // Refers to input 1 geometry
 
 
+Supported Collision Detection
+--------------------------------
+
+**Legend**
+
+ - `-`: Not collidable, unimplemented.
+ - X: Collidable, implemented.
+ - N/A: Not collidable, not applicable.
+
+**Matrix**
+
+.. csv-table:: 
+   :header: "", "Capsule", "Cylinder", "ImplicitGeometry", "LineMesh", "OrientedBox", "Plane", "PointSet", "Sphere", "SurfaceMesh"
+
+   "Capsule",	         `-`,          ,                   ,           ,              ,        ,           ,         ,      
+   "Cylinder",	        `-`,      `-`,                   ,           ,              ,        ,           ,         ,      
+   "ImplicitGeometry",  `-`,      `-`,                `-`,           ,              ,        ,           ,         ,      
+   "LineMesh",          `-`,      `-`,                `-`,        `-`,              ,        ,           ,         ,      
+   "OrientedBox",     	`-`,      `-`,                `-`,        `-`,           `-`,        ,           ,         ,     
+   "Plane",	            `-`,      `-`,                `-`,        `-`,           `-`,     N/A,           ,         ,      
+   "PointSet",        	  X,        X,                  X,        N/A,             X,       X,        N/A,         ,      
+   "Sphere",            `-`,        X,                `-`,        `-`,           `-`,       X,          X,        X,      
+   "SurfaceMesh",         X,      `-`,                `-`,          X,           `-`,       X,          X,        X,      X
+
+
+**Notes**
+
+ - Fluid collision is available but not through a generalized PointSetvsPointSetCD.
+ - SurfaceMesh & LineMesh extend PointSet. So PointSet to X may give sufficient behaviour.
+ - SurfaceMeshToPlaneCD covered by PointSetPlaneCD
+
 Collision Detection Method Types
 --------------------------------
 
