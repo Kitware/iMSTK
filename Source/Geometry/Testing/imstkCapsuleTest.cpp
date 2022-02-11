@@ -64,17 +64,11 @@ TEST(imstkCapsuleTest, GetVolume)
 
    capsule.setLength(2.0);
    capsule.setRadius(1.0);
-   EXPECT_DOUBLE_EQ(
-      PI * capsule.getRadius() * capsule.getRadius()
-      * (capsule.getLength() + 4.0 / 3.0 * capsule.getRadius()),
-      capsule.getVolume());
+   EXPECT_DOUBLE_EQ(PI * (10.0 / 3.0), capsule.getVolume());
 
    capsule.setLength(20000.0);
    capsule.setRadius(10000000.0);
-   EXPECT_DOUBLE_EQ(
-      PI * capsule.getRadius() * capsule.getRadius()
-      * (capsule.getLength() + 4.0 / 3.0 * capsule.getRadius()),
-      capsule.getVolume());
+   EXPECT_DOUBLE_EQ(PI * 1.0e14 * (40060000.0 / 3.0), capsule.getVolume());
 }
 
 TEST(imstkCapsuleTest, GetFunctionalValue)
