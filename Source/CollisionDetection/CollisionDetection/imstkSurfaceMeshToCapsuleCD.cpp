@@ -100,7 +100,7 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
 
             const double distSqr = (centroid - spherePos).squaredNorm();
             const double rSum    = triangleBoundingRadius + sphereRadius;
-            if (distSqr < rSum * rSum)
+            if (distSqr <= rSum * rSum)
             {
                 Vec3d triangleContactPt;
                 Vec2i edgeContact;

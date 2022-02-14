@@ -715,7 +715,7 @@ testSphereToTriangle(const Vec3d& spherePt, const double sphereRadius,
     const double dist = diff.norm();
 
     // If intersecting
-    if (dist < sphereRadius)
+    if (dist <= sphereRadius)
     {
         switch (caseType)
         {
