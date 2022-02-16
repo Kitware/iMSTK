@@ -38,7 +38,7 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class VTKSurfaceMeshRenderDelegate
 ///
-/// \brief Surface mesh render delegate with VTK backend
+/// \brief Surface mesh render delegate with VTK backend.
 ///
 class VTKSurfaceMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
@@ -88,6 +88,8 @@ protected:
     void setTextureCoordinateBuffer(std::shared_ptr<AbstractDataArray> textureCoordinates);
 
     std::shared_ptr<SurfaceMesh> m_geometry;
+    bool m_isDynamicMesh;
+
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
     std::shared_ptr<VecDataArray<double, 3>> m_normals;
     std::shared_ptr<VecDataArray<int, 3>>    m_indices;
