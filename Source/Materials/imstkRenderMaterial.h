@@ -284,6 +284,9 @@ public:
     bool getRenderPointsAsSpheres() const { return m_renderPointsAsSpheres; }
     void setRenderPointsAsSpheres(const bool renderPointsAsSpheres) { m_renderPointsAsSpheres = renderPointsAsSpheres; }
 
+    bool getIsDynamicMesh() const { return m_isDynamicMesh; }
+    void setIsDynamicMesh(const bool isDynamicMesh) { m_isDynamicMesh = isDynamicMesh; }
+
     void postModified() { this->postEvent(Event(RenderMaterial::modified())); }
 
 protected:
@@ -337,6 +340,7 @@ protected:
     Color  m_edgeTint        = Color::White;
 
     bool m_backfaceCulling = true; ///< For performance, uncommon for this to be false
+    bool m_isDynamicMesh   = true; ///< Dynamic mesh is one whose buffers are re-evaluated on update
 
     DisplayMode  m_displayMode  = DisplayMode::Surface;
     ShadingModel m_shadingModel = ShadingModel::Phong;

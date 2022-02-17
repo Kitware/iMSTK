@@ -37,10 +37,12 @@
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
 #include <vtkTexture.h>
+#include <vtkTransform.h>
 
 namespace imstk
 {
 VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+    m_isDynamicMesh(m_visualModel->getRenderMaterial()->getIsDynamicMesh()),
     m_polydata(vtkSmartPointer<vtkPolyData>::New()),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
     m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
@@ -49,7 +51,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     m_geometry->computeVertexNeighborTriangles();
 
     // Get our own handles to these in case the geometry changes them
-    m_vertices = m_geometry->getVertexPositions();
+    m_vertices = m_isDynamicMesh ? m_geometry->getVertexPositions() : m_geometry->getInitialVertexPositions();
     m_indices  = m_geometry->getTriangleIndices();
 
     // Map vertices to VTK point data
@@ -57,7 +59,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     {
         m_mappedVertexArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_vertices));
         auto points = vtkSmartPointer<vtkPoints>::New();
-        points->SetNumberOfPoints(m_geometry->getNumVertices());
+        points->SetNumberOfPoints(m_vertices->size());
         points->SetData(m_mappedVertexArray);
         m_polydata->SetPoints(points);
     }
@@ -108,10 +110,10 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     queueConnect<Event>(m_geometry, &Geometry::modified, this, &VTKSurfaceMeshRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(m_geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::vertexDataModified);
+    queueConnect<Event>(m_vertices, &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::vertexDataModified);
 
     // When index buffer internals are modified
-    queueConnect<Event>(m_geometry->getTriangleIndices(), &VecDataArray<int, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::indexDataModified);
+    queueConnect<Event>(m_indices, &VecDataArray<int, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::indexDataModified);
 
     // When index buffer internals are modified
     queueConnect<Event>(m_geometry->getVertexNormals(), &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::normalDataModified);
@@ -124,9 +126,12 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
         mapper->SetInputData(m_polydata);
         vtkNew<vtkActor> actor;
         actor->SetMapper(mapper);
-        //actor->SetUserTransform(m_transform);
         m_mapper = mapper;
         m_actor  = actor;
+        if (!m_isDynamicMesh)
+        {
+            m_actor->SetUserTransform(m_transform);
+        }
         if (auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper))
         {
             glMapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
@@ -140,12 +145,28 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
 void
 VTKSurfaceMeshRenderDelegate::processEvents()
 {
+    if (!m_isDynamicMesh)
+    {
+        // Update the transform
+        const Mat4d&         mImstk = m_geometry->getTransform();
+        vtkNew<vtkMatrix4x4> mVtk;
+        for (int y = 0; y < 4; y++)
+        {
+            for (int x = 0; x < 4; x++)
+            {
+                mVtk->SetElement(x, y, mImstk(x, y));
+            }
+        }
+        m_transform->SetMatrix(mVtk);
+    }
+
     // Custom handling of events
-    std::shared_ptr<VecDataArray<double, 3>> verticesPtr           = m_geometry->getVertexPositions();
-    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr            = m_geometry->getTriangleIndices();
-    std::shared_ptr<AbstractDataArray>       cellScalarsPtr        = m_geometry->getCellScalars();
-    std::shared_ptr<AbstractDataArray>       vertexScalarsPtr      = m_geometry->getVertexScalars();
-    std::shared_ptr<AbstractDataArray>       textureCoordinatesPtr = m_geometry->getVertexTCoords();
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr =
+        m_isDynamicMesh ? m_geometry->getVertexPositions() : m_geometry->getInitialVertexPositions();
+    std::shared_ptr<VecDataArray<int, 3>> indicesPtr            = m_geometry->getTriangleIndices();
+    std::shared_ptr<AbstractDataArray>    cellScalarsPtr        = m_geometry->getCellScalars();
+    std::shared_ptr<AbstractDataArray>    vertexScalarsPtr      = m_geometry->getVertexScalars();
+    std::shared_ptr<AbstractDataArray>    textureCoordinatesPtr = m_geometry->getVertexTCoords();
 
     // Only use the most recent event from respective sender
     std::array<Command, 8> cmds;
@@ -208,13 +229,17 @@ VTKSurfaceMeshRenderDelegate::processEvents()
 void
 VTKSurfaceMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
 {
-    setVertexBuffer(m_geometry->getVertexPositions());
+    setVertexBuffer(m_isDynamicMesh ? m_geometry->getVertexPositions() :
+        m_geometry->getInitialVertexPositions());
 
-    // If the material says we should recompute normals
-    if (m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
+    if (m_isDynamicMesh)
     {
-        m_geometry->computeVertexNormals();
-        setNormalBuffer(m_geometry->getVertexNormals());
+        // If the material says we should recompute normals
+        if (m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
+        {
+            m_geometry->computeVertexNormals();
+            setNormalBuffer(m_geometry->getVertexNormals());
+        }
     }
 }
 
@@ -251,30 +276,66 @@ VTKSurfaceMeshRenderDelegate::textureCoordinatesModified(Event* imstkNotUsed(e))
 void
 VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
 {
-    // If the vertices were reallocated
-    if (m_vertices != m_geometry->getVertexPositions())
+    // If the mesh is dynamic check for buffer size changes & consistently reupload
+    // the vertex buffer. Recompute normals dynamically.
+    if (m_isDynamicMesh)
     {
-        setVertexBuffer(m_geometry->getVertexPositions());
+        // If the vertices were reallocated
+        if (m_vertices != m_geometry->getVertexPositions())
+        {
+            setVertexBuffer(m_geometry->getVertexPositions());
+        }
+
+        // Consistently reupload the vertex buffer
+        m_mappedVertexArray->Modified();
+
+        // Only update index buffer when reallocated
+        if (m_indices != m_geometry->getTriangleIndices())
+        {
+            setIndexBuffer(m_geometry->getTriangleIndices());
+        }
+
+        if (m_normals != m_geometry->getVertexNormals())
+        {
+            setNormalBuffer(m_geometry->getVertexNormals());
+        }
+
+        if (m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
+        {
+            m_geometry->computeVertexNormals();
+            setNormalBuffer(m_geometry->getVertexNormals());
+        }
     }
-
-    // Assume vertices are always changed
-    m_mappedVertexArray->Modified();
-
-    // Only update index buffer when reallocated
-    if (m_indices != m_geometry->getTriangleIndices())
+    // If the mesh is not dynamic, avoid reuploading & recomputing any buffers
+    // vertices & normals can be changed rigidly by a transform in the shader
+    else
     {
-        setIndexBuffer(m_geometry->getTriangleIndices());
-    }
+        // If the vertices were reallocated
+        bool normalsOutdated = false;
+        if (m_vertices != m_geometry->getInitialVertexPositions())
+        {
+            setVertexBuffer(m_geometry->getInitialVertexPositions());
+            normalsOutdated = true;
+        }
 
-    if (m_normals != m_geometry->getVertexNormals())
-    {
-        setNormalBuffer(m_geometry->getVertexNormals());
-    }
+        // Only update index buffer when reallocated
+        if (m_indices != m_geometry->getTriangleIndices())
+        {
+            setIndexBuffer(m_geometry->getTriangleIndices());
+            normalsOutdated = true;
+        }
 
-    if (m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
-    {
-        m_geometry->computeVertexNormals();
-        setNormalBuffer(m_geometry->getVertexNormals());
+        if (m_normals != m_geometry->getVertexNormals())
+        {
+            setNormalBuffer(m_geometry->getVertexNormals());
+            normalsOutdated = false;
+        }
+
+        if (normalsOutdated && m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
+        {
+            m_geometry->computeVertexNormals();
+            setNormalBuffer(m_geometry->getVertexNormals());
+        }
     }
 
     if (m_vertexScalars != m_geometry->getVertexScalars())
