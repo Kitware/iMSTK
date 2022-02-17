@@ -5,7 +5,7 @@ include(imstkAddExternalProject)
 
 # Download options
 if(NOT DEFINED iMSTK_Assimp_GIT_SHA)
-  set(iMSTK_Assimp_GIT_SHA "ce3d6a91d2e0e945493c0fdeb162b50c9034e5f9") # imstk-v3.3.1-2016-07-08-a8673d482
+  set(iMSTK_Assimp_GIT_SHA "9c4296940da7f767dc08ccc11de55ea02dfce991") # imstk-v3.3.1-2016-07-08-a8673d482
 endif()
 if(NOT DEFINED iMSTK_Assimp_GIT_REPOSITORY)
   set(iMSTK_Assimp_GIT_REPOSITORY "https://gitlab.kitware.com/iMSTK/assimp.git")
