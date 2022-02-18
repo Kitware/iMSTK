@@ -34,6 +34,8 @@ iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.
 ### Documentation
 Click [here](https://imstk.readthedocs.io/en/latest/) for detailed documentation.
 
+Click [here](https://imstk.gitlab.io/) for doxygen code documentation.
+
 ### Dashboard
 Click [here](https://open.cdash.org/index.php?project=iMSTK) for nightly build & MR results.
 
