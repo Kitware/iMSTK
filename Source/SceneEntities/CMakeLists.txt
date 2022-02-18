@@ -8,13 +8,6 @@ if (NOT iMSTK_USE_MODEL_REDUCTION)
     Objects/imstkReducedFeDeformableObject.cpp)
 endif()
 
-if (NOT iMSTK_USE_PHYSX)
-  list(APPEND ExclusionFiles
-    Objects/imstkRigidObject.h
-    Objects/imstkRigidObject.cpp
-    )
-endif()
-
 include(imstkAddLibrary)
 imstk_add_library(SceneEntities
   EXCLUDE_FILES

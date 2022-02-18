@@ -37,11 +37,6 @@
 #include "imstkTrackingDeviceControl.h"
 #include "imstkVisualModel.h"
 
-#ifdef IMSTK_USE_PHYSX
-#include "imstkRigidBodyWorld.h"
-#include "imstkRigidObject.h"
-#endif
-
 namespace imstk
 {
 Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
@@ -165,40 +160,6 @@ Scene::buildTaskGraph()
     m_taskGraph = TaskGraph::removeUnusedNodes(m_taskGraph);
     // Resolve criticals across objects
     m_taskGraph = TaskGraph::resolveCriticalNodes(m_taskGraph);
-
-#ifdef IMSTK_USE_PHYSX
-    // Gather all the physX rigid bodies
-    std::list<std::shared_ptr<SceneObject>> rigidBodies;
-    for (const auto& obj : m_sceneObjects)
-    {
-        if (std::dynamic_pointer_cast<RigidObject>(obj) != nullptr)
-        {
-            rigidBodies.push_back(obj);
-        }
-    }
-
-    // Edge Case: Rigid bodies all have a singular update point because of how PhysX works
-    // Think about generalizes these islands of interaction to Systems
-    if (rigidBodies.size() > 0)
-    {
-        // The node that updates the rigid body system
-        auto physXUpdate = m_taskGraph->addFunction("PhysXUpdate", [&]()
-            {
-                auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
-                // \todo: update the time step, split into two steps, collide and advance
-                physxScene->simulate(RigidBodyWorld::getInstance()->getTimeStep());
-                physxScene->fetchResults(true);
-            });
-
-        // Scene Source->physX Update->Rigid Body Update Geometry[i]
-        m_taskGraph->addEdge(m_taskGraph->getSource(), physXUpdate);
-        m_taskGraph->addEdge(physXUpdate, m_taskGraph->getSink());
-        for (std::list<std::shared_ptr<SceneObject>>::iterator i = rigidBodies.begin(); i != rigidBodies.end(); i++)
-        {
-            m_taskGraph->addEdge(physXUpdate, (*i)->getUpdateGeometryNode());
-        }
-    }
-#endif
 }
 
 void

@@ -156,20 +156,6 @@ endif()
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_VRPN:BOOL)
 
-option(${PROJECT_NAME}_USE_PHYSX "Build with Physx support" OFF)
-mark_as_superbuild(iMSTK_USE_PHYSX:BOOL)
-if(iMSTK_USE_PHYSX)
-  set(PHYSX_CONFIGURATION "RELEASE" CACHE STRING "PhysX release library type")
-  mark_as_superbuild(PHYSX_CONFIGURATION:STRING)
-
-  # Set the possible values for cmake-gui
-  set_property(CACHE PHYSX_CONFIGURATION PROPERTY STRINGS
-    "RELEASE"
-    "CHECKED"
-    "PROFILE"
-    )
-endif()
-
 option(iMSTK_USE_OpenHaptics "Use OpenHaptic Support." OFF)
 mark_as_superbuild(iMSTK_USE_OpenHaptics:BOOL)
 if(NOT WIN32 AND iMSTK_USE_OpenHaptics)
@@ -215,9 +201,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(g3log)
   imstk_define_dependency(LibNiFalcon)
   imstk_define_dependency(OpenVR)
-  if (${PROJECT_NAME}_USE_PHYSX)
-    imstk_define_dependency(PhysX)
-  endif()
   imstk_define_dependency(TBB)
   imstk_define_dependency(VegaFEM)
   imstk_define_dependency(VTK)
@@ -296,14 +279,6 @@ find_package( LibNiFalcon REQUIRED)
 find_package( Libusb REQUIRED)
 # OpenVR
 find_package( OpenVR REQUIRED )
-
-# PhysX
-if (iMSTK_USE_PHYSX)
-  add_compile_definitions(IMSTK_USE_PHYSX)
-  # Variable PHYSX_CONFIGURATION used in FindPhysX.cmake is set above where
-  # iMSTK_USE_PHYSX CMake option is defined.
-  find_package(PhysX REQUIRED)
-endif()
 
 # SFML
 if(NOT iMSTK_AUDIO_ENABLED)
