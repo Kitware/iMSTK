@@ -176,6 +176,12 @@ if(NOT WIN32 AND iMSTK_USE_OpenHaptics)
   message(FATAL_ERROR "Setting iMSTK_USE_OpenHaptics to ON is only supported on Windows")
 endif()
 
+# Note: Step 3
+option(${PROJECT_NAME}_USE_benchmark "Build with benchmark support" ON)
+mark_as_superbuild(${PROJECT_NAME}_USE_benchmark)
+
+
+
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
 #-----------------------------------------------------------------------------
@@ -255,6 +261,13 @@ if(${PROJECT_NAME}_SUPERBUILD)
   if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
     imstk_define_dependency(iMSTKData)
   endif()
+
+
+  # Build with Google Benchmark for benchmarking
+  if (${PROJECT_NAME}_USE_benchmark)
+    imstk_define_dependency(benchmark)
+  endif()
+
 
   #-----------------------------------------------------------------------------
   # Solve project dependencies
@@ -412,6 +425,15 @@ endif()
 if(${PROJECT_NAME}_BUILD_TESTING)
   find_package( GTest CONFIG REQUIRED )
 endif()
+
+#------------------------------------------------------------------
+# Benchmarking
+#------------------------------------------------------------------
+# Note: Step 2 QUESTION: Does this go here?
+if (${PROJECT_NAME}_USE_benchmark)
+  find_package( benchmark REQUIRED )
+endif()
+
 
 #-----------------------------------------------------------------------------
 # Code Coverage

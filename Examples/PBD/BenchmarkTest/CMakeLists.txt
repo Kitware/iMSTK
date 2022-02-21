@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Example-PbdBenchmark)
+project(Example-BenchmarkTest)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} PbdBenchmark.cpp)
+imstk_add_executable(${PROJECT_NAME} BenchmarkTest.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

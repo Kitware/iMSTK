@@ -1,57 +1,49 @@
 /*=========================================================================
 
-   Library: iMSTK
+    Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+    Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+    & Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
       http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 
 =========================================================================*/
 
-#include "imstkCamera.h"
-#include "imstkDirectionalLight.h"
-#include "imstkImageData.h"
-#include "imstkKeyboardDeviceClient.h"
-#include "imstkKeyboardSceneControl.h"
-#include "imstkLineMesh.h"
+
 #include "imstkMeshIO.h"
-#include "imstkMeshToMeshBruteForceCD.h"
-#include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkRbdConstraint.h"
-#include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
 #include "imstkScene.h"
-#include "imstkSceneManager.h"
-#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkVisualModel.h"
-#include "imstkVTKViewer.h"
+#include "imstkMath.h"
+#include "imstkGeometry.h"
 
 
+#include <benchmark/benchmark.h>
 
 using namespace imstk;
 
+
+
+
 ///
 /// \brief Creates a tetraheral grid
-/// \param physical dimension of tissue
-/// \param dimensions of tetrahedral grid used for tissue
+/// \param physical dimension of domain
+/// \param dimensions of tetrahedral grid
 /// \param center of grid
 ///
 static std::shared_ptr<TetrahedralMesh>
@@ -145,8 +137,8 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 
 
 
-///
-/// \brief Creates tissue object
+//
+/// \brief Creates PBD object
 /// \param name
 /// \param physical dimension of tissue
 /// \param dimensions of tetrahedral grid used for tissue
@@ -154,9 +146,12 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 ///
 static std::shared_ptr<PbdObject>
 makePbdObj(const std::string& name,
-              const Vec3d& size, const Vec3i& dim, const Vec3d& center)
+           const Vec3d& size, 
+           const Vec3i& dim, 
+           const Vec3d& center,
+           const int numIter)
 {
-    imstkNew<PbdObject> clothObj(name);
+    imstkNew<PbdObject> prismObj(name);
 
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(size, dim, center);
@@ -165,7 +160,6 @@ makePbdObj(const std::string& name,
     imstkNew<PbdModelConfig> pbdParams;
 
     // Use volume+distance constraints, worse results. More performant (can use larger mesh)
-    // Some stiffness parameters are bounded
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 1.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
 
@@ -173,7 +167,7 @@ makePbdObj(const std::string& name,
     pbdParams->m_uniformMassValue = 0.05;
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = 0.05;
-    pbdParams->m_iterations = 3;
+    pbdParams->m_iterations = numIter;
     pbdParams->m_viscousDampingCoeff = 0.03;
 
     // Fix the borders
@@ -197,85 +191,58 @@ makePbdObj(const std::string& name,
     pbdModel->setModelGeometry(prismMesh);
     pbdModel->configure(pbdParams);
 
-    // Setup the material
-    imstkNew<RenderMaterial> material;
-    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-
-    // Add a visual model to render the surface of the tet mesh
-    imstkNew<VisualModel> visualModel;
-    visualModel->setGeometry(prismMesh);
-    visualModel->setRenderMaterial(material);
-    clothObj->addVisualModel(visualModel);
-
 
     // Setup the Object
-    clothObj->setPhysicsGeometry(prismMesh);
-    clothObj->setDynamicalModel(pbdModel);
+    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setDynamicalModel(pbdModel);
 
-    return clothObj;
+    return prismObj;
+}
+
+
+static void BM_DistanceVolume(benchmark::State& state) {
+  	
+  	// Setup
+    imstkNew<Scene> scene("PbdBenchmark");
+
+  	double dt = 0.001;
+
+    std::shared_ptr<PbdObject> prismObj = makePbdObj("Prism",
+        Vec3d(4.0, 4.0, 4.0), 
+        Vec3i(state.range(0), state.range(0), state.range(0)), 
+        Vec3d(0.0, 0.0, 0.0),
+        state.range(1));
+
+    scene->addSceneObject(prismObj);
+    scene->initialize();
+
+  	for (auto _ : state) {
+        scene->advance(dt);
+  	}
+    state.SetBytesProcessed(int64_t(state.iterations()) *
+                          int64_t(state.range(0)));
 }
 
 
 
-///
-/// \brief This example demonstrates collision interaction with a 3d pbd
-/// simulated tissue (tetrahedral)
-///
-int
-main()
-{
-    // Setup logger (write to file and stdout)
-    Logger::startLogger();
+static void BM_MeshTransform(benchmark::State& state) {
+    
+    // Setup the mesh
+    std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(Vec3d(2.0, 2.0, 2.0),Vec3i(20, 20, 20), Vec3d(0.0, 1.0, 0.0));
 
-    // Setup the scene
-    imstkNew<Scene> scene("PBDBenchmarkTest");
-    scene->getActiveCamera()->setPosition(0.12, 4.51, 16.51);
-    scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
-    scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
-
-    // Setup a tissue
-    std::shared_ptr<PbdObject> PbdObj = makePbdObj("Tissue",
-        Vec3d(4.0, 4.0, 4.0), Vec3i(40, 40, 40), Vec3d(0.0, 0.0, 0.0));
-    scene->addSceneObject(PbdObj);
-
-    // Light
-    imstkNew<DirectionalLight> light;
-    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-    light->setIntensity(1);
-    scene->addLight("Light", light);
-
-    // Run the simulation
-    {
-        // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
-        viewer->setActiveScene(scene);
-        viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
-
-        // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
-        sceneManager->setActiveScene(scene);
-        sceneManager->pause(); // Start simulation paused
-
-        imstkNew<SimulationManager> driver;
-        driver->addModule(viewer);
-        driver->addModule(sceneManager);
-        driver->setDesiredDt(0.001);
-
-
-        // Add mouse and keyboard controls to the viewer
-        {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
-
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
-        }
-
-        driver->start();
+    // Make sure compiler is not optimizing away the loop. 
+    // This loop gets timed
+    for (auto _ : state) {
+        prismMesh->translate({0.1, 0.1, 0.1}, Geometry::TransformType::ApplyToData);  
     }
-
-    return 0;
 }
+
+
+BENCHMARK(BM_DistanceVolume)
+    ->ArgsProduct({{4,6,8,10,16,20,25}, {2, 5}});
+
+BENCHMARK(BM_MeshTransform); 
+
+// Run the benchmark
+BENCHMARK_MAIN();
+
