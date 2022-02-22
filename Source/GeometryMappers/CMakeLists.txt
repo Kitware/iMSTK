@@ -10,7 +10,6 @@ imstk_add_library( GeometryMappers
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-#if( ${PROJECT_NAME}_BUILD_TESTING )
-#  include(imstkAddTest)
-#  imstk_add_test( GeometryMappers )
-#endif()
+if( ${PROJECT_NAME}_BUILD_TESTING )
+  add_subdirectory( Testing )
+endif()

@@ -57,7 +57,7 @@ OneToOneMap::compute()
         });
 
     // Copy data from map to vector for parallel processing
-    m_oneToOneMapVector.resize(0);
+    m_oneToOneMapVector.clear();
     for (auto kv : m_oneToOneMap)
     {
         m_oneToOneMapVector.push_back({ kv.first, kv.second });
