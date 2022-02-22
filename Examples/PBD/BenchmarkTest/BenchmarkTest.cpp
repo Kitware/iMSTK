@@ -33,6 +33,7 @@
 #include "imstkGeometry.h"
 
 
+
 #include <benchmark/benchmark.h>
 
 using namespace imstk;
@@ -138,14 +139,14 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 
 
 //
-/// \brief Creates PBD object
+/// \brief Creates PBD object of a volume mesh
 /// \param name
-/// \param physical dimension of tissue
-/// \param dimensions of tetrahedral grid used for tissue
-/// \param center of tissue block
+/// \param physical dimension of block
+/// \param dimensions of tetrahedral grid used for block
+/// \param center of block
 ///
 static std::shared_ptr<PbdObject>
-makePbdObj(const std::string& name,
+makePbdObjVolume(const std::string& name,
            const Vec3d& size, 
            const Vec3i& dim, 
            const Vec3d& center,
@@ -155,6 +156,7 @@ makePbdObj(const std::string& name,
 
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(size, dim, center);
+    
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
@@ -163,7 +165,7 @@ makePbdObj(const std::string& name,
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 1.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
 
-    pbdParams->m_doPartitioning   = true;
+    pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 0.05;
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = 0.05;
@@ -178,7 +180,72 @@ makePbdObj(const std::string& name,
             for (int x = 0; x < dim[0]; x++)
             {
                 // if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
-                if (y == 3)
+                if (y == dim[1]-1)
+                {
+                    pbdParams->m_fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                }
+            }
+        }
+    }
+
+
+    // Setup the Model
+    imstkNew<PbdModel> pbdModel;
+    pbdModel->setModelGeometry(prismMesh);
+    pbdModel->configure(pbdParams);
+
+
+    // Setup the Object
+    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setDynamicalModel(pbdModel);
+
+    return prismObj;
+}
+
+//
+/// \brief Creates PBD-FEM object of a volume mesh
+/// \param name
+/// \param physical dimension of block
+/// \param dimensions of tetrahedral grid used for block
+/// \param center of block
+///
+static std::shared_ptr<PbdObject>
+makePbdFemObjVolume(const std::string& name,
+           const Vec3d& size, 
+           const Vec3i& dim, 
+           const Vec3d& center,
+           const int numIter)
+{
+    imstkNew<PbdObject> prismObj(name);
+
+    // Setup the Geometry
+    std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(size, dim, center);
+    
+    // Setup the Parameters
+    imstkNew<PbdModelConfig> pbdParams;
+
+    // Use FEMTet constraints
+    pbdParams->m_femParams->m_YoungModulus = 5.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.4;
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+
+
+    pbdParams->m_doPartitioning   = false;
+    pbdParams->m_uniformMassValue = 0.05;
+    pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdParams->m_dt         = 0.05;
+    pbdParams->m_iterations = numIter;
+    pbdParams->m_viscousDampingCoeff = 0.03;
+
+    // Fix the borders
+    for (int z = 0; z < dim[2]; z++)
+    {
+        for (int y = 0; y < dim[1]; y++)
+        {
+            for (int x = 0; x < dim[0]; x++)
+            {
+                // if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
+                if (y == dim[1]-1)
                 {
                     pbdParams->m_fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
                 }
@@ -199,15 +266,110 @@ makePbdObj(const std::string& name,
     return prismObj;
 }
 
+//
+/// \brief Creates PBD object of a surface mesh
+/// \param name
+/// \param physical dimension of block
+/// \param dimensions of tetrahedral grid used for block
+/// \param center of block
+///
+static std::shared_ptr<PbdObject>
+makePbdObjSurface(const std::string& name,
+           const Vec3d& size, 
+           const Vec3i& dim, 
+           const Vec3d& center,
+           const int numIter)
+{
+    imstkNew<PbdObject> prismObj(name);
 
-static void BM_DistanceVolume(benchmark::State& state) {
+    // Setup the Geometry
+    std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(size, dim, center);
+    std::shared_ptr<SurfaceMesh>     surfMesh   = prismMesh->extractSurfaceMesh();
+
+    // Setup the Parameters
+    imstkNew<PbdModelConfig> pbdParams;
+
+    // Use volume+distance constraints, worse results. More performant (can use larger mesh)
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
+
+    pbdParams->m_doPartitioning   = false;
+    pbdParams->m_uniformMassValue = 0.05;
+    pbdParams->m_gravity    = Vec3d(0.0, -8.0, 0.0);
+    pbdParams->m_dt         = 0.05;
+    pbdParams->m_iterations = numIter;
+    pbdParams->m_viscousDampingCoeff = 0.03;
+
+    // Fix the borders
+    for (int vert_id = 0; vert_id < surfMesh->getNumVertices(); vert_id++)
+    {   
+        auto position = surfMesh->getVertexPosition(vert_id);
+
+        if (position(1) == 2.0){
+            pbdParams->m_fixedNodeIds.push_back(vert_id);
+        }
+
+    }
+    
+    // Setup the Model
+    imstkNew<PbdModel> pbdModel;
+    pbdModel->setModelGeometry(surfMesh);
+    pbdModel->configure(pbdParams);
+
+    // Setup the Object
+    prismObj->setPhysicsGeometry(surfMesh);
+    prismObj->setDynamicalModel(pbdModel);
+
+    return prismObj;
+}
+
+
+
+
+// Time evolution step of PBD using Distance+Volume constraint
+static void BM_DistanceVolume(benchmark::State& state) 
+{
   	
   	// Setup
     imstkNew<Scene> scene("PbdBenchmark");
 
   	double dt = 0.001;
 
-    std::shared_ptr<PbdObject> prismObj = makePbdObj("Prism",
+
+    state.counters["DOFs"] = state.range(0)*state.range(0)*state.range(0);
+
+
+    std::shared_ptr<PbdObject> prismObj = makePbdObjVolume("Prism",
+        Vec3d(4.0, 4.0, 4.0), 
+        Vec3i(state.range(0), state.range(0), state.range(0)), 
+        Vec3d(0.0, 0.0, 0.0),
+        state.range(1));
+
+
+
+    scene->addSceneObject(prismObj);
+    scene->initialize();
+
+  	for (auto _ : state) {
+        scene->advance(dt);
+  	}
+    // state.SetBytesProcessed(int64_t(state.iterations()) *
+    //                       int64_t(state.range(0)));
+}
+
+
+// Time evolution step for PBD using distance+dihedral angle constraint
+static void BM_DistanceDihedral(benchmark::State& state) {
+    
+    // Setup
+    imstkNew<Scene> scene("PbdBenchmark");
+
+    double dt = 0.001;
+
+    // Estimate of number of DOFs
+    state.counters["DOFs"] = state.range(0)*state.range(0)*6;
+
+    std::shared_ptr<PbdObject> prismObj = makePbdObjSurface("Prism",
         Vec3d(4.0, 4.0, 4.0), 
         Vec3i(state.range(0), state.range(0), state.range(0)), 
         Vec3d(0.0, 0.0, 0.0),
@@ -216,17 +378,45 @@ static void BM_DistanceVolume(benchmark::State& state) {
     scene->addSceneObject(prismObj);
     scene->initialize();
 
-  	for (auto _ : state) {
+    for (auto _ : state) {
         scene->advance(dt);
-  	}
-    state.SetBytesProcessed(int64_t(state.iterations()) *
-                          int64_t(state.range(0)));
+    }
+    // state.SetBytesProcessed(int64_t(state.iterations()) *
+    //                       int64_t(state.range(0)));
+
+}
+
+// Time evolution step of PBD using FEM constraint
+static void BM_PbdFem(benchmark::State& state) 
+{
+    
+    // Setup
+    imstkNew<Scene> scene("PbdBenchmark");
+
+    double dt = 0.001;
+
+
+    state.counters["DOFs"] = state.range(0)*state.range(0)*state.range(0);
+
+    std::shared_ptr<PbdObject> prismObj = makePbdFemObjVolume("Prism",
+        Vec3d(4.0, 4.0, 4.0), 
+        Vec3i(state.range(0), state.range(0), state.range(0)), 
+        Vec3d(0.0, 0.0, 0.0),
+        state.range(1));
+
+    scene->addSceneObject(prismObj);
+    scene->initialize();
+
+    for (auto _ : state) {
+        scene->advance(dt);
+    }
+    // state.SetBytesProcessed(int64_t(state.iterations()) *
+    //                       int64_t(state.range(0)));
 }
 
 
-
+// Time a simple translation of the mesh
 static void BM_MeshTransform(benchmark::State& state) {
-    
     // Setup the mesh
     std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(Vec3d(2.0, 2.0, 2.0),Vec3i(20, 20, 20), Vec3d(0.0, 1.0, 0.0));
 
@@ -239,7 +429,20 @@ static void BM_MeshTransform(benchmark::State& state) {
 
 
 BENCHMARK(BM_DistanceVolume)
+    ->Unit(benchmark::kMillisecond)
+    ->Name("Cube Volume Benchmark Distance and Volume Constraints")
     ->ArgsProduct({{4,6,8,10,16,20,25}, {2, 5}});
+
+BENCHMARK(BM_DistanceDihedral)
+    ->Unit(benchmark::kMillisecond)
+    ->Name("Cube Surface Benchmark Distance and Dihedral Angle Constraints")
+    ->ArgsProduct({{4,6,8,10,16,20,25}, {2, 5}});
+
+BENCHMARK(BM_PbdFem)
+    ->Unit(benchmark::kMillisecond)
+    ->Name("Cube Volume using FEM Constraints")
+    ->ArgsProduct({{4,6,8,10,16,20}, {2, 5}});
+
 
 BENCHMARK(BM_MeshTransform); 
 

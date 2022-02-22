@@ -156,7 +156,7 @@ static std::shared_ptr<PbdObject>
 makePbdObj(const std::string& name,
               const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
-    imstkNew<PbdObject> clothObj(name);
+    imstkNew<PbdObject> prismObj(name);
 
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(size, dim, center);
@@ -184,7 +184,7 @@ makePbdObj(const std::string& name,
             for (int x = 0; x < dim[0]; x++)
             {
                 // if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
-                if (y == 3)
+                if (y == dim[1]-1)
                 {
                     pbdParams->m_fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
                 }
@@ -205,14 +205,152 @@ makePbdObj(const std::string& name,
     imstkNew<VisualModel> visualModel;
     visualModel->setGeometry(prismMesh);
     visualModel->setRenderMaterial(material);
-    clothObj->addVisualModel(visualModel);
+    prismObj->addVisualModel(visualModel);
 
 
     // Setup the Object
-    clothObj->setPhysicsGeometry(prismMesh);
-    clothObj->setDynamicalModel(pbdModel);
+    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setDynamicalModel(pbdModel);
 
-    return clothObj;
+    return prismObj;
+}
+
+//
+/// \brief Creates PBD-FEM object of a volume mesh
+/// \param name
+/// \param physical dimension of block
+/// \param dimensions of tetrahedral grid used for block
+/// \param center of block
+///
+static std::shared_ptr<PbdObject>
+makePbdFemObjVolume(const std::string& name,
+           const Vec3d& size, 
+           const Vec3i& dim, 
+           const Vec3d& center,
+           const int numIter)
+{
+    imstkNew<PbdObject> prismObj(name);
+
+    // Setup the Geometry
+    std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(size, dim, center);
+    
+
+    // Setup the Parameters
+    imstkNew<PbdModelConfig> pbdParams;
+
+    // Use FEMTet constraints
+    pbdParams->m_femParams->m_YoungModulus = 5.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.4;
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+
+
+    pbdParams->m_doPartitioning   = true;
+    pbdParams->m_uniformMassValue = 0.05;
+    pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdParams->m_dt         = 0.05;
+    pbdParams->m_iterations = numIter;
+    pbdParams->m_viscousDampingCoeff = 0.03;
+
+    // Fix the borders
+    for (int z = 0; z < dim[2]; z++)
+    {
+        for (int y = 0; y < dim[1]; y++)
+        {
+            for (int x = 0; x < dim[0]; x++)
+            {
+                // if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
+                if (y == dim[1]-1)
+                {
+                    pbdParams->m_fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                }
+            }
+        }
+    }
+
+    // Setup the Model
+    imstkNew<PbdModel> pbdModel;
+    pbdModel->setModelGeometry(prismMesh);
+    pbdModel->configure(pbdParams);
+
+    // Setup the material
+    imstkNew<RenderMaterial> material;
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+
+    // Add a visual model to render the surface of the tet mesh
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(prismMesh);
+    visualModel->setRenderMaterial(material);
+    prismObj->addVisualModel(visualModel);
+
+
+    // Setup the Object
+    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setDynamicalModel(pbdModel);
+
+    return prismObj;
+}
+
+
+static std::shared_ptr<PbdObject>
+makePbdObjSurface(const std::string& name,
+           const Vec3d& size, 
+           const Vec3i& dim, 
+           const Vec3d& center,
+           const int numIter)
+{
+    imstkNew<PbdObject> prismObj(name);
+
+    // Setup the Geometry
+    std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(size, dim, center);
+    std::shared_ptr<SurfaceMesh>     surfMesh   = prismMesh->extractSurfaceMesh();
+
+    // Setup the Parameters
+    imstkNew<PbdModelConfig> pbdParams;
+
+    // Use volume+distance constraints, worse results. More performant (can use larger mesh)
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
+
+    pbdParams->m_doPartitioning   = true;
+    pbdParams->m_uniformMassValue = 0.05;
+    pbdParams->m_gravity    = Vec3d(0.0, -8.0, 0.0);
+    pbdParams->m_dt         = 0.05;
+    pbdParams->m_iterations = numIter;
+    pbdParams->m_viscousDampingCoeff = 0.03;
+
+    // Fix the borders
+    for (int vert_id = 0; vert_id < surfMesh->getNumVertices(); vert_id++)
+    {   
+        auto position = surfMesh->getVertexPosition(vert_id);
+
+        if (position(1) == 2.0){
+            pbdParams->m_fixedNodeIds.push_back(vert_id);
+        }
+
+    }
+    
+
+    // Setup the Model
+    imstkNew<PbdModel> pbdModel;
+    pbdModel->setModelGeometry(surfMesh);
+    pbdModel->configure(pbdParams);
+
+    // Setup the material
+    imstkNew<RenderMaterial> material;
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+
+    // Add a visual model to render the surface of the tet mesh
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(surfMesh);
+    visualModel->setRenderMaterial(material);
+    prismObj->addVisualModel(visualModel);
+
+
+    // Setup the Object
+    prismObj->setPhysicsGeometry(surfMesh);
+    prismObj->setDynamicalModel(pbdModel);
+
+    return prismObj;
 }
 
 
@@ -234,8 +372,8 @@ main()
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
     // Setup a tissue
-    std::shared_ptr<PbdObject> PbdObj = makePbdObj("Tissue",
-        Vec3d(4.0, 4.0, 4.0), Vec3i(40, 40, 40), Vec3d(0.0, 0.0, 0.0));
+    std::shared_ptr<PbdObject> PbdObj = makePbdFemObjVolume("Tissue",
+        Vec3d(4.0, 4.0, 4.0), Vec3i(6, 6, 6), Vec3d(0.0, 0.0, 0.0), 5);
     scene->addSceneObject(PbdObj);
 
     // Light
