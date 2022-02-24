@@ -134,6 +134,12 @@ set(BUILD_TESTING OFF)
 if (${PROJECT_NAME}_BUILD_TESTING)
   set(BUILD_TESTING ON)
 endif ()
+
+#Build Benchmark
+option(${PROJECT_NAME}_BUILD_BENCHMARK "Build iMSTK benchmarks" ON)
+mark_as_superbuild(${PROJECT_NAME}_BUILD_BENCHMARK:BOOL)
+
+
 if (UNIX)
   option(${PROJECT_NAME}_USE_MODEL_REDUCTION "Build with model reduction, requires a VegaFEM built with Intel MKL and arpack" OFF)
   mark_as_superbuild(${PROJECT_NAME}_USE_MODEL_REDUCTION:BOOL)
