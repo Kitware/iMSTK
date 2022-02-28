@@ -371,13 +371,13 @@ PbdModel::integratePosition()
 {
     std::shared_ptr<VecDataArray<double, 3>> prevPosPtr = m_previousState->getPositions();
     VecDataArray<double, 3>&                 prevPos    = *prevPosPtr;
-    
-    std::shared_ptr<VecDataArray<double, 3>> posPtr     = m_currentState->getPositions();
-    VecDataArray<double, 3>&                 pos       = *posPtr;
-    
-    std::shared_ptr<VecDataArray<double, 3>> velPtr    = m_currentState->getVelocities();
-    VecDataArray<double, 3>&                 vel       = *velPtr;
-    
+
+    std::shared_ptr<VecDataArray<double, 3>> posPtr = m_currentState->getPositions();
+    VecDataArray<double, 3>&                 pos    = *posPtr;
+
+    std::shared_ptr<VecDataArray<double, 3>> velPtr = m_currentState->getVelocities();
+    VecDataArray<double, 3>&                 vel    = *velPtr;
+
     std::shared_ptr<VecDataArray<double, 3>> accnPtr   = m_currentState->getAccelerations();
     VecDataArray<double, 3>&                 accn      = *accnPtr;
     const DataArray<double>&                 invMasses = *m_invMass;

@@ -70,8 +70,8 @@ endif()
 
 # Google Benchmark Question: Should the set be in the if statement?
 # Note: Step 7 NOTE: might need to couple to specific packages
-set(iMSTK_USE_benchmark @iMSTK_USE_benchmark@)
-if (${PROJECT_NAME}_USE_benchmark)
+set(iMSTK_BUILD_BENCHMARK @iMSTK_BUILD_BENCHMARK@)
+if (${PROJECT_NAME}_BUILD_BENCHMARK)
   find_package( benchmark REQUIRED )
 endif()
 

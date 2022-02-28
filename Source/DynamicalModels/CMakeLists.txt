@@ -64,5 +64,6 @@ if( ${PROJECT_NAME}_BUILD_TESTING )
 endif()
 
 if( ${PROJECT_NAME}_BUILD_BENCHMARK )
-  add_subdirectory(Benchmark)
+  add_subdirectory(Benchmarking)
+  add_subdirectory(BenchmarkView)
 endif()

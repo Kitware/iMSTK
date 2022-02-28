@@ -183,8 +183,8 @@ if(NOT WIN32 AND iMSTK_USE_OpenHaptics)
 endif()
 
 # Note: Step 3
-option(${PROJECT_NAME}_USE_benchmark "Build with benchmark support" ON)
-mark_as_superbuild(${PROJECT_NAME}_USE_benchmark)
+option(${PROJECT_NAME}_BUILD_BENCHMARK "Build with benchmark support" ON)
+mark_as_superbuild(${PROJECT_NAME}_BUILD_BENCHMARK)
 
 
 
@@ -270,7 +270,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
 
 
   # Build with Google Benchmark for benchmarking
-  if (${PROJECT_NAME}_USE_benchmark)
+  if (${PROJECT_NAME}_BUILD_BENCHMARK)
     imstk_define_dependency(benchmark)
   endif()
 
@@ -436,7 +436,7 @@ endif()
 # Benchmarking
 #------------------------------------------------------------------
 # Note: Step 2 QUESTION: Does this go here?
-if (${PROJECT_NAME}_USE_benchmark)
+if (${PROJECT_NAME}_BUILD_BENCHMARK)
   find_package( benchmark REQUIRED )
 endif()
 

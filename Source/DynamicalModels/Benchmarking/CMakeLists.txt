@@ -33,5 +33,4 @@ imstk_add_executable(${PROJECT_NAME} PbdBenchmark.cpp)
 #-----------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME}
 	SimulationManager
-	ViewerVTK
 	benchmark::benchmark)
