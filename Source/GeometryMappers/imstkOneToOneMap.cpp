@@ -70,10 +70,7 @@ OneToOneMap::findMatchingVertex(const VecDataArray<double, 3>& parentVertices, c
     const double eps2 = m_epsilon * m_epsilon;
     for (int idx = 0; idx < parentVertices.size(); idx++)
     {
-        if ((parentVertices[idx] - p).squaredNorm() < eps2)
-        {
-            return idx;
-        }
+        if (p.isApprox(parentVertices[idx], m_epsilon)) return idx;
     }
     return -1;
 }

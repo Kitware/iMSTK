@@ -124,13 +124,15 @@ TEST(imstkOneToOneMapTest, OneToManyMap)
 
     auto child  = std::make_shared<PointSet>();
     auto points = getCubePoints();
-    points->push_back((*points)[0]);
-    points->push_back((*points)[1] * 10);
+    points->push_back(Vec3d(0.5, 0.5, -0.5));
+    points->push_back(Vec3d(0.5, 0.5, -0.5) * 10);
     child->initialize(points);
+
 
     OneToOneMap map;
     map.setParentGeometry(parent);
     map.setChildGeometry(child);
+    map.setTolerance(1e-8);
 
     map.compute();
 
@@ -139,7 +141,7 @@ TEST(imstkOneToOneMapTest, OneToManyMap)
         EXPECT_EQ(map.getMapIdx(i), i);
     }
 
-    EXPECT_EQ(map.getMapIdx(8), 0);
+    EXPECT_EQ(map.getMapIdx(8), 2);
 
     EXPECT_EQ(map.getMapIdx(9), IMSTK_NO_INDEX);
 
