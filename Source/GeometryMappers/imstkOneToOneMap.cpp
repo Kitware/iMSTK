@@ -20,25 +20,63 @@
 
 namespace imstk
 {
+OneToOneMap::OneToOneMap()
+{
+    setRequiredInputType<PointSet>(0);
+    setRequiredInputType<PointSet>(1);
+}
+OneToOneMap::OneToOneMap(
+    std::shared_ptr<Geometry> parent,
+    std::shared_ptr<Geometry> child)
+{
+    setParentGeometry(parent);
+    setChildGeometry(child);
+
+    setRequiredInputType<PointSet>(0);
+    setRequiredInputType<PointSet>(1);
+}
+
 void
 OneToOneMap::compute()
 {
-    CHECK(m_parentGeom != nullptr && m_childGeom != nullptr) << "OneToOneMap map is being applied without valid geometries";
-
-    auto meshParent = std::dynamic_pointer_cast<PointSet>(m_parentGeom);
-    auto meshChild  = std::dynamic_pointer_cast<PointSet>(m_childGeom);
-
-    CHECK(meshParent != nullptr && meshChild != nullptr) << "Fail to cast from geometry to pointset";
+    if (!areInputsValid())
+    {
+        LOG(WARNING) << "OneToOneMap failed to run, inputs not satisfied";
+        return;
+    }
 
     m_oneToOneMap.clear();
-    ParallelUtils::SpinLock lock;
+    computeMap(m_oneToOneMap);
+
+    // Copy data from map to vector for parallel processing
+    m_oneToOneMapVector.clear();
+    for (auto kv : m_oneToOneMap)
+    {
+        m_oneToOneMapVector.push_back({ kv.first, kv.second });
+    }
+}
+
+void
+OneToOneMap::computeMap(std::unordered_map<int, int>& tetVertToSurfVertMap)
+{
+    tetVertToSurfVertMap.clear();
+
+    if (!areInputsValid())
+    {
+        LOG(WARNING) << "OneToOneMap failed to run, inputs not satisfied";
+        return;
+    }
+
+    auto meshParent = std::dynamic_pointer_cast<PointSet>(getParentGeometry());
+    auto meshChild = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
 
     std::shared_ptr<VecDataArray<double, 3>> parentVerticesPtr = meshParent->getInitialVertexPositions();
-    const VecDataArray<double, 3>&           parentVertices    = *parentVerticesPtr;
-    std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr  = meshChild->getInitialVertexPositions();
-    const VecDataArray<double, 3>&           childVertices     = *childVerticesPtr;
+    const VecDataArray<double, 3>& parentVertices = *parentVerticesPtr;
+    std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr = meshChild->getInitialVertexPositions();
+    const VecDataArray<double, 3>& childVertices = *childVerticesPtr;
 
     // For every vertex on the child, find corresponding one on the parent
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(meshChild->getNumVertices(),
         [&](const int nodeId)
         {
@@ -52,33 +90,22 @@ OneToOneMap::compute()
             // Add to the map
             // Note: This replaces the map if one with <nodeId> already exists
             lock.lock();
-            m_oneToOneMap[nodeId] = matchingNodeId; // child index -> parent index
+            tetVertToSurfVertMap[nodeId] = matchingNodeId; // child index -> parent index
             lock.unlock();
         });
-
-    // Copy data from map to vector for parallel processing
-    m_oneToOneMapVector.clear();
-    for (auto kv : m_oneToOneMap)
-    {
-        m_oneToOneMapVector.push_back({ kv.first, kv.second });
-    }
 }
 
 int
 OneToOneMap::findMatchingVertex(const VecDataArray<double, 3>& parentVertices, const Vec3d& p)
 {
-    const double eps2 = m_epsilon * m_epsilon;
     for (int idx = 0; idx < parentVertices.size(); idx++)
     {
-        if (p.isApprox(parentVertices[idx], m_epsilon)) return idx;
+        if (p.isApprox(parentVertices[idx], m_epsilon))
+        {
+            return idx;
+        }
     }
     return -1;
-}
-
-bool
-OneToOneMap::isValid() const
-{
-    return true;
 }
 
 void
@@ -95,68 +122,27 @@ OneToOneMap::setMap(const std::unordered_map<int, int>& sourceMap)
 }
 
 void
-OneToOneMap::apply()
+OneToOneMap::requestUpdate()
 {
-    // Check Map active
-    if (!m_isActive)
-    {
-        LOG(WARNING) << "OneToOneMap map is not active";
-        return;
-    }
-
-    // Check geometries
-    CHECK(m_parentGeom != nullptr && m_childGeom != nullptr) << "OneToOneMap map is being applied without valid geometries";
+    auto meshParent = std::dynamic_pointer_cast<PointSet>(getParentGeometry());
+    auto meshChild = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
 
     // Check data
     CHECK(m_oneToOneMap.size() == m_oneToOneMapVector.size()) << "Internal data is corrupted";
-
-    auto meshParent = std::dynamic_pointer_cast<PointSet>(m_parentGeom);
-    auto meshChild  = std::dynamic_pointer_cast<PointSet>(m_childGeom);
-
-    CHECK(meshParent != nullptr && meshChild != nullptr) << "Failed to cast from Geometry to PointSet";
 
     std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr  = meshChild->getVertexPositions();
     VecDataArray<double, 3>&                 childVertices     = *childVerticesPtr;
     std::shared_ptr<VecDataArray<double, 3>> parentVerticesPtr = meshParent->getVertexPositions();
     const VecDataArray<double, 3>&           parentVertices    = *parentVerticesPtr;
     ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
-        [&](const size_t idx) {
+        [&](const size_t idx)
+        {
             const auto& mapValue = m_oneToOneMapVector[idx];
             childVertices[mapValue.first] = parentVertices[mapValue.second];
         });
     meshChild->postModified();
-}
 
-void
-OneToOneMap::print() const
-{
-    // Print Type
-    GeometryMap::print();
-
-    // Print the one-to-one map
-    LOG(INFO) << "[childVertId, parentVertexId]\n";
-    for (auto const& mapValue : m_oneToOneMap)
-    {
-        LOG(INFO) << "[" << mapValue.first << ", " << mapValue.second << "]\n";
-    }
-}
-
-void
-OneToOneMap::setParentGeometry(std::shared_ptr<Geometry> parent)
-{
-    CHECK(parent != nullptr) << "The parent geometry provided is nullptr";
-    CHECK(std::dynamic_pointer_cast<PointSet>(parent) != nullptr) <<
-        "The parent geometry provided is not PointSet";
-    GeometryMap::setParentGeometry(parent);
-}
-
-void
-OneToOneMap::setChildGeometry(std::shared_ptr<Geometry> child)
-{
-    CHECK(child != nullptr) << "The child geometry provided is nullptr";
-    CHECK(std::dynamic_pointer_cast<PointSet>(child) != nullptr) <<
-        "The child geometry provided is not PointSet";
-    GeometryMap::setChildGeometry(child);
+    setOutput(meshChild);
 }
 
 int
