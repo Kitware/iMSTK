@@ -255,8 +255,6 @@ BM_DistanceDihedral(benchmark::State& state)
     for (int vert_id = 0; vert_id < surfMesh->getNumVertices(); vert_id++)
     {
         auto position = surfMesh->getVertexPosition(vert_id);
-
-        // Switch to Eigen.isApprox()
         if (position.y() == 2.0)
         {
             pbdParams->m_fixedNodeIds.push_back(vert_id);
@@ -317,7 +315,7 @@ BM_PbdFem(benchmark::State& state)
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
 
-    // Use FEMTet constraints
+    // Use FEM Tet constraints
     pbdParams->m_femParams->m_YoungModulus = 5.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.4;
     pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);

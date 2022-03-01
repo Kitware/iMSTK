@@ -182,7 +182,6 @@ if(NOT WIN32 AND iMSTK_USE_OpenHaptics)
   message(FATAL_ERROR "Setting iMSTK_USE_OpenHaptics to ON is only supported on Windows")
 endif()
 
-# Note: Step 3
 option(${PROJECT_NAME}_BUILD_BENCHMARK "Build with benchmark support" ON)
 mark_as_superbuild(${PROJECT_NAME}_BUILD_BENCHMARK)
 
@@ -435,7 +434,6 @@ endif()
 #------------------------------------------------------------------
 # Benchmarking
 #------------------------------------------------------------------
-# Note: Step 2 QUESTION: Does this go here?
 if (${PROJECT_NAME}_BUILD_BENCHMARK)
   find_package( benchmark REQUIRED )
 endif()
