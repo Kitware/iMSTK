@@ -35,7 +35,7 @@ class VTKRenderDelegate;
 /// \class RenderDelegateObjectFactory
 ///
 /// \brief This is the factory class for VTKRenderDelegates.
-/// 
+///
 /// VTKRenderDelegate's are constructed with a VisualModel.
 ///
 /// The factory implements its own creation scheme/logic, but if a
@@ -61,9 +61,9 @@ public:
         static_assert(std::is_base_of<VTKRenderDelegate, T>::value,
             "T must be a subclass of VTKRenderDelegate");
         m_objCreationMap[name] = [](std::shared_ptr<VisualModel> visualModel)
-            {
-                return std::make_shared<T>(visualModel);
-            };
+                                 {
+                                     return std::make_shared<T>(visualModel);
+                                 };
     }
 
     ///
@@ -75,4 +75,4 @@ private:
     static std::unordered_map<std::string, DelegateMakeFunc> m_objCreationMap;
 };
 #define REGISTER_RENDER_DELEGATE(delegateType) RenderDelegateObjectFactory::registerDelegate<delegateType>(#delegateType)
-}
+} // namespace imstk

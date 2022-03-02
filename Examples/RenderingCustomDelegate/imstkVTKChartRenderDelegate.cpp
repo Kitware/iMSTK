@@ -56,8 +56,8 @@ VTKChartRenderDelegate::VTKChartRenderDelegate(std::shared_ptr<VisualModel> visu
 void
 VTKChartRenderDelegate::processEvents()
 {
-    auto chartVisualModel = std::dynamic_pointer_cast<ChartVisualModel>(m_visualModel);
-    const std::vector<std::shared_ptr<Plot2d>>& plotsImstk = chartVisualModel->getPlots();
+    auto                                        chartVisualModel = std::dynamic_pointer_cast<ChartVisualModel>(m_visualModel);
+    const std::vector<std::shared_ptr<Plot2d>>& plotsImstk       = chartVisualModel->getPlots();
 
     // If we need to add/remove plots it's best to just to clear all the plots, re-add them
     // So find the diffs
@@ -130,8 +130,8 @@ VTKChartRenderDelegate::processEvents()
     m_table = vtkSmartPointer<vtkTable>::New();
     for (auto arrayKeyValPair : m_arrayLocations)
     {
-        vtkSmartPointer<vtkDataArray> arrVtk = GeometryUtils::copyToVtkDataArray(arrayKeyValPair.first);
-        const std::string arrName = "data" + std::to_string(arrayKeyValPair.second);
+        vtkSmartPointer<vtkDataArray> arrVtk  = GeometryUtils::copyToVtkDataArray(arrayKeyValPair.first);
+        const std::string             arrName = "data" + std::to_string(arrayKeyValPair.second);
         arrVtk->SetName(arrName.c_str());
         m_table->AddColumn(arrVtk);
     }
@@ -140,7 +140,7 @@ VTKChartRenderDelegate::processEvents()
     Vec2d max = Vec2d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
     for (auto pair : m_plots)
     {
-        vtkPlot* plotVtk = pair.second;
+        vtkPlot*                plotVtk   = pair.second;
         std::shared_ptr<Plot2d> plotImstk = pair.first;
 
         const size_t xLocation = m_arrayLocations[plotImstk->m_xVals];

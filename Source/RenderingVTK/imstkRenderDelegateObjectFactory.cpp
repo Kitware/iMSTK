@@ -145,4 +145,4 @@ RenderDelegateObjectFactory::makeRenderDelegate(std::shared_ptr<VisualModel> vis
     LOG(FATAL) << "RenderDelegate::makeDelegate error: Could not find delegate for rendering";
     return nullptr;
 }
-}
+} // namespace imstk

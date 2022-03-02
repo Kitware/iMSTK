@@ -16,13 +16,13 @@
 #
 ###########################################################################
 
-project(SpringTuneTest)
+project(Example-RenderingCustomDelegate)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
 imstk_add_executable(${PROJECT_NAME}
-	SpringTuneTest.cpp
+    RenderingCustomDelegateExample.cpp
 	imstkChartVisualModel.h
 	imstkChartVisualModel.cpp
 	imstkVTKChartRenderDelegate.h
@@ -31,7 +31,7 @@ imstk_add_executable(${PROJECT_NAME}
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Rendering)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

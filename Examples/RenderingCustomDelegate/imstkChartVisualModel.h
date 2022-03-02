@@ -27,7 +27,7 @@
 namespace imstk
 {
 class AbstractDataArray;
-}
+} // namespace imstk
 
 using namespace imstk;
 

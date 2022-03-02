@@ -20,40 +20,31 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkDataArray.h"
 #include "imstkDirectionalLight.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
-#include "imstkIsometricMap.h"
+#include "imstkDummyClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLineMesh.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkOrientedBox.h"
-#include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
-#include "imstkRigidObjectCollision.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkVisualModel.h"
-#include "imstkVTKViewer.h"
-#include "imstkDummyClient.h"
-#include "imstkVTKRenderer.h"
-#include "imstkChartVisualModel.h"
-#include "imstkRenderDelegateObjectFactory.h"
 #include "imstkVTKChartRenderDelegate.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
 ///
 /// \brief Convert a deque to a data array
-/// 
+///
 template<typename T>
 static void
 queueToArray(std::deque<T>& vals, DataArray<T>& arr)
@@ -68,7 +59,7 @@ queueToArray(std::deque<T>& vals, DataArray<T>& arr)
 
 ///
 /// \brief Create a sequential array of type T
-/// 
+///
 template<typename T>
 static std::shared_ptr<DataArray<T>>
 seqArray(int size)
@@ -83,7 +74,8 @@ seqArray(int size)
 }
 
 ///
-/// \brief Spring Analysis Testbed
+/// \brief This example demonstrates addition of a subclassed RenderDelegate
+/// which can be used to add new rendering functionality to objects
 ///
 int
 main()
@@ -94,18 +86,18 @@ main()
     Logger::startLogger();
 
     // Scene
-    imstkNew<Scene> scene("SpringTest");
+    imstkNew<Scene> scene("RenderingCustomDelegate");
 
-    const int rbdCount = 2;
-    std::vector<std::shared_ptr<RigidObject2>> rbdObjs(rbdCount);
+    const int                                           rbdCount = 2;
+    std::vector<std::shared_ptr<RigidObject2>>          rbdObjs(rbdCount);
     std::vector<std::shared_ptr<RigidObjectController>> rbdControllers(rbdCount);
-    std::vector<std::shared_ptr<DummyClient>> deviceClients(rbdCount);
+    std::vector<std::shared_ptr<DummyClient>>           deviceClients(rbdCount);
     for (int i = 0; i < rbdCount; i++)
     {
         rbdObjs[i] = std::make_shared<RigidObject2>("rbdObj" + std::to_string(i));
         {
             imstkNew<RigidBodyModel2> rbdModel;
-            rbdModel->getConfig()->m_dt = 0.001;
+            rbdModel->getConfig()->m_dt      = 0.001;
             rbdModel->getConfig()->m_gravity = Vec3d::Zero();
             rbdObjs[i]->setDynamicalModel(rbdModel);
             rbdObjs[i]->getRigidBody()->m_mass = 0.5;
@@ -128,8 +120,6 @@ main()
 
         // Create a virtual coupling controller
         rbdControllers[i] = std::make_shared<RigidObjectController>(rbdObjs[i], deviceClients[i]);
-        /*controller->setLinearKs(10000.0);
-        controller->setLinearKd(100.0);*/
         if (i == 0)
         {
             rbdControllers[i]->setLinearKs(10.0);
@@ -145,7 +135,6 @@ main()
         rbdControllers[i]->setTranslationScaling(1.0);
         //controller->setTranslationScaling(0.02);
         rbdControllers[i]->setForceScaling(0.001);
-        //controller->setInversionFlags(RigidObjectController::InvertFlag::rotY);
         scene->addController(rbdControllers[i]);
     }
 
@@ -183,102 +172,9 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-        //std::deque<double> dxs;
-        //const int kernelMaxSize = 50;
-        //// Aim to compute variance via sum of square shortcut
-        //double dxSumSqr = 0.0; // sum(x^2)
-        //double dxSum = 0.0; // sum(x)^2
-        //double count = 0;
-        //
-        //auto push = [&](double dx)
-        //{
-        //    if (dxs.size() < kernelMaxSize)
-        //    {
-        //        dxSum += dx;
-        //        dxSumSqr += dx * dx;
-        //    }
-        //    else
-        //    {
-        //        double oldDx = dxs.front();
-        //        dxSum -= oldDx;
-        //        dxSumSqr -= oldDx * oldDx;
-        //        dxs.pop_front();
-        //    }
-        //    dxs.push_back(dx);
-        //    count = dxs.size();
-        //};
-
-        //const double stepSize = 0.000001;
-        //int iter = 0;
-
-        //double prevY = 0.0;
-        //double currY = 0.0;
-
-        //double currKd = controller->getLinearKd();
-        //double prevKd = currKd;
-
-        //double currKs = controller->getLinearKs()[0];
-        //double prevKs = currKs;
-
-        ///* std::cout << "ks: " << currKs << std::endl;
-        // std::cout << "kd: " << currKd << std::endl << std::endl;*/
-        //connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-        //    {
-        //        // Push back position
-        //       /* prevPos = currPos;
-        //        currPos = *rbdObj->getRigidBody()->m_pos;*/
-
-        //        Vec3d bodyPos = *rbdObj->getRigidBody()->m_pos;
-        //        Vec3d controllerPos = controller->getPosition();
-
-        //        prevY = currY;
-        //        currY = (controllerPos - bodyPos).norm();
-
-        //        //push((currPos - prevPos).norm());
-        //        //double variance = (dxSumSqr - dxSum * dxSum / count) / (count - 1);
-        //        //currY = variance;
-        //        iter++;
-
-        //        // Only adjust after 50 or so iterations
-        //        if (iter % 50 == 0)
-        //        {
-        //            /* std::cout << "BodyPos: " << bodyPos[0] << ", " << bodyPos[1] << ", " << bodyPos[2] << std::endl;
-        //             std::cout << "DevicePos: " << controllerPos[0] << ", " << controllerPos[1] << ", " << controllerPos[2] << std::endl;*/
-
-        //            double dy = currY - prevY;
-        //            /* std::cout << "dy: " << dy << std::endl;
-        //             std::cout << "currY: " << currY << std::endl;
-        //             std::cout << "prevY: " << prevY << std::endl;*/
-        //             //std::cout << "dt: " << rbdObj->getRigidBodyModel2()->getConfig()->m_dt << std::endl;
-
-        //            if (dy == 0.0)
-        //            {
-        //                iter = 0;
-        //                return;
-        //            }
-
-        //            prevKs = currKs;
-        //            currKs = currKs + stepSize / dy;
-        //            /*prevKd = currKd;
-        //            currKd = currKd + stepSize / dy;*/
-
-        //            /* std::cout << "step: " << stepSize / dy << std::endl;
-
-        //             std::cout << "prevKs: " << prevKs << std::endl;
-        //             std::cout << "currKs: " << currKs << std::endl;
-
-        //             std::cout << "prevKd: " << prevKd << std::endl;
-        //             std::cout << "currKd: " << currKd << std::endl;*/
-
-        //            //controller->setLinearKd(currKd);
-        //            controller->setLinearKs(currKs);
-        //            iter = 0;
-        //            std::cout << std::endl;
-        //        }
-        //    });
-
+        // Setup some queues to keep running track of spring forces
         const int recordSize = 5000;
-        auto timesPtr = std::make_shared<DataArray<double>>(recordSize);
+        auto      timesPtr   = std::make_shared<DataArray<double>>(recordSize);
 
         std::deque<double> timesQueue;
         for (int j = 0; j < recordSize; j++)
@@ -287,9 +183,9 @@ main()
         }
         queueToArray(timesQueue, *timesPtr);
 
-        std::vector<std::deque<double>> springForceQueues(rbdCount);
+        std::vector<std::deque<double>>                 springForceQueues(rbdCount);
         std::vector<std::shared_ptr<DataArray<double>>> springForcesPtrs(rbdCount);
-        std::vector<Plot2d> plots(rbdCount);
+        std::vector<Plot2d>                             plots(rbdCount);
         for (int i = 0; i < rbdCount; i++)
         {
             springForcesPtrs[i] = std::make_shared<DataArray<double>>(recordSize);

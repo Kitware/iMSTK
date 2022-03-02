@@ -32,7 +32,7 @@ using namespace imstk;
 namespace imstk
 {
 class AbstractDataArray;
-}
+} // namespace imstk
 
 class vtkPlot;
 class vtkTable;
