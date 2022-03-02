@@ -240,7 +240,7 @@ BM_DistanceDihedral(benchmark::State& state)
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
 
-    // Use volume+distance constraints, worse results. More performant (can use larger mesh)
+    // Use distance+dihedral angle
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
 
@@ -405,13 +405,13 @@ BM_PbdContactDistanceVol(benchmark::State& state)
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
 
-    // Use volume+distance constraints, worse results. More performant (can use larger mesh)
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 1.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
+    // Use volume+distance
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 0.9);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.9);
 
     pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 0.05;
-    pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdParams->m_gravity    = Vec3d(0.0, -1.0 / (double)state.range(0), 0.0);
     pbdParams->m_dt         = 0.05;
     pbdParams->m_iterations = state.range(1);
     pbdParams->m_viscousDampingCoeff = 0.03;
@@ -508,13 +508,13 @@ BM_PbdContactDistanceDihedral(benchmark::State& state)
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
 
-    // Use volume+distance constraints, worse results. More performant (can use larger mesh)
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
+    // Set up distance+dihearal angle constraints
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.9);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.9);
 
     pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 0.05;
-    pbdParams->m_gravity    = Vec3d(0.0, -8.0, 0.0);
+    pbdParams->m_gravity    = Vec3d(0.0, -2.0 / (double)state.range(0), 0.0);
     pbdParams->m_dt         = dt;
     pbdParams->m_iterations = state.range(1);
     pbdParams->m_viscousDampingCoeff = 0.03;
