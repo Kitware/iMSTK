@@ -30,6 +30,7 @@
 #include "imstkNew.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
+#include "imstkRenderDelegateObjectFactory.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"

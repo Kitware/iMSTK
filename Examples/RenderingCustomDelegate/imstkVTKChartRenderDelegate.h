@@ -22,24 +22,22 @@
 #pragma once
 
 #include "imstkChartVisualModel.h"
-#include "imstkRenderDelegateObjectFactory.h"
 #include "imstkVTKRenderDelegate.h"
 
 #include <unordered_map>
 
-using namespace imstk;
+class vtkChartXY;
+class vtkContextActor;
+class vtkContextScene;
+class vtkPlot;
+class vtkTable;
 
 namespace imstk
 {
 class AbstractDataArray;
 } // namespace imstk
 
-class vtkPlot;
-class vtkTable;
-class vtkChartXY;
-class vtkContextActor;
-class vtkContextScene;
-class vtkContextView;
+using namespace imstk;
 
 ///
 /// \class VTKChartRenderDelegate
@@ -59,17 +57,12 @@ public:
 
     void updateRenderProperties() override { }
 
-//protected:
-//    vtkSmartPointer<vtkTable> getTable();
-
 protected:
-    vtkSmartPointer<vtkTable>   m_table = nullptr;
-    vtkSmartPointer<vtkChartXY> m_chart = nullptr;
+    vtkSmartPointer<vtkTable>   m_table;
+    vtkSmartPointer<vtkChartXY> m_chart;
 
     std::unordered_map<std::shared_ptr<Plot2d>, vtkPlot*> m_plots;
 
-    vtkSmartPointer<vtkContextActor> m_chartActor   = nullptr;
-    vtkSmartPointer<vtkContextScene> m_contextScene = nullptr;
-
-    int t = 0;
+    vtkSmartPointer<vtkContextActor> m_chartActor;
+    vtkSmartPointer<vtkContextScene> m_contextScene;
 };
