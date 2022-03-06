@@ -197,19 +197,19 @@ main()
             queueToArray(springForceQueues[i], *springForcesPtrs[i]);
 
             Plot2d plot;
-            plot.m_xVals = timesPtr;
-            plot.m_yVals = springForcesPtrs[i];
+            plot.xVals = timesPtr;
+            plot.yVals = springForcesPtrs[i];
             if (i == 0)
             {
-                plot.m_lineColor = Color::Red;
+                plot.lineColor = Color::Red;
             }
             else if (i == 1)
             {
-                plot.m_lineColor = Color::Green;
+                plot.lineColor = Color::Green;
             }
             else if (i == 2)
             {
-                plot.m_lineColor = Color::Blue;
+                plot.lineColor = Color::Blue;
             }
             chartModel->addPlot(plot);
         }

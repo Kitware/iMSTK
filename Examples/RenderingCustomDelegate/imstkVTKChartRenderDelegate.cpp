@@ -114,15 +114,15 @@ VTKChartRenderDelegate::processEvents()
     for (auto pair : m_plots)
     {
         std::shared_ptr<Plot2d> plotImstk = pair.first;
-        if (m_arrayLocations.count(plotImstk->m_xVals) == 0)
+        if (m_arrayLocations.count(plotImstk->xVals) == 0)
         {
             const size_t i1 = m_arrayLocations.size();
-            m_arrayLocations[plotImstk->m_xVals] = i1;
+            m_arrayLocations[plotImstk->xVals] = i1;
         }
-        if (m_arrayLocations.count(plotImstk->m_yVals) == 0)
+        if (m_arrayLocations.count(plotImstk->yVals) == 0)
         {
             const size_t i2 = m_arrayLocations.size();
-            m_arrayLocations[plotImstk->m_yVals] = i2;
+            m_arrayLocations[plotImstk->yVals] = i2;
         }
     }
 
@@ -143,13 +143,13 @@ VTKChartRenderDelegate::processEvents()
         vtkPlot*                plotVtk   = pair.second;
         std::shared_ptr<Plot2d> plotImstk = pair.first;
 
-        const size_t xLocation = m_arrayLocations[plotImstk->m_xVals];
-        const size_t yLocation = m_arrayLocations[plotImstk->m_yVals];
+        const size_t xLocation = m_arrayLocations[plotImstk->xVals];
+        const size_t yLocation = m_arrayLocations[plotImstk->yVals];
 
         plotVtk->SetInputData(m_table, xLocation, yLocation);
-        const Color& color = plotImstk->m_lineColor;
+        const Color& color = plotImstk->lineColor;
         plotVtk->SetColor(color.r * 255.0, color.g * 255.0, color.b * 255.0, color.a * 255.0);
-        plotVtk->SetWidth(plotImstk->m_lineWidth);
+        plotVtk->SetWidth(plotImstk->lineWidth);
 
         double* rangeX = m_table->GetRowData()->GetArray(static_cast<int>(xLocation))->GetRange();
         double* rangeY = m_table->GetRowData()->GetArray(static_cast<int>(yLocation))->GetRange();

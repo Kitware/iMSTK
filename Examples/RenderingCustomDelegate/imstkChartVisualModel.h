@@ -34,11 +34,11 @@ using namespace imstk;
 struct Plot2d
 {
     public:
-        std::shared_ptr<AbstractDataArray> m_xVals;
-        std::shared_ptr<AbstractDataArray> m_yVals;
+        std::shared_ptr<AbstractDataArray> xVals;
+        std::shared_ptr<AbstractDataArray> yVals;
 
-        Color m_lineColor  = Color::Red;
-        double m_lineWidth = 1.0;
+        Color lineColor  = Color::Red;
+        double lineWidth = 1.0;
 };
 
 ///
@@ -50,7 +50,7 @@ class ChartVisualModel : public VisualModel
 {
 public:
     ChartVisualModel();
-    virtual ~ChartVisualModel() override = default;
+    ~ChartVisualModel() override = default;
 
     void addPlot(Plot2d plot) { m_plots.push_back(std::make_shared<Plot2d>(plot)); }
 

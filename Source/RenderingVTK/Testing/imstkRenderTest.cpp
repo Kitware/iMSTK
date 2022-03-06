@@ -209,7 +209,7 @@ RenderTest::updateMaterial()
         break;
     }
 
-    std::cout << "DisplayMode=" << dm << " Color=" << c << " Shading Model=" << sm << " Blend Mode=" << bm << "\n";
+    //std::cout << "DisplayMode=" << dm << " Color=" << c << " Shading Model=" << sm << " Blend Mode=" << bm << "\n";
     blendMode++;
     if (blendMode == 4)
     {
