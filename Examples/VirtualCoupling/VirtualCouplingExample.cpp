@@ -82,6 +82,7 @@ main()
 
     for (int i = 0; i < 2; i++)
     {
+        obstacleObjs[i]->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
         scene->addSceneObject(obstacleObjs[i]);
     }
 
@@ -105,6 +106,7 @@ main()
         mat->setShadingModel(RenderMaterial::ShadingModel::PBR);
         mat->setRoughness(0.5);
         mat->setMetalness(1.0);
+        mat->setIsDynamicMesh(false);
     }
     scene->addSceneObject(rbdObj);
 

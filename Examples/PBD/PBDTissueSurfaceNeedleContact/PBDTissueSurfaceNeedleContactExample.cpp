@@ -284,7 +284,7 @@ makeToolObj()
     toolObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
     toolObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
     toolObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-    //toolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
+    toolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
     std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
     rbdModel->getConfig()->m_gravity = Vec3d::Zero();
@@ -334,6 +334,7 @@ main()
     ghostToolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
     ghostToolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
     ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.3);
+    ghostToolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
     scene->addSceneObject(ghostToolObj);
 
     scene->addInteraction(std::make_shared<NeedleInteraction>(tissueObj, toolObj));

@@ -158,43 +158,10 @@ Code
 
 This can then be given to a LevelSetDeformableObject for usage in the scene.
 
-Rigid Body (RBD)
-================
-
-The rigid body model is backed by PhysX. It is for simulating bodies that only rigidly transform (translate and rotate) and collide with other rigid bodies. With the PhysX rigid body model all/any bodies with a RigidBodyModel will be able to collide. But you may specific which are static, kinematic, or dynamic.
-
-Usage
-=====
-
-Rigid body simulations in iMSTK mostly find their use with tools.
-
-.. image:: media/rbd.png
-  :width: 400
-  :alt: Rigid body dynamics
-  :align: center
-
-
-Code
-====
-
-Unlike PBD, FEM, SPH the RigidBodyModel & RigidBodyModel2 deal with multiple differing geometries in the same model for implicit solves.
-
-With RigidBodyModel2 you setup a different RigidBodyModel for every object to be simulated.
-
-::
-
-    // Setup config
-    imstkNew<RigidBodyConfig> rbdConfig;
-    rbdConfig->m_rigidBodyType = RigidBodyType::Kinematic;
-
-    imstkNew<RigidBodyModel>  rigidModel;
-    rigidModel->configure(rbdConfig);
-    rigidModel->setModelGeometry(surfMesh);
-
 Rigid Body 2
 ============
 
-The secondary rigid body model is our own implementation, very similar to the previously mentioned PhysX backed model. This one provides more extensible and flexible constraint and contact implementations. It is less performant for large amounts of bodies and contacts but often surgical scenarios require few bodies.
+This rigid body model is our own implementation. This one provides more extensible and flexible constraint and contact implementations. It is less performant for large amounts of bodies and contacts but often surgical scenarios require few bodies.
 
 Usage
 =====

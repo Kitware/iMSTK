@@ -34,6 +34,8 @@ iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.
 ### Documentation
 Click [here](https://imstk.readthedocs.io/en/latest/) for detailed documentation.
 
+Click [here](https://imstk.gitlab.io/) for doxygen code documentation.
+
 ### Dashboard
 Click [here](https://open.cdash.org/index.php?project=iMSTK) for nightly build & MR results.
 
@@ -91,28 +93,6 @@ This will checkout, build and link all iMSTK dependencies. When making changes t
 Run CMake-GUI and follow the directions described [HERE](https://cmake.org/runningcmake/). You will have to choose which version of Visual Studio you'd like to use when configuring the project, make sure to select **Microsoft Visual Studio C++ 15 2017 or 2019**. CMake will generate a `iMSTK.sln` solution file for Visual Studio at the top level. Open this file and build all targets, which will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `iMSTK.sln` solution file located in the `Innerbuild` directory.
 If you would like to build on multiple cores add /MP[N] to CMAKE_CXX_FLAGS in CMake-GUI, where N is optional representing the number of cores (without N supplied, the build will use as many cores as available on the device).
 If you check out the unit tests or the examples make sure to run `git install lfs` to make sure that `git lfs` is installed.
-
-* ##### PhysX Support
-Please note, we are currently deprecating PhysX support, by default PhysX will be OFF but can be turned on via `iMSTK_USE_PHYSX` in  the CMAKE configuration
-
-PhysX supports multiple build configurations, designed for different stages of development and deployment.
-  * The DEBUG build can be useful for error analysis, but contains asserts used for SDK development which some customers may find too intrusive for daily use. Optimizations are turned off for this configuration.
-  * The CHECKED build contains code to detect invalid parameters, API race conditions, and other incorrect uses of the API which might otherwise cause mysterious crashes or failures in simulation.
-  * The PROFILE build omits the checks, but still has PVD and memory instrumentation.
-  * The RELEASE build is built for minimal footprint and maximum speed. It omits most checks and instrumentation.
-
-  
-Simulation works the same way in all of them, and all are compiled with high optimization levels (except debug configuration).
-
-Due to the fluid nature of development and the need to easily switch between these different configurations, the iMSTK superbuild will build ALL of these configurations, regardless of the provided BUILD_TYPE.
-The iMSTK superbuild provides a CMake variable iMSTK_PHYSX_CONFIGURATION for you to specify the PhysX configuration it will use when building both Release and RelWithDebugInfo configurations
-Using this variable, you may select RELEASE, CHECKED, or PROFILE, and iMSTK will link to those libraries.
-Debug iMSTK builds will always link to the DEBUG PhysX libraries.
-By default, RELEASE libraries will be used.
-
-**Note We strongly recommend that you use the CHECKED build if you are developing new PhysX functionality in iMSTK.**
-
-Once the superbuild is complete, you may also switch the PhysX library of the Innerbuild by selecting the desired configuration via the PHYSX_CONFIGURATION variable and regenerating the InnerBuild via CMake.
 
 * ##### Phantom Omni Support
 To support the [Geomagic Touch (formerly Sensable Phantom Omni)](http://www.geomagic.com/en/products/phantom-omni/overview) haptic device, follow the steps below:

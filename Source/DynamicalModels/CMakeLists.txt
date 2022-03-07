@@ -31,20 +31,6 @@ else()
     ObjectModels/imstkReducedStVKBodyModel.cpp)
 endif()
 
-if (iMSTK_USE_PHYSX)
-  list(APPEND Dependencies PhysX::PhysX)
-else()
-  list(APPEND ExclusionFiles
-    ObjectModels/imstkRigidBodyModel.h
-    ObjectModels/imstkRigidBodyModel.cpp
-    ObjectModels/imstkRigidBodyState.h
-    ObjectModels/imstkRigidBodyState.cpp
-    ObjectModels/imstkRigidBodyWorld.h
-    ObjectModels/imstkRigidBodyWorld.cpp
-    )
-endif()
-
-
 imstk_add_library(DynamicalModels
   SUBDIR_LIST
     ObjectStates
