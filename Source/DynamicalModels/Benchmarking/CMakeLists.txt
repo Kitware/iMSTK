@@ -26,7 +26,8 @@ imstk_add_executable(${PROJECT_NAME} PbdBenchmark.cpp)
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-# SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
+
+SET_TARGET_PROPERTIES (${PROJECT_NAMNE} PROPERTIES FOLDER Benchmarking)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
