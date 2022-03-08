@@ -57,7 +57,7 @@ protected:
     ///
     void vertexDataModified(Event* e);
 
-    virtual void updateRenderProperties() override;
+    void updateRenderProperties() override;
 
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
 

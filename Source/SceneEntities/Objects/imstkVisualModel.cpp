@@ -26,6 +26,7 @@ namespace imstk
 {
 VisualModel::VisualModel() :
     m_name(""),
+    m_delegateHint(""),
     m_geometry(nullptr),
     m_renderMaterial(std::make_shared<RenderMaterial>()),
     m_isVisible(true)

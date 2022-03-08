@@ -19,31 +19,18 @@
 
 =========================================================================*/
 
-#pragma once
+#include "imstkChartVisualModel.h"
+#include "imstkDataArray.h"
+#include "imstkLogger.h"
 
-#include "imstkVTKPolyDataRenderDelegate.h"
+using namespace imstk;
 
-class vtkCapsuleSource;
-
-namespace imstk
+ChartVisualModel::ChartVisualModel()
 {
-///
-/// \class VTKCapsuleRenderDelegate
-///
-/// \brief Render capsule object with vtk backend
-///
-class VTKCapsuleRenderDelegate : public VTKPolyDataRenderDelegate
-{
-public:
-    VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-    ~VTKCapsuleRenderDelegate() override = default;
+    setDelegateHint("VTKChartRenderDelegate");
 
-    ///
-    /// \brief Update capsule source based on the capsule geometry
-    ///
-    void processEvents() override;
-
-protected:
-    vtkSmartPointer<vtkCapsuleSource> m_capsuleSource;
-};
-} // namespace imstk
+    m_viewBounds[0] = 0.0;
+    m_viewBounds[1] = 320.0;
+    m_viewBounds[2] = 0.0;
+    m_viewBounds[3] = 220.0;
+}

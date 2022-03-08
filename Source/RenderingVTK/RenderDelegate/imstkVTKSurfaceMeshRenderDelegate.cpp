@@ -130,7 +130,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
         m_actor  = actor;
         if (!m_isDynamicMesh)
         {
-            m_actor->SetUserTransform(m_transform);
+            actor->SetUserTransform(m_transform);
         }
         if (auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper))
         {

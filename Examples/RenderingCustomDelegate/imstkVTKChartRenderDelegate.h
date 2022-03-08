@@ -21,29 +21,48 @@
 
 #pragma once
 
-#include "imstkVTKPolyDataRenderDelegate.h"
+#include "imstkChartVisualModel.h"
+#include "imstkVTKRenderDelegate.h"
 
-class vtkCapsuleSource;
+#include <unordered_map>
+
+class vtkChartXY;
+class vtkContextActor;
+class vtkContextScene;
+class vtkPlot;
+class vtkTable;
 
 namespace imstk
 {
+class AbstractDataArray;
+} // namespace imstk
+
+using namespace imstk;
+
 ///
-/// \class VTKCapsuleRenderDelegate
+/// \class VTKChartRenderDelegate
 ///
-/// \brief Render capsule object with vtk backend
+/// \brief Render delegate to render graphs
 ///
-class VTKCapsuleRenderDelegate : public VTKPolyDataRenderDelegate
+class VTKChartRenderDelegate : public VTKRenderDelegate
 {
 public:
-    VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-    ~VTKCapsuleRenderDelegate() override = default;
+    VTKChartRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    ~VTKChartRenderDelegate() override = default;
 
     ///
-    /// \brief Update capsule source based on the capsule geometry
+    /// \brief Update render delegate source based on the internal data
     ///
     void processEvents() override;
 
+    void updateRenderProperties() override { }
+
 protected:
-    vtkSmartPointer<vtkCapsuleSource> m_capsuleSource;
+    vtkSmartPointer<vtkTable>   m_table;
+    vtkSmartPointer<vtkChartXY> m_chart;
+
+    std::unordered_map<std::shared_ptr<Plot2d>, vtkPlot*> m_plots;
+
+    vtkSmartPointer<vtkContextActor> m_chartActor;
+    vtkSmartPointer<vtkContextScene> m_contextScene;
 };
-} // namespace imstk

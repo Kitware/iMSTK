@@ -63,6 +63,14 @@ public:
     ///@}
 
     ///
+    /// \brief Get/Set the delegate hint, which helps indicate
+    /// how to render this VisualModel
+    ///@{
+    const std::string& getDelegateHint() { return m_delegateHint; }
+    void setDelegateHint(const std::string& name) { m_delegateHint = name; }
+    ///@}
+
+    ///
     /// \brief Set/Get render material
     ///@{
     void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial);
@@ -89,6 +97,7 @@ public:
 
 protected:
     std::string m_name;
+    std::string m_delegateHint;
 
     std::shared_ptr<Geometry>       m_geometry;
     std::shared_ptr<RenderMaterial> m_renderMaterial;

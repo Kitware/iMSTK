@@ -21,29 +21,36 @@
 
 #pragma once
 
-#include "imstkVTKPolyDataRenderDelegate.h"
+#include "imstkVTKRenderDelegate.h"
+#include "imstkVisualModel.h"
+#include "imstkRenderDelegateObjectFactory.h"
 
-class vtkCapsuleSource;
+#include "gtest/gtest.h"
 
 namespace imstk
 {
-///
-/// \class VTKCapsuleRenderDelegate
-///
-/// \brief Render capsule object with vtk backend
-///
-class VTKCapsuleRenderDelegate : public VTKPolyDataRenderDelegate
+class RenderDelegateMock : public VTKRenderDelegate
 {
 public:
-    VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-    ~VTKCapsuleRenderDelegate() override = default;
+    RenderDelegateMock(std::shared_ptr<VisualModel> visualModel) : VTKRenderDelegate(visualModel)
+    {
+    }
 
-    ///
-    /// \brief Update capsule source based on the capsule geometry
-    ///
-    void processEvents() override;
+    ~RenderDelegateMock() override = default;
 
-protected:
-    vtkSmartPointer<vtkCapsuleSource> m_capsuleSource;
+    void updateRenderProperties() override { }
 };
+
+TEST(imstkRenderDelegateFactoryTest, TestMakeRenderDelegate)
+{
+    REGISTER_RENDER_DELEGATE(RenderDelegateMock);
+
+    auto visualModel = std::make_shared<VisualModel>();
+    visualModel->setDelegateHint("RenderDelegateMock");
+    std::shared_ptr<VTKRenderDelegate> renderDelegate =
+        RenderDelegateObjectFactory::makeRenderDelegate(visualModel);
+
+    // Expect RenderDelegateMock to be created when given a visualModel
+    EXPECT_TRUE(std::dynamic_pointer_cast<RenderDelegateMock>(renderDelegate) != nullptr);
+}
 } // namespace imstk
