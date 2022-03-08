@@ -136,7 +136,7 @@ if (${PROJECT_NAME}_BUILD_TESTING)
 endif ()
 
 #Build Benchmark
-option(${PROJECT_NAME}_BUILD_BENCHMARK "Build iMSTK benchmarks" OFF)
+option(${PROJECT_NAME}_BUILD_BENCHMARK "Build iMSTK benchmarks" ON)
 mark_as_superbuild(${PROJECT_NAME}_BUILD_BENCHMARK:BOOL)
 
 
@@ -167,11 +167,6 @@ mark_as_superbuild(iMSTK_USE_OpenHaptics:BOOL)
 if(NOT WIN32 AND iMSTK_USE_OpenHaptics)
   message(FATAL_ERROR "Setting iMSTK_USE_OpenHaptics to ON is only supported on Windows")
 endif()
-
-option(${PROJECT_NAME}_BUILD_BENCHMARK "Build with benchmark support" ON)
-mark_as_superbuild(${PROJECT_NAME}_BUILD_BENCHMARK)
-
-
 
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
