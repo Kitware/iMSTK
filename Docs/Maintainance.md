@@ -32,8 +32,7 @@ This tells the superbuild that `iMSTK` depends on `NewLib` and will trigger all 
 **Step 2:** Add `find_package` with the appropriate options for this library
 
 --- 
-
-    if (${PROJECT_NAME}_USE_VRPN)
+    if (${PROJECT_NAME}_USE_NewLib)
       find_package( NewLib REQUIRED )
     endif()
 

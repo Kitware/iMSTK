@@ -43,8 +43,12 @@ imstk_add_library(DynamicalModels
     ${Dependencies})
  
 #-----------------------------------------------------------------------------
-# Testing
+# Testing and benchmarking
 #-----------------------------------------------------------------------------
 if( ${PROJECT_NAME}_BUILD_TESTING )
   add_subdirectory(Testing)
+endif()
+
+if( ${PROJECT_NAME}_BUILD_BENCHMARK )
+  add_subdirectory(Benchmarking)
 endif()

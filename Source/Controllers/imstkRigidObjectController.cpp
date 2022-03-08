@@ -25,7 +25,7 @@
 #include "imstkRbdConstraint.h"
 #include "imstkRigidObject2.h"
 
-#include <Eigen/EigenValues>
+#include <Eigen/Eigenvalues>
 
 namespace imstk
 {

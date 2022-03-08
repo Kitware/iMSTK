@@ -97,6 +97,7 @@ ExternalProject_Add( ${PROJECT_NAME}
     # External Libraries
     -DEigen3_DIR:PATH=${Eigen3_DIR}    
     -DGTest_DIR:PATH=${GTest_DIR}
+    -Dbenchmark_DIR:PATH=${benchmark_DIR}
     -DVegaFEM_DIR:PATH=${VegaFEM_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}
     ${EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS}

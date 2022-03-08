@@ -134,6 +134,12 @@ set(BUILD_TESTING OFF)
 if (${PROJECT_NAME}_BUILD_TESTING)
   set(BUILD_TESTING ON)
 endif ()
+
+#Build Benchmark
+option(${PROJECT_NAME}_BUILD_BENCHMARK "Build iMSTK benchmarks" ON)
+mark_as_superbuild(${PROJECT_NAME}_BUILD_BENCHMARK:BOOL)
+
+
 if (UNIX)
   option(${PROJECT_NAME}_USE_MODEL_REDUCTION "Build with model reduction, requires a VegaFEM built with Intel MKL and arpack" OFF)
   mark_as_superbuild(${PROJECT_NAME}_USE_MODEL_REDUCTION:BOOL)
@@ -238,6 +244,13 @@ if(${PROJECT_NAME}_SUPERBUILD)
   if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
     imstk_define_dependency(iMSTKData)
   endif()
+
+
+  # Build with Google Benchmark for benchmarking
+  if (${PROJECT_NAME}_BUILD_BENCHMARK)
+    imstk_define_dependency(benchmark)
+  endif()
+
 
   #-----------------------------------------------------------------------------
   # Solve project dependencies
@@ -387,6 +400,14 @@ endif()
 if(${PROJECT_NAME}_BUILD_TESTING)
   find_package( GTest CONFIG REQUIRED )
 endif()
+
+#------------------------------------------------------------------
+# Benchmarking
+#------------------------------------------------------------------
+if (${PROJECT_NAME}_BUILD_BENCHMARK)
+  find_package( benchmark REQUIRED )
+endif()
+
 
 #-----------------------------------------------------------------------------
 # Code Coverage
