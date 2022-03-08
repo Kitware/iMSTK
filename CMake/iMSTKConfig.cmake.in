@@ -55,7 +55,7 @@ endif()
 
 # Google Benchmark
 set(iMSTK_BUILD_BENCHMARK @iMSTK_BUILD_BENCHMARK@)
-if ($iMSTK_BUILD_BENCHMARK)
+if (iMSTK_BUILD_BENCHMARK)
   find_package( benchmark REQUIRED )
 endif()
 
