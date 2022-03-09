@@ -136,7 +136,7 @@ if (${PROJECT_NAME}_BUILD_TESTING)
 endif ()
 
 #Build Benchmark
-option(${PROJECT_NAME}_BUILD_BENCHMARK "Build iMSTK benchmarks" ON)
+option(${PROJECT_NAME}_BUILD_BENCHMARK "Build iMSTK benchmarks" OFF)
 mark_as_superbuild(${PROJECT_NAME}_BUILD_BENCHMARK:BOOL)
 
 
