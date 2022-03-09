@@ -265,11 +265,11 @@ main()
         int   triangleSelected       = -1;
         Vec3d triangleSelectionPtUvw = Vec3d::Zero();
 
-        auto colSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
+        auto                                     colSurfMesh    = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
         std::shared_ptr<VecDataArray<double, 3>> colVerticesPtr = colSurfMesh->getVertexPositions();
-        VecDataArray<double, 3>& colVertices = *colVerticesPtr;
-        std::shared_ptr<VecDataArray<int, 3>> colIndicesPtr = colSurfMesh->getTriangleIndices();
-        const VecDataArray<int, 3>& colIndices = *colIndicesPtr;
+        VecDataArray<double, 3>&                 colVertices    = *colVerticesPtr;
+        std::shared_ptr<VecDataArray<int, 3>>    colIndicesPtr  = colSurfMesh->getTriangleIndices();
+        const VecDataArray<int, 3>&              colIndices     = *colIndicesPtr;
 
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
             [&](MouseEvent* e)
@@ -303,7 +303,7 @@ main()
                             if (dist < minDist)
                             {
                                 minDist = dist;
-                                triangleSelected = i;
+                                triangleSelected       = i;
                                 triangleSelectionPtUvw = uvw;
                             }
                         }
