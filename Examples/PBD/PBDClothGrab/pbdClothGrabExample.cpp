@@ -200,7 +200,7 @@ main()
     // Setup a scene
     imstkNew<Scene>            scene("PBDCloth");
     std::shared_ptr<PbdObject> clothObj =
-        makeClothObj("Cloth", Vec2d(5.0, 5.0), Vec2i(16, 16), Vec3d(0.0, 6.0, 0.0));
+        makeClothObj("Cloth", Vec2d(5.0, 5.0), Vec2i(4, 4), Vec3d(0.0, 6.0, 0.0));
     scene->addSceneObject(clothObj);
 
     auto            planeObj =  std::make_shared<CollidingObject>("Plane");
@@ -265,6 +265,12 @@ main()
         int   triangleSelected       = -1;
         Vec3d triangleSelectionPtUvw = Vec3d::Zero();
 
+        auto                                     colSurfMesh    = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
+        std::shared_ptr<VecDataArray<double, 3>> colVerticesPtr = colSurfMesh->getVertexPositions();
+        VecDataArray<double, 3>&                 colVertices    = *colVerticesPtr;
+        std::shared_ptr<VecDataArray<int, 3>>    colIndicesPtr  = colSurfMesh->getTriangleIndices();
+        const VecDataArray<int, 3>&              colIndices     = *colIndicesPtr;
+
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
             [&](MouseEvent* e)
             {
@@ -277,21 +283,16 @@ main()
                         Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
                     const Vec3d rayStart = scene->getActiveCamera()->getPosition();
 
-                    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
-                    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
-                    const VecDataArray<double, 3>& vertices = *verticesPtr;
-                    std::shared_ptr<VecDataArray<int, 3>> indicesPtr = surfMesh->getTriangleIndices();
-                    const VecDataArray<int, 3>& indices = *indicesPtr;
-
                     // Comptue the nearest triangle intersection along the picking ray
                     double minDist   = IMSTK_DOUBLE_MAX;
                     triangleSelected = -1;
-                    for (int i = 0; i < indices.size(); i++)
+                    Vec3d uvw = Vec3d::Zero();
+                    for (int i = 0; i < colIndices.size(); i++)
                     {
-                        const Vec3d& a = vertices[indices[i][0]];
-                        const Vec3d& b = vertices[indices[i][1]];
-                        const Vec3d& c = vertices[indices[i][2]];
-                        if (CollisionUtils::testSegmentTriangle(rayStart, rayStart + rayDir * 1000.0, a, b, c, triangleSelectionPtUvw))
+                        const Vec3d& a = colVertices[colIndices[i][0]];
+                        const Vec3d& b = colVertices[colIndices[i][1]];
+                        const Vec3d& c = colVertices[colIndices[i][2]];
+                        if (CollisionUtils::testSegmentTriangle(rayStart, rayStart + rayDir * 1000.0, a, b, c, uvw))
                         {
                             Vec3d iPt =
                                 a * triangleSelectionPtUvw[0] +
@@ -302,7 +303,8 @@ main()
                             if (dist < minDist)
                             {
                                 minDist = dist;
-                                triangleSelected = i;
+                                triangleSelected       = i;
+                                triangleSelectionPtUvw = uvw;
                             }
                         }
                     }
@@ -339,23 +341,19 @@ main()
                     CollisionUtils::testRayToPlane(rayStart, rayDir, plane->getPosition(),
                         plane->getNormal(), curr_iPt);
 
+                    // Visualize the clicked point on the plane
                     clickSphere1->setPosition(curr_iPt);
                     clickSphere1->updatePostTransformData();
 
-                    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
-                    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
-                    VecDataArray<double, 3>& vertices = *verticesPtr;
-                    std::shared_ptr<VecDataArray<int, 3>> indicesPtr = surfMesh->getTriangleIndices();
-                    const VecDataArray<int, 3>& indices = *indicesPtr;
-
-                    Vec3d& a       = vertices[indices[triangleSelected][0]];
-                    Vec3d& b       = vertices[indices[triangleSelected][0]];
-                    Vec3d& c       = vertices[indices[triangleSelected][0]];
+                    Vec3d& a       = colVertices[colIndices[triangleSelected][0]];
+                    Vec3d& b       = colVertices[colIndices[triangleSelected][1]];
+                    Vec3d& c       = colVertices[colIndices[triangleSelected][2]];
                     Vec3d prev_iPt =
                         a * triangleSelectionPtUvw[0] +
                         b * triangleSelectionPtUvw[1] +
                         c * triangleSelectionPtUvw[2];
 
+                    // Visualize the interpolated point
                     clickSphere2->setPosition(prev_iPt);
                     clickSphere2->updatePostTransformData();
 
