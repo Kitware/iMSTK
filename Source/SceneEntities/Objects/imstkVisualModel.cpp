@@ -21,6 +21,10 @@
 
 #include "imstkVisualModel.h"
 #include "imstkRenderMaterial.h"
+#include "imstkGeometry.h"
+#include "imstkPointSet.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkImageData.h"
 
 namespace imstk
 {
@@ -31,6 +35,43 @@ VisualModel::VisualModel() :
     m_renderMaterial(std::make_shared<RenderMaterial>()),
     m_isVisible(true)
 {
+}
+
+const std::string
+VisualModel::getDelegateHint() const
+{
+    // Prioritize user set delegate hint
+    if (m_delegateHint != "")
+    {
+        return m_delegateHint;
+    }
+
+    // Special Handling
+    if (getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Fluid
+        && std::dynamic_pointer_cast<PointSet>(m_geometry) != nullptr)
+    {
+        return "Fluid";
+    }
+
+    if (getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::SurfaceNormals
+        && std::dynamic_pointer_cast<SurfaceMesh>(m_geometry) != nullptr)
+    {
+        return "SurfaceNormals";
+    }
+
+    if (getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Points
+        && std::dynamic_pointer_cast<ImageData>(m_geometry) != nullptr)
+    {
+        return "PointSet"; // Match Point set Type name
+    }
+
+    // Default delegate through geometry type
+    if (m_geometry != nullptr)
+    {
+        return m_geometry->getTypeName();
+    }
+
+    return "";
 }
 
 void

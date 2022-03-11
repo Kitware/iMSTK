@@ -53,17 +53,23 @@ public:
     ///
     /// \brief Register the RenderDelegate creation function with
     /// template type. Provide a delegateHint in the VisualModel to use
-    /// this creation function instead. Creation functions can be overriden
+    /// this creation function instead. Creation functions can be overridden
     ///
     template<typename T>
     static void registerDelegate(std::string name)
     {
         static_assert(std::is_base_of<VTKRenderDelegate, T>::value,
             "T must be a subclass of VTKRenderDelegate");
-        m_objCreationMap[name] = [](std::shared_ptr<VisualModel> visualModel)
-                                 {
-                                     return std::make_shared<T>(visualModel);
-                                 };
+        m_objCreationMap[name] = makeFunc<T>();
+    }
+
+    template<typename T>
+    static DelegateMakeFunc makeFunc()
+    {
+        return [](std::shared_ptr<VisualModel> visualModel)
+               {
+                   return std::make_shared<T>(visualModel);
+               };
     }
 
     ///

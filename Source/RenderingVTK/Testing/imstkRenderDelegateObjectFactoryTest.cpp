@@ -21,9 +21,13 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
-#include "imstkVisualModel.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkRenderDelegateObjectFactory.h"
+#include "imstkRenderMaterial.h"
+#include "imstkVTKSurfaceMeshRenderDelegate.h"
+#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKSurfaceNormalRenderDelegate.h"
+#include "imstkVisualModel.h"
 
 #include "gtest/gtest.h"
 
@@ -41,7 +45,7 @@ public:
     void updateRenderProperties() override { }
 };
 
-TEST(imstkRenderDelegateFactoryTest, TestMakeRenderDelegate)
+TEST(imstkRenderDelegateFactoryTest, CustomRenderDelegate)
 {
     REGISTER_RENDER_DELEGATE(RenderDelegateMock);
 
@@ -52,5 +56,30 @@ TEST(imstkRenderDelegateFactoryTest, TestMakeRenderDelegate)
 
     // Expect RenderDelegateMock to be created when given a visualModel
     EXPECT_TRUE(std::dynamic_pointer_cast<RenderDelegateMock>(renderDelegate) != nullptr);
+}
+
+TEST(imstkRenderDelegateFactoryTest, GeometryRenderDelegate)
+{
+    auto visualModel = std::make_shared<VisualModel>();
+    visualModel->setGeometry(std::make_shared<SurfaceMesh>());
+
+    std::shared_ptr<VTKRenderDelegate> renderDelegate =
+        RenderDelegateObjectFactory::makeRenderDelegate(visualModel);
+
+    EXPECT_TRUE(std::dynamic_pointer_cast<VTKSurfaceMeshRenderDelegate>(renderDelegate) != nullptr);
+}
+
+TEST(imstkRenderDelegateFactoryTest, MaterialRenderDelegate)
+{
+    auto visualModel = std::make_shared<VisualModel>();
+    visualModel->setGeometry(std::make_shared<SurfaceMesh>());
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::SurfaceNormals);
+    visualModel->setRenderMaterial(material);
+
+    std::shared_ptr<VTKRenderDelegate> renderDelegate =
+        RenderDelegateObjectFactory::makeRenderDelegate(visualModel);
+
+    EXPECT_TRUE(std::dynamic_pointer_cast<VTKSurfaceNormalRenderDelegate>(renderDelegate) != nullptr);
 }
 } // namespace imstk
