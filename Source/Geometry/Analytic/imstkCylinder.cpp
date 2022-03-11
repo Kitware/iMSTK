@@ -118,7 +118,7 @@ Cylinder::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(p
 {
     updatePostTransformData();
 
-    const Vec3d orientationAxes = getRotation().transpose().col(1);
+    const Vec3d orientationAxes = m_orientationPostTransform.toRotationMatrix().col(1);
     const Vec3d d  = orientationAxes * m_lengthPostTransform * 0.5;
     const Vec3d p1 = m_positionPostTransform - d;
     const Vec3d p2 = m_positionPostTransform + d;
