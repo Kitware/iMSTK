@@ -78,7 +78,7 @@ double
 Capsule::getFunctionValue(const Vec3d& x) const
 {
     // Two lines points
-    const Vec3d orientationAxes = getRotation().col(1);
+    const Vec3d orientationAxes = m_orientationPostTransform.toRotationMatrix().col(1);
     const Vec3d a = m_positionPostTransform + 0.5 * orientationAxes * m_lengthPostTransform;
     const Vec3d b = 2.0 * m_positionPostTransform - a;
 
@@ -120,12 +120,14 @@ Capsule::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(pa
 {
     updatePostTransformData();
 
-    const Vec3d orientationAxes = getRotation().col(1);
-    const Vec3d l  = (m_lengthPostTransform * 0.5 + m_radiusPostTransform) * orientationAxes;
+    const Vec3d orientationAxes = m_orientationPostTransform.toRotationMatrix().col(1);
+    const Vec3d l  = m_lengthPostTransform * 0.5 * orientationAxes;
     const Vec3d p1 = m_positionPostTransform - l;
     const Vec3d p2 = m_positionPostTransform + l;
 
     min = p1.cwiseMin(p2);
     max = p1.cwiseMax(p2);
+    min -= Vec3d(m_radiusPostTransform, m_radiusPostTransform, m_radiusPostTransform);
+    max += Vec3d(m_radiusPostTransform, m_radiusPostTransform, m_radiusPostTransform);
 }
 } // namespace imstk

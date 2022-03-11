@@ -89,7 +89,7 @@ OrientedBox::updatePostTransformData() const
 double
 OrientedBox::getFunctionValue(const Vec3d& pos) const
 {
-    const Mat3d  rot     = m_orientationPostTransform.toRotationMatrix();
+    const Mat3d  rot     = m_orientationPostTransform.toRotationMatrix().transpose();
     const Vec3d& extents = m_extentsPostTransform;
 
     const Vec3d diff = (pos - m_positionPostTransform);
