@@ -125,8 +125,8 @@ Capsule::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(pa
     const Vec3d p1 = m_positionPostTransform - l;
     const Vec3d p2 = m_positionPostTransform + l;
 
-    min = p1.cwiseMin(p2);
-    max = p1.cwiseMax(p2);
+    min  = p1.cwiseMin(p2);
+    max  = p1.cwiseMax(p2);
     min -= Vec3d(m_radiusPostTransform, m_radiusPostTransform, m_radiusPostTransform);
     max += Vec3d(m_radiusPostTransform, m_radiusPostTransform, m_radiusPostTransform);
 }
