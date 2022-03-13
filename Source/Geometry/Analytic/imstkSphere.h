@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkAnalyticalGeometry.h"
-#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -46,7 +45,10 @@ public:
 
     ~Sphere() override = default;
 
-    IMSTK_TYPENAME(Sphere);
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    const std::string getTypeName() const override { return "Sphere"; }
 
     ///
     /// \brief Print the sphere info
