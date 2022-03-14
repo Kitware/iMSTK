@@ -136,6 +136,8 @@ if (MSVC)
             -DSWIG_OUTPUT_DIR:PATH=${SWIG_CSHARP_OUTPUT_DIR}
             -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_PREFIX_PATH}
             -DiMSTK_SWIG_PINNED_ARRAY:BOOL=${iMSTK_SWIG_PINNED_ARRAY}
+            -DiMSTK_USE_OpenHaptics:BOOL=${iMSTK_USE_OpenHaptics}
+            -DiMSTK_USE_VRPN:BOOL=${iMSTK_USE_VRPN}
         )
     set_target_properties (iMSTKSharp PROPERTIES
         FOLDER Wrappers)
