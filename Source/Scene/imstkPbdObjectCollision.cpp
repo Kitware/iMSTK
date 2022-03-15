@@ -135,7 +135,7 @@ PbdObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     }
     else
     {
-        m_taskGraph->addEdge(obj2->getUpdateGeometryNode(), m_collisionDetectionNode);
+        m_taskGraph->addEdge(obj2->getUpdateGeometryNode(), m_collisionGeometryUpdateNode);
         m_taskGraph->addEdge(m_collisionDetectionNode, obj2->getTaskGraph()->getSink());
     }
 }
