@@ -31,11 +31,13 @@ LaparoscopicToolController::LaparoscopicToolController(
     std::shared_ptr<CollidingObject> shaft,
     std::shared_ptr<CollidingObject> upperJaw,
     std::shared_ptr<CollidingObject> lowerJaw,
+    std::shared_ptr<CollidingObject> pickObj,
     std::shared_ptr<DeviceClient>    trackingDevice) :
     TrackingDeviceControl(trackingDevice),
     m_shaft(shaft),
     m_upperJaw(upperJaw),
     m_lowerJaw(lowerJaw),
+    m_pickObj(pickObj),
     m_jawRotationAxis(Vec3d(1, 0, 0))
 {
     trackingDevice->setButtonsEnabled(true);
@@ -48,6 +50,8 @@ LaparoscopicToolController::LaparoscopicToolController(
     m_shaftCollidingTransform    = m_shaft->getCollidingGeometry()->getTransform();
     m_upperJawCollidingTransform = m_upperJaw->getCollidingGeometry()->getTransform();
     m_lowerJawCollidingTransform = m_lowerJaw->getCollidingGeometry()->getTransform();
+
+    m_pickGeomTransform = m_pickObj->getCollidingGeometry()->getTransform();
 }
 
 void
@@ -72,6 +76,7 @@ LaparoscopicToolController::update(const double dt)
     {
         m_shaft->getVisualGeometry()->setTransform(m_controllerWorldTransform * m_shaftVisualTransform);
         m_shaft->getCollidingGeometry()->setTransform(m_controllerWorldTransform * m_shaftCollidingTransform);
+        m_pickObj->getCollidingGeometry()->setTransform(m_controllerWorldTransform * m_pickGeomTransform);
     }
 
     // Update jaw angles

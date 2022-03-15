@@ -21,6 +21,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
@@ -33,17 +34,14 @@
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectPicking.h"
-#include "imstkPBDPickingCH.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTaskNode.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-
-#include "imstkTaskNode.h"
-#include "imstkCollisionDetectionAlgorithm.h"
 
 using namespace imstk;
 
@@ -125,7 +123,7 @@ makeClothObj(const std::string& name,
     pbdParams->m_gravity    = Vec3d(0.0, -140.0, 0.0);
     pbdParams->m_dt         = 0.01;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.01;
+    pbdParams->m_viscousDampingCoeff = 0.005;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
@@ -188,7 +186,7 @@ main()
     imstkNew<Capsule> geomUpperJaw;
     geomUpperJaw->setLength(25.0);
     geomUpperJaw->setTranslation(Vec3d(0.0, 1.0, -12.5));
-    geomUpperJaw->setRadius(2.0);
+    geomUpperJaw->setRadius(2.2);
     geomUpperJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
     objUpperJaw->setVisualGeometry(upperSurfMesh);
@@ -198,18 +196,28 @@ main()
     imstkNew<Capsule> geomLowerJaw;
     geomLowerJaw->setLength(25.0);
     geomLowerJaw->setTranslation(Vec3d(0.0, -1.0, -12.5));
-    geomLowerJaw->setRadius(2.0);
+    geomLowerJaw->setRadius(2.2);
     geomLowerJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
     objLowerJaw->setVisualGeometry(lowerSurfMesh);
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 15, 15);
+    imstkNew<Capsule> pickGeom;
+    pickGeom->setLength(25.0);
+    pickGeom->setTranslation(Vec3d(0.0, -1.0, -12.5));
+    pickGeom->setRadius(3.0);
+    pickGeom->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
+    imstkNew<CollidingObject> objPickGeom("PickGeom");
+    //objPickGeom->setVisualGeometry(pickGeom);
+    objPickGeom->setCollidingGeometry(pickGeom);
+    scene->addSceneObject(objPickGeom);
+
+    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 5, 5);
     scene->addSceneObject(clothObj);
 
     // Create and add virtual coupling object controller in the scene
-    imstkNew<LaparoscopicToolController> controller(objShaft, objUpperJaw, objLowerJaw, client);
+    imstkNew<LaparoscopicToolController> controller(objShaft, objUpperJaw, objLowerJaw, objPickGeom, client);
     controller->setJawAngleChange(6.0e-3);
     scene->addController(controller);
 
@@ -220,10 +228,9 @@ main()
     scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
-    auto upperJawPicking = std::make_shared<PbdObjectPicking>(clothObj, objUpperJaw, "PointSetToCapsuleCD");
-    auto lowerJawPicking = std::make_shared<PbdObjectPicking>(clothObj, objLowerJaw, "PointSetToCapsuleCD");
-    scene->addInteraction(upperJawPicking);
-    scene->addInteraction(lowerJawPicking);
+    auto jawPicking = std::make_shared<PbdObjectPicking>(clothObj, objPickGeom, "SurfaceMeshToCapsuleCD");
+    jawPicking->setPickingMode(PbdObjectPicking::Mode::PickElement);
+    scene->addInteraction(jawPicking);
 
     // Camera
     scene->getActiveCamera()->setPosition(Vec3d(1.0, 1.0, 1.0) * 100.0);
@@ -264,36 +271,30 @@ main()
             viewer->addControl(keyControl);
         }
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
             {
                 // Simulate the cloth in real time
                 clothObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
-        });
+            });
 
         connect<Event>(controller, &LaparoscopicToolController::JawClosed,
             [&](Event*)
             {
                 LOG(INFO) << "Jaw Closed!";
 
-                upperJawCollision->getCollisionDetectionNode()->setEnabled(false);
-                upperJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
-                upperJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
-                lowerJawCollision->getCollisionDetectionNode()->setEnabled(false);
-                lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsA.resize(0);
-                lowerJawCollision->getCollisionDetection()->getCollisionData()->elementsB.resize(0);
-
-                upperJawPicking->beginPick();
-                lowerJawPicking->beginPick();
+                upperJawCollision->setEnabled(false);
+                lowerJawCollision->setEnabled(false);
+                jawPicking->beginPick();
             });
         connect<Event>(controller, &LaparoscopicToolController::JawOpened,
             [&](Event*)
             {
                 LOG(INFO) << "Jaw Opened!";
 
-                upperJawCollision->getCollisionDetectionNode()->setEnabled(true);
-                lowerJawCollision->getCollisionDetectionNode()->setEnabled(true);
-                upperJawPicking->endPick();
-                lowerJawPicking->endPick();
+                upperJawCollision->setEnabled(true);
+                lowerJawCollision->setEnabled(true);
+                jawPicking->endPick();
             });
 
         driver->start();

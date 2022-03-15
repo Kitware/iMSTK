@@ -73,6 +73,13 @@ public:
 
     void updateCollisionGeometry();
 
+    ///
+    /// \brief Enabled or disable the interaction
+    ///@{ 
+    virtual void setEnabled(const bool enabled);
+    virtual bool getEnabled() const;
+    ///@}
+
 protected:
     ///
     /// \brief Update collision

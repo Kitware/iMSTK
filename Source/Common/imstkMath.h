@@ -227,6 +227,20 @@ tetVolume(Vec3d p0, Vec3d p1, Vec3d p2, Vec3d p3)
 }
 
 ///
+/// \brief Compute bary coordinates of line given point on line
+/// Projects point to line
+///
+static Vec2d
+baryCentric(const Vec3d& pt, const Vec3d& p, const Vec3d& q)
+{
+    Vec3d        dir    = q - p;
+    const double length = dir.norm();
+    dir /= length;
+    const double t = (pt - p).dot(dir) / length;
+    return Vec2d(t, 1.0 - t);
+}
+
+///
 /// \brief Compute bary centric coordinates (u,v,w) given triangle in 2d space (and point p on triangle)
 ///
 static Vec3d
@@ -244,6 +258,7 @@ baryCentric(const Vec2d& p, const Vec2d& a, const Vec2d& b, const Vec2d& c)
 
 ///
 /// \brief Compute bary centric coordinates (u,v,w) of point p, given 3 points in 3d space (a,b,c)
+/// Projects point to triangle
 ///
 static Vec3d
 baryCentric(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c)
