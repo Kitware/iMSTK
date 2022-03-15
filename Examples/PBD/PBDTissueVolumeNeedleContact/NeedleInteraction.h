@@ -47,7 +47,7 @@ public:
     ~NeedleInteraction() override = default;
 
 public:
-    virtual const std::string getTypeName() const override { return "NeedleInteraction"; }
+    const std::string getTypeName() const override { return "NeedleInteraction"; }
 
 public:
     std::shared_ptr<TetraToLineMeshCD> getEmbeddingCD() const { return tetMeshCD; }
@@ -56,7 +56,7 @@ public:
     ///
     /// \brief Setup connectivity of task graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     std::shared_ptr<TetraToLineMeshCD> tetMeshCD;

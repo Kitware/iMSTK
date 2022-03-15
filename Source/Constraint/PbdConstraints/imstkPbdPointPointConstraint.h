@@ -47,10 +47,9 @@ public:
     ///
     /// \brief compute value and gradient of constraint function
     ///
-    /// \param[in] currVertexPositionsA current positions from object A
-    /// \param[in] currVertexPositionsA current positions from object B
     /// \param[inout] c constraint value
-    /// \param[inout] dcdx constraint gradient
+    /// \param[inout] dcdx constraint gradient for A
+    /// \param[inout] dcdx constraint gradient for B
     ///
     bool computeValueAndGradient(double&             c,
                                  std::vector<Vec3d>& dcdxA,
