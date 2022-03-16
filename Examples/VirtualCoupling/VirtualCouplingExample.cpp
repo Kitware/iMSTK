@@ -110,6 +110,22 @@ main()
     }
     scene->addSceneObject(rbdObj);
 
+    // Setup a ghost tool object to show off virtual coupling
+    imstkNew<SceneObject> ghostToolObj("GhostTool");
+    auto                  toolMesh = std::dynamic_pointer_cast<SurfaceMesh>(rbdObj->getVisualGeometry());
+    imstkNew<SurfaceMesh> toolGhostMesh;
+    toolGhostMesh->initialize(
+        std::make_shared<VecDataArray<double, 3>>(*toolMesh->getVertexPositions()),
+        std::make_shared<VecDataArray<int, 3>>(*toolMesh->getTriangleIndices()));
+    ghostToolObj->setVisualGeometry(toolGhostMesh);
+    auto ghostMaterial = std::make_shared<RenderMaterial>();
+    ghostMaterial->setColor(Color::Orange);
+    ghostMaterial->setLineWidth(5.0);
+    ghostMaterial->setOpacity(0.3);
+    ghostMaterial->setIsDynamicMesh(false);
+    ghostToolObj->getVisualModel(0)->setRenderMaterial(ghostMaterial);
+    scene->addSceneObject(ghostToolObj);
+
     // Create a virtual coupling controller
     imstkNew<RigidObjectController> controller(rbdObj, client);
     controller->setLinearKs(10000.0);
@@ -157,6 +173,14 @@ main()
             {
                 // Run the rbd model in real time
                 rbdObj->getRigidBodyModel2()->getConfig()->m_dt = driver->getDt();
+
+                ghostMaterial->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+
+                // Also apply controller transform to ghost geometry
+                toolGhostMesh->setTranslation(controller->getPosition());
+                toolGhostMesh->setRotation(controller->getOrientation());
+                toolGhostMesh->updatePostTransformData();
+                toolGhostMesh->postModified();
             });
 
         // Add mouse and keyboard controls to the viewer
