@@ -207,8 +207,9 @@
 %include <std_pair.i>
 namespace std
 {
-  %template(VectorInt) vector<int>; 
+  %template(VectorInt) vector<int>;
   %template(VectorSizet) vector<std::size_t>;
+  %template(VectorDouble) vector<double>;
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
 }
 
