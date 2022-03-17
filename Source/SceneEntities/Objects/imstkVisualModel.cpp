@@ -25,6 +25,7 @@
 #include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkImageData.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -46,11 +47,22 @@ VisualModel::getDelegateHint() const
         return m_delegateHint;
     }
 
-    // Special Handling
+    // Early Exit
+    if (m_geometry == nullptr)
+    {
+        return "";
+    }
+
+    // Special Handling various rendermaterials
     if (getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Fluid
         && std::dynamic_pointer_cast<PointSet>(m_geometry) != nullptr)
     {
         return "Fluid";
+    }
+    else
+    {
+        LOG(WARNING) << "Requested DisplayMode::Fluid but <" << m_geometry->getTypeName()
+                     << "> cannot be converted to PointSet using default render delegate.";
     }
 
     if (getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::SurfaceNormals
@@ -58,20 +70,24 @@ VisualModel::getDelegateHint() const
     {
         return "SurfaceNormals";
     }
+    else
+    {
+        LOG(WARNING) << "Requested DisplayMode::SurfaceNormals but <" << m_geometry->getTypeName()
+                     << "> cannot be converted to SurfaceMesh using default render delegate.";
+    }
 
     if (getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Points
-        && std::dynamic_pointer_cast<ImageData>(m_geometry) != nullptr)
+        && std::dynamic_pointer_cast<PointSet>(m_geometry) != nullptr)
     {
         return "PointSet"; // Match Point set Type name
     }
-
-    // Default delegate through geometry type
-    if (m_geometry != nullptr)
+    else
     {
-        return m_geometry->getTypeName();
+        LOG(WARNING) << "Requested DisplayMode::Points but <" << m_geometry->getTypeName()
+                     << "> cannot be converted to PointSet using default render delegate.";
     }
 
-    return "";
+    return m_geometry->getTypeName();
 }
 
 void
