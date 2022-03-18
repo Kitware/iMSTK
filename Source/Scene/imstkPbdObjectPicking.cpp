@@ -157,10 +157,9 @@ getTetrahedron(const CollisionElement& elem, const MeshSide& side)
     return results;
 }
 
-PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                                   std::string cdType) :
-    SceneObject("PbdObjectPicking_" + obj1->getName() + "_vs_" + obj2->getName()),
-    m_objA(obj1), m_objB(obj2), m_cdType(cdType)
+PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1) :
+    SceneObject("PbdObjectPicking_" + obj1->getName()),
+    m_objA(obj1)
 {
     // We have 3 implementations for 3 methods
     //  - picking all points inside the primitive (uses CD)
@@ -172,13 +171,10 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_
     m_taskGraph->addNode(m_pickingNode);
 
     m_taskGraph->addNode(obj1->getPbdModel()->getSolveNode());
-    m_taskGraph->addNode(obj2->getUpdateGeometryNode());
     m_taskGraph->addNode(obj1->getPbdModel()->getTaskGraph()->getSink());
 
     m_taskGraph->addNode(obj1->getTaskGraph()->getSource());
-    m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
     m_taskGraph->addNode(obj1->getTaskGraph()->getSink());
-    m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
 }
 
 void
@@ -189,8 +185,40 @@ PbdObjectPicking::endPick()
 }
 
 void
-PbdObjectPicking::beginPick()
+PbdObjectPicking::beginVertexPick(std::shared_ptr<AnalyticalGeometry> geometry)
 {
+    m_pickingMode = Mode::PickVertex;
+    m_pickingGeometry = geometry;
+
+    m_isPicking = true;
+    LOG(INFO) << "Begin pick";
+}
+void
+PbdObjectPicking::beginElementPick(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType)
+{
+    m_pickingMode = Mode::PickElement;
+    m_pickingGeometry = geometry;
+
+    m_isPicking = true;
+    LOG(INFO) << "Begin pick";
+}
+void
+PbdObjectPicking::beginRayPick(Vec3d rayStart, Vec3d rayDir)
+{
+    m_pickingMode = Mode::PickRay;
+    m_rayStart = rayStart;
+    m_rayDir = rayDir;
+
+    m_isPicking = true;
+    LOG(INFO) << "Begin pick";
+}
+void
+PbdObjectPicking::beginRayElementPick(Vec3d rayStart, Vec3d rayDir)
+{
+    m_pickingMode = Mode::PickRayElement;
+    m_rayStart = rayStart;
+    m_rayDir = rayDir;
+
     m_isPicking = true;
     LOG(INFO) << "Begin pick";
 }
@@ -208,17 +236,7 @@ PbdObjectPicking::addPickConstraints()
 {
     removePickConstraints();
 
-    CHECK(m_objA != nullptr && m_objB != nullptr)
-        << "PBDPickingCH:addPickConstraints error: "
-        << "no pdb object or colliding object.";
-
-    auto pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(m_objB->getCollidingGeometry());
-    CHECK(pickGeom != nullptr) << "Colliding geometry is analytical geometry ";
-    const Vec3d pickGeomPos = pickGeom->getPosition();
-
-    /*Vec3d min, max;
-    pickGeom->computeBoundingBox(min, max);
-    m_thickness = (max - min).norm() * 0.1;*/
+    const Vec3d pickGeomPos = m_pickingGeometry->getPosition();
 
     std::shared_ptr<PbdModel>                model         = m_objA->getPbdModel();
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr   = model->getCurrentState()->getPositions();
@@ -255,20 +273,20 @@ PbdObjectPicking::addPickConstraints()
         // sample if in or out of the shape
         for (int i = 0; i < vertices.size(); i++)
         {
-            const double signedDist = pickGeom->getFunctionValue(vertices[i]);
+            const double signedDist = m_pickingGeometry->getFunctionValue(vertices[i]);
 
             // If inside the primitive
             // \todo: come back to this
             if (signedDist <= 0.0)
             {
-                const Mat3d rot = pickGeom->getRotation().transpose();
-                const Vec3d relativePos = rot * (vertices[i] - pickGeom->getPosition());
+                const Mat3d rot = m_pickingGeometry->getRotation().transpose();
+                const Vec3d relativePos = rot * (vertices[i] - m_pickingGeometry->getPosition());
 
                 m_pickedPtIdxOffset[i] = relativePos;
 
                 m_constraintPts.push_back({
                         i,
-                        pickGeom->getPosition() + rot.transpose() * relativePos,
+                        m_pickingGeometry->getPosition() + rot.transpose() * relativePos,
                         Vec3d(0.0, 0.0, 0.0) });
                 std::tuple<int, Vec3d, Vec3d>& cPt = m_constraintPts.back();
 
@@ -285,13 +303,13 @@ PbdObjectPicking::addPickConstraints()
             m_colDetect = CDObjectFactory::makeCollisionDetection(m_cdType);
         }
         m_colDetect->setInputGeometryA(m_objA->getCollidingGeometry());
-        m_colDetect->setInputGeometryB(m_objB->getCollidingGeometry());
+        m_colDetect->setInputGeometryB(m_pickingGeometry);
         m_colDetect->update();
 
         const std::vector<CollisionElement>& elementsA = m_colDetect->getCollisionData()->elementsA;
         const std::vector<CollisionElement>& elementsB = m_colDetect->getCollisionData()->elementsB;
 
-        const Mat3d rot = pickGeom->getRotation().transpose();
+        const Mat3d rot = m_pickingGeometry->getRotation().transpose();
         for (int i = 0; i < elementsA.size(); i++)
         {
             // A is the mesh, B is the analytic geometry
@@ -335,7 +353,7 @@ PbdObjectPicking::addPickConstraints()
             // But pbd implicit solve with reprojection avoids issues
             for (size_t j = 0; j < cellVerts.size(); j++)
             {
-                const Vec3d  relativePos = rot * (*cellVerts[j].second.vertex - pickGeom->getPosition());
+                const Vec3d  relativePos = rot * (*cellVerts[j].second.vertex - m_pickingGeometry->getPosition());
                 const size_t index       = m_constraintPts.size();
                 const size_t vertexIndex = cellVerts[j].first;
                 m_pickedPtIdxOffset[index] = relativePos;
@@ -350,7 +368,7 @@ PbdObjectPicking::addPickConstraints()
             }
         }
     }
-    else if (m_pickingMode == Mode::PickPoint)
+    else if (m_pickingMode == Mode::PickRay)
     {
         // In PickPtInterpolated we actually perform element vs analytical geometry collision
         if (m_cdType != "" && m_colDetect == nullptr)
@@ -358,13 +376,13 @@ PbdObjectPicking::addPickConstraints()
             m_colDetect = CDObjectFactory::makeCollisionDetection(m_cdType);
         }
         m_colDetect->setInputGeometryA(m_objA->getCollidingGeometry());
-        m_colDetect->setInputGeometryB(m_objB->getCollidingGeometry());
+        m_colDetect->setInputGeometryB(m_pickingGeometry);
         m_colDetect->update();
 
         const std::vector<CollisionElement>& elementsA = m_colDetect->getCollisionData()->elementsA;
         const std::vector<CollisionElement>& elementsB = m_colDetect->getCollisionData()->elementsB;
 
-        const Mat3d rot = pickGeom->getRotation().transpose();
+        const Mat3d rot = m_pickingGeometry->getRotation().transpose();
         for (size_t i = 0; i < elementsA.size(); i++)
         {
             // A is the mesh, B is the analytic geometry
@@ -435,7 +453,7 @@ PbdObjectPicking::addPickConstraints()
                 weights[1] = baryCoord[1];
             }
 
-            const Vec3d  relativePos = rot * (pickingPt - pickGeom->getPosition());
+            const Vec3d  relativePos = rot * (pickingPt - m_pickingGeometry->getPosition());
             const size_t index       = m_constraintPts.size();
             m_pickedPtIdxOffset[index] = relativePos;
             m_constraintPts.push_back({
@@ -495,18 +513,14 @@ PbdObjectPicking::updatePicking()
 void
 PbdObjectPicking::updateConstraints()
 {
-    std::shared_ptr<PbdModel> model    = m_objA->getPbdModel();
-    auto                      pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(m_objB->getCollidingGeometry());
-    CHECK(pickGeom != nullptr) << "Colliding geometry is analytical geometry ";
-
-    const Mat3d rot = pickGeom->getRotation().transpose();
+    const Mat3d rot = m_pickingGeometry->getRotation().transpose();
 
     // Update constraint point positions
     {
         for (auto& cPt : m_constraintPts)
         {
             const Vec3d offset = m_pickedPtIdxOffset[std::get<0>(cPt)];
-            std::get<1>(cPt) = pickGeom->getPosition() + rot.transpose() * offset;
+            std::get<1>(cPt) = m_pickingGeometry->getPosition() + rot.transpose() * offset;
         }
     }
 
@@ -521,20 +535,14 @@ void
 PbdObjectPicking::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     auto pbdObj     = m_objA;
-    auto pickingObj = m_objB;
 
     std::shared_ptr<PbdModel> pbdModel = pbdObj->getPbdModel();
 
     m_taskGraph->addEdge(source, pbdObj->getTaskGraph()->getSource());
-    m_taskGraph->addEdge(source, pickingObj->getTaskGraph()->getSource());
     m_taskGraph->addEdge(pbdObj->getTaskGraph()->getSink(), sink);
-    m_taskGraph->addEdge(pickingObj->getTaskGraph()->getSink(), sink);
 
     // The ideal location is after the internal positional solve
     m_taskGraph->addEdge(pbdModel->getSolveNode(), m_pickingNode);
     m_taskGraph->addEdge(m_pickingNode, pbdModel->getTaskGraph()->getSink());
-
-    m_taskGraph->addEdge(pickingObj->getUpdateGeometryNode(), m_pickingNode);
-    m_taskGraph->addEdge(m_pickingNode, pickingObj->getTaskGraph()->getSink());
 }
 } // namespace imstk

@@ -28,7 +28,7 @@ limitations under the License.
 
 namespace imstk
 {
-class CollidingObject;
+class AnalyticalGeometry;
 class PbdCollisionConstraint;
 class PbdObject;
 
@@ -45,23 +45,17 @@ public:
     enum class Mode
     {
         PickVertex, // Grab a vertex (most performant)
-        PickPoint,  // Grab a point on an element
-        PickElement // Grab the entire element
-        // PickNearest // Grab the point on the nearest element
+        PickElement, // Grab the entire element/s
+        PickRay, // Grab the the point on the element along the ray
+        PickRayElement, // Grab the element along the ray
+        PickNearestElement // Grab the nearest element
     };
 
 public:
-    PbdObjectPicking(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
+    PbdObjectPicking(std::shared_ptr<PbdObject> obj1);
     ~PbdObjectPicking() override = default;
 
     const std::string getTypeName() const override { return "PbdObjectPicking"; }
-
-    ///
-    /// \brief Set/Get the picking mode. Indicating how to pick the object
-    ///@{
-    void setPickingMode(Mode pickingMode) { m_pickingMode = pickingMode; }
-    Mode getPickingMode() const { return m_pickingMode; }
-    ///@}
 
     ///
     /// \brief Set/Get the stiffness, 0-1 value that alters the step size in
@@ -77,9 +71,14 @@ public:
     void endPick();
 
     ///
-    /// \brief Begin picking (picking will start on next update)
-    ///
-    void beginPick();
+    /// \brief Begin a Pick
+    ///@{
+    void beginVertexPick(std::shared_ptr<AnalyticalGeometry> geometry);
+    void beginElementPick(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType);
+    void beginRayPick(Vec3d rayStart, Vec3d rayDir);
+    void beginRayElementPick(Vec3d rayStart, Vec3d rayDir);
+    //void beginNearestElementPick(Vec3d grabPoint, double radius);
+    ///@}
 
     ///
     /// \brief Compute/generate the constraints for picking
@@ -106,7 +105,7 @@ protected:
     ///
     /// \brief Update picking state
     ///
-    void updatePicking();
+    virtual void updatePicking();
 
     ///
     /// \brief Update the constraints used for picking
@@ -117,7 +116,7 @@ protected:
     std::shared_ptr<TaskNode> m_pickingNode = nullptr;
 
     std::shared_ptr<PbdObject>       m_objA = nullptr;
-    std::shared_ptr<CollidingObject> m_objB = nullptr;
+    std::shared_ptr<AnalyticalGeometry> m_pickingGeometry = nullptr;
     std::string m_cdType = "";
 
     Mode m_pickingMode = Mode::PickVertex;
@@ -128,6 +127,8 @@ protected:
     double m_stiffness = 0.4;
 
     std::shared_ptr<CollisionDetectionAlgorithm> m_colDetect = nullptr;
+    Vec3d m_rayStart = Vec3d::Zero();
+    Vec3d m_rayDir = Vec3d::Zero();
 
     std::unordered_map<size_t, Vec3d> m_pickedPtIdxOffset; ///> Map for picked nodes.
 

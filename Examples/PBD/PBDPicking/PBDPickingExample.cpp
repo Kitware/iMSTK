@@ -228,8 +228,7 @@ main()
     scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
-    auto jawPicking = std::make_shared<PbdObjectPicking>(clothObj, objPickGeom, "SurfaceMeshToCapsuleCD");
-    jawPicking->setPickingMode(PbdObjectPicking::Mode::PickElement);
+    auto jawPicking = std::make_shared<PbdObjectPicking>(clothObj);
     scene->addInteraction(jawPicking);
 
     // Camera
@@ -285,7 +284,7 @@ main()
 
                 upperJawCollision->setEnabled(false);
                 lowerJawCollision->setEnabled(false);
-                jawPicking->beginPick();
+                jawPicking->beginElementPick(pickGeom, "SurfaceMeshToCapsuleCD");
             });
         connect<Event>(controller, &LaparoscopicToolController::JawOpened,
             [&](Event*)
