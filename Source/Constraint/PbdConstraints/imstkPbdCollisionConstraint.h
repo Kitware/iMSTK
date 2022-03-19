@@ -26,6 +26,11 @@
 
 namespace imstk
 {
+///
+/// \struct VertexMassPair
+///
+/// \brief Represents a point in a PBD mesh with a mass & velocity
+///
 struct VertexMassPair
 {
     Vec3d* vertex;
@@ -36,7 +41,13 @@ struct VertexMassPair
 ///
 /// \class PbdCollisionConstraint
 ///
-/// \brief
+/// \brief Abstract base class for collision constraints. Collision
+/// constraints are non penetration constraints solved with PBD.
+/// They are formulated with a gradient dcdx and scalar c which must
+/// be returned in computeValueAndGradient.
+/// These constraints differ from PbdConstraints in that they do not
+/// support XPBD (as they are meant to be solved completely) & they
+/// are meant to be generated during runtime quickly upon contacts.
 ///
 class PbdCollisionConstraint
 {
@@ -50,15 +61,17 @@ public:
 public:
     ///
     /// \brief Get vertex indices of first object
-    ///
+    ///@{
     const std::vector<VertexMassPair>& getVertexIdsFirst() const { return m_bodiesFirst; }
     const std::vector<VertexMassPair>& getVertexIdsSecond() const { return m_bodiesSecond; }
+    ///@}
 
     ///
     /// \brief Get stiffness
-    ///
+    ///@{
     const double getStiffnessA() const { return m_stiffnessA; }
     const double getStiffnessB() const { return m_stiffnessB; }
+    ///@}
 
     ///
     /// \brief compute value and gradient of constraint function
@@ -81,13 +94,13 @@ public:
     virtual void correctVelocity(const double friction, const double restitution);
 
 protected:
-    std::vector<VertexMassPair> m_bodiesFirst;                         ///> index of points for the first object
-    std::vector<VertexMassPair> m_bodiesSecond;                        ///> index of points for the second object
+    std::vector<VertexMassPair> m_bodiesFirst;  ///< index of points for the first object
+    std::vector<VertexMassPair> m_bodiesSecond; ///< index of points for the second object
 
     double m_stiffnessA = 1.0;
     double m_stiffnessB = 1.0;
 
-    std::vector<Vec3d> m_dcdxA;                                        ///> Constraint gradients (per vertex)
-    std::vector<Vec3d> m_dcdxB;                                        ///> Constraint gradients (per vertex)
+    std::vector<Vec3d> m_dcdxA; ///< Constraint gradients (per vertex)
+    std::vector<Vec3d> m_dcdxB; ///< Constraint gradients (per vertex)
 };
 } // namespace imstk

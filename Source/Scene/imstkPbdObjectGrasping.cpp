@@ -22,269 +22,66 @@ limitations under the License.
 #include "imstkPbdObjectGrasping.h"
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCDObjectFactory.h"
-#include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkCellPicker.h"
 #include "imstkLineMesh.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdPointPointConstraint.h"
+#include "imstkPointPicker.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkVertexPicker.h"
 
 namespace imstk
 {
-/////
-///// \brief PickData covers all picking datas
-///// via composition.
-///// 
-//struct PickData
-//{
-//public:
-//    Vec3d pickPoint;
-//    int cellId;
-//    std::vector<int> vertexIds;
-//    std::vector<double> weights;
-//};
-//
-/////
-///// \brief Abstract functor for picking of shapes.
-///// \note: A factory mapping shape types to picking types is
-///// a strong possibility.
-///// 
-//struct PickingMethod
-//{
-//public:
-//    ///
-//    /// \brief Perform picking on provided geometry
-//    /// 
-//    virtual std::vector<PickData> Pick(std::shared_ptr<Geometry> geomToPick) = 0;
-//};
-//
-/////
-///// \brief Picks elements of geomToPick via those that that are
-///// intersecting pickingGeom.
-///// 
-//struct ElementPicking : public PickingMethod
-//{
-//public:
-//    std::vector<PickData> Pick(std::shared_ptr<Geometry> geometryToPick) override
-//    {
-//        // Crazy combinatoral explosion
-//    }
-//    void setPickingGeometry(std::shared_ptr<Geometry> pickGeometry)
-//    {
-//        m_pickGeometry = pickGeometry;
-//    }
-//    std::shared_ptr<Geometry> getPickGeometry() const { return m_pickGeometry; }
-//
-//protected:
-//    std::shared_ptr<Geometry> m_pickGeometry = nullptr;
-//};
-//
-/////
-///// \brief Picks vertices of geomToPick via those that that are
-///// intersecting pickingGeom.
-///// 
-//struct VertexPicking : public PickingMethod
-//{
-//public:
-//    std::vector<PickData> Pick(std::shared_ptr<Geometry> geometryToPick) override
-//    {
-//        std::vector<PickData> pickDatas;
-//
-//        auto pointSetToPick = std::dynamic_pointer_cast<PointSet>(geometryToPick);
-//        CHECK(pointSetToPick != nullptr) << "Trying to vertex pick with geometry that has no vertices";
-//
-//        // Use implicit functions available in the geometries to sample if in or out of the shape
-//        std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSetToPick->getVertexPositions();
-//        VecDataArray<double, 3>& vertices = *verticesPtr;
-//        for (int i = 0; i < vertices.size(); i++)
-//        {
-//            const double signedDist = m_pickGeometry->getFunctionValue(vertices[i]);
-//
-//            // If inside the primitive
-//            // \todo: come back to this
-//            if (signedDist <= 0.0)
-//            {
-//                const Mat3d rot = m_pickGeometry->getRotation().transpose();
-//                const Vec3d relativePos = rot * (vertices[i] - m_pickGeometry->getPosition());
-//
-//                m_pickedPtIdxOffset[i] = relativePos;
-//
-//                m_constraintPts.push_back({
-//                        i,
-//                        m_pickingGeometry->getPosition() + rot.transpose() * relativePos,
-//                        Vec3d(0.0, 0.0, 0.0) });
-//                std::tuple<int, Vec3d, Vec3d>& cPt = m_constraintPts.back();
-//
-//                addConstraint(
-//                    { { &vertices[i], invMasses[i], &velocities[i] } }, { 1.0 },
-//                    { { &std::get<1>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
-//                    m_stiffness, 0.0);
-//            }
-//        }
-//        return pickData;
-//    }
-//
-//    void setPickingGeometry(std::shared_ptr<AnalyticalGeometry> pickGeometry) { m_pickGeometry = pickGeometry; }
-//    std::shared_ptr<AnalyticalGeometry> getPickGeometry() const { return m_pickGeometry; }
-//
-//protected:
-//    std::shared_ptr<AnalyticalGeometry> m_pickGeometry = nullptr;
-//};
-//
-/////
-///// \brief Picks points on elements of geomToPick via those that that are
-///// intersecting the provided ray.
-///// 
-//struct PointPicking : public PickingMethod
-//{
-//public:
-//    std::vector<PickData> Pick(std::shared_ptr<Geometry> geometryToPick) override
-//    {
-//        // Crazy combinatoral explosion
-//    }
-//    void setPickingRay(const Vec3d& rayStart, const Vec3d& rayDir)
-//    {
-//        m_rayStart = rayStart;
-//        m_rayDir = rayDir;
-//    }
-//    const Vec3d& getPickRayStart() const { return m_rayStart; }
-//    const Vec3d& getPickRayDir() const { return m_rayDir; }
-//
-//protected:
-//    Vec3d m_rayStart = Vec3d::Zero();
-//    Vec3d m_rayDir = Vec3d::Zero();
-//};
-
-
 ///
 /// \brief Packs the info needed to add a constraint to a side
+/// by reference (this way dynamic casting & dereferencing is not
+/// being done in tight loops)
 ///
 struct MeshSide
 {
     MeshSide(VecDataArray<double, 3>& vertices, VecDataArray<double, 3>& velocities, DataArray<double>& invMasses,
-             GeometryMap* mapPtr, AbstractDataArray* indicesPtr) : m_vertices(vertices), m_velocities(velocities),
-        m_invMasses(invMasses), m_mapPtr(mapPtr), m_indicesPtr(indicesPtr)
+             AbstractDataArray* indicesPtr) : m_vertices(vertices), m_velocities(velocities),
+        m_invMasses(invMasses), m_indicesPtr(indicesPtr)
     {
     }
 
     VecDataArray<double, 3>& m_vertices;
     VecDataArray<double, 3>& m_velocities;
     DataArray<double>& m_invMasses;
-    GeometryMap* m_mapPtr = nullptr;
     AbstractDataArray* m_indicesPtr = nullptr;
 };
 
-static std::array<std::pair<int, VertexMassPair>, 2>
-getEdge(const CollisionElement& elem, const MeshSide& side)
+template<int N>
+static std::vector<std::pair<int, VertexMassPair>>
+getElement(const PickData& pickData, const MeshSide& side)
 {
-    int v1, v2;
-    v1 = v2 = -1;
-    if (elem.m_type == CollisionElementType::CellIndex && elem.m_element.m_CellIndexElement.cellType == IMSTK_EDGE)
+    std::vector<std::pair<int, VertexMassPair>> results(N);
+    if (pickData.idCount == 1) // If given cell index
     {
-        if (elem.m_element.m_CellIndexElement.idCount == 1)
+        const Eigen::Matrix<int, N, 1>& cell = (*dynamic_cast<VecDataArray<int, N>*>(side.m_indicesPtr))[pickData.ids[0]];
+        for (int i = 0; i < N; i++)
         {
-            const Vec2i& cell = (*dynamic_cast<VecDataArray<int, 2>*>(side.m_indicesPtr))[elem.m_element.m_CellIndexElement.ids[0]];
-            v1 = cell[0];
-            v2 = cell[1];
-        }
-        else if (elem.m_element.m_CellIndexElement.idCount == 2)
-        {
-            v1 = elem.m_element.m_CellIndexElement.ids[0];
-            v2 = elem.m_element.m_CellIndexElement.ids[1];
+            const int vertexId = cell[i];
+            results[i] = { vertexId, { &side.m_vertices[vertexId], side.m_invMasses[vertexId], &side.m_velocities[vertexId] } };
         }
     }
-    std::array<std::pair<int, VertexMassPair>, 2> results;
-    if (v1 != -1)
+    else // If given vertex indices
     {
-        if (side.m_mapPtr && dynamic_cast<OneToOneMap*>(side.m_mapPtr) != nullptr)
+        for (int i = 0; i < N; i++)
         {
-            v1 = side.m_mapPtr->getMapIdx(v1);
-            v2 = side.m_mapPtr->getMapIdx(v2);
+            const int vertexId = pickData.ids[i];
+            results[i] = { vertexId, { &side.m_vertices[vertexId], side.m_invMasses[vertexId], &side.m_velocities[vertexId] } };
         }
-        results[0] = { v1, { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] } };
-        results[1] = { v2, { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] } };
     }
     return results;
 }
 
-static std::array<std::pair<int, VertexMassPair>, 3>
-getTriangle(const CollisionElement& elem, const MeshSide& side)
-{
-    int v1, v2, v3;
-    v1 = v2 = v3 = -1;
-    if (elem.m_type == CollisionElementType::CellIndex && elem.m_element.m_CellIndexElement.cellType == IMSTK_TRIANGLE)
-    {
-        if (elem.m_element.m_CellIndexElement.idCount == 1)
-        {
-            const Vec3i& cell = (*dynamic_cast<VecDataArray<int, 3>*>(side.m_indicesPtr))[elem.m_element.m_CellIndexElement.ids[0]];
-            v1 = cell[0];
-            v2 = cell[1];
-            v3 = cell[2];
-        }
-        else if (elem.m_element.m_CellIndexElement.idCount == 3)
-        {
-            v1 = elem.m_element.m_CellIndexElement.ids[0];
-            v2 = elem.m_element.m_CellIndexElement.ids[1];
-            v3 = elem.m_element.m_CellIndexElement.ids[2];
-        }
-    }
-    std::array<std::pair<int, VertexMassPair>, 3> results;
-    if (v1 != -1)
-    {
-        if (side.m_mapPtr && dynamic_cast<OneToOneMap*>(side.m_mapPtr) != nullptr)
-        {
-            v1 = static_cast<int>(side.m_mapPtr->getMapIdx(v1));
-            v2 = static_cast<int>(side.m_mapPtr->getMapIdx(v2));
-            v3 = static_cast<int>(side.m_mapPtr->getMapIdx(v3));
-        }
-        results[0] = { v1, { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] } };
-        results[1] = { v2, { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] } };
-        results[2] = { v3, { &side.m_vertices[v3], side.m_invMasses[v3], &side.m_velocities[v3] } };
-    }
-    return results;
-}
-
-static std::array<std::pair<int, VertexMassPair>, 4>
-getTetrahedron(const CollisionElement& elem, const MeshSide& side)
-{
-    int v1, v2, v3, v4;
-    v1 = v2 = v3 = v4 = -1;
-    if (elem.m_type == CollisionElementType::CellIndex && elem.m_element.m_CellIndexElement.cellType == IMSTK_TETRAHEDRON)
-    {
-        if (elem.m_element.m_CellIndexElement.idCount == 1)
-        {
-            const Vec4i& cell = (*dynamic_cast<VecDataArray<int, 4>*>(side.m_indicesPtr))[elem.m_element.m_CellIndexElement.ids[0]];
-            v1 = cell[0];
-            v2 = cell[1];
-            v3 = cell[2];
-            v4 = cell[3];
-        }
-        else if (elem.m_element.m_CellIndexElement.idCount == 4)
-        {
-            v1 = elem.m_element.m_CellIndexElement.ids[0];
-            v2 = elem.m_element.m_CellIndexElement.ids[1];
-            v3 = elem.m_element.m_CellIndexElement.ids[2];
-            v4 = elem.m_element.m_CellIndexElement.ids[3];
-        }
-    }
-    std::array<std::pair<int, VertexMassPair>, 4> results;
-    if (v1 != -1)
-    {
-        results[0] = { v1, { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] } };
-        results[1] = { v2, { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] } };
-        results[2] = { v3, { &side.m_vertices[v3], side.m_invMasses[v3], &side.m_velocities[v3] } };
-        results[3] = { v2, { &side.m_vertices[v4], side.m_invMasses[v4], &side.m_velocities[v4] } };
-    }
-    return results;
-}
-
-PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> obj1) :
-    SceneObject("PbdObjectPicking_" + obj1->getName()),
-    m_objA(obj1)
+PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> obj) :
+    SceneObject("PbdObjectGrasping_" + obj->getName()),
+    m_objectToGrasp(obj), m_pickMethod(std::make_shared<CellPicker>())
 {
     // We have 3 implementations for 3 methods
     //  - picking all points inside the primitive (uses CD)
@@ -295,58 +92,73 @@ PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> obj1) :
         "PbdPickingUpdate", true);
     m_taskGraph->addNode(m_pickingNode);
 
-    m_taskGraph->addNode(obj1->getPbdModel()->getSolveNode());
-    m_taskGraph->addNode(obj1->getPbdModel()->getTaskGraph()->getSink());
+    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getSolveNode());
+    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getTaskGraph()->getSink());
 
-    m_taskGraph->addNode(obj1->getTaskGraph()->getSource());
-    m_taskGraph->addNode(obj1->getTaskGraph()->getSink());
+    m_taskGraph->addNode(m_objectToGrasp->getTaskGraph()->getSource());
+    m_taskGraph->addNode(m_objectToGrasp->getTaskGraph()->getSink());
 }
 
 void
-PbdObjectGrasping::endPick()
+PbdObjectGrasping::beginVertexGrasp(std::shared_ptr<AnalyticalGeometry> geometry)
 {
-    m_isPicking = false;
-    LOG(INFO) << "End pick";
+    auto vertexPicker = std::make_shared<VertexPicker>();
+    vertexPicker->setPickingGeometry(geometry);
+    m_pickMethod = vertexPicker;
+    m_graspMode  = GraspMode::Vertex;
+    m_graspGeom  = geometry;
+
+    m_isGrasping = true;
+    LOG(INFO) << "Begin grasp";
 }
 
 void
-PbdObjectGrasping::beginVertexPick(std::shared_ptr<AnalyticalGeometry> geometry)
+PbdObjectGrasping::beginCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType)
 {
-    m_pickingMode = Mode::PickVertex;
-    m_pickingGeometry = geometry;
+    auto cellPicker = std::make_shared<CellPicker>();
+    cellPicker->setPickingGeometry(geometry);
+    cellPicker->setCollisionDetection(CDObjectFactory::makeCollisionDetection(cdType));
+    m_pickMethod = cellPicker;
+    m_graspMode  = GraspMode::Cell;
+    m_graspGeom  = geometry;
 
-    m_isPicking = true;
-    LOG(INFO) << "Begin pick";
+    m_isGrasping = true;
+    LOG(INFO) << "Begin grasp";
 }
-void
-PbdObjectGrasping::beginElementPick(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType)
-{
-    m_pickingMode = Mode::PickElement;
-    m_pickingGeometry = geometry;
-    m_cdType = cdType;
 
-    m_isPicking = true;
-    LOG(INFO) << "Begin pick";
+void
+PbdObjectGrasping::beginRayPointGrasp(std::shared_ptr<AnalyticalGeometry> geometry,
+                                      const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist)
+{
+    auto pointPicker = std::make_shared<PointPicker>();
+    pointPicker->setPickingRay(rayStart, rayDir, maxDist);
+    m_pickMethod = pointPicker;
+    m_graspMode  = GraspMode::RayPoint;
+    m_graspGeom  = geometry;
+
+    m_isGrasping = true;
+    LOG(INFO) << "Begin grasp";
 }
-void
-PbdObjectGrasping::beginRayPick(Vec3d rayStart, Vec3d rayDir)
-{
-    m_pickingMode = Mode::PickRay;
-    m_rayStart = rayStart;
-    m_rayDir = rayDir;
 
-    m_isPicking = true;
-    LOG(INFO) << "Begin pick";
+void
+PbdObjectGrasping::beginRayCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry,
+                                     const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist)
+{
+    auto pointPicker = std::make_shared<PointPicker>();
+    pointPicker->setPickingRay(rayStart, rayDir, maxDist);
+    m_pickMethod = pointPicker;
+    m_graspMode  = GraspMode::RayCell;
+    m_graspGeom  = geometry;
+
+    m_isGrasping = true;
+    LOG(INFO) << "Begin grasp";
 }
-void
-PbdObjectGrasping::beginRayElementPick(Vec3d rayStart, Vec3d rayDir)
-{
-    m_pickingMode = Mode::PickRayElement;
-    m_rayStart = rayStart;
-    m_rayDir = rayDir;
 
-    m_isPicking = true;
-    LOG(INFO) << "Begin pick";
+void
+PbdObjectGrasping::endGrasp()
+{
+    m_isGrasping = false;
+    LOG(INFO) << "End grasp";
 }
 
 void
@@ -354,7 +166,6 @@ PbdObjectGrasping::removePickConstraints()
 {
     m_constraints.clear();
     m_constraintPts.clear();
-    m_pickedPtIdxOffset.clear();
 }
 
 void
@@ -362,202 +173,144 @@ PbdObjectGrasping::addPickConstraints()
 {
     removePickConstraints();
 
-    const Vec3d pickGeomPos = m_pickingGeometry->getPosition();
+    auto pointSetToPick = std::dynamic_pointer_cast<PointSet>(m_objectToGrasp->getPhysicsGeometry());
+    CHECK(pointSetToPick != nullptr) << "Trying to vertex pick with geometry that has no vertices";
 
-    std::shared_ptr<PbdModel>                model         = m_objA->getPbdModel();
-    std::shared_ptr<VecDataArray<double, 3>> verticesPtr   = model->getCurrentState()->getPositions();
-    VecDataArray<double, 3>&                 vertices      = *verticesPtr;
-    std::shared_ptr<VecDataArray<double, 3>> velocitiesPtr = model->getCurrentState()->getVelocities();
-    VecDataArray<double, 3>&                 velocities    = *velocitiesPtr;
-    std::shared_ptr<DataArray<double>>       invMassesPtr  = model->getInvMasses();
-    const DataArray<double>&                 invMasses     = *invMassesPtr;
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSetToPick->getVertexPositions();
+    VecDataArray<double, 3>&                 vertices    = *verticesPtr;
+
+    auto velocitiesPtr =
+        std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSetToPick->getVertexAttribute("Velocities"));
+    CHECK(velocitiesPtr != nullptr) << "Trying to vertex pick with geometry that has no Velocities";
+
+    VecDataArray<double, 3>& velocities   = *velocitiesPtr;
+    auto                     invMassesPtr =
+        std::dynamic_pointer_cast<DataArray<double>>(pointSetToPick->getVertexAttribute("InvMass"));
+    CHECK(invMassesPtr != nullptr) << "Trying to vertex pick with geometry that has no InvMass";
+
+    const DataArray<double>& invMasses = *invMassesPtr;
 
     std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
-    if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_objA->getPhysicsGeometry()))
+    if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(pointSetToPick))
     {
         indicesPtr = lineMesh->getLinesIndices();
     }
-    if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_objA->getPhysicsGeometry()))
+    if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(pointSetToPick))
     {
         indicesPtr = surfMesh->getTriangleIndices();
     }
-    else if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_objA->getPhysicsGeometry()))
+    else if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick))
     {
         indicesPtr = tetMesh->getTetrahedraIndices();
     }
 
+    // Place all the data into a struct to pass around & for quick access without casting
+    // or dereferencing
     MeshSide meshStruct(
         *verticesPtr,
         *velocitiesPtr,
         *invMassesPtr,
-        nullptr,
         indicesPtr.get());
 
-    if (m_pickingMode == Mode::PickVertex)
+    const Vec3d& pickGeomPos = m_graspGeom->getPosition();
+    const Mat3d  pickGeomRot = m_graspGeom->getRotation().transpose();
+
+    // Perform the picking
+    const std::vector<PickData>& pickData = m_pickMethod->pick(pointSetToPick);
+
+    // Digest the pick data based on grasp mode
+    if (m_graspMode == GraspMode::Vertex)
     {
-        // In PickPt mode we simply use SDF functions available in the geometries to
-        // sample if in or out of the shape
-        for (int i = 0; i < vertices.size(); i++)
+        for (size_t i = 0; i < pickData.size(); i++)
         {
-            const double signedDist = m_pickingGeometry->getFunctionValue(vertices[i]);
+            const PickData& data     = pickData[i];
+            const int       vertexId = data.ids[0];
 
-            // If inside the primitive
-            // \todo: come back to this
-            if (signedDist <= 0.0)
-            {
-                const Mat3d rot = m_pickingGeometry->getRotation().transpose();
-                const Vec3d relativePos = rot * (vertices[i] - m_pickingGeometry->getPosition());
+            const Vec3d relativePos = pickGeomRot * (vertices[vertexId] - pickGeomPos);
+            m_constraintPts.push_back({
+                    vertices[vertexId],
+                    relativePos,
+                    Vec3d::Zero() });
+            std::tuple<Vec3d, Vec3d, Vec3d>& cPt = m_constraintPts.back();
 
-                m_pickedPtIdxOffset[i] = relativePos;
-
-                m_constraintPts.push_back({
-                        i,
-                        m_pickingGeometry->getPosition() + rot.transpose() * relativePos,
-                        Vec3d(0.0, 0.0, 0.0) });
-                std::tuple<int, Vec3d, Vec3d>& cPt = m_constraintPts.back();
-
-                addConstraint(
-                    { { &vertices[i], invMasses[i], &velocities[i] } }, { 1.0 },
-                    { { &std::get<1>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
-                    m_stiffness, 0.0);
-            }
+            addConstraint(
+                { { &vertices[vertexId], invMasses[vertexId], &velocities[vertexId] } }, { 1.0 },
+                { { &std::get<0>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
+                m_stiffness, 0.0);
         }
     }
-    else if (m_pickingMode == Mode::PickElement)
+    else if (m_graspMode == GraspMode::Cell || m_graspMode == GraspMode::RayCell)
     {
-        // In PickPtInterpolated we actually perform element vs analytical geometry collision
-        if (m_cdType != "" && m_colDetect == nullptr)
+        for (size_t i = 0; i < pickData.size(); i++)
         {
-            m_colDetect = CDObjectFactory::makeCollisionDetection(m_cdType);
-        }
-        m_colDetect->setInputGeometryA(m_objA->getCollidingGeometry());
-        m_colDetect->setInputGeometryB(m_pickingGeometry);
-        m_colDetect->update();
-
-        const std::vector<CollisionElement>& elementsA = m_colDetect->getCollisionData()->elementsA;
-        const std::vector<CollisionElement>& elementsB = m_colDetect->getCollisionData()->elementsB;
-
-        const Mat3d rot = m_pickingGeometry->getRotation().transpose();
-        for (int i = 0; i < elementsA.size(); i++)
-        {
-            // A is the mesh, B is the analytic geometry
-            const CollisionElement& colElemA = elementsA[i];
-            const CollisionElement& colElemB = elementsB[i];
-
-            if (colElemA.m_type != CollisionElementType::CellIndex)
-            {
-                continue;
-            }
-
-            const CellTypeId cellTypeA = colElemA.m_element.m_CellIndexElement.cellType;
+            const PickData&  data = pickData[i];
+            const CellTypeId pickedCellType = data.cellType;
 
             std::vector<std::pair<int, VertexMassPair>> cellVerts;
-            if (cellTypeA == IMSTK_TETRAHEDRON)
+            if (pickedCellType == IMSTK_TETRAHEDRON)
             {
-                std::array<std::pair<int, VertexMassPair>, 4> vertexMass = getTetrahedron(colElemA, meshStruct);
-                cellVerts.resize(4);
-                cellVerts[0] = vertexMass[0];
-                cellVerts[1] = vertexMass[1];
-                cellVerts[2] = vertexMass[2];
-                cellVerts[3] = vertexMass[3];
+                cellVerts = getElement<4>(data, meshStruct);
             }
-            else if (cellTypeA == IMSTK_TRIANGLE)
+            else if (pickedCellType == IMSTK_TRIANGLE)
             {
-                std::array<std::pair<int, VertexMassPair>, 3> vertexMass = getTriangle(colElemA, meshStruct);
-                cellVerts.resize(3);
-                cellVerts[0] = vertexMass[0];
-                cellVerts[1] = vertexMass[1];
-                cellVerts[2] = vertexMass[2];
+                cellVerts = getElement<3>(data, meshStruct);
             }
-            else if (cellTypeA == IMSTK_EDGE)
+            else if (pickedCellType == IMSTK_EDGE)
             {
-                std::array<std::pair<int, VertexMassPair>, 2> vertexMass = getEdge(colElemA, meshStruct);
-                cellVerts.resize(2);
-                cellVerts[0] = vertexMass[0];
-                cellVerts[1] = vertexMass[1];
+                cellVerts = getElement<2>(data, meshStruct);
             }
 
             // Does not resolve duplicate vertices yet
             // But pbd implicit solve with reprojection avoids issues
             for (size_t j = 0; j < cellVerts.size(); j++)
             {
-                const Vec3d  relativePos = rot * (*cellVerts[j].second.vertex - m_pickingGeometry->getPosition());
-                const size_t index       = m_constraintPts.size();
-                const size_t vertexIndex = cellVerts[j].first;
-                m_pickedPtIdxOffset[index] = relativePos;
+                const int vertexId = cellVerts[j].first;
+
+                const Vec3d relativePos = pickGeomRot * (vertices[vertexId] - pickGeomPos);
                 m_constraintPts.push_back({
-                        index,
-                        *cellVerts[j].second.vertex,
-                        Vec3d(0.0, 0.0, 0.0) });
-                std::tuple<int, Vec3d, Vec3d>& cPt = m_constraintPts.back();
+                        vertices[vertexId],
+                        relativePos,
+                        Vec3d::Zero() });
+                std::tuple<Vec3d, Vec3d, Vec3d>& cPt = m_constraintPts.back();
 
                 addConstraint(
-                    { { &vertices[vertexIndex], invMasses[vertexIndex], &velocities[vertexIndex] } }, { 1.0 },
-                    { { &std::get<1>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
+                    { { &vertices[vertexId], invMasses[vertexId], &velocities[vertexId] } }, { 1.0 },
+                    { { &std::get<0>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
                     m_stiffness, 0.0);
             }
         }
     }
-    else if (m_pickingMode == Mode::PickRay)
+    else if (m_graspMode == GraspMode::RayPoint)
     {
-        // In PickPtInterpolated we actually perform element vs analytical geometry collision
-        if (m_cdType != "" && m_colDetect == nullptr)
+        for (size_t i = 0; i < pickData.size(); i++)
         {
-            m_colDetect = CDObjectFactory::makeCollisionDetection(m_cdType);
-        }
-        m_colDetect->setInputGeometryA(m_objA->getCollidingGeometry());
-        m_colDetect->setInputGeometryB(m_pickingGeometry);
-        m_colDetect->update();
+            const PickData&  data = pickData[i];
+            const CellTypeId pickedCellType = data.cellType;
 
-        const std::vector<CollisionElement>& elementsA = m_colDetect->getCollisionData()->elementsA;
-        const std::vector<CollisionElement>& elementsB = m_colDetect->getCollisionData()->elementsB;
-
-        const Mat3d rot = m_pickingGeometry->getRotation().transpose();
-        for (size_t i = 0; i < elementsA.size(); i++)
-        {
-            // A is the mesh, B is the analytic geometry
-            const CollisionElement& colElemA = elementsA[i];
-            const CollisionElement& colElemB = elementsB[i];
-
-            if (colElemA.m_type != CollisionElementType::CellIndex)
+            std::vector<std::pair<int, VertexMassPair>> cellIdVerts;
+            if (pickedCellType == IMSTK_TETRAHEDRON)
             {
-                continue;
+                cellIdVerts = getElement<4>(data, meshStruct);
             }
-
-            const CellTypeId cellTypeA = colElemA.m_element.m_CellIndexElement.cellType;
-
-            std::vector<VertexMassPair> cellVerts;
-            if (cellTypeA == IMSTK_TETRAHEDRON)
+            else if (pickedCellType == IMSTK_TRIANGLE)
             {
-                std::array<std::pair<int, VertexMassPair>, 4> vertexMass = getTetrahedron(colElemA, meshStruct);
-                cellVerts.resize(4);
-                cellVerts[0] = vertexMass[0].second;
-                cellVerts[1] = vertexMass[1].second;
-                cellVerts[2] = vertexMass[2].second;
-                cellVerts[3] = vertexMass[3].second;
+                cellIdVerts = getElement<3>(data, meshStruct);
             }
-            else if (cellTypeA == IMSTK_TRIANGLE)
+            else if (pickedCellType == IMSTK_EDGE)
             {
-                std::array<std::pair<int, VertexMassPair>, 3> vertexMass = getTriangle(colElemA, meshStruct);
-                cellVerts.resize(3);
-                cellVerts[0] = vertexMass[0].second;
-                cellVerts[1] = vertexMass[1].second;
-                cellVerts[2] = vertexMass[2].second;
+                cellIdVerts = getElement<2>(data, meshStruct);
             }
-            // Edge vs ...
-            else if (cellTypeA == IMSTK_EDGE)
+            std::vector<VertexMassPair> cellVerts(cellIdVerts.size());
+            for (size_t j = 0; j < cellIdVerts.size(); j++)
             {
-                std::array<std::pair<int, VertexMassPair>, 2> vertexMass = getEdge(colElemA, meshStruct);
-                cellVerts.resize(2);
-                cellVerts[0] = vertexMass[0].second;
-                cellVerts[1] = vertexMass[1].second;
+                cellVerts[j] = cellIdVerts[j].second;
             }
 
             // The point to constrain the element too
-            const Vec3d pickingPt = colElemB.m_element.m_PointDirectionElement.pt;
+            const Vec3d pickingPt = data.pickPoint;
 
             std::vector<double> weights(cellVerts.size());
-            if (cellTypeA == IMSTK_TETRAHEDRON)
+            if (pickedCellType == IMSTK_TETRAHEDRON)
             {
                 const Vec4d baryCoord = baryCentric(pickingPt,
                     *cellVerts[0].vertex,
@@ -569,33 +322,31 @@ PbdObjectGrasping::addPickConstraints()
                 weights[2] = baryCoord[2];
                 weights[3] = baryCoord[3];
             }
-            else if (cellTypeA == IMSTK_TRIANGLE)
+            else if (pickedCellType == IMSTK_TRIANGLE)
             {
                 const Vec3d baryCoord = baryCentric(pickingPt, *cellVerts[0].vertex, *cellVerts[1].vertex, *cellVerts[2].vertex);
                 weights[0] = baryCoord[0];
                 weights[1] = baryCoord[1];
                 weights[2] = baryCoord[2];
             }
-            else
+            else if (pickedCellType == IMSTK_EDGE)
             {
                 const Vec2d baryCoord = baryCentric(pickingPt, *cellVerts[0].vertex, *cellVerts[1].vertex);
                 weights[0] = baryCoord[0];
                 weights[1] = baryCoord[1];
             }
 
-            const Vec3d  relativePos = rot * (pickingPt - m_pickingGeometry->getPosition());
-            const size_t index       = m_constraintPts.size();
-            m_pickedPtIdxOffset[index] = relativePos;
+            const Vec3d  relativePos = pickGeomRot * (pickingPt - pickGeomPos);
             m_constraintPts.push_back({
-                    index,
-                    pickingPt,
-                    Vec3d(0.0, 0.0, 0.0) });
-            std::tuple<int, Vec3d, Vec3d>& cPt = m_constraintPts.back();
+                        pickingPt,
+                        relativePos,
+                        Vec3d::Zero() });
+            std::tuple<Vec3d, Vec3d, Vec3d>& cPt = m_constraintPts.back();
 
             // Cell to single point constraint
             addConstraint(
                 cellVerts, weights,
-                { { &std::get<1>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
+                { { &std::get<0>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
                 m_stiffness, 0.0);
         }
     }
@@ -620,22 +371,22 @@ PbdObjectGrasping::addConstraint(
 void
 PbdObjectGrasping::updatePicking()
 {
-    m_objA->updateGeometries();
+    m_objectToGrasp->updateGeometries();
 
     // If started picking
-    if (!m_isPrevPicking && m_isPicking)
+    if (!m_isPrevGrasping && m_isGrasping)
     {
         addPickConstraints();
     }
     // If stopped picking
-    if (!m_isPicking && m_isPrevPicking)
+    if (!m_isGrasping && m_isPrevGrasping)
     {
         removePickConstraints();
     }
     // Push back the picking state
-    m_isPrevPicking = m_isPicking;
+    m_isPrevGrasping = m_isGrasping;
 
-    if (m_isPicking)
+    if (m_isGrasping)
     {
         updateConstraints();
     }
@@ -644,14 +395,14 @@ PbdObjectGrasping::updatePicking()
 void
 PbdObjectGrasping::updateConstraints()
 {
-    const Mat3d rot = m_pickingGeometry->getRotation().transpose();
-
     // Update constraint point positions
     {
+        const Vec3d& pos = m_graspGeom->getPosition();
+        const Mat3d  rot = m_graspGeom->getRotation();
         for (auto& cPt : m_constraintPts)
         {
-            const Vec3d offset = m_pickedPtIdxOffset[std::get<0>(cPt)];
-            std::get<1>(cPt) = m_pickingGeometry->getPosition() + rot.transpose() * offset;
+            const Vec3d relativePos = std::get<1>(cPt);
+            std::get<0>(cPt) = pos + rot * relativePos;
         }
     }
 
@@ -665,12 +416,10 @@ PbdObjectGrasping::updateConstraints()
 void
 PbdObjectGrasping::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    auto pbdObj     = m_objA;
+    std::shared_ptr<PbdModel> pbdModel = m_objectToGrasp->getPbdModel();
 
-    std::shared_ptr<PbdModel> pbdModel = pbdObj->getPbdModel();
-
-    m_taskGraph->addEdge(source, pbdObj->getTaskGraph()->getSource());
-    m_taskGraph->addEdge(pbdObj->getTaskGraph()->getSink(), sink);
+    m_taskGraph->addEdge(source, m_objectToGrasp->getTaskGraph()->getSource());
+    m_taskGraph->addEdge(m_objectToGrasp->getTaskGraph()->getSink(), sink);
 
     // The ideal location is after the internal positional solve
     m_taskGraph->addEdge(pbdModel->getSolveNode(), m_pickingNode);

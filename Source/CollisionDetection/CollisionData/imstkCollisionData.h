@@ -60,7 +60,7 @@ struct EmptyElement { };
 
 ///
 /// \brief Represents a cell by its vertex values
-/// Possibly cells may be: point, edge, triangle, quad, or tetrahedron
+/// Possible cells may be: point, edge, triangle, quad, or tetrahedron
 /// Maximum 4 vertices (tetrahedron is maximum cell it could represent)
 ///
 struct CellVertexElement
@@ -69,9 +69,9 @@ struct CellVertexElement
     int size     = 0;
 };
 ///
-/// \brief Represents a cell by its single cell id OR by its N vertex ids
-/// which case can be determined by the idCount
-/// Possibly cells may be: point, edge, triangle, quad, or tetrahedron
+/// \brief Represents a cell by a single cell id OR by N vertex ids
+/// Which case can be determined by the idCount
+/// Possible cells may be: point, edge, triangle, quad, or tetrahedron
 /// maximum 4 ids (tetrahedron by vertex ids is maximum cell it could represent)
 ///
 struct CellIndexElement

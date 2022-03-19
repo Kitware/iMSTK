@@ -16,13 +16,12 @@
 #
 ###########################################################################
 if(iMSTK_USE_OpenHaptics)
-
-  project(Example-PBDPicking)
+  project(Example-PbdThinTissueGrasping)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
-  imstk_add_executable(${PROJECT_NAME} PBDPickingExample.cpp)
+  imstk_add_executable(${PROJECT_NAME} PbdThinTissueGraspingExample.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
@@ -33,7 +32,6 @@ if(iMSTK_USE_OpenHaptics)
   # Link libraries to executable
   #-----------------------------------------------------------------------------
   target_link_libraries(${PROJECT_NAME}
-	SimulationManager
-	ViewerVTK)
-
+    SimulationManager
+    ViewerVTK)
 endif()

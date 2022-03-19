@@ -21,10 +21,10 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
-#include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
+#include "imstkImageData.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLaparoscopicToolController.h"
 #include "imstkMeshIO.h"
@@ -39,23 +39,21 @@
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkTaskNode.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
 
 ///
-/// \brief Creates cloth geometry
+/// \brief Creates tissue geometry
 ///
 static std::shared_ptr<SurfaceMesh>
-makeClothGeometry(const double width,
-                  const double height,
-                  const int    nRows,
-                  const int    nCols)
+makeTriangleGrid(const double width,
+                 const double height,
+                 const int    nRows,
+                 const int    nCols,
+                 const double uvScale)
 {
-    imstkNew<SurfaceMesh> clothMesh;
-
     imstkNew<VecDataArray<double, 3>> verticesPtr(nRows * nCols);
     VecDataArray<double, 3>&          vertices = *verticesPtr.get();
     const double                      dy       = width / static_cast<double>(nCols - 1);
@@ -64,7 +62,7 @@ makeClothGeometry(const double width,
     {
         for (int j = 0; j < nCols; j++)
         {
-            vertices[i * nCols + j] = Vec3d(dx * static_cast<double>(i), 1.0, dy * static_cast<double>(j));
+            vertices[i * nCols + j] = Vec3d(dx * static_cast<double>(i), 0.0, dy * static_cast<double>(j)) - Vec3d(height, 0.0, width) * 0.5;
         }
     }
 
@@ -94,58 +92,82 @@ makeClothGeometry(const double width,
         }
     }
 
-    clothMesh->initialize(verticesPtr, indicesPtr);
+    imstkNew<VecDataArray<float, 2>> uvCoordsPtr(nRows * nCols);
+    VecDataArray<float, 2>& uvCoords = *uvCoordsPtr.get();
+    for (int i = 0; i < nRows; ++i)
+    {
+        for (int j = 0; j < nCols; j++)
+        {
+            uvCoords[i * nCols + j] = Vec2f(static_cast<float>(i) / nRows, static_cast<float>(j) / nCols) * uvScale;
+        }
+    }
 
-    return clothMesh;
+    imstkNew<SurfaceMesh> mesh;
+    mesh->initialize(verticesPtr, indicesPtr);
+    mesh->setVertexTCoords("uvs", uvCoordsPtr);
+    return mesh;
 }
 
 ///
-/// \brief Creates cloth object
+/// \brief Creates tissue object
 ///
 static std::shared_ptr<PbdObject>
-makeClothObj(const std::string& name,
+makeTissueObj(const std::string& name,
              const double       width,
              const double       height,
-             const int          nRows,
-             const int          nCols)
+             const int          rowCount,
+             const int          colCount)
 {
-    imstkNew<PbdObject> clothObj(name);
-
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh(makeClothGeometry(width, height, nRows, nCols));
+    std::shared_ptr<SurfaceMesh> mesh =
+        makeTriangleGrid(width, height, rowCount, colCount, 2.0);
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 4000.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 100.0);
-    pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
-    pbdParams->m_uniformMassValue = width * height / ((double)nRows * (double)nCols);
-    pbdParams->m_gravity    = Vec3d(0.0, -140.0, 0.0);
-    pbdParams->m_dt         = 0.01;
-    pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.005;
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1000.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.1);
+    for (int x = 0; x < rowCount; x++)
+    {
+        for (int y = 0; y < colCount; y++)
+        {
+            if (x == 0 || y == 0 || x == rowCount - 1 || y == colCount - 1)
+            {
+                pbdParams->m_fixedNodeIds.push_back(x * colCount + y);
+            }
+        }
+    }
+    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->m_gravity    = Vec3d(0.0, -0.098, 0.0);
+    pbdParams->m_dt         = 0.005;
+    pbdParams->m_iterations = 4;
+    pbdParams->m_viscousDampingCoeff = 0.01;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(clothMesh);
+    pbdModel->setModelGeometry(mesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-
-    imstkNew<VisualModel> visualModel;
-    visualModel->setGeometry(clothMesh);
-    visualModel->setRenderMaterial(material);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
+    material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
+    auto normalTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshNormal.jpg");
+    material->addTexture(std::make_shared<Texture>(normalTex, Texture::Type::Normal));
+    auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshORM.jpg");
+    material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
 
     // Setup the Object
-    clothObj->addVisualModel(visualModel);
-    clothObj->setPhysicsGeometry(clothMesh);
-    clothObj->setCollidingGeometry(clothMesh);
-    clothObj->setDynamicalModel(pbdModel);
+    imstkNew<PbdObject> tissueObj(name);
+    tissueObj->setVisualGeometry(mesh);
+    tissueObj->getVisualModel(0)->setRenderMaterial(material);
+    tissueObj->setPhysicsGeometry(mesh);
+    tissueObj->setCollidingGeometry(mesh);
+    tissueObj->setDynamicalModel(pbdModel);
 
-    return clothObj;
+    return tissueObj;
 }
 
 ///
@@ -160,13 +182,9 @@ main()
 
     // Scene
     imstkNew<Scene> scene("PBDPicking");
-
-    // Create the virtual coupling object controller
-
-    // Device Server
-    imstkNew<HapticDeviceManager> server;
-    server->setSleepDelay(1.0);
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
+    scene->getActiveCamera()->setPosition(0.001, 0.05, 0.15);
+    scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
+    scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
     // Load the meshes
     auto upperSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/upper.obj");
@@ -174,19 +192,19 @@ main()
     auto pivotSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/pivot.obj");
 
     imstkNew<Capsule> geomShaft;
-    geomShaft->setLength(20.0);
-    geomShaft->setRadius(1.0);
+    geomShaft->setLength(1.0);
+    geomShaft->setRadius(0.005);
     geomShaft->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
-    geomShaft->setTranslation(Vec3d(0.0, 0.0, 10.0));
+    geomShaft->setTranslation(Vec3d(0.0, 0.0, 0.5));
     imstkNew<CollidingObject> objShaft("ShaftObject");
     objShaft->setVisualGeometry(pivotSurfMesh);
     objShaft->setCollidingGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
     imstkNew<Capsule> geomUpperJaw;
-    geomUpperJaw->setLength(25.0);
-    geomUpperJaw->setTranslation(Vec3d(0.0, 1.0, -12.5));
-    geomUpperJaw->setRadius(2.2);
+    geomUpperJaw->setLength(0.05);
+    geomUpperJaw->setTranslation(Vec3d(0.0, 0.0013, -0.016));
+    geomUpperJaw->setRadius(0.004);
     geomUpperJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
     objUpperJaw->setVisualGeometry(upperSurfMesh);
@@ -194,9 +212,9 @@ main()
     scene->addSceneObject(objUpperJaw);
 
     imstkNew<Capsule> geomLowerJaw;
-    geomLowerJaw->setLength(25.0);
-    geomLowerJaw->setTranslation(Vec3d(0.0, -1.0, -12.5));
-    geomLowerJaw->setRadius(2.2);
+    geomLowerJaw->setLength(0.05);
+    geomLowerJaw->setTranslation(Vec3d(0.0, -0.0013, -0.016));
+    geomLowerJaw->setRadius(0.004);
     geomLowerJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
     objLowerJaw->setVisualGeometry(lowerSurfMesh);
@@ -204,40 +222,42 @@ main()
     scene->addSceneObject(objLowerJaw);
 
     imstkNew<Capsule> pickGeom;
-    pickGeom->setLength(25.0);
-    pickGeom->setTranslation(Vec3d(0.0, -1.0, -12.5));
-    pickGeom->setRadius(3.0);
+    pickGeom->setLength(0.05);
+    pickGeom->setTranslation(Vec3d(0.0, 0.0, -0.016));
+    pickGeom->setRadius(0.006);
     pickGeom->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objPickGeom("PickGeom");
-    //objPickGeom->setVisualGeometry(pickGeom);
+    objPickGeom->setVisualGeometry(pickGeom);
     objPickGeom->setCollidingGeometry(pickGeom);
     scene->addSceneObject(objPickGeom);
 
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 5, 5);
-    scene->addSceneObject(clothObj);
+    // 300mm x 300mm patch of tissue
+    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue", 0.1, 0.1, 16, 16);
+    scene->addSceneObject(tissueObj);
+
+    imstkNew<HapticDeviceManager> deviceManager;
+    deviceManager->setSleepDelay(1.0);
+    std::shared_ptr<HapticDeviceClient> client = deviceManager->makeDeviceClient();
 
     // Create and add virtual coupling object controller in the scene
     imstkNew<LaparoscopicToolController> controller(objShaft, objUpperJaw, objLowerJaw, objPickGeom, client);
     controller->setJawAngleChange(6.0e-3);
+    controller->setTranslationScaling(0.001);
     scene->addController(controller);
 
     // Add collision for both jaws of the tool
-    auto upperJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objUpperJaw, "SurfaceMeshToCapsuleCD");
-    auto lowerJawCollision = std::make_shared<PbdObjectCollision>(clothObj, objLowerJaw, "SurfaceMeshToCapsuleCD");
+    auto upperJawCollision = std::make_shared<PbdObjectCollision>(tissueObj, objUpperJaw, "SurfaceMeshToCapsuleCD");
+    auto lowerJawCollision = std::make_shared<PbdObjectCollision>(tissueObj, objLowerJaw, "SurfaceMeshToCapsuleCD");
     scene->addInteraction(upperJawCollision);
     scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
-    auto jawPicking = std::make_shared<PbdObjectGrasping>(clothObj);
-    scene->addInteraction(jawPicking);
-
-    // Camera
-    scene->getActiveCamera()->setPosition(Vec3d(1.0, 1.0, 1.0) * 100.0);
-    scene->getActiveCamera()->setFocalPoint(Vec3d(0.0, -50.0, 0.0));
+   /* auto jawPicking = std::make_shared<PbdObjectGrasping>(tissueObj);
+    scene->addInteraction(jawPicking);*/
 
     // Light
     imstkNew<DirectionalLight> light;
-    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setFocalPoint(Vec3d(-1.0, -1.0, 0.0));
     light->setIntensity(1.0);
     scene->addLight("light", light);
 
@@ -246,6 +266,7 @@ main()
         // Setup a viewer to render
         imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
+        viewer->setDebugAxesLength(0.01, 0.01, 0.01);
 
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager;
@@ -253,7 +274,7 @@ main()
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;
-        driver->addModule(server);
+        driver->addModule(deviceManager);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.005);
@@ -274,7 +295,7 @@ main()
             [&](Event*)
             {
                 // Simulate the cloth in real time
-                clothObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+                tissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
             });
 
         connect<Event>(controller, &LaparoscopicToolController::JawClosed,
@@ -282,18 +303,18 @@ main()
             {
                 LOG(INFO) << "Jaw Closed!";
 
-                upperJawCollision->setEnabled(false);
+                /*upperJawCollision->setEnabled(false);
                 lowerJawCollision->setEnabled(false);
-                jawPicking->beginElementPick(pickGeom, "SurfaceMeshToCapsuleCD");
+                jawPicking->beginCellGrasp(pickGeom, "SurfaceMeshToCapsuleCD");*/
             });
         connect<Event>(controller, &LaparoscopicToolController::JawOpened,
             [&](Event*)
             {
                 LOG(INFO) << "Jaw Opened!";
 
-                upperJawCollision->setEnabled(true);
+                /*upperJawCollision->setEnabled(true);
                 lowerJawCollision->setEnabled(true);
-                jawPicking->endPick();
+                jawPicking->endGrasp();*/
             });
 
         driver->start();

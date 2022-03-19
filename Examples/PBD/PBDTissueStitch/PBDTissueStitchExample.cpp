@@ -269,7 +269,7 @@ main()
         Vec3d(0.07, 0.01, 0.07), Vec3i(12, 2, 8), Vec3d(0.0, 0.0, 0.0));
     scene->addSceneObject(tissueObj);
 
-    auto cdObj = std::make_shared<CollidingObject>("pipe");
+    auto cdObj       = std::make_shared<CollidingObject>("pipe");
     auto capsuleGeom = std::make_shared<Capsule>();
     capsuleGeom->setPosition(0.0, 0.03, 0.0);
     capsuleGeom->setRadius(0.01);
@@ -318,19 +318,19 @@ main()
         //    });
 
         const std::vector<size_t>& fixedNodes = tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds;
-        std::vector<Vec3d> initPositions;
+        std::vector<Vec3d>         initPositions;
 
-        auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
+        auto                                     tetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr = tetMesh->getVertexPositions();
-        VecDataArray<double, 3>& vertices = *verticesPtr;
+        VecDataArray<double, 3>&                 vertices    = *verticesPtr;
         for (size_t i = 0; i < fixedNodes.size(); i++)
         {
             initPositions.push_back(vertices[fixedNodes[i]]);
         }
 
         double t = 0.0;
-        bool performStitch = false;
-        bool prevPerformStitch = false;
+        bool   performStitch     = false;
+        bool   prevPerformStitch = false;
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
                 // Move upwards until within radius slightly larger then cylinder
@@ -341,11 +341,11 @@ main()
                 t += dt;
 
                 prevPerformStitch = performStitch;
-                performStitch = false;
+                performStitch     = false;
                 for (size_t i = 0; i < fixedNodes.size(); i++)
                 {
                     Vec3d initPos = initPositions[i];
-                    Vec3d& pos = vertices[fixedNodes[i]];
+                    Vec3d& pos    = vertices[fixedNodes[i]];
 
                     const double dy = std::abs(pos[1] - initPos[1]);
                     const double dx = std::abs(pos[0] - initPos[0]);
@@ -378,10 +378,8 @@ main()
                 {
                     // Perform line intersection to place a stitch along intersection points in line
 
-
                     auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
                     //constraint->initConstraint();
-
                 }
             });
 

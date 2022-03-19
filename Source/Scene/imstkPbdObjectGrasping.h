@@ -32,6 +32,7 @@ namespace imstk
 class AnalyticalGeometry;
 class PbdCollisionConstraint;
 class PbdObject;
+class PickingAlgorithm;
 
 ///
 /// \class PbdObjectGrasping
@@ -39,19 +40,19 @@ class PbdObject;
 /// \brief This class defines grasping of a PbdObject via different
 /// picking methods. Where grasping is define as grabbing & attaching
 /// of a PbdObject's mesh to points.
-/// 
+///
 /// Given an input PickData the appropriate grasping will be produced.
 ///
 class PbdObjectGrasping : public SceneObject
 {
-public:
-    enum class Mode
+protected:
+    enum class GraspMode
     {
-        PickVertex, // Grab a vertex (most performant)
-        PickElement, // Grab the entire element/s
-        PickRay, // Grab the the point on the element along the ray
-        PickRayElement, // Grab the element along the ray
-        PickNearestElement // Grab the nearest element
+        Vertex,      // Grab a vertex (most performant)
+        Cell,        // Grab an entire cell/s
+        RayPoint,    // Grab a point on the nearest cell along the ray
+        RayCell     // Grab a cell along the ray
+        //NearestCells // Grab the nearest element
     };
 
 public:
@@ -69,19 +70,40 @@ public:
     ///@}
 
     ///
-    /// \brief End picking (picking will end on next update)
+    /// \brief Begin a vertex grasp (picking will begin on the next update)
+    /// \param Geometry attached/grasped too
     ///
-    void endPick();
+    void beginVertexGrasp(std::shared_ptr<AnalyticalGeometry> geometry);
 
     ///
-    /// \brief Begin a Pick
-    ///@{
-    void beginVertexPick(std::shared_ptr<AnalyticalGeometry> geometry);
-    void beginElementPick(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType);
-    void beginRayPick(Vec3d rayStart, Vec3d rayDir);
-    void beginRayElementPick(Vec3d rayStart, Vec3d rayDir);
-    //void beginNearestElementPick(Vec3d grabPoint, double radius);
-    ///@}
+    /// \brief Begin a cell grasp (picking will begin on the next update)
+    /// \param Geometry attached/grasped too
+    /// \param The intersection type/class name
+    ///
+    void beginCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType);
+
+    ///
+    /// \brief Begin a ray point grasp (picking will begin on the next update)
+    /// \param Geometry attached/grasped too
+    /// \param Global space ray start
+    /// \param Global space ray direction
+    ///
+    void beginRayPointGrasp(std::shared_ptr<AnalyticalGeometry> geometry,
+                            const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist = -1.0);
+
+    ///
+    /// \brief Begin a ray point grasp (picking will begin on the next update)
+    /// \param Geometry attached/grasped too
+    /// \param Global space ray start
+    /// \param Global space ray direction
+    ///
+    void beginRayCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry,
+                           const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist = -1.0);
+
+    ///
+    /// \brief End a grasp (picking will end on next update)
+    ///
+    void endGrasp();
 
     ///
     /// \brief Compute/generate the constraints for picking
@@ -94,7 +116,7 @@ public:
     void removePickConstraints();
 
     ///
-    /// \brief Add constraint between a point on each element given via 
+    /// \brief Add constraint between a point on each element given via
     /// barycentric coordinates
     /// pt position = weightA_0 * ptsA_0 + weightA_1 * ptsA_1 + ...
     ///
@@ -105,13 +127,20 @@ public:
         std::vector<double> weightsB,
         double stiffnessA, double stiffnessB);
 
+    ///
+    /// \brief Get/Set the method use for picking, default is CellPicker
+    ///@{
+    void setPickingAlgorithm(std::shared_ptr<PickingAlgorithm> pickMethod) { m_pickMethod = pickMethod; }
+    std::shared_ptr<PickingAlgorithm> getPickingAlgorithm() const { return m_pickMethod; }
+    ///@}
+
     std::shared_ptr<TaskNode> getPickingNode() const { return m_pickingNode; }
 
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     ///
-    /// \brief Update picking state
+    /// \brief Update picking state, this should move grasp points
     ///
     virtual void updatePicking();
 
@@ -123,24 +152,20 @@ protected:
 protected:
     std::shared_ptr<TaskNode> m_pickingNode = nullptr;
 
-    std::shared_ptr<PbdObject>       m_objA = nullptr;
-    std::shared_ptr<AnalyticalGeometry> m_pickingGeometry = nullptr;
-    std::string m_cdType = "";
+    std::shared_ptr<PbdObject> m_objectToGrasp      = nullptr;
+    std::shared_ptr<AnalyticalGeometry> m_graspGeom = nullptr;
 
-    Mode m_pickingMode = Mode::PickVertex;
+    std::shared_ptr<PickingAlgorithm> m_pickMethod = nullptr;
+    GraspMode m_graspMode = GraspMode::Cell;
 
-    bool m_isPicking     = false;
-    bool m_isPrevPicking = false;
+    bool m_isGrasping     = false;
+    bool m_isPrevGrasping = false;
 
+    /// Stiffness of grasp, when 1 the position is completely moved too the grasp point
+    /// when stiffness < 1 it will slowly converge on the grasp point
     double m_stiffness = 0.4;
 
-    std::shared_ptr<CollisionDetectionAlgorithm> m_colDetect = nullptr;
-    Vec3d m_rayStart = Vec3d::Zero();
-    Vec3d m_rayDir = Vec3d::Zero();
-
-    std::unordered_map<size_t, Vec3d> m_pickedPtIdxOffset; ///> Map for picked nodes.
-
-    std::list<std::tuple<int, Vec3d, Vec3d>> m_constraintPts;
-    std::vector<std::shared_ptr<PbdCollisionConstraint>> m_constraints; ///> List of PBD constraints
+    std::list<std::tuple<Vec3d, Vec3d, Vec3d>> m_constraintPts;         ///< Position, Relative position, Velocity
+    std::vector<std::shared_ptr<PbdCollisionConstraint>> m_constraints; ///< List of PBD constraints
 };
 } // namespace imstk

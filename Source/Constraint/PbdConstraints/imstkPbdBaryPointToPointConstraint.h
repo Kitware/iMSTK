@@ -28,15 +28,12 @@ namespace imstk
 ///
 /// \class PbdBaryPointToPointConstraint
 ///
-/// \brief Constrains two points from two separate elements given via
-/// barycentric coordinates.
+/// \brief Constrains two points from two separate cells/elements given via
+/// barycentric coordinates to be coincident
 ///
-/// This constraint technically is a cache-all implementation of all
-/// non-penetration constraints as it works for any elements. However,
-/// it is not fast so using for many contacts is not ideal.
-/// Note: Template solution avoided as imstk is a dynamic library.
-///
-/// \todo: Could be altered as a distance constraint
+/// Such constraint may be used for grasping (grabbing points on elements,
+/// grabbing points with other points), stitching (constraining two
+/// points from separate elements together)
 ///
 class PbdBaryPointToPointConstraint : public PbdCollisionConstraint
 {
@@ -44,7 +41,6 @@ public:
     PbdBaryPointToPointConstraint() : PbdCollisionConstraint(0, 0) { }
     ~PbdBaryPointToPointConstraint() override = default;
 
-public:
     Vec3d computeInterpolantDifference() const;
 
     ///
