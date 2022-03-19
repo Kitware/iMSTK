@@ -19,7 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkPbdObjectPicking.h"
+#include "imstkPbdObjectGrasping.h"
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionDetectionAlgorithm.h"
@@ -35,6 +35,131 @@ limitations under the License.
 
 namespace imstk
 {
+/////
+///// \brief PickData covers all picking datas
+///// via composition.
+///// 
+//struct PickData
+//{
+//public:
+//    Vec3d pickPoint;
+//    int cellId;
+//    std::vector<int> vertexIds;
+//    std::vector<double> weights;
+//};
+//
+/////
+///// \brief Abstract functor for picking of shapes.
+///// \note: A factory mapping shape types to picking types is
+///// a strong possibility.
+///// 
+//struct PickingMethod
+//{
+//public:
+//    ///
+//    /// \brief Perform picking on provided geometry
+//    /// 
+//    virtual std::vector<PickData> Pick(std::shared_ptr<Geometry> geomToPick) = 0;
+//};
+//
+/////
+///// \brief Picks elements of geomToPick via those that that are
+///// intersecting pickingGeom.
+///// 
+//struct ElementPicking : public PickingMethod
+//{
+//public:
+//    std::vector<PickData> Pick(std::shared_ptr<Geometry> geometryToPick) override
+//    {
+//        // Crazy combinatoral explosion
+//    }
+//    void setPickingGeometry(std::shared_ptr<Geometry> pickGeometry)
+//    {
+//        m_pickGeometry = pickGeometry;
+//    }
+//    std::shared_ptr<Geometry> getPickGeometry() const { return m_pickGeometry; }
+//
+//protected:
+//    std::shared_ptr<Geometry> m_pickGeometry = nullptr;
+//};
+//
+/////
+///// \brief Picks vertices of geomToPick via those that that are
+///// intersecting pickingGeom.
+///// 
+//struct VertexPicking : public PickingMethod
+//{
+//public:
+//    std::vector<PickData> Pick(std::shared_ptr<Geometry> geometryToPick) override
+//    {
+//        std::vector<PickData> pickDatas;
+//
+//        auto pointSetToPick = std::dynamic_pointer_cast<PointSet>(geometryToPick);
+//        CHECK(pointSetToPick != nullptr) << "Trying to vertex pick with geometry that has no vertices";
+//
+//        // Use implicit functions available in the geometries to sample if in or out of the shape
+//        std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSetToPick->getVertexPositions();
+//        VecDataArray<double, 3>& vertices = *verticesPtr;
+//        for (int i = 0; i < vertices.size(); i++)
+//        {
+//            const double signedDist = m_pickGeometry->getFunctionValue(vertices[i]);
+//
+//            // If inside the primitive
+//            // \todo: come back to this
+//            if (signedDist <= 0.0)
+//            {
+//                const Mat3d rot = m_pickGeometry->getRotation().transpose();
+//                const Vec3d relativePos = rot * (vertices[i] - m_pickGeometry->getPosition());
+//
+//                m_pickedPtIdxOffset[i] = relativePos;
+//
+//                m_constraintPts.push_back({
+//                        i,
+//                        m_pickingGeometry->getPosition() + rot.transpose() * relativePos,
+//                        Vec3d(0.0, 0.0, 0.0) });
+//                std::tuple<int, Vec3d, Vec3d>& cPt = m_constraintPts.back();
+//
+//                addConstraint(
+//                    { { &vertices[i], invMasses[i], &velocities[i] } }, { 1.0 },
+//                    { { &std::get<1>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
+//                    m_stiffness, 0.0);
+//            }
+//        }
+//        return pickData;
+//    }
+//
+//    void setPickingGeometry(std::shared_ptr<AnalyticalGeometry> pickGeometry) { m_pickGeometry = pickGeometry; }
+//    std::shared_ptr<AnalyticalGeometry> getPickGeometry() const { return m_pickGeometry; }
+//
+//protected:
+//    std::shared_ptr<AnalyticalGeometry> m_pickGeometry = nullptr;
+//};
+//
+/////
+///// \brief Picks points on elements of geomToPick via those that that are
+///// intersecting the provided ray.
+///// 
+//struct PointPicking : public PickingMethod
+//{
+//public:
+//    std::vector<PickData> Pick(std::shared_ptr<Geometry> geometryToPick) override
+//    {
+//        // Crazy combinatoral explosion
+//    }
+//    void setPickingRay(const Vec3d& rayStart, const Vec3d& rayDir)
+//    {
+//        m_rayStart = rayStart;
+//        m_rayDir = rayDir;
+//    }
+//    const Vec3d& getPickRayStart() const { return m_rayStart; }
+//    const Vec3d& getPickRayDir() const { return m_rayDir; }
+//
+//protected:
+//    Vec3d m_rayStart = Vec3d::Zero();
+//    Vec3d m_rayDir = Vec3d::Zero();
+//};
+
+
 ///
 /// \brief Packs the info needed to add a constraint to a side
 ///
@@ -157,7 +282,7 @@ getTetrahedron(const CollisionElement& elem, const MeshSide& side)
     return results;
 }
 
-PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1) :
+PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> obj1) :
     SceneObject("PbdObjectPicking_" + obj1->getName()),
     m_objA(obj1)
 {
@@ -166,7 +291,7 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1) :
     //  - picking nearest point to obj2 geometry center
     //  - picking point on element via interpolation
 
-    m_pickingNode = std::make_shared<TaskNode>(std::bind(&PbdObjectPicking::updatePicking, this),
+    m_pickingNode = std::make_shared<TaskNode>(std::bind(&PbdObjectGrasping::updatePicking, this),
         "PbdPickingUpdate", true);
     m_taskGraph->addNode(m_pickingNode);
 
@@ -178,14 +303,14 @@ PbdObjectPicking::PbdObjectPicking(std::shared_ptr<PbdObject> obj1) :
 }
 
 void
-PbdObjectPicking::endPick()
+PbdObjectGrasping::endPick()
 {
     m_isPicking = false;
     LOG(INFO) << "End pick";
 }
 
 void
-PbdObjectPicking::beginVertexPick(std::shared_ptr<AnalyticalGeometry> geometry)
+PbdObjectGrasping::beginVertexPick(std::shared_ptr<AnalyticalGeometry> geometry)
 {
     m_pickingMode = Mode::PickVertex;
     m_pickingGeometry = geometry;
@@ -194,16 +319,17 @@ PbdObjectPicking::beginVertexPick(std::shared_ptr<AnalyticalGeometry> geometry)
     LOG(INFO) << "Begin pick";
 }
 void
-PbdObjectPicking::beginElementPick(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType)
+PbdObjectGrasping::beginElementPick(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType)
 {
     m_pickingMode = Mode::PickElement;
     m_pickingGeometry = geometry;
+    m_cdType = cdType;
 
     m_isPicking = true;
     LOG(INFO) << "Begin pick";
 }
 void
-PbdObjectPicking::beginRayPick(Vec3d rayStart, Vec3d rayDir)
+PbdObjectGrasping::beginRayPick(Vec3d rayStart, Vec3d rayDir)
 {
     m_pickingMode = Mode::PickRay;
     m_rayStart = rayStart;
@@ -213,7 +339,7 @@ PbdObjectPicking::beginRayPick(Vec3d rayStart, Vec3d rayDir)
     LOG(INFO) << "Begin pick";
 }
 void
-PbdObjectPicking::beginRayElementPick(Vec3d rayStart, Vec3d rayDir)
+PbdObjectGrasping::beginRayElementPick(Vec3d rayStart, Vec3d rayDir)
 {
     m_pickingMode = Mode::PickRayElement;
     m_rayStart = rayStart;
@@ -224,7 +350,7 @@ PbdObjectPicking::beginRayElementPick(Vec3d rayStart, Vec3d rayDir)
 }
 
 void
-PbdObjectPicking::removePickConstraints()
+PbdObjectGrasping::removePickConstraints()
 {
     m_constraints.clear();
     m_constraintPts.clear();
@@ -232,7 +358,7 @@ PbdObjectPicking::removePickConstraints()
 }
 
 void
-PbdObjectPicking::addPickConstraints()
+PbdObjectGrasping::addPickConstraints()
 {
     removePickConstraints();
 
@@ -290,8 +416,10 @@ PbdObjectPicking::addPickConstraints()
                         Vec3d(0.0, 0.0, 0.0) });
                 std::tuple<int, Vec3d, Vec3d>& cPt = m_constraintPts.back();
 
-                addConstraint(&std::get<1>(cPt), &std::get<2>(cPt),
-                    &vertices[i], invMasses[i], &velocities[i]);
+                addConstraint(
+                    { { &vertices[i], invMasses[i], &velocities[i] } }, { 1.0 },
+                    { { &std::get<1>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
+                    m_stiffness, 0.0);
             }
         }
     }
@@ -363,8 +491,10 @@ PbdObjectPicking::addPickConstraints()
                         Vec3d(0.0, 0.0, 0.0) });
                 std::tuple<int, Vec3d, Vec3d>& cPt = m_constraintPts.back();
 
-                addConstraint(&std::get<1>(cPt), &std::get<2>(cPt),
-                    &vertices[vertexIndex], invMasses[vertexIndex], &velocities[vertexIndex]);
+                addConstraint(
+                    { { &vertices[vertexIndex], invMasses[vertexIndex], &velocities[vertexIndex] } }, { 1.0 },
+                    { { &std::get<1>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
+                    m_stiffness, 0.0);
             }
         }
     }
@@ -462,32 +592,33 @@ PbdObjectPicking::addPickConstraints()
                     Vec3d(0.0, 0.0, 0.0) });
             std::tuple<int, Vec3d, Vec3d>& cPt = m_constraintPts.back();
 
-            auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
-            constraint->initConstraint(
-                cellVerts,
-                weights,
-                { { &std::get<1>(cPt), 0.0, &std::get<2>(cPt) } },
-                { 1.0 }, m_stiffness, 0.0);
-            m_constraints.push_back(constraint);
+            // Cell to single point constraint
+            addConstraint(
+                cellVerts, weights,
+                { { &std::get<1>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
+                m_stiffness, 0.0);
         }
     }
 }
 
 void
-PbdObjectPicking::addConstraint(
-    Vec3d* fixedPt, Vec3d* fixedPtVel,
-    Vec3d* vertex2, double invMass2, Vec3d* velocity2)
+PbdObjectGrasping::addConstraint(
+    std::vector<VertexMassPair> graspPtsA,
+    std::vector<double> graspWeightsA,
+    std::vector<VertexMassPair> meshPtsB,
+    std::vector<double> meshWeightsB,
+    double stiffnessA, double stiffnessB)
 {
-    auto constraint = std::make_shared<PbdPointPointConstraint>();
+    auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
     constraint->initConstraint(
-        { fixedPt, 0.0, fixedPtVel },
-        { vertex2, invMass2, velocity2 },
-        0.0, m_stiffness); // LHS is considered infinite mass
+        graspPtsA, graspWeightsA,
+        meshPtsB, meshWeightsB,
+        stiffnessA, stiffnessB);
     m_constraints.push_back(constraint);
 }
 
 void
-PbdObjectPicking::updatePicking()
+PbdObjectGrasping::updatePicking()
 {
     m_objA->updateGeometries();
 
@@ -511,7 +642,7 @@ PbdObjectPicking::updatePicking()
 }
 
 void
-PbdObjectPicking::updateConstraints()
+PbdObjectGrasping::updateConstraints()
 {
     const Mat3d rot = m_pickingGeometry->getRotation().transpose();
 
@@ -532,7 +663,7 @@ PbdObjectPicking::updateConstraints()
 }
 
 void
-PbdObjectPicking::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+PbdObjectGrasping::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     auto pbdObj     = m_objA;
 

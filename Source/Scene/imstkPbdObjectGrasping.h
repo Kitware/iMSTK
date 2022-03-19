@@ -23,6 +23,7 @@ limitations under the License.
 
 #include "imstkCollisionInteraction.h"
 #include "imstkMath.h"
+#include "imstkPbdCollisionConstraint.h"
 
 #include <unordered_map>
 
@@ -33,13 +34,15 @@ class PbdCollisionConstraint;
 class PbdObject;
 
 ///
-/// \class PbdObjectPicking
+/// \class PbdObjectGrasping
 ///
-/// \brief This class defines a picking interaction between a PbdObject and
-/// a CollidingObject with AnalyticalGeometry. It works with 3 modes.
+/// \brief This class defines grasping of a PbdObject via different
+/// picking methods. Where grasping is define as grabbing & attaching
+/// of a PbdObject's mesh to points.
+/// 
+/// Given an input PickData the appropriate grasping will be produced.
 ///
-///
-class PbdObjectPicking : public SceneObject
+class PbdObjectGrasping : public SceneObject
 {
 public:
     enum class Mode
@@ -52,10 +55,10 @@ public:
     };
 
 public:
-    PbdObjectPicking(std::shared_ptr<PbdObject> obj1);
-    ~PbdObjectPicking() override = default;
+    PbdObjectGrasping(std::shared_ptr<PbdObject> obj1);
+    ~PbdObjectGrasping() override = default;
 
-    const std::string getTypeName() const override { return "PbdObjectPicking"; }
+    const std::string getTypeName() const override { return "PbdObjectGrasping"; }
 
     ///
     /// \brief Set/Get the stiffness, 0-1 value that alters the step size in
@@ -91,11 +94,16 @@ public:
     void removePickConstraints();
 
     ///
-    /// \brief Add constraint between virtual point
+    /// \brief Add constraint between a point on each element given via 
+    /// barycentric coordinates
+    /// pt position = weightA_0 * ptsA_0 + weightA_1 * ptsA_1 + ...
     ///
     virtual void addConstraint(
-        Vec3d* fixedPt, Vec3d* fixedPtVel,
-        Vec3d* vertex2, double invMass2, Vec3d* velocity2);
+        std::vector<VertexMassPair> ptsA,
+        std::vector<double> weightsA,
+        std::vector<VertexMassPair> ptsB,
+        std::vector<double> weightsB,
+        double stiffnessA, double stiffnessB);
 
     std::shared_ptr<TaskNode> getPickingNode() const { return m_pickingNode; }
 

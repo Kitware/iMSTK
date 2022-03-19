@@ -33,7 +33,7 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
-#include "imstkPbdObjectPicking.h"
+#include "imstkPbdObjectGrasping.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -228,7 +228,7 @@ main()
     scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
-    auto jawPicking = std::make_shared<PbdObjectPicking>(clothObj);
+    auto jawPicking = std::make_shared<PbdObjectGrasping>(clothObj);
     scene->addInteraction(jawPicking);
 
     // Camera
