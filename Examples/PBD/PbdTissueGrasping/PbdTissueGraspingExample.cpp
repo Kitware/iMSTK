@@ -176,29 +176,38 @@ setSphereTexCoords(std::shared_ptr<SurfaceMesh> surfMesh, const double uvScale)
 ///
 static std::shared_ptr<PbdObject>
 makeTissueObj(const std::string& name,
-    const Vec3d& size, const Vec3i& dim, const Vec3d& center)
+              const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
     imstkNew<PbdObject> clothObj(name);
 
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tissueMesh = makeTetGrid(size, dim, center);
-    std::shared_ptr<SurfaceMesh>     surfMesh = tissueMesh->extractSurfaceMesh();
+    std::shared_ptr<SurfaceMesh>     surfMesh   = tissueMesh->extractSurfaceMesh();
     setSphereTexCoords(surfMesh, 6.0);
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
-    // Actual skin young's modulus, 0.42MPa to 0.85Mpa, as reported in papers
-    // Actual skin possion ratio, 0.48, as reported in papers
-    pbdParams->m_femParams->m_YoungModulus = 420000.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.48;
-    // FYI:
-    //  - Poisson ratio gives shear to bulk, with 0.5 being complete shear
-    //    where everything is like a fluid and can slide past each other. 0.0
-    //    gives complete bulk where its rigid
-    //  - Youngs modulus then gives the scaling of the above in pressure
-    //    (pascals).
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
-    pbdParams->m_doPartitioning = false;
+    const bool useFem = false;
+    if (useFem)
+    {
+        // Actual skin young's modulus, 0.42MPa to 0.85Mpa, as reported in papers
+        // Actual skin possion ratio, 0.48, as reported in papers
+        pbdParams->m_femParams->m_YoungModulus = 420000.0;
+        pbdParams->m_femParams->m_PoissonRatio = 0.48;
+        // FYI:
+        //  - Poisson ratio gives shear to bulk, with 0.5 being complete shear
+        //    where everything is like a fluid and can slide past each other. 0.0
+        //    gives complete bulk where its rigid
+        //  - Youngs modulus then gives the scaling of the above in pressure
+        //    (pascals).
+        pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+    }
+    else
+    {
+        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100000.0);
+        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100000.0);
+    }
+    pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 100.0;
     pbdParams->m_dt = 0.001; // realtime used in update calls later in main
     pbdParams->m_iterations = 5;
@@ -234,29 +243,21 @@ makeTissueObj(const std::string& name,
 
     // Setup the material
     imstkNew<RenderMaterial> material;
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setBackFaceCulling(false);
-    /* material->setShadingModel(RenderMaterial::ShadingModel::PBR);
-     auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
-     material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
-     auto normalTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshNormal.jpg");
-     material->addTexture(std::make_shared<Texture>(normalTex, Texture::Type::Normal));
-     auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshORM.jpg");
-     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
-     material->setNormalStrength(0.3);*/
-    material->setOpacity(0.5);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    material->addTexture(std::make_shared<Texture>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg",
+            Texture::Type::Diffuse));
+    material->addTexture(std::make_shared<Texture>(iMSTK_DATA_ROOT "/textures/fleshNormal.jpg",
+            Texture::Type::Normal));
+    material->addTexture(std::make_shared<Texture>(iMSTK_DATA_ROOT "/textures/fleshORM.jpg",
+            Texture::Type::ORM));
+    material->setNormalStrength(0.3);
 
     // Add a visual model to render the surface of the tet mesh
     imstkNew<VisualModel> visualModel;
     visualModel->setGeometry(surfMesh);
     visualModel->setRenderMaterial(material);
     clothObj->addVisualModel(visualModel);
-
-    // Add a visual model to render the normals of the surface
-    /*imstkNew<VisualModel> normalsVisualModel(surfMesh);
-    normalsVisualModel->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::SurfaceNormals);
-    normalsVisualModel->getRenderMaterial()->setPointSize(0.5);
-    clothObj->addVisualModel(normalsVisualModel);*/
 
     // Setup the Object
     clothObj->setPhysicsGeometry(tissueMesh);
@@ -283,18 +284,13 @@ main()
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
-    // Load the meshes
-    auto upperSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/upper.obj");
-    auto lowerSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/lower.obj");
-    auto pivotSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/pivot.obj");
-
     imstkNew<Capsule> geomShaft;
     geomShaft->setLength(1.0);
     geomShaft->setRadius(0.005);
     geomShaft->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 0.5));
     imstkNew<CollidingObject> objShaft("ShaftObject");
-    objShaft->setVisualGeometry(geomShaft);
+    objShaft->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/pivot.obj"));
     objShaft->setCollidingGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
@@ -304,7 +300,7 @@ main()
     geomUpperJaw->setRadius(0.004);
     geomUpperJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
-    objUpperJaw->setVisualGeometry(geomUpperJaw);
+    objUpperJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/upper.obj"));
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
     scene->addSceneObject(objUpperJaw);
 
@@ -314,7 +310,7 @@ main()
     geomLowerJaw->setRadius(0.004);
     geomLowerJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
-    objLowerJaw->setVisualGeometry(geomLowerJaw);
+    objLowerJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/lower.obj"));
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
@@ -351,7 +347,7 @@ main()
 
     // Light
     imstkNew<DirectionalLight> light;
-    light->setFocalPoint(Vec3d(-1.0, -1.0, 0.0));
+    light->setFocalPoint(Vec3d(0.0, -1.0, -1.0));
     light->setIntensity(1.0);
     scene->addLight("light", light);
 
@@ -371,7 +367,7 @@ main()
         driver->addModule(deviceManager);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(0.005);
+        driver->setDesiredDt(0.001);
 
         // Add mouse and keyboard controls to the viewer
         {
