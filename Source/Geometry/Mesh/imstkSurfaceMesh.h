@@ -73,16 +73,16 @@ struct TriCell
     {
         // Only works if sorted
         return (vertexIds[0] == other.vertexIds[0] && vertexIds[1] == other.vertexIds[1]
-            && vertexIds[2] == other.vertexIds[2]);
+                && vertexIds[2] == other.vertexIds[2]);
     }
 };
-}
+} // namespace imstk
 
 namespace std
 {
 ///
 /// \struct hash<imstk::TriCell>
-/// 
+///
 /// \brief Gives a hashing function for triangles that results in
 /// identical hashes for any ordering of ids hash(0,1,2)=hash(1,2,0)
 /// and is well distributed (avoids collisions)

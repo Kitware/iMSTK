@@ -336,11 +336,11 @@ PbdObjectGrasping::addPickConstraints()
                 weights[1] = baryCoord[1];
             }
 
-            const Vec3d  relativePos = pickGeomRot * (pickingPt - pickGeomPos);
+            const Vec3d relativePos = pickGeomRot * (pickingPt - pickGeomPos);
             m_constraintPts.push_back({
-                        pickingPt,
-                        relativePos,
-                        Vec3d::Zero() });
+                    pickingPt,
+                    relativePos,
+                    Vec3d::Zero() });
             std::tuple<Vec3d, Vec3d, Vec3d>& cPt = m_constraintPts.back();
 
             // Cell to single point constraint

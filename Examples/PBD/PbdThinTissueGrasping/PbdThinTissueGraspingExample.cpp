@@ -93,7 +93,7 @@ makeTriangleGrid(const double width,
     }
 
     imstkNew<VecDataArray<float, 2>> uvCoordsPtr(nRows * nCols);
-    VecDataArray<float, 2>& uvCoords = *uvCoordsPtr.get();
+    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
     for (int i = 0; i < nRows; ++i)
     {
         for (int j = 0; j < nCols; j++)
@@ -113,10 +113,10 @@ makeTriangleGrid(const double width,
 ///
 static std::shared_ptr<PbdObject>
 makeTissueObj(const std::string& name,
-             const double       width,
-             const double       height,
-             const int          rowCount,
-             const int          colCount)
+              const double       width,
+              const double       height,
+              const int          rowCount,
+              const int          colCount)
 {
     // Setup the Geometry
     std::shared_ptr<SurfaceMesh> mesh =

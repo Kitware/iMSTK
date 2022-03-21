@@ -50,7 +50,7 @@ public:
         std::shared_ptr<CollidingObject> shaft,
         std::shared_ptr<CollidingObject> upperJaw,
         std::shared_ptr<CollidingObject> lowerJaw,
-        std::shared_ptr<Geometry> pickGeom,
+        std::shared_ptr<Geometry>        pickGeom,
         std::shared_ptr<DeviceClient>    trackingDevice);
     ~LaparoscopicToolController() override = default;
 

@@ -57,8 +57,8 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
     imstkNew<TetrahedralMesh> tissueMesh;
 
     imstkNew<VecDataArray<double, 3>> verticesPtr(dim[0] * dim[1] * dim[2]);
-    VecDataArray<double, 3>& vertices = *verticesPtr.get();
-    const Vec3d                       dx = size.cwiseQuotient((dim - Vec3i(1, 1, 1)).cast<double>());
+    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
+    const Vec3d                       dx       = size.cwiseQuotient((dim - Vec3i(1, 1, 1)).cast<double>());
     for (int z = 0; z < dim[2]; z++)
     {
         for (int y = 0; y < dim[1]; y++)
@@ -72,7 +72,7 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 
     // Add connectivity data
     imstkNew<VecDataArray<int, 4>> indicesPtr;
-    VecDataArray<int, 4>& indices = *indicesPtr.get();
+    VecDataArray<int, 4>&          indices = *indicesPtr.get();
     for (int z = 0; z < dim[2] - 1; z++)
     {
         for (int y = 0; y < dim[1] - 1; y++)
@@ -113,7 +113,7 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
     }
 
     imstkNew<VecDataArray<float, 2>> uvCoordsPtr(dim[0] * dim[1] * dim[2]);
-    VecDataArray<float, 2>& uvCoords = *uvCoordsPtr.get();
+    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
     for (int z = 0; z < dim[2]; z++)
     {
         for (int y = 0; y < dim[1]; y++)
@@ -148,20 +148,20 @@ setSphereTexCoords(std::shared_ptr<SurfaceMesh> surfMesh, const double uvScale)
 {
     Vec3d min, max;
     surfMesh->computeBoundingBox(min, max);
-    const Vec3d size = max - min;
+    const Vec3d size   = max - min;
     const Vec3d center = (max + min) * 0.5;
 
     const double radius = (size * 0.5).norm();
 
     imstkNew<VecDataArray<float, 2>> uvCoordsPtr(surfMesh->getNumVertices());
-    VecDataArray<float, 2>& uvCoords = *uvCoordsPtr.get();
+    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
     for (int i = 0; i < surfMesh->getNumVertices(); i++)
     {
         Vec3d vertex = surfMesh->getVertexPosition(i) - center;
 
         // Compute phi and theta on the sphere
         const double theta = asin(vertex[0] / radius);
-        const double phi = atan2(vertex[1], vertex[2]);
+        const double phi   = atan2(vertex[1], vertex[2]);
         uvCoords[i] = Vec2f(phi / (PI * 2.0) + 0.5, theta / (PI * 2.0) + 0.5) * uvScale;
     }
     surfMesh->setVertexTCoords("tcoords", uvCoordsPtr);

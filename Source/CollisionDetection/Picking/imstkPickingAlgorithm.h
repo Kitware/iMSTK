@@ -32,10 +32,10 @@ namespace imstk
 ///
 struct PickData
 {
-    int ids[4] = { -1, -1, -1, -1 }; ///< Ids of the cell or vertices
-    int idCount = 0; ///< Indicates number of vertices (if 1 a cell or individual vertex)
-    CellTypeId cellType = IMSTK_VERTEX; ///< Indicates picked cell type
-    Vec3d pickPoint = Vec3d::Zero(); ///< Some pickings may produce specific points on an element
+    int ids[4]  = { -1, -1, -1, -1 };    ///< Ids of the cell or vertices
+    int idCount = 0;                     ///< Indicates number of vertices (if 1 a cell or individual vertex)
+    CellTypeId cellType = IMSTK_VERTEX;  ///< Indicates picked cell type
+    Vec3d pickPoint     = Vec3d::Zero(); ///< Some pickings may produce specific points on an element
 };
 
 ///
@@ -59,6 +59,7 @@ public:
         setNumInputPorts(1);
         setNumOutputPorts(0);
     }
+
     ~PickingAlgorithm() override = default;
 
     ///

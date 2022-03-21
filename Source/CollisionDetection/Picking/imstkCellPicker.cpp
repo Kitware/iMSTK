@@ -58,8 +58,8 @@ CellPicker::requestUpdate()
 
         PickData data;
         std::copy(colElemA.m_element.m_CellIndexElement.ids,
-            colElemA.m_element.m_CellIndexElement.ids+4, data.ids);
-        data.idCount = colElemA.m_element.m_CellIndexElement.idCount;
+            colElemA.m_element.m_CellIndexElement.ids + 4, data.ids);
+        data.idCount  = colElemA.m_element.m_CellIndexElement.idCount;
         data.cellType = colElemA.m_element.m_CellIndexElement.cellType;
         m_results.push_back(data);
     }

@@ -45,9 +45,9 @@ PointPicker::requestUpdate()
 
         // Brute force
         // For every cell
-        double minSqrDist = IMSTK_DOUBLE_MAX;
-        int minCellIndex = -1;
-        Vec3d minPt = Vec3d::Zero();
+        double minSqrDist   = IMSTK_DOUBLE_MAX;
+        int    minCellIndex = -1;
+        Vec3d  minPt = Vec3d::Zero();
         for (int i = 0; i < indices.size(); i++)
         {
             const Vec3i& cell = indices[i];
@@ -65,7 +65,7 @@ PointPicker::requestUpdate()
                     if (sqrDist < minSqrDist)
                     {
                         minCellIndex = i;
-                        minSqrDist = sqrDist;
+                        minSqrDist   = sqrDist;
                         minPt = iPt;
                     }
                 }
@@ -86,14 +86,14 @@ PointPicker::requestUpdate()
         static int faces[4][3] = { { 0, 1, 2 }, { 1, 2, 3 }, { 0, 2, 3 }, { 0, 1, 3 } };
 
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr = tetMeshToPick->getVertexPositions();
-        const VecDataArray<double, 3>& vertices = *verticesPtr;
-        std::shared_ptr<VecDataArray<int, 4>>    indicesPtr = tetMeshToPick->getTetrahedraIndices();
-        const VecDataArray<int, 4>& indices = *indicesPtr;
+        const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+        std::shared_ptr<VecDataArray<int, 4>>    indicesPtr  = tetMeshToPick->getTetrahedraIndices();
+        const VecDataArray<int, 4>&              indices     = *indicesPtr;
 
         // For every tet
-        double minSqrDist = IMSTK_DOUBLE_MAX;
-        int minCellIndex = -1;
-        Vec3d minPt = Vec3d::Zero();
+        double minSqrDist   = IMSTK_DOUBLE_MAX;
+        int    minCellIndex = -1;
+        Vec3d  minPt = Vec3d::Zero();
         for (int i = 0; i < indices.size(); i++)
         {
             const Vec4i& tet = indices[i];
@@ -107,7 +107,7 @@ PointPicker::requestUpdate()
                 const Vec3d& c = vertices[tet[faces[j][2]]];
 
                 Vec3d iPt;
-                if (CollisionUtils::testRayToPlane(m_rayStart, m_rayDir, a, 
+                if (CollisionUtils::testRayToPlane(m_rayStart, m_rayDir, a,
                     (b - a).cross(c - a).normalized(), iPt))
                 {
                     const Vec3d uvw = baryCentric(iPt, a, b, c);
@@ -118,7 +118,7 @@ PointPicker::requestUpdate()
                         if (sqrDist < minSqrDist)
                         {
                             minCellIndex = i;
-                            minSqrDist = sqrDist;
+                            minSqrDist   = sqrDist;
                             minPt = iPt;
                         }
                     }
@@ -176,7 +176,7 @@ PointPicker::requestUpdate()
         if (CollisionUtils::testRayToObb(m_rayStart, m_rayDir,
             worldToBox.inverse(), obbToPick->getExtents(), t))
         {
-            const Vec3d iPt = m_rayStart + m_rayDir * t[0];
+            const Vec3d  iPt = m_rayStart + m_rayDir * t[0];
             const double minSqrDist = (m_rayStart - iPt).squaredNorm();
             if (m_maxDist == -1.0 || minSqrDist < m_maxDist * m_maxDist)
             {
@@ -197,7 +197,7 @@ PointPicker::requestUpdate()
         const Vec3d extents = (max - min) * 0.5; // Half the size
 
         const Mat4d boxTransform = mat4dTranslate(center);
-        Vec2d t = Vec2d::Zero(); // Entry and exit t
+        Vec2d       t = Vec2d::Zero(); // Entry and exit t
         if (CollisionUtils::testRayToObb(m_rayStart, m_rayDir, boxTransform.inverse(), extents, t))
         {
             // If it hit, start iterating from this point on the box in the implicit geometry

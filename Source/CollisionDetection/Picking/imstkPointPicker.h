@@ -43,19 +43,19 @@ public:
     void requestUpdate() override;
 
     void setPickingRay(const Vec3d& rayStart, const Vec3d& rayDir,
-        const double maxDist = -1.0)
+                       const double maxDist = -1.0)
     {
         m_rayStart = rayStart;
         m_rayDir   = rayDir;
-        m_maxDist = maxDist;
+        m_maxDist  = maxDist;
     }
 
     const Vec3d& getPickRayStart() const { return m_rayStart; }
     const Vec3d& getPickRayDir() const { return m_rayDir; }
 
 protected:
-    Vec3d m_rayStart = Vec3d::Zero();
-    Vec3d m_rayDir   = Vec3d::Zero();
-    double m_maxDist = -1.0;
+    Vec3d  m_rayStart = Vec3d::Zero();
+    Vec3d  m_rayDir   = Vec3d::Zero();
+    double m_maxDist  = -1.0;
 };
 } // namespace imstk
