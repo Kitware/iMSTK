@@ -82,11 +82,11 @@ LaparoscopicToolController::update(const double dt)
     // Update jaw angles
     if (m_deviceClient->getButton(0))
     {
-        m_jawAngle += m_change;
+        m_jawAngle += m_change * dt;
     }
     if (m_deviceClient->getButton(1))
     {
-        m_jawAngle -= m_change;
+        m_jawAngle -= m_change * dt;
     }
 
     // Clamp

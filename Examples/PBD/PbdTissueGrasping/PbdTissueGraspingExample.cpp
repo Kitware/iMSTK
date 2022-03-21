@@ -335,7 +335,7 @@ main()
 
     // Create and add virtual coupling object controller in the scene
     imstkNew<LaparoscopicToolController> controller(objShaft, objUpperJaw, objLowerJaw, pickGeom, client);
-    controller->setJawAngleChange(6.0e-3);
+    controller->setJawAngleChange(1.0);
     controller->setTranslationScaling(0.001);
     scene->addController(controller);
 
