@@ -58,7 +58,7 @@ public:
     ///
     /// \brief Get/Set name
     ///@{
-    const std::string& getName() { return m_name; }
+    const std::string& getName() const { return m_name; }
     void setName(std::string name) { m_name = name; }
     ///@}
 
@@ -66,7 +66,7 @@ public:
     /// \brief Get/Set the delegate hint, which helps indicate
     /// how to render this VisualModel
     ///@{
-    const std::string& getDelegateHint() { return m_delegateHint; }
+    const std::string getDelegateHint() const;
     void setDelegateHint(const std::string& name) { m_delegateHint = name; }
     ///@}
 
