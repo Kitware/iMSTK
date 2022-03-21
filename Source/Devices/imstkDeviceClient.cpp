@@ -21,6 +21,7 @@
 
 #include "imstkDeviceClient.h"
 #include "imstkLogger.h"
+#include <limits>
 
 namespace imstk
 {
@@ -98,6 +99,19 @@ DeviceClient::getButtons() const
     return m_buttons;
 }
 
+int
+DeviceClient::getButton(const int buttonId)
+{
+    int result = 0;
+    m_dataLock.lock();
+    if (m_buttons.find(buttonId) != m_buttons.end())
+    {
+        result = m_buttons.at(buttonId);
+    }
+    m_dataLock.unlock();
+    return result;
+}
+
 std::vector<double>
 DeviceClient::getAnalog() const
 {
@@ -106,5 +120,23 @@ DeviceClient::getAnalog() const
     result = m_analogChannels;
     m_dataLock.unlock();
     return result;
+}
+
+double
+DeviceClient::getAnalog(int i) const
+{
+    if (i > m_analogChannels.size())
+    {
+        LOG(WARNING) << "Requested unknown channel, returning NAN";
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    else
+    {
+        double result;
+        m_dataLock.lock();
+        result = m_analogChannels[i];
+        m_dataLock.unlock();
+        return result;
+    }
 }
 } // namespace imstk

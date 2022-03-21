@@ -141,19 +141,18 @@ public:
     /// \brief Get the state of a button
     /// returns 0 if can't find button
     ///
-    int getButton(const int buttonId)
-    {
-        int result = 0;
-        m_dataLock.lock();
-        if (m_buttons.find(buttonId) != m_buttons.end())
-        {
-            result = m_buttons.at(buttonId);
-        }
-        m_dataLock.unlock();
-        return result;
-    }
+    int getButton(const int buttonId);
 
+    ///
+    /// \brief get values of the analog input
+    ///
     std::vector<double> getAnalog() const;
+
+    ///
+    /// \brief get single analog value
+    /// \return the value of the analog channel if exists, NAN otherwise
+    ///
+    double getAnalog(int i) const;
 
     ///
     /// \brief Do runtime logic
@@ -181,8 +180,8 @@ protected:
     std::unordered_map<int, int> m_buttons;
     std::vector<double> m_analogChannels;
 
-    ParallelUtils::SpinLock m_transformLock;    /// > Used for devices filling data from other threads
-    ParallelUtils::SpinLock m_forceLock;        /// > Used for devices filling data from other threads
-    mutable ParallelUtils::SpinLock m_dataLock; /// > Used for button and analog data
+    ParallelUtils::SpinLock m_transformLock;    ///< Used for devices filling data from other threads
+    ParallelUtils::SpinLock m_forceLock;        ///< Used for devices filling data from other threads
+    mutable ParallelUtils::SpinLock m_dataLock; ///< Used for button and analog data
 };
 } // namespace imstk

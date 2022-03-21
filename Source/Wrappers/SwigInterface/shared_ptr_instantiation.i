@@ -171,6 +171,7 @@
 %shared_ptr(imstk::CollisionInteraction)
 %shared_ptr(imstk::RigidObjectCollision)
 %shared_ptr(imstk::PbdObjectCutting)
+%shared_ptr(imstk::PbdObjectPicking)
 %shared_ptr(imstk::PbdRigidObjectCollision)
 %shared_ptr(imstk::PbdObjectCollision)
 %shared_ptr(imstk::SphObjectCollision)

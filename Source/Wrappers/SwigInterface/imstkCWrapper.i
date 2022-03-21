@@ -162,6 +162,7 @@
 #include "imstkCollisionInteraction.h"
 #include "imstkRigidObjectCollision.h"
 #include "imstkPbdObjectCutting.h"
+#include "imstkPbdObjectPicking.h"
 #include "imstkPbdRigidObjectCollision.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkSphObjectCollision.h"
@@ -206,8 +207,9 @@
 %include <std_pair.i>
 namespace std
 {
-  %template(VectorInt) vector<int>; 
+  %template(VectorInt) vector<int>;
   %template(VectorSizet) vector<std::size_t>;
+  %template(VectorDouble) vector<double>;
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
 }
 
@@ -392,6 +394,7 @@ namespace std
 %include "../../Scene/imstkCollisionInteraction.h"
 %include "../../Scene/imstkRigidObjectCollision.h"
 %include "../../Scene/imstkPbdObjectCutting.h"
+%include "../../Scene/imstkPbdObjectPicking.h"
 %include "../../Scene/imstkPbdRigidObjectCollision.h"
 %include "../../Scene/imstkPbdObjectCollision.h"
 %include "../../Scene/imstkSphObjectCollision.h"
