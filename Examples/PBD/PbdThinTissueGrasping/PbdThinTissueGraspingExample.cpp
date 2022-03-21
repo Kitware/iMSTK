@@ -124,7 +124,7 @@ makeTissueObj(const std::string& name,
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1000.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 10000.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.1);
     for (int x = 0; x < rowCount; x++)
     {
@@ -137,7 +137,7 @@ makeTissueObj(const std::string& name,
         }
     }
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity    = Vec3d(0.0, -0.098, 0.0);
+    pbdParams->m_gravity    = Vec3d(0.0, -0.01, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 4;
     pbdParams->m_viscousDampingCoeff = 0.01;
@@ -171,8 +171,8 @@ makeTissueObj(const std::string& name,
 }
 
 ///
-/// \brief This example demonstrates the concept of PBD picking
-/// for haptic interaction. NOTE: Requires GeoMagic Touch device
+/// \brief This example demonstrates Pbd grasping. PbdObjectGrasping allows
+/// us to hold onto parts of a tissue or other pbd deformable with a tool
 ///
 int
 main()
@@ -181,7 +181,7 @@ main()
     Logger::startLogger();
 
     // Scene
-    imstkNew<Scene> scene("PBDPicking");
+    imstkNew<Scene> scene("PbdThinTissueGraspingExample");
     scene->getActiveCamera()->setPosition(0.001, 0.05, 0.15);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
@@ -197,7 +197,7 @@ main()
     geomShaft->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 0.5));
     imstkNew<CollidingObject> objShaft("ShaftObject");
-    objShaft->setVisualGeometry(pivotSurfMesh);
+    objShaft->setVisualGeometry(geomShaft);
     objShaft->setCollidingGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
@@ -207,7 +207,7 @@ main()
     geomUpperJaw->setRadius(0.004);
     geomUpperJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
-    objUpperJaw->setVisualGeometry(upperSurfMesh);
+    objUpperJaw->setVisualGeometry(geomUpperJaw);
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
     scene->addSceneObject(objUpperJaw);
 
@@ -217,7 +217,7 @@ main()
     geomLowerJaw->setRadius(0.004);
     geomLowerJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
-    objLowerJaw->setVisualGeometry(lowerSurfMesh);
+    objLowerJaw->setVisualGeometry(geomLowerJaw);
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
@@ -226,10 +226,6 @@ main()
     pickGeom->setTranslation(Vec3d(0.0, 0.0, -0.016));
     pickGeom->setRadius(0.006);
     pickGeom->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
-    imstkNew<CollidingObject> objPickGeom("PickGeom");
-    objPickGeom->setVisualGeometry(pickGeom);
-    objPickGeom->setCollidingGeometry(pickGeom);
-    scene->addSceneObject(objPickGeom);
 
     // 300mm x 300mm patch of tissue
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue", 0.1, 0.1, 16, 16);
@@ -240,7 +236,7 @@ main()
     std::shared_ptr<HapticDeviceClient> client = deviceManager->makeDeviceClient();
 
     // Create and add virtual coupling object controller in the scene
-    imstkNew<LaparoscopicToolController> controller(objShaft, objUpperJaw, objLowerJaw, objPickGeom, client);
+    imstkNew<LaparoscopicToolController> controller(objShaft, objUpperJaw, objLowerJaw, pickGeom, client);
     controller->setJawAngleChange(6.0e-3);
     controller->setTranslationScaling(0.001);
     scene->addController(controller);
@@ -252,8 +248,8 @@ main()
     scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
-   /* auto jawPicking = std::make_shared<PbdObjectGrasping>(tissueObj);
-    scene->addInteraction(jawPicking);*/
+    auto jawPicking = std::make_shared<PbdObjectGrasping>(tissueObj);
+    scene->addInteraction(jawPicking);
 
     // Light
     imstkNew<DirectionalLight> light;
@@ -303,18 +299,18 @@ main()
             {
                 LOG(INFO) << "Jaw Closed!";
 
-                /*upperJawCollision->setEnabled(false);
+                upperJawCollision->setEnabled(false);
                 lowerJawCollision->setEnabled(false);
-                jawPicking->beginCellGrasp(pickGeom, "SurfaceMeshToCapsuleCD");*/
+                jawPicking->beginCellGrasp(pickGeom, "SurfaceMeshToCapsuleCD");
             });
         connect<Event>(controller, &LaparoscopicToolController::JawOpened,
             [&](Event*)
             {
                 LOG(INFO) << "Jaw Opened!";
 
-                /*upperJawCollision->setEnabled(true);
+                upperJawCollision->setEnabled(true);
                 lowerJawCollision->setEnabled(true);
-                jawPicking->endGrasp();*/
+                jawPicking->endGrasp();
             });
 
         driver->start();

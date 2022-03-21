@@ -82,7 +82,57 @@ PointPicker::requestUpdate()
     }
     else if (auto tetMeshToPick = std::dynamic_pointer_cast<TetrahedralMesh>(geomToPick))
     {
-        LOG(FATAL) << "Tetrahedral Mesh picking not implemented yet";
+        // Current implementation just based off the triangle faces
+        static int faces[4][3] = { { 0, 1, 2 }, { 1, 2, 3 }, { 0, 2, 3 }, { 0, 1, 3 } };
+
+        std::shared_ptr<VecDataArray<double, 3>> verticesPtr = tetMeshToPick->getVertexPositions();
+        const VecDataArray<double, 3>& vertices = *verticesPtr;
+        std::shared_ptr<VecDataArray<int, 4>>    indicesPtr = tetMeshToPick->getTetrahedraIndices();
+        const VecDataArray<int, 4>& indices = *indicesPtr;
+
+        // For every tet
+        double minSqrDist = IMSTK_DOUBLE_MAX;
+        int minCellIndex = -1;
+        Vec3d minPt = Vec3d::Zero();
+        for (int i = 0; i < indices.size(); i++)
+        {
+            const Vec4i& tet = indices[i];
+
+            // For every face
+            for (int j = 0; j < 4; j++)
+            {
+                // Find intersection point and add constraints
+                const Vec3d& a = vertices[tet[faces[j][0]]];
+                const Vec3d& b = vertices[tet[faces[j][1]]];
+                const Vec3d& c = vertices[tet[faces[j][2]]];
+
+                Vec3d iPt;
+                if (CollisionUtils::testRayToPlane(m_rayStart, m_rayDir, a, 
+                    (b - a).cross(c - a).normalized(), iPt))
+                {
+                    const Vec3d uvw = baryCentric(iPt, a, b, c);
+                    if (uvw[0] >= 0.0 && uvw[1] >= 0.0 && uvw[2] >= 0.0) // Check if within triangle
+                    {
+                        // If within line bounds
+                        const double sqrDist = (m_rayStart - iPt).squaredNorm();
+                        if (sqrDist < minSqrDist)
+                        {
+                            minCellIndex = i;
+                            minSqrDist = sqrDist;
+                            minPt = iPt;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (minCellIndex != -1)
+        {
+            if (m_maxDist == -1.0 || minSqrDist < m_maxDist * m_maxDist)
+            {
+                m_results.push_back({ { minCellIndex }, 1, IMSTK_TETRAHEDRON, minPt });
+            }
+        }
     }
     else if (auto lineMeshToPick = std::dynamic_pointer_cast<LineMesh>(geomToPick))
     {

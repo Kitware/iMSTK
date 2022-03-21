@@ -924,6 +924,11 @@ testRayToPlane(const Vec3d& rayOrigin, const Vec3d& rayDir,
         return false;
     }
     const double t = (planePos - rayOrigin).dot(planeNormal) / denom;
+    // Ray points out from plane
+    if (t <= 0.0)
+    {
+        return false;
+    }
     iPt = rayOrigin + t * rayDir;
     return true;
 }

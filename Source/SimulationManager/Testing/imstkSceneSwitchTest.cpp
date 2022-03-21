@@ -140,14 +140,14 @@ createClothScene(std::string sceneName)
         // Setup the Geometry
         const double                 width     = 10.0;
         const double                 height    = 10.0;
-        const int                    dim       = 16;
+        const int                    dim       = 4;
         std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(width, height, dim, dim);
 
         // Setup the Parameters
         auto pbdConfig = std::make_shared<PbdModelConfig>();
         pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e2);
         pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e1);
-        pbdConfig->m_fixedNodeIds     = { 0, static_cast<size_t>(16) - 1 };
+        pbdConfig->m_fixedNodeIds     = { 0, static_cast<size_t>(dim) - 1 };
         pbdConfig->m_uniformMassValue = width * height / static_cast<double>(dim * dim);
         pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
         pbdConfig->m_dt         = 0.03;
@@ -202,11 +202,11 @@ TEST(imstkSimulationManagerTest, TestSceneSwitchWithRendering)
     connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
             elapsedTime += sceneManager->getDt();
-            if (elapsedTime > 12.0)
+            if (elapsedTime > 3.0)
             {
                 driver->requestStatus(ModuleDriverStopped);
             }
-            else if (elapsedTime > 8.0)
+            else if (elapsedTime > 2.0)
             {
                 if (sceneManager->getActiveScene() != scene1)
                 {
@@ -215,7 +215,7 @@ TEST(imstkSimulationManagerTest, TestSceneSwitchWithRendering)
                     viewer->setActiveScene(scene1);
                 }
             }
-            else if (elapsedTime > 4.0)
+            else if (elapsedTime > 1.0)
             {
                 if (sceneManager->getActiveScene() != scene2)
                 {
@@ -253,11 +253,11 @@ TEST(imstkSimulationManagerTest, TestSceneSwitchWithoutRendering)
     connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
             elapsedTime += sceneManager->getDt();
-            if (elapsedTime > 6.0)
+            if (elapsedTime > 3.0)
             {
                 driver->requestStatus(ModuleDriverStopped);
             }
-            else if (elapsedTime > 4.0)
+            else if (elapsedTime > 2.0)
             {
                 if (sceneManager->getActiveScene() != scene1)
                 {
@@ -265,7 +265,7 @@ TEST(imstkSimulationManagerTest, TestSceneSwitchWithoutRendering)
                     sceneManager->setActiveScene(scene1);
                 }
             }
-            else if (elapsedTime > 2.0)
+            else if (elapsedTime > 1.0)
             {
                 if (sceneManager->getActiveScene() != scene2)
                 {
