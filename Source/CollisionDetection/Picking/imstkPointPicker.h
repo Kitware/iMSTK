@@ -59,12 +59,12 @@ public:
     ///@{
     void setUseFirstHit(const bool useFirstHit) { m_useFirstHit = useFirstHit; }
     bool getUseFirstHit() const { return m_useFirstHit; }
-    ///@}
+///@}
 
 protected:
-    Vec3d  m_rayStart = Vec3d::Zero();
-    Vec3d  m_rayDir   = Vec3d::Zero();
-    double m_maxDist  = -1.0;
+    Vec3d  m_rayStart    = Vec3d::Zero();
+    Vec3d  m_rayDir      = Vec3d::Zero();
+    double m_maxDist     = -1.0;
     bool   m_useFirstHit = true;
 };
 } // namespace imstk

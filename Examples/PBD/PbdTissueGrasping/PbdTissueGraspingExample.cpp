@@ -187,7 +187,7 @@ makeTissueObj(const std::string& name,
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
-    const bool useFem = false;
+    const bool               useFem = false;
     if (useFem)
     {
         // Actual skin young's modulus, 0.42MPa to 0.85Mpa, as reported in papers

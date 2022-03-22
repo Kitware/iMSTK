@@ -196,14 +196,14 @@ PointPicker::requestUpdate()
     if (m_useFirstHit)
     {
         double minSqrDist = IMSTK_DOUBLE_MAX;
-        int index = -1;
+        int    index      = -1;
         for (size_t i = 0; i < m_results.size(); i++)
         {
             // Possibly parameterize all by t and use that here instead
             const double sqrDist = (m_results[i].pickPoint - m_rayStart).squaredNorm();
             if (sqrDist < minSqrDist)
             {
-                index = i;
+                index      = i;
                 minSqrDist = sqrDist;
             }
         }
