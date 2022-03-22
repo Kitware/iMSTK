@@ -93,7 +93,7 @@ PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> obj) :
     m_taskGraph->addNode(m_pickingNode);
 
     m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getSolveNode());
-    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getTaskGraph()->getSink());
+    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getUpdateVelocityNode());
 
     m_taskGraph->addNode(m_objectToGrasp->getTaskGraph()->getSource());
     m_taskGraph->addNode(m_objectToGrasp->getTaskGraph()->getSink());
@@ -182,12 +182,11 @@ PbdObjectGrasping::addPickConstraints()
     auto velocitiesPtr =
         std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSetToPick->getVertexAttribute("Velocities"));
     CHECK(velocitiesPtr != nullptr) << "Trying to vertex pick with geometry that has no Velocities";
+    VecDataArray<double, 3>& velocities = *velocitiesPtr;
 
-    VecDataArray<double, 3>& velocities   = *velocitiesPtr;
-    auto                     invMassesPtr =
+    auto invMassesPtr =
         std::dynamic_pointer_cast<DataArray<double>>(pointSetToPick->getVertexAttribute("InvMass"));
     CHECK(invMassesPtr != nullptr) << "Trying to vertex pick with geometry that has no InvMass";
-
     const DataArray<double>& invMasses = *invMassesPtr;
 
     std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
@@ -354,16 +353,16 @@ PbdObjectGrasping::addPickConstraints()
 
 void
 PbdObjectGrasping::addConstraint(
-    std::vector<VertexMassPair> graspPtsA,
-    std::vector<double> graspWeightsA,
-    std::vector<VertexMassPair> meshPtsB,
-    std::vector<double> meshWeightsB,
+    std::vector<VertexMassPair> ptsA,
+    std::vector<double> weightsA,
+    std::vector<VertexMassPair> ptsB,
+    std::vector<double> weightsB,
     double stiffnessA, double stiffnessB)
 {
     auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
     constraint->initConstraint(
-        graspPtsA, graspWeightsA,
-        meshPtsB, meshWeightsB,
+        ptsA, weightsA,
+        ptsB, weightsB,
         stiffnessA, stiffnessB);
     m_constraints.push_back(constraint);
 }
@@ -423,6 +422,6 @@ PbdObjectGrasping::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_
 
     // The ideal location is after the internal positional solve
     m_taskGraph->addEdge(pbdModel->getSolveNode(), m_pickingNode);
-    m_taskGraph->addEdge(m_pickingNode, pbdModel->getTaskGraph()->getSink());
+    m_taskGraph->addEdge(m_pickingNode, pbdModel->getUpdateVelocityNode());
 }
 } // namespace imstk
