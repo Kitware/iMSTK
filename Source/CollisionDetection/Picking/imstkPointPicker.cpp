@@ -45,9 +45,6 @@ PointPicker::requestUpdate()
 
         // Brute force
         // For every cell
-        double minSqrDist   = IMSTK_DOUBLE_MAX;
-        int    minCellIndex = -1;
-        Vec3d  minPt = Vec3d::Zero();
         for (int i = 0; i < indices.size(); i++)
         {
             const Vec3i& cell = indices[i];
@@ -61,22 +58,8 @@ PointPicker::requestUpdate()
                 const Vec3d uvw = baryCentric(iPt, a, b, c);
                 if (uvw[0] >= 0.0 && uvw[1] >= 0.0 && uvw[2] >= 0.0) // Check if within triangle
                 {
-                    const double sqrDist = (m_rayStart - iPt).squaredNorm();
-                    if (sqrDist < minSqrDist)
-                    {
-                        minCellIndex = i;
-                        minSqrDist   = sqrDist;
-                        minPt = iPt;
-                    }
+                    m_results.push_back({ { i }, 1, IMSTK_TRIANGLE, iPt });
                 }
-            }
-        }
-
-        if (minCellIndex != -1)
-        {
-            if (m_maxDist == -1.0 || minSqrDist < m_maxDist * m_maxDist)
-            {
-                m_results.push_back({ { minCellIndex }, 1, IMSTK_TRIANGLE, minPt });
             }
         }
     }
@@ -91,9 +74,6 @@ PointPicker::requestUpdate()
         const VecDataArray<int, 4>&              indices     = *indicesPtr;
 
         // For every tet
-        double minSqrDist   = IMSTK_DOUBLE_MAX;
-        int    minCellIndex = -1;
-        Vec3d  minPt = Vec3d::Zero();
         for (int i = 0; i < indices.size(); i++)
         {
             const Vec4i& tet = indices[i];
@@ -113,24 +93,9 @@ PointPicker::requestUpdate()
                     const Vec3d uvw = baryCentric(iPt, a, b, c);
                     if (uvw[0] >= 0.0 && uvw[1] >= 0.0 && uvw[2] >= 0.0) // Check if within triangle
                     {
-                        // If within line bounds
-                        const double sqrDist = (m_rayStart - iPt).squaredNorm();
-                        if (sqrDist < minSqrDist)
-                        {
-                            minCellIndex = i;
-                            minSqrDist   = sqrDist;
-                            minPt = iPt;
-                        }
+                        m_results.push_back({ { i }, 1, IMSTK_TETRAHEDRON, iPt });
                     }
                 }
-            }
-        }
-
-        if (minCellIndex != -1)
-        {
-            if (m_maxDist == -1.0 || minSqrDist < m_maxDist * m_maxDist)
-            {
-                m_results.push_back({ { minCellIndex }, 1, IMSTK_TETRAHEDRON, minPt });
             }
         }
     }
@@ -145,11 +110,8 @@ PointPicker::requestUpdate()
         if (CollisionUtils::testRayToSphere(m_rayStart, m_rayDir,
             sphereToPick->getPosition(), sphereToPick->getRadius(), iPt))
         {
-            const double minSqrDist = (m_rayStart - iPt).squaredNorm();
-            if (m_maxDist == -1.0 || minSqrDist < m_maxDist * m_maxDist)
-            {
-                m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
-            }
+            m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
+            // \todo: Exit point
         }
     }
     else if (auto planeToPick = std::dynamic_pointer_cast<Plane>(geomToPick))
@@ -158,11 +120,7 @@ PointPicker::requestUpdate()
         if (CollisionUtils::testRayToPlane(m_rayStart, m_rayDir,
             planeToPick->getPosition(), planeToPick->getNormal(), iPt))
         {
-            const double minSqrDist = (m_rayStart - iPt).squaredNorm();
-            if (m_maxDist == -1.0 || minSqrDist < m_maxDist * m_maxDist)
-            {
-                m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
-            }
+            m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
         }
     }
     //else if (auto capsuleToPick = std::dynamic_pointer_cast<Capsule>(geomToPick))
@@ -176,12 +134,8 @@ PointPicker::requestUpdate()
         if (CollisionUtils::testRayToObb(m_rayStart, m_rayDir,
             worldToBox.inverse(), obbToPick->getExtents(), t))
         {
-            const Vec3d  iPt = m_rayStart + m_rayDir * t[0];
-            const double minSqrDist = (m_rayStart - iPt).squaredNorm();
-            if (m_maxDist == -1.0 || minSqrDist < m_maxDist * m_maxDist)
-            {
-                m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
-            }
+            m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, m_rayStart + m_rayDir * t[0] });
+            m_results.push_back({ { 1 }, 1, IMSTK_VERTEX, m_rayStart + m_rayDir * t[1] });
         }
     }
     else if (auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomToPick))
@@ -236,6 +190,26 @@ PointPicker::requestUpdate()
     else
     {
         LOG(FATAL) << "Tried to point pick with an unsupported geometry " << geomToPick->getTypeName();
+        return;
+    }
+
+    if (m_useFirstHit)
+    {
+        double minSqrDist = IMSTK_DOUBLE_MAX;
+        int index = -1;
+        for (size_t i = 0; i < m_results.size(); i++)
+        {
+            // Possibly parameterize all by t and use that here instead
+            const double sqrDist = (m_results[i].pickPoint - m_rayStart).squaredNorm();
+            if (sqrDist < minSqrDist)
+            {
+                index = i;
+                minSqrDist = sqrDist;
+            }
+        }
+        PickData data = m_results[index];
+        m_results.resize(1);
+        m_results[0] = data;
     }
 }
 } // namespace imstk
