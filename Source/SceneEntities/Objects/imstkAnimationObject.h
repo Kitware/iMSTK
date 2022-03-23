@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkSceneObject.h"
 
 namespace imstk
@@ -37,7 +38,7 @@ public:
     AnimationObject(const std::string& name) : SceneObject(name) { }
     ~AnimationObject() override = default;
 
-    const std::string getTypeName() const override { return "AnimationObject"; }
+    IMSTK_TYPE_NAME(AnimationObject)
 
     ///
     /// \brief Set/Get animation model

@@ -344,11 +344,11 @@ MeshToMeshBruteForceCD::computeCollisionDataAB(
 
             if (m_generateEdgeEdgeContacts)
             {
-                if (geomA->getTypeName() == "LineMesh")
+                if (geomA->getTypeName() == LineMesh::getStaticTypeName())
                 {
                     lineMeshEdgeToTriangleTest(geomA, geomB, elementsA, elementsB);
                 }
-                else if (geomA->getTypeName() == "SurfaceMesh")
+                else if (geomA->getTypeName() == SurfaceMesh::getStaticTypeName())
                 {
                     surfMeshEdgeToTriangleTest(geomA, geomB, elementsA, elementsB);
                 }

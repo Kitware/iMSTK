@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkGeometryMap.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -48,7 +49,7 @@ public:
 
     ~TetraTriangleMap() override = default;
 
-    const std::string getTypeName() const override { return "TetraTriangleMap"; }
+    IMSTK_TYPE_NAME(TetraTriangleMap)
 
     ///
     /// \brief Compute the tetra-triangle mesh map

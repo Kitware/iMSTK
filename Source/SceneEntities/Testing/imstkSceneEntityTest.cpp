@@ -19,39 +19,23 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkRigidBodyCH.h"
+#include "imstkSceneEntity.h"
 #include "imstkMacros.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 
-class NeedleRigidBodyCH : public RigidBodyCH
+namespace
+{
+class MockEntity : public SceneEntity
 {
 public:
-    NeedleRigidBodyCH() = default;
-    ~NeedleRigidBodyCH() override = default;
-
-    IMSTK_TYPE_NAME(NeedleRigidBodyCH)
-
-protected:
-    ///
-    /// \brief Handle the collision/contact data
-    ///
-    virtual void handle(
-        const std::vector<CollisionElement>& elementsA,
-        const std::vector<CollisionElement>& elementsB) override;
-
-    ///
-    /// \brief Add constraint for the rigid body given contact
-    ///
-    void addConstraint(
-        std::shared_ptr<RigidObject2> rbdObj,
-        const Vec3d& contactPt, const Vec3d& contactNormal,
-        const double contactDepth) override;
-
-protected:
-    Vec3d m_initContactPt  = Vec3d::Zero();
-    Vec3d m_initNeedleAxes = Vec3d::Zero();
-    Quatd m_initNeedleOrientation = Quatd::Identity();
+    IMSTK_TYPE_NAME(MockEntity)
 };
+} // namespace
+
+TEST(SceneEntityTest, typenames) {
+    MockEntity m;
+    EXPECT_EQ(m.getTypeName(), MockEntity::getStaticTypeName());
+}

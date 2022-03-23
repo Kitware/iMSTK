@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkGeometryMap.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -36,7 +37,7 @@ public:
     IdentityMap() { }
     ~IdentityMap() override = default;
 
-    const std::string getTypeName() const override { return "IdentityMap"; }
+    IMSTK_TYPE_NAME(IdentityMap)
 
     ///
     /// \brief Compute the map

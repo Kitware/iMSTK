@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkPointLight.h"
 
 namespace imstk
@@ -36,7 +37,7 @@ public:
     SpotLight() : m_spotAngle(10.0) { }
     ~SpotLight() override = default;
 
-    const std::string getTypeName() const override { return "SpotLight"; }
+    IMSTK_TYPE_NAME(SpotLight)
 
     ///
     /// \brief Get the spotlight angle in degrees

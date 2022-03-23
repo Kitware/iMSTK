@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkAnalyticalGeometry.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -46,10 +47,7 @@ public:
 
     ~Cylinder() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "Cylinder"; }
+    IMSTK_TYPE_NAME(Cylinder)
 
     ///
     /// \brief Print the cylinder info

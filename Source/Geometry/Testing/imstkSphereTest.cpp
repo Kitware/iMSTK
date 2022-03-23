@@ -28,6 +28,7 @@ using namespace imstk;
 TEST(imstkSphereTest, SetGetRadius)
 {
     Sphere sphere;
+
     sphere.setRadius(2);
     EXPECT_DOUBLE_EQ(2, sphere.getRadius());
 

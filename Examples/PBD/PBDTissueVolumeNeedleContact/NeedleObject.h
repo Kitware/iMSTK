@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkRigidObject2.h"
 
 using namespace imstk;
@@ -39,7 +40,7 @@ public:
     NeedleObject(const std::string& name) : RigidObject2(name) { }
     virtual ~NeedleObject() = default;
 
-    const std::string getTypeName() const override { return "NeedleObject"; }
+    IMSTK_TYPE_NAME(NeedleObject)
 
 public:
     void setCollisionState(const CollisionState state) { m_collisionState = state; }

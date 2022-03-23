@@ -85,7 +85,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     for (const auto& light : scene->getLights())
     {
         std::string name = light->getTypeName();
-        if (name == "DirectionalLight")
+        if (name == DirectionalLight::getStaticTypeName())
         {
             auto lightVtk = vtkSmartPointer<vtkLight>::New();
             lightVtk->SetPositional(false);
@@ -98,7 +98,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
 
             m_vtkLights.push_back(VtkLightPair(light, lightVtk));
         }
-        else if (name == "SpotLight")
+        else if (name == SpotLight::getStaticTypeName())
         {
             auto lightVtk = vtkSmartPointer<vtkLight>::New();
             lightVtk->SetPositional(true);
@@ -118,7 +118,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
             lightActorSpot->SetLight(lightVtk);
             m_debugVtkActors.push_back(lightActorSpot);
         }
-        else if (name == "PointLight")
+        else if (name == PointLight::getStaticTypeName())
         {
             auto lightVtk = vtkSmartPointer<vtkLight>::New();
             lightVtk->SetPositional(true);

@@ -59,7 +59,7 @@ VegaMeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::s
     CHECK(imstkVolMesh != nullptr) << "@VegaMeshIO::write error: imstk::PointSet object supplied is not a imstk::VolumetricMesh type for input" << filePath;
 
     const std::string geometryType = imstkVolMesh->getTypeName();
-    if (geometryType == "TetrahedralMesh" || geometryType == "HexahedralMesh")
+    if (geometryType == TetrahedralMesh::getStaticTypeName() || geometryType == HexahedralMesh::getStaticTypeName())
     {
         auto vegaMesh = convertVolumetricMeshToVegaMesh(imstkVolMesh);
 
@@ -156,7 +156,7 @@ std::shared_ptr<vega::VolumetricMesh>
 VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::VolumetricMesh> imstkVolMesh)
 {
     // as of now, only works for TET elements
-    if (imstkVolMesh->getTypeName() == "TetrahedralMesh")
+    if (imstkVolMesh->getTypeName() == TetrahedralMesh::getStaticTypeName())
     {
         auto imstkVolTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(imstkVolMesh);
 

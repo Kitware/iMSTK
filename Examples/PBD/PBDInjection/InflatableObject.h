@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdConstraintContainer.h"
 
@@ -52,7 +53,8 @@ public:
     InflatableObject(const std::string& name, const Vec3d& tissueSize, const Vec3i& tissueDim, const Vec3d& tissueCenter);
 
 public:
-    const std::string getTypeName() const override { return "InflatableObject"; }
+
+    IMSTK_TYPE_NAME(InflatableObject)
 
     bool initialize() override;
 

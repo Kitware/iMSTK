@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkLight.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -41,7 +42,7 @@ public:
 
     ~DirectionalLight() override = default;
 
-    const std::string getTypeName() const override { return "DirectionalLight"; }
+    IMSTK_TYPE_NAME(DirectionalLight)
 
     ///
     /// \brief Set the direction of the light

@@ -240,7 +240,7 @@ public:
                 for (const auto& pPrimitive : m_Octree->m_vPrimitivePtrs[i])
                 {
                     const auto pNode = pPrimitive->m_pNode;
-                    if (pPrimitive->m_pGeometry->getTypeName() == "PointSet")
+                    if (pPrimitive->m_pGeometry->getTypeName() == PointSet::getStaticTypeName())
                     {
                         EXPECT_EQ(pNode->looselyContains(pPrimitive->m_Position), true);
                     }

@@ -44,7 +44,7 @@ public:
     PbdCollisionHandling();
     virtual ~PbdCollisionHandling() override;
 
-    virtual const std::string getTypeName() const override { return "PbdCollisionHandling"; }
+    IMSTK_TYPE_NAME(PbdCollisionHandling)
 
 public:
     ///

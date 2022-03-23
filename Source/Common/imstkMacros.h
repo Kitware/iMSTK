@@ -36,6 +36,10 @@ namespace imstk
 #define imstkGetMacro(name, dataType) \
     virtual dataType get ## name() { return this->m_ ## name; }
 
+#define IMSTK_TYPE_NAME(name)                                      \
+    static const std::string getStaticTypeName() { return #name; } \
+    const std::string getTypeName() const override { return #name; }
+
 // \todo Switch to template type lists
 ///
 /// \brief Maps ScalarType type to templated function call

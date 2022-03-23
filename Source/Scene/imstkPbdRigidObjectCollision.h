@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionInteraction.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -45,7 +46,7 @@ public:
 
     ~PbdRigidObjectCollision() override = default;
 
-    const std::string getTypeName() const override { return "PbdRigidObjectCollision"; }
+    IMSTK_TYPE_NAME(PbdRigidObjectCollision)
 
     void setRestitution(const double restitution);
     const double getRestitution() const;

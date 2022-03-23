@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkRigidBodyCH.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRigidBodyModel2.h"
@@ -37,7 +38,7 @@ public:
     NeedleRigidBodyCH() = default;
     ~NeedleRigidBodyCH() override = default;
 
-    const std::string getTypeName() const override { return "NeedleRigidBodyCH"; }
+    IMSTK_TYPE_NAME(NeedleRigidBodyCH)
 
 protected:
     ///

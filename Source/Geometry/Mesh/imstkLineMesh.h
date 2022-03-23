@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkPointSet.h"
 
 #include <array>
@@ -40,10 +41,7 @@ public:
     LineMesh();
     ~LineMesh() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "LineMesh"; }
+    IMSTK_TYPE_NAME(LineMesh)
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and

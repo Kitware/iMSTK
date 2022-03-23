@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -38,14 +39,11 @@ public:
     PointSetToPlaneCD();
     virtual ~PointSetToPlaneCD() override = default;
 
-    ///
-    /// \brief Returns collision detection type string name
-    ///
-    virtual const std::string getTypeName() const override { return "PointSetToPlaneCD"; }
+    IMSTK_TYPE_NAME(PointSetToPlaneCD)
 
 protected:
     ///
-    /// \brief Compute collision data for AB simulatenously
+    /// \brief Compute collision data for AB simultaneously
     ///
     virtual void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,

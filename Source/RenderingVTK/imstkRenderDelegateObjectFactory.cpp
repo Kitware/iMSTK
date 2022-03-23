@@ -52,17 +52,17 @@ namespace imstk
 {
 std::unordered_map<std::string, RenderDelegateObjectFactory::DelegateMakeFunc> RenderDelegateObjectFactory::m_objCreationMap =
 {
-    { "SurfaceMesh", makeFunc<VTKSurfaceMeshRenderDelegate>() },
-    { "TetrahedralMesh", makeFunc<VTKTetrahedralMeshRenderDelegate>() },
-    { "LineMesh", makeFunc<VTKLineMeshRenderDelegate>() },
-    { "HexahedralMesh", makeFunc<VTKHexahedralMeshRenderDelegate>() },
-    { "PointSet", makeFunc<VTKPointSetRenderDelegate>() },
-    { "Plane", makeFunc<VTKPlaneRenderDelegate>() },
-    { "Sphere", makeFunc<VTKSphereRenderDelegate>() },
-    { "Capsule", makeFunc<VTKCapsuleRenderDelegate>() },
-    { "OrientedBox", makeFunc<VTKOrientedCubeRenderDelegate>() },
-    { "Cylinder", makeFunc<VTKCylinderRenderDelegate>() },
-    { "ImageData", makeFunc<VTKImageDataRenderDelegate>() },
+    { SurfaceMesh::getStaticTypeName(), makeFunc<VTKSurfaceMeshRenderDelegate>() },
+    { TetrahedralMesh::getStaticTypeName(), makeFunc<VTKTetrahedralMeshRenderDelegate>() },
+    { LineMesh::getStaticTypeName(), makeFunc<VTKLineMeshRenderDelegate>() },
+    { HexahedralMesh::getStaticTypeName(), makeFunc<VTKHexahedralMeshRenderDelegate>() },
+    { PointSet::getStaticTypeName(), makeFunc<VTKPointSetRenderDelegate>() },
+    { Plane::getStaticTypeName(), makeFunc<VTKPlaneRenderDelegate>() },
+    { Sphere::getStaticTypeName(), makeFunc<VTKSphereRenderDelegate>() },
+    { Capsule::getStaticTypeName(), makeFunc<VTKCapsuleRenderDelegate>() },
+    { OrientedBox::getStaticTypeName(), makeFunc<VTKOrientedCubeRenderDelegate>() },
+    { Cylinder::getStaticTypeName(), makeFunc<VTKCylinderRenderDelegate>() },
+    { ImageData::getStaticTypeName(), makeFunc<VTKImageDataRenderDelegate>() },
     { "Fluid", makeFunc<VTKFluidRenderDelegate>() },
     { "SurfaceNormals", makeFunc<VTKSurfaceNormalRenderDelegate>() }
 };

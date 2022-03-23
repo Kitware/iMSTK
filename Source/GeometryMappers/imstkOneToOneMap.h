@@ -16,6 +16,7 @@
 #pragma once
 
 #include "imstkGeometryMap.h"
+#include "imstkMacros.h"
 #include "imstkTypes.h"
 
 namespace imstk
@@ -43,7 +44,7 @@ public:
 
     ~OneToOneMap() override = default;
 
-    const std::string getTypeName() const override { return "OneToOneMap"; }
+    IMSTK_TYPE_NAME(OneToOneMap)
 
     ///
     /// \brief Compute the tetra-triangle mesh map

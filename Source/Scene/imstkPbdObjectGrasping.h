@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionInteraction.h"
+#include "imstkMacros.h"
 #include "imstkMath.h"
 #include "imstkPbdCollisionConstraint.h"
 
@@ -60,7 +61,7 @@ public:
     PbdObjectGrasping(std::shared_ptr<PbdObject> obj1);
     ~PbdObjectGrasping() override = default;
 
-    const std::string getTypeName() const override { return "PbdObjectGrasping"; }
+    IMSTK_TYPE_NAME(PbdObjectGrasping)
 
     ///
     /// \brief Set/Get the stiffness, 0-1 value that alters the step size in
