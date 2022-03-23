@@ -147,15 +147,17 @@ PointPicker::requestUpdate()
         // Find the intersection point on the oriented box
         Vec3d min, max;
         implicitGeom->computeBoundingBox(min, max);
-        const Vec3d center  = (min + max) * 0.5;
-        const Vec3d extents = (max - min) * 0.5; // Half the size
+        const Vec3d  center     = (min + max) * 0.5;
+        const Vec3d  extents    = (max - min) * 0.5; // Half the size
+        const double size       = extents.norm() * 2.0;
+        const double stepLength = size / 50.0;
 
         const Mat4d boxTransform = mat4dTranslate(center);
-        Vec2d       t = Vec2d::Zero(); // Entry and exit t
-        if (CollisionUtils::testRayToObb(m_rayStart, m_rayDir, boxTransform.inverse(), extents, t))
+        Vec2d       tPt = Vec2d::Zero(); // Entry and exit t
+        if (CollisionUtils::testRayToObb(m_rayStart, m_rayDir, boxTransform.inverse(), extents, tPt))
         {
             // If it hit, start iterating from this point on the box in the implicit geometry
-            Vec3d iPt = m_rayStart + m_rayDir * t[0];
+            Vec3d iPt = m_rayStart + m_rayDir * tPt[0];
 
             // For implicit geometry this isn't always signed distance
             double currDist = IMSTK_DOUBLE_MAX;
@@ -170,19 +172,15 @@ PointPicker::requestUpdate()
 
                 // Compute new pt
                 const double t = static_cast<double>(i) / 50.0;
-                currPt   = iPt + t * m_rayDir * 50.0;
+                currPt   = iPt + t * m_rayDir * stepLength;
                 currDist = implicitGeom->getFunctionValue(currPt);
 
-                // If it turned negative
-                if (currDist < 0.0)
+                // If the sign changed
+                if (std::signbit(currDist) != std::signbit(prevDist))
                 {
                     // Use midpoint of results
                     iPt = (currPt + prevPt) * 0.5;
-                    const double minSqrDist = (m_rayStart - iPt).squaredNorm();
-                    if (m_maxDist == -1.0 || minSqrDist < m_maxDist * m_maxDist)
-                    {
-                        m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
-                    }
+                    m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
                 }
             }
         }
@@ -193,6 +191,9 @@ PointPicker::requestUpdate()
         return;
     }
 
+    // Only select the first hit that is within max distance
+    const double maxSqrDist = m_maxDist * m_maxDist;
+    const bool   useMaxDist = (m_maxDist != -1.0);
     if (m_useFirstHit)
     {
         double minSqrDist = IMSTK_DOUBLE_MAX;
@@ -201,15 +202,33 @@ PointPicker::requestUpdate()
         {
             // Possibly parameterize all by t and use that here instead
             const double sqrDist = (m_results[i].pickPoint - m_rayStart).squaredNorm();
-            if (sqrDist < minSqrDist)
+            if (sqrDist < minSqrDist && (!useMaxDist || sqrDist >= maxSqrDist))
             {
-                index      = i;
+                index      = static_cast<int>(i);
                 minSqrDist = sqrDist;
             }
         }
-        PickData data = m_results[index];
-        m_results.resize(1);
-        m_results[0] = data;
+
+        if (index != -1)
+        {
+            PickData data = m_results[index];
+            m_results.resize(1);
+            m_results[0] = data;
+        }
+    }
+    // Remove all distances not within max distance
+    else
+    {
+        std::vector<PickData> pickData;
+        for (size_t i = 0; i < m_results.size(); i++)
+        {
+            const double sqrDist = (m_results[i].pickPoint - m_rayStart).squaredNorm();
+            if ((!useMaxDist || sqrDist >= maxSqrDist))
+            {
+                pickData.push_back(m_results[i]);
+            }
+        }
+        m_results = std::move(pickData);
     }
 }
 } // namespace imstk

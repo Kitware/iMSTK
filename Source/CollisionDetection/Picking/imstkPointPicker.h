@@ -46,7 +46,7 @@ public:
                        const double maxDist = -1.0)
     {
         m_rayStart = rayStart;
-        m_rayDir   = rayDir;
+        m_rayDir   = rayDir.normalized();
         m_maxDist  = maxDist;
     }
 
