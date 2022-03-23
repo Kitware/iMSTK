@@ -51,17 +51,23 @@ CellPicker::requestUpdate()
         const CollisionElement& colElemA = elementsA[i];
         //const CollisionElement& colElemB = elementsB[i];
 
-        if (colElemA.m_type != CollisionElementType::CellIndex)
+        if (colElemA.m_type == CollisionElementType::CellIndex)
         {
-            continue;
+            PickData data;
+            std::copy(colElemA.m_element.m_CellIndexElement.ids,
+                colElemA.m_element.m_CellIndexElement.ids + 4, data.ids);
+            data.idCount  = colElemA.m_element.m_CellIndexElement.idCount;
+            data.cellType = colElemA.m_element.m_CellIndexElement.cellType;
+            m_results.push_back(data);
         }
-
-        PickData data;
-        std::copy(colElemA.m_element.m_CellIndexElement.ids,
-            colElemA.m_element.m_CellIndexElement.ids + 4, data.ids);
-        data.idCount  = colElemA.m_element.m_CellIndexElement.idCount;
-        data.cellType = colElemA.m_element.m_CellIndexElement.cellType;
-        m_results.push_back(data);
+        else if (colElemA.m_type == CollisionElementType::PointIndexDirection)
+        {
+            PickData data;
+            data.ids[0]   = colElemA.m_element.m_PointIndexDirectionElement.ptIndex;
+            data.idCount  = 1;
+            data.cellType = IMSTK_VERTEX;
+            m_results.push_back(data);
+        }
     }
 }
 } // namespace imstk

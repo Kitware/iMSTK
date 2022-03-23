@@ -59,7 +59,7 @@ static std::vector<std::pair<int, VertexMassPair>>
 getElement(const PickData& pickData, const MeshSide& side)
 {
     std::vector<std::pair<int, VertexMassPair>> results(N);
-    if (pickData.idCount == 1) // If given cell index
+    if (pickData.idCount == 1 && pickData.cellType != IMSTK_VERTEX) // If given cell index
     {
         const Eigen::Matrix<int, N, 1>& cell = (*dynamic_cast<VecDataArray<int, N>*>(side.m_indicesPtr))[pickData.ids[0]];
         for (int i = 0; i < N; i++)
@@ -257,6 +257,10 @@ PbdObjectGrasping::addPickConstraints()
             else if (pickedCellType == IMSTK_EDGE)
             {
                 cellVerts = getElement<2>(data, meshStruct);
+            }
+            else if (pickedCellType == IMSTK_VERTEX)
+            {
+                cellVerts = getElement<1>(data, meshStruct);
             }
 
             // Does not resolve duplicate vertices yet
