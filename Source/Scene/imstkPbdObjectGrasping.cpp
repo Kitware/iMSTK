@@ -24,6 +24,7 @@ limitations under the License.
 #include "imstkCDObjectFactory.h"
 #include "imstkCellPicker.h"
 #include "imstkLineMesh.h"
+#include "imstkOneToOneMap.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
@@ -42,16 +43,17 @@ namespace imstk
 ///
 struct MeshSide
 {
-    MeshSide(VecDataArray<double, 3>& vertices, VecDataArray<double, 3>& velocities, DataArray<double>& invMasses,
-             AbstractDataArray* indicesPtr) : m_vertices(vertices), m_velocities(velocities),
-        m_invMasses(invMasses), m_indicesPtr(indicesPtr)
+    MeshSide(VecDataArray<double, 3>& verticest, VecDataArray<double, 3>& velocitiest, DataArray<double>& invMassest,
+             AbstractDataArray* indicesPtrt, OneToOneMap* mapt) : vertices(verticest), velocities(velocitiest),
+        invMasses(invMassest), indicesPtr(indicesPtrt), map(mapt)
     {
     }
 
-    VecDataArray<double, 3>& m_vertices;
-    VecDataArray<double, 3>& m_velocities;
-    DataArray<double>& m_invMasses;
-    AbstractDataArray* m_indicesPtr = nullptr;
+    VecDataArray<double, 3>& vertices;
+    VecDataArray<double, 3>& velocities;
+    DataArray<double>& invMasses;
+    AbstractDataArray* indicesPtr = nullptr;
+    OneToOneMap* map = nullptr;
 };
 
 template<int N>
@@ -61,19 +63,27 @@ getElement(const PickData& pickData, const MeshSide& side)
     std::vector<std::pair<int, VertexMassPair>> results(N);
     if (pickData.idCount == 1 && pickData.cellType != IMSTK_VERTEX) // If given cell index
     {
-        const Eigen::Matrix<int, N, 1>& cell = (*dynamic_cast<VecDataArray<int, N>*>(side.m_indicesPtr))[pickData.ids[0]];
+        const Eigen::Matrix<int, N, 1>& cell = (*dynamic_cast<VecDataArray<int, N>*>(side.indicesPtr))[pickData.ids[0]];
         for (int i = 0; i < N; i++)
         {
-            const int vertexId = cell[i];
-            results[i] = { vertexId, { &side.m_vertices[vertexId], side.m_invMasses[vertexId], &side.m_velocities[vertexId] } };
+            int vertexId = cell[i];
+            if (side.map != nullptr)
+            {
+                vertexId = static_cast<int>(side.map->getMapIdx(vertexId));
+            }
+            results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
         }
     }
     else // If given vertex indices
     {
         for (int i = 0; i < N; i++)
         {
-            const int vertexId = pickData.ids[i];
-            results[i] = { vertexId, { &side.m_vertices[vertexId], side.m_invMasses[vertexId], &side.m_velocities[vertexId] } };
+            int vertexId = pickData.ids[i];
+            if (side.map != nullptr)
+            {
+                vertexId = static_cast<int>(side.map->getMapIdx(vertexId));
+            }
+            results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
         }
     }
     return results;
@@ -173,19 +183,28 @@ PbdObjectGrasping::addPickConstraints()
 {
     removePickConstraints();
 
-    auto pointSetToPick = std::dynamic_pointer_cast<PointSet>(m_objectToGrasp->getPhysicsGeometry());
-    CHECK(pointSetToPick != nullptr) << "Trying to vertex pick with geometry that has no vertices";
+    std::shared_ptr<PointSet> pbdPhysicsGeom =
+        std::dynamic_pointer_cast<PointSet>(m_objectToGrasp->getPhysicsGeometry());
 
-    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSetToPick->getVertexPositions();
+    // If the point set to pick hasn't been set yet, default it to the physics geometry
+    // This would be the case if the user was mapping a geometry to another
+    std::shared_ptr<PointSet> pointSetToPick = std::dynamic_pointer_cast<PointSet>(m_geomToPick);
+    if (m_geomToPick == nullptr)
+    {
+        pointSetToPick = pbdPhysicsGeom;
+    }
+
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pbdPhysicsGeom->getVertexPositions();
     VecDataArray<double, 3>&                 vertices    = *verticesPtr;
 
+    // Get the attributes from the physics geometry
     auto velocitiesPtr =
-        std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSetToPick->getVertexAttribute("Velocities"));
+        std::dynamic_pointer_cast<VecDataArray<double, 3>>(pbdPhysicsGeom->getVertexAttribute("Velocities"));
     CHECK(velocitiesPtr != nullptr) << "Trying to vertex pick with geometry that has no Velocities";
     VecDataArray<double, 3>& velocities = *velocitiesPtr;
 
     auto invMassesPtr =
-        std::dynamic_pointer_cast<DataArray<double>>(pointSetToPick->getVertexAttribute("InvMass"));
+        std::dynamic_pointer_cast<DataArray<double>>(pbdPhysicsGeom->getVertexAttribute("InvMass"));
     CHECK(invMassesPtr != nullptr) << "Trying to vertex pick with geometry that has no InvMass";
     const DataArray<double>& invMasses = *invMassesPtr;
 
@@ -203,13 +222,21 @@ PbdObjectGrasping::addPickConstraints()
         indicesPtr = tetMesh->getTetrahedraIndices();
     }
 
+    // If the user tries to pick
+    OneToOneMap* map = nullptr;
+    if (m_geometryToPickMap != nullptr)
+    {
+        map = m_geometryToPickMap.get();
+    }
+
     // Place all the data into a struct to pass around & for quick access without casting
     // or dereferencing
     MeshSide meshStruct(
         *verticesPtr,
         *velocitiesPtr,
         *invMassesPtr,
-        indicesPtr.get());
+        indicesPtr.get(),
+        map);
 
     const Vec3d& pickGeomPos = m_graspGeom->getPosition();
     const Mat3d  pickGeomRot = m_graspGeom->getRotation().transpose();
@@ -223,7 +250,11 @@ PbdObjectGrasping::addPickConstraints()
         for (size_t i = 0; i < pickData.size(); i++)
         {
             const PickData& data     = pickData[i];
-            const int       vertexId = data.ids[0];
+            int             vertexId = data.ids[0];
+            if (meshStruct.map != nullptr)
+            {
+                vertexId = static_cast<int>(meshStruct.map->getMapIdx(vertexId));
+            }
 
             const Vec3d relativePos = pickGeomRot * (vertices[vertexId] - pickGeomPos);
             m_constraintPts.push_back({

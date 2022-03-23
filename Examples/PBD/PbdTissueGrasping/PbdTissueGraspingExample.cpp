@@ -343,6 +343,9 @@ main()
 
     // Add picking interaction for both jaws of the tool
     auto jawPicking = std::make_shared<PbdObjectGrasping>(tissueObj);
+    // Pick the surface instead of the tetrahedral mesh
+    jawPicking->setGeometryToPick(tissueObj->getVisualGeometry(),
+        std::dynamic_pointer_cast<OneToOneMap>(tissueObj->getPhysicsToCollidingMap()));
     scene->addInteraction(jawPicking);
 
     // Light
@@ -397,6 +400,7 @@ main()
                 lowerJawCollision->setEnabled(false);
                 jawPicking->beginRayPointGrasp(pickGeom, pickGeom->getPosition(),
                     -pickGeom->getOrientation().toRotationMatrix().col(1), 0.03);
+                //jawPicking->beginCellGrasp(pickGeom, "SurfaceMeshToCapsuleCD");
             });
         connect<Event>(controller, &LaparoscopicToolController::JawOpened,
             [&](Event*)
