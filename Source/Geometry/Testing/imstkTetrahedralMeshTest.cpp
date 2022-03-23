@@ -109,10 +109,10 @@ TEST(imstkTetrahedralMeshTest, GetVolume)
     VecDataArray<double, 3>& vertices    = *verticesPtr;
     VecDataArray<int, 4>&    indices     = *indicesPtr;
 
-    vertices[0] = Vec3d(1.0, 0.0, -1.0 / std::sqrt(2.0));
-    vertices[1] = Vec3d(-1.0, 0.0, -1.0 / std::sqrt(2.0));
-    vertices[2] = Vec3d(0.0, 1.0, 1.0 / std::sqrt(2.0));
-    vertices[3] = Vec3d(0.0, -1.0, 1.0 / std::sqrt(2.0));
+    vertices[0] = Vec3d(1.0, 0.0, -1.0 / std::sqrt(edgeLenth));
+    vertices[1] = Vec3d(-1.0, 0.0, -1.0 / std::sqrt(edgeLenth));
+    vertices[2] = Vec3d(0.0, 1.0, 1.0 / std::sqrt(edgeLenth));
+    vertices[3] = Vec3d(0.0, -1.0, 1.0 / std::sqrt(edgeLenth));
 
     indices[0] = Vec4i(0, 1, 2, 3);
 

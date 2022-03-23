@@ -198,9 +198,6 @@ TEST(imstkPointerPickerTest, PickTetrahedralMesh)
     auto tetMesh = std::make_shared<TetrahedralMesh>();
     {
         // We use a regular tetrahedron with edge lengths 2
-        // V = (edge length)^3/(6sqrt(2))
-        const double edgeLenth = 2.0;
-
         auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
         auto                     indicesPtr  = std::make_shared<VecDataArray<int, 4>>(1);
         VecDataArray<double, 3>& vertices    = *verticesPtr;
