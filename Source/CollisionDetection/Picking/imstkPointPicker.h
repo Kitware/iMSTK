@@ -42,6 +42,12 @@ public:
 
     void requestUpdate() override;
 
+    ///
+    /// \brief Set the picking ray
+    /// \param Start of the ray
+    /// \param Direction of the ray
+    /// \param Max distance of accepted pick points, anything farther excluded
+    ///
     void setPickingRay(const Vec3d& rayStart, const Vec3d& rayDir,
                        const double maxDist = -1.0)
     {

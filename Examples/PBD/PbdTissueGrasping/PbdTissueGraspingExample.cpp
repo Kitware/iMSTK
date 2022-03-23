@@ -395,7 +395,7 @@ main()
 
                 upperJawCollision->setEnabled(false);
                 lowerJawCollision->setEnabled(false);
-                jawPicking->beginRayCellGrasp(pickGeom, pickGeom->getPosition(),
+                jawPicking->beginRayPointGrasp(pickGeom, pickGeom->getPosition(),
                     -pickGeom->getOrientation().toRotationMatrix().col(1), 0.03);
             });
         connect<Event>(controller, &LaparoscopicToolController::JawOpened,

@@ -152,6 +152,47 @@ TEST(imstkPointerPickerTest, PickSurfaceMesh)
     EXPECT_EQ(pickData3.size(), 0);
 }
 
+///
+/// \brief Tests the max distance path in point picker
+///
+TEST(imstkPointerPickerTest, PickMaxDist)
+{
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    {
+        auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(3);
+        (*verticesPtr)[0] = Vec3d(0.5, 0.0, -0.5);
+        (*verticesPtr)[1] = Vec3d(-0.5, 0.0, -0.5);
+        (*verticesPtr)[2] = Vec3d(0.0, 0.0, 0.5);
+        auto indicesPtr = std::make_shared<VecDataArray<int, 3>>(1);
+        (*indicesPtr)[0] = Vec3i(0, 1, 2);
+        surfMesh->initialize(verticesPtr, indicesPtr);
+    }
+
+    // Ray above triangle, pointing directly down
+    PointPicker picker;
+
+    auto runPickTest = [&]()
+                       {
+                           // Just beneath max distance, should not be accepted
+                           picker.setPickingRay(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0, -1.0, 0.0), 0.999);
+                           EXPECT_EQ(picker.pick(surfMesh).size(), 0);
+
+                           // Just at max distance, should be
+                           picker.setPickingRay(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0, -1.0, 0.0), 1.0);
+                           EXPECT_EQ(picker.pick(surfMesh).size(), 1);
+
+                           // Over, should be
+                           picker.setPickingRay(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0, -1.0, 0.0), 1.0001);
+                           EXPECT_EQ(picker.pick(surfMesh).size(), 1);
+                       };
+
+    // Run with and without first hit culling
+    picker.setUseFirstHit(false);
+    runPickTest();
+    picker.setUseFirstHit(true);
+    runPickTest();
+}
+
 TEST(imstkPointerPickerTest, PickTetrahedralMesh)
 {
     auto tetMesh = std::make_shared<TetrahedralMesh>();

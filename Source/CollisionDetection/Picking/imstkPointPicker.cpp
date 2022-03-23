@@ -196,13 +196,14 @@ PointPicker::requestUpdate()
     const bool   useMaxDist = (m_maxDist != -1.0);
     if (m_useFirstHit)
     {
-        double minSqrDist = IMSTK_DOUBLE_MAX;
+        // Start at max, unless you get under this it won't select
+        double minSqrDist = useMaxDist ? maxSqrDist : IMSTK_DOUBLE_MAX;
         int    index      = -1;
         for (size_t i = 0; i < m_results.size(); i++)
         {
             // Possibly parameterize all by t and use that here instead
             const double sqrDist = (m_results[i].pickPoint - m_rayStart).squaredNorm();
-            if (sqrDist < minSqrDist && (!useMaxDist || sqrDist >= maxSqrDist))
+            if (sqrDist <= minSqrDist)
             {
                 index      = static_cast<int>(i);
                 minSqrDist = sqrDist;
@@ -215,6 +216,10 @@ PointPicker::requestUpdate()
             m_results.resize(1);
             m_results[0] = data;
         }
+        else
+        {
+            m_results.clear();
+        }
     }
     // Remove all distances not within max distance
     else
@@ -223,7 +228,7 @@ PointPicker::requestUpdate()
         for (size_t i = 0; i < m_results.size(); i++)
         {
             const double sqrDist = (m_results[i].pickPoint - m_rayStart).squaredNorm();
-            if ((!useMaxDist || sqrDist >= maxSqrDist))
+            if ((!useMaxDist || sqrDist <= maxSqrDist))
             {
                 pickData.push_back(m_results[i]);
             }
