@@ -179,6 +179,12 @@ public:
     ///@}
 
     ///
+    /// \brief Get the name of the geometry
+    ///
+    const std::string& getName() const { return m_name; }
+    void setName(const std::string& name) { m_name = name; }
+
+    ///
     /// \brief Get the global (unique) index of the geometry
     ///
     size_t getGlobalId() const { return m_globalId; }
@@ -221,7 +227,8 @@ protected:
 
     Mat4d m_transform = Mat4d::Identity();  ///> Transformation matrix
 
-    size_t m_globalId;                      ///> Unique ID assigned to each geometry upon construction
+    size_t      m_globalId;                 ///> Unique ID assigned to each geometry upon construction
+    std::string m_name = "";
 
     /// Total number of geometries that have been created in this program
     static std::atomic<size_t> s_numGlobalIds;
