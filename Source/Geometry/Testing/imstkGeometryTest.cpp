@@ -111,3 +111,11 @@ TEST(imstkGeometryTest, GetSetRotation3)
     geometry.setRotation(axes, angle);
     EXPECT_TRUE(geometry.getRotation().isApprox(mat3));
 }
+
+TEST(imstkGeometryTest, GetSetName)
+{
+    MockGeometry geometry;
+
+    geometry.setName("testGeom");
+    EXPECT_EQ("testGeom", geometry.getName());
+}

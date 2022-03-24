@@ -228,7 +228,7 @@ protected:
     Mat4d m_transform = Mat4d::Identity();  ///> Transformation matrix
 
     size_t      m_globalId;                 ///> Unique ID assigned to each geometry upon construction
-    std::string m_name = "";
+    std::string m_name = "unnamed";
 
     /// Total number of geometries that have been created in this program
     static std::atomic<size_t> s_numGlobalIds;

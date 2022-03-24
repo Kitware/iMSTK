@@ -345,14 +345,14 @@ PointSet::setActiveVertexAttribute(std::string& activeAttributeName, std::string
     std::shared_ptr<AbstractDataArray> attribute = m_vertexAttributes[attributeName];
     if (attribute->getNumberOfComponents() != expectedNumComponents)
     {
-        LOG(WARNING) << "Failed to set vertex attribute on PointSet with "
+        LOG(WARNING) << "Failed to set vertex attribute on PointSet " + getName() + " with "
                      << attribute->getNumberOfComponents() << " components. Expected " <<
             expectedNumComponents << " components.";
         return;
     }
     else if (attribute->getScalarType() != expectedScalarType)
     {
-        LOG(INFO) << "Tried to set vertex attribute on PointSet with scalar type "
+        LOG(INFO) << "Tried to set vertex attribute on PointSet " + getName() + " with scalar type "
                   << static_cast<int>(attribute->getScalarType()) << ". Casting to "
                   << static_cast<int>(expectedScalarType) << " scalar type";
         m_vertexAttributes[attributeName] = attribute->cast(expectedScalarType);

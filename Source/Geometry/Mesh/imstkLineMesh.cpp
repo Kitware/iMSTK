@@ -141,14 +141,14 @@ LineMesh::setCellActiveAttribute(std::string& activeAttributeName, std::string a
     std::shared_ptr<AbstractDataArray> attribute = m_cellAttributes[attributeName];
     if (attribute->getNumberOfComponents() != expectedNumComponents)
     {
-        LOG(WARNING) << "Failed to set cell attribute on LineMesh with "
+        LOG(WARNING) << "Failed to set cell attribute on LineMesh " + getName() + " with "
                      << attribute->getNumberOfComponents() << " components. Expected " <<
             expectedNumComponents << " components.";
         return;
     }
     else if (attribute->getScalarType() != expectedScalarType)
     {
-        LOG(INFO) << "Tried to set cell attribute on LineMesh with scalar type "
+        LOG(INFO) << "Tried to set cell attribute on LineMesh " + getName() + " with scalar type "
                   << static_cast<int>(attribute->getScalarType()) << ". Casting to "
                   << static_cast<int>(expectedScalarType) << " scalar type";
         m_cellAttributes[attributeName] = attribute->cast(expectedScalarType);
