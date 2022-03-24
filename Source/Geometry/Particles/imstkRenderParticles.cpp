@@ -24,8 +24,7 @@
 
 namespace imstk
 {
-RenderParticles::RenderParticles(const unsigned int maxNumParticles /*=128*/, const std::string& name /*= std::string("")*/)
-    : Geometry(name)
+RenderParticles::RenderParticles(const unsigned int maxNumParticles)
 {
     if (maxNumParticles <= 128)
     {

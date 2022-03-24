@@ -80,7 +80,7 @@ class SurfaceMesh : public PointSet
 public:
     using NeighborsType = std::set<size_t>;
 
-    SurfaceMesh(const std::string& name = std::string(""));
+    SurfaceMesh();
     ~SurfaceMesh() override = default;
 
     ///

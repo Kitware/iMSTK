@@ -26,7 +26,7 @@
 
 namespace imstk
 {
-SurfaceMesh::SurfaceMesh(const std::string& name) : PointSet(name),
+SurfaceMesh::SurfaceMesh() : PointSet(),
     m_triangleIndices(std::make_shared<VecDataArray<int, 3>>())
 {
 }
@@ -642,8 +642,6 @@ SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
     this->m_activeCellNormals  = srcMesh->m_activeCellNormals;
     this->m_activeCellScalars  = srcMesh->m_activeCellScalars;
     this->m_activeCellTangents = srcMesh->m_activeCellTangents;
-    //this->m_originalNumTriangles = srcMesh->m_originalNumTriangles;
-    //this->m_maxNumTriangles      = srcMesh->m_maxNumTriangles;
 
     // PointSet members
     this->m_initialVertexPositions = std::make_shared<VecDataArray<double, 3>>(*srcMesh->m_initialVertexPositions);
@@ -657,13 +655,8 @@ SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
     this->m_activeVertexScalars  = srcMesh->m_activeVertexScalars;
     this->m_activeVertexTangents = srcMesh->m_activeVertexTangents;
     this->m_activeVertexTCoords  = srcMesh->m_activeVertexTCoords;
-    this->m_loadFactor          = srcMesh->m_loadFactor;
-    this->m_maxNumVertices      = srcMesh->m_maxNumVertices;
-    this->m_originalNumVertices = srcMesh->m_originalNumVertices;
 
     // Geometry members
-    this->m_name = srcMesh->m_name;
-    this->m_geometryIndex    = getUniqueID();
     this->m_transformApplied = srcMesh->m_transformApplied;
     this->m_transform = srcMesh->m_transform;
 }
@@ -804,14 +797,14 @@ SurfaceMesh::setCellActiveAttribute(std::string& activeAttributeName, std::strin
     std::shared_ptr<AbstractDataArray> attribute = m_cellAttributes[attributeName];
     if (attribute->getNumberOfComponents() != expectedNumComponents)
     {
-        LOG(WARNING) << "Failed to set cell attribute on " << getName() << " with "
+        LOG(WARNING) << "Failed to set cell attribute on SurfaceMesh with "
                      << attribute->getNumberOfComponents() << " components. Expected " <<
             expectedNumComponents << " components.";
         return;
     }
     else if (attribute->getScalarType() != expectedScalarType)
     {
-        LOG(INFO) << "Tried to set cell attribute on " << getName() << " with scalar type "
+        LOG(INFO) << "Tried to set cell attribute on SurfaceMesh with scalar type "
                   << static_cast<int>(attribute->getScalarType()) << ". Casting to "
                   << static_cast<int>(expectedScalarType) << " scalar type";
         m_cellAttributes[attributeName] = attribute->cast(expectedScalarType);

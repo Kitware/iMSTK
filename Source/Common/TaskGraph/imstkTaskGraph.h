@@ -31,9 +31,9 @@ limitations under the License.
 
 namespace imstk
 {
-using TaskNodeVector  = std::vector<std::shared_ptr<TaskNode>>;
-using TaskNodeList    = std::list<std::shared_ptr<TaskNode>>;
-using TaskNodeSet     = std::unordered_set<std::shared_ptr<TaskNode>>;
+using TaskNodeVector = std::vector<std::shared_ptr<TaskNode>>;
+using TaskNodeList = std::list<std::shared_ptr<TaskNode>>;
+using TaskNodeSet = std::unordered_set<std::shared_ptr<TaskNode>>;
 using TaskNodeAdjList = std::unordered_map<std::shared_ptr<TaskNode>, TaskNodeSet>;
 
 ///
@@ -68,7 +68,7 @@ public:
     ///
     const TaskNodeAdjList& getInvAdjList() const { return m_invAdjList; }
 
-// Node operations
+    // Node operations
 public:
     ///
     /// \brief Linear search for node by name within this graph
@@ -135,7 +135,7 @@ public:
     ///
     void insertBefore(std::shared_ptr<TaskNode> refNode, std::shared_ptr<TaskNode> newNode);
 
-// Edge operations
+    // Edge operations
 public:
     ///
     /// \brief Returns whether or not this graph contains the given directed edge
@@ -183,7 +183,7 @@ public:
         m_invAdjList.clear();
     }
 
-// Graph algorithms, todo: Move into filtering module
+    // Graph algorithms, todo: Move into filtering module
 public:
     ///
     /// \brief Graph sum, shared references are considered identical nodes, source/sink of results invalidated/nullptr
@@ -194,11 +194,6 @@ public:
     /// \brief Topological sort of all nodes within graph
     ///
     static std::shared_ptr<TaskNodeList> topologicalSort(std::shared_ptr<TaskGraph> graph);
-
-    ///
-    /// \brief Makes sure no two *critical nodes* run at the same time by establishing an edge between them.
-    ///
-    static std::shared_ptr<TaskGraph> resolveCriticalNodes(std::shared_ptr<TaskGraph> graph);
 
     ///
     /// \brief Remove redundant edges. Removal is such that all vertices are still reachable and graph goes from source->sink
@@ -256,6 +251,6 @@ protected:
     TaskNodeAdjList m_invAdjList; ///> This gives the inputs of every node
 
     std::shared_ptr<TaskNode> m_source = nullptr;
-    std::shared_ptr<TaskNode> m_sink   = nullptr;
+    std::shared_ptr<TaskNode> m_sink = nullptr;
 };
 } // namespace imstk

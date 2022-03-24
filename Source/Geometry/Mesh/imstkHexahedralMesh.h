@@ -33,7 +33,7 @@ namespace imstk
 class HexahedralMesh : public VolumetricMesh
 {
 public:
-    HexahedralMesh(const std::string& name = std::string(""));
+    HexahedralMesh();
     ~HexahedralMesh() override = default;
 
     ///

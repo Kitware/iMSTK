@@ -33,9 +33,8 @@ namespace imstk
 class Plane : public AnalyticalGeometry
 {
 public:
-    Plane(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d& normal = Vec3d(0.0, 1.0, 0.0),
-          const std::string& name = std::string("defaultPlane")) :
-        AnalyticalGeometry(name), m_width(1.0)
+    Plane(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d& normal = Vec3d(0.0, 1.0, 0.0)) :
+        AnalyticalGeometry(), m_width(1.0)
     {
         setPosition(pos);
         setNormal(normal.normalized());

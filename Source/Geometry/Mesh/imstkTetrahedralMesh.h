@@ -38,7 +38,7 @@ class SurfaceMesh;
 class TetrahedralMesh : public VolumetricMesh
 {
 public:
-    TetrahedralMesh(const std::string& name = std::string(""));
+    TetrahedralMesh();
     ~TetrahedralMesh() override = default;
 
     ///

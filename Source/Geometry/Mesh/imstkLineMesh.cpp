@@ -25,7 +25,7 @@
 
 namespace imstk
 {
-LineMesh::LineMesh(const std::string& name) : PointSet(name),
+LineMesh::LineMesh() : PointSet(),
     m_segmentIndices(std::make_shared<VecDataArray<int, 2>>())
 {
 }
@@ -141,14 +141,14 @@ LineMesh::setCellActiveAttribute(std::string& activeAttributeName, std::string a
     std::shared_ptr<AbstractDataArray> attribute = m_cellAttributes[attributeName];
     if (attribute->getNumberOfComponents() != expectedNumComponents)
     {
-        LOG(WARNING) << "Failed to set cell attribute on " << getName() << " with "
+        LOG(WARNING) << "Failed to set cell attribute on LineMesh with "
                      << attribute->getNumberOfComponents() << " components. Expected " <<
             expectedNumComponents << " components.";
         return;
     }
     else if (attribute->getScalarType() != expectedScalarType)
     {
-        LOG(INFO) << "Tried to set cell attribute on " << getName() << " with scalar type "
+        LOG(INFO) << "Tried to set cell attribute on LineMesh with scalar type "
                   << static_cast<int>(attribute->getScalarType()) << ". Casting to "
                   << static_cast<int>(expectedScalarType) << " scalar type";
         m_cellAttributes[attributeName] = attribute->cast(expectedScalarType);

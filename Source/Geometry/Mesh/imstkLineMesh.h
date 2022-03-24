@@ -37,7 +37,7 @@ struct Color;
 class LineMesh : public PointSet
 {
 public:
-    LineMesh(const std::string& name = std::string(""));
+    LineMesh();
     ~LineMesh() override = default;
 
     ///

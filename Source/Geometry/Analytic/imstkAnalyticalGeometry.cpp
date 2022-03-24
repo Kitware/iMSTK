@@ -24,7 +24,7 @@
 
 namespace imstk
 {
-AnalyticalGeometry::AnalyticalGeometry(const std::string& name) : ImplicitGeometry(name),
+AnalyticalGeometry::AnalyticalGeometry() : ImplicitGeometry(),
     m_position(Vec3d::Zero()), m_positionPostTransform(Vec3d::Zero()),
     m_orientation(Quatd::Identity()), m_orientationPostTransform(Quatd::Identity())
 {

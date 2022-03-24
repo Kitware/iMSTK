@@ -380,7 +380,7 @@ LooseOctree::addPointSet(const std::shared_ptr<PointSet>& pointset)
     static const auto type = static_cast<int>(OctreePrimitiveType::Point);
 
     const auto pGeometry = static_cast<Geometry*>(pointset.get());
-    const auto geomIdx   = pGeometry->getGlobalIndex();
+    const auto geomIdx   = static_cast<uint32_t>(pGeometry->getGlobalId());
     addGeometry(geomIdx);
 
     const auto numNewPrimitives = static_cast<uint32_t>(pointset->getNumVertices());
@@ -407,7 +407,7 @@ LooseOctree::addTriangleMesh(const std::shared_ptr<SurfaceMesh>& surfMesh)
     static const auto type = static_cast<int>(OctreePrimitiveType::Triangle);
 
     const auto pGeometry = static_cast<Geometry*>(surfMesh.get());
-    const auto geomIdx   = pGeometry->getGlobalIndex();
+    const auto geomIdx   = static_cast<uint32_t>(pGeometry->getGlobalId());
     addGeometry(geomIdx);
 
     const auto numNewPrimitives = static_cast<uint32_t>(surfMesh->getNumTriangles());
@@ -434,7 +434,7 @@ LooseOctree::addAnalyticalGeometry(const std::shared_ptr<Geometry>& geometry)
     static const auto type = static_cast<int>(OctreePrimitiveType::Analytical);
 
     const auto pGeometry = geometry.get();
-    const auto geomIdx   = pGeometry->getGlobalIndex();
+    const auto geomIdx   = static_cast<uint32_t>(pGeometry->getGlobalId());
     addGeometry(geomIdx);
 
     const auto pPrimitiveBlock = new OctreePrimitive[1];

@@ -30,8 +30,6 @@ namespace
 class MockGeometry : public Geometry
 {
 public:
-    MockGeometry() : Geometry("MockGeometry") { }
-
     const std::string getTypeName() const override { return "MockGeometry"; }
 };
 } // namespace

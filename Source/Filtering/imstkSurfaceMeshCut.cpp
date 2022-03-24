@@ -289,7 +289,7 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
         Vec3d p1 = (*cutVertices)[(*cutTriangles)[0][1]];
         Vec3d p2 = (*cutVertices)[(*cutTriangles)[0][2]];
         Vec3d cutNormal = ((p1 - p0).cross(p2 - p0)).normalized();
-        auto  cutPlane  = std::make_shared<Plane>(p0, cutNormal, "cutPlane");
+        auto  cutPlane  = std::make_shared<Plane>(p0, cutNormal);
         cutGeometry = std::static_pointer_cast<AnalyticalGeometry>(cutPlane);
     }
 
@@ -553,7 +553,7 @@ SurfaceMeshCut::generateSurfaceMeshCutData(std::shared_ptr<SurfaceMesh> cutSurf,
     Vec3d p1 = (*cutVertices)[(*cutTriangles)[0][1]];
     Vec3d p2 = (*cutVertices)[(*cutTriangles)[0][2]];
     Vec3d cutNormal = (p1 - p0).cross(p2 - p0);
-    auto  cutPlane  = std::make_shared<Plane>(p0, cutNormal, "cutPlane");
+    auto  cutPlane  = std::make_shared<Plane>(p0, cutNormal);
 
     // Compute cut data using infinite cutPlane
     generateAnalyticalCutData(std::static_pointer_cast<AnalyticalGeometry>(cutPlane), outputSurf);

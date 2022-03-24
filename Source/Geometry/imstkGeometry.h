@@ -30,11 +30,6 @@
 
 namespace imstk
 {
-namespace ParallelUtils
-{
-class SpinLock;
-} // namespace ParallelUtils
-
 ///
 /// \class Geometry
 /// \brief Base class for any geometrical representation
@@ -65,10 +60,23 @@ public:
     };
 
 protected:
-    Geometry(const std::string& name = std::string(""));
+    Geometry() : m_globalId(getUniqueId()) { }
 
 public:
+    Geometry(Geometry& other)
+    {
+        m_transformApplied = other.m_transformApplied;
+        m_transform = other.m_transform;
+        m_globalId = Geometry::getUniqueId();
+    }
     ~Geometry() override = default;
+
+    void operator=(const Geometry& other)
+    {
+        m_transformApplied = other.m_transformApplied;
+        m_transform = other.m_transform;
+        m_globalId = Geometry::getUniqueId();
+    }
 
     ///
     /// \brief Returns the string representing the type name of the geometry
@@ -166,23 +174,17 @@ public:
         m_transform = m;
         m_transformApplied = false;
     }
-
     ///@}
-
-    ///
-    /// \brief Get name of the geometry
-    ///
-    const std::string& getName() const { return m_name; }
-
+    
     ///
     /// \brief Get the global (unique) index of the geometry
     ///
-    uint32_t getGlobalIndex() const { return m_geometryIndex; }
+    size_t getGlobalId() const { return m_globalId; }
 
     ///
-    /// \brief Get a pointer to geometry that has been registered globally
+    /// \brief Get number of ids/geometries
     ///
-    static uint32_t getTotalNumberGeometries() { return s_NumGeneratedGegometries; }
+    static size_t getNumGlobalIds() { return s_numGlobalIds; }
 
     ///
     /// \brief Returns true if the geometry is a mesh, else returns false
@@ -198,26 +200,28 @@ public:
 
 protected:
     ///
-    /// \brief Get a unique ID for the new generated geometry object
-    ///
-    static uint32_t getUniqueID();
-
-    /// Mutex lock for thread-safe counter update and name set update
-    static ParallelUtils::SpinLock s_GeomGlobalLock;
-
-    /// Total number of geometries that have been created in this program
-    static uint32_t s_NumGeneratedGegometries;
-
-    ///
     /// \brief Directly apply transform to data
     ///
     virtual void applyTransform(const Mat4d& imstkNotUsed(m)) { }
 
-    std::string m_name;                     ///> Unique name for each geometry
-    uint32_t    m_geometryIndex;            ///> Unique ID assigned to each geometry upon construction
+    ///
+    /// \brief Get a unique ID for the new generated geometry object
+    ///
+    static size_t getUniqueId()
+    {
+        const size_t idx = s_numGlobalIds;
+        s_numGlobalIds++;
+        return idx;
+    }
 
+protected:
     mutable bool m_transformApplied = true; // Internally used for lazy evaluation
 
-    Mat4d m_transform;                      ///> Transformation matrix
+    Mat4d m_transform = Mat4d::Identity(); ///> Transformation matrix
+
+    size_t m_globalId; ///> Unique ID assigned to each geometry upon construction
+
+    /// Total number of geometries that have been created in this program
+    static std::atomic<size_t> s_numGlobalIds;
 };
 } // namespace imstk

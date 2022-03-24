@@ -79,7 +79,7 @@ public:
     void updatePostTransformData() const override;
 
 protected:
-    AnalyticalGeometry(const std::string& name = std::string(""));
+    AnalyticalGeometry();
 
     ///
     /// \brief Apply a user transform directly to (pre-transformed) parameters producing
