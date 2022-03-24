@@ -149,8 +149,6 @@ Scene::buildTaskGraph()
         {
             // Remove any unused nodes
             objComputeGraph = TaskGraph::removeUnusedNodes(objComputeGraph);
-            // Add edges between any nodes that are marked critical and running simulatenously
-            objComputeGraph = TaskGraph::resolveCriticalNodes(objComputeGraph);
             // Sum and nest the graph
             m_taskGraph->nestGraph(objComputeGraph, m_taskGraph->getSource(), m_taskGraph->getSink());
         }
@@ -158,22 +156,12 @@ Scene::buildTaskGraph()
 
     // Remove any possible unused nodes
     m_taskGraph = TaskGraph::removeUnusedNodes(m_taskGraph);
-    // Resolve criticals across objects
-    m_taskGraph = TaskGraph::resolveCriticalNodes(m_taskGraph);
 }
 
 void
 Scene::initTaskGraph()
 {
-    // Pick a controller for the graph execution
-    if (m_config->taskParallelizationEnabled)
-    {
-        m_taskGraphController = std::make_shared<TbbTaskGraphController>();
-    }
-    else
-    {
-        m_taskGraphController = std::make_shared<SequentialTaskGraphController>();
-    }
+    m_taskGraphController = std::make_shared<SequentialTaskGraphController>();
 
     if (TaskGraph::isCyclic(m_taskGraph))
     {
