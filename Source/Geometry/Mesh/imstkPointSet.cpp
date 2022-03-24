@@ -26,7 +26,7 @@
 
 namespace imstk
 {
-PointSet::PointSet() : 
+PointSet::PointSet() :
     m_initialVertexPositions(std::make_shared<VecDataArray<double, 3>>()),
     m_vertexPositions(std::make_shared<VecDataArray<double, 3>>())
 {

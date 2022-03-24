@@ -37,37 +37,41 @@ class TaskGraph;
 class TaskNode
 {
 public:
-    TaskNode() = default;
+    TaskNode() : m_globalId(TaskNode::getUniqueID()) { }
+
     TaskNode(std::function<void()> func, std::string name = "none", bool isCritical = false) :
         m_name(name), m_isCritical(isCritical),
         m_computeTime(0.0), m_func(func),
         m_globalId(TaskNode::getUniqueID())
     {
     }
+
     TaskNode(TaskNode& other)
     {
         // When copied from another take all tis values
         // but its global id
-        m_name = other.m_name;
-        m_enabled = other.m_enabled;
-        m_isCritical = other.m_isCritical;
-        m_computeTime = other.m_computeTime;
+        m_name         = other.m_name;
+        m_enabled      = other.m_enabled;
+        m_isCritical   = other.m_isCritical;
+        m_computeTime  = other.m_computeTime;
         m_enableTiming = other.m_enableTiming;
-        m_func = other.m_func;
-        m_globalId = getUniqueID();
+        m_func         = other.m_func;
+        m_globalId     = getUniqueID();
     }
+
     void operator=(const TaskNode& other)
     {
         // When set equal to another take all its values but
         // its global id
-        m_name = other.m_name;
-        m_enabled = other.m_enabled;
-        m_isCritical = other.m_isCritical;
-        m_computeTime = other.m_computeTime;
+        m_name         = other.m_name;
+        m_enabled      = other.m_enabled;
+        m_isCritical   = other.m_isCritical;
+        m_computeTime  = other.m_computeTime;
         m_enableTiming = other.m_enableTiming;
-        m_func = other.m_func;
-        m_globalId = getUniqueID();
+        m_func         = other.m_func;
+        m_globalId     = getUniqueID();
     }
+
     virtual ~TaskNode() = default;
 
     void setFunction(std::function<void()> func) { this->m_func = func; }
@@ -95,7 +99,7 @@ public:
 
     ///
     /// \brief Two nodes are equivalent if ids are the same
-    /// 
+    ///
     bool operator==(const TaskNode& other) const { return m_globalId == other.m_globalId; }
     bool operator<(const TaskNode& other) const { return m_globalId < other.m_globalId; }
 
@@ -136,4 +140,4 @@ struct hash<imstk::TaskNode>
         return node.getGlobalId();
     }
 };
-}
+} // namespace std

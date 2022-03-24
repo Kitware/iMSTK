@@ -31,9 +31,9 @@ namespace imstk
 ///
 static void
 computeDepths(std::shared_ptr<TaskGraph> graph,
-              std::unordered_map<std::shared_ptr<TaskNode>, int>& depths)
+              std::unordered_map<std::shared_ptr<TaskNode>, int, TaskNodeHash, TaskNodeEq>& depths)
 {
-    std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
+    std::unordered_set<std::shared_ptr<TaskNode>, TaskNodeHash, TaskNodeEq> visitedNodes;
 
     const TaskNodeAdjList& adjList = graph->getAdjList();
 
@@ -90,7 +90,7 @@ computeCritList(std::shared_ptr<TaskGraph> graph,
     // For every critical node
     for (size_t i = 0; i < critNodes.size(); i++)
     {
-        std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
+        TaskNodeSet visitedNodes;
 
         // DFS for the dependencies (try to reach another critical)
         std::stack<std::shared_ptr<TaskNode>> nodeStack;
@@ -396,7 +396,7 @@ TaskGraph::isReachable(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNo
     const TaskNodeAdjList& adjList = getAdjList();
 
     // Simple BFS
-    std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
+    TaskNodeSet visitedNodes;
 
     // It inserts itself as well
     std::queue<std::shared_ptr<TaskNode>> nodeStack;
@@ -488,7 +488,7 @@ TaskGraph::topologicalSort(std::shared_ptr<TaskGraph> graph)
 {
     CHECK(graph != nullptr) << "Graph is nullptr";
     // Compute the number of inputs to each node (we will remove these as we go)
-    std::unordered_map<std::shared_ptr<TaskNode>, size_t> numInputs;
+    std::unordered_map<std::shared_ptr<TaskNode>, size_t, TaskNodeHash, TaskNodeEq> numInputs;
 
     const TaskNodeAdjList& adjList    = graph->getAdjList();
     const TaskNodeAdjList& invAdjList = graph->getInvAdjList();
@@ -502,7 +502,7 @@ TaskGraph::topologicalSort(std::shared_ptr<TaskGraph> graph)
     }
 
     // Create an edge blacklist for edge removal during algorithm
-    std::unordered_map<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>> removedEdges;
+    std::unordered_map<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>, TaskNodeHash, TaskNodeEq> removedEdges;
 
     auto edgeHasBeenRemoved = [&removedEdges](const std::shared_ptr<TaskNode>& node1, const std::shared_ptr<TaskNode>& node2)
                               {
@@ -682,7 +682,7 @@ TaskGraph::isCyclic(std::shared_ptr<TaskGraph> graph)
     const TaskNodeVector&  nodes   = graph->getNodes();
     for (size_t i = 0; i < nodes.size(); i++)
     {
-        std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
+        TaskNodeSet visitedNodes;
 
         // DFS for the dependencies (start at children instead of itself)
         std::stack<std::shared_ptr<TaskNode>> nodeStack;
@@ -731,21 +731,22 @@ TaskGraph::isCyclic(std::shared_ptr<TaskGraph> graph)
     return false;
 }
 
-std::unordered_map<std::shared_ptr<TaskNode>, std::string>
+TaskNodeNameMap
 TaskGraph::getUniqueNodeNames(std::shared_ptr<TaskGraph> graph, bool apply)
 {
     CHECK(graph != nullptr) << "Graph is nullptr";
     // Produce non colliding names
-    std::unordered_map<std::shared_ptr<TaskNode>, std::string> nodeNames;
-    std::unordered_map<std::string, int>                       names;
-    const TaskNodeVector&                                      nodes = graph->getNodes();
+
+    TaskNodeNameMap                      nodeNames;
+    std::unordered_map<std::string, int> names;
+    const TaskNodeVector&                nodes = graph->getNodes();
     for (size_t i = 0; i < nodes.size(); i++)
     {
         nodeNames[nodes[i]] = nodes[i]->m_name;
         names[nodes[i]->m_name]++;
     }
     // Adjust names
-    for (std::unordered_map<std::shared_ptr<TaskNode>, std::string>::iterator it = nodeNames.begin();
+    for (TaskNodeNameMap::iterator it = nodeNames.begin();
          it != nodeNames.end(); it++)
     {
         int         nameIter = 0;
@@ -770,17 +771,18 @@ TaskGraph::getUniqueNodeNames(std::shared_ptr<TaskGraph> graph, bool apply)
     return nodeNames;
 }
 
-std::unordered_map<std::shared_ptr<TaskNode>, double>
+std::unordered_map<std::shared_ptr<TaskNode>, double, TaskNodeHash, TaskNodeEq>
 TaskGraph::getNodeStartTimes(std::shared_ptr<TaskGraph> graph)
 {
     CHECK(graph != nullptr) << "Graph is nullptr";
     const TaskNodeAdjList& adjList = graph->getAdjList();
 
     // Setup a map for total elapsed times at each node
-    std::unordered_map<std::shared_ptr<TaskNode>, double> startTimes;
+    using NodeTimeMap = std::unordered_map<std::shared_ptr<TaskNode>, double, TaskNodeHash, TaskNodeEq>;
+    NodeTimeMap startTimes;
 
     {
-        std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
+        TaskNodeSet visitedNodes;
 
         // BFS down the tree computing total times
         std::stack<std::shared_ptr<TaskNode>> nodeStack;
@@ -824,7 +826,8 @@ TaskNodeList
 TaskGraph::getCriticalPath(std::shared_ptr<TaskGraph> graph)
 {
     CHECK(graph != nullptr) << "Graph is nullptr";
-    std::unordered_map<std::shared_ptr<TaskNode>, double> nodeStartTimes = getNodeStartTimes(graph);
+    std::unordered_map<std::shared_ptr<TaskNode>, double, TaskNodeHash, TaskNodeEq> nodeStartTimes =
+        getNodeStartTimes(graph);
 
     // Now backtrack to acquire the path of longest duration
     const TaskNodeAdjList&               invAdjList = graph->getInvAdjList();

@@ -67,15 +67,16 @@ public:
     {
         m_transformApplied = other.m_transformApplied;
         m_transform = other.m_transform;
-        m_globalId = Geometry::getUniqueId();
+        m_globalId  = Geometry::getUniqueId();
     }
+
     ~Geometry() override = default;
 
     void operator=(const Geometry& other)
     {
         m_transformApplied = other.m_transformApplied;
         m_transform = other.m_transform;
-        m_globalId = Geometry::getUniqueId();
+        m_globalId  = Geometry::getUniqueId();
     }
 
     ///
@@ -174,8 +175,9 @@ public:
         m_transform = m;
         m_transformApplied = false;
     }
+
     ///@}
-    
+
     ///
     /// \brief Get the global (unique) index of the geometry
     ///
@@ -217,9 +219,9 @@ protected:
 protected:
     mutable bool m_transformApplied = true; // Internally used for lazy evaluation
 
-    Mat4d m_transform = Mat4d::Identity(); ///> Transformation matrix
+    Mat4d m_transform = Mat4d::Identity();  ///> Transformation matrix
 
-    size_t m_globalId; ///> Unique ID assigned to each geometry upon construction
+    size_t m_globalId;                      ///> Unique ID assigned to each geometry upon construction
 
     /// Total number of geometries that have been created in this program
     static std::atomic<size_t> s_numGlobalIds;

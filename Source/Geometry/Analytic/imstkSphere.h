@@ -39,6 +39,7 @@ public:
         setPosition(pos);
         setRadius(radius);
     }
+
     ~Sphere() override = default;
 
     ///

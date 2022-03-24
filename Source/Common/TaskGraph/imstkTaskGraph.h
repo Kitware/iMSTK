@@ -31,10 +31,27 @@ limitations under the License.
 
 namespace imstk
 {
-using TaskNodeVector = std::vector<std::shared_ptr<TaskNode>>;
-using TaskNodeList = std::list<std::shared_ptr<TaskNode>>;
-using TaskNodeSet = std::unordered_set<std::shared_ptr<TaskNode>>;
-using TaskNodeAdjList = std::unordered_map<std::shared_ptr<TaskNode>, TaskNodeSet>;
+struct TaskNodeHash
+{
+    std::size_t operator()(const std::shared_ptr<TaskNode>& node) const
+    {
+        return node->getGlobalId();
+    }
+};
+struct TaskNodeEq
+{
+    bool operator()(const std::shared_ptr<TaskNode>& a,
+                    const std::shared_ptr<TaskNode>& b) const
+    {
+        return a->getGlobalId() == b->getGlobalId();
+    }
+};
+
+using TaskNodeVector  = std::vector<std::shared_ptr<TaskNode>>;
+using TaskNodeList    = std::list<std::shared_ptr<TaskNode>>;
+using TaskNodeSet     = std::unordered_set<std::shared_ptr<TaskNode>, TaskNodeHash, TaskNodeEq>;
+using TaskNodeAdjList = std::unordered_map<std::shared_ptr<TaskNode>, TaskNodeSet, TaskNodeHash, TaskNodeEq>;
+using TaskNodeNameMap = std::unordered_map<std::shared_ptr<TaskNode>, std::string, TaskNodeHash, TaskNodeEq>;
 
 ///
 /// \class TaskGraph
@@ -68,7 +85,7 @@ public:
     ///
     const TaskNodeAdjList& getInvAdjList() const { return m_invAdjList; }
 
-    // Node operations
+// Node operations
 public:
     ///
     /// \brief Linear search for node by name within this graph
@@ -135,7 +152,7 @@ public:
     ///
     void insertBefore(std::shared_ptr<TaskNode> refNode, std::shared_ptr<TaskNode> newNode);
 
-    // Edge operations
+// Edge operations
 public:
     ///
     /// \brief Returns whether or not this graph contains the given directed edge
@@ -183,7 +200,7 @@ public:
         m_invAdjList.clear();
     }
 
-    // Graph algorithms, todo: Move into filtering module
+// Graph algorithms, todo: Move into filtering module
 public:
     ///
     /// \brief Graph sum, shared references are considered identical nodes, source/sink of results invalidated/nullptr
@@ -233,12 +250,12 @@ public:
     ///
     /// \brief Nodes may not have unique names. Iterates the names with numeric postfix to generate uniques
     ///
-    static std::unordered_map<std::shared_ptr<TaskNode>, std::string> getUniqueNodeNames(std::shared_ptr<TaskGraph> graph, bool apply = false);
+    static TaskNodeNameMap getUniqueNodeNames(std::shared_ptr<TaskGraph> graph, bool apply = false);
 
     ///
     /// \brief Gets the completion times of each node (source = ~0s)
     ///
-    static std::unordered_map<std::shared_ptr<TaskNode>, double> getNodeStartTimes(std::shared_ptr<TaskGraph> graph);
+    static std::unordered_map<std::shared_ptr<TaskNode>, double, TaskNodeHash, TaskNodeEq> getNodeStartTimes(std::shared_ptr<TaskGraph> graph);
 
     ///
     /// \brief Computes the critical path
@@ -251,6 +268,6 @@ protected:
     TaskNodeAdjList m_invAdjList; ///> This gives the inputs of every node
 
     std::shared_ptr<TaskNode> m_source = nullptr;
-    std::shared_ptr<TaskNode> m_sink = nullptr;
+    std::shared_ptr<TaskNode> m_sink   = nullptr;
 };
 } // namespace imstk
