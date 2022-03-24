@@ -25,12 +25,6 @@
 
 namespace imstk
 {
-ImageData::ImageData(const std::string& name)
-    : PointSet(name),
-    m_scalarArray(nullptr)
-{
-}
-
 void
 ImageData::print() const
 {

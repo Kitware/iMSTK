@@ -33,9 +33,6 @@ namespace imstk
 ///
 class ImplicitGeometry : public Geometry
 {
-protected:
-    ImplicitGeometry(std::string name = "") : Geometry(name) { }
-
 public:
     ~ImplicitGeometry() override = default;
 

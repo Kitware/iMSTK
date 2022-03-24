@@ -64,11 +64,22 @@ TbbTaskGraphController::execute()
     const TaskNodeAdjList& adjList = m_graph->getAdjList();
     for (const auto& i : adjList)
     {
-        TbbContinueNode& tbbNode1 = tbbNodes.at(i.first);
-        for (const auto& outputNode : i.second)
+        if (i.first == m_graph->getSource())
         {
-            TbbContinueNode& tbbNode2 = tbbNodes.at(outputNode);
-            make_edge(tbbNode1, tbbNode2);
+            for (const auto& outputNode : i.second)
+            {
+                TbbContinueNode& tbbNode2 = tbbNodes.at(outputNode);
+                make_edge(start, tbbNode2);
+            }
+        }
+        else
+        {
+            TbbContinueNode& tbbNode1 = tbbNodes.at(i.first);
+            for (const auto& outputNode : i.second)
+            {
+                TbbContinueNode& tbbNode2 = tbbNodes.at(outputNode);
+                make_edge(tbbNode1, tbbNode2);
+            }
         }
     }
 

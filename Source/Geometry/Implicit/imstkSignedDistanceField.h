@@ -46,7 +46,7 @@ public:
     /// \param ImageData to utilize
     /// \param geometry name
     ///
-    SignedDistanceField(std::shared_ptr<ImageData> imageData, std::string name = "");
+    SignedDistanceField(std::shared_ptr<ImageData> imageData);
     ~SignedDistanceField() override = default;
 
     ///

@@ -43,8 +43,8 @@ public:
 
     using GeometryBoolPair = std::pair<std::shared_ptr<ImplicitGeometry>, GeometryBoolType>;
 
-    CompositeImplicitGeometry(std::string name = "") : ImplicitGeometry(name) { }
-    ~CompositeImplicitGeometry() override      = default;
+    CompositeImplicitGeometry() = default;
+    ~CompositeImplicitGeometry() override = default;
 
     ///
     /// \brief Returns the string representing the type name of the geometry

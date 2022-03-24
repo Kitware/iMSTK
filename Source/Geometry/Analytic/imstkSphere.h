@@ -33,11 +33,8 @@ namespace imstk
 class Sphere : public AnalyticalGeometry
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    Sphere(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const std::string& name = std::string("defaultSphere")) :
-        AnalyticalGeometry(name)
+    Sphere(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0) :
+        AnalyticalGeometry()
     {
         setPosition(pos);
         setRadius(radius);

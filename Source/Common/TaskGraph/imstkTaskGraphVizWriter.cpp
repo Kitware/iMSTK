@@ -87,8 +87,8 @@ TaskGraphVizWriter::write()
             "edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, color=grey20];\n";
 
         // Write the node section
-        const TaskNodeVector&                                      nodes = m_inputGraph->getNodes();
-        std::unordered_map<std::shared_ptr<TaskNode>, std::string> nodeIds;
+        const TaskNodeVector& nodes = m_inputGraph->getNodes();
+        TaskNodeNameMap       nodeIds;
         for (size_t i = 0; i < nodes.size(); i++)
         {
             const std::string nodeUniqueName = "node" + std::to_string(i);

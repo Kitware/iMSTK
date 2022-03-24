@@ -36,7 +36,7 @@ class AbstractDataArray;
 class ImageData : public PointSet
 {
 public:
-    ImageData(const std::string& name = std::string(""));
+    ImageData() = default;
     ~ImageData() override = default;
 
     ///

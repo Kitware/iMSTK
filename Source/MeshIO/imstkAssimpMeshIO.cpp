@@ -150,7 +150,7 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
                 cells[j++] = Vec2i(indices[0], indices[1]);
             }
         }
-        auto lineMesh = std::make_shared<LineMesh>(std::string(importedMesh->mName.C_Str()));
+        auto lineMesh = std::make_shared<LineMesh>();
         lineMesh->initialize(verticesPtr, cellsPtr);
         return lineMesh;
     }
@@ -190,7 +190,7 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
             }
         }
 
-        auto surfMesh = std::make_shared<SurfaceMesh>(std::string(importedMesh->mName.C_Str()));
+        auto surfMesh = std::make_shared<SurfaceMesh>();
         surfMesh->initialize(verticesPtr, cellsPtr, normalsPtr, false);
         surfMesh->setVertexNormals("normals", normalsPtr);
 

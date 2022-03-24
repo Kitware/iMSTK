@@ -34,8 +34,8 @@ class Cylinder : public AnalyticalGeometry
 {
 public:
     Cylinder(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const double length = 1.0,
-             const Quatd& orientation = Quatd::Identity(), const std::string& name = std::string("defaultCylinder")) :
-        AnalyticalGeometry(name)
+             const Quatd& orientation = Quatd::Identity()) :
+        AnalyticalGeometry()
     {
         setPosition(pos);
         setOrientation(orientation);

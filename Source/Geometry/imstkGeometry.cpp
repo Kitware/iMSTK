@@ -25,15 +25,7 @@
 
 namespace imstk
 {
-Geometry::Geometry(const std::string& name) :
-    m_name(name), m_geometryIndex(Geometry::getUniqueID()), m_transform(Mat4d::Identity())
-{
-    // If the geometry name is empty, enumerate it by name (which will not be duplicated)
-    if (m_name.empty())
-    {
-        m_name = std::string("unnamed_geometry-") + std::to_string(m_geometryIndex);
-    }
-}
+std::atomic<size_t> Geometry::s_numGlobalIds = { 0 };
 
 void
 Geometry::print() const
@@ -215,23 +207,5 @@ Geometry::getScaling() const
         m_transform.block<3, 1>(0, 0).norm(),
         m_transform.block<3, 1>(0, 1).norm(),
         m_transform.block<3, 1>(0, 2).norm());
-}
-
-// Static mutex lock
-ParallelUtils::SpinLock
-Geometry::s_GeomGlobalLock;
-
-// Static counter
-uint32_t
-Geometry::s_NumGeneratedGegometries = 0;
-
-uint32_t
-Geometry::getUniqueID()
-{
-    s_GeomGlobalLock.lock();
-    const auto idx = s_NumGeneratedGegometries;
-    ++s_NumGeneratedGegometries;
-    s_GeomGlobalLock.unlock();
-    return idx;
 }
 } // namespace imstk

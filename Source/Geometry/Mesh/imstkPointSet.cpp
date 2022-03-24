@@ -26,7 +26,7 @@
 
 namespace imstk
 {
-PointSet::PointSet(const std::string& name) : Geometry(name),
+PointSet::PointSet() :
     m_initialVertexPositions(std::make_shared<VecDataArray<double, 3>>()),
     m_vertexPositions(std::make_shared<VecDataArray<double, 3>>())
 {
@@ -199,14 +199,6 @@ PointSet::updatePostTransformData() const
     m_transformApplied = true;
 }
 
-void
-PointSet::setLoadFactor(const double loadFactor)
-{
-    m_loadFactor     = loadFactor;
-    m_maxNumVertices = static_cast<int>(m_originalNumVertices * m_loadFactor);
-    m_vertexPositions->reserve(static_cast<int>(m_maxNumVertices));
-}
-
 bool
 PointSet::hasVertexAttribute(const std::string& arrayName) const
 {
@@ -353,14 +345,14 @@ PointSet::setActiveVertexAttribute(std::string& activeAttributeName, std::string
     std::shared_ptr<AbstractDataArray> attribute = m_vertexAttributes[attributeName];
     if (attribute->getNumberOfComponents() != expectedNumComponents)
     {
-        LOG(WARNING) << "Failed to set vertex attribute on " << getName() << " with "
+        LOG(WARNING) << "Failed to set vertex attribute on PointSet " + getName() + " with "
                      << attribute->getNumberOfComponents() << " components. Expected " <<
             expectedNumComponents << " components.";
         return;
     }
     else if (attribute->getScalarType() != expectedScalarType)
     {
-        LOG(INFO) << "Tried to set vertex attribute on " << getName() << " with scalar type "
+        LOG(INFO) << "Tried to set vertex attribute on PointSet " + getName() + " with scalar type "
                   << static_cast<int>(attribute->getScalarType()) << ". Casting to "
                   << static_cast<int>(expectedScalarType) << " scalar type";
         m_vertexAttributes[attributeName] = attribute->cast(expectedScalarType);

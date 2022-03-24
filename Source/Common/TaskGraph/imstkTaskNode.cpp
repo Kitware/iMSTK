@@ -24,6 +24,8 @@ limitations under the License.
 
 namespace imstk
 {
+std::atomic<size_t> TaskNode::s_numGlobalIds = { 0 };
+
 void
 TaskNode::execute()
 {

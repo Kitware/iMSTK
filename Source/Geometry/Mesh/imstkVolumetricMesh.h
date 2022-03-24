@@ -41,8 +41,5 @@ public:
     /// \brief Compute the conforming surface mesh
     ///
     virtual std::shared_ptr<SurfaceMesh> extractSurfaceMesh() { return nullptr; }
-
-protected:
-    VolumetricMesh(const std::string& name = std::string("")) : PointSet(name) {}
 };
 } // namespace imstk

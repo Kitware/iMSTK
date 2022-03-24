@@ -35,9 +35,9 @@ namespace imstk
 class Capsule : public AnalyticalGeometry
 {
 public:
-    Capsule(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 0.5, const double length = 1.0, const Quatd orientation = Quatd::Identity(),
-            const std::string& name = std::string("defaultCapsule")) :
-        AnalyticalGeometry(name)
+    Capsule(const Vec3d& pos    = Vec3d(0.0, 0.0, 0.0), const double radius = 0.5,
+            const double length = 1.0, const Quatd orientation = Quatd::Identity()) :
+        AnalyticalGeometry()
     {
         setPosition(pos);
         setOrientation(orientation);

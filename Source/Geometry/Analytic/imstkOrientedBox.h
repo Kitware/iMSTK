@@ -35,8 +35,7 @@ class OrientedBox : public AnalyticalGeometry
 public:
     OrientedBox(const Vec3d& pos         = Vec3d::Zero(),
                 const Vec3d extents      = Vec3d(0.5, 0.5, 0.5),
-                const Quatd& orientation = Quatd::Identity(),
-                const std::string& name  = std::string("defaultOrientedBox")) : AnalyticalGeometry(name)
+                const Quatd& orientation = Quatd::Identity()) : AnalyticalGeometry()
     {
         setPosition(pos);
         setOrientation(orientation);
