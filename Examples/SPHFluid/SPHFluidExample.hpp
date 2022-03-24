@@ -120,12 +120,12 @@ main(int argc, char* argv[])
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
-        sceneManager->setExecutionType(Module::ExecutionType::PARALLEL);
         sceneManager->pause();
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.01);
 
         // Add mouse and keyboard controls to the viewer
         {
