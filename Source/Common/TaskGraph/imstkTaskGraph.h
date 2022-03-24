@@ -29,29 +29,43 @@ limitations under the License.
 #include <unordered_set>
 #include <vector>
 
-namespace imstk
+namespace std
 {
-struct TaskNodeHash
+///
+/// \brief hash used in algorithms in STL when referring to
+/// a shared_ptr<TaskNode>
+///
+template<>
+struct hash<std::shared_ptr<imstk::TaskNode>>
 {
-    std::size_t operator()(const std::shared_ptr<TaskNode>& node) const
+    std::size_t operator()(const std::shared_ptr<imstk::TaskNode>& node) const
     {
+        using std::size_t;
         return node->getGlobalId();
     }
 };
-struct TaskNodeEq
+///
+/// \brief equal_to used in algorithms in STL when referring to
+/// a shared_ptr<TaskNode>
+///
+template<>
+struct equal_to<std::shared_ptr<imstk::TaskNode>>
 {
-    bool operator()(const std::shared_ptr<TaskNode>& a,
-                    const std::shared_ptr<TaskNode>& b) const
+    bool operator()(const std::shared_ptr<imstk::TaskNode>& lhs,
+                    const std::shared_ptr<imstk::TaskNode>& rhs) const
     {
-        return a->getGlobalId() == b->getGlobalId();
+        return lhs->getGlobalId() == rhs->getGlobalId();
     }
 };
+} // namespace std
 
+namespace imstk
+{
 using TaskNodeVector  = std::vector<std::shared_ptr<TaskNode>>;
 using TaskNodeList    = std::list<std::shared_ptr<TaskNode>>;
-using TaskNodeSet     = std::unordered_set<std::shared_ptr<TaskNode>, TaskNodeHash, TaskNodeEq>;
-using TaskNodeAdjList = std::unordered_map<std::shared_ptr<TaskNode>, TaskNodeSet, TaskNodeHash, TaskNodeEq>;
-using TaskNodeNameMap = std::unordered_map<std::shared_ptr<TaskNode>, std::string, TaskNodeHash, TaskNodeEq>;
+using TaskNodeSet     = std::unordered_set<std::shared_ptr<TaskNode>>;
+using TaskNodeAdjList = std::unordered_map<std::shared_ptr<TaskNode>, TaskNodeSet>;
+using TaskNodeNameMap = std::unordered_map<std::shared_ptr<TaskNode>, std::string>;
 
 ///
 /// \class TaskGraph
@@ -255,7 +269,7 @@ public:
     ///
     /// \brief Gets the completion times of each node (source = ~0s)
     ///
-    static std::unordered_map<std::shared_ptr<TaskNode>, double, TaskNodeHash, TaskNodeEq> getNodeStartTimes(std::shared_ptr<TaskGraph> graph);
+    static std::unordered_map<std::shared_ptr<TaskNode>, double> getNodeStartTimes(std::shared_ptr<TaskGraph> graph);
 
     ///
     /// \brief Computes the critical path

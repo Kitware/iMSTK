@@ -31,9 +31,9 @@ namespace imstk
 ///
 static void
 computeDepths(std::shared_ptr<TaskGraph> graph,
-              std::unordered_map<std::shared_ptr<TaskNode>, int, TaskNodeHash, TaskNodeEq>& depths)
+              std::unordered_map<std::shared_ptr<TaskNode>, int>& depths)
 {
-    std::unordered_set<std::shared_ptr<TaskNode>, TaskNodeHash, TaskNodeEq> visitedNodes;
+    TaskNodeSet visitedNodes;
 
     const TaskNodeAdjList& adjList = graph->getAdjList();
 
@@ -59,65 +59,6 @@ computeDepths(std::shared_ptr<TaskGraph> graph,
                     visitedNodes.insert(childNode);
                     depths[childNode] = currLevel + 1;
                     nodeStack.push(childNode);
-                }
-            }
-        }
-    }
-}
-
-///
-/// \brief Compute the adjacent critical nodes. The set of critical nodes
-/// that can be reached from a given critical node
-///
-static void
-computeCritList(std::shared_ptr<TaskGraph> graph,
-                TaskNodeAdjList&           critAdjList)
-{
-    const TaskNodeAdjList& adjList = graph->getAdjList();
-    const TaskNodeVector&  nodes   = graph->getNodes();
-
-    TaskNodeVector critNodes;
-    for (size_t i = 0; i < nodes.size(); i++)
-    {
-        if (nodes[i]->m_isCritical)
-        {
-            critNodes.push_back(nodes[i]);
-        }
-    }
-
-    critAdjList.clear();
-
-    // For every critical node
-    for (size_t i = 0; i < critNodes.size(); i++)
-    {
-        TaskNodeSet visitedNodes;
-
-        // DFS for the dependencies (try to reach another critical)
-        std::stack<std::shared_ptr<TaskNode>> nodeStack;
-        nodeStack.push(critNodes[i]);
-        while (!nodeStack.empty())
-        {
-            std::shared_ptr<TaskNode> currNode = nodeStack.top();
-            nodeStack.pop();
-
-            // If you can reach one critical node from the other then they are adjacent
-            if (currNode->m_isCritical)
-            {
-                critAdjList[critNodes[i]].insert(currNode);
-            }
-
-            // Add children to stack if not yet visited
-            if (adjList.count(currNode) != 0)
-            {
-                const TaskNodeSet& outputNodes = adjList.at(currNode);
-                for (TaskNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
-                {
-                    std::shared_ptr<TaskNode> childNode = *j;
-                    if (visitedNodes.count(childNode) == 0)
-                    {
-                        visitedNodes.insert(childNode);
-                        nodeStack.push(childNode);
-                    }
                 }
             }
         }
@@ -488,7 +429,7 @@ TaskGraph::topologicalSort(std::shared_ptr<TaskGraph> graph)
 {
     CHECK(graph != nullptr) << "Graph is nullptr";
     // Compute the number of inputs to each node (we will remove these as we go)
-    std::unordered_map<std::shared_ptr<TaskNode>, size_t, TaskNodeHash, TaskNodeEq> numInputs;
+    std::unordered_map<std::shared_ptr<TaskNode>, size_t> numInputs;
 
     const TaskNodeAdjList& adjList    = graph->getAdjList();
     const TaskNodeAdjList& invAdjList = graph->getInvAdjList();
@@ -502,7 +443,7 @@ TaskGraph::topologicalSort(std::shared_ptr<TaskGraph> graph)
     }
 
     // Create an edge blacklist for edge removal during algorithm
-    std::unordered_map<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>, TaskNodeHash, TaskNodeEq> removedEdges;
+    std::unordered_map<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>> removedEdges;
 
     auto edgeHasBeenRemoved = [&removedEdges](const std::shared_ptr<TaskNode>& node1, const std::shared_ptr<TaskNode>& node2)
                               {
@@ -654,7 +595,7 @@ TaskGraph::removeUnusedNodes(std::shared_ptr<TaskGraph> graph)
     auto results = std::make_shared<TaskGraph>(*graph);
 
     // Find the set of nodes not used by any edge
-    std::unordered_set<std::shared_ptr<TaskNode>> nodes;
+    TaskNodeSet nodes;
     nodes.reserve(results->m_nodes.size());
     for (auto& i : results->m_adjList)
     {
@@ -771,14 +712,14 @@ TaskGraph::getUniqueNodeNames(std::shared_ptr<TaskGraph> graph, bool apply)
     return nodeNames;
 }
 
-std::unordered_map<std::shared_ptr<TaskNode>, double, TaskNodeHash, TaskNodeEq>
+std::unordered_map<std::shared_ptr<TaskNode>, double>
 TaskGraph::getNodeStartTimes(std::shared_ptr<TaskGraph> graph)
 {
     CHECK(graph != nullptr) << "Graph is nullptr";
     const TaskNodeAdjList& adjList = graph->getAdjList();
 
     // Setup a map for total elapsed times at each node
-    using NodeTimeMap = std::unordered_map<std::shared_ptr<TaskNode>, double, TaskNodeHash, TaskNodeEq>;
+    using NodeTimeMap = std::unordered_map<std::shared_ptr<TaskNode>, double>;
     NodeTimeMap startTimes;
 
     {
@@ -826,7 +767,7 @@ TaskNodeList
 TaskGraph::getCriticalPath(std::shared_ptr<TaskGraph> graph)
 {
     CHECK(graph != nullptr) << "Graph is nullptr";
-    std::unordered_map<std::shared_ptr<TaskNode>, double, TaskNodeHash, TaskNodeEq> nodeStartTimes =
+    std::unordered_map<std::shared_ptr<TaskNode>, double> nodeStartTimes =
         getNodeStartTimes(graph);
 
     // Now backtrack to acquire the path of longest duration

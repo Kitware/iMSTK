@@ -42,7 +42,7 @@ TbbTaskGraphController::execute()
     broadcast_node<continue_msg> start(g);
 
     // Create a continue node for every TaskNode (except start)
-    std::unordered_map<std::shared_ptr<TaskNode>, TbbContinueNode, TaskNodeHash, TaskNodeEq> tbbNodes;
+    std::unordered_map<std::shared_ptr<TaskNode>, TbbContinueNode> tbbNodes;
     using NodeKeyValuePair = std::pair<std::shared_ptr<TaskNode>, TbbContinueNode>;
 
     const TaskNodeVector& nodes = m_graph->getNodes();

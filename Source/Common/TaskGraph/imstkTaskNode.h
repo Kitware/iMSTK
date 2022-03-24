@@ -27,8 +27,6 @@ limitations under the License.
 
 namespace imstk
 {
-class TaskGraph;
-
 ///
 /// \class TaskNode
 ///
@@ -97,14 +95,6 @@ public:
     ///
     static size_t getNumGlobalIds() { return s_numGlobalIds; }
 
-    ///
-    /// \brief Two nodes are equivalent if ids are the same
-    ///
-    bool operator==(const TaskNode& other) const { return m_globalId == other.m_globalId; }
-    bool operator<(const TaskNode& other) const { return m_globalId < other.m_globalId; }
-
-    friend class TaskGraph;
-
 protected:
     static size_t getUniqueID()
     {
@@ -128,16 +118,3 @@ protected:
     static std::atomic<size_t> s_numGlobalIds;
 };
 } // namespace imstk
-
-namespace std
-{
-template<>
-struct hash<imstk::TaskNode>
-{
-    std::size_t operator()(const imstk::TaskNode& node) const
-    {
-        using std::size_t;
-        return node.getGlobalId();
-    }
-};
-} // namespace std
