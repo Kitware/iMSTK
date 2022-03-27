@@ -94,7 +94,7 @@ TetrahedralMesh::extractSurfaceMesh()
     const VecDataArray<double, 3>&           tetVertices    = *tetVerticesPtr;
     std::shared_ptr<VecDataArray<int, 3>>    triIndicesPtr  = std::make_shared<VecDataArray<int, 3>>();
     VecDataArray<int, 3>&                    triIndices     = *triIndicesPtr;
-    //std::vector<size_t>                   surfaceTriTet;
+    std::vector<size_t>                      surfaceTriTet; // Map tri to tet id
 
     // Gives surfaceTri id/faceid -> index of unused vert for face (4 verts per tet, one will be unused)
     std::vector<size_t> tetRemainingVert;
@@ -139,7 +139,7 @@ TetrahedralMesh::extractSurfaceMesh()
             if (unique)
             {
                 triIndices.push_back(Vec3i(a, b, c));
-                //surfaceTriTet.push_back(tetId);
+                surfaceTriTet.push_back(i);
                 tetRemainingVert.push_back(tet[unusedVert[t]]);
             }
             // If found, erase face, it is not unique anymore
