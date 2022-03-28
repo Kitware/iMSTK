@@ -54,7 +54,6 @@ protected:
         Cell,       // Grab an entire cell/s
         RayPoint,   // Grab a point on the nearest cell along the ray
         RayCell     // Grab a cell along the ray
-        //NearestCells // Grab the nearest element
     };
 
 public:

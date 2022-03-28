@@ -48,8 +48,8 @@ public:
     /// \brief compute value and gradient of constraint function
     ///
     /// \param[inout] c constraint value
-    /// \param[inout] dcdx constraint gradient for A
-    /// \param[inout] dcdx constraint gradient for B
+    /// \param[inout] dcdxA constraint gradient for A
+    /// \param[inout] dcdxB constraint gradient for B
     ///
     bool computeValueAndGradient(double&             c,
                                  std::vector<Vec3d>& dcdxA,

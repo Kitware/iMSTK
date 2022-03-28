@@ -74,11 +74,11 @@ public:
     void updateCollisionGeometry();
 
     ///
-    /// \brief Enabled or disable the interaction, when disabled the interaction isn't executed and no response will happen
+    /// \brief Enable or disable the interaction, when disabled the interaction isn't executed and no response will happen
     ///@{
     virtual void setEnabled(const bool enabled);
     virtual bool getEnabled() const;
-///@}
+    ///@}
 
 protected:
     ///

@@ -60,7 +60,7 @@ public:
 
 public:
     ///
-    /// \brief Get vertex indices of first object
+    /// \brief Get vertex, mass, velocities of constrained objects
     ///@{
     const std::vector<VertexMassPair>& getVertexIdsFirst() const { return m_bodiesFirst; }
     const std::vector<VertexMassPair>& getVertexIdsSecond() const { return m_bodiesSecond; }
