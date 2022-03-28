@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCollidingObject.h"
+#include "imstkGeometry.h"
 #include "imstkGeometryMap.h"
 
 namespace imstk
@@ -34,7 +35,7 @@ CollidingObject::initialize()
 
     if (m_collidingToVisualMap)
     {
-        m_collidingToVisualMap->initialize();
+        m_collidingToVisualMap->compute();
     }
 
     return true;
@@ -69,7 +70,7 @@ CollidingObject::updateGeometries()
 {
     if (m_collidingToVisualMap)
     {
-        m_collidingToVisualMap->apply();
+        m_collidingToVisualMap->update();
         m_collidingToVisualMap->getChildGeometry()->postModified();
     }
     SceneObject::updateGeometries();

@@ -70,7 +70,7 @@ getVertex(const CollisionElement& elem, const MeshSide& side)
         auto oneToOneMap = dynamic_cast<OneToOneMap*>(side.m_mapPtr);
         if (side.m_mapPtr && oneToOneMap != nullptr)
         {
-            ptId = oneToOneMap->getMapIdx(ptId);
+            ptId = oneToOneMap->getParentVertexId(ptId);
         }
         results[0] = { &side.m_vertices[ptId], side.m_invMasses[ptId], &side.m_velocities[ptId] };
     }
@@ -102,8 +102,8 @@ getEdge(const CollisionElement& elem, const MeshSide& side)
         auto oneToOneMap = dynamic_cast<OneToOneMap*>(side.m_mapPtr);
         if (side.m_mapPtr && oneToOneMap != nullptr)
         {
-            v1 = oneToOneMap->getMapIdx(v1);
-            v2 = oneToOneMap->getMapIdx(v2);
+            v1 = oneToOneMap->getParentVertexId(v1);
+            v2 = oneToOneMap->getParentVertexId(v2);
         }
         results[0] = { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] };
         results[1] = { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] };
@@ -138,9 +138,9 @@ getTriangle(const CollisionElement& elem, const MeshSide& side)
         auto oneToOneMap = dynamic_cast<OneToOneMap*>(side.m_mapPtr);
         if (side.m_mapPtr && oneToOneMap != nullptr)
         {
-            v1 = oneToOneMap->getMapIdx(v1);
-            v2 = oneToOneMap->getMapIdx(v2);
-            v3 = oneToOneMap->getMapIdx(v3);
+            v1 = oneToOneMap->getParentVertexId(v1);
+            v2 = oneToOneMap->getParentVertexId(v2);
+            v3 = oneToOneMap->getParentVertexId(v3);
         }
         results[0] = { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] };
         results[1] = { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] };

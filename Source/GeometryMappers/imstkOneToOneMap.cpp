@@ -70,9 +70,9 @@ OneToOneMap::computeMap(std::unordered_map<int, int>& tetVertToSurfVertMap)
     auto meshParent = std::dynamic_pointer_cast<PointSet>(getParentGeometry());
     auto meshChild = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
 
-    std::shared_ptr<VecDataArray<double, 3>> parentVerticesPtr = meshParent->getInitialVertexPositions();
+    std::shared_ptr<VecDataArray<double, 3>> parentVerticesPtr = meshParent->getVertexPositions();
     const VecDataArray<double, 3>& parentVertices = *parentVerticesPtr;
-    std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr = meshChild->getInitialVertexPositions();
+    std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr = meshChild->getVertexPositions();
     const VecDataArray<double, 3>& childVertices = *childVerticesPtr;
 
     // For every vertex on the child, find corresponding one on the parent
@@ -146,16 +146,9 @@ OneToOneMap::requestUpdate()
 }
 
 int
-OneToOneMap::getMapIdx(const int idx) const
+OneToOneMap::getParentVertexId(const int childVertexId) const
 {
-    auto citer = m_oneToOneMap.find(idx);
-    if (citer != m_oneToOneMap.end())
-    {
-        return citer->second;
-    }
-    else
-    {
-        return -1;
-    }
+    auto citer = m_oneToOneMap.find(childVertexId);
+    return (citer != m_oneToOneMap.end()) ? citer->second : -1;
 }
 } // namespace imstk

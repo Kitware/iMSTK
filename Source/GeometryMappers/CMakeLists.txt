@@ -4,7 +4,7 @@
 include(imstkAddLibrary)
 imstk_add_library( GeometryMappers
   DEPENDS
-	Geometry
+	FilteringCore
   )
 
 #-----------------------------------------------------------------------------

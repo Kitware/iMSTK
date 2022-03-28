@@ -20,63 +20,20 @@
 =========================================================================*/
 
 #include "imstkGeometryMap.h"
-#include "imstkLogger.h"
+#include "imstkGeometry.h"
 
 namespace imstk
 {
-void
-GeometryMap::mute()
+GeometryMap::GeometryMap()
 {
-    m_isActive = false;
-}
+    // Set 2 ports for each, inputs will be set to outputs
+    setNumInputPorts(2);
 
-void
-GeometryMap::activate()
-{
-    m_isActive = true;
-}
+    // Both inputs required
+    setRequiredInputType<Geometry>(0);
+    setRequiredInputType<Geometry>(1);
 
-void
-GeometryMap::print() const
-{
-    LOG(INFO) << this->getTypeName();
+    // Set 1 output port, the child
+    setNumOutputPorts(1);
 }
-
-bool
-GeometryMap::isActive() const
-{
-    return m_isActive;
 }
-
-void
-GeometryMap::setParentGeometry(std::shared_ptr<Geometry> parent)
-{
-    m_parentGeom = parent;
-}
-
-std::shared_ptr<Geometry>
-GeometryMap::getParentGeometry() const
-{
-    return m_parentGeom;
-}
-
-void
-GeometryMap::setChildGeometry(std::shared_ptr<Geometry> child)
-{
-    m_childGeom = child;
-}
-
-std::shared_ptr<Geometry>
-GeometryMap::getChildGeometry() const
-{
-    return m_childGeom;
-}
-
-void
-GeometryMap::initialize()
-{
-    CHECK(this->isValid()) << "Map is invalid!";
-
-    this->compute();
-}
-} // namespace imstk

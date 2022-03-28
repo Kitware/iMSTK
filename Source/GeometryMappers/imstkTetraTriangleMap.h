@@ -23,6 +23,7 @@
 
 #include "imstkGeometryMap.h"
 #include "imstkMacros.h"
+#include "imstkMath.h"
 
 namespace imstk
 {
@@ -31,22 +32,17 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class TetraTriangleMap
 ///
-/// \brief Computes and applies the triangle-tetrahedra map. The parent mesh is the
-///  tetrahedral mesh and the child is the surface triangular mesh.
+/// \brief Computes and applies the PointSet-Tetrahedra map. Vertices of the
+/// child geometry are deformed according to the deformation of the tetrahedron
+/// they are located in. If they are not within one, nearest tet is used.
 ///
 class TetraTriangleMap : public GeometryMap
 {
 public:
-    TetraTriangleMap() : m_boundingBoxAvailable(false) { }
+    TetraTriangleMap();
     TetraTriangleMap(
         std::shared_ptr<Geometry> parent,
-        std::shared_ptr<Geometry> child)
-        : m_boundingBoxAvailable(false)
-    {
-        this->setParentGeometry(parent);
-        this->setChildGeometry(child);
-    }
-
+        std::shared_ptr<Geometry> child);
     ~TetraTriangleMap() override = default;
 
     IMSTK_TYPE_NAME(TetraTriangleMap)
@@ -56,36 +52,16 @@ public:
     ///
     void compute() override;
 
+protected:
     ///
     /// \brief Apply (if active) the tetra-triangle mesh map
     ///
-    void apply() override;
+    void requestUpdate() override;
 
-    ///
-    /// \brief Print the map
-    ///
-    void print() const override;
-
-    ///
-    /// \brief Check the validity of the map
-    ///
-    bool isValid() const override;
-
-    ///
-    /// \brief Set the geometry that dictates the map
-    ///
-    void setParentGeometry(std::shared_ptr<Geometry> parent) override;
-
-    ///
-    /// \brief Set the geometry that follows the parent
-    ///
-    void setChildGeometry(std::shared_ptr<Geometry> child) override;
-
-protected:
     ///
     /// \brief Find the tetrahedron that encloses a given point in 3D space
     ///
-    size_t findEnclosingTetrahedron(const Vec3d& pos) const;
+    int findEnclosingTetrahedron(const Vec3d& pos) const;
 
     ///
     /// \brief Update bounding box of each tetrahedra of the mesh
@@ -96,11 +72,12 @@ protected:
     /// \brief Find the closest tetrahedron based on the distance to their centroids for a given
     /// point in 3D space
     ///
-    size_t findClosestTetrahedron(const Vec3d& pos) const;
+    int findClosestTetrahedron(const Vec3d& pos) const;
 
+protected:
     std::vector<Vec4d> m_verticesWeights;           ///> weights
 
-    std::vector<size_t> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
+    std::vector<int> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
 
     std::vector<Vec3d> m_bBoxMin;
     std::vector<Vec3d> m_bBoxMax;

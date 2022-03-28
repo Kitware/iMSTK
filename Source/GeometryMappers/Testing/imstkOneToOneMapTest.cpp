@@ -19,14 +19,14 @@
 
 =========================================================================*/
 
-#include "imstkSurfaceMesh.h"
-#include "imstkPointSet.h"
 #include "imstkGeometry.h"
 #include "imstkOneToOneMap.h"
+#include "imstkPointSet.h"
+#include "imstkSphere.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkVecDataArray.h"
 
 #include <gtest/gtest.h>
-#include "imstkSphere.h"
 
 using namespace imstk;
 
@@ -71,16 +71,15 @@ TEST(imstkOneToOneMapTest, SimpleMap)
     OneToOneMap map;
     map.setParentGeometry(parent);
     map.setChildGeometry(child);
-
     map.compute();
 
     for (int i = 0; i < child->getNumVertices(); ++i)
     {
-        EXPECT_EQ(map.getMapIdx(i), i);
+        EXPECT_EQ(map.getParentVertexId(i), i);
     }
 
     parent->translate({ 1.0, 2.0, 3.0 }, Geometry::TransformType::ApplyToData);
-    map.apply();
+    map.update();
     for (int i = 0; i < child->getNumVertices(); ++i)
     {
         EXPECT_TRUE(parent->getVertexPosition(i).isApprox(child->getVertexPosition(i)));
@@ -133,23 +132,22 @@ TEST(imstkOneToOneMapTest, OneToManyMap)
     map.setParentGeometry(parent);
     map.setChildGeometry(child);
     map.setTolerance(1e-8);
-
     map.compute();
 
     for (int i = 0; i < parent->getNumVertices(); ++i)
     {
-        EXPECT_EQ(map.getMapIdx(i), i);
+        EXPECT_EQ(map.getParentVertexId(i), i);
     }
 
-    EXPECT_EQ(map.getMapIdx(8), 2);
+    EXPECT_EQ(map.getParentVertexId(8), 2);
 
-    EXPECT_EQ(map.getMapIdx(9), IMSTK_NO_INDEX);
+    EXPECT_EQ(map.getParentVertexId(9), -1);
 
     parent->translate({ 1.0, 2.0, 3.0 }, Geometry::TransformType::ApplyToData);
-    map.apply();
+    map.update();
     for (int i = 0; i < child->getNumVertices() - 1; ++i)
     {
-        auto j = map.getMapIdx(i);
+        auto j = map.getParentVertexId(i);
         EXPECT_TRUE(child->getVertexPosition(i).isApprox(parent->getVertexPosition(j))) << "For " << i << ", " << j;
     }
 }

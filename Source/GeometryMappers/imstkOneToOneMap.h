@@ -17,12 +17,12 @@
 
 #include "imstkGeometryMap.h"
 #include "imstkMacros.h"
+#include "imstkMath.h"
 #include "imstkTypes.h"
 
 namespace imstk
 {
 template<typename T, int N> class VecDataArray;
-class PointSet;
 
 ///
 /// \class OneToOneMap
@@ -33,15 +33,10 @@ class PointSet;
 class OneToOneMap : public GeometryMap
 {
 public:
-    OneToOneMap() : GeometryMap() {}
+    OneToOneMap();
     OneToOneMap(
         std::shared_ptr<Geometry> parent,
-        std::shared_ptr<Geometry> child)
-    {
-        this->setParentGeometry(parent);
-        this->setChildGeometry(child);
-    }
-
+        std::shared_ptr<Geometry> child);
     ~OneToOneMap() override = default;
 
     IMSTK_TYPE_NAME(OneToOneMap)
@@ -52,9 +47,9 @@ public:
     void compute() override;
 
     ///
-    /// \brief Check the validity of the map
-    ///
-    bool isValid() const override;
+    /// \brief Compute tet vertex id to surf vertex id map
+    /// 
+    void computeMap(std::unordered_map<int, int>& tetVertToSurfVertMap);
 
     ///
     /// \brief Sets the one-to-one correspondence directly
@@ -62,31 +57,11 @@ public:
     void setMap(const std::unordered_map<int, int>& sourceMap);
 
     ///
-    /// \brief Apply (if active) the tetra-triangle mesh map
-    ///
-    void apply() override;
-
-    ///
-    /// \brief Print the map
-    ///
-    void print() const override;
-
-    ///
-    /// \brief Set the geometry that dictates the map
-    ///
-    void setParentGeometry(std::shared_ptr<Geometry> parent) override;
-
-    ///
-    /// \brief Set the geometry that follows the parent
-    ///
-    void setChildGeometry(std::shared_ptr<Geometry> child) override;
-
-    ///
     /// \brief Get the mapped/corresponding parent index, given a child index.
     /// returns -1 if no correspondence found.
     /// \param index on the child geometry
     ///
-    int getMapIdx(const int idx) const;
+    int getParentVertexId(const int childVertexId) const;
 
     ///
     /// \brief Set/Get the tolerance. The distance to consider
@@ -94,7 +69,7 @@ public:
     ///@{
     void setTolerance(const double tolerance) { m_epsilon = tolerance; }
     double getTolerance() const { return m_epsilon; }
-///@}
+    ///@}
 
 protected:
     ///
@@ -102,6 +77,12 @@ protected:
     ///
     int findMatchingVertex(const VecDataArray<double, 3>& parentMesh, const Vec3d& p);
 
+    ///
+    /// \brief Apply (if active) the tetra-triangle mesh map
+    ///
+    void requestUpdate() override;
+
+public:
     // A map and vector are maintained. The vector for parallel processing, the map for fast lookup
     std::unordered_map<int, int>     m_oneToOneMap;       ///> One to one mapping data
     std::vector<std::pair<int, int>> m_oneToOneMapVector; ///> One to one mapping data
