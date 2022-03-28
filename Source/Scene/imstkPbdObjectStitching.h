@@ -96,18 +96,12 @@ public:
          const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist = -1.0);*/
 
     ///
-    /// \brief End a sttich (all constraints removed)
-    /// \todo: Remove by stitch id
-    ///
-    void endStitch();
-
-    ///
-    /// \brief Compute/generate the constraints for picking
+    /// \brief Compute/generate the constraints for stitching
     ///
     void addStitchConstraints();
 
     ///
-    /// \brief Remove the constraints for picking
+    /// \brief Clears all the stitches
     ///
     void removeStitchConstraints();
 
@@ -117,11 +111,11 @@ public:
     /// pt position = weightA_0 * ptsA_0 + weightA_1 * ptsA_1 + ...
     ///
     virtual void addConstraint(
-        std::vector<VertexMassPair> ptsA,
-        std::vector<double> weightsA,
-        std::vector<VertexMassPair> ptsB,
-        std::vector<double> weightsB,
-        double stiffnessA, double stiffnessB);
+        const std::vector<VertexMassPair>& ptsA,
+        const std::vector<double>& weightsA,
+        const std::vector<VertexMassPair>& ptsB,
+        const std::vector<double>& weightsB,
+        const double stiffnessA, const double stiffnessB);
 
     ///
     /// \brief Get/Set the method use for picking, default is CellPicker
@@ -148,7 +142,7 @@ protected:
     ///
     /// \brief Update picking state, this should move grasp points
     ///
-    virtual void updatePicking();
+    virtual void updateStitching();
 
     ///
     /// \brief Update the constraints used for picking
@@ -169,9 +163,12 @@ protected:
     bool m_isStitching = false;
     bool m_isPrevStitching = false;
 
-    /// Stiffness of grasp, when 1 the position is completely moved too the grasp point
+    /// Stiffness of stitches, when 1 the position is completely moved too the grasp point
     /// when stiffness < 1 it will slowly converge on the grasp point
-    double m_stiffness = 0.4;
+    double m_stiffness = 0.1;
+
+    bool m_debugGeometry = false; ///< Display debug points & lines for stitches
+    bool m_retractingStitch = false; ///< Place a stitch that slowly retracts to 0 after placement
 
     std::vector<std::shared_ptr<PbdCollisionConstraint>> m_constraints; ///< List of PBD constraints
 };

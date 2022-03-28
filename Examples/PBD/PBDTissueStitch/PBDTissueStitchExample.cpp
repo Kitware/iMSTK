@@ -22,11 +22,9 @@
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
 #include "imstkDirectionalLight.h"
-#include "imstkImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
-#include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOneToOneMap.h"
@@ -41,20 +39,17 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkPbdBaryPointToPointConstraint.h"
-#include "imstkPointPicker.h"
-#include "imstkPbdObjectGrasping.h"
-#include "imstkSphere.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkRigidObjectController.h"
 #include "imstkRigidObject2.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRbdConstraint.h"
+#include "imstkPbdObjectStitching.h"
 
 using namespace imstk;
 
-//#define USE_FEM
+#define USE_FEM
 
 ///
 /// \brief Creates a tetraheral grid
@@ -173,21 +168,19 @@ makeTissueObj(const std::string& name,
 #ifdef USE_FEM
     // Use FEMTet constraints (42k - 85k for tissue, but we want
     // something much more stretchy to wrap)
-    pbdParams->m_femParams->m_YoungModulus = 100000.0;
+    pbdParams->m_femParams->m_YoungModulus = 1000.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.4; // 0.48 for tissue
     pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
 #else
-    // Use volume+distance constraints, worse results. More performant (can use larger mesh)
-    // Handles inversion better
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100000.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100000.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 0.01);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.4);
 #endif
     pbdParams->m_doPartitioning   = false;
-    pbdParams->m_uniformMassValue = 100.0;
-    pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
+    pbdParams->m_uniformMassValue = 0.00001;
+    pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);;
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
-    pbdParams->m_contactStiffness = 0.1;
+    //pbdParams->m_contactStiffness = 0.4;
     pbdParams->m_viscousDampingCoeff = 0.05;
 
     // Fix the borders
@@ -197,7 +190,7 @@ makeTissueObj(const std::string& name,
         {
             for (int x = 0; x < dim[0]; x++)
             {
-                if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
+                if (x == 0)
                 {
                     pbdParams->m_fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
                 }
@@ -212,10 +205,10 @@ makeTissueObj(const std::string& name,
 
     // Setup the material
     imstkNew<RenderMaterial> material;
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     material->setColor(Color(0.77, 0.53, 0.34));
     material->setEdgeColor(Color(0.87, 0.63, 0.44));
-    //material->setOpacity(0.5);
+    material->setOpacity(0.5);
 
     // Setup the Object
     tissueObj->setVisualGeometry(surfMesh);
@@ -271,6 +264,8 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
+    const double capsuleRadius = 0.02;
+
     // Setup the scene
     imstkNew<Scene> scene("PbdTissueStitch");
     scene->getActiveCamera()->setPosition(0.0012, 0.0451, 0.1651);
@@ -279,13 +274,13 @@ main()
 
     // Setup a tet tissue
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
-        Vec3d(0.1, 0.01, 0.07), Vec3i(12, 2, 8), Vec3d(0.0, 0.0, 0.0));
+        Vec3d(0.2, 0.01, 0.07), Vec3i(20, 2, 5), Vec3d(0.1, -0.01 - capsuleRadius, 0.0));
     scene->addSceneObject(tissueObj);
 
     auto cdObj       = std::make_shared<CollidingObject>("Bone");
     auto capsuleGeom = std::make_shared<Capsule>();
-    capsuleGeom->setPosition(0.0, 0.03, 0.0);
-    capsuleGeom->setRadius(0.01);
+    capsuleGeom->setPosition(0.0, 0.0, 0.0);
+    capsuleGeom->setRadius(capsuleRadius);
     capsuleGeom->setLength(0.08);
     capsuleGeom->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     cdObj->setVisualGeometry(capsuleGeom);
@@ -299,10 +294,15 @@ main()
 
     // Setup CD with a cylinder CD object
     auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, cdObj, "SurfaceMeshToCapsuleCD");
+    interaction->setFriction(0.0);
+    interaction->setRestitution(0.0);
     scene->addInteraction(interaction);
 
-    auto grasping = std::make_shared<PbdObjectGrasping>(tissueObj);
-    scene->addInteraction(grasping);
+   /* auto grasping = std::make_shared<PbdObjectGrasping>(tissueObj);
+    scene->addInteraction(grasping);*/
+
+    auto stitching = std::make_shared<PbdObjectStitching>(tissueObj);
+    scene->addInteraction(stitching);
 
     // Light
     imstkNew<DirectionalLight> light1;
@@ -333,8 +333,6 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-        bool performStitch = false;
-
 #ifdef iMSTK_USE_OPENHAPTICS
         imstkNew<HapticDeviceManager> hapticManager;
         hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
@@ -356,225 +354,81 @@ main()
             {
                 if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
                 {
-                    performStitch = true;
+                    auto toolGeom = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                    const Vec3d& v1 = toolGeom->getVertexPosition(0);
+                    const Vec3d& v2 = toolGeom->getVertexPosition(1);
+                    stitching->beginRayPointStitch(v1, (v2 - v1).normalized());
                 }
             });
+#else
 #endif
 
-        // Record the tool position relative to the camera
-        // As the camera moves, reapply that relative transform
-
-        const std::vector<size_t>& fixedNodes = tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds;
-        std::vector<Vec3d>         initPositions;
-
-        auto tetMesh =
-            std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
-        std::shared_ptr<VecDataArray<double, 3>> verticesPtr = tetMesh->getVertexPositions();
-        VecDataArray<double, 3>&                 vertices    = *verticesPtr;
-        for (size_t i = 0; i < fixedNodes.size(); i++)
-        {
-            initPositions.push_back(vertices[fixedNodes[i]]);
-        }
-
+        // Toggle gravity, perform stitch, & reset
+        double t = 0.0;
         connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
             [&](KeyEvent* e)
             {
                 if (e->m_key == 'g')
                 {
-                    tissueObj->getPbdModel()->getConfig()->m_gravity = Vec3d(0.0, -1.0, 0.0);
-                }
-#ifdef iMSTK_USE_OPENHAPTICS
-                else if (e->m_key == 's')
-                {
-                    performStitch = true;
-                }
-#endif
-            });
-
-        // Script the movement of the tissues fixed points
-        // Move upwards, then inwards
-       
-        std::shared_ptr<PbdBaryPointToPointConstraint> stitchConstraint = nullptr;
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-            {
-                const double dt = sceneManager->getDt();
-
-                for (size_t i = 0; i < fixedNodes.size(); i++)
-                {
-                    Vec3d initPos = initPositions[i];
-                    Vec3d& pos    = vertices[fixedNodes[i]];
-
-                    const double dy = std::abs(pos[1] - initPos[1]);
-                    const double dx = std::abs(pos[0] - initPos[0]);
-                    if (dy < 0.04)
+                    Vec3d& g = tissueObj->getPbdModel()->getConfig()->m_gravity;
+                    if (g.norm() > 0.0)
                     {
-                        pos[1] += 0.01 * dt;
-                    }
-                    else if (dx < 0.03)
-                    {
-                        if (initPos[0] < 0.0)
-                        {
-                            pos[0] += 0.01 * dt;
-                        }
-                        else
-                        {
-                            pos[0] -= 0.01 * dt;
-                        }
-                        if (initPos[1] < 0.0)
-                        {
-                            pos[1] += 0.005 * dt;
-                        }
+                        tissueObj->getPbdModel()->getConfig()->m_gravity = Vec3d(0.0, 0.0, 0.0);
                     }
                     else
                     {
-                        tissueObj->getPbdModel()->setPointUnfixed(fixedNodes[i]);
+                        tissueObj->getPbdModel()->getConfig()->m_gravity = Vec3d(0.0, -1.0, 0.0);
                     }
                 }
-
-                if (performStitch && stitchConstraint == nullptr)
+                else if (e->m_key == 's')
                 {
-                    std::shared_ptr<VecDataArray<int, 4>> indicesPtr     = tetMesh->getTetrahedraIndices();
-
-                    auto velocitiesPtr =
-                        std::dynamic_pointer_cast<VecDataArray<double, 3>>(tetMesh->getVertexAttribute("Velocities"));
-                    CHECK(velocitiesPtr != nullptr) << "Trying to stitch with geometry that has no Velocities";
-
-                    auto invMassesPtr =
-                        std::dynamic_pointer_cast<DataArray<double>>(tetMesh->getVertexAttribute("InvMass"));
-                    CHECK(invMassesPtr != nullptr) << "Trying to stitch with geometry that has no InvMass";
-
                     auto toolGeom = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
-
-                    // Perform line intersection to place a stitch along intersection points in line
-                    PointPicker picker;
                     const Vec3d& v1 = toolGeom->getVertexPosition(0);
                     const Vec3d& v2 = toolGeom->getVertexPosition(1);
-                    picker.setPickingRay(v1, (v2 - v1).normalized());
-                    picker.setUseFirstHit(false);
-                    /*const std::vector<PickData>& pickData = picker.pick(tetMesh);
-
-                    // Select the intersection points closest together but on opposites sides of the origin
-                    std::pair<PickData, PickData> closestPair;
-                    double minDist = IMSTK_DOUBLE_MAX;
-                    for (size_t i = 0; i < pickData.size(); i++)
-                    {
-                        const Vec3d& pickPt1 = pickData[i].pickPoint;
-                        if (pickPt1[0] > 0.0)
-                        {
-                            continue;
-                        }
-                        for (size_t j = 0; j < pickData.size(); j++)
-                        {
-                            const Vec3d& pickPt2 = pickData[j].pickPoint;
-                            if (i == j || pickPt2[0] < 0.0)
-                            {
-                                continue;
-                            }
-
-                            const double dist    = (pickPt2 - pickPt1).norm();
-                            if (dist < minDist)
-                            {
-                                minDist     = dist;
-                                closestPair = { pickData[i], pickData[j] };
-                            }
-                        }
-                    }*/
-
-                    {
-                        // Perform the picking only on surface data
-                        std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
-                        surfMesh->computeTrianglesNormals();
-
-                        const std::vector<PickData>& pickData = picker.pick(surfMesh);
-
-                        // ** Warning **, surface triangles are not 100% garunteed to tell inside/out
-                        // Use angle-weighted psuedonormals as done in MeshToMeshBruteForceCD
-                        std::shared_ptr<VecDataArray<double, 3>> faceNormalsPtr = surfMesh->getCellNormals();
-                        const VecDataArray<double, 3>& faceNormals = *faceNormalsPtr;
-
-                        // Find all neighbor pairs with normals facing each other
-                        std::vector<std::pair<PickData, PickData>> constraintPair;
-                        for (size_t i = 0, j = 1; i < pickData.size() - 1; i++, j++)
-                        {
-                            const Vec3d& pt_i = pickData[i].pickPoint;
-                            const Vec3d& pt_j = pickData[j].pickPoint;
-                            const Vec3d& normal_i = faceNormals[pickData[i].ids[0]];
-                            const Vec3d& normal_j = faceNormals[pickData[j].ids[0]];
-                            const Vec3d diff = pt_j - pt_i;
-
-                            //bool faceOpposite = (normal_i.dot(normal_j) < 0.0);
-                            std::cout << "diff: " << diff.transpose() << std::endl;
-                            std::cout << "normal_i: " << normal_i.transpose() << std::endl;
-                            std::cout << "normal_j: " << normal_j.transpose() << std::endl;
-                            bool faceInwards = (diff.dot(normal_i) > 0.0) && (diff.dot(normal_j) < 0.0);
-
-                            // If they face in opposite directions
-                            if (faceInwards)
-                            {
-                                constraintPair.push_back({ pickData[i], pickData[j] });
-                            }
-                        }
-                        
-                        for (size_t i = 0; i < constraintPair.size(); i++)
-                        {
-                            // Get the tet id from the triangle id
-                            size_t triId1 = constraintPair[i].first.ids[0];
-                            size_t tetId1 = 0;
-                            size_t triId2 = constraintPair[i].second.ids[0];
-                            size_t tetId2 = 0;
-
-                            std::vector<VertexMassPair> cell1(4);
-                            for (size_t i = 0; i < 4; i++)
-                            {
-                                const int vertexId = (*indicesPtr)[tetId1][i];
-                                cell1[i] = { &(*verticesPtr)[vertexId], (*invMassesPtr)[vertexId], &(*velocitiesPtr)[vertexId] };
-                            }
-                            const Vec4d bcCoord1 = baryCentric(constraintPair[i].first.pickPoint,
-                                *cell1[0].vertex, *cell1[1].vertex, *cell1[2].vertex, *cell1[3].vertex);
-                            std::vector<double> weights1 = { bcCoord1[0], bcCoord1[1], bcCoord1[2], bcCoord1[3] };
-
-                            std::vector<VertexMassPair> cell2(4);
-                            for (size_t i = 0; i < 4; i++)
-                            {
-                                const int vertexId = (*indicesPtr)[tetId2][i];
-                                cell2[i] = { &(*verticesPtr)[vertexId], (*invMassesPtr)[vertexId], &(*velocitiesPtr)[vertexId] };
-                            }
-                            const Vec4d bcCoord2 = baryCentric(constraintPair[i].second.pickPoint,
-                                *cell2[0].vertex, *cell2[1].vertex, *cell2[2].vertex, *cell2[3].vertex);
-                            std::vector<double> weights2 = { bcCoord2[0], bcCoord2[1], bcCoord2[2], bcCoord2[3] };
-
-                            stitchConstraint = std::make_shared<PbdBaryPointToPointConstraint>();
-                            stitchConstraint->initConstraint(cell1, weights1, cell2, weights2, 0.1, 0.1);
-                        }
-                    }
-
-                    // Assume tet to tet
-                   /* std::vector<VertexMassPair> cell1(4);
-                    for (size_t i = 0; i < 4; i++)
-                    {
-                        const int vertexId = (*indicesPtr)[closestPair.first.ids[0]][i];
-                        cell1[i] = { &(*verticesPtr)[vertexId], (*invMassesPtr)[vertexId], &(*velocitiesPtr)[vertexId] };
-                    }
-                    const Vec4d bcCoord1 = baryCentric(closestPair.first.pickPoint,
-                        *cell1[0].vertex, *cell1[1].vertex, *cell1[2].vertex, *cell1[3].vertex);
-                    std::vector<double> weights1 = { bcCoord1[0], bcCoord1[1], bcCoord1[2], bcCoord1[3] };
-
-                    std::vector<VertexMassPair> cell2(4);
-                    for (size_t i = 0; i < 4; i++)
-                    {
-                        const int vertexId = (*indicesPtr)[closestPair.second.ids[0]][i];
-                        cell2[i] = { &(*verticesPtr)[vertexId], (*invMassesPtr)[vertexId], &(*velocitiesPtr)[vertexId] };
-                    }
-                    const Vec4d bcCoord2 = baryCentric(closestPair.second.pickPoint,
-                        *cell2[0].vertex, *cell2[1].vertex, *cell2[2].vertex, *cell2[3].vertex);
-                    std::vector<double> weights2 = { bcCoord2[0], bcCoord2[1], bcCoord2[2], bcCoord2[3] };
-
-                    stitchConstraint = std::make_shared<PbdBaryPointToPointConstraint>();
-                    stitchConstraint->initConstraint(cell1, weights1, cell2, weights2, 0.1, 0.1);*/
+                    stitching->beginRayPointStitch(v1, (v2 - v1).normalized());
                 }
-                if (stitchConstraint != nullptr)
+                else if (e->m_key == 'r')
                 {
-                    stitchConstraint->solvePosition();
+                    t = 0.0;
+                }
+            });
+
+        // Record the intial positions
+        std::vector<Vec3d> initPositions;
+
+        auto tetMesh =
+            std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
+        std::shared_ptr<VecDataArray<double, 3>> verticesPtr = tetMesh->getVertexPositions();
+        VecDataArray<double, 3>& vertices = *verticesPtr;
+        const std::vector<size_t>& fixedNodes = tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds;
+        for (size_t i = 0; i < fixedNodes.size(); i++)
+        {
+            initPositions.push_back(vertices[fixedNodes[i]]);
+        }
+
+        // Script the movement of the tissues fixed points
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+            {
+                const double dt = sceneManager->getDt();
+                t += dt;
+                if (t < 9.0)
+                {
+                    for (size_t i = 0; i < fixedNodes.size(); i++)
+                    {
+                        Vec3d initPos = initPositions[i];
+                        Vec3d& pos = vertices[fixedNodes[i]];
+
+                        const double r = (capsuleGeom->getPosition().head<2>() - initPos.head<2>()).norm();
+                        pos = Vec3d(-sin(t) * r, -cos(t) * r, initPos[2]);
+                    }
+                }
+                else if ( t > 11.0)
+                {
+                    for (size_t i = 0; i < fixedNodes.size(); i++)
+                    {
+                        tissueObj->getPbdModel()->setPointUnfixed(fixedNodes[i]);
+                    }
                 }
             });
 

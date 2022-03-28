@@ -32,6 +32,7 @@ limitations under the License.
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVertexPicker.h"
+#include "imstkSurfaceToTetraMap.h"
 
 namespace imstk
 {
@@ -68,7 +69,7 @@ getElement(const PickData& pickData, const MeshSide& side)
             int vertexId = cell[i];
             if (side.map != nullptr)
             {
-                vertexId = static_cast<int>(side.map->getMapIdx(vertexId));
+                vertexId = static_cast<int>(side.map->getParentVertexId(vertexId));
             }
             results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
         }
@@ -80,7 +81,7 @@ getElement(const PickData& pickData, const MeshSide& side)
             int vertexId = pickData.ids[i];
             if (side.map != nullptr)
             {
-                vertexId = static_cast<int>(side.map->getMapIdx(vertexId));
+                vertexId = static_cast<int>(side.map->getParentVertexId(vertexId));
             }
             results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
         }
@@ -88,11 +89,48 @@ getElement(const PickData& pickData, const MeshSide& side)
     return results;
 }
 
+static std::vector<double>
+getWeights(const std::vector<VertexMassPair>& cellVerts, const Vec3d& pt)
+{
+    std::vector<double> weights(cellVerts.size());
+    if (cellVerts.size() == IMSTK_TETRAHEDRON)
+    {
+        const Vec4d baryCoord = baryCentric(pt,
+            *cellVerts[0].vertex,
+            *cellVerts[1].vertex,
+            *cellVerts[2].vertex,
+            *cellVerts[3].vertex);
+        weights[0] = baryCoord[0];
+        weights[1] = baryCoord[1];
+        weights[2] = baryCoord[2];
+        weights[3] = baryCoord[3];
+    }
+    else if (cellVerts.size() == IMSTK_TRIANGLE)
+    {
+        const Vec3d baryCoord = baryCentric(pt,
+            *cellVerts[0].vertex, *cellVerts[1].vertex, *cellVerts[2].vertex);
+        weights[0] = baryCoord[0];
+        weights[1] = baryCoord[1];
+        weights[2] = baryCoord[2];
+    }
+    else if (cellVerts.size() == IMSTK_EDGE)
+    {
+        const Vec2d baryCoord = baryCentric(pt, *cellVerts[0].vertex, *cellVerts[1].vertex);
+        weights[0] = baryCoord[0];
+        weights[1] = baryCoord[1];
+    }
+    else if (cellVerts.size() == IMSTK_VERTEX)
+    {
+        weights[0] = 1.0;
+    }
+    return weights;
+};
+
 PbdObjectStitching::PbdObjectStitching(std::shared_ptr<PbdObject> obj) :
     SceneObject("PbdObjectStitching_" + obj->getName()),
     m_objectToStitch(obj), m_pickMethod(std::make_shared<CellPicker>())
 {
-    m_stitchingNode = std::make_shared<TaskNode>(std::bind(&PbdObjectStitching::updatePicking, this),
+    m_stitchingNode = std::make_shared<TaskNode>(std::bind(&PbdObjectStitching::updateStitching, this),
         "PbdStitchingUpdate", true);
     m_taskGraph->addNode(m_stitchingNode);
 
@@ -116,13 +154,6 @@ PbdObjectStitching::beginRayPointStitch(const Vec3d& rayStart, const Vec3d& rayD
 }
 
 void
-PbdObjectStitching::endStitch()
-{
-    m_isStitching = false;
-    LOG(INFO) << "End stitch";
-}
-
-void
 PbdObjectStitching::removeStitchConstraints()
 {
     m_constraints.clear();
@@ -131,11 +162,13 @@ PbdObjectStitching::removeStitchConstraints()
 void
 PbdObjectStitching::addStitchConstraints()
 {
+    // PbdModel geometry can only be PointSet
     std::shared_ptr<PointSet> pbdPhysicsGeom =
         std::dynamic_pointer_cast<PointSet>(m_objectToStitch->getPhysicsGeometry());
 
-    // If the point set to pick hasn't been set yet, default it to the physics geometry
-    // This would be the case if the user was mapping a geometry to another
+    // If the geometry to pick hasn't been set yet, default it to the physics geometry
+    // Could be different in cases where user wants to pick a mapped geometry, mapping back
+    // to the physics geometry
     std::shared_ptr<PointSet> pointSetToPick = std::dynamic_pointer_cast<PointSet>(m_geomToStitch);
     if (m_geomToStitch == nullptr)
     {
@@ -186,216 +219,136 @@ PbdObjectStitching::addStitchConstraints()
         indicesPtr.get(),
         map);
 
-    // Digest the pick data based on grasp mode
-    if (m_mode == StitchMode::Vertex)
+    auto getCellVerts = [&](const PickData& data)
     {
-        /*for (size_t i = 0; i < pickData.size(); i++)
+        const CellTypeId pickedCellType = data.cellType;
+
+        std::vector<std::pair<int, VertexMassPair>> cellIdVerts;
+        if (pickedCellType == IMSTK_TETRAHEDRON)
         {
-            const PickData& data = pickData[i];
-            int             vertexId = data.ids[0];
-            if (meshStruct.map != nullptr)
-            {
-                vertexId = static_cast<int>(meshStruct.map->getMapIdx(vertexId));
-            }
+            cellIdVerts = getElement<4>(data, meshStruct);
+        }
+        else if (pickedCellType == IMSTK_TRIANGLE)
+        {
+            cellIdVerts = getElement<3>(data, meshStruct);
+        }
+        else if (pickedCellType == IMSTK_EDGE)
+        {
+            cellIdVerts = getElement<2>(data, meshStruct);
+        }
+        std::vector<VertexMassPair> cellVerts(cellIdVerts.size());
+        for (size_t j = 0; j < cellIdVerts.size(); j++)
+        {
+            cellVerts[j] = cellIdVerts[j].second;
+        }
+        return cellVerts;
+    };
 
-            const Vec3d relativePos = pickGeomRot * (vertices[vertexId] - pickGeomPos);
-            m_constraintPts.push_back({
-                    vertices[vertexId],
-                    relativePos,
-                    Vec3d::Zero() });
-            std::tuple<Vec3d, Vec3d, Vec3d>& cPt = m_constraintPts.back();
+    auto pointPicker = std::dynamic_pointer_cast<PointPicker>(m_pickMethod);
+    pointPicker->setUseFirstHit(false);
 
-            addConstraint(
-                { { &vertices[vertexId], invMasses[vertexId], &velocities[vertexId] } }, { 1.0 },
-                { { &std::get<0>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
-                m_stiffness, 0.0);
-        }*/
-    }
-    else if (m_mode == StitchMode::Cell || m_mode == StitchMode::RayCell)
+    // Perform the picking only on surface data
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(pointSetToPick);
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick);
+    if (tetMesh != nullptr)
     {
-        //for (size_t i = 0; i < pickData.size(); i++)
-        //{
-        //    const PickData& data = pickData[i];
-        //    const CellTypeId pickedCellType = data.cellType;
+        surfMesh = tetMesh->extractSurfaceMesh();
+    }
+    const std::vector<PickData>& pickData = m_pickMethod->pick(surfMesh);
 
-        //    std::vector<std::pair<int, VertexMassPair>> cellVerts;
-        //    if (pickedCellType == IMSTK_TETRAHEDRON)
-        //    {
-        //        cellVerts = getElement<4>(data, meshStruct);
-        //    }
-        //    else if (pickedCellType == IMSTK_TRIANGLE)
-        //    {
-        //        cellVerts = getElement<3>(data, meshStruct);
-        //    }
-        //    else if (pickedCellType == IMSTK_EDGE)
-        //    {
-        //        cellVerts = getElement<2>(data, meshStruct);
-        //    }
-        //    else if (pickedCellType == IMSTK_VERTEX)
-        //    {
-        //        cellVerts = getElement<1>(data, meshStruct);
-        //    }
+    // Must have at least 2
+    if (pickData.size() < 1)
+    {
+        return;
+    }
 
-        //    // Does not resolve duplicate vertices yet
-        //    // But pbd implicit solve with reprojection avoids issues
-        //    for (size_t j = 0; j < cellVerts.size(); j++)
-        //    {
-        //        const int vertexId = cellVerts[j].first;
+    // ** Warning **, surface triangles are not 100% garunteed to tell inside/out
+    // Should use angle-weighted psuedonormals as done in MeshToMeshBruteForceCD
+    surfMesh->computeTrianglesNormals();
+    std::shared_ptr<VecDataArray<double, 3>> faceNormalsPtr = surfMesh->getCellNormals();
+    const VecDataArray<double, 3>& faceNormals = *faceNormalsPtr;
 
-        //        const Vec3d relativePos = pickGeomRot * (vertices[vertexId] - pickGeomPos);
-        //        m_constraintPts.push_back({
-        //                vertices[vertexId],
-        //                relativePos,
-        //                Vec3d::Zero() });
-        //        std::tuple<Vec3d, Vec3d, Vec3d>& cPt = m_constraintPts.back();
-
-        //        addConstraint(
-        //            { { &vertices[vertexId], invMasses[vertexId], &velocities[vertexId] } }, { 1.0 },
-        //            { { &std::get<0>(cPt), 0.0, &std::get<2>(cPt) } }, { 1.0 },
-        //            m_stiffness, 0.0);
-        //    }
-        //}
+    // Digest the pick data based on grasp mode
+    if (m_mode == StitchMode::RayCell)
+    {
     }
     else if (m_mode == StitchMode::RayPoint)
     {
-        auto pointPicker = std::dynamic_pointer_cast<PointPicker>(m_pickMethod);
-        //const Vec3d& rayStart = pointPicker->getPickRayStart();
-        //const Vec3d& rayDir = pointPicker->getPickRayDir();
-
-        // Simple heuristic used here. Stitch all points together along the ray with normals
-        // facing each other. Any normal pointing in/out can be assumed going inside/outside the mesh
-
-        // Other possibility: If given a manfiold mesh get all the intersection points {1,2,3,4}.
-        // Assuming we start outside the shape, stitch up 2 & 3. Any points beyond this we ignore
-        // If given a non-manifold mesh we stitch up all points found along the ray
-        
-        // Perform the picking only on surface data
-        std::shared_ptr<SurfaceMesh> surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(pointSetToPick);
-        if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick))
-        {
-            surfMesh = tetMesh->extractSurfaceMesh();
-        }
-        surfMesh->computeTrianglesNormals();
-
-        const std::vector<PickData>& pickData = m_pickMethod->pick(surfMesh);
-
-        // ** Warning **, surface triangles are not 100% garunteed to tell inside/out
-        // Use angle-weighted psuedonormals as done in MeshToMeshBruteForceCD
-        std::shared_ptr<VecDataArray<double, 3>> faceNormalsPtr = surfMesh->getCellNormals();
-        const VecDataArray<double, 3>& faceNormals = *faceNormalsPtr;
-
         // Find all neighbor pairs with normals facing each other
+        printf("Pick Datas: %d\n", static_cast<int>(pickData.size()));
         std::vector<std::pair<PickData, PickData>> constraintPair;
         for (size_t i = 0, j = 1; i < pickData.size() - 1; i++, j++)
         {
+            const Vec3d& pt_i = pickData[i].pickPoint;
+            const Vec3d& pt_j = pickData[j].pickPoint;
             const Vec3d& normal_i = faceNormals[pickData[i].ids[0]];
             const Vec3d& normal_j = faceNormals[pickData[j].ids[0]];
+            const Vec3d diff = pt_j - pt_i;
 
-            // If they face in to each other
-            if (normal_i.dot(normal_j) < 0.0)
+            //bool faceOpposite = (normal_i.dot(normal_j) < 0.0);
+            bool faceInwards = (diff.dot(normal_i) > 0.0) && (diff.dot(normal_j) < 0.0);
+
+            // If they face into each other
+            if (faceInwards)
             {
                 constraintPair.push_back({ pickData[i], pickData[j] });
             }
         }
+        printf("ConstraintPairs: %d\n", static_cast<int>(constraintPair.size()));
 
-        // Now add constraints based on these
-        // If a SurfaceMesh just directly add the element
-        if (std::dynamic_pointer_cast<SurfaceMesh>(pointSetToPick) != nullptr)
+        if (tetMesh != nullptr && constraintPair.size() > 0)
         {
-            auto getCellVerts = [&](const PickData& data)
-            {
-                const CellTypeId pickedCellType = data.cellType;
-
-                std::vector<std::pair<int, VertexMassPair>> cellIdVerts;
-                if (pickedCellType == IMSTK_TETRAHEDRON)
-                {
-                    cellIdVerts = getElement<4>(data, meshStruct);
-                }
-                else if (pickedCellType == IMSTK_TRIANGLE)
-                {
-                    cellIdVerts = getElement<3>(data, meshStruct);
-                }
-                else if (pickedCellType == IMSTK_EDGE)
-                {
-                    cellIdVerts = getElement<2>(data, meshStruct);
-                }
-                std::vector<VertexMassPair> cellVerts(cellIdVerts.size());
-                for (size_t j = 0; j < cellIdVerts.size(); j++)
-                {
-                    cellVerts[j] = cellIdVerts[j].second;
-                }
-                return cellVerts;
-            };
-
-            auto getWeights = [](const std::vector<VertexMassPair>& cellVerts, const Vec3d& pt)
-            {
-                std::vector<double> weights(cellVerts.size());
-                if (cellVerts.size() == IMSTK_TETRAHEDRON)
-                {
-                    const Vec4d baryCoord = baryCentric(pt,
-                        *cellVerts[0].vertex,
-                        *cellVerts[1].vertex,
-                        *cellVerts[2].vertex,
-                        *cellVerts[3].vertex);
-                    weights[0] = baryCoord[0];
-                    weights[1] = baryCoord[1];
-                    weights[2] = baryCoord[2];
-                    weights[3] = baryCoord[3];
-                }
-                else if (cellVerts.size() == IMSTK_TRIANGLE)
-                {
-                    const Vec3d baryCoord = baryCentric(pt,
-                        *cellVerts[0].vertex, *cellVerts[1].vertex, *cellVerts[2].vertex);
-                    weights[0] = baryCoord[0];
-                    weights[1] = baryCoord[1];
-                    weights[2] = baryCoord[2];
-                }
-                else if (cellVerts.size() == IMSTK_EDGE)
-                {
-                    const Vec2d baryCoord = baryCentric(pt, *cellVerts[0].vertex, *cellVerts[1].vertex);
-                    weights[0] = baryCoord[0];
-                    weights[1] = baryCoord[1];
-                }
-                else if (cellVerts.size() == IMSTK_VERTEX)
-                {
-                    weights[0] = 1.0;
-                }
-                return weights;
-            };
+            // We supplied a extracted SurfaceMesh to the picker so that it would only pick points
+            // along the boundary/surface of the tet mesh. We need to map these back to the tetrahedrons
+            // as the tetrahedrons are needed for the constraints instead of triangles
+            SurfaceToTetraMap mapper;
+            mapper.setParentGeometry(tetMesh);
+            mapper.setChildGeometry(surfMesh);
+            mapper.compute();
 
             for (size_t i = 0; i < constraintPair.size(); i++)
             {
-                const PickData& pickData1 = constraintPair[i].first;
-                const PickData& pickData2 = constraintPair[i].second;
+                PickData& pickData1 = constraintPair[i].first;
+                PickData& pickData2 = constraintPair[i].second;
 
-                std::vector<VertexMassPair> cellVerts1 = getCellVerts(pickData1);
-                std::vector<double> weights1 = getWeights(cellVerts1, pickData1.pickPoint);
-                std::vector<VertexMassPair> cellVerts2 = getCellVerts(pickData2);
-                std::vector<double> weights2 = getWeights(cellVerts2, pickData2.pickPoint);
+                // Get the tet id from the triangle id
+                pickData1.ids[0] = mapper.getParentTetId(pickData1.ids[0]);
+                pickData1.idCount = 1;
+                pickData1.cellType = IMSTK_TETRAHEDRON;
 
-                // Cell to single point constraint
-                addConstraint(
-                    cellVerts1, weights1,
-                    cellVerts2, weights2,
-                    m_stiffness, m_stiffness);
+                pickData2.ids[0] = mapper.getParentTetId(pickData2.ids[0]);
+                pickData2.idCount = 1;
+                pickData2.cellType = IMSTK_TETRAHEDRON;
+                // Leave pick point the same
             }
         }
-        // If a TetrahedralMesh we need to map our triangle/surface element
-        //  back to our tetrahedral one
-        else if (std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick) != nullptr)
-        {
 
+        for (size_t i = 0; i < constraintPair.size(); i++)
+        {
+            const PickData& pickData1 = constraintPair[i].first;
+            const PickData& pickData2 = constraintPair[i].second;
+
+            std::vector<VertexMassPair> cellVerts1 = getCellVerts(pickData1);
+            std::vector<double> weights1 = getWeights(cellVerts1, pickData1.pickPoint);
+            std::vector<VertexMassPair> cellVerts2 = getCellVerts(pickData2);
+            std::vector<double> weights2 = getWeights(cellVerts2, pickData2.pickPoint);
+
+            // Cell to single point constraint
+            addConstraint(
+                cellVerts1, weights1,
+                cellVerts2, weights2,
+                m_stiffness, m_stiffness);
         }
     }
 }
 
 void
 PbdObjectStitching::addConstraint(
-    std::vector<VertexMassPair> ptsA,
-    std::vector<double> weightsA,
-    std::vector<VertexMassPair> ptsB,
-    std::vector<double> weightsB,
-    double stiffnessA, double stiffnessB)
+    const std::vector<VertexMassPair>& ptsA,
+    const std::vector<double>& weightsA,
+    const std::vector<VertexMassPair>& ptsB,
+    const std::vector<double>& weightsB,
+    const double stiffnessA, const double stiffnessB)
 {
     auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
     constraint->initConstraint(
@@ -406,7 +359,7 @@ PbdObjectStitching::addConstraint(
 }
 
 void
-PbdObjectStitching::updatePicking()
+PbdObjectStitching::updateStitching()
 {
     m_objectToStitch->updateGeometries();
 
@@ -414,19 +367,12 @@ PbdObjectStitching::updatePicking()
     if (!m_isPrevStitching && m_isStitching)
     {
         addStitchConstraints();
-    }
-    // If stopped
-    if (!m_isStitching && m_isPrevStitching)
-    {
-        removeStitchConstraints();
+        m_isStitching = false;
     }
     // Push back the state
     m_isPrevStitching = m_isStitching;
 
-    if (m_isStitching)
-    {
-        updateConstraints();
-    }
+    updateConstraints();
 }
 
 void

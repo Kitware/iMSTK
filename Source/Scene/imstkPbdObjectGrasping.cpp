@@ -69,7 +69,7 @@ getElement(const PickData& pickData, const MeshSide& side)
             int vertexId = cell[i];
             if (side.map != nullptr)
             {
-                vertexId = static_cast<int>(side.map->getMapIdx(vertexId));
+                vertexId = static_cast<int>(side.map->getParentVertexId(vertexId));
             }
             results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
         }
@@ -81,7 +81,7 @@ getElement(const PickData& pickData, const MeshSide& side)
             int vertexId = pickData.ids[i];
             if (side.map != nullptr)
             {
-                vertexId = static_cast<int>(side.map->getMapIdx(vertexId));
+                vertexId = static_cast<int>(side.map->getParentVertexId(vertexId));
             }
             results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
         }
@@ -253,7 +253,7 @@ PbdObjectGrasping::addPickConstraints()
             int             vertexId = data.ids[0];
             if (meshStruct.map != nullptr)
             {
-                vertexId = static_cast<int>(meshStruct.map->getMapIdx(vertexId));
+                vertexId = static_cast<int>(meshStruct.map->getParentVertexId(vertexId));
             }
 
             const Vec3d relativePos = pickGeomRot * (vertices[vertexId] - pickGeomPos);
