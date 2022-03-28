@@ -101,7 +101,7 @@ TEST(imstkTetrahedralMeshTest, GetVolume)
 
     // We use a regular tetrahedron with edge lengths 2
     // V = (edge length)^3/(6sqrt(2))
-    const double edgeLength      = 2.0;
+    const double edgeLength     = 2.0;
     const double expectedVolume = std::pow(edgeLength, 3.0) / (6.0 * std::sqrt(edgeLength));
 
     auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);

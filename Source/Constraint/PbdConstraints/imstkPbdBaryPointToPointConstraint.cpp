@@ -51,11 +51,11 @@ PbdBaryPointToPointConstraint::initConstraint(
 {
     m_dcdxA.resize(ptsA.size());
     m_bodiesFirst = ptsA;
-    m_weightsA = weightsA;
+    m_weightsA    = weightsA;
 
     m_dcdxB.resize(ptsB.size());
     m_bodiesSecond = ptsB;
-    m_weightsB = weightsB;
+    m_weightsB     = weightsB;
 
     m_stiffnessA = stiffnessA;
     m_stiffnessB = stiffnessB;

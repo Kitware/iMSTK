@@ -78,7 +78,7 @@ public:
     ///@{
     virtual void setEnabled(const bool enabled);
     virtual bool getEnabled() const;
-    ///@}
+///@}
 
 protected:
     ///
