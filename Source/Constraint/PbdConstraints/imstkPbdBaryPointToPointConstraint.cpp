@@ -43,26 +43,18 @@ PbdBaryPointToPointConstraint::computeInterpolantDifference() const
 
 void
 PbdBaryPointToPointConstraint::initConstraint(
-    std::vector<VertexMassPair> ptsA,
-    std::vector<double> weightsA,
-    std::vector<VertexMassPair> ptsB,
-    std::vector<double> weightsB,
-    double stiffnessA, double stiffnessB)
+    const std::vector<VertexMassPair>& ptsA,
+    const std::vector<double>& weightsA,
+    const std::vector<VertexMassPair>& ptsB,
+    const std::vector<double>& weightsB,
+    const double stiffnessA, const double stiffnessB)
 {
-    m_bodiesFirst.resize(ptsA.size());
     m_dcdxA.resize(ptsA.size());
-    for (int i = 0; i < ptsA.size(); i++)
-    {
-        m_bodiesFirst[i] = ptsA[i];
-    }
+    m_bodiesFirst = ptsA;
     m_weightsA = weightsA;
 
-    m_bodiesSecond.resize(ptsB.size());
     m_dcdxB.resize(ptsB.size());
-    for (int i = 0; i < ptsB.size(); i++)
-    {
-        m_bodiesSecond[i] = ptsB[i];
-    }
+    m_bodiesSecond = ptsB;
     m_weightsB = weightsB;
 
     m_stiffnessA = stiffnessA;
