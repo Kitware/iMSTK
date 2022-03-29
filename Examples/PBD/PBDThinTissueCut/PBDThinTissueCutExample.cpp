@@ -49,7 +49,7 @@ makePlaneGeometry(const double width,
                   const int    nRows,
                   const int    nCols)
 {
-    imstkNew<SurfaceMesh> clothMesh("Cloth_SurfaceMesh");
+    imstkNew<SurfaceMesh> clothMesh;
 
     imstkNew<VecDataArray<double, 3>> verticesPtr(nRows * nCols);
     VecDataArray<double, 3>&          vertices = *verticesPtr.get();
