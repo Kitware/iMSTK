@@ -47,7 +47,7 @@ namespace imstk
 ///
 struct TriCell
 {
-    std::uint32_t vertexIds[3];
+    std::array<std::uint32_t, 3> vertexIds;
 
     TriCell(std::uint32_t id0, std::uint32_t id1, std::uint32_t id2)
     {
