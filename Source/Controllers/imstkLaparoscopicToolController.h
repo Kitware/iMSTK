@@ -26,6 +26,7 @@
 namespace imstk
 {
 class CollidingObject;
+class Geometry;
 
 ///
 /// \class LaparoscopicToolController
@@ -49,6 +50,7 @@ public:
         std::shared_ptr<CollidingObject> shaft,
         std::shared_ptr<CollidingObject> upperJaw,
         std::shared_ptr<CollidingObject> lowerJaw,
+        std::shared_ptr<Geometry>        pickGeom,
         std::shared_ptr<DeviceClient>    trackingDevice);
     ~LaparoscopicToolController() override = default;
 
@@ -106,6 +108,7 @@ protected:
     std::shared_ptr<CollidingObject> m_shaft;               ///< Tool shaft
     std::shared_ptr<CollidingObject> m_upperJaw;            ///< Tool upper jaw
     std::shared_ptr<CollidingObject> m_lowerJaw;            ///< Tool lower jaw
+    std::shared_ptr<Geometry> m_pickGeom;
 
     double   m_jawAngle    = PI / 6.0;                      ///< Angle of the jaws
     double   m_change      = 6.0e-5;                        ///< Amount of change in jaw angle per frame
@@ -115,6 +118,7 @@ protected:
     Vec3d m_jawRotationAxis;                                ///< Angle of the jaws
 
     Mat4d m_controllerWorldTransform = Mat4d::Identity();   // Final world transform of the controller
+    Mat4d m_pickGeomTransform = Mat4d::Identity();
 
     Mat4d m_shaftVisualTransform    = Mat4d::Identity();    // Initial local transform of the visual shaft
     Mat4d m_upperJawVisualTransform = Mat4d::Identity();    // Initial local transform of the visual upper jaw

@@ -22,71 +22,18 @@
 #pragma once
 
 #include "imstkCollisionHandling.h"
+#include "imstkSurfaceMesh.h"
 
 #include <unordered_map>
 
 namespace imstk
 {
 class EmbeddingConstraint;
-class Geometry;
 class PbdCollisionSolver;
 class PbdCollisionConstraint;
 } // namespace imstk
 
 using namespace imstk;
-
-///
-/// \brief Sorts and test equivalence of a set of vertex indices
-///
-struct TriCell
-{
-    std::uint32_t vertexIds[3];
-
-    TriCell(std::uint32_t id0, std::uint32_t id1, std::uint32_t id2)
-    {
-        vertexIds[0] = id0;
-        vertexIds[1] = id1;
-        vertexIds[2] = id2;
-        if (vertexIds[0] > vertexIds[1])
-        {
-            std::swap(vertexIds[0], vertexIds[1]);
-        }
-        if (vertexIds[1] > vertexIds[2])
-        {
-            std::swap(vertexIds[1], vertexIds[2]);
-        }
-        if (vertexIds[0] > vertexIds[1])
-        {
-            std::swap(vertexIds[0], vertexIds[1]);
-        }
-    }
-
-    // Test true equivalence
-    bool operator==(const TriCell& other) const
-    {
-        // Only works if sorted
-        return (vertexIds[0] == other.vertexIds[0] && vertexIds[1] == other.vertexIds[1]
-                && vertexIds[2] == other.vertexIds[2]);
-    }
-};
-namespace std
-{
-template<>
-struct hash<TriCell>
-{
-    // A 128 int could garuntee no collisions but its harder to find support for
-    std::size_t operator()(const TriCell& k) const
-    {
-        using std::size_t;
-        using std::hash;
-
-        // Assuming sorted
-        const std::size_t r =
-            symCantor(static_cast<size_t>(k.vertexIds[0]), static_cast<size_t>(k.vertexIds[1]));
-        return symCantor(r, static_cast<size_t>(k.vertexIds[2]));
-    }
-};
-} // namespace std
 
 ///
 /// \class NeedleEmbeddedCH
@@ -98,9 +45,9 @@ class NeedleEmbeddedCH : public CollisionHandling
 {
 public:
     NeedleEmbeddedCH();
-    virtual ~NeedleEmbeddedCH() override = default;
+    ~NeedleEmbeddedCH() override = default;
 
-    virtual const std::string getTypeName() const override { return "NeedleEmbeddedCH"; }
+    const std::string getTypeName() const override { return "NeedleEmbeddedCH"; }
 
 public:
     std::shared_ptr<Geometry> getHandlingGeometryA() override;

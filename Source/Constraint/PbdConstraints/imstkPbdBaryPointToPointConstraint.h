@@ -25,24 +25,33 @@
 
 namespace imstk
 {
-////
-/// \class PbdPointPointConstraint
 ///
-/// \brief This constraint resolves two vertices to each other
+/// \class PbdBaryPointToPointConstraint
 ///
-class PbdPointPointConstraint : public PbdCollisionConstraint
+/// \brief Constrains two points from two separate cells/elements given via
+/// barycentric coordinates to be coincident
+///
+/// Such constraint may be used for grasping (grabbing points on elements,
+/// grabbing points with other points), stitching (constraining two
+/// points from separate elements together)
+///
+class PbdBaryPointToPointConstraint : public PbdCollisionConstraint
 {
 public:
-    PbdPointPointConstraint() : PbdCollisionConstraint(1, 1) { }
-    ~PbdPointPointConstraint() override = default;
+    PbdBaryPointToPointConstraint() : PbdCollisionConstraint(0, 0) { }
+    ~PbdBaryPointToPointConstraint() override = default;
 
-public:
+    Vec3d computeInterpolantDifference() const;
+
     ///
     /// \brief initialize constraint
     ///
     void initConstraint(
-        VertexMassPair ptA, VertexMassPair ptB,
-        double stiffnessA, double stiffnessB);
+        const std::vector<VertexMassPair>& ptsA,
+        const std::vector<double>& weightsA,
+        const std::vector<VertexMassPair>& ptsB,
+        const std::vector<double>& weightsB,
+        const double stiffnessA, const double stiffnessB);
 
     ///
     /// \brief compute value and gradient of constraint function
@@ -54,5 +63,10 @@ public:
     bool computeValueAndGradient(double&             c,
                                  std::vector<Vec3d>& dcdxA,
                                  std::vector<Vec3d>& dcdxB) const override;
+
+protected:
+    // Bary weights
+    std::vector<double> m_weightsA;
+    std::vector<double> m_weightsB;
 };
-} // imstk
+} // namespace imstk

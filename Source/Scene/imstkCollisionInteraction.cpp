@@ -118,4 +118,26 @@ CollisionInteraction::updateCollisionGeometry()
         dynObj2->updateGeometries();
     }
 }
+
+void
+CollisionInteraction::setEnabled(const bool enabled)
+{
+    m_collisionDetectionNode->setEnabled(enabled);
+    if (m_colDetect != nullptr)
+    {
+        // Clear the data (since CD clear is only run before CD is performed)
+        m_colDetect->getCollisionData()->elementsA.resize(0);
+        m_colDetect->getCollisionData()->elementsA.resize(0);
+    }
+    else
+    {
+        LOG(FATAL) << "Tried to enable/disable collision, but no CD method was provided";
+    }
+}
+
+bool
+CollisionInteraction::getEnabled() const
+{
+    return m_collisionDetectionNode->m_enabled;
+}
 } // namespace imstk

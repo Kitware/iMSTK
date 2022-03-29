@@ -39,7 +39,7 @@ public:
     NeedleObject(const std::string& name) : RigidObject2(name) { }
     virtual ~NeedleObject() = default;
 
-    virtual const std::string getTypeName() const override { return "NeedleObject"; }
+    const std::string getTypeName() const override { return "NeedleObject"; }
 
 public:
     void setCollisionState(const CollisionState state) { m_collisionState = state; }

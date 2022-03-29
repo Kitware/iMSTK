@@ -37,7 +37,7 @@ public:
     NeedleRigidBodyCH() = default;
     ~NeedleRigidBodyCH() override = default;
 
-    virtual const std::string getTypeName() const override { return "NeedleRigidBodyCH"; }
+    const std::string getTypeName() const override { return "NeedleRigidBodyCH"; }
 
 protected:
     ///

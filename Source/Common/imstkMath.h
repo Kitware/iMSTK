@@ -227,7 +227,23 @@ tetVolume(Vec3d p0, Vec3d p1, Vec3d p2, Vec3d p3)
 }
 
 ///
-/// \brief Compute bary centric coordinates (u,v,w) given triangle in 2d space (and point p on triangle)
+/// \brief Compute barycentric coordinates (u,v) of point in 3d space, given a line
+/// Projects point to line
+/// Barycentric coords give distances on line split by point (u, 1-u)
+///
+static Vec2d
+baryCentric(const Vec3d& pt, const Vec3d& p, const Vec3d& q)
+{
+    Vec3d        dir    = q - p;
+    const double length = dir.norm();
+    dir /= length;
+    const double t = (pt - p).dot(dir) / length;
+    return Vec2d(t, 1.0 - t);
+}
+
+///
+/// \brief Compute barycentric coordinates (u,v,w) of point in 2d space, given a triangle
+/// Barycentric coords give areas on triangle split by point (1-v-w, v, w)
 ///
 static Vec3d
 baryCentric(const Vec2d& p, const Vec2d& a, const Vec2d& b, const Vec2d& c)
@@ -243,7 +259,9 @@ baryCentric(const Vec2d& p, const Vec2d& a, const Vec2d& b, const Vec2d& c)
 }
 
 ///
-/// \brief Compute bary centric coordinates (u,v,w) of point p, given 3 points in 3d space (a,b,c)
+/// \brief Compute barycentric coordinates (u,v,w) of point p in 3d space, given a triangle
+/// Projects point to triangle
+/// Barycentric coords give areas on triangle split by point (1-v-w, v, w)
 ///
 static Vec3d
 baryCentric(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c)
@@ -264,7 +282,8 @@ baryCentric(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c)
 }
 
 ///
-/// \brief Compute bary centric coordinates (u,v,w,x) of point p, given 4 points in 3d space (a,b,c,d)
+/// \brief Compute barycentric coordinates (u,v,w,x) of point p in 3d space, given a tetrahedron
+/// Barycentric coords give volumes on tetrahedron split by point
 ///
 static Vec4d
 baryCentric(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c, const Vec3d& d)

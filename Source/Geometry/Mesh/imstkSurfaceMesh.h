@@ -40,8 +40,68 @@ struct NormalGroup
 };
 } // namespace imstk
 
+namespace imstk
+{
+///
+/// \brief Utility for triangle comparison
+///
+struct TriCell
+{
+    std::array<std::uint32_t, 3> vertexIds;
+
+    TriCell(std::uint32_t id0, std::uint32_t id1, std::uint32_t id2)
+    {
+        vertexIds[0] = id0;
+        vertexIds[1] = id1;
+        vertexIds[2] = id2;
+        if (vertexIds[0] > vertexIds[1])
+        {
+            std::swap(vertexIds[0], vertexIds[1]);
+        }
+        if (vertexIds[1] > vertexIds[2])
+        {
+            std::swap(vertexIds[1], vertexIds[2]);
+        }
+        if (vertexIds[0] > vertexIds[1])
+        {
+            std::swap(vertexIds[0], vertexIds[1]);
+        }
+    }
+
+    // Test true equivalence
+    bool operator==(const TriCell& other) const
+    {
+        // Only works if sorted
+        return (vertexIds[0] == other.vertexIds[0] && vertexIds[1] == other.vertexIds[1]
+                && vertexIds[2] == other.vertexIds[2]);
+    }
+};
+} // namespace imstk
+
 namespace std
 {
+///
+/// \struct hash<imstk::TriCell>
+///
+/// \brief Gives a hashing function for triangles that results in
+/// identical hashes for any ordering of ids hash(0,1,2)=hash(1,2,0)
+/// and is well distributed (avoids collisions)
+///
+template<>
+struct hash<imstk::TriCell>
+{
+    // A 128 int could garuntee no collisions but its harder to find support for
+    std::size_t operator()(const imstk::TriCell& k) const
+    {
+        using std::size_t;
+        using std::hash;
+
+        // Assuming sorted
+        const std::size_t r =
+            imstk::symCantor(static_cast<size_t>(k.vertexIds[0]), static_cast<size_t>(k.vertexIds[1]));
+        return imstk::symCantor(r, static_cast<size_t>(k.vertexIds[2]));
+    }
+};
 ///
 /// \struct less<imstk::NormalGroup>
 ///
