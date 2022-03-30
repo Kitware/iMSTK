@@ -39,17 +39,25 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
 #include "imstkRigidObjectController.h"
 #include "imstkRigidObject2.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRbdConstraint.h"
 #include "imstkPbdObjectStitching.h"
+#include "imstkPlane.h"
 
 using namespace imstk;
 
 #define USE_FEM
+//#define USE_HAPTICS
+
+#ifdef USE_HAPTICS
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
+#else
+#include "imstkDummyClient.h"
+#include "imstkMouseDeviceClient.h"
+#endif
 
 ///
 /// \brief Creates a tetraheral grid
@@ -177,10 +185,9 @@ makeTissueObj(const std::string& name,
 #endif
     pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 0.00001;
-    pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);;
+    pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
-    //pbdParams->m_contactStiffness = 0.4;
     pbdParams->m_viscousDampingCoeff = 0.05;
 
     // Fix the borders
@@ -267,14 +274,15 @@ main()
     const double capsuleRadius = 0.02;
 
     // Setup the scene
-    imstkNew<Scene> scene("PbdTissueStitch");
+    auto scene = std::make_shared<Scene>("PbdTissueStitch");
     scene->getActiveCamera()->setPosition(0.0012, 0.0451, 0.1651);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
     // Setup a tet tissue
+    const double tissueLength = 0.15;
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
-        Vec3d(0.2, 0.01, 0.07), Vec3i(20, 2, 5), Vec3d(0.1, -0.01 - capsuleRadius, 0.0));
+        Vec3d(tissueLength, 0.01, 0.07), Vec3i(15, 2, 5), Vec3d(tissueLength * 0.5, -0.01 - capsuleRadius, 0.0));
     scene->addSceneObject(tissueObj);
 
     auto cdObj       = std::make_shared<CollidingObject>("Bone");
@@ -293,28 +301,22 @@ main()
     scene->addSceneObject(toolObj);
 
     // Setup CD with a cylinder CD object
-    auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, cdObj, "SurfaceMeshToCapsuleCD");
-    interaction->setFriction(0.0);
-    interaction->setRestitution(0.0);
-    scene->addInteraction(interaction);
-
-   /* auto grasping = std::make_shared<PbdObjectGrasping>(tissueObj);
-    scene->addInteraction(grasping);*/
+    auto col1 = std::make_shared<PbdObjectCollision>(tissueObj, cdObj, "SurfaceMeshToCapsuleCD");
+    col1->setFriction(0.0);
+    scene->addInteraction(col1);
 
     auto stitching = std::make_shared<PbdObjectStitching>(tissueObj);
     scene->addInteraction(stitching);
 
-    // Light
-    imstkNew<DirectionalLight> light1;
+    // Lights
+    auto light1 = std::make_shared<DirectionalLight>();
     light1->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light1->setIntensity(0.5);
-    scene->addLight("Light1", light1);
-
-    // Light
-    imstkNew<DirectionalLight> light2;
+    scene->addLight("light1", light1);
+    auto light2 = std::make_shared<DirectionalLight>();
     light2->setFocalPoint(Vec3d(-5.0, -8.0, -5.0));
     light2->setIntensity(0.5);
-    scene->addLight("Light2", light2);
+    scene->addLight("light2", light2);
 
     // Run the simulation
     {
@@ -333,13 +335,23 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-#ifdef iMSTK_USE_OPENHAPTICS
+#ifdef USE_HAPTICS
         imstkNew<HapticDeviceManager> hapticManager;
         hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
+        std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
+#else
+        imstkNew<DummyClient> deviceClient("deviceClient");
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+            {
+                const Vec2d& pos = viewer->getMouseDevice()->getPos();
+                deviceClient->setPosition(Vec3d(37.0, 0.0, -(pos[1] * 100.0 - 50.0)));
+                deviceClient->setOrientation(Quatd(Rotd(0.65, Vec3d(0.0, 0.0, 1.0))));
+            });
+#endif
 
-        imstkNew<RigidObjectController> controller(toolObj, hapticDeviceClient);
+        imstkNew<RigidObjectController> controller(toolObj, deviceClient);
         controller->setTranslationScaling(0.001);
         controller->setLinearKs(1000.0);
         controller->setAngularKs(10000000.0);
@@ -349,6 +361,7 @@ main()
         controller->setUseForceSmoothening(true);
         scene->addController(controller);
 
+#ifdef USE_HAPTICS
         connect<ButtonEvent>(hapticDeviceClient, &HapticDeviceClient::buttonStateChanged,
             [&](ButtonEvent* e)
             {
@@ -360,7 +373,6 @@ main()
                     stitching->beginRayPointStitch(v1, (v2 - v1).normalized());
                 }
             });
-#else
 #endif
 
         // Toggle gravity, perform stitch, & reset
@@ -400,11 +412,12 @@ main()
             std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr = tetMesh->getVertexPositions();
         VecDataArray<double, 3>& vertices = *verticesPtr;
-        const std::vector<size_t>& fixedNodes = tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds;
+        const std::vector<size_t> fixedNodes = tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds;
         for (size_t i = 0; i < fixedNodes.size(); i++)
         {
             initPositions.push_back(vertices[fixedNodes[i]]);
         }
+        bool stopped = false;
 
         // Script the movement of the tissues fixed points
         connect<Event>(sceneManager, &SceneManager::postUpdate,
@@ -412,7 +425,7 @@ main()
             {
                 const double dt = sceneManager->getDt();
                 t += dt;
-                if (t < 9.0)
+                if (t < 10.5)
                 {
                     for (size_t i = 0; i < fixedNodes.size(); i++)
                     {
@@ -423,11 +436,18 @@ main()
                         pos = Vec3d(-sin(t) * r, -cos(t) * r, initPos[2]);
                     }
                 }
-                else if ( t > 11.0)
+                else
                 {
-                    for (size_t i = 0; i < fixedNodes.size(); i++)
+                    if (!stopped)
                     {
-                        tissueObj->getPbdModel()->setPointUnfixed(fixedNodes[i]);
+                        stopped = true;
+                        for (size_t i = 0; i < fixedNodes.size(); i++)
+                        {
+                            tissueObj->getPbdModel()->setPointUnfixed(fixedNodes[i]);
+                        }
+
+                        // Clear and reinit all constraints
+                        tissueObj->initialize();
                     }
                 }
             });

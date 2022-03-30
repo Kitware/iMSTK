@@ -24,21 +24,25 @@
 namespace imstk
 {
 Vec3d
-PbdBaryPointToPointConstraint::computeInterpolantDifference() const
+PbdBaryPointToPointConstraint::computePtA() const
 {
     Vec3d p1 = Vec3d::Zero();
     for (size_t i = 0; i < m_bodiesFirst.size(); i++)
     {
         p1 += *m_bodiesFirst[i].vertex * m_weightsA[i];
     }
+    return p1;
+}
 
+Vec3d
+PbdBaryPointToPointConstraint::computePtB() const
+{
     Vec3d p2 = Vec3d::Zero();
     for (size_t i = 0; i < m_bodiesSecond.size(); i++)
     {
         p2 += *m_bodiesSecond[i].vertex * m_weightsB[i];
     }
-
-    return p2 - p1;
+    return p2;
 }
 
 void

@@ -36,7 +36,7 @@ namespace imstk
 class DummyClient : public DeviceClient
 {
 public:
-    DummyClient(const std::string& name) : DeviceClient(name, "localhost") {}
+    DummyClient(const std::string& name = "") : DeviceClient(name, "localhost") {}
     ~DummyClient() override = default;
 
 protected:

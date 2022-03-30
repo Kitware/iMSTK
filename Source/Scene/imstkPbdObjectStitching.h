@@ -30,7 +30,7 @@ limitations under the License.
 namespace imstk
 {
 class OneToOneMap;
-class PbdCollisionConstraint;
+class PbdBaryPointToPointConstraint;
 class PbdObject;
 class PointSet;
 class PickingAlgorithm;
@@ -149,6 +149,8 @@ protected:
     ///
     void updateConstraints();
 
+    void updateDebug();
+
 protected:
     std::shared_ptr<TaskNode> m_stitchingNode = nullptr;
 
@@ -167,9 +169,8 @@ protected:
     /// when stiffness < 1 it will slowly converge on the grasp point
     double m_stiffness = 0.1;
 
-    bool m_debugGeometry = false; ///< Display debug points & lines for stitches
-    bool m_retractingStitch = false; ///< Place a stitch that slowly retracts to 0 after placement
+    //bool m_retractingStitch = false; ///< Place a stitch that slowly retracts to 0 after placement
 
-    std::vector<std::shared_ptr<PbdCollisionConstraint>> m_constraints; ///< List of PBD constraints
+    std::vector<std::shared_ptr<PbdBaryPointToPointConstraint>> m_constraints; ///< List of PBD constraints
 };
 } // namespace imstk

@@ -34,6 +34,17 @@ namespace imstk
 void
 PointPicker::requestUpdate()
 {
+    // Use for sorting 
+    // \todo: Could also parameterize by distance to avoid recomputation
+    //  if dealing with many intersections
+    auto pred = [&](const PickData& a, const PickData& b)
+    {
+        const double sqrDistA = (a.pickPoint - m_rayStart).squaredNorm();
+        const double sqrDistB = (b.pickPoint - m_rayStart).squaredNorm();
+        return sqrDistA < sqrDistB;
+    };
+    std::set<PickData, decltype(pred)> resultSet(pred);
+
     std::shared_ptr<Geometry> geomToPick = getInput(0);
     geomToPick->updatePostTransformData();
     if (auto surfMeshToPick = std::dynamic_pointer_cast<SurfaceMesh>(geomToPick))
@@ -58,7 +69,7 @@ PointPicker::requestUpdate()
                 const Vec3d uvw = baryCentric(iPt, a, b, c);
                 if (uvw[0] >= 0.0 && uvw[1] >= 0.0 && uvw[2] >= 0.0) // Check if within triangle
                 {
-                    m_results.push_back({ { i }, 1, IMSTK_TRIANGLE, iPt });
+                    resultSet.insert({ { i }, 1, IMSTK_TRIANGLE, iPt });
                 }
             }
         }
@@ -93,7 +104,7 @@ PointPicker::requestUpdate()
                     const Vec3d uvw = baryCentric(iPt, a, b, c);
                     if (uvw[0] >= 0.0 && uvw[1] >= 0.0 && uvw[2] >= 0.0) // Check if within triangle
                     {
-                        m_results.push_back({ { i }, 1, IMSTK_TETRAHEDRON, iPt });
+                        resultSet.insert({ { i }, 1, IMSTK_TETRAHEDRON, iPt });
                     }
                 }
             }
@@ -110,7 +121,7 @@ PointPicker::requestUpdate()
         if (CollisionUtils::testRayToSphere(m_rayStart, m_rayDir,
             sphereToPick->getPosition(), sphereToPick->getRadius(), iPt))
         {
-            m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
+            resultSet.insert({ { 0 }, 1, IMSTK_VERTEX, iPt });
             // \todo: Exit point
         }
     }
@@ -120,7 +131,7 @@ PointPicker::requestUpdate()
         if (CollisionUtils::testRayToPlane(m_rayStart, m_rayDir,
             planeToPick->getPosition(), planeToPick->getNormal(), iPt))
         {
-            m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
+            resultSet.insert({ { 0 }, 1, IMSTK_VERTEX, iPt });
         }
     }
     //else if (auto capsuleToPick = std::dynamic_pointer_cast<Capsule>(geomToPick))
@@ -134,8 +145,8 @@ PointPicker::requestUpdate()
         if (CollisionUtils::testRayToObb(m_rayStart, m_rayDir,
             worldToBox.inverse(), obbToPick->getExtents(), t))
         {
-            m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, m_rayStart + m_rayDir * t[0] });
-            m_results.push_back({ { 1 }, 1, IMSTK_VERTEX, m_rayStart + m_rayDir * t[1] });
+            resultSet.insert({ { 0 }, 1, IMSTK_VERTEX, m_rayStart + m_rayDir * t[0] });
+            resultSet.insert({ { 1 }, 1, IMSTK_VERTEX, m_rayStart + m_rayDir * t[1] });
         }
     }
     else if (auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(geomToPick))
@@ -180,7 +191,7 @@ PointPicker::requestUpdate()
                 {
                     // Use midpoint of results
                     iPt = (currPt + prevPt) * 0.5;
-                    m_results.push_back({ { 0 }, 1, IMSTK_VERTEX, iPt });
+                    resultSet.insert({ { 0 }, 1, IMSTK_VERTEX, iPt });
                 }
             }
         }
@@ -198,42 +209,37 @@ PointPicker::requestUpdate()
     {
         // Start at max, unless you get under this it won't select
         double minSqrDist = useMaxDist ? maxSqrDist : IMSTK_DOUBLE_MAX;
-        int    index      = -1;
-        for (size_t i = 0; i < m_results.size(); i++)
+        PickData results;
+        bool resultsFound = false;
+        for (const auto& pickData : resultSet)
         {
             // Possibly parameterize all by t and use that here instead
-            const double sqrDist = (m_results[i].pickPoint - m_rayStart).squaredNorm();
+            const double sqrDist = (pickData.pickPoint - m_rayStart).squaredNorm();
             if (sqrDist <= minSqrDist)
             {
-                index      = static_cast<int>(i);
+                results = pickData;
+                resultsFound = true;
                 minSqrDist = sqrDist;
             }
         }
 
-        if (index != -1)
+        if (resultsFound)
         {
-            PickData data = m_results[index];
             m_results.resize(1);
-            m_results[0] = data;
-        }
-        else
-        {
-            m_results.clear();
+            m_results[0] = results;
         }
     }
-    // Remove all distances not within max distance
     else
     {
-        std::vector<PickData> pickData;
-        for (size_t i = 0; i < m_results.size(); i++)
+        m_results = std::vector<PickData>();
+        for (auto pickData : resultSet)
         {
-            const double sqrDist = (m_results[i].pickPoint - m_rayStart).squaredNorm();
-            if ((!useMaxDist || sqrDist <= maxSqrDist))
+            const double sqrDist = (pickData.pickPoint - m_rayStart).squaredNorm();
+            if (!useMaxDist || sqrDist <= maxSqrDist)
             {
-                pickData.push_back(m_results[i]);
+                m_results.push_back(pickData);
             }
         }
-        m_results = std::move(pickData);
     }
 }
 } // namespace imstk

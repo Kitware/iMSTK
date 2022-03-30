@@ -33,6 +33,8 @@ limitations under the License.
 #include "imstkTetrahedralMesh.h"
 #include "imstkVertexPicker.h"
 #include "imstkSurfaceToTetraMap.h"
+#include "imstkVisualModel.h"
+#include "imstkRenderMaterial.h"
 
 namespace imstk
 {
@@ -275,7 +277,6 @@ PbdObjectStitching::addStitchConstraints()
     else if (m_mode == StitchMode::RayPoint)
     {
         // Find all neighbor pairs with normals facing each other
-        printf("Pick Datas: %d\n", static_cast<int>(pickData.size()));
         std::vector<std::pair<PickData, PickData>> constraintPair;
         for (size_t i = 0, j = 1; i < pickData.size() - 1; i++, j++)
         {
@@ -294,7 +295,6 @@ PbdObjectStitching::addStitchConstraints()
                 constraintPair.push_back({ pickData[i], pickData[j] });
             }
         }
-        printf("ConstraintPairs: %d\n", static_cast<int>(constraintPair.size()));
 
         if (tetMesh != nullptr && constraintPair.size() > 0)
         {

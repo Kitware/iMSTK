@@ -41,7 +41,9 @@ public:
     PbdBaryPointToPointConstraint() : PbdCollisionConstraint(0, 0) { }
     ~PbdBaryPointToPointConstraint() override = default;
 
-    Vec3d computeInterpolantDifference() const;
+    Vec3d computePtA() const;
+    Vec3d computePtB() const;
+    Vec3d computeInterpolantDifference() const { return computePtB() - computePtA(); }
 
     ///
     /// \brief initialize constraint
