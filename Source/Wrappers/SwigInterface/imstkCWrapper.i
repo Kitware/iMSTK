@@ -48,7 +48,7 @@
  */
 #include "imstkGeometryMap.h"
 #include "imstkPointwiseMap.h"
-#include "imstkTetraTriangleMap.h"
+#include "imstkPointToTetMap.h"
 
 /*
  * Filter
@@ -268,7 +268,7 @@ namespace std
  */
 %include "../../GeometryMappers/imstkGeometryMap.h"
 %include "../../GeometryMappers/imstkPointwiseMap.h"
-%include "../../GeometryMappers/imstkTetraTriangleMap.h"
+%include "../../GeometryMappers/imstkPointToTetMap.h"
 
 /*
  * FilteringCore

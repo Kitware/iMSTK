@@ -22,19 +22,19 @@
 namespace imstk
 {
 ///
-/// \class SurfaceToTetraMap
+/// \class TriangleToTetMap
 ///
 /// \brief SurfaceToTetrahedralMap serves as a PointwiseMap but also maps
 /// tets to triangle faces.
 ///
-class SurfaceToTetraMap : public PointwiseMap
+class TriangleToTetMap : public PointwiseMap
 {
 public:
-    SurfaceToTetraMap();
-    SurfaceToTetraMap(
+    TriangleToTetMap();
+    TriangleToTetMap(
         std::shared_ptr<Geometry> parent,
         std::shared_ptr<Geometry> child);
-    ~SurfaceToTetraMap() override = default;
+    ~TriangleToTetMap() override = default;
 
     ///
     /// \brief Compute the map

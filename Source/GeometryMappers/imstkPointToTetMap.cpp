@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkTetraTriangleMap.h"
+#include "imstkPointToTetMap.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 #include "imstkTetrahedralMesh.h"
@@ -27,13 +27,13 @@
 
 namespace imstk
 {
-TetraTriangleMap::TetraTriangleMap() : m_boundingBoxAvailable(false)
+PointToTetMap::PointToTetMap() : m_boundingBoxAvailable(false)
 {
     setRequiredInputType<TetrahedralMesh>(0);
     setRequiredInputType<PointSet>(1);
 }
 
-TetraTriangleMap::TetraTriangleMap(
+PointToTetMap::PointToTetMap(
     std::shared_ptr<Geometry> parent,
     std::shared_ptr<Geometry> child)
     : m_boundingBoxAvailable(false)
@@ -46,11 +46,11 @@ TetraTriangleMap::TetraTriangleMap(
 }
 
 void
-TetraTriangleMap::compute()
+PointToTetMap::compute()
 {
     if (!areInputsValid())
     {
-        LOG(WARNING) << "TetraTriangleMap failed to run, inputs not satisfied";
+        LOG(WARNING) << "PointToTetMap failed to run, inputs not satisfied";
         return;
     }
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
@@ -107,7 +107,7 @@ TetraTriangleMap::compute()
 }
 
 void
-TetraTriangleMap::requestUpdate()
+PointToTetMap::requestUpdate()
 {
     auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     auto pointSet = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
@@ -132,7 +132,7 @@ TetraTriangleMap::requestUpdate()
 }
 
 int
-TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
+PointToTetMap::findClosestTetrahedron(const Vec3d& pos) const
 {
     auto   tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     double closestDistanceSqr = IMSTK_DOUBLE_MAX;
@@ -161,7 +161,7 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 }
 
 int
-TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
+PointToTetMap::findEnclosingTetrahedron(const Vec3d& pos) const
 {
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     int  enclosingTetrahedron = IMSTK_INT_MAX;
@@ -191,7 +191,7 @@ TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 }
 
 void
-TetraTriangleMap::updateBoundingBox()
+PointToTetMap::updateBoundingBox()
 {
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     m_bBoxMin.resize(tetMesh->getNumTetrahedra());

@@ -30,20 +30,20 @@ namespace imstk
 template<typename T, int N> class VecDataArray;
 
 ///
-/// \class TetraTriangleMap
+/// \class PointToTetMap
 ///
 /// \brief Computes and applies the PointSet-Tetrahedra map. Vertices of the
 /// child geometry are deformed according to the deformation of the tetrahedron
 /// they are located in. If they are not within one, nearest tet is used.
 ///
-class TetraTriangleMap : public GeometryMap
+class PointToTetMap : public GeometryMap
 {
 public:
-    TetraTriangleMap();
-    TetraTriangleMap(
+    PointToTetMap();
+    PointToTetMap(
         std::shared_ptr<Geometry> parent,
         std::shared_ptr<Geometry> child);
-    ~TetraTriangleMap() override = default;
+    ~PointToTetMap() override = default;
 
     IMSTK_TYPE_NAME(TetraTriangleMap)
 

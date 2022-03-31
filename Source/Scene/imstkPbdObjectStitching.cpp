@@ -27,9 +27,9 @@ limitations under the License.
 #include "imstkPbdObject.h"
 #include "imstkPointPicker.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkSurfaceToTetraMap.h"
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkTriangleToTetMap.h"
 
 namespace imstk
 {
@@ -292,7 +292,7 @@ PbdObjectStitching::addStitchConstraints()
 
         // If we have a tet mesh and some results, map the picked surface triangles
         // back to the tetrahedrons
-        SurfaceToTetraMap mapper;
+        TriangleToTetMap mapper;
         mapper.setParentGeometry(tetMesh);
         mapper.setChildGeometry(surfMesh);
         mapper.compute();

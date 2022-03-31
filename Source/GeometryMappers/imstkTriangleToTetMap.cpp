@@ -13,20 +13,20 @@
    limitations under the License.
 =========================================================================*/
 
-#include "imstkSurfaceToTetraMap.h"
+#include "imstkTriangleToTetMap.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVecDataArray.h"
 
 namespace imstk
 {
-SurfaceToTetraMap::SurfaceToTetraMap()
+TriangleToTetMap::TriangleToTetMap()
 {
     setRequiredInputType<TetrahedralMesh>(0);
     setRequiredInputType<SurfaceMesh>(1);
 }
 
-SurfaceToTetraMap::SurfaceToTetraMap(
+TriangleToTetMap::TriangleToTetMap(
     std::shared_ptr<Geometry> parent,
     std::shared_ptr<Geometry> child)
 {
@@ -38,7 +38,7 @@ SurfaceToTetraMap::SurfaceToTetraMap(
 }
 
 void
-SurfaceToTetraMap::compute()
+TriangleToTetMap::compute()
 {
     PointwiseMap::compute();
 
@@ -47,7 +47,7 @@ SurfaceToTetraMap::compute()
 }
 
 void
-SurfaceToTetraMap::computeTriToTetMap(std::unordered_map<int, int>& triToTetMap)
+TriangleToTetMap::computeTriToTetMap(std::unordered_map<int, int>& triToTetMap)
 {
     triToTetMap.clear();
 
@@ -104,7 +104,7 @@ SurfaceToTetraMap::computeTriToTetMap(std::unordered_map<int, int>& triToTetMap)
 }
 
 int
-SurfaceToTetraMap::getParentTetId(const int triId) const
+TriangleToTetMap::getParentTetId(const int triId) const
 {
     auto citer = m_triToTetMap.find(triId);
     return (citer != m_triToTetMap.end()) ? citer->second : -1;
