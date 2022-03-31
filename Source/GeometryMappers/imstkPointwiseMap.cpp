@@ -13,20 +13,20 @@
    limitations under the License.
 =========================================================================*/
 
-#include "imstkOneToOneMap.h"
+#include "imstkPointwiseMap.h"
 #include "imstkParallelUtils.h"
 #include "imstkLogger.h"
 #include "imstkPointSet.h"
 
 namespace imstk
 {
-OneToOneMap::OneToOneMap()
+PointwiseMap::PointwiseMap()
 {
     setRequiredInputType<PointSet>(0);
     setRequiredInputType<PointSet>(1);
 }
 
-OneToOneMap::OneToOneMap(
+PointwiseMap::PointwiseMap(
     std::shared_ptr<Geometry> parent,
     std::shared_ptr<Geometry> child)
 {
@@ -38,11 +38,11 @@ OneToOneMap::OneToOneMap(
 }
 
 void
-OneToOneMap::compute()
+PointwiseMap::compute()
 {
     if (!areInputsValid())
     {
-        LOG(WARNING) << "OneToOneMap failed to run, inputs not satisfied";
+        LOG(WARNING) << "PointwiseMap failed to run, inputs not satisfied";
         return;
     }
 
@@ -58,13 +58,13 @@ OneToOneMap::compute()
 }
 
 void
-OneToOneMap::computeMap(std::unordered_map<int, int>& tetVertToSurfVertMap)
+PointwiseMap::computeMap(std::unordered_map<int, int>& tetVertToSurfVertMap)
 {
     tetVertToSurfVertMap.clear();
 
     if (!areInputsValid())
     {
-        LOG(WARNING) << "OneToOneMap failed to run, inputs not satisfied";
+        LOG(WARNING) << "PointwiseMap failed to run, inputs not satisfied";
         return;
     }
 
@@ -97,7 +97,7 @@ OneToOneMap::computeMap(std::unordered_map<int, int>& tetVertToSurfVertMap)
 }
 
 int
-OneToOneMap::findMatchingVertex(const VecDataArray<double, 3>& parentVertices, const Vec3d& p)
+PointwiseMap::findMatchingVertex(const VecDataArray<double, 3>& parentVertices, const Vec3d& p)
 {
     for (int idx = 0; idx < parentVertices.size(); idx++)
     {
@@ -110,7 +110,7 @@ OneToOneMap::findMatchingVertex(const VecDataArray<double, 3>& parentVertices, c
 }
 
 void
-OneToOneMap::setMap(const std::unordered_map<int, int>& sourceMap)
+PointwiseMap::setMap(const std::unordered_map<int, int>& sourceMap)
 {
     m_oneToOneMap = sourceMap;
 
@@ -123,7 +123,7 @@ OneToOneMap::setMap(const std::unordered_map<int, int>& sourceMap)
 }
 
 void
-OneToOneMap::requestUpdate()
+PointwiseMap::requestUpdate()
 {
     auto meshParent = std::dynamic_pointer_cast<PointSet>(getParentGeometry());
     auto meshChild  = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
@@ -147,7 +147,7 @@ OneToOneMap::requestUpdate()
 }
 
 int
-OneToOneMap::getParentVertexId(const int childVertexId) const
+PointwiseMap::getParentVertexId(const int childVertexId) const
 {
     auto citer = m_oneToOneMap.find(childVertexId);
     return (citer != m_oneToOneMap.end()) ? citer->second : -1;

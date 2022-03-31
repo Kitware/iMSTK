@@ -29,11 +29,11 @@ limitations under the License.
 
 namespace imstk
 {
-class OneToOneMap;
 class PbdBaryPointToPointConstraint;
 class PbdObject;
 class PointSet;
 class PickingAlgorithm;
+class PointwiseMap;
 
 ///
 /// \class PbdObjectStitching
@@ -104,7 +104,7 @@ public:
     /// \brief Set a different geometry to pick with and a mapping back to the physics geometry
     /// to select the correct vertices
     ///
-    void setGeometryToStitch(std::shared_ptr<Geometry> geomToStitch, std::shared_ptr<OneToOneMap> map)
+    void setGeometryToStitch(std::shared_ptr<Geometry> geomToStitch, std::shared_ptr<PointwiseMap> map)
     {
         m_geomToStitch = geomToStitch;
         m_geometryToStitchMap = map;
@@ -128,8 +128,8 @@ protected:
 protected:
     std::shared_ptr<TaskNode> m_stitchingNode = nullptr;
 
-    std::shared_ptr<Geometry>    m_geomToStitch = nullptr;
-    std::shared_ptr<OneToOneMap> m_geometryToStitchMap = nullptr;
+    std::shared_ptr<Geometry>     m_geomToStitch = nullptr;
+    std::shared_ptr<PointwiseMap> m_geometryToStitchMap = nullptr;
 
     std::shared_ptr<PbdObject> m_objectToStitch = nullptr;
 

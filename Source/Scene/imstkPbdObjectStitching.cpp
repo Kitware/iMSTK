@@ -41,7 +41,7 @@ namespace imstk
 struct MeshSide
 {
     MeshSide(VecDataArray<double, 3>& verticest, VecDataArray<double, 3>& velocitiest, DataArray<double>& invMassest,
-             AbstractDataArray* indicesPtrt, OneToOneMap* mapt) : vertices(verticest), velocities(velocitiest),
+             AbstractDataArray* indicesPtrt, PointwiseMap* mapt) : vertices(verticest), velocities(velocitiest),
         invMasses(invMassest), indicesPtr(indicesPtrt), map(mapt)
     {
     }
@@ -50,7 +50,7 @@ struct MeshSide
     VecDataArray<double, 3>& velocities;
     DataArray<double>& invMasses;
     AbstractDataArray* indicesPtr = nullptr;
-    OneToOneMap* map = nullptr;
+    PointwiseMap* map = nullptr;
 };
 
 template<int N>
@@ -197,7 +197,7 @@ PbdObjectStitching::addStitchConstraints()
     }
 
     // If the user tries to pick
-    OneToOneMap* map = nullptr;
+    PointwiseMap* map = nullptr;
     if (m_geometryToStitchMap != nullptr)
     {
         map = m_geometryToStitchMap.get();

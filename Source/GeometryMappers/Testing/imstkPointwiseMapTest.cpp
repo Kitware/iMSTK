@@ -20,8 +20,8 @@
 =========================================================================*/
 
 #include "imstkGeometry.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPointSet.h"
+#include "imstkPointwiseMap.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVecDataArray.h"
@@ -60,7 +60,7 @@ getCubePoints()
 }
 } // namespace
 
-TEST(imstkOneToOneMapTest, SimpleMap)
+TEST(imstkPointwiseMapTest, SimpleMap)
 {
     auto parent = std::make_shared<PointSet>();
     parent->initialize(getCubePoints());
@@ -68,7 +68,7 @@ TEST(imstkOneToOneMapTest, SimpleMap)
     auto child = std::make_shared<PointSet>();
     child->initialize(getCubePoints());
 
-    OneToOneMap map;
+    PointwiseMap map;
     map.setParentGeometry(parent);
     map.setChildGeometry(child);
     map.compute();
@@ -86,37 +86,37 @@ TEST(imstkOneToOneMapTest, SimpleMap)
     }
 }
 
-TEST(imstkOneToOneMapTest, DeathTests)
+TEST(imstkPointwiseMapTest, DeathTests)
 {
     auto parent = std::make_shared<PointSet>();
     auto child  = std::make_shared<PointSet>();
 
     auto sphere = std::make_shared<Sphere>();
     {
-        OneToOneMap map;
+        PointwiseMap map;
         ASSERT_DEATH(map.compute(), "without valid geometries");
     }
     {
-        OneToOneMap map;
+        PointwiseMap map;
         map.setParentGeometry(parent);
         ASSERT_DEATH(map.compute(), "without valid geometries");
     }
     {
-        OneToOneMap map;
+        PointwiseMap map;
         map.setChildGeometry(child);
         ASSERT_DEATH(map.compute(), "without valid geometries");
     }
     {
-        OneToOneMap map;
+        PointwiseMap map;
         ASSERT_DEATH(map.setParentGeometry(sphere), "The geometry provided is not a PointSet!");
     }
     {
-        OneToOneMap map;
+        PointwiseMap map;
         ASSERT_DEATH(map.setChildGeometry(sphere), "The geometry provided is not a PointSet!");
     }
 }
 
-TEST(imstkOneToOneMapTest, OneToManyMap)
+TEST(imstkPointwiseMapTest, OneToManyMap)
 {
     auto parent = std::make_shared<PointSet>();
     parent->initialize(getCubePoints());
@@ -127,7 +127,7 @@ TEST(imstkOneToOneMapTest, OneToManyMap)
     points->push_back(Vec3d(0.5, 0.5, -0.5) * 10);
     child->initialize(points);
 
-    OneToOneMap map;
+    PointwiseMap map;
     map.setParentGeometry(parent);
     map.setChildGeometry(child);
     map.setTolerance(1e-8);

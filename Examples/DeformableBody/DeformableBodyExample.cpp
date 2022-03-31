@@ -29,8 +29,8 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPlane.h"
+#include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -175,7 +175,7 @@ makeFEDeformableObject(std::shared_ptr<TetrahedralMesh> tetMesh)
     deformableObj->getVisualModel(0)->setRenderMaterial(mat);
     deformableObj->setPhysicsGeometry(tetMesh);
     // Map simulated geometry to visual
-    deformableObj->setPhysicsToVisualMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));
+    deformableObj->setPhysicsToVisualMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     deformableObj->setDynamicalModel(dynaModel);
 
     return deformableObj;

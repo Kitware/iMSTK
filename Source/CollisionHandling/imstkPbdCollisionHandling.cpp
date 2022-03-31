@@ -22,7 +22,6 @@
 #include "imstkPbdCollisionHandling.h"
 #include "imstkCollisionData.h"
 #include "imstkGeometryMap.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPbdEdgeEdgeConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
@@ -30,6 +29,7 @@
 #include "imstkPbdPointPointConstraint.h"
 #include "imstkPbdPointTriangleConstraint.h"
 #include "imstkPbdSolver.h"
+#include "imstkPointwiseMap.h"
 #include "imstkSurfaceMesh.h"
 
 namespace imstk
@@ -67,10 +67,10 @@ getVertex(const CollisionElement& elem, const MeshSide& side)
     std::array<VertexMassPair, 1> results;
     if (ptId != -1)
     {
-        auto oneToOneMap = dynamic_cast<OneToOneMap*>(side.m_mapPtr);
-        if (side.m_mapPtr && oneToOneMap != nullptr)
+        auto geomMap = dynamic_cast<PointwiseMap*>(side.m_mapPtr);
+        if (side.m_mapPtr && geomMap != nullptr)
         {
-            ptId = oneToOneMap->getParentVertexId(ptId);
+            ptId = geomMap->getParentVertexId(ptId);
         }
         results[0] = { &side.m_vertices[ptId], side.m_invMasses[ptId], &side.m_velocities[ptId] };
     }
@@ -99,11 +99,11 @@ getEdge(const CollisionElement& elem, const MeshSide& side)
     std::array<VertexMassPair, 2> results;
     if (v1 != -1)
     {
-        auto oneToOneMap = dynamic_cast<OneToOneMap*>(side.m_mapPtr);
-        if (side.m_mapPtr && oneToOneMap != nullptr)
+        auto geomMap = dynamic_cast<PointwiseMap*>(side.m_mapPtr);
+        if (side.m_mapPtr && geomMap != nullptr)
         {
-            v1 = oneToOneMap->getParentVertexId(v1);
-            v2 = oneToOneMap->getParentVertexId(v2);
+            v1 = geomMap->getParentVertexId(v1);
+            v2 = geomMap->getParentVertexId(v2);
         }
         results[0] = { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] };
         results[1] = { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] };
@@ -135,12 +135,12 @@ getTriangle(const CollisionElement& elem, const MeshSide& side)
     std::array<VertexMassPair, 3> results;
     if (v1 != -1)
     {
-        auto oneToOneMap = dynamic_cast<OneToOneMap*>(side.m_mapPtr);
-        if (side.m_mapPtr && oneToOneMap != nullptr)
+        auto geomMap = dynamic_cast<PointwiseMap*>(side.m_mapPtr);
+        if (side.m_mapPtr && geomMap != nullptr)
         {
-            v1 = oneToOneMap->getParentVertexId(v1);
-            v2 = oneToOneMap->getParentVertexId(v2);
-            v3 = oneToOneMap->getParentVertexId(v3);
+            v1 = geomMap->getParentVertexId(v1);
+            v2 = geomMap->getParentVertexId(v2);
+            v3 = geomMap->getParentVertexId(v3);
         }
         results[0] = { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] };
         results[1] = { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] };

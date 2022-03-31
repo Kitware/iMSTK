@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include "imstkOneToOneMap.h"
+#include "imstkPointwiseMap.h"
 #include "imstkMath.h"
 #include "imstkTypes.h"
 
@@ -24,10 +24,10 @@ namespace imstk
 ///
 /// \class SurfaceToTetraMap
 ///
-/// \brief SurfaceToTetrahedralMap serves as a OneToOneMap but also
-/// maps tets to triangle faces.
+/// \brief SurfaceToTetrahedralMap serves as a PointwiseMap but also maps
+/// tets to triangle faces.
 ///
-class SurfaceToTetraMap : public OneToOneMap
+class SurfaceToTetraMap : public PointwiseMap
 {
 public:
     SurfaceToTetraMap();

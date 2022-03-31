@@ -40,7 +40,7 @@ SurfaceToTetraMap::SurfaceToTetraMap(
 void
 SurfaceToTetraMap::compute()
 {
-    OneToOneMap::compute();
+    PointwiseMap::compute();
 
     m_triToTetMap.clear();
     computeTriToTetMap(m_triToTetMap);

@@ -26,11 +26,11 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectStitching.h"
+#include "imstkPointwiseMap.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
@@ -286,7 +286,7 @@ makeTetTissueObj(const std::string& name,
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(tissueMesh);
     tissueObj->setCollidingGeometry(surfMesh);
-    tissueObj->setPhysicsToCollidingMap(std::make_shared<OneToOneMap>(tissueMesh, surfMesh));
+    tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     tissueObj->setDynamicalModel(pbdModel);
 
     return tissueObj;

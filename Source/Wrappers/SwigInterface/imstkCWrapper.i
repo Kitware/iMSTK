@@ -47,7 +47,7 @@
  * GeometryMappers
  */
 #include "imstkGeometryMap.h"
-#include "imstkOneToOneMap.h"
+#include "imstkPointwiseMap.h"
 #include "imstkTetraTriangleMap.h"
 
 /*
@@ -267,7 +267,7 @@ namespace std
  * GeometryMap
  */
 %include "../../GeometryMappers/imstkGeometryMap.h"
-%include "../../GeometryMappers/imstkOneToOneMap.h"
+%include "../../GeometryMappers/imstkPointwiseMap.h"
 %include "../../GeometryMappers/imstkTetraTriangleMap.h"
 
 /*

@@ -25,19 +25,19 @@ namespace imstk
 template<typename T, int N> class VecDataArray;
 
 ///
-/// \class OneToOneMap
+/// \class PointwiseMap
 ///
-/// \brief OneToOneMap can compute & apply a one-to-one mapping between parent
-/// and child PointSet geometries.
+/// \brief PointwiseMap can compute & apply a mapping between parent and
+/// child PointSet geometries.
 ///
-class OneToOneMap : public GeometryMap
+class PointwiseMap : public GeometryMap
 {
 public:
-    OneToOneMap();
-    OneToOneMap(
+    PointwiseMap();
+    PointwiseMap(
         std::shared_ptr<Geometry> parent,
         std::shared_ptr<Geometry> child);
-    ~OneToOneMap() override = default;
+    ~PointwiseMap() override = default;
 
     IMSTK_TYPE_NAME(OneToOneMap)
 
