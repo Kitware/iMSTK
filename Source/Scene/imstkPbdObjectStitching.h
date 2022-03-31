@@ -149,8 +149,6 @@ protected:
     ///
     void updateConstraints();
 
-    void updateDebug();
-
 protected:
     std::shared_ptr<TaskNode> m_stitchingNode = nullptr;
 

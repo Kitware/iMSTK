@@ -95,7 +95,7 @@ static std::vector<double>
 getWeights(const std::vector<VertexMassPair>& cellVerts, const Vec3d& pt)
 {
     std::vector<double> weights(cellVerts.size());
-    if (cellVerts.size() == IMSTK_TETRAHEDRON)
+    if (cellVerts.size() == 4)
     {
         const Vec4d baryCoord = baryCentric(pt,
             *cellVerts[0].vertex,
@@ -107,7 +107,7 @@ getWeights(const std::vector<VertexMassPair>& cellVerts, const Vec3d& pt)
         weights[2] = baryCoord[2];
         weights[3] = baryCoord[3];
     }
-    else if (cellVerts.size() == IMSTK_TRIANGLE)
+    else if (cellVerts.size() == 3)
     {
         const Vec3d baryCoord = baryCentric(pt,
             *cellVerts[0].vertex, *cellVerts[1].vertex, *cellVerts[2].vertex);
@@ -115,13 +115,13 @@ getWeights(const std::vector<VertexMassPair>& cellVerts, const Vec3d& pt)
         weights[1] = baryCoord[1];
         weights[2] = baryCoord[2];
     }
-    else if (cellVerts.size() == IMSTK_EDGE)
+    else if (cellVerts.size() == 2)
     {
         const Vec2d baryCoord = baryCentric(pt, *cellVerts[0].vertex, *cellVerts[1].vertex);
         weights[0] = baryCoord[0];
         weights[1] = baryCoord[1];
     }
-    else if (cellVerts.size() == IMSTK_VERTEX)
+    else if (cellVerts.size() == 1)
     {
         weights[0] = 1.0;
     }
@@ -264,20 +264,16 @@ PbdObjectStitching::addStitchConstraints()
         return;
     }
 
-    // ** Warning **, surface triangles are not 100% garunteed to tell inside/out
-    // Should use angle-weighted psuedonormals as done in MeshToMeshBruteForceCD
-    surfMesh->computeTrianglesNormals();
-    std::shared_ptr<VecDataArray<double, 3>> faceNormalsPtr = surfMesh->getCellNormals();
-    const VecDataArray<double, 3>& faceNormals = *faceNormalsPtr;
+    std::vector<std::pair<PickData, PickData>> constraintPair;
+    if (std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick) != nullptr)
+    {
+        // ** Warning **, surface triangles are not 100% garunteed to tell inside/out
+        // Should use angle-weighted psuedonormals as done in MeshToMeshBruteForceCD
+        surfMesh->computeTrianglesNormals();
+        std::shared_ptr<VecDataArray<double, 3>> faceNormalsPtr = surfMesh->getCellNormals();
+        const VecDataArray<double, 3>& faceNormals = *faceNormalsPtr;
 
-    // Digest the pick data based on grasp mode
-    if (m_mode == StitchMode::RayCell)
-    {
-    }
-    else if (m_mode == StitchMode::RayPoint)
-    {
         // Find all neighbor pairs with normals facing each other
-        std::vector<std::pair<PickData, PickData>> constraintPair;
         for (size_t i = 0, j = 1; i < pickData.size() - 1; i++, j++)
         {
             const Vec3d& pt_i = pickData[i].pickPoint;
@@ -296,33 +292,56 @@ PbdObjectStitching::addStitchConstraints()
             }
         }
 
-        if (tetMesh != nullptr && constraintPair.size() > 0)
+        // If no constraint pairs, no stitches can be placed
+        if (constraintPair.size() == 0)
         {
-            // We supplied a extracted SurfaceMesh to the picker so that it would only pick points
-            // along the boundary/surface of the tet mesh. We need to map these back to the tetrahedrons
-            // as the tetrahedrons are needed for the constraints instead of triangles
-            SurfaceToTetraMap mapper;
-            mapper.setParentGeometry(tetMesh);
-            mapper.setChildGeometry(surfMesh);
-            mapper.compute();
-
-            for (size_t i = 0; i < constraintPair.size(); i++)
-            {
-                PickData& pickData1 = constraintPair[i].first;
-                PickData& pickData2 = constraintPair[i].second;
-
-                // Get the tet id from the triangle id
-                pickData1.ids[0] = mapper.getParentTetId(pickData1.ids[0]);
-                pickData1.idCount = 1;
-                pickData1.cellType = IMSTK_TETRAHEDRON;
-
-                pickData2.ids[0] = mapper.getParentTetId(pickData2.ids[0]);
-                pickData2.idCount = 1;
-                pickData2.cellType = IMSTK_TETRAHEDRON;
-                // Leave pick point the same
-            }
+            return;
         }
 
+        // If we have a tet mesh and some results, map the picked surface triangles
+        // back to the tetrahedrons
+        SurfaceToTetraMap mapper;
+        mapper.setParentGeometry(tetMesh);
+        mapper.setChildGeometry(surfMesh);
+        mapper.compute();
+
+        for (size_t i = 0; i < constraintPair.size(); i++)
+        {
+            PickData& pickData1 = constraintPair[i].first;
+            PickData& pickData2 = constraintPair[i].second;
+
+            // Get the tet id from the triangle id
+            pickData1.ids[0] = mapper.getParentTetId(pickData1.ids[0]);
+            pickData1.idCount = 1;
+            pickData1.cellType = IMSTK_TETRAHEDRON;
+
+            pickData2.ids[0] = mapper.getParentTetId(pickData2.ids[0]);
+            pickData2.idCount = 1;
+            pickData2.cellType = IMSTK_TETRAHEDRON;
+            // Leave pick point the same
+        }
+    }
+    else if (std::dynamic_pointer_cast<SurfaceMesh>(pointSetToPick) != nullptr)
+    {
+        // For a SurfaceMesh just constrain every pair
+        for (size_t i = 0, j = 1; i < pickData.size() - 1; i++, j++)
+        {
+            constraintPair.push_back({ pickData[i], pickData[j] });
+        }
+    }
+
+    // Digest the pick data based on grasp mode
+    if (m_mode == StitchMode::RayCell)
+    {
+        // Constrain all vertices of the elements
+
+        // If a tetrahedron, use the mapped face
+
+        // If a surfacemesh just use the face
+    }
+    else if (m_mode == StitchMode::RayPoint)
+    {
+        // Constrain only the pick points between the two elements
         for (size_t i = 0; i < constraintPair.size(); i++)
         {
             const PickData& pickData1 = constraintPair[i].first;

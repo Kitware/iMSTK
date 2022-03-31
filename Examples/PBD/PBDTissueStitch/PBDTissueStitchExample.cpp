@@ -26,12 +26,16 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
+#include "imstkPbdObjectStitching.h"
+#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
+#include "imstkRigidBodyModel2.h"
+#include "imstkRigidObject2.h"
+#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -39,12 +43,6 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkRigidObjectController.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRbdConstraint.h"
-#include "imstkPbdObjectStitching.h"
-#include "imstkPlane.h"
 
 using namespace imstk;
 
@@ -68,25 +66,24 @@ using namespace imstk;
 static std::shared_ptr<TetrahedralMesh>
 makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
-    imstkNew<TetrahedralMesh> tissueMesh;
-
-    imstkNew<VecDataArray<double, 3>> verticesPtr(dim[0] * dim[1] * dim[2]);
-    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
-    const Vec3d                       dx       = size.cwiseQuotient((dim - Vec3i(1, 1, 1)).cast<double>());
+    auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1] * dim[2]);
+    VecDataArray<double, 3>& vertices = *verticesPtr;
+    const Vec3d dx = size.cwiseQuotient((dim - Vec3i(1, 1, 1)).cast<double>());
+    int iter = 0;
     for (int z = 0; z < dim[2]; z++)
     {
         for (int y = 0; y < dim[1]; y++)
         {
-            for (int x = 0; x < dim[0]; x++)
+            for (int x = 0; x < dim[0]; x++, iter++)
             {
-                vertices[x + dim[0] * (y + dim[1] * z)] = Vec3i(x, y, z).cast<double>().cwiseProduct(dx) - size * 0.5 + center;
+                vertices[iter] = Vec3i(x, y, z).cast<double>().cwiseProduct(dx) - size * 0.5 + center;
             }
         }
     }
 
     // Add connectivity data
-    imstkNew<VecDataArray<int, 4>> indicesPtr;
-    VecDataArray<int, 4>&          indices = *indicesPtr.get();
+    auto indicesPtr = std::make_shared<VecDataArray<int, 4>>();
+    VecDataArray<int, 4>& indices = *indicesPtr;
     for (int z = 0; z < dim[2] - 1; z++)
     {
         for (int y = 0; y < dim[1] - 1; y++)
@@ -126,8 +123,8 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
         }
     }
 
-    imstkNew<VecDataArray<float, 2>> uvCoordsPtr(dim[0] * dim[1] * dim[2]);
-    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
+    auto uvCoordsPtr = std::make_shared<VecDataArray<float, 2>>(dim[0] * dim[1] * dim[2]);
+    VecDataArray<float, 2>& uvCoords = *uvCoordsPtr;
     for (int z = 0; z < dim[2]; z++)
     {
         for (int y = 0; y < dim[1]; y++)
@@ -148,10 +145,79 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
         }
     }
 
-    tissueMesh->initialize(verticesPtr, indicesPtr);
-    tissueMesh->setVertexTCoords("uvs", uvCoordsPtr);
+    auto tetMesh = std::make_shared<TetrahedralMesh>();
+    tetMesh->initialize(verticesPtr, indicesPtr);
+    tetMesh->setVertexTCoords("uvs", uvCoordsPtr);
+    return tetMesh;
+}
 
-    return tissueMesh;
+///
+/// \brief Creates triangle grid geometry
+/// \param cloth width (x), height (z)
+/// \param cloth dimensions/divisions
+///
+static std::shared_ptr<SurfaceMesh>
+makeTriangleGrid(const Vec2d size,
+    const Vec2i dim,
+    const Vec3d center,
+    const double uvScale)
+{
+    auto verticesPtr= std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1]);
+    VecDataArray<double, 3>& vertices = *verticesPtr;
+    const Vec3d size3 = Vec3d(size[0], 0.0, size[1]);
+    const Vec3i dim3 = Vec3i(dim[0], 0, dim[1]);
+    Vec3d dx = size3.cwiseQuotient((dim3 - Vec3i(1, 0, 1)).cast<double>());
+    dx[1] = 0.0;
+    int iter = 0;
+    for (int y = 0; y < dim[1]; y++)
+    {
+        for (int x = 0; x < dim[0]; x++, iter++)
+        {
+            vertices[iter] = Vec3i(x, 0, y).cast<double>().cwiseProduct(dx) + center - size3 * 0.5;
+        }
+    }
+
+    // Add connectivity data
+    auto indicesPtr = std::make_shared<VecDataArray<int, 3>>();
+    VecDataArray<int, 3>& indices = *indicesPtr;
+    for (int y = 0; y < dim[1] - 1; y++)
+    {
+        for (int x = 0; x < dim[0] - 1; x++)
+        {
+            const int index1 = y * dim[0] + x;
+            const int index2 = index1 + dim[0];
+            const int index3 = index1 + 1;
+            const int index4 = index2 + 1;
+
+            // Interleave [/][\]
+            if (x % 2 ^ y % 2)
+            {
+                indices.push_back(Vec3i(index1, index2, index3));
+                indices.push_back(Vec3i(index4, index3, index2));
+            }
+            else
+            {
+                indices.push_back(Vec3i(index2, index4, index1));
+                indices.push_back(Vec3i(index4, index3, index1));
+            }
+        }
+    }
+
+    auto uvCoordsPtr = std::make_shared<VecDataArray<float, 2>>(dim[0] * dim[1]);
+    VecDataArray<float, 2>& uvCoords = *uvCoordsPtr;
+    iter = 0;
+    for (int y = 0; y < dim[1]; y++)
+    {
+        for (int x = 0; x < dim[0]; x++, iter++)
+        {
+            uvCoords[iter] = Vec2f(static_cast<float>(x) / dim[0], static_cast<float>(y) / dim[1]) * uvScale;
+        }
+    }
+
+    auto triMesh = std::make_shared<SurfaceMesh>();
+    triMesh->initialize(verticesPtr, indicesPtr);
+    triMesh->setVertexTCoords("uvs", uvCoordsPtr);
+    return triMesh;
 }
 
 ///
@@ -162,17 +228,17 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 /// \param center of tissue block
 ///
 static std::shared_ptr<PbdObject>
-makeTissueObj(const std::string& name,
-              const Vec3d& size, const Vec3i& dim, const Vec3d& center)
+makeTetTissueObj(const std::string& name,
+                 const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
-    imstkNew<PbdObject> tissueObj(name);
+    auto tissueObj = std::make_shared<PbdObject>(name);
 
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tissueMesh = makeTetGrid(size, dim, center);
     std::shared_ptr<SurfaceMesh>     surfMesh   = tissueMesh->extractSurfaceMesh();
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
+    auto pbdParams = std::make_shared<PbdModelConfig>();
 #ifdef USE_FEM
     // Use FEMTet constraints (42k - 85k for tissue, but we want
     // something much more stretchy to wrap)
@@ -206,12 +272,12 @@ makeTissueObj(const std::string& name,
     }
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
+    auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(tissueMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the material
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     material->setColor(Color(0.77, 0.53, 0.34));
     material->setEdgeColor(Color(0.87, 0.63, 0.44));
@@ -228,18 +294,72 @@ makeTissueObj(const std::string& name,
     return tissueObj;
 }
 
+static std::shared_ptr<PbdObject>
+makeTriTissueObj(const std::string& name,
+    const Vec2d& size, const Vec2i& dim, const Vec3d& center)
+{
+    auto tissueObj = std::make_shared<PbdObject>(name);
+
+    // Setup the Geometry
+    std::shared_ptr<SurfaceMesh> triMesh = makeTriangleGrid(size, dim, center, 1.0);
+
+    // Setup the Parameters
+    auto pbdParams = std::make_shared<PbdModelConfig>();
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6);
+    pbdParams->m_uniformMassValue = 0.00001;
+    pbdParams->m_gravity = Vec3d(0.0, 0.0, 0.0);
+    pbdParams->m_dt = 0.001;
+    pbdParams->m_iterations = 5;
+    pbdParams->m_viscousDampingCoeff = 0.025;
+
+    // Fix the borders
+    for (int y = 0; y < dim[1]; y++)
+    {
+        for (int x = 0; x < dim[0]; x++)
+        {
+            if (x == 0)
+            {
+                pbdParams->m_fixedNodeIds.push_back(x + dim[0] * y);
+            }
+        }
+    }
+
+    // Setup the Model
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->setModelGeometry(triMesh);
+    pbdModel->configure(pbdParams);
+
+    // Setup the VisualModel
+    auto material = std::make_shared<RenderMaterial>();
+    material->setBackFaceCulling(false);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    material->setColor(Color(0.77, 0.53, 0.34));
+    material->setEdgeColor(Color(0.87, 0.63, 0.44));
+    material->setOpacity(0.5);
+
+    // Setup the Object
+    tissueObj->setVisualGeometry(triMesh);
+    tissueObj->getVisualModel(0)->setRenderMaterial(material);
+    tissueObj->setPhysicsGeometry(triMesh);
+    tissueObj->setCollidingGeometry(triMesh);
+    tissueObj->setDynamicalModel(pbdModel);
+
+    return tissueObj;
+}
+
 static std::shared_ptr<RigidObject2>
 makeToolObj()
 {
-    imstkNew<LineMesh> toolGeom;
-    imstkNew<VecDataArray<double, 3>> verticesPtr(2);
+    auto toolGeom = std::make_shared<LineMesh>();
+    auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(2);
     (*verticesPtr)[0] = Vec3d(0.0, -0.05, 0.0);
     (*verticesPtr)[1] = Vec3d(0.0, 0.05, 0.0);
-    imstkNew<VecDataArray<int, 2>> indicesPtr(1);
+    auto indicesPtr = std::make_shared<VecDataArray<int, 2>>(1);
     (*indicesPtr)[0] = Vec2i(0, 1);
     toolGeom->initialize(verticesPtr, indicesPtr);
 
-    imstkNew<RigidObject2> toolObj("ToolObj");
+    auto toolObj = std::make_shared<RigidObject2>("ToolObj");
     toolObj->setVisualGeometry(toolGeom);
     toolObj->setCollidingGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
@@ -249,7 +369,7 @@ makeToolObj()
     toolObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
     toolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
-    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
+    auto rbdModel = std::make_shared<RigidBodyModel2>();
     rbdModel->getConfig()->m_gravity = Vec3d::Zero();
     rbdModel->getConfig()->m_maxNumIterations = 5;
     toolObj->setDynamicalModel(rbdModel);
@@ -262,8 +382,7 @@ makeToolObj()
 }
 
 ///
-/// \brief This example demonstrates collision interaction with a 3d pbd
-/// simulated tissue (tetrahedral)
+/// \brief This example demonstrates stitching interaction with pbd tissues
 ///
 int
 main()
@@ -272,6 +391,8 @@ main()
     Logger::startLogger();
 
     const double capsuleRadius = 0.02;
+    const bool useThinTissue = false;
+    const double tissueLength = 0.15;
 
     // Setup the scene
     auto scene = std::make_shared<Scene>("PbdTissueStitch");
@@ -280,11 +401,22 @@ main()
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
     // Setup a tet tissue
-    const double tissueLength = 0.15;
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
-        Vec3d(tissueLength, 0.01, 0.07), Vec3i(15, 2, 5), Vec3d(tissueLength * 0.5, -0.01 - capsuleRadius, 0.0));
+    std::shared_ptr<PbdObject> tissueObj = nullptr;
+    if (useThinTissue)
+    {
+        tissueObj = makeTriTissueObj("Tissue",
+            Vec2d(tissueLength, 0.07), Vec2i(15, 5),
+            Vec3d(tissueLength * 0.5, -0.01 - capsuleRadius, 0.0));
+    }
+    else
+    {
+        tissueObj = makeTetTissueObj("Tissue",
+            Vec3d(tissueLength, 0.01, 0.07), Vec3i(15, 2, 5),
+            Vec3d(tissueLength * 0.5, -0.01 - capsuleRadius, 0.0));
+    }
     scene->addSceneObject(tissueObj);
 
+    // Setup a capsule to wrap around
     auto cdObj       = std::make_shared<CollidingObject>("Bone");
     auto capsuleGeom = std::make_shared<Capsule>();
     capsuleGeom->setPosition(0.0, 0.0, 0.0);
@@ -321,37 +453,45 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
         viewer->setDebugAxesLength(0.001, 0.001, 0.001);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
 #ifdef USE_HAPTICS
-        imstkNew<HapticDeviceManager> hapticManager;
+        auto hapticManager = std::make_shared<HapticDeviceManager>();
         hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
         std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 #else
-        imstkNew<DummyClient> deviceClient("deviceClient");
+        auto deviceClient = std::make_shared<DummyClient>();
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
             {
                 const Vec2d& pos = viewer->getMouseDevice()->getPos();
-                deviceClient->setPosition(Vec3d(37.0, 0.0, -(pos[1] * 100.0 - 50.0)));
-                deviceClient->setOrientation(Quatd(Rotd(0.65, Vec3d(0.0, 0.0, 1.0))));
+                if (useThinTissue)
+                {
+                    deviceClient->setPosition(Vec3d(40.0, 40.0, -(pos[1] * 100.0 - 50.0)));
+                    deviceClient->setOrientation(Quatd(Rotd(-0.6, Vec3d(0.0, 0.0, 1.0))));
+                }
+                else
+                {
+                    deviceClient->setPosition(Vec3d(37.0, 0.0, -(pos[1] * 100.0 - 50.0)));
+                    deviceClient->setOrientation(Quatd(Rotd(0.65, Vec3d(0.0, 0.0, 1.0))));
+                }
             });
 #endif
 
-        imstkNew<RigidObjectController> controller(toolObj, deviceClient);
+        auto controller = std::make_shared<RigidObjectController>(toolObj, deviceClient);
         controller->setTranslationScaling(0.001);
         controller->setLinearKs(1000.0);
         controller->setAngularKs(10000000.0);
@@ -362,7 +502,7 @@ main()
         scene->addController(controller);
 
 #ifdef USE_HAPTICS
-        connect<ButtonEvent>(hapticDeviceClient, &HapticDeviceClient::buttonStateChanged,
+        connect<ButtonEvent>(deviceClient, &HapticDeviceClient::buttonStateChanged,
             [&](ButtonEvent* e)
             {
                 if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
@@ -375,23 +515,17 @@ main()
             });
 #endif
 
-        // Toggle gravity, perform stitch, & reset
         double t = 0.0;
         connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
             [&](KeyEvent* e)
             {
+                // Toggle gravity
                 if (e->m_key == 'g')
                 {
                     Vec3d& g = tissueObj->getPbdModel()->getConfig()->m_gravity;
-                    if (g.norm() > 0.0)
-                    {
-                        tissueObj->getPbdModel()->getConfig()->m_gravity = Vec3d(0.0, 0.0, 0.0);
-                    }
-                    else
-                    {
-                        tissueObj->getPbdModel()->getConfig()->m_gravity = Vec3d(0.0, -1.0, 0.0);
-                    }
+                    g = Vec3d(0.0, -static_cast<double>(!(g.norm() > 0.0)), 0.0);
                 }
+                // Perform stitch
                 else if (e->m_key == 's')
                 {
                     auto toolGeom = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
@@ -399,6 +533,7 @@ main()
                     const Vec3d& v2 = toolGeom->getVertexPosition(1);
                     stitching->beginRayPointStitch(v1, (v2 - v1).normalized());
                 }
+                // Reset
                 else if (e->m_key == 'r')
                 {
                     t = 0.0;
@@ -408,9 +543,9 @@ main()
         // Record the intial positions
         std::vector<Vec3d> initPositions;
 
-        auto tetMesh =
-            std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
-        std::shared_ptr<VecDataArray<double, 3>> verticesPtr = tetMesh->getVertexPositions();
+        auto pointMesh =
+            std::dynamic_pointer_cast<PointSet>(tissueObj->getPhysicsGeometry());
+        std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointMesh->getVertexPositions();
         VecDataArray<double, 3>& vertices = *verticesPtr;
         const std::vector<size_t> fixedNodes = tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds;
         for (size_t i = 0; i < fixedNodes.size(); i++)
@@ -441,10 +576,7 @@ main()
                     if (!stopped)
                     {
                         stopped = true;
-                        for (size_t i = 0; i < fixedNodes.size(); i++)
-                        {
-                            tissueObj->getPbdModel()->setPointUnfixed(fixedNodes[i]);
-                        }
+                        tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds.clear();
 
                         // Clear and reinit all constraints
                         tissueObj->initialize();
@@ -454,11 +586,11 @@ main()
 
         // Add mouse and keyboard controls to the viewer
         {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
