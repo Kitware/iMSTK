@@ -43,12 +43,12 @@ public:
 
     ///
     /// \brief Compute tet vertex id to surf vertex id map
-    /// 
+    ///
     void computeTriToTetMap(std::unordered_map<int, int>& triToTetMap);
 
     ///
     /// \brief Get the tet id that contains the triangle
-    /// 
+    ///
     int getParentTetId(const int triId) const;
 
 public:

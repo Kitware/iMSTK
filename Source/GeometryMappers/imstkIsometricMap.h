@@ -36,11 +36,12 @@ class IsometricMap : public GeometryMap
 public:
     IsometricMap() = default;
     IsometricMap(std::shared_ptr<Geometry> parent,
-        std::shared_ptr<Geometry> child)
+                 std::shared_ptr<Geometry> child)
     {
         this->setParentGeometry(parent);
         this->setChildGeometry(child);
     }
+
     ~IsometricMap() override = default;
 
     IMSTK_TYPE_NAME(IsometricMap)

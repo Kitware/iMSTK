@@ -58,7 +58,7 @@ getCubePoints()
 
     return verticesPtr;
 }
-}
+} // namespace
 
 TEST(imstkOneToOneMapTest, SimpleMap)
 {
@@ -126,7 +126,6 @@ TEST(imstkOneToOneMapTest, OneToManyMap)
     points->push_back(Vec3d(0.5, 0.5, -0.5));
     points->push_back(Vec3d(0.5, 0.5, -0.5) * 10);
     child->initialize(points);
-
 
     OneToOneMap map;
     map.setParentGeometry(parent);

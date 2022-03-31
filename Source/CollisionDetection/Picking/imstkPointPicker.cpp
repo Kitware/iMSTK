@@ -34,15 +34,15 @@ namespace imstk
 void
 PointPicker::requestUpdate()
 {
-    // Use for sorting 
+    // Use for sorting
     // \todo: Could also parameterize by distance to avoid recomputation
     //  if dealing with many intersections
     auto pred = [&](const PickData& a, const PickData& b)
-    {
-        const double sqrDistA = (a.pickPoint - m_rayStart).squaredNorm();
-        const double sqrDistB = (b.pickPoint - m_rayStart).squaredNorm();
-        return sqrDistA < sqrDistB;
-    };
+                {
+                    const double sqrDistA = (a.pickPoint - m_rayStart).squaredNorm();
+                    const double sqrDistB = (b.pickPoint - m_rayStart).squaredNorm();
+                    return sqrDistA < sqrDistB;
+                };
     std::set<PickData, decltype(pred)> resultSet(pred);
 
     std::shared_ptr<Geometry> geomToPick = getInput(0);
@@ -208,18 +208,18 @@ PointPicker::requestUpdate()
     if (m_useFirstHit)
     {
         // Start at max, unless you get under this it won't select
-        double minSqrDist = useMaxDist ? maxSqrDist : IMSTK_DOUBLE_MAX;
+        double   minSqrDist = useMaxDist ? maxSqrDist : IMSTK_DOUBLE_MAX;
         PickData results;
-        bool resultsFound = false;
+        bool     resultsFound = false;
         for (const auto& pickData : resultSet)
         {
             // Possibly parameterize all by t and use that here instead
             const double sqrDist = (pickData.pickPoint - m_rayStart).squaredNorm();
             if (sqrDist <= minSqrDist)
             {
-                results = pickData;
+                results      = pickData;
                 resultsFound = true;
-                minSqrDist = sqrDist;
+                minSqrDist   = sqrDist;
             }
         }
 

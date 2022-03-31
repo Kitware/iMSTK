@@ -46,7 +46,7 @@ namespace imstk
 struct MeshSide
 {
     MeshSide(VecDataArray<double, 3>& verticest, VecDataArray<double, 3>& velocitiest, DataArray<double>& invMassest,
-        AbstractDataArray* indicesPtrt, OneToOneMap* mapt) : vertices(verticest), velocities(velocitiest),
+             AbstractDataArray* indicesPtrt, OneToOneMap* mapt) : vertices(verticest), velocities(velocitiest),
         invMasses(invMassest), indicesPtr(indicesPtrt), map(mapt)
     {
     }
@@ -149,7 +149,7 @@ PbdObjectStitching::beginRayPointStitch(const Vec3d& rayStart, const Vec3d& rayD
     auto pointPicker = std::make_shared<PointPicker>();
     pointPicker->setPickingRay(rayStart, rayDir, maxDist);
     m_pickMethod = pointPicker;
-    m_mode = StitchMode::RayPoint;
+    m_mode       = StitchMode::RayPoint;
 
     m_isStitching = true;
     LOG(INFO) << "Begin stitch";
@@ -222,36 +222,36 @@ PbdObjectStitching::addStitchConstraints()
         map);
 
     auto getCellVerts = [&](const PickData& data)
-    {
-        const CellTypeId pickedCellType = data.cellType;
+                        {
+                            const CellTypeId pickedCellType = data.cellType;
 
-        std::vector<std::pair<int, VertexMassPair>> cellIdVerts;
-        if (pickedCellType == IMSTK_TETRAHEDRON)
-        {
-            cellIdVerts = getElement<4>(data, meshStruct);
-        }
-        else if (pickedCellType == IMSTK_TRIANGLE)
-        {
-            cellIdVerts = getElement<3>(data, meshStruct);
-        }
-        else if (pickedCellType == IMSTK_EDGE)
-        {
-            cellIdVerts = getElement<2>(data, meshStruct);
-        }
-        std::vector<VertexMassPair> cellVerts(cellIdVerts.size());
-        for (size_t j = 0; j < cellIdVerts.size(); j++)
-        {
-            cellVerts[j] = cellIdVerts[j].second;
-        }
-        return cellVerts;
-    };
+                            std::vector<std::pair<int, VertexMassPair>> cellIdVerts;
+                            if (pickedCellType == IMSTK_TETRAHEDRON)
+                            {
+                                cellIdVerts = getElement<4>(data, meshStruct);
+                            }
+                            else if (pickedCellType == IMSTK_TRIANGLE)
+                            {
+                                cellIdVerts = getElement<3>(data, meshStruct);
+                            }
+                            else if (pickedCellType == IMSTK_EDGE)
+                            {
+                                cellIdVerts = getElement<2>(data, meshStruct);
+                            }
+                            std::vector<VertexMassPair> cellVerts(cellIdVerts.size());
+                            for (size_t j = 0; j < cellIdVerts.size(); j++)
+                            {
+                                cellVerts[j] = cellIdVerts[j].second;
+                            }
+                            return cellVerts;
+                        };
 
     auto pointPicker = std::dynamic_pointer_cast<PointPicker>(m_pickMethod);
     pointPicker->setUseFirstHit(false);
 
     // Perform the picking only on surface data
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(pointSetToPick);
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick);
+    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick);
     if (tetMesh != nullptr)
     {
         surfMesh = tetMesh->extractSurfaceMesh();
@@ -271,16 +271,16 @@ PbdObjectStitching::addStitchConstraints()
         // Should use angle-weighted psuedonormals as done in MeshToMeshBruteForceCD
         surfMesh->computeTrianglesNormals();
         std::shared_ptr<VecDataArray<double, 3>> faceNormalsPtr = surfMesh->getCellNormals();
-        const VecDataArray<double, 3>& faceNormals = *faceNormalsPtr;
+        const VecDataArray<double, 3>&           faceNormals    = *faceNormalsPtr;
 
         // Find all neighbor pairs with normals facing each other
         for (size_t i = 0, j = 1; i < pickData.size() - 1; i++, j++)
         {
-            const Vec3d& pt_i = pickData[i].pickPoint;
-            const Vec3d& pt_j = pickData[j].pickPoint;
+            const Vec3d& pt_i     = pickData[i].pickPoint;
+            const Vec3d& pt_j     = pickData[j].pickPoint;
             const Vec3d& normal_i = faceNormals[pickData[i].ids[0]];
             const Vec3d& normal_j = faceNormals[pickData[j].ids[0]];
-            const Vec3d diff = pt_j - pt_i;
+            const Vec3d  diff     = pt_j - pt_i;
 
             //bool faceOpposite = (normal_i.dot(normal_j) < 0.0);
             bool faceInwards = (diff.dot(normal_i) > 0.0) && (diff.dot(normal_j) < 0.0);
@@ -311,12 +311,12 @@ PbdObjectStitching::addStitchConstraints()
             PickData& pickData2 = constraintPair[i].second;
 
             // Get the tet id from the triangle id
-            pickData1.ids[0] = mapper.getParentTetId(pickData1.ids[0]);
-            pickData1.idCount = 1;
+            pickData1.ids[0]   = mapper.getParentTetId(pickData1.ids[0]);
+            pickData1.idCount  = 1;
             pickData1.cellType = IMSTK_TETRAHEDRON;
 
-            pickData2.ids[0] = mapper.getParentTetId(pickData2.ids[0]);
-            pickData2.idCount = 1;
+            pickData2.ids[0]   = mapper.getParentTetId(pickData2.ids[0]);
+            pickData2.idCount  = 1;
             pickData2.cellType = IMSTK_TETRAHEDRON;
             // Leave pick point the same
         }
@@ -348,9 +348,9 @@ PbdObjectStitching::addStitchConstraints()
             const PickData& pickData2 = constraintPair[i].second;
 
             std::vector<VertexMassPair> cellVerts1 = getCellVerts(pickData1);
-            std::vector<double> weights1 = getWeights(cellVerts1, pickData1.pickPoint);
+            std::vector<double>         weights1   = getWeights(cellVerts1, pickData1.pickPoint);
             std::vector<VertexMassPair> cellVerts2 = getCellVerts(pickData2);
-            std::vector<double> weights2 = getWeights(cellVerts2, pickData2.pickPoint);
+            std::vector<double>         weights2   = getWeights(cellVerts2, pickData2.pickPoint);
 
             // Cell to single point constraint
             addConstraint(

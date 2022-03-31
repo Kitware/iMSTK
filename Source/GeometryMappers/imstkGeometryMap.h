@@ -48,7 +48,7 @@ public:
 
     ///
     /// \brief Compute the map, usually called once on startup
-    /// 
+    ///
     virtual void compute() = 0;
 
     ///

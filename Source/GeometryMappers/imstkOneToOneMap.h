@@ -48,7 +48,7 @@ public:
 
     ///
     /// \brief Compute tet vertex id to surf vertex id map
-    /// 
+    ///
     void computeMap(std::unordered_map<int, int>& tetVertToSurfVertMap);
 
     ///
@@ -69,7 +69,7 @@ public:
     ///@{
     void setTolerance(const double tolerance) { m_epsilon = tolerance; }
     double getTolerance() const { return m_epsilon; }
-    ///@}
+///@}
 
 protected:
     ///

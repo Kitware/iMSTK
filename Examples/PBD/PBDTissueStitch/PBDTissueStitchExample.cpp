@@ -66,10 +66,10 @@ using namespace imstk;
 static std::shared_ptr<TetrahedralMesh>
 makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
-    auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1] * dim[2]);
-    VecDataArray<double, 3>& vertices = *verticesPtr;
-    const Vec3d dx = size.cwiseQuotient((dim - Vec3i(1, 1, 1)).cast<double>());
-    int iter = 0;
+    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1] * dim[2]);
+    VecDataArray<double, 3>& vertices    = *verticesPtr;
+    const Vec3d              dx   = size.cwiseQuotient((dim - Vec3i(1, 1, 1)).cast<double>());
+    int                      iter = 0;
     for (int z = 0; z < dim[2]; z++)
     {
         for (int y = 0; y < dim[1]; y++)
@@ -82,8 +82,8 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
     }
 
     // Add connectivity data
-    auto indicesPtr = std::make_shared<VecDataArray<int, 4>>();
-    VecDataArray<int, 4>& indices = *indicesPtr;
+    auto                  indicesPtr = std::make_shared<VecDataArray<int, 4>>();
+    VecDataArray<int, 4>& indices    = *indicesPtr;
     for (int z = 0; z < dim[2] - 1; z++)
     {
         for (int y = 0; y < dim[1] - 1; y++)
@@ -123,8 +123,8 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
         }
     }
 
-    auto uvCoordsPtr = std::make_shared<VecDataArray<float, 2>>(dim[0] * dim[1] * dim[2]);
-    VecDataArray<float, 2>& uvCoords = *uvCoordsPtr;
+    auto                    uvCoordsPtr = std::make_shared<VecDataArray<float, 2>>(dim[0] * dim[1] * dim[2]);
+    VecDataArray<float, 2>& uvCoords    = *uvCoordsPtr;
     for (int z = 0; z < dim[2]; z++)
     {
         for (int y = 0; y < dim[1]; y++)
@@ -157,16 +157,16 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 /// \param cloth dimensions/divisions
 ///
 static std::shared_ptr<SurfaceMesh>
-makeTriangleGrid(const Vec2d size,
-    const Vec2i dim,
-    const Vec3d center,
-    const double uvScale)
+makeTriangleGrid(const Vec2d  size,
+                 const Vec2i  dim,
+                 const Vec3d  center,
+                 const double uvScale)
 {
-    auto verticesPtr= std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1]);
-    VecDataArray<double, 3>& vertices = *verticesPtr;
-    const Vec3d size3 = Vec3d(size[0], 0.0, size[1]);
-    const Vec3i dim3 = Vec3i(dim[0], 0, dim[1]);
-    Vec3d dx = size3.cwiseQuotient((dim3 - Vec3i(1, 0, 1)).cast<double>());
+    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1]);
+    VecDataArray<double, 3>& vertices    = *verticesPtr;
+    const Vec3d              size3       = Vec3d(size[0], 0.0, size[1]);
+    const Vec3i              dim3 = Vec3i(dim[0], 0, dim[1]);
+    Vec3d                    dx   = size3.cwiseQuotient((dim3 - Vec3i(1, 0, 1)).cast<double>());
     dx[1] = 0.0;
     int iter = 0;
     for (int y = 0; y < dim[1]; y++)
@@ -178,8 +178,8 @@ makeTriangleGrid(const Vec2d size,
     }
 
     // Add connectivity data
-    auto indicesPtr = std::make_shared<VecDataArray<int, 3>>();
-    VecDataArray<int, 3>& indices = *indicesPtr;
+    auto                  indicesPtr = std::make_shared<VecDataArray<int, 3>>();
+    VecDataArray<int, 3>& indices    = *indicesPtr;
     for (int y = 0; y < dim[1] - 1; y++)
     {
         for (int x = 0; x < dim[0] - 1; x++)
@@ -203,8 +203,8 @@ makeTriangleGrid(const Vec2d size,
         }
     }
 
-    auto uvCoordsPtr = std::make_shared<VecDataArray<float, 2>>(dim[0] * dim[1]);
-    VecDataArray<float, 2>& uvCoords = *uvCoordsPtr;
+    auto                    uvCoordsPtr = std::make_shared<VecDataArray<float, 2>>(dim[0] * dim[1]);
+    VecDataArray<float, 2>& uvCoords    = *uvCoordsPtr;
     iter = 0;
     for (int y = 0; y < dim[1]; y++)
     {
@@ -296,7 +296,7 @@ makeTetTissueObj(const std::string& name,
 
 static std::shared_ptr<PbdObject>
 makeTriTissueObj(const std::string& name,
-    const Vec2d& size, const Vec2i& dim, const Vec3d& center)
+                 const Vec2d& size, const Vec2i& dim, const Vec3d& center)
 {
     auto tissueObj = std::make_shared<PbdObject>(name);
 
@@ -308,8 +308,8 @@ makeTriTissueObj(const std::string& name,
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6);
     pbdParams->m_uniformMassValue = 0.00001;
-    pbdParams->m_gravity = Vec3d(0.0, 0.0, 0.0);
-    pbdParams->m_dt = 0.001;
+    pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
+    pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
     pbdParams->m_viscousDampingCoeff = 0.025;
 
@@ -351,7 +351,7 @@ makeTriTissueObj(const std::string& name,
 static std::shared_ptr<RigidObject2>
 makeToolObj()
 {
-    auto toolGeom = std::make_shared<LineMesh>();
+    auto toolGeom    = std::make_shared<LineMesh>();
     auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(2);
     (*verticesPtr)[0] = Vec3d(0.0, -0.05, 0.0);
     (*verticesPtr)[1] = Vec3d(0.0, 0.05, 0.0);
@@ -391,8 +391,8 @@ main()
     Logger::startLogger();
 
     const double capsuleRadius = 0.02;
-    const bool useThinTissue = false;
-    const double tissueLength = 0.15;
+    const bool   useThinTissue = false;
+    const double tissueLength  = 0.15;
 
     // Setup the scene
     auto scene = std::make_shared<Scene>("PbdTissueStitch");
@@ -507,7 +507,7 @@ main()
             {
                 if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
                 {
-                    auto toolGeom = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                    auto toolGeom   = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
                     const Vec3d& v1 = toolGeom->getVertexPosition(0);
                     const Vec3d& v2 = toolGeom->getVertexPosition(1);
                     stitching->beginRayPointStitch(v1, (v2 - v1).normalized());
@@ -528,7 +528,7 @@ main()
                 // Perform stitch
                 else if (e->m_key == 's')
                 {
-                    auto toolGeom = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                    auto toolGeom   = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
                     const Vec3d& v1 = toolGeom->getVertexPosition(0);
                     const Vec3d& v2 = toolGeom->getVertexPosition(1);
                     stitching->beginRayPointStitch(v1, (v2 - v1).normalized());
@@ -546,8 +546,8 @@ main()
         auto pointMesh =
             std::dynamic_pointer_cast<PointSet>(tissueObj->getPhysicsGeometry());
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointMesh->getVertexPositions();
-        VecDataArray<double, 3>& vertices = *verticesPtr;
-        const std::vector<size_t> fixedNodes = tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds;
+        VecDataArray<double, 3>&                 vertices    = *verticesPtr;
+        const std::vector<size_t>                fixedNodes  = tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds;
         for (size_t i = 0; i < fixedNodes.size(); i++)
         {
             initPositions.push_back(vertices[fixedNodes[i]]);
@@ -565,7 +565,7 @@ main()
                     for (size_t i = 0; i < fixedNodes.size(); i++)
                     {
                         Vec3d initPos = initPositions[i];
-                        Vec3d& pos = vertices[fixedNodes[i]];
+                        Vec3d& pos    = vertices[fixedNodes[i]];
 
                         const double r = (capsuleGeom->getPosition().head<2>() - initPos.head<2>()).norm();
                         pos = Vec3d(-sin(t) * r, -cos(t) * r, initPos[2]);

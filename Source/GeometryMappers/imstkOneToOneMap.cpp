@@ -25,6 +25,7 @@ OneToOneMap::OneToOneMap()
     setRequiredInputType<PointSet>(0);
     setRequiredInputType<PointSet>(1);
 }
+
 OneToOneMap::OneToOneMap(
     std::shared_ptr<Geometry> parent,
     std::shared_ptr<Geometry> child)
@@ -68,12 +69,12 @@ OneToOneMap::computeMap(std::unordered_map<int, int>& tetVertToSurfVertMap)
     }
 
     auto meshParent = std::dynamic_pointer_cast<PointSet>(getParentGeometry());
-    auto meshChild = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
+    auto meshChild  = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
 
     std::shared_ptr<VecDataArray<double, 3>> parentVerticesPtr = meshParent->getVertexPositions();
-    const VecDataArray<double, 3>& parentVertices = *parentVerticesPtr;
-    std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr = meshChild->getVertexPositions();
-    const VecDataArray<double, 3>& childVertices = *childVerticesPtr;
+    const VecDataArray<double, 3>&           parentVertices    = *parentVerticesPtr;
+    std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr  = meshChild->getVertexPositions();
+    const VecDataArray<double, 3>&           childVertices     = *childVerticesPtr;
 
     // For every vertex on the child, find corresponding one on the parent
     ParallelUtils::SpinLock lock;
@@ -125,7 +126,7 @@ void
 OneToOneMap::requestUpdate()
 {
     auto meshParent = std::dynamic_pointer_cast<PointSet>(getParentGeometry());
-    auto meshChild = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
+    auto meshChild  = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
 
     // Check data
     CHECK(m_oneToOneMap.size() == m_oneToOneMapVector.size()) << "Internal data is corrupted";

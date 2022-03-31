@@ -25,6 +25,7 @@ SurfaceToTetraMap::SurfaceToTetraMap()
     setRequiredInputType<TetrahedralMesh>(0);
     setRequiredInputType<SurfaceMesh>(1);
 }
+
 SurfaceToTetraMap::SurfaceToTetraMap(
     std::shared_ptr<Geometry> parent,
     std::shared_ptr<Geometry> child)
@@ -54,18 +55,18 @@ SurfaceToTetraMap::computeTriToTetMap(std::unordered_map<int, int>& triToTetMap)
         Vec3i(0, 1, 2), Vec3i(0, 1, 3), Vec3i(0, 2, 3), Vec3i(1, 2, 3)
     };
 
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
+    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(getChildGeometry());
 
     //std::shared_ptr<VecDataArray<double, 3>> tetVerticesPtr = tetMesh->getVertexPositions();
     //const VecDataArray<double, 3>& tetVertices = *tetVerticesPtr;
     std::shared_ptr<VecDataArray<int, 4>> tetIndicesPtr = tetMesh->getTetrahedraIndices();
-    const VecDataArray<int, 4>& tetIndices = *tetIndicesPtr;
+    const VecDataArray<int, 4>&           tetIndices    = *tetIndicesPtr;
 
     //std::shared_ptr<VecDataArray<double, 3>> surfVerticesPtr = surfMesh->getVertexPositions();
     //const VecDataArray<double, 3>& surfVertices = *surfVerticesPtr;
     std::shared_ptr<VecDataArray<int, 3>> surfIndicesPtr = surfMesh->getTriangleIndices();
-    const VecDataArray<int, 3>& surfIndices = *surfIndicesPtr;
+    const VecDataArray<int, 3>&           surfIndices    = *surfIndicesPtr;
 
     // Brute force
     for (int i = 0; i < surfIndices.size(); i++)
@@ -108,4 +109,4 @@ SurfaceToTetraMap::getParentTetId(const int triId) const
     auto citer = m_triToTetMap.find(triId);
     return (citer != m_triToTetMap.end()) ? citer->second : -1;
 }
-}
+} // namespace imstk

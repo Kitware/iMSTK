@@ -75,7 +75,7 @@ protected:
     int findClosestTetrahedron(const Vec3d& pos) const;
 
 protected:
-    std::vector<Vec4d> m_verticesWeights;           ///> weights
+    std::vector<Vec4d> m_verticesWeights;        ///> weights
 
     std::vector<int> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
 

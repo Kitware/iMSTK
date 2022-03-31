@@ -242,7 +242,7 @@ TEST(imstkPointerPickerTest, PickFirstHit)
 
 ///
 /// \brief Test that the intersection points are ordered by distance along the ray
-/// 
+///
 TEST(imstkPointerPickerTest, PickOrder)
 {
     auto surfMesh = std::make_shared<SurfaceMesh>();

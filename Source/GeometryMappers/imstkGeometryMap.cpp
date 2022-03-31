@@ -36,4 +36,4 @@ GeometryMap::GeometryMap()
     // Set 1 output port, the child
     setNumOutputPorts(1);
 }
-}
+} // namespace imstk

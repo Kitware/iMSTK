@@ -32,6 +32,7 @@ TetraTriangleMap::TetraTriangleMap() : m_boundingBoxAvailable(false)
     setRequiredInputType<TetrahedralMesh>(0);
     setRequiredInputType<PointSet>(1);
 }
+
 TetraTriangleMap::TetraTriangleMap(
     std::shared_ptr<Geometry> parent,
     std::shared_ptr<Geometry> child)
@@ -108,7 +109,7 @@ TetraTriangleMap::compute()
 void
 TetraTriangleMap::requestUpdate()
 {
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
+    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     auto pointSet = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
 
     VecDataArray<double, 3>& vertices = *m_childVerts;
@@ -135,8 +136,8 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 {
     auto   tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     double closestDistanceSqr = IMSTK_DOUBLE_MAX;
-    int closestTetrahedron = IMSTK_INT_MAX;
-    Vec3d center(0.0, 0.0, 0.0);
+    int    closestTetrahedron = IMSTK_INT_MAX;
+    Vec3d  center(0.0, 0.0, 0.0);
 
     for (int tetId = 0; tetId < tetMesh->getNumTetrahedra(); tetId++)
     {
@@ -162,14 +163,14 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 int
 TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 {
-    auto   tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
-    int enclosingTetrahedron = IMSTK_INT_MAX;
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
+    int  enclosingTetrahedron = IMSTK_INT_MAX;
 
     for (int idx = 0; idx < tetMesh->getNumTetrahedra(); idx++)
     {
         const bool inBox = (pos[0] >= m_bBoxMin[idx][0] && pos[0] <= m_bBoxMax[idx][0])
-                     && (pos[1] >= m_bBoxMin[idx][1] && pos[1] <= m_bBoxMax[idx][1])
-                     && (pos[2] >= m_bBoxMin[idx][2] && pos[2] <= m_bBoxMax[idx][2]);
+                           && (pos[1] >= m_bBoxMin[idx][1] && pos[1] <= m_bBoxMax[idx][1])
+                           && (pos[2] >= m_bBoxMin[idx][2] && pos[2] <= m_bBoxMax[idx][2]);
 
         // If the point is outside the bounding box, it is for sure not inside
         // the element
