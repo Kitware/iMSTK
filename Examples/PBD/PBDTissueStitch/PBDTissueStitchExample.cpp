@@ -46,10 +46,9 @@
 
 using namespace imstk;
 
-#define USE_FEM
-//#define USE_HAPTICS
+// #define USE_THIN_TISSUE
 
-#ifdef USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #else
@@ -155,6 +154,8 @@ makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 /// \brief Creates triangle grid geometry
 /// \param cloth width (x), height (z)
 /// \param cloth dimensions/divisions
+/// \param center of tissue/translation control
+/// \param tex coord scale
 ///
 static std::shared_ptr<SurfaceMesh>
 makeTriangleGrid(const Vec2d  size,
@@ -221,7 +222,7 @@ makeTriangleGrid(const Vec2d  size,
 }
 
 ///
-/// \brief Creates tissue object
+/// \brief Creates tetrahedral tissue object
 /// \param name
 /// \param physical dimension of tissue
 /// \param dimensions of tetrahedral grid used for tissue
@@ -239,16 +240,13 @@ makeTetTissueObj(const std::string& name,
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
-#ifdef USE_FEM
     // Use FEMTet constraints (42k - 85k for tissue, but we want
     // something much more stretchy to wrap)
     pbdParams->m_femParams->m_YoungModulus = 1000.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.4; // 0.48 for tissue
     pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
-#else
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 0.01);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.4);
-#endif
+    /* pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 0.01);
+     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.4);*/
     pbdParams->m_doPartitioning   = false;
     pbdParams->m_uniformMassValue = 0.00001;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
@@ -294,6 +292,9 @@ makeTetTissueObj(const std::string& name,
     return tissueObj;
 }
 
+///
+/// \brief Creates thin tissue object
+///
 static std::shared_ptr<PbdObject>
 makeTriTissueObj(const std::string& name,
                  const Vec2d& size, const Vec2i& dim, const Vec3d& center)
@@ -333,10 +334,9 @@ makeTriTissueObj(const std::string& name,
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setColor(Color(0.77, 0.53, 0.34));
     material->setEdgeColor(Color(0.87, 0.63, 0.44));
-    material->setOpacity(0.5);
 
     // Setup the Object
     tissueObj->setVisualGeometry(triMesh);
@@ -387,12 +387,11 @@ makeToolObj()
 int
 main()
 {
+    const double capsuleRadius = 0.02;
+    const double tissueLength  = 0.15;
+
     // Setup logger (write to file and stdout)
     Logger::startLogger();
-
-    const double capsuleRadius = 0.02;
-    const bool   useThinTissue = false;
-    const double tissueLength  = 0.15;
 
     // Setup the scene
     auto scene = std::make_shared<Scene>("PbdTissueStitch");
@@ -401,19 +400,15 @@ main()
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
     // Setup a tet tissue
-    std::shared_ptr<PbdObject> tissueObj = nullptr;
-    if (useThinTissue)
-    {
-        tissueObj = makeTriTissueObj("Tissue",
-            Vec2d(tissueLength, 0.07), Vec2i(15, 5),
-            Vec3d(tissueLength * 0.5, -0.01 - capsuleRadius, 0.0));
-    }
-    else
-    {
-        tissueObj = makeTetTissueObj("Tissue",
-            Vec3d(tissueLength, 0.01, 0.07), Vec3i(15, 2, 5),
-            Vec3d(tissueLength * 0.5, -0.01 - capsuleRadius, 0.0));
-    }
+#ifdef USE_THIN_TISSUE
+    std::shared_ptr<PbdObject> tissueObj = makeTriTissueObj("Tissue",
+        Vec2d(tissueLength, 0.07), Vec2i(15, 5),
+        Vec3d(tissueLength * 0.5, -0.01 - capsuleRadius, 0.0));
+#else
+    std::shared_ptr<PbdObject> tissueObj = makeTetTissueObj("Tissue",
+        Vec3d(tissueLength, 0.01, 0.07), Vec3i(15, 2, 5),
+        Vec3d(tissueLength * 0.5, -0.01 - capsuleRadius, 0.0));
+#endif
     scene->addSceneObject(tissueObj);
 
     // Setup a capsule to wrap around
@@ -433,11 +428,12 @@ main()
     scene->addSceneObject(toolObj);
 
     // Setup CD with a cylinder CD object
-    auto col1 = std::make_shared<PbdObjectCollision>(tissueObj, cdObj, "SurfaceMeshToCapsuleCD");
-    col1->setFriction(0.0);
-    scene->addInteraction(col1);
+    auto collisionInteraction = std::make_shared<PbdObjectCollision>(tissueObj, cdObj, "SurfaceMeshToCapsuleCD");
+    collisionInteraction->setFriction(0.0);
+    scene->addInteraction(collisionInteraction);
 
     auto stitching = std::make_shared<PbdObjectStitching>(tissueObj);
+    stitching->setStitchDistance(0.015);
     scene->addInteraction(stitching);
 
     // Lights
@@ -467,7 +463,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-#ifdef USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
         auto hapticManager = std::make_shared<HapticDeviceManager>();
         hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
         std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
@@ -478,16 +474,13 @@ main()
             [&](Event*)
             {
                 const Vec2d& pos = viewer->getMouseDevice()->getPos();
-                if (useThinTissue)
-                {
-                    deviceClient->setPosition(Vec3d(40.0, 40.0, -(pos[1] * 100.0 - 50.0)));
-                    deviceClient->setOrientation(Quatd(Rotd(-0.6, Vec3d(0.0, 0.0, 1.0))));
-                }
-                else
-                {
-                    deviceClient->setPosition(Vec3d(37.0, 0.0, -(pos[1] * 100.0 - 50.0)));
-                    deviceClient->setOrientation(Quatd(Rotd(0.65, Vec3d(0.0, 0.0, 1.0))));
-                }
+#ifdef USE_THIN_TISSUE
+                deviceClient->setPosition(Vec3d(40.0, 40.0, -(pos[1] * 100.0 - 50.0)));
+                deviceClient->setOrientation(Quatd(Rotd(-0.6, Vec3d(0.0, 0.0, 1.0))));
+#else
+                deviceClient->setPosition(Vec3d(37.0, 0.0, -(pos[1] * 100.0 - 50.0)));
+                deviceClient->setOrientation(Quatd(Rotd(0.65, Vec3d(0.0, 0.0, 1.0))));
+#endif
             });
 #endif
 
@@ -501,7 +494,7 @@ main()
         controller->setUseForceSmoothening(true);
         scene->addController(controller);
 
-#ifdef USE_HAPTICS
+#ifdef iMSTK_USE_OPENHAPTICS
         connect<ButtonEvent>(deviceClient, &HapticDeviceClient::buttonStateChanged,
             [&](ButtonEvent* e)
             {
@@ -510,7 +503,7 @@ main()
                     auto toolGeom   = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
                     const Vec3d& v1 = toolGeom->getVertexPosition(0);
                     const Vec3d& v2 = toolGeom->getVertexPosition(1);
-                    stitching->beginRayPointStitch(v1, (v2 - v1).normalized());
+                    stitching->beginStitch(v1, (v2 - v1).normalized());
                 }
             });
 #endif
@@ -531,7 +524,7 @@ main()
                     auto toolGeom   = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
                     const Vec3d& v1 = toolGeom->getVertexPosition(0);
                     const Vec3d& v2 = toolGeom->getVertexPosition(1);
-                    stitching->beginRayPointStitch(v1, (v2 - v1).normalized());
+                    stitching->beginStitch(v1, (v2 - v1).normalized());
                 }
                 // Reset
                 else if (e->m_key == 'r')
@@ -575,10 +568,9 @@ main()
                 {
                     if (!stopped)
                     {
+                        // Clear and reinit all constraints (new resting lengths)
                         stopped = true;
                         tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds.clear();
-
-                        // Clear and reinit all constraints
                         tissueObj->initialize();
                     }
                 }

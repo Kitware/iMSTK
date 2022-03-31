@@ -43,15 +43,6 @@ class PickingAlgorithm;
 ///
 class PbdObjectStitching : public SceneObject
 {
-protected:
-    enum class StitchMode
-    {
-        Vertex,     // Stitch two vertices together
-        Cell,       // Stitch two cells together
-        RayPoint,   // Stitch two points on two cells together found via rays
-        RayCell     // Stitch two cells found via rays
-    };
-
 public:
     PbdObjectStitching(std::shared_ptr<PbdObject> obj1);
     ~PbdObjectStitching() override = default;
@@ -66,34 +57,19 @@ public:
     double getStiffness() const { return m_stiffness; }
     ///@}
 
-    /* ///
-     /// \brief Begin a vertex grasp (picking will begin on the next update)
-     /// \param Geometry attached/grasped too
-     ///
-     void beginVertexGrasp(std::shared_ptr<AnalyticalGeometry> geometry);
-
-     ///
-     /// \brief Begin a cell grasp (picking will begin on the next update)
-     /// \param Geometry attached/grasped too
-     /// \param The intersection type/class name
-     ///
-     void beginCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType);*/
+    ///
+    /// \brief Set/Get the maximum distance for which a stitch may be placed
+    ///@{
+    void setStitchDistance(const double distance) { m_maxStitchDist = distance; }
+    double getStitchDistance() const { return m_maxStitchDist; }
+    ///@}
 
     ///
-    /// \brief Begin a ray point grasp (picking will begin on the next update)
+    /// \brief Begin a ray point stitch. Stitches two points for separate elements.
     /// \param Global space ray start
     /// \param Global space ray direction
     ///
-    void beginRayPointStitch(const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist = -1.0);
-
-    /* ///
-     /// \brief Begin a ray point grasp (picking will begin on the next update)
-     /// \param Geometry attached/grasped too
-     /// \param Global space ray start
-     /// \param Global space ray direction
-     ///
-     void beginRayCellStitch(std::shared_ptr<AnalyticalGeometry> geometry,
-         const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist = -1.0);*/
+    void beginStitch(const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist = -1.0);
 
     ///
     /// \brief Compute/generate the constraints for stitching
@@ -158,16 +134,13 @@ protected:
     std::shared_ptr<PbdObject> m_objectToStitch = nullptr;
 
     std::shared_ptr<PickingAlgorithm> m_pickMethod = nullptr;
-    StitchMode m_mode = StitchMode::Cell;
 
-    bool m_isStitching     = false;
-    bool m_isPrevStitching = false;
+    bool m_performStitch = false;
 
     /// Stiffness of stitches, when 1 the position is completely moved too the grasp point
     /// when stiffness < 1 it will slowly converge on the grasp point
-    double m_stiffness = 0.1;
-
-    //bool m_retractingStitch = false; ///< Place a stitch that slowly retracts to 0 after placement
+    double m_stiffness     = 0.1;
+    double m_maxStitchDist = -1.0;                                             // Set a maximum distance for which a stitch can be placed
 
     std::vector<std::shared_ptr<PbdBaryPointToPointConstraint>> m_constraints; ///< List of PBD constraints
 };

@@ -20,21 +20,16 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkPbdObjectStitching.h"
-#include "imstkCDObjectFactory.h"
 #include "imstkCellPicker.h"
 #include "imstkLineMesh.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPointPicker.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkSurfaceToTetraMap.h"
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkVertexPicker.h"
-#include "imstkSurfaceToTetraMap.h"
-#include "imstkVisualModel.h"
-#include "imstkRenderMaterial.h"
 
 namespace imstk
 {
@@ -144,14 +139,13 @@ PbdObjectStitching::PbdObjectStitching(std::shared_ptr<PbdObject> obj) :
 }
 
 void
-PbdObjectStitching::beginRayPointStitch(const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist)
+PbdObjectStitching::beginStitch(const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist)
 {
     auto pointPicker = std::make_shared<PointPicker>();
     pointPicker->setPickingRay(rayStart, rayDir, maxDist);
     m_pickMethod = pointPicker;
-    m_mode       = StitchMode::RayPoint;
 
-    m_isStitching = true;
+    m_performStitch = true;
     LOG(INFO) << "Begin stitch";
 }
 
@@ -178,18 +172,15 @@ PbdObjectStitching::addStitchConstraints()
     }
 
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pbdPhysicsGeom->getVertexPositions();
-    //VecDataArray<double, 3>& vertices = *verticesPtr;
 
     // Get the attributes from the physics geometry
     auto velocitiesPtr =
         std::dynamic_pointer_cast<VecDataArray<double, 3>>(pbdPhysicsGeom->getVertexAttribute("Velocities"));
     CHECK(velocitiesPtr != nullptr) << "Trying to vertex pick with geometry that has no Velocities";
-    //VecDataArray<double, 3>& velocities = *velocitiesPtr;
 
     auto invMassesPtr =
         std::dynamic_pointer_cast<DataArray<double>>(pbdPhysicsGeom->getVertexAttribute("InvMass"));
     CHECK(invMassesPtr != nullptr) << "Trying to vertex pick with geometry that has no InvMass";
-    //const DataArray<double>& invMasses = *invMassesPtr;
 
     std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
     if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(pointSetToPick))
@@ -221,30 +212,31 @@ PbdObjectStitching::addStitchConstraints()
         indicesPtr.get(),
         map);
 
-    auto getCellVerts = [&](const PickData& data)
-                        {
-                            const CellTypeId pickedCellType = data.cellType;
+    auto getCellVerts =
+        [&](const PickData& data)
+        {
+            const CellTypeId pickedCellType = data.cellType;
 
-                            std::vector<std::pair<int, VertexMassPair>> cellIdVerts;
-                            if (pickedCellType == IMSTK_TETRAHEDRON)
-                            {
-                                cellIdVerts = getElement<4>(data, meshStruct);
-                            }
-                            else if (pickedCellType == IMSTK_TRIANGLE)
-                            {
-                                cellIdVerts = getElement<3>(data, meshStruct);
-                            }
-                            else if (pickedCellType == IMSTK_EDGE)
-                            {
-                                cellIdVerts = getElement<2>(data, meshStruct);
-                            }
-                            std::vector<VertexMassPair> cellVerts(cellIdVerts.size());
-                            for (size_t j = 0; j < cellIdVerts.size(); j++)
-                            {
-                                cellVerts[j] = cellIdVerts[j].second;
-                            }
-                            return cellVerts;
-                        };
+            std::vector<std::pair<int, VertexMassPair>> cellIdVerts;
+            if (pickedCellType == IMSTK_TETRAHEDRON)
+            {
+                cellIdVerts = getElement<4>(data, meshStruct);
+            }
+            else if (pickedCellType == IMSTK_TRIANGLE)
+            {
+                cellIdVerts = getElement<3>(data, meshStruct);
+            }
+            else if (pickedCellType == IMSTK_EDGE)
+            {
+                cellIdVerts = getElement<2>(data, meshStruct);
+            }
+            std::vector<VertexMassPair> cellVerts(cellIdVerts.size());
+            for (size_t j = 0; j < cellIdVerts.size(); j++)
+            {
+                cellVerts[j] = cellIdVerts[j].second;
+            }
+            return cellVerts;
+        };
 
     auto pointPicker = std::dynamic_pointer_cast<PointPicker>(m_pickMethod);
     pointPicker->setUseFirstHit(false);
@@ -330,23 +322,14 @@ PbdObjectStitching::addStitchConstraints()
         }
     }
 
-    // Digest the pick data based on grasp mode
-    if (m_mode == StitchMode::RayCell)
+    // Constrain only the pick points between the two elements
+    for (size_t i = 0; i < constraintPair.size(); i++)
     {
-        // Constrain all vertices of the elements
+        const PickData& pickData1 = constraintPair[i].first;
+        const PickData& pickData2 = constraintPair[i].second;
 
-        // If a tetrahedron, use the mapped face
-
-        // If a surfacemesh just use the face
-    }
-    else if (m_mode == StitchMode::RayPoint)
-    {
-        // Constrain only the pick points between the two elements
-        for (size_t i = 0; i < constraintPair.size(); i++)
+        if (m_maxStitchDist == -1.0 || (pickData2.pickPoint - pickData1.pickPoint).norm() < m_maxStitchDist)
         {
-            const PickData& pickData1 = constraintPair[i].first;
-            const PickData& pickData2 = constraintPair[i].second;
-
             std::vector<VertexMassPair> cellVerts1 = getCellVerts(pickData1);
             std::vector<double>         weights1   = getWeights(cellVerts1, pickData1.pickPoint);
             std::vector<VertexMassPair> cellVerts2 = getCellVerts(pickData2);
@@ -383,13 +366,11 @@ PbdObjectStitching::updateStitching()
     m_objectToStitch->updateGeometries();
 
     // If started
-    if (!m_isPrevStitching && m_isStitching)
+    if (m_performStitch)
     {
         addStitchConstraints();
-        m_isStitching = false;
+        m_performStitch = false;
     }
-    // Push back the state
-    m_isPrevStitching = m_isStitching;
 
     updateConstraints();
 }

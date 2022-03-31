@@ -34,3 +34,5 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
 target_link_libraries(${PROJECT_NAME}
 	SimulationManager
 	ViewerVTK)
+
+#target_compile_options(${PROJECT_NAME} PUBLIC -DUSE_THIN_TISSUE)
