@@ -86,36 +86,6 @@ TEST(imstkPointwiseMapTest, SimpleMap)
     }
 }
 
-TEST(imstkPointwiseMapTest, DeathTests)
-{
-    auto parent = std::make_shared<PointSet>();
-    auto child  = std::make_shared<PointSet>();
-
-    auto sphere = std::make_shared<Sphere>();
-    {
-        PointwiseMap map;
-        ASSERT_DEATH(map.compute(), "without valid geometries");
-    }
-    {
-        PointwiseMap map;
-        map.setParentGeometry(parent);
-        ASSERT_DEATH(map.compute(), "without valid geometries");
-    }
-    {
-        PointwiseMap map;
-        map.setChildGeometry(child);
-        ASSERT_DEATH(map.compute(), "without valid geometries");
-    }
-    {
-        PointwiseMap map;
-        ASSERT_DEATH(map.setParentGeometry(sphere), "The geometry provided is not a PointSet!");
-    }
-    {
-        PointwiseMap map;
-        ASSERT_DEATH(map.setChildGeometry(sphere), "The geometry provided is not a PointSet!");
-    }
-}
-
 TEST(imstkPointwiseMapTest, OneToManyMap)
 {
     auto parent = std::make_shared<PointSet>();
