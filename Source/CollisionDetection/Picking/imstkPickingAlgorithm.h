@@ -28,12 +28,11 @@ namespace imstk
 {
 ///
 /// \brief PickData provides ids to indicate what was picked
-/// Many of its members are optional and based on the selection
 /// These may be optionally used to indicate the selection
 ///
 struct PickData
 {
-    int ids[4]  = { -1, -1, -1, -1 };    ///< Ids of cell vertices
+    int ids[4]  = { -1, -1, -1, -1 };    ///< Ids of the cell or vertices
     int idCount = 0;                     ///< Indicates number of vertices (if 1 a cell or individual vertex)
     CellTypeId cellType = IMSTK_VERTEX;  ///< Indicates picked cell type
     Vec3d pickPoint     = Vec3d::Zero(); ///< Some pickings may produce specific points on an element
