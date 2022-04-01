@@ -80,7 +80,6 @@ TetrahedralMesh::getVolume()
     return volume;
 }
 
-#pragma optimize("", off)
 std::shared_ptr<SurfaceMesh>
 TetrahedralMesh::extractSurfaceMesh()
 {
@@ -90,11 +89,12 @@ TetrahedralMesh::extractSurfaceMesh()
     const std::array<int, 4>   unusedVert = { 3, 2, 1, 0 };
 
     // Find and store the tetrahedral faces that are unique
-    const VecDataArray<int, 4>&    tetraIndices  = *m_tetrahedraIndices;
-    const VecDataArray<double, 3>& tetVertices   = *m_vertexPositions;
-    auto                           triIndicesPtr = std::make_shared<VecDataArray<int, 3>>();
-    VecDataArray<int, 3>&          triIndices    = *triIndicesPtr;
-    std::vector<size_t>            surfaceTriTet; // Map tri to tet id
+    const VecDataArray<int, 4>&              tetraIndices   = *this->getTetrahedraIndices();
+    std::shared_ptr<VecDataArray<double, 3>> tetVerticesPtr = getVertexPositions();
+    const VecDataArray<double, 3>&           tetVertices    = *tetVerticesPtr;
+    std::shared_ptr<VecDataArray<int, 3>>    triIndicesPtr  = std::make_shared<VecDataArray<int, 3>>();
+    VecDataArray<int, 3>&                    triIndices     = *triIndicesPtr;
+    //std::vector<size_t>                   surfaceTriTet;
 
     // Gives surfaceTri id/faceid -> index of unused vert for face (4 verts per tet, one will be unused)
     std::vector<size_t> tetRemainingVert;
@@ -139,7 +139,7 @@ TetrahedralMesh::extractSurfaceMesh()
             if (unique)
             {
                 triIndices.push_back(Vec3i(a, b, c));
-                surfaceTriTet.push_back(i);
+                //surfaceTriTet.push_back(tetId);
                 tetRemainingVert.push_back(tet[unusedVert[t]]);
             }
             // If found, erase face, it is not unique anymore
@@ -217,9 +217,8 @@ TetrahedralMesh::extractSurfaceMesh()
         }
     }
 
-    auto triVerticesPtr =
-        std::make_shared<VecDataArray<double, 3>>(static_cast<int>(oldToNewVertId.size()));
-    VecDataArray<double, 3>& triVertices = *triVerticesPtr;
+    auto                     triVerticesPtr = std::make_shared<VecDataArray<double, 3>>(static_cast<int>(oldToNewVertId.size()));
+    VecDataArray<double, 3>& triVertices    = *triVerticesPtr;
 
     for (auto vertIndexPair : oldToNewVertId)
     {
@@ -236,8 +235,6 @@ TetrahedralMesh::extractSurfaceMesh()
     surfMesh->initialize(triVerticesPtr, triIndicesPtr);
     return surfMesh;
 }
-
-#pragma optimize("", on)
 
 Vec4d
 TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos) const
