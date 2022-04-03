@@ -470,10 +470,11 @@ Scene::advance(const double dt)
         controller->setTrackerToOutOfDate();
     }
 
+    m_sceneTime += dt;
     if (m_resetRequested)
     {
         resetSceneObjects();
-        //\note May need to reset CD, CH and other components of the scene in the future
+        m_sceneTime      = 0.0;
         m_resetRequested = false;
     }
 

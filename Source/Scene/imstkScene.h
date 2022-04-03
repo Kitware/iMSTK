@@ -257,6 +257,8 @@ public:
     ///
     double getFPS() const { return m_fps; }
 
+    double getSceneTime() const { return m_sceneTime; }
+
     ///
     /// \brief Get the map of elapsed times
     ///
@@ -294,7 +296,8 @@ protected:
     std::shared_ptr<ParallelUtils::SpinLock> m_computeTimesLock;
     std::unordered_map<std::string, double>  m_nodeComputeTimes; ///< Map of ComputeNode names to elapsed times for benchmarking
 
-    double m_fps = 0.0;
+    double m_fps       = 0.0;
+    double m_sceneTime = 0.0; ///< Scene time/simulation total time, updated at the end of scene update
 
     std::atomic<bool> m_resetRequested = ATOMIC_VAR_INIT(false);
 };
