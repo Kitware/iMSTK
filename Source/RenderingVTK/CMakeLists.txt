@@ -64,3 +64,7 @@ vtk_module_autoinit(TARGETS RenderingVTK MODULES ${VTK_LIBRARIES})
 if( ${PROJECT_NAME}_BUILD_TESTING )
   add_subdirectory(Testing)
 endif()
+
+if( ${PROJECT_NAME}_BUILD_VISUAL_TESTING )
+  add_subdirectory(VisualTesting)
+endif()
