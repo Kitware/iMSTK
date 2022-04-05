@@ -19,25 +19,16 @@
 
 =========================================================================*/
 
-#include "imstkNew.h"
-#include "imstkParallelFor.h"
+#include <gtest/gtest.h>
+
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskGraph.h"
-#include "imstkTbbTaskGraphController.h"
-#include "imstkLogger.h"
+#include "imstkTaskNode.h"
 
 using namespace imstk;
 
-///
-/// \brief This example how to use a TaskGraph standalone
-///
-int
-main()
+TEST(imstkSequentialTaskGraphControllerTest, SumData)
 {
-    Logger::startLogger();
-
-    const bool runExampleInParallel = true;
-
     // Initialize some data arrays
     const int countA = 100;
     const int countB = 255;
@@ -61,7 +52,7 @@ main()
     int sumB = 0;
 
     // Now create a graph that computes results = sum_i(x_i + y_i) * sum_i(w_i * z_i)
-    imstkNew<TaskGraph> graph;
+    auto graph = std::make_shared<TaskGraph>();
 
     // Create and add the nodes
     std::shared_ptr<TaskNode> addNode = graph->addFunction("Add Step",
@@ -88,25 +79,8 @@ main()
     graph->addEdge(multNode, graph->getSink());
 
     // Set which controller to use
-    std::shared_ptr<TaskGraphController> controller = nullptr;
-    if (runExampleInParallel)
-    {
-        controller = std::make_shared<TbbTaskGraphController>();
-    }
-    else
-    {
-        controller = std::make_shared<SequentialTaskGraphController>();
-    }
-
-    // Compute
-    controller->setTaskGraph(graph);
-    if (!controller->initialize())
-    {
-        LOG(FATAL) << "TaskGraph failed to initialize";
-        return 1;
-    }
-    controller->execute();
-    LOG(INFO) << "Results: " << sumA + sumB;
-
-    return 0;
+    SequentialTaskGraphController controller;
+    controller.setTaskGraph(graph);
+    EXPECT_EQ(controller.initialize(), true) << "TaskGraph failed to initialize";
+    controller.execute();
 }
