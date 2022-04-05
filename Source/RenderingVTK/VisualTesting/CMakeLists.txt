@@ -16,18 +16,7 @@
 #
 ###########################################################################
 
-project(PbdBenchmark)
-
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} PbdBenchmark.cpp)
-
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Benchmarking)
-
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME}
-	SimulationManager
-	benchmark::benchmark)
+include(imstkAddTest)
+imstk_add_visual_test( RenderingVTK )
+# Note: Links to ViewerVTK but only tests RenderingVTK
+target_link_libraries(RenderingVTKVisualTests ViewerVTK)

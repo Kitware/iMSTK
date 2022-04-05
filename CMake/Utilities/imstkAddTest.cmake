@@ -59,7 +59,7 @@ endif()
   #-----------------------------------------------------------------------------
   # Add the target to Testing folder
   #-----------------------------------------------------------------------------
-  SET_TARGET_PROPERTIES (${test_driver_executable} PROPERTIES FOLDER Testing)
+  SET_TARGET_PROPERTIES (${test_driver_executable} PROPERTIES FOLDER ${kind})
 
 endfunction()
 
