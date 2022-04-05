@@ -139,7 +139,7 @@ public class PbdCutting
                                          int    nRows,
                                          int    nCols)
     {
-        SurfaceMesh clothMesh = new SurfaceMesh("Cloth_SurfaceMesh");
+        SurfaceMesh clothMesh = new SurfaceMesh();
 
         VecDataArray3d vertices = new VecDataArray3d(nRows * nCols);
         double dy = width / (nCols - 1);
