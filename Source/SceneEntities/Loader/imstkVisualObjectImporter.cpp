@@ -31,6 +31,7 @@
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <fstream>
 #include <stack>
 #include <unordered_map>
 

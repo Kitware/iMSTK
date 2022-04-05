@@ -9,7 +9,6 @@ imstk_add_library( Common
     imstkColor.h
     imstkColorFunction.h
     imstkDataArray.h
-    imstkDataLogger.h
     imstkEventObject.h
     imstkLogger.h
     imstkMacros.h
@@ -34,7 +33,6 @@ imstk_add_library( Common
     Utils/imstkTimer.h
   CPP_FILES
     imstkColor.cpp
-    imstkDataLogger.cpp
     imstkLogger.cpp
     imstkModule.cpp
     imstkModuleDriver.cpp

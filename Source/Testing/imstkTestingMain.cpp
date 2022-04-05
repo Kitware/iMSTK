@@ -19,11 +19,10 @@
 
 =========================================================================*/
 
-#include <vtksys/SystemTools.hxx>
+#include "imstkLogger.h"
 
 #include <gtest/gtest.h>
-
-#include "imstkLogger.h"
+#include <vtksys/SystemTools.hxx>
 
 int
 main(int argc, char** argv)
@@ -46,6 +45,7 @@ main(int argc, char** argv)
 
     auto& logger = imstk::Logger::getInstance();
     logger.addFileSink("test", "log");
+    logger.addStdoutSink();
 
     ::testing::InitGoogleTest(&argc, argv);
     GTEST_FLAG_SET(death_test_style, "threadsafe");
