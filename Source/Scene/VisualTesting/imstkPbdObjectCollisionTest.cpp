@@ -326,6 +326,8 @@ public:
         m_preUpdateFunc =
             [&](Event*)
             {
+                // Run in realtime at a slightly slowed down speed
+                // Still fixed, but # of iterations may vary by system
                 m_pbdObj->getPbdModel()->getConfig()->m_dt =
                     m_sceneManager->getDt() * 0.5;
             };

@@ -48,16 +48,10 @@ to_string_with_precision(const T a_value, const int n = 6)
 class SceneVisualTest : public testing::Test
 {
 public:
-    void SetUp() override
-    {
-        Logger::startLogger();
-        m_scene = std::make_shared<Scene>("unnamed");
-    }
-
     ///
     /// \brief Run the simulation for given duration at given fixed timestep
     /// \param total time (seconds) to run the simulation
-    /// \param fixed timestep (seconds), total # of updates may vary
+    /// \param fixed timestep (seconds)
     ///
     void runFor(const double duration, const double fixedTimestep = 0.001)
     {

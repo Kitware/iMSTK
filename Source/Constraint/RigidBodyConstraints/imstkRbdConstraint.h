@@ -96,8 +96,10 @@ struct RigidBody
 ///
 /// \class RbdConstraint
 ///
-/// \brief Abstract class for rigid body constraints
-/// \todo: consider removing static flags and using sides in the interaction
+/// \brief Abstract class for rigid body constraints. A RbdConstraint should
+/// mainly provide a constraint jacobian. It provides a constraint gradient
+/// for both linear and angular (each column). This gradient should vanish
+/// as the constraint scalar approaches 0.
 ///
 class RbdConstraint
 {
@@ -109,6 +111,13 @@ public:
         AB
     };
 
+    virtual ~RbdConstraint() = default;
+
+    ///
+    /// \brief Compute constraint jacobian
+    ///
+    virtual void compute(double dt) = 0;
+
 protected:
     RbdConstraint(std::shared_ptr<RigidBody> rbd1,
                   std::shared_ptr<RigidBody> rbd2, const Side side) :
@@ -117,18 +126,8 @@ protected:
     }
 
 public:
-    virtual ~RbdConstraint() = default;
-
-public:
-    ///
-    /// \brief Compute constraint jacobian
-    ///
-    virtual void compute(double dt) = 0;
-
-public:
-    // Jacobian
-    Eigen::Matrix<double, 3, 4> J = Eigen::Matrix<double, 3, 4>::Zero();
-    double vu = 0.0;
+    Eigen::Matrix<double, 3, 4> J = Eigen::Matrix<double, 3, 4>::Zero(); ///< Jacobian, "vanish" to zero
+    double vu = 0.0; ///< Bauhmgarte stabilization term
     // Range of the constraint force (for projection step during solve)
     // by default (0, inf) so bodies may only be pushed apart
     double range[2] = { 0.0, std::numeric_limits<double>::max() };
