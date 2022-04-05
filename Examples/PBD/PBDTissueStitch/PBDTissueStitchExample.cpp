@@ -412,7 +412,7 @@ main()
     scene->addSceneObject(tissueObj);
 
     // Setup a capsule to wrap around
-    auto cdObj       = std::make_shared<CollidingObject>("Bone");
+    auto cdObj       = std::make_shared<CollidingObject>("collisionObject");
     auto capsuleGeom = std::make_shared<Capsule>();
     capsuleGeom->setPosition(0.0, 0.0, 0.0);
     capsuleGeom->setRadius(capsuleRadius);

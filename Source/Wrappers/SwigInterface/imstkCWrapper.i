@@ -351,7 +351,7 @@ namespace std
 /*
  * CollisionDetection
  */
-%include "../../CollisionDetection/imstkCollisionData.h";
+%include "../../CollisionDetection/imstkCollisionData.h"
 %include "../../CollisionDetection/imstkCollisionDetectionAlgorithm.h"
 %include "../../CollisionDetection/imstkCollisionUtils.h"
 %include "../../CollisionDetection/CollisionDetection/imstkBidirectionalPlaneToSphereCD.h"
