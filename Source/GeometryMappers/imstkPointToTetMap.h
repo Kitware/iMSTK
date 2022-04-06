@@ -45,7 +45,7 @@ public:
         std::shared_ptr<Geometry> child);
     ~PointToTetMap() override = default;
 
-    IMSTK_TYPE_NAME(TetraTriangleMap)
+    IMSTK_TYPE_NAME(PointToTetMap)
 
     ///
     /// \brief Compute the tetra-triangle mesh map

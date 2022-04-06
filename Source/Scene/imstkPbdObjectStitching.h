@@ -21,9 +21,10 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkSceneObject.h"
+#include "imstkMacros.h"
 #include "imstkMath.h"
 #include "imstkPbdCollisionConstraint.h"
+#include "imstkSceneObject.h"
 
 #include <unordered_map>
 
@@ -47,7 +48,7 @@ public:
     PbdObjectStitching(std::shared_ptr<PbdObject> obj1);
     ~PbdObjectStitching() override = default;
 
-    const std::string getTypeName() const override { return "PbdObjectStitching"; }
+    IMSTK_TYPE_NAME(PbdObjectStitching)
 
     ///
     /// \brief Set/Get the stiffness, 0-1 value that alters the step size in

@@ -36,6 +36,8 @@ public:
         std::shared_ptr<Geometry> child);
     ~TriangleToTetMap() override = default;
 
+    IMSTK_TYPE_NAME(TriangleToTetMap)
+
     ///
     /// \brief Compute the map
     ///

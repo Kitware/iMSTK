@@ -39,7 +39,7 @@ public:
         std::shared_ptr<Geometry> child);
     ~PointwiseMap() override = default;
 
-    IMSTK_TYPE_NAME(OneToOneMap)
+    IMSTK_TYPE_NAME(PointwiseMap)
 
     ///
     /// \brief Compute the tetra-triangle mesh map
