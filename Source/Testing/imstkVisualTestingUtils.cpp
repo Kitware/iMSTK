@@ -51,6 +51,7 @@ VisualTestManager::runFor(const double duration, const double fixedTimestep)
     m_viewer->setActiveScene(m_scene);
     m_viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
     m_viewer->setDebugAxesLength(0.05, 0.05, 0.05);
+    m_viewer->setWindowTitle(m_scene->getName());
 
     // Setup a scene manager to advance the scene
     m_sceneManager->setActiveScene(m_scene);
