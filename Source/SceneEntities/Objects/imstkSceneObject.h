@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkSceneEntity.h"
+#include "imstkMacros.h"
 
 #include <memory>
 #include <vector>
@@ -46,14 +47,11 @@ public:
     SceneObject(const std::string& name);
     ~SceneObject() override = default;
 
+    IMSTK_TYPE_NAME(SceneObject)
+
     // *INDENT-OFF*
     SIGNAL(SceneObject, modified);
     // *INDENT-ON*
-
-    ///
-    /// \brief Get the type of the object
-    ///
-    virtual const std::string getTypeName() const { return "SceneObject"; }
 
     ///
     /// \brief Get the computational graph

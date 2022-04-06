@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionHandling.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -41,7 +42,7 @@ public:
     PenaltyCH() = default;
     virtual ~PenaltyCH() override = default;
 
-    virtual const std::string getTypeName() const override { return "PenaltyCH"; }
+    IMSTK_TYPE_NAME(PenaltyCH)
 
 public:
     void setInputFeObject(std::shared_ptr<FeDeformableObject> feObj);

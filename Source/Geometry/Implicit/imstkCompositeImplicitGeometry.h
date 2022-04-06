@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkImplicitGeometry.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -46,10 +47,7 @@ public:
     CompositeImplicitGeometry() = default;
     ~CompositeImplicitGeometry() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "CompositeImplicitGeometry"; }
+    IMSTK_TYPE_NAME(CompositeImplicitGeometry)
 
     ///
     /// \brief Returns signed distance to surface at pos

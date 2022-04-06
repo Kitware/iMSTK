@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkMacros.h"
 #include "imstkSpatialHashTableSeparateChaining.h"
 
 namespace imstk
@@ -39,10 +40,7 @@ public:
     TetraToPointSetCD();
     virtual ~TetraToPointSetCD() override = default;
 
-    ///
-    /// \brief Returns collision detection type string name
-    ///
-    virtual const std::string getTypeName() const override { return "TetraToPointSetCD"; }
+    IMSTK_TYPE_NAME(TetraToPointSetCD)
 
 public:
     ///

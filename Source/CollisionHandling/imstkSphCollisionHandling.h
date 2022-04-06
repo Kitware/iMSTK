@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionHandling.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -42,7 +43,7 @@ public:
     SphCollisionHandling() = default;
     virtual ~SphCollisionHandling() override = default;
 
-    virtual const std::string getTypeName() const override { return "SphCollisionHandling"; }
+    IMSTK_TYPE_NAME(SphCollisionHandling)
 
 public:
     void setInputSphObject(std::shared_ptr<SphObject> sphObj);

@@ -41,6 +41,7 @@ public:
     ///
     /// \brief Returns the string class name
     ///
+    /// Required for using IMSTK_TYPE_MACRO
     virtual const std::string getTypeName() const = 0;
 
     ///

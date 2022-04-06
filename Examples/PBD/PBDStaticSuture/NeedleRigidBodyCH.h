@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkRigidBodyCH.h"
+#include "imstkMacros.h"
 
 using namespace imstk;
 
@@ -31,7 +32,7 @@ public:
     NeedleRigidBodyCH() = default;
     ~NeedleRigidBodyCH() override = default;
 
-    virtual const std::string getTypeName() const override { return "NeedleRigidBodyCH"; }
+    IMSTK_TYPE_NAME(NeedleRigidBodyCH)
 
 protected:
     ///

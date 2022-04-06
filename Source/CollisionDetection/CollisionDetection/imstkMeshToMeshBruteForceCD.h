@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -60,10 +61,7 @@ public:
     MeshToMeshBruteForceCD();
     virtual ~MeshToMeshBruteForceCD() override = default;
 
-    ///
-    /// \brief Returns collision detection type string name
-    ///
-    virtual const std::string getTypeName() const override { return "MeshToMeshBruteForceCD"; }
+    IMSTK_TYPE_NAME(MeshToMeshBruteForceCD)
 
 public:
     ///
@@ -86,7 +84,7 @@ public:
 
 protected:
     ///
-    /// \brief Compute collision data for AB simulatenously
+    /// \brief Compute collision data for AB simultaneously
     ///
     virtual void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,

@@ -23,6 +23,7 @@ limitations under the License.
 
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -47,16 +48,13 @@ public:
     ImplicitGeometryToPointSetCCD();
     virtual ~ImplicitGeometryToPointSetCCD() override = default;
 
-    ///
-    /// \brief Returns collision detection type string name
-    ///
-    virtual const std::string getTypeName() const override { return "ImplicitGeometryToPointSetCCD"; }
+    IMSTK_TYPE_NAME(ImplicitGeometryToPointSetCCD)
 
 protected:
     void setupFunctions(std::shared_ptr<ImplicitGeometry> implicitGeom, std::shared_ptr<PointSet> pointSet);
 
     ///
-    /// \brief Compute collision data for AB simulatenously
+    /// \brief Compute collision data for AB simultaneously
     ///
     virtual void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,

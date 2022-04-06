@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkDynamicObject.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -39,7 +40,7 @@ public:
     PbdObject(const std::string& name) : DynamicObject(name) { }
     ~PbdObject() override = default;
 
-    virtual const std::string getTypeName() const override { return "PbdObject"; }
+    IMSTK_TYPE_NAME(PbdObject)
 
     ///
     /// \biref Get the Pbd model of the object

@@ -23,12 +23,14 @@
 
 #include "imstkCollisionHandling.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkMacros.h"
 
 #include <unordered_map>
 
 namespace imstk
 {
 class EmbeddingConstraint;
+class Geometry;
 class PbdCollisionSolver;
 class PbdCollisionConstraint;
 } // namespace imstk
@@ -45,9 +47,9 @@ class NeedleEmbeddedCH : public CollisionHandling
 {
 public:
     NeedleEmbeddedCH();
-    ~NeedleEmbeddedCH() override = default;
+    virtual ~NeedleEmbeddedCH() override = default;
 
-    const std::string getTypeName() const override { return "NeedleEmbeddedCH"; }
+    IMSTK_TYPE_NAME(NeedleEmbeddedCH)
 
 public:
     std::shared_ptr<Geometry> getHandlingGeometryA() override;

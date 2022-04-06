@@ -23,6 +23,7 @@
 
 #include "imstkGeometry.h"
 #include "imstkMath.h"
+#include "imstkMacros.h"
 
 #ifdef WIN32
 #pragma warning( push )
@@ -71,10 +72,7 @@ public:
     RenderParticles(const unsigned int maxNumParticles = 128);
     ~RenderParticles() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "RenderParticles"; }
+    IMSTK_TYPE_NAME(RenderParticles)
 
     ///
     /// \brief Set size of particle

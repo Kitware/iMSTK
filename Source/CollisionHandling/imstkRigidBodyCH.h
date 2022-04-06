@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionHandling.h"
+#include "imstkMacros.h"
 
 #include <vector>
 
@@ -44,7 +45,7 @@ public:
     RigidBodyCH() = default;
     virtual ~RigidBodyCH() override = default;
 
-    virtual const std::string getTypeName() const override { return "RigidBodyCH"; }
+    IMSTK_TYPE_NAME(RigidBodyCH)
 
 public:
     void setInputRigidObjectA(std::shared_ptr<RigidObject2> rbdObjA);

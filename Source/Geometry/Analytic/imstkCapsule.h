@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkAnalyticalGeometry.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -47,10 +48,7 @@ public:
 
     ~Capsule() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "Capsule"; }
+    IMSTK_TYPE_NAME(Capsule)
 
     ///
     /// \brief Print the capsule info

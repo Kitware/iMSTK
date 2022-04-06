@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionInteraction.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -41,7 +42,7 @@ public:
     RigidObjectCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
     ~RigidObjectCollision() override = default;
 
-    const std::string getTypeName() const override { return "RigidObjectCollision"; }
+    IMSTK_TYPE_NAME(RigidObjectCollision)
 
     void setStiffness(double stiffness);
     const double getStiffness() const;

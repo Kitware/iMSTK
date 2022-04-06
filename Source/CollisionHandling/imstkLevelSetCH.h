@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionHandling.h"
+#include "imstkMacros.h"
 
 #include <unordered_set>
 #include <vector>
@@ -44,7 +45,7 @@ public:
     LevelSetCH();
     virtual ~LevelSetCH() override;
 
-    virtual const std::string getTypeName() const override { return "LevelSetCH"; }
+    IMSTK_TYPE_NAME(LevelSetCH)
 
 public:
     void setInputLvlSetObj(std::shared_ptr<LevelSetDeformableObject> lvlSetObj);

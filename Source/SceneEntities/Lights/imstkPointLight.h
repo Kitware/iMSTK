@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkLight.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -37,7 +38,7 @@ public:
     PointLight() = default;
     ~PointLight() override = default;
 
-    const std::string getTypeName() const override { return "PointLight"; }
+    IMSTK_TYPE_NAME(PointLight)
 
     const Vec3d getPosition() const { return m_position; }
     void setPosition(const Vec3d& p) { m_position = p; }

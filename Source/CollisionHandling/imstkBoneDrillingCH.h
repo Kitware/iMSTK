@@ -23,6 +23,7 @@
 
 #include "imstkCollisionHandling.h"
 #include "imstkMath.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -43,7 +44,7 @@ public:
     BoneDrillingCH() = default;
     virtual ~BoneDrillingCH() override = default;
 
-    virtual const std::string getTypeName() const override { return "BoneDrillingCH"; }
+    IMSTK_TYPE_NAME(BoneDrillingCH)
 
 public:
     ///

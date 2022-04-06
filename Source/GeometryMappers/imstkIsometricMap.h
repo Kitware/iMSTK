@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkGeometryMap.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -43,7 +44,7 @@ public:
 
     ~IsometricMap() override = default;
 
-    const std::string getTypeName() const override { return "IsometricMap"; }
+    IMSTK_TYPE_NAME(IsometricMap)
 
     ///
     /// \brief Compute the map

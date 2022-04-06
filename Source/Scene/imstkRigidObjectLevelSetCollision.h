@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionInteraction.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -41,7 +42,7 @@ public:
     RigidObjectLevelSetCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2);
     virtual ~RigidObjectLevelSetCollision() override = default;
 
-    virtual const std::string getTypeName() const override { return "RigidObjectLevelSetCollision"; }
+    IMSTK_TYPE_NAME(RigidObjectLevelSetCollision)
 
     ///
     /// \brief Setup connectivity of task graph

@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionInteraction.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -40,7 +41,7 @@ public:
                        std::string cdType = "ImplicitGeometryToPointSetCD");
     ~SphObjectCollision() override = default;
 
-    const std::string getTypeName() const override { return "SphObjectCollision"; }
+    IMSTK_TYPE_NAME(SphObjectCollision)
 
     ///
     /// \brief Setup connectivity of task graph

@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkVolumetricMesh.h"
 
 #include <array>
@@ -41,10 +42,7 @@ public:
     TetrahedralMesh();
     ~TetrahedralMesh() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "TetrahedralMesh"; }
+    IMSTK_TYPE_NAME(TetrahedralMesh)
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and

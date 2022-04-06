@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkAnalyticalGeometry.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -43,10 +44,7 @@ public:
 
     ~Plane() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "Plane"; }
+    IMSTK_TYPE_NAME(Plane)
 
     ///
     /// \brief Get/Set the normal to the plane

@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionInteraction.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -43,7 +44,7 @@ public:
                        std::string cdType = "MeshToMeshBruteForceCD");
     ~PbdObjectCollision() override = default;
 
-    const std::string getTypeName() const override { return "PbdObjectCollision"; }
+    IMSTK_TYPE_NAME(PbdObjectCollision)
 
     void setRestitution(const double restitution);
     const double getRestitution() const;

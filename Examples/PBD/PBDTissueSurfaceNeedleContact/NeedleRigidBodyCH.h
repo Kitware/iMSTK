@@ -21,9 +21,11 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkRigidBodyCH.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRigidBodyModel2.h"
+
 #include "NeedleObject.h"
 #include "RbdAxesLockingConstraint.h"
 #include "RbdAngularLockingConstraint.h"
@@ -36,9 +38,8 @@ public:
     NeedleRigidBodyCH() = default;
     ~NeedleRigidBodyCH() override = default;
 
-    virtual const std::string getTypeName() const override { return "NeedleRigidBodyCH"; }
+    IMSTK_TYPE_NAME(NeedleRigidBodyCH)
 
-public:
     void setNeedleForceThreshold(double needleForceThreshold) { m_needleForceThreshold = needleForceThreshold; }
     double getNeedleForceThrehsold() const { return m_needleForceThreshold; }
 

@@ -49,10 +49,7 @@ public:
     SignedDistanceField(std::shared_ptr<ImageData> imageData);
     ~SignedDistanceField() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "SignedDistanceField"; }
+    IMSTK_TYPE_NAME(SignedDistanceField)
 
     ///
     /// \brief Returns signed distance to surface at pos, returns clamped/nearest if out of bounds

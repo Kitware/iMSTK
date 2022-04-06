@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkSceneObject.h"
+#include "imstkMacros.h"
 #include "imstkMath.h"
 
 namespace imstk
@@ -40,7 +41,7 @@ public:
     CollidingObject(const std::string& name) : SceneObject(name) { }
     ~CollidingObject() override = default;
 
-    const std::string getTypeName() const override { return "CollidingObject"; }
+    IMSTK_TYPE_NAME(CollidingObject)
 
     ///
     /// \brief

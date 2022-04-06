@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkPointSet.h"
 #include "imstkTypes.h"
 
@@ -39,10 +40,7 @@ public:
     ImageData() = default;
     ~ImageData() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "ImageData"; }
+    IMSTK_TYPE_NAME(ImageData)
 
     ///
     /// \brief Print the image data info

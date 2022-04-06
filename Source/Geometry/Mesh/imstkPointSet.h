@@ -43,10 +43,7 @@ public:
     PointSet();
     ~PointSet() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const override { return "PointSet"; }
+    IMSTK_TYPE_NAME(PointSet)
 
     ///
     /// \brief Initializes the data structure given vertex positions

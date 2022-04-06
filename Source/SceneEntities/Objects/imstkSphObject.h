@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkDynamicObject.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -39,7 +40,7 @@ public:
     SphObject(const std::string& name) : DynamicObject(name) { }
     ~SphObject() override = default;
 
-    const std::string getTypeName() const override { return "SphObject"; }
+    IMSTK_TYPE_NAME(SphObject)
 
     ///
     /// \brief Get the model governing the Sph fluid dynamics of this object

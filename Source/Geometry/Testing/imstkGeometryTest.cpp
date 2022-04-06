@@ -30,7 +30,9 @@ namespace
 class MockGeometry : public Geometry
 {
 public:
-    const std::string getTypeName() const override { return "MockGeometry"; }
+    MockGeometry() : Geometry() { }
+
+    IMSTK_TYPE_NAME(MockGeometry)
 };
 } // namespace
 
@@ -110,12 +112,4 @@ TEST(imstkGeometryTest, GetSetRotation3)
     const Mat3d  mat3  = Mat3d(Rotd(angle, axes));
     geometry.setRotation(axes, angle);
     EXPECT_TRUE(geometry.getRotation().isApprox(mat3));
-}
-
-TEST(imstkGeometryTest, GetSetName)
-{
-    MockGeometry geometry;
-
-    geometry.setName("testGeom");
-    EXPECT_EQ("testGeom", geometry.getName());
 }

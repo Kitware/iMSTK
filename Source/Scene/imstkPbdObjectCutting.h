@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionInteraction.h"
+#include "imstkMacros.h"
 
 #include <unordered_set>
 #include <vector>
@@ -46,7 +47,7 @@ public:
     PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj);
     ~PbdObjectCutting() override = default;
 
-    const std::string getTypeName() const override { return "PbdObjectCutting"; }
+    IMSTK_TYPE_NAME(PbdObjectCutting)
 
     ///
     /// \brief Applies the cut when called

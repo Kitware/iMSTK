@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -37,14 +38,11 @@ public:
     SurfaceMeshToCapsuleCD();
     virtual ~SurfaceMeshToCapsuleCD() override = default;
 
-    ///
-    /// \brief Returns collision detection type string name
-    ///
-    virtual const std::string getTypeName() const override { return "SurfaceMeshToCapsuleCD"; }
+    IMSTK_TYPE_NAME(SurfaceMeshToCapsuleCD)
 
 protected:
     ///
-    /// \brief Compute collision data for AB simulatenously
+    /// \brief Compute collision data for AB simultaneously
     ///
     virtual void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,

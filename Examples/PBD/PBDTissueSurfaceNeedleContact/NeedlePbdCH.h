@@ -37,7 +37,7 @@ public:
     NeedlePbdCH() = default;
     ~NeedlePbdCH() override = default;
 
-    const std::string getTypeName() const override { return "NeedlePbdCH"; }
+    IMSTK_TYPE_NAME(NeedlePbdCH)
 
 protected:
     ///

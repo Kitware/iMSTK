@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkRigidObject2.h"
+#include "imstkMacros.h"
 
 using namespace imstk;
 
@@ -39,7 +40,7 @@ public:
     NeedleObject();
     virtual ~NeedleObject() = default;
 
-    virtual const std::string getTypeName() const override { return "NeedleObject"; }
+    IMSTK_TYPE_NAME(NeedleObject)
 
 public:
     // *INDENT-OFF*

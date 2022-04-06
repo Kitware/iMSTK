@@ -82,6 +82,7 @@ public:
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
+    /// Required to enable use of the IMSTK_TYPE_NAME macro
     virtual const std::string getTypeName() const = 0;
 
     // *INDENT-OFF*

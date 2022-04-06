@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkPointSet.h"
 
 #include <array>
@@ -143,10 +144,7 @@ public:
     SurfaceMesh();
     ~SurfaceMesh() override = default;
 
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    virtual const std::string getTypeName() const override { return "SurfaceMesh"; }
+    IMSTK_TYPE_NAME(SurfaceMesh)
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and

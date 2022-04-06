@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -38,10 +39,7 @@ public:
     SurfaceMeshToSurfaceMeshCD();
     virtual ~SurfaceMeshToSurfaceMeshCD() override = default;
 
-    ///
-    /// \brief Returns collision detection type string name
-    ///
-    virtual const std::string getTypeName() const override { return "SurfaceMeshToSurfaceMeshCD"; }
+    IMSTK_TYPE_NAME(SurfaceMeshToSurfaceMeshCD)
 
 public:
     void setMaxNumContacts(const int maxNumContacts) { m_maxNumContacts = maxNumContacts; }
@@ -49,7 +47,7 @@ public:
 
 protected:
     ///
-    /// \brief Compute collision data for AB simulatenously
+    /// \brief Compute collision data for AB simultaneously
     ///
     virtual void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,

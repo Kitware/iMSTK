@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkPbdRigidObjectCollision.h"
 
 using namespace imstk;
@@ -46,17 +47,15 @@ public:
                       std::shared_ptr<NeedleObject> needleObj);
     ~NeedleInteraction() override = default;
 
-public:
-    const std::string getTypeName() const override { return "NeedleInteraction"; }
+    IMSTK_TYPE_NAME(NeedleInteraction)
 
-public:
     std::shared_ptr<TetraToLineMeshCD> getEmbeddingCD() const { return tetMeshCD; }
     std::shared_ptr<NeedleEmbeddedCH> getEmbeddingCH() const { return embeddedCH; }
 
     ///
     /// \brief Setup connectivity of task graph
     ///
-    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     std::shared_ptr<TetraToLineMeshCD> tetMeshCD;

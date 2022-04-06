@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkDynamicObject.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -39,10 +40,10 @@ public:
     LevelSetDeformableObject(const std::string& name) : DynamicObject(name) { }
     ~LevelSetDeformableObject() override = default;
 
-    const std::string getTypeName() const override { return "LevelSetDeformableObject"; }
+    IMSTK_TYPE_NAME(LevelSetDeformableObject)
 
     ///
-    /// \biref Get the LevelSet model of the object
+    /// \brief Get the LevelSet model of the object
     ///
     std::shared_ptr<LevelSetModel> getLevelSetModel();
 
