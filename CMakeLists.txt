@@ -129,6 +129,9 @@ option(${PROJECT_NAME}_BUILD_TESTING "Build iMSTK tests" ON)
 mark_as_superbuild(${PROJECT_NAME}_BUILD_TESTING:BOOL)
 
 option(${PROJECT_NAME}_BUILD_VISUAL_TESTING "Build iMSTK visual tests" ON)
+if (${PROJECT_NAME}_BUILD_VISUAL_TESTING)
+    set(${PROJECT_NAME}_BUILD_TESTING ON)
+endif()
 mark_as_superbuild(${PROJECT_NAME}_BUILD_VISUAL_TESTING:BOOL)
 
 set(BUILD_TESTING OFF)
@@ -233,7 +236,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(SFML)
   endif()
 
-  if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_VISUAL_TESTING)
+  if(${PROJECT_NAME}_BUILD_TESTING)
     imstk_define_dependency(GTest)
 
     #-----------------------------------------------------------------------------
@@ -250,7 +253,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   endif()
 
   if (${PROJECT_NAME}_BUILD_TESTING OR 
-      ${PROJECT_NAME}_BUILD_VISUAL_TESTING OR 
       ${PROJECT_NAME}_BUILD_EXAMPLES)
     imstk_define_dependency(iMSTKData)
   endif()

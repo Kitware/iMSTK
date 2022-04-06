@@ -18,5 +18,3 @@
 
 include(imstkAddTest)
 imstk_add_visual_test( RenderingVTK )
-# Note: Links to ViewerVTK but only tests RenderingVTK
-target_link_libraries(RenderingVTKVisualTests ViewerVTK)

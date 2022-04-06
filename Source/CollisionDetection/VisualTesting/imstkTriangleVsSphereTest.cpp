@@ -22,14 +22,18 @@
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionDataDebugObject.h"
-#include "imstkCollisionDetectionVisualTest.h"
 #include "imstkDirectionalLight.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSimulationManager.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshToSphereCD.h"
 #include "imstkVecDataArray.h"
 #include "imstkVisualModel.h"
+#include "imstkVisualTestingUtils.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -39,7 +43,7 @@ using namespace imstk;
 /// It displays the collision data, and allows users to investigate various cases
 /// by moving the geometry around with keyboard controls i,j,k,l,o,u
 ///
-TEST_F(CollisionDetectionVisualTest, TriangleVsSphere)
+TEST_F(VisualTestManager, TriangleVsSphere)
 {
     // Setup the scene
     m_scene = std::make_shared<Scene>("TriangleVsSphereTest");
@@ -50,9 +54,9 @@ TEST_F(CollisionDetectionVisualTest, TriangleVsSphere)
     auto                    obj1 = std::make_shared<CollidingObject>("obj1");
     auto                    triangleMesh = std::make_shared<SurfaceMesh>();
     VecDataArray<double, 3> triangleVertices(3);
-    triangleVertices[0] = Vec3d(-0.5, 1.1, -0.5);
-    triangleVertices[1] = Vec3d(0.5, 1.1, -0.5);
-    triangleVertices[2] = Vec3d(0.0, 1.1, 0.5);
+    triangleVertices[0] = Vec3d(-0.5, 0.9, -0.5);
+    triangleVertices[1] = Vec3d(0.5, 0.9, -0.5);
+    triangleVertices[2] = Vec3d(0.0, 0.9, 0.5);
     VecDataArray<int, 3> triangleIndices(1);
     triangleIndices[0] = Vec3i(0, 1, 2);
     triangleMesh->initialize(
@@ -91,7 +95,7 @@ TEST_F(CollisionDetectionVisualTest, TriangleVsSphere)
     std::cout << "Key i/j/k/u/o move the triangle\n";
     std::cout << "================================================\n\n";
 
-    m_keyPressFunc =
+    connect<KeyEvent>(m_viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
         [&](KeyEvent* e)
         {
             const double s = 0.05;
@@ -123,12 +127,12 @@ TEST_F(CollisionDetectionVisualTest, TriangleVsSphere)
             triangleMesh->updatePostTransformData();
             cd->update();
             cdDebugObj->debugUpdate();
-        };
-    m_startingFunc =
+        });
+    connect<Event>(m_driver, &SimulationManager::starting,
         [&](Event*)
         {
             cdDebugObj->debugUpdate();
-        };
+        });
 
     runFor(2.0);
 }

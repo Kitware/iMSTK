@@ -131,13 +131,13 @@ public:
     void destroy()
     {
         m_g3logWorker = nullptr;
-        m_sinkCount = 0;
+        m_sinkCount   = 0;
     }
 
 private:
     Logger() { initialize(); }
 
     std::shared_ptr<g3::LogWorker> m_g3logWorker;
-    int m_sinkCount = 0; 
+    int m_sinkCount = 0;
 };
 } // namespace imstk

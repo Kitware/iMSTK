@@ -111,7 +111,7 @@ void
 Logger::initialize()
 {
     m_g3logWorker = g3::LogWorker::createLogWorker();
-    m_sinkCount = 0;
+    m_sinkCount   = 0;
     g3::initializeLogging(m_g3logWorker.get());
 }
 } // namespace imstk

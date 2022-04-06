@@ -55,6 +55,11 @@ public:
         m_modules.push_back(module);
     }
 
+    ///
+    /// \brief Remove all modules
+    ///
+    virtual void clearModules() { m_modules.clear(); }
+
     void requestStatus(ModuleDriverStatus status) { simState = status; }
     ModuleDriverStatus getStatus() const { return simState; }
 

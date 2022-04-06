@@ -127,7 +127,7 @@ protected:
 
 public:
     Eigen::Matrix<double, 3, 4> J = Eigen::Matrix<double, 3, 4>::Zero(); ///< Jacobian, "vanish" to zero
-    double vu = 0.0; ///< Bauhmgarte stabilization term
+    double vu = 0.0;                                                     ///< Bauhmgarte stabilization term
     // Range of the constraint force (for projection step during solve)
     // by default (0, inf) so bodies may only be pushed apart
     double range[2] = { 0.0, std::numeric_limits<double>::max() };

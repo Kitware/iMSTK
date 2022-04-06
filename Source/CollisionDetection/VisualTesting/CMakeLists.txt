@@ -18,7 +18,3 @@
 
 include(imstkAddTest)
 imstk_add_visual_test( CollisionDetection )
-target_link_libraries(CollisionDetectionVisualTests
-    SimulationManager  
-    ViewerVTK
-    )

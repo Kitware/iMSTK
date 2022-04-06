@@ -19,16 +19,20 @@
 
 =========================================================================*/
 
-#include "imstkCollisionDetectionVisualTest.h"
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionDataDebugObject.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkOrientedBox.h"
 #include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVisualTestingUtils.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -38,7 +42,7 @@ using namespace imstk;
 /// It displays the collision data, and allows users to investigate various cases
 /// by moving the geometry around with keyboard controls i,j,k,l,o,u
 ///
-TEST_F(CollisionDetectionVisualTest, BoxVsBoxSurfaceMesh)
+TEST_F(VisualTestManager, BoxVsBoxSurfaceMesh)
 {
     // Create a box mesh
     auto box1 = std::make_shared<OrientedBox>(
@@ -89,7 +93,7 @@ TEST_F(CollisionDetectionVisualTest, BoxVsBoxSurfaceMesh)
     std::cout << "Key 1/2/3/4 rotate the cube\n";
     std::cout << "================================================\n\n";
 
-    m_keyPressFunc =
+    connect<KeyEvent>(m_viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
         [&](KeyEvent* e)
         {
             const double s = 0.05;
@@ -138,12 +142,12 @@ TEST_F(CollisionDetectionVisualTest, BoxVsBoxSurfaceMesh)
             box2Mesh->updatePostTransformData();
             cd->update();
             cdDebugObj->debugUpdate();
-        };
-    m_startingFunc =
+        });
+    connect<Event>(m_driver, &SimulationManager::starting,
         [&](Event*)
         {
             cdDebugObj->debugUpdate();
-        };
+        });
 
     runFor(2.0);
 }

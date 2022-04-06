@@ -20,23 +20,26 @@
 =========================================================================*/
 
 #include "imstkRenderTest.h"
-
+#include "imstkCamera.h"
 #include "imstkColorFunction.h"
+#include "imstkGeometry.h"
+#include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
+#include "imstkTimer.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 void
-RenderTest::SetUp()
+RenderTest::createScene()
 {
-    scene = std::make_shared<Scene>("Render Test Scene");
-    scene->getActiveCamera()->setPosition(Vec3d(0.0, 1.0, -3.0));
-
-    viewer = std::make_shared<VTKViewer>("Viewer");
-    viewer->setActiveScene(scene);
+    m_scene = std::make_shared<Scene>("Render Test Scene");
+    m_scene->getActiveCamera()->setPosition(Vec3d(0.0, 1.0, -3.0));
 
     renderMaterial = std::make_shared<RenderMaterial>();
 
-    createGeometry();
-
-    ASSERT_TRUE(geom != nullptr) << "ERROR: No geometry";
+    ASSERT_NE(geom, nullptr) << "ERROR: No geometry";
 
     visualModel = std::make_shared<VisualModel>();
     visualModel->setGeometry(geom);
@@ -44,55 +47,37 @@ RenderTest::SetUp()
 
     sceneObj = std::make_shared<SceneObject>("SceneObject");
     sceneObj->addVisualModel(visualModel);
-    scene->addSceneObject(sceneObj);
-
-    viewer->init();
-}
-
-void
-RenderTest::runFor(const int seconds)
-{
-    StopWatch timer;
-    timer.start();
-    const double ms = seconds * 1000.0;
-    while (timer.getTimeElapsed() < ms)
-    {
-        viewer->update();
-    }
-    viewer->uninit();
+    m_scene->addSceneObject(sceneObj);
 }
 
 void
 RenderTest::runAllMaterials()
 {
-    complete     = false;
+    double elapsedTime = 0.0;
     displayMode  = 0;
     color        = 0;
     shadingModel = 0;
     blendMode    = 0;
     updateMaterial();
 
-    viewer->init();
-    StopWatch timer;
-    timer.start();
-    const double updateMaterialTimeMs = 50.0;
-    const double angularVel = 0.005;
-    while (!complete)
-    {
-        const double dt = timer.getTimeElapsed();
-        timer.start();
-        elapsedTime += dt;
-        if (elapsedTime > updateMaterialTimeMs)
+    const double updateMaterialTimeSecs = 0.05;
+    const double angularVel = 5.0;
+    connect<Event>(m_viewer, &VTKViewer::preUpdate,
+        [&](Event*)
         {
-            elapsedTime = 0.0;
-            updateMaterial();
-        }
-        geom->rotate(Vec3d(0.0, 1.0, 0.0), dt * angularVel);
-        geom->postModified();
-
-        viewer->update();
-    }
-    viewer->uninit();
+            const double dt = m_viewer->getDt();
+            elapsedTime    += dt;
+            if (elapsedTime > updateMaterialTimeSecs)
+            {
+                elapsedTime = 0.0;
+                updateMaterial();
+            }
+            geom->rotate(Vec3d(0.0, 1.0, 0.0), dt * angularVel);
+            geom->postModified();
+        });
+    // Run nonstop (define our own stopping criteria above,
+    // when all materials have cycled)
+    runFor(-1.0, 0.01);
 }
 
 void
@@ -228,6 +213,6 @@ RenderTest::updateMaterial()
     }
     if (displayMode == 8)
     {
-        complete = true;
+        m_driver->requestStatus(ModuleDriverStopped);
     }
 }

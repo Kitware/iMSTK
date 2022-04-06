@@ -110,6 +110,6 @@ protected:
     double m_compliance     = 1e-7;    ///< used in xPBD, inverse of Young's Modulus
     mutable double m_lambda = 0.0;     ///< Lagrange multiplier
 
-    std::vector<Vec3d> m_dcdx; ///< Normalized constraint gradients (per vertex)
+    std::vector<Vec3d> m_dcdx;         ///< Normalized constraint gradients (per vertex)
 };
 } // namespace imstk

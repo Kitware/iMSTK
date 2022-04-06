@@ -27,62 +27,37 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 
-class CapsuleRenderTest : public RenderTest
-{
-void createGeometry() override
+TEST_F(RenderTest, createCapsule)
 {
     geom = std::make_shared<Capsule>();
-}
-};
-TEST_F(CapsuleRenderTest, createCapsule)
-{
+    createScene();
     runAllMaterials();
 }
 
-class CylinderRenderTest : public RenderTest
-{
-void createGeometry() override
+TEST_F(RenderTest, createCylinder)
 {
     geom = std::make_shared<Cylinder>();
-}
-};
-TEST_F(CylinderRenderTest, createCylinder)
-{
-  runAllMaterials();
+    createScene();
+    runAllMaterials();
 }
 
-class OrientedBoxRenderTest : public RenderTest
-{
-void createGeometry() override
+TEST_F(RenderTest, createOrientedBox)
 {
     geom = std::make_shared<OrientedBox>();
-}
-};
-TEST_F(OrientedBoxRenderTest, createOrientedBox)
-{
-  runAllMaterials();
+    createScene();
+    runAllMaterials();
 }
 
-class PlaneRenderTest : public RenderTest
-{
-void createGeometry() override
+TEST_F(RenderTest, createPlane)
 {
     geom = std::make_shared<Plane>();
-}
-};
-TEST_F(PlaneRenderTest, createPlane)
-{
-  runAllMaterials();
+    createScene();
+    runAllMaterials();
 }
 
-class SphereRenderTest : public RenderTest
-{
-void createGeometry() override
+TEST_F(RenderTest, createSphere)
 {
     geom = std::make_shared<Sphere>();
-}
-};
-TEST_F(SphereRenderTest, createSphere)
-{
-  runAllMaterials();
+    createScene();
+    runAllMaterials();
 }

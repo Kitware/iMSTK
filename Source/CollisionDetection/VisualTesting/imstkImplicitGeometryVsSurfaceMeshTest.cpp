@@ -22,15 +22,19 @@
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionDataDebugObject.h"
-#include "imstkCollisionDetectionVisualTest.h"
 #include "imstkDirectionalLight.h"
-#include "imstkRenderMaterial.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkImplicitGeometry.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
-#include "imstkVecDataArray.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkPlane.h"
+#include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkVecDataArray.h"
 #include "imstkVisualModel.h"
+#include "imstkVisualTestingUtils.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -40,7 +44,7 @@ using namespace imstk;
 /// It displays the collision data, and allows users to investigate various cases
 /// by moving the geometry around with keyboard controls i,j,k,l,o,u
 ///
-TEST_F(CollisionDetectionVisualTest, ImplicitGeometryVsSurfaceMesh)
+TEST_F(VisualTestManager, ImplicitGeometryVsSurfaceMesh)
 {
     // Setup the scene
     m_scene = std::make_shared<Scene>("ImplicitGeometryVsSurfaceMesh");
@@ -96,7 +100,7 @@ TEST_F(CollisionDetectionVisualTest, ImplicitGeometryVsSurfaceMesh)
     std::cout << "Key i/j/k/u/o move the triangle\n";
     std::cout << "================================================\n\n";
 
-    m_keyPressFunc =
+    connect<KeyEvent>(m_viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
         [&](KeyEvent* e)
         {
             const double s = 0.05;
@@ -128,12 +132,12 @@ TEST_F(CollisionDetectionVisualTest, ImplicitGeometryVsSurfaceMesh)
             triangleMesh1->updatePostTransformData();
             cd->update();
             cdDebugObj->debugUpdate();
-        };
-    m_startingFunc =
+        });
+   connect<Event>(m_driver, &SimulationManager::starting,
         [&](Event*)
         {
             cdDebugObj->debugUpdate();
-        };
+        });
 
     runFor(2.0);
 }

@@ -18,7 +18,3 @@
 
 include(imstkAddTest)
 imstk_add_visual_test( Scene )
-target_link_libraries(SceneVisualTests
-    SimulationManager  
-    ViewerVTK
-    )

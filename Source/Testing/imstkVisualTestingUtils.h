@@ -21,41 +21,37 @@
 
 #pragma once
 
-#include "imstkVisualTestingUtils.h"
+#include <gtest/gtest.h>
 
 namespace imstk
 {
-class DirectionalLight;
-class Geometry;
-class RenderMaterial;
-class SceneObject;
-class VisualModel;
+class Scene;
+class SceneManager;
+class SimulationManager;
+class VTKViewer;
 } // namespace imstk
 
 using namespace imstk;
 
-class RenderTest : public VisualTestManager
+class VisualTestManager : public testing::Test
 {
 public:
-    void runAllMaterials();
+    void SetUp() override;
+
+    ///
+    /// \brief Run the simulation for given duration at given fixed timestep
+    /// \param total time (seconds) to run the simulation (-1 for nonstop)
+    /// \param fixed timestep (seconds)
+    ///
+    void runFor(const double duration = -1.0, const double fixedTimestep = 0.001);
 
 protected:
-    void createScene();
+    double m_duration    = 2.0;   ///< Duration to run the test
+    double m_dt          = 0.001; ///< Fixed timestep
+    bool   m_timerPaused = false;
 
-    void updateMaterial();
-
-    void applyColor();
-
-    // Render Contents
-    std::shared_ptr<DirectionalLight> light;
-    std::shared_ptr<Geometry>       geom;
-    std::shared_ptr<RenderMaterial> renderMaterial;
-    std::shared_ptr<VisualModel>    visualModel;
-    std::shared_ptr<SceneObject>    sceneObj;
-
-    int displayMode;
-    int color;
-    int shadingModel;
-    int blendMode;
-    std::string dm, c, sm, bm;
+    std::shared_ptr<VTKViewer>         m_viewer       = nullptr;
+    std::shared_ptr<SceneManager>      m_sceneManager = nullptr;
+    std::shared_ptr<SimulationManager> m_driver       = nullptr;
+    std::shared_ptr<Scene> m_scene = nullptr;
 };

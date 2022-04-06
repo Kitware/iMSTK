@@ -20,33 +20,26 @@
 =========================================================================*/
 
 #include "imstkRenderTest.h"
-
 #include "imstkTetrahedralMesh.h"
 #include "imstkVecDataArray.h"
 
-class TetrahedralMeshRenderTest : public RenderTest
+TEST_F(RenderTest, createTetrahedralMesh)
 {
-void createGeometry() override
-{
-    geom = std::make_shared<TetrahedralMesh>();
+    auto tetMesh = std::make_shared<TetrahedralMesh>();
+    geom = tetMesh;
 
-    auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
-    auto indicesPtr  = std::make_shared<VecDataArray<int, 4>>(1);
-
-    VecDataArray<double, 3>& vertices = *verticesPtr;
-    VecDataArray<int, 4>&    indices  = *indicesPtr;
-
+    VecDataArray<double, 3> vertices(4);
     vertices[0] = Vec3d(-0.5, 0.0, -0.5);
     vertices[1] = Vec3d(0.5, 0.0, -0.5);
     vertices[2] = Vec3d(0.0, 0.0, 0.75);
     vertices[3] = Vec3d(0.0, 0.5, 0.0);
 
+    VecDataArray<int, 4> indices(1);
     indices[0] = Vec4i(0, 1, 2, 3);
 
-    std::dynamic_pointer_cast<TetrahedralMesh>(geom)->initialize(verticesPtr, indicesPtr);
-}
-};
-TEST_F(TetrahedralMeshRenderTest, createTetrahedralMesh)
-{
-  runAllMaterials();
+    tetMesh->initialize(std::make_shared<VecDataArray<double, 3>>(vertices),
+        std::make_shared<VecDataArray<int, 4>>(indices));
+
+    createScene();
+    runAllMaterials();
 }
