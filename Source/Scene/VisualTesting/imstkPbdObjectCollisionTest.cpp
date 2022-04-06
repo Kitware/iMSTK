@@ -489,8 +489,8 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_TetNoMapping)
     m_collidingGeometry = implicitGeom;
 
     m_collisionName = "PointSetToPlaneCD";
-    m_friction      = 0.0;
-    m_restitution   = 0.0;
+    m_friction = 0.0;
+    m_restitution = 0.0;
 
     m_assertionBoundsMin = Vec3d(-1.0, -0.15, -1.0);
     m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -513,13 +513,48 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_TetMapping)
     m_collidingGeometry = implicitGeom;
 
     m_collisionName = "PointSetToPlaneCD";
-    m_friction      = 0.0;
-    m_restitution   = 0.0;
+    m_friction = 0.0;
+    m_restitution = 0.0;
 
     createScene();
     runFor(2.0);
 }
 ///@}
+
+///
+/// \brief Test edge case with multiple conflicting contacts
+///
+TEST_F(PbdObjectCollisionTest, PbdTissue_Crevice)
+{
+    // Setup the tissue
+    m_pbdObj = makeTriTissueObj("Tissue",
+        Vec2d(0.1, 0.1), Vec2i(3, 3), Vec3d::Zero(),
+        Quatd(Rotd(0.4, Vec3d(0.0, 0.0, 1.0))));
+
+    // Setup the geometry
+    auto                    surfMesh = std::make_shared<SurfaceMesh>();
+    VecDataArray<double, 3> vertices(4);
+    vertices[0] = Vec3d(0.0, -0.1, -0.25);
+    vertices[1] = Vec3d(0.0, -0.1, 0.25);
+    vertices[2] = Vec3d(0.25, 0.2, 0.0);
+    vertices[3] = Vec3d(-0.25, 0.2, 0.0);
+    VecDataArray<int, 3> indices(2);
+    indices[0] = Vec3i(0, 1, 2);
+    indices[1] = Vec3i(0, 3, 1);
+    surfMesh->initialize(std::make_shared<VecDataArray<double, 3>>(vertices),
+        std::make_shared<VecDataArray<int, 3>>(indices));
+    m_collidingGeometry = surfMesh;
+
+    m_collisionName = "MeshToMeshBruteForceCD";
+    m_friction = 0.0;
+    m_restitution = 0.0;
+
+    m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
+    m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
+
+    createScene();
+    runFor(4.0);
+}
 
 ///
 /// \brief Test MeshToMeshBruteForceCD with PbdObjectCollision
@@ -533,9 +568,9 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_MeshToMeshBruteForceCD_LineMeshVsSurfMe
     // Setup the geometry
     auto                    surfMesh = std::make_shared<SurfaceMesh>();
     VecDataArray<double, 3> vertices(3);
-    vertices[0] = Vec3d(-0.5, -0.1, 0.5);
-    vertices[1] = Vec3d(0.5, -0.1, 0.5);
-    vertices[2] = Vec3d(0.0, -0.1, -0.5);
+    vertices[0] = Vec3d(-0.25, -0.1, 0.25);
+    vertices[1] = Vec3d(0.25, -0.1, 0.25);
+    vertices[2] = Vec3d(0.0, -0.1, -0.25);
     VecDataArray<int, 3> indices(1);
     indices[0] = Vec3i(0, 1, 2);
     surfMesh->initialize(std::make_shared<VecDataArray<double, 3>>(vertices),
@@ -566,9 +601,9 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_MeshToMeshBruteForceCD_SurfMeshVsSurfMe
     // Setup the geometry
     auto                    surfMesh = std::make_shared<SurfaceMesh>();
     VecDataArray<double, 3> vertices(3);
-    vertices[0] = Vec3d(-0.5, -0.1, 0.5);
-    vertices[1] = Vec3d(0.5, -0.1, 0.5);
-    vertices[2] = Vec3d(0.0, -0.1, -0.5);
+    vertices[0] = Vec3d(-0.25, -0.1, 0.25);
+    vertices[1] = Vec3d(0.25, -0.1, 0.25);
+    vertices[2] = Vec3d(0.0, -0.1, -0.25);
     VecDataArray<int, 3> indices(1);
     indices[0] = Vec3i(0, 1, 2);
     surfMesh->initialize(std::make_shared<VecDataArray<double, 3>>(vertices),
@@ -593,7 +628,7 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_SurfaceMeshToSphereCD)
 {
     // Setup the tissue
     m_pbdObj = makeTriTissueObj("Tissue",
-        Vec2d(0.1, 0.1), Vec2i(3, 3), Vec3d::Zero(),
+        Vec2d(0.3, 0.3), Vec2i(3, 3), Vec3d::Zero(),
         Quatd(Rotd(0.4, Vec3d(0.0, 0.0, 1.0))));
 
     // Setup the geometry
@@ -620,7 +655,7 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_SurfaceMeshToCapsuleCD)
 {
     // Setup the tissue
     m_pbdObj = makeTriTissueObj("Tissue",
-        Vec2d(0.1, 0.1), Vec2i(3, 3), Vec3d::Zero(),
+        Vec2d(0.3, 0.3), Vec2i(3, 3), Vec3d::Zero(),
         Quatd(Rotd(0.4, Vec3d(0.0, 0.0, 1.0))));
 
     // Setup the geometry
