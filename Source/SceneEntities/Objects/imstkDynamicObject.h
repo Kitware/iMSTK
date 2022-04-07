@@ -106,6 +106,5 @@ protected:
     // Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap = nullptr; ///< Maps from Physics to collision geometry
     std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap    = nullptr; ///< Maps from Physics to visual geometry
-    bool m_updateVisualFromPhysicsGeometry = true;                      ///< Defines if visual is updated from colliding mapping or physics mapping
 };
 } // namespace imstk
