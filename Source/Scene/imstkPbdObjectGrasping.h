@@ -150,6 +150,8 @@ public:
 
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
+    bool hasConstraints() const;
+
 protected:
     ///
     /// \brief Update picking state, this should move grasp points

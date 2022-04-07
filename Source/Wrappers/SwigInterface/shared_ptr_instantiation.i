@@ -172,8 +172,9 @@
 %shared_ptr(imstk::RigidObjectCollision)
 %shared_ptr(imstk::PbdObjectCutting)
 %shared_ptr(imstk::PbdObjectGrasping)
-%shared_ptr(imstk::PbdRigidObjectCollision)
 %shared_ptr(imstk::PbdObjectCollision)
+%shared_ptr(imstk::PbdRigidObjectCollision)
+%shared_ptr(imstk::PbdRigidObjectGrasping)
 %shared_ptr(imstk::SphObjectCollision)
 
 /*

@@ -459,4 +459,10 @@ PbdObjectGrasping::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_
     m_taskGraph->addEdge(pbdModel->getSolveNode(), m_pickingNode);
     m_taskGraph->addEdge(m_pickingNode, pbdModel->getUpdateVelocityNode());
 }
+
+bool
+PbdObjectGrasping::hasConstraints() const
+{
+    return !m_constraints.empty();
+}
 } // namespace imstk

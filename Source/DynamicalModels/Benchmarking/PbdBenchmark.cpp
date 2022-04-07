@@ -24,11 +24,11 @@
 #include "imstkGeometry.h"
 #include "imstkMath.h"
 #include "imstkMeshIO.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPointSetToCapsuleCD.h"
+#include "imstkPointwiseMap.h"
 #include "imstkSphere.h"
 #include "imstkScene.h"
 #include "imstkSurfaceMesh.h"
@@ -400,7 +400,7 @@ BM_PbdContactDistanceVol(benchmark::State& state)
     prismObj->setCollidingGeometry(surfMesh);
 
     // Force deformation to match between the surface and volume mesh
-    prismObj->setPhysicsToCollidingMap(std::make_shared<OneToOneMap>(prismMesh, surfMesh));
+    prismObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(prismMesh, surfMesh));
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
@@ -612,7 +612,7 @@ BM_PbdFemContact(benchmark::State& state)
     prismObj->setCollidingGeometry(surfMesh);
 
     // Force deformation to match between the surface and volume mesh
-    prismObj->setPhysicsToCollidingMap(std::make_shared<OneToOneMap>(prismMesh, surfMesh));
+    prismObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(prismMesh, surfMesh));
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();

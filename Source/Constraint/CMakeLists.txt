@@ -6,6 +6,7 @@ imstk_add_library( Constraints
   SUBDIR_LIST
     PbdConstraints
     RigidBodyConstraints
+    MultiModelConstraints
   DEPENDS
     Common
     DataStructures
