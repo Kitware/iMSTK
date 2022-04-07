@@ -262,8 +262,8 @@ PbdCollisionHandling::generateMeshNonMeshConstraints(
         {
             std::array<VertexMassPair, 1> vertexMassA = getVertex(colElemA, sideA);
 
-            const Vec3d& dir   = colElemA.m_element.m_PointIndexDirectionElement.dir;                      // Direction to resolve point out of shape
-            const Vec3d& pt    = *vertexMassA[0].vertex; // Point inside the shape
+            const Vec3d& dir   = colElemA.m_element.m_PointIndexDirectionElement.dir; // Direction to resolve point out of shape
+            const Vec3d& pt    = *vertexMassA[0].vertex;                              // Point inside the shape
             const double depth = colElemA.m_element.m_PointIndexDirectionElement.penetrationDepth;
 
             // Point to resolve to

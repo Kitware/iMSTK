@@ -489,8 +489,8 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_TetNoMapping)
     m_collidingGeometry = implicitGeom;
 
     m_collisionName = "PointSetToPlaneCD";
-    m_friction = 0.0;
-    m_restitution = 0.0;
+    m_friction      = 0.0;
+    m_restitution   = 0.0;
 
     m_assertionBoundsMin = Vec3d(-1.0, -0.15, -1.0);
     m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -513,8 +513,8 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_TetMapping)
     m_collidingGeometry = implicitGeom;
 
     m_collisionName = "PointSetToPlaneCD";
-    m_friction = 0.0;
-    m_restitution = 0.0;
+    m_friction      = 0.0;
+    m_restitution   = 0.0;
 
     createScene();
     runFor(2.0);
@@ -546,8 +546,8 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_Crevice)
     m_collidingGeometry = surfMesh;
 
     m_collisionName = "MeshToMeshBruteForceCD";
-    m_friction = 0.0;
-    m_restitution = 0.0;
+    m_friction      = 0.0;
+    m_restitution   = 0.0;
 
     m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
     m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
