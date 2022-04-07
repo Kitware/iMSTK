@@ -163,8 +163,9 @@
 #include "imstkRigidObjectCollision.h"
 #include "imstkPbdObjectCutting.h"
 #include "imstkPbdObjectGrasping.h"
-#include "imstkPbdRigidObjectCollision.h"
 #include "imstkPbdObjectCollision.h"
+#include "imstkPbdRigidObjectCollision.h"
+#include "imstkPbdRigidObjectGrasping.h"
 #include "imstkSphObjectCollision.h"
 
 /*
@@ -395,8 +396,9 @@ namespace std
 %include "../../Scene/imstkRigidObjectCollision.h"
 %include "../../Scene/imstkPbdObjectCutting.h"
 %include "../../Scene/imstkPbdObjectGrasping.h"
-%include "../../Scene/imstkPbdRigidObjectCollision.h"
 %include "../../Scene/imstkPbdObjectCollision.h"
+%include "../../Scene/imstkPbdRigidObjectCollision.h"
+%include "../../Scene/imstkPbdRigidObjectGrasping.h"
 %include "../../Scene/imstkSphObjectCollision.h"
 
 /*
