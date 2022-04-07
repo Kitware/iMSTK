@@ -27,7 +27,7 @@ limitations under the License.
 namespace imstk
 {
 ///
-/// \brief PickData provides a set of ids, an idCount, & a cell type
+/// \brief PickData provides ids to indicate what was picked
 /// These may be optionally used to indicate the selection
 ///
 struct PickData

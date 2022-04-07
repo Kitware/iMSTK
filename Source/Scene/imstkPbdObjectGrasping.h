@@ -31,11 +31,11 @@ limitations under the License.
 namespace imstk
 {
 class AnalyticalGeometry;
-class OneToOneMap;
 class PbdCollisionConstraint;
 class PbdObject;
-class PointSet;
 class PickingAlgorithm;
+class PointSet;
+class PointwiseMap;
 
 ///
 /// \class PbdObjectGrasping
@@ -140,7 +140,7 @@ public:
     /// \brief Set a different geometry to pick with and a mapping back to the physics geometry
     /// to select the correct vertices
     ///
-    void setGeometryToPick(std::shared_ptr<Geometry> geomToPick, std::shared_ptr<OneToOneMap> map)
+    void setGeometryToPick(std::shared_ptr<Geometry> geomToPick, std::shared_ptr<PointwiseMap> map)
     {
         m_geomToPick = geomToPick;
         m_geometryToPickMap = map;
@@ -164,8 +164,8 @@ protected:
 protected:
     std::shared_ptr<TaskNode> m_pickingNode = nullptr;
 
-    std::shared_ptr<Geometry>    m_geomToPick = nullptr;
-    std::shared_ptr<OneToOneMap> m_geometryToPickMap = nullptr;
+    std::shared_ptr<Geometry>     m_geomToPick = nullptr;
+    std::shared_ptr<PointwiseMap> m_geometryToPickMap = nullptr;
 
     std::shared_ptr<PbdObject> m_objectToGrasp      = nullptr;
     std::shared_ptr<AnalyticalGeometry> m_graspGeom = nullptr;

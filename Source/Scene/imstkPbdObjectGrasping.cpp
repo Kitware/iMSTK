@@ -24,11 +24,11 @@ limitations under the License.
 #include "imstkCDObjectFactory.h"
 #include "imstkCellPicker.h"
 #include "imstkLineMesh.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPointPicker.h"
+#include "imstkPointwiseMap.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
@@ -44,7 +44,7 @@ namespace imstk
 struct MeshSide
 {
     MeshSide(VecDataArray<double, 3>& verticest, VecDataArray<double, 3>& velocitiest, DataArray<double>& invMassest,
-             AbstractDataArray* indicesPtrt, OneToOneMap* mapt) : vertices(verticest), velocities(velocitiest),
+             AbstractDataArray* indicesPtrt, PointwiseMap* mapt) : vertices(verticest), velocities(velocitiest),
         invMasses(invMassest), indicesPtr(indicesPtrt), map(mapt)
     {
     }
@@ -53,7 +53,7 @@ struct MeshSide
     VecDataArray<double, 3>& velocities;
     DataArray<double>& invMasses;
     AbstractDataArray* indicesPtr = nullptr;
-    OneToOneMap* map = nullptr;
+    PointwiseMap* map = nullptr;
 };
 
 template<int N>
@@ -69,7 +69,7 @@ getElement(const PickData& pickData, const MeshSide& side)
             int vertexId = cell[i];
             if (side.map != nullptr)
             {
-                vertexId = static_cast<int>(side.map->getMapIdx(vertexId));
+                vertexId = static_cast<int>(side.map->getParentVertexId(vertexId));
             }
             results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
         }
@@ -81,7 +81,7 @@ getElement(const PickData& pickData, const MeshSide& side)
             int vertexId = pickData.ids[i];
             if (side.map != nullptr)
             {
-                vertexId = static_cast<int>(side.map->getMapIdx(vertexId));
+                vertexId = static_cast<int>(side.map->getParentVertexId(vertexId));
             }
             results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
         }
@@ -223,7 +223,7 @@ PbdObjectGrasping::addPickConstraints()
     }
 
     // If the user tries to pick
-    OneToOneMap* map = nullptr;
+    PointwiseMap* map = nullptr;
     if (m_geometryToPickMap != nullptr)
     {
         map = m_geometryToPickMap.get();
@@ -253,7 +253,7 @@ PbdObjectGrasping::addPickConstraints()
             int             vertexId = data.ids[0];
             if (meshStruct.map != nullptr)
             {
-                vertexId = static_cast<int>(meshStruct.map->getMapIdx(vertexId));
+                vertexId = static_cast<int>(meshStruct.map->getParentVertexId(vertexId));
             }
 
             const Vec3d relativePos = pickGeomRot * (vertices[vertexId] - pickGeomPos);

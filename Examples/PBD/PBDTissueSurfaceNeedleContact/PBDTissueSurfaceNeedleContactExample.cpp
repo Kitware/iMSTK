@@ -29,10 +29,10 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
+#include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -253,7 +253,7 @@ makeTissueObj(const std::string& name,
     // Setup the Object
     clothObj->setPhysicsGeometry(tissueMesh);
     clothObj->setCollidingGeometry(surfMesh);
-    clothObj->setPhysicsToCollidingMap(std::make_shared<OneToOneMap>(tissueMesh, surfMesh));
+    clothObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     clothObj->setDynamicalModel(pbdModel);
 
     return clothObj;

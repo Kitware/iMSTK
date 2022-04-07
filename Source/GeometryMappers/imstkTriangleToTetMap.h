@@ -1,69 +1,59 @@
 /*=========================================================================
-
    Library: iMSTK
-
    Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
    & Imaging in Medicine, Rensselaer Polytechnic Institute.
-
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
-
       http://www.apache.org/licenses/LICENSE-2.0.txt
-
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-
 =========================================================================*/
 
 #pragma once
 
-#include "imstkGeometryMap.h"
-#include "imstkMacros.h"
+#include "imstkPointwiseMap.h"
+#include "imstkMath.h"
+#include "imstkTypes.h"
 
 namespace imstk
 {
 ///
-/// \class IdentityMap
+/// \class TriangleToTetMap
 ///
-/// \brief A maps that lets the child follow the parent's position and orientation
+/// \brief SurfaceToTetrahedralMap serves as a PointwiseMap but also maps
+/// tets to triangle faces.
 ///
-class IdentityMap : public GeometryMap
+class TriangleToTetMap : public PointwiseMap
 {
 public:
-    IdentityMap() { }
-    ~IdentityMap() override = default;
+    TriangleToTetMap();
+    TriangleToTetMap(
+        std::shared_ptr<Geometry> parent,
+        std::shared_ptr<Geometry> child);
+    ~TriangleToTetMap() override = default;
 
-    IMSTK_TYPE_NAME(IdentityMap)
+    IMSTK_TYPE_NAME(TriangleToTetMap)
 
     ///
     /// \brief Compute the map
     ///
-    void compute() override {}
+    void compute() override;
 
     ///
-    /// \brief Apply the map
+    /// \brief Compute tet vertex id to surf vertex id map
     ///
-    void apply() override;
+    void computeTriToTetMap(std::unordered_map<int, int>& triToTetMap);
 
     ///
-    /// \brief Check the validity of the map
+    /// \brief Get the tet id that contains the triangle
     ///
-    bool isValid() const override { return true; }
+    int getParentTetId(const int triId) const;
 
-    // Accessors
-
-    ///
-    /// \brief DISABLED: Set the transform of the Identity map
-    ///
-    void setTransform(const RigidTransform3d& affineTransform) = delete;
-
-    ///
-    /// \brief Get the transform of Identity map which is an Identity (3x3)
-    ///
-    const RigidTransform3d getTransform() const;
+public:
+    std::unordered_map<int, int> m_triToTetMap;
 };
 } // namespace imstk

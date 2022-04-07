@@ -20,26 +20,16 @@
 =========================================================================*/
 
 #include "InflatableObject.h"
-#include "imstkNew.h"
-#include "imstkVecDataArray.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkCollisionUtils.h"
 #include "imstkImageData.h"
-#include "imstkLogger.h"
 #include "imstkMeshIO.h"
-#include "imstkOneToOneMap.h"
-#include "imstkParallelFor.h"
-#include "imstkPbdConstraint.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdObject.h"
-#include "imstkRenderMaterial.h"
-#include "imstkTexture.h"
-#include "imstkVisualModel.h"
-#include "imstkCollisionUtils.h"
-
+#include "imstkNew.h"
 #include "imstkPbdInflatableDistanceConstraint.h"
 #include "imstkPbdInflatableVolumeConstraint.h"
+#include "imstkPbdModel.h"
+#include "imstkPointwiseMap.h"
+#include "imstkRenderMaterial.h"
+#include "imstkVisualModel.h"
 
 InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueSize, const Vec3i& tissueDim, const Vec3d& tissueCenter) : PbdObject(name)
 {
@@ -106,7 +96,7 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
     // Setup the Object
     setPhysicsGeometry(m_objectTetMesh);
     setCollidingGeometry(m_objectSurfMesh);
-    setPhysicsToCollidingMap(std::make_shared<OneToOneMap>(m_objectTetMesh, m_objectSurfMesh));
+    setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(m_objectTetMesh, m_objectSurfMesh));
     setDynamicalModel(pbdModel);
 }
 

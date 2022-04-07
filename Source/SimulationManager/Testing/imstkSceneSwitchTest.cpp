@@ -21,9 +21,9 @@
 
 #include "imstkCamera.h"
 #include "imstkMeshIO.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -124,7 +124,7 @@ createSoftBodyScene(std::string sceneName)
     pbdObj->setVisualGeometry(surfMesh);
     pbdObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     pbdObj->setPhysicsGeometry(tetMesh);
-    pbdObj->setPhysicsToVisualMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));
+    pbdObj->setPhysicsToVisualMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     pbdObj->setDynamicalModel(pbdModel);
 
     scene->addSceneObject(pbdObj);

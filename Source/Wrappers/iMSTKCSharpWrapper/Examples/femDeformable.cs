@@ -143,7 +143,7 @@ public class FeDeformable
         deformableObj.addVisualModel(surfMeshModel);
         deformableObj.setPhysicsGeometry(tetMesh);
         // Map simulated geometry to visual
-        deformableObj.setPhysicsToVisualMap(new OneToOneMap(tetMesh, surfMesh));
+        deformableObj.setPhysicsToVisualMap(new PointwiseMap(tetMesh, surfMesh));
         deformableObj.setDynamicalModel(dynaModel);
 
         return deformableObj;

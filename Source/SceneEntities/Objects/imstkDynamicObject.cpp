@@ -49,7 +49,7 @@ DynamicObject::updateGeometries()
     {
         if (m_physicsToVisualGeomMap)
         {
-            m_physicsToVisualGeomMap->apply();
+            m_physicsToVisualGeomMap->update();
             m_physicsToVisualGeomMap->getChildGeometry()->postModified();
         }
     }
@@ -66,7 +66,7 @@ DynamicObject::updatePhysicsGeometry()
 
     if (m_physicsToCollidingGeomMap)
     {
-        m_physicsToCollidingGeomMap->apply();
+        m_physicsToCollidingGeomMap->update();
         m_physicsToCollidingGeomMap->getChildGeometry()->postModified();
     }
 
@@ -83,12 +83,12 @@ DynamicObject::initialize()
     {
         if (m_physicsToCollidingGeomMap)
         {
-            m_physicsToCollidingGeomMap->initialize();
+            m_physicsToCollidingGeomMap->compute();
         }
 
         if (m_physicsToVisualGeomMap)
         {
-            m_physicsToVisualGeomMap->initialize();
+            m_physicsToVisualGeomMap->compute();
         }
 
         return m_dynamicalModel->initialize();

@@ -21,19 +21,21 @@
 
 #pragma once
 
-#include "imstkGeometry.h"
+#include "imstkGeometryAlgorithm.h"
 
 namespace imstk
 {
+class Geometry;
+
 ///
 /// \class GeometryMap
 ///
 /// \brief Base class for any geometric map
 ///
-class GeometryMap
+class GeometryMap : public GeometryAlgorithm
 {
 protected:
-    GeometryMap() : m_isActive(true) { }
+    GeometryMap();
 
 public:
     virtual ~GeometryMap() = default;
@@ -45,72 +47,22 @@ public:
     virtual const std::string getTypeName() const = 0;
 
     ///
-    /// \brief Compute the map
+    /// \brief Compute the map, usually called once on startup
     ///
     virtual void compute() = 0;
 
     ///
-    /// \brief Apply the map
-    ///
-    virtual void apply() = 0;
-
-    ///
-    /// \brief Print the map
-    ///
-    virtual void print() const;
-
-    ///
-    /// \brief Deactivate the map
-    ///
-    void mute();
-
-    ///
-    /// \brief Check the validity of the map
-    ///
-    virtual bool isValid() const = 0;
-
-    ///
-    /// \brief Activate the map
-    ///
-    void activate();
-
-    ///
-    /// \brief Returns true if the map is actively applied at runtime, else false.
-    ///
-    bool isActive() const;
-
-    // Accessors
-
-    ///
     /// \brief Get/Set parent geometry
     ///@{
-    virtual void setParentGeometry(std::shared_ptr<Geometry> parent);
-    virtual std::shared_ptr<Geometry> getParentGeometry() const;
+    void setParentGeometry(std::shared_ptr<Geometry> parent) { setInput(parent, 0); }
+    std::shared_ptr<Geometry> getParentGeometry() const { return getInput(0); }
     ///@}
 
     ///
     /// \brief Get/Set child geometry
     ///@{
-    virtual void setChildGeometry(std::shared_ptr<Geometry> child);
-    virtual std::shared_ptr<Geometry> getChildGeometry() const;
+    void setChildGeometry(std::shared_ptr<Geometry> child) { setInput(child, 1); }
+    std::shared_ptr<Geometry> getChildGeometry() const { return getInput(1); }
     ///@}
-
-    ///
-    /// \brief getMapIdx
-    /// \param idx
-    /// \return index of parent corresponding to the idx of child
-    ///
-    virtual size_t getMapIdx(const size_t&) { return 0; }
-
-    ///
-    /// \brief Initialize the map
-    ///
-    virtual void initialize();
-
-protected:
-    bool m_isActive;                        ///> true if the map us active at runtime
-
-    std::shared_ptr<Geometry> m_parentGeom; ///> the geometry which dictates the configuration
-    std::shared_ptr<Geometry> m_childGeom;  ///> the geometry which follows the parent
 };
 } // namespace imstk

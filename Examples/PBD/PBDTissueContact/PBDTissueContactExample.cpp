@@ -29,9 +29,9 @@
 #include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkPointwiseMap.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
@@ -273,7 +273,7 @@ makeTissueObj(const std::string& name,
     // Setup the Object
     clothObj->setPhysicsGeometry(tissueMesh);
     clothObj->setCollidingGeometry(surfMesh);
-    clothObj->setPhysicsToCollidingMap(std::make_shared<OneToOneMap>(tissueMesh, surfMesh));
+    clothObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     clothObj->setDynamicalModel(pbdModel);
 
     return clothObj;

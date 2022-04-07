@@ -62,7 +62,7 @@ public class PbdCollisionOneObject
                 deformableObj.addVisualModel(surfMeshModel);
                 deformableObj.setCollidingGeometry(coarseTetMesh);
                 deformableObj.setPhysicsGeometry(coarseTetMesh);
-                deformableObj.setPhysicsToVisualMap(new TetraTriangleMap(coarseTetMesh, highResSurfMesh));
+                deformableObj.setPhysicsToVisualMap(new PointToTetMap(coarseTetMesh, highResSurfMesh));
                 deformableObj.setDynamicalModel(pbdModel);
             }
             scene.addSceneObject(deformableObj);

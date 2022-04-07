@@ -20,27 +20,14 @@
 =========================================================================*/
 
 #include "imstkIsometricMap.h"
+#include "imstkGeometry.h"
 #include "imstkLogger.h"
 
 namespace imstk
 {
 void
-IsometricMap::apply()
+IsometricMap::requestUpdate()
 {
-    // Check Map active
-    if (!m_isActive)
-    {
-        LOG(WARNING) << "Isometric map is not active";
-        return;
-    }
-
-    // Check geometries
-    if (!m_parentGeom || !m_childGeom)
-    {
-        LOG(WARNING) << "Isometric map is being applied without valid geometries";
-        return;
-    }
-
-    m_childGeom->setTransform(m_parentGeom->getTransform());
+    getChildGeometry()->setTransform(getParentGeometry()->getTransform());
 }
 } // namespace imstk

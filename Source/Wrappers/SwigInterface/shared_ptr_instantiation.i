@@ -50,8 +50,8 @@
  * GeometryMap
  */
 %shared_ptr(imstk::GeometryMap)
-%shared_ptr(imstk::OneToOneMap)
-%shared_ptr(imstk::TetraTriangleMap)
+%shared_ptr(imstk::PointwiseMap)
+%shared_ptr(imstk::PointToTetMap)
 
 /*
  * FilteringCore

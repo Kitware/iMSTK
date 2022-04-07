@@ -47,8 +47,8 @@
  * GeometryMappers
  */
 #include "imstkGeometryMap.h"
-#include "imstkOneToOneMap.h"
-#include "imstkTetraTriangleMap.h"
+#include "imstkPointwiseMap.h"
+#include "imstkPointToTetMap.h"
 
 /*
  * Filter
@@ -267,8 +267,8 @@ namespace std
  * GeometryMap
  */
 %include "../../GeometryMappers/imstkGeometryMap.h"
-%include "../../GeometryMappers/imstkOneToOneMap.h"
-%include "../../GeometryMappers/imstkTetraTriangleMap.h"
+%include "../../GeometryMappers/imstkPointwiseMap.h"
+%include "../../GeometryMappers/imstkPointToTetMap.h"
 
 /*
  * FilteringCore
@@ -351,10 +351,10 @@ namespace std
 /*
  * CollisionDetection
  */
-%include "../../CollisionDetection/CollisionData/imstkCollisionData.h";
-%include "../../CollisionDetection/CollisionDetection/imstkCollisionDetectionAlgorithm.h"
+%include "../../CollisionDetection/imstkCollisionData.h"
+%include "../../CollisionDetection/imstkCollisionDetectionAlgorithm.h"
+%include "../../CollisionDetection/imstkCollisionUtils.h"
 %include "../../CollisionDetection/CollisionDetection/imstkBidirectionalPlaneToSphereCD.h"
-%include "../../CollisionDetection/CollisionDetection/imstkCollisionUtils.h"
 %include "../../CollisionDetection/CollisionDetection/imstkImplicitGeometryToPointSetCCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkImplicitGeometryToPointSetCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkMeshToMeshBruteForceCD.h"

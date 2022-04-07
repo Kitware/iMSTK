@@ -239,3 +239,42 @@ TEST(imstkPointerPickerTest, PickFirstHit)
     const std::vector<PickData>& pickData1 = picker.pick(obb);
     EXPECT_EQ(pickData1.size(), 1);
 }
+
+///
+/// \brief Test that the intersection points are ordered by distance along the ray
+///
+TEST(imstkPointerPickerTest, PickOrder)
+{
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    {
+        // 3 Triangles at differing heights (out of order, { 1, 0, 2 })
+        auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(9);
+        (*verticesPtr)[0] = Vec3d(0.5, 0.0, -0.5);
+        (*verticesPtr)[1] = Vec3d(-0.5, 0.0, -0.5);
+        (*verticesPtr)[2] = Vec3d(0.0, 0.0, 0.5);
+
+        (*verticesPtr)[3] = Vec3d(0.5, 1.0, -0.5);
+        (*verticesPtr)[4] = Vec3d(-0.5, 1.0, -0.5);
+        (*verticesPtr)[5] = Vec3d(0.0, 1.0, 0.5);
+
+        (*verticesPtr)[6] = Vec3d(0.5, -1.0, -0.5);
+        (*verticesPtr)[7] = Vec3d(-0.5, -1.0, -0.5);
+        (*verticesPtr)[8] = Vec3d(0.0, -1.0, 0.5);
+        auto indicesPtr = std::make_shared<VecDataArray<int, 3>>(3);
+        (*indicesPtr)[0] = Vec3i(0, 1, 2);
+        (*indicesPtr)[1] = Vec3i(3, 4, 5);
+        (*indicesPtr)[2] = Vec3i(6, 7, 8);
+        surfMesh->initialize(verticesPtr, indicesPtr);
+    }
+
+    // Ray above triangle, pointing directly down
+    PointPicker picker;
+    picker.setPickingRay(Vec3d(0.0, 2.0, 0.0), Vec3d(0.0, -1.0, 0.0));
+    picker.setUseFirstHit(false);
+    const std::vector<PickData>& pickData1 = picker.pick(surfMesh);
+    EXPECT_EQ(pickData1.size(), 3);
+
+    EXPECT_EQ(pickData1[0].ids[0], 1);
+    EXPECT_EQ(pickData1[1].ids[0], 0);
+    EXPECT_EQ(pickData1[2].ids[0], 2);
+}
