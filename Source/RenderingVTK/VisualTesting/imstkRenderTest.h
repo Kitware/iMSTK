@@ -34,7 +34,7 @@ class VisualModel;
 
 using namespace imstk;
 
-class RenderTest : public VisualTestManager
+class RenderTest : public VisualTest
 {
 public:
     void runAllMaterials();

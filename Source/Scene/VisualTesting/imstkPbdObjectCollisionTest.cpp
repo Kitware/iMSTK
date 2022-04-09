@@ -377,7 +377,7 @@ makeLineThreadObj(const std::string& name,
     return tissueObj;
 }
 
-class PbdObjectCollisionTest : public VisualTestManager
+class PbdObjectCollisionTest : public VisualTest
 {
 public:
     void createScene()

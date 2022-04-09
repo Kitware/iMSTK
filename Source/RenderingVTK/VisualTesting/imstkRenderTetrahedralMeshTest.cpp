@@ -23,7 +23,7 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkVecDataArray.h"
 
-TEST_F(RenderTest, createTetrahedralMesh)
+TEST_F(RenderTest, TetrahedralMesh)
 {
     auto tetMesh = std::make_shared<TetrahedralMesh>();
     geom = tetMesh;

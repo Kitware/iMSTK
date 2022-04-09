@@ -20,21 +20,11 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollidingObject.h"
-#include "imstkCollisionDataDebugObject.h"
-#include "imstkDirectionalLight.h"
-#include "imstkImplicitGeometry.h"
+#include "imstkCollisionDetectionVisualTest.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
-#include "imstkKeyboardDeviceClient.h"
 #include "imstkPlane.h"
-#include "imstkRenderMaterial.h"
-#include "imstkScene.h"
-#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVecDataArray.h"
-#include "imstkVisualModel.h"
-#include "imstkVisualTestingUtils.h"
-#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -42,102 +32,39 @@ using namespace imstk;
 /// \brief This test is used to investigate ImplicitGeometry Vs SurfaceMesh collision
 /// of the ImplicitGeometryToPointSet method.
 /// It displays the collision data, and allows users to investigate various cases
-/// by moving the geometry around with keyboard controls i,j,k,l,o,u
 ///
-TEST_F(VisualTestManager, ImplicitGeometryVsSurfaceMesh)
+TEST_F(CollisionDetectionVisualTest, ImplicitGeometryVsSurfaceMesh)
 {
-    // Setup the scene
-    m_scene = std::make_shared<Scene>("ImplicitGeometryVsSurfaceMesh");
-    m_scene->getActiveCamera()->setPosition(0.18, 1.08, 1.34);
-    m_scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
-    m_scene->getActiveCamera()->setViewUp(0.011, 0.78, -0.63);
+    m_camera = std::make_shared<Camera>();
+    m_camera->setPosition(0.18, 1.08, 1.34);
+    m_camera->setFocalPoint(0.0, 0.0, 0.0);
+    m_camera->setViewUp(0.011, 0.78, -0.63);
 
-    auto                    obj1 = std::make_shared<CollidingObject>("obj1");
-    auto                    triangleMesh1 = std::make_shared<SurfaceMesh>();
-    VecDataArray<double, 3> triangleVertices1(3);
-    triangleVertices1[0] = Vec3d(0.1, -0.5, 0.0);
-    triangleVertices1[1] = Vec3d(0.1, 0.5, 0.0);
-    triangleVertices1[2] = Vec3d(-0.5, 0.0, 0.0);
-    VecDataArray<int, 3> triangleIndices1(1);
-    triangleIndices1[0] = Vec3i(0, 1, 2);
-    triangleMesh1->initialize(
-        std::make_shared<VecDataArray<double, 3>>(triangleVertices1),
-        std::make_shared<VecDataArray<int, 3>>(triangleIndices1));
-    obj1->setVisualGeometry(triangleMesh1);
-    obj1->setCollidingGeometry(triangleMesh1);
-    obj1->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
-    m_scene->addSceneObject(obj1);
-
-    auto obj2 = std::make_shared<CollidingObject>("obj2");
     auto implicitGeom = std::make_shared<Plane>();
     implicitGeom->setNormal(0.0, 1.0, 0.0);
     implicitGeom->setPosition(0.0, 0.0, 0.0);
     implicitGeom->setWidth(0.5);
-    obj2->setVisualGeometry(implicitGeom);
-    obj2->setCollidingGeometry(implicitGeom);
-    obj2->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
-    m_scene->addSceneObject(obj2);
+    m_cdGeom1 = implicitGeom;
+
+    auto                    triangleMesh = std::make_shared<SurfaceMesh>();
+    VecDataArray<double, 3> triangleVertices(3);
+    triangleVertices[0] = Vec3d(0.1, -0.5, 0.0);
+    triangleVertices[1] = Vec3d(0.1, 0.5, 0.0);
+    triangleVertices[2] = Vec3d(-0.5, 0.0, 0.0);
+    VecDataArray<int, 3> triangleIndices(1);
+    triangleIndices[0] = Vec3i(0, 1, 2);
+    triangleMesh->initialize(
+        std::make_shared<VecDataArray<double, 3>>(triangleVertices),
+        std::make_shared<VecDataArray<int, 3>>(triangleIndices));
+    m_cdGeom2 = triangleMesh;
 
     auto cd = std::make_shared<ImplicitGeometryToPointSetCD>();
     cd->setGenerateCD(true, true);
-    cd->setInputGeometryA(triangleMesh1);
+    cd->setInputGeometryA(triangleMesh);
     cd->setInputGeometryB(implicitGeom);
     cd->update();
+    m_collisionMethod = cd;
 
-    // Debug geometry to visualize collision data
-    auto cdDebugObj = std::make_shared<CollisionDataDebugObject>();
-    cdDebugObj->setInputCD(cd->getCollisionData());
-    cdDebugObj->setPrintContacts(true);
-    m_scene->addSceneObject(cdDebugObj);
-
-    // Light
-    auto light = std::make_shared<DirectionalLight>();
-    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-    light->setIntensity(1.0);
-    m_scene->addLight("Light", light);
-
-    std::cout << "================================================\n";
-    std::cout << "Key i/j/k/u/o move the triangle\n";
-    std::cout << "================================================\n\n";
-
-    connect<KeyEvent>(m_viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
-        [&](KeyEvent* e)
-        {
-            const double s = 0.05;
-            if (e->m_key == 'i')
-            {
-                triangleMesh1->translate(Vec3d(0.0, 0.0, 1.0) * s);
-            }
-            else if (e->m_key == 'k')
-            {
-                triangleMesh1->translate(Vec3d(0.0, 0.0, -1.0) * s);
-            }
-            else if (e->m_key == 'j')
-            {
-                triangleMesh1->translate(Vec3d(-1.0, 0.0, 0.0) * s);
-            }
-            else if (e->m_key == 'l')
-            {
-                triangleMesh1->translate(Vec3d(1.0, 0.0, 0.0) * s);
-            }
-            else if (e->m_key == 'u')
-            {
-                triangleMesh1->translate(Vec3d(0.0, -1.0, 0.0) * s);
-            }
-            else if (e->m_key == 'o')
-            {
-                triangleMesh1->translate(Vec3d(0.0, 1.0, 0.0) * s);
-            }
-            triangleMesh1->postModified();
-            triangleMesh1->updatePostTransformData();
-            cd->update();
-            cdDebugObj->debugUpdate();
-        });
-   connect<Event>(m_driver, &SimulationManager::starting,
-        [&](Event*)
-        {
-            cdDebugObj->debugUpdate();
-        });
-
+    createScene();
     runFor(2.0);
 }

@@ -34,8 +34,12 @@
 using namespace imstk;
 
 void
-VisualTestManager::SetUp()
+VisualTest::SetUp()
 {
+    if (m_useStdOut)
+    {
+        Logger::getInstance().addStdoutSink();
+    }
     // Constructed early so user can subscribe calls to them
     m_driver       = std::make_shared<SimulationManager>();
     m_sceneManager = std::make_shared<SceneManager>();
@@ -43,7 +47,7 @@ VisualTestManager::SetUp()
 }
 
 void
-VisualTestManager::runFor(const double duration, const double fixedTimestep)
+VisualTest::runFor(const double duration, const double fixedTimestep)
 {
     m_duration = duration;
 

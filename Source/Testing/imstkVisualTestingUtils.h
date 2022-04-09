@@ -33,7 +33,7 @@ class VTKViewer;
 
 using namespace imstk;
 
-class VisualTestManager : public testing::Test
+class VisualTest : public testing::Test
 {
 public:
     void SetUp() override;
@@ -48,7 +48,8 @@ public:
 protected:
     double m_duration    = 2.0;   ///< Duration to run the test
     double m_dt          = 0.001; ///< Fixed timestep
-    bool   m_timerPaused = false;
+    bool   m_timerPaused = false; ///< Pauses the test timer
+    bool   m_useStdOut   = false; //< Enables std out in the logger, default off for testing
 
     std::shared_ptr<VTKViewer>         m_viewer       = nullptr;
     std::shared_ptr<SceneManager>      m_sceneManager = nullptr;
