@@ -208,7 +208,9 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(Assimp)
   imstk_define_dependency(Eigen3)
   imstk_define_dependency(g3log)
-  imstk_define_dependency(LibNiFalcon)
+  if (${PROJECT_NAME}_USE_VRPN)
+    imstk_define_dependency(LibNiFalcon)
+  endif()
   imstk_define_dependency(OpenVR)
   imstk_define_dependency(TBB)
   imstk_define_dependency(VegaFEM)
@@ -217,15 +219,15 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(OpenHaptics)
   endif()
   if (${PROJECT_NAME}_USE_VRPN)
+    if(WIN32)
+      imstk_define_dependency(Libusb) #for VRPN
+      imstk_define_dependency(FTD2XX) #for LibNiFalcon
+    endif()
     imstk_define_dependency(VRPN)
   endif()
 
-  if(WIN32)
-    imstk_define_dependency(Libusb) #for VRPN
-    imstk_define_dependency(FTD2XX) #for LibNiFalcon
-    if(${PROJECT_NAME}_AUDIO_ENABLED)
-      imstk_define_dependency(SFML)
-    endif()
+  if(WIN32 AND ${PROJECT_NAME}_AUDIO_ENABLED)
+    imstk_define_dependency(SFML)
   endif()
 
   if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_VISUAL_TESTING)
@@ -283,18 +285,25 @@ set(PACKAGE_PREFIX_DIR ${CMAKE_INSTALL_PREFIX})
 
 # Assimp
 find_package( Assimp REQUIRED )
+
 # Eigen
 find_package( Eigen3 3.1.2 REQUIRED )
-if(WIN32)
+
+if(WIN32 AND ${PROJECT_NAME}_USE_VRPN)
   # FTD2XX
   find_package( FTD2XX REQUIRED )
 endif()
+
 # g3log
 find_package( g3log REQUIRED )
-# LibNiFalcon
-find_package( LibNiFalcon REQUIRED)
-# Libusb
-find_package( Libusb REQUIRED)
+
+if (${PROJECT_NAME}_USE_VRPN)
+  # LibNiFalcon
+  find_package( LibNiFalcon REQUIRED)
+  # Libusb
+  find_package( Libusb REQUIRED)
+endif()
+
 # OpenVR
 find_package( OpenVR REQUIRED )
 
@@ -396,8 +405,6 @@ if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
     ${CMAKE_INSTALL_PREFIX}/data
     )
 endif()
-
-
 
 #-----------------------------------------------------------------------------
 # Testing
