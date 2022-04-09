@@ -37,7 +37,7 @@ class PointSetToCapsuleCD : public CollisionDetectionAlgorithm
 {
 public:
     PointSetToCapsuleCD();
-    virtual ~PointSetToCapsuleCD() override = default;
+    ~PointSetToCapsuleCD() override = default;
 
     IMSTK_TYPE_NAME(PointSetToCapsuleCD)
 
@@ -45,7 +45,7 @@ protected:
     ///
     /// \brief Compute collision data for AB simultaneously
     ///
-    virtual void computeCollisionDataAB(
+    void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsA,
@@ -54,7 +54,7 @@ protected:
     ///
     /// \brief Compute collision data for side A
     ///
-    virtual void computeCollisionDataA(
+    void computeCollisionDataA(
         std::shared_ptr<Geometry>      geomA,
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsA) override;
@@ -62,7 +62,7 @@ protected:
     ///
     /// \brief Compute collision data for side B
     ///
-    virtual void computeCollisionDataB(
+    void computeCollisionDataB(
         std::shared_ptr<Geometry>      geomA,
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsB) override;

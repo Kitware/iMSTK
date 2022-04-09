@@ -37,7 +37,7 @@ class SurfaceMeshToSurfaceMeshCD : public CollisionDetectionAlgorithm
 {
 public:
     SurfaceMeshToSurfaceMeshCD();
-    virtual ~SurfaceMeshToSurfaceMeshCD() override = default;
+    ~SurfaceMeshToSurfaceMeshCD() override = default;
 
     IMSTK_TYPE_NAME(SurfaceMeshToSurfaceMeshCD)
 
@@ -49,7 +49,7 @@ protected:
     ///
     /// \brief Compute collision data for AB simultaneously
     ///
-    virtual void computeCollisionDataAB(
+    void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsA,
