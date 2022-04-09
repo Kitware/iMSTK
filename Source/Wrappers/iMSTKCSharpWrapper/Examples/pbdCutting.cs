@@ -15,7 +15,7 @@ public class PbdCutting
 
         // Setup a scene
         Scene scene = new Scene("PBDCutting");
-        SurfaceMesh cutGeom = makeClothGeometry(40, 40, 2, 2);
+        SurfaceMesh cutGeom = Utils.toTriangleGrid(new Vec3d(0.0, 0.0, 0.0), new Vec2d(40, 40), new Vec2i(2, 2));
         cutGeom.setTranslation(new Vec3d(-10.0, -20.0, 0.0));
         cutGeom.updatePostTransformData();
         CollidingObject cutObj = new CollidingObject("CuttingObject");
@@ -97,7 +97,8 @@ public class PbdCutting
         PbdObject clothObj = new PbdObject(name);
 
         // Setup the Geometry
-        SurfaceMesh clothMesh = makeClothGeometry(width, height, nRows, nCols);
+        SurfaceMesh clothMesh = Utils.toTriangleGrid(new Vec3d(0.0, 0.0, 0.0),
+            new Vec2d(width, height), new Vec2i(nRows, nCols));
 
         // Setup the Parameters
         PbdModelConfig pbdParams = new PbdModelConfig();
@@ -132,57 +133,5 @@ public class PbdCutting
         clothObj.setDynamicalModel(pbdModel);
 
         return clothObj;
-    }
-
-    static SurfaceMesh makeClothGeometry(double width,
-                                         double height,
-                                         int    nRows,
-                                         int    nCols)
-    {
-        SurfaceMesh clothMesh = new SurfaceMesh();
-
-        VecDataArray3d vertices = new VecDataArray3d(nRows * nCols);
-        double dy = width / (nCols - 1);
-        double dx = height / (nRows - 1);
-        for (int i = 0; i < nRows; ++i)
-        {
-            Vec3d xyz = new Vec3d();
-            for (int j = 0; j < nCols; j++)
-            {
-                xyz[0] = dx * i;
-                xyz[1] = 1.0;
-                xyz[2] = dy * j;
-                vertices[(uint)(i * nCols + j)] = xyz;
-            }
-        }
-
-        // Add connectivity data
-        VecDataArray3i indices = new VecDataArray3i();
-        for (int i = 0; i < nRows - 1; i++)
-        {
-            for (int j = 0; j < nCols - 1; j++)
-            {
-                int index1 = i * nCols + j;
-                int index2 = index1 + nCols;
-                int index3 = index1 + 1;
-                int index4 = index2 + 1;
-
-                // Interleave [/][\]
-                if (i % 2 != 0 || j % 2 != 0)
-                {
-                    indices.push_back(new Vec3i(index1, index2, index3));
-                    indices.push_back(new Vec3i(index4, index3, index2));
-                }
-                else
-                {
-                    indices.push_back(new Vec3i(index2, index4, index1));
-                    indices.push_back(new Vec3i(index4, index3, index1));
-                }
-            }
-        }
-
-        clothMesh.initialize(vertices, indices);
-
-        return clothMesh;
     }
 }

@@ -166,15 +166,15 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     const double penetrationDepth = sphereRadius - dist;
                     contactNormal /= dist;
 
-                    // Point contact
+                                                    // Point contact
                     PointIndexDirectionElement elemA;
-                    elemA.ptIndex = pointContact;
-                    elemA.dir     = -contactNormal; // Direction to resolve point
+                    elemA.ptIndex = pointContact;   // Point on triangle
+                    elemA.dir     = -contactNormal; // Direction to resolve point on triangle
                     elemA.penetrationDepth = penetrationDepth;
 
                     PointDirectionElement elemB;
-                    elemB.pt  = triangleContactPt; // Point on sphere
-                    elemB.dir = contactNormal;     // Direction to resolve point
+                    elemB.pt  = spherePos - sphereRadius * contactNormal; // Contact point on sphere
+                    elemB.dir = contactNormal;                            // Direction to resolve point
                     elemB.penetrationDepth = penetrationDepth;
 
                     lock.lock();

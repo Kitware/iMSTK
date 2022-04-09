@@ -21,6 +21,7 @@
 
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseSceneControl.h"
@@ -40,64 +41,6 @@
 using namespace imstk;
 
 ///
-/// \brief Creates cloth geometry
-/// \param cloth width
-/// \param cloth height
-/// \param cloth row count
-/// \param cloth column count
-///
-static std::shared_ptr<SurfaceMesh>
-makeClothGeometry(const double width,
-                  const double height,
-                  const int    nRows,
-                  const int    nCols)
-{
-    imstkNew<SurfaceMesh> clothMesh;
-
-    imstkNew<VecDataArray<double, 3>> verticesPtr(nRows * nCols);
-    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
-    const double                      dy       = width / (nCols - 1);
-    const double                      dx       = height / (nRows - 1);
-    for (int i = 0; i < nRows; ++i)
-    {
-        for (int j = 0; j < nCols; j++)
-        {
-            vertices[i * nCols + j] = Vec3d(dx * static_cast<double>(i), 1.0, dy * static_cast<double>(j));
-        }
-    }
-
-    // Add connectivity data
-    imstkNew<VecDataArray<int, 3>> indicesPtr;
-    VecDataArray<int, 3>&          indices = *indicesPtr.get();
-    for (int i = 0; i < nRows - 1; ++i)
-    {
-        for (int j = 0; j < nCols - 1; j++)
-        {
-            const int index1 = i * nCols + j;
-            const int index2 = index1 + nCols;
-            const int index3 = index1 + 1;
-            const int index4 = index2 + 1;
-
-            // Interleave [/][\]
-            if (i % 2 ^ j % 2)
-            {
-                indices.push_back(Vec3i(index1, index2, index3));
-                indices.push_back(Vec3i(index4, index3, index2));
-            }
-            else
-            {
-                indices.push_back(Vec3i(index2, index4, index1));
-                indices.push_back(Vec3i(index4, index3, index1));
-            }
-        }
-    }
-
-    clothMesh->initialize(verticesPtr, indicesPtr);
-
-    return clothMesh;
-}
-
-///
 /// \brief Creates cloth object
 /// \param name
 /// \param cloth width
@@ -115,7 +58,9 @@ makeClothObj(const std::string& name,
     imstkNew<PbdObject> clothObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(width, height, nRows, nCols);
+    std::shared_ptr<SurfaceMesh> clothMesh =
+        GeometryUtils::toTriangleGrid(Vec3d::Zero(),
+            Vec2d(width, height), Vec2i(nRows, nCols));
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
@@ -160,31 +105,28 @@ main()
     Logger::startLogger();
 
     // Setup a scene
-    imstkNew<Scene>            scene("PBDCloth");
-    std::shared_ptr<PbdObject> clothObj = nullptr;
-    {
-        clothObj = makeClothObj("Cloth", 10.0, 10.0, 8, 8);
-        scene->addSceneObject(clothObj);
+    imstkNew<Scene> scene("PBDCloth");
+    scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 0.0);
+    scene->getActiveCamera()->setPosition(0.0, 1.5, 25.0);
+    scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-        // Light (white)
-        imstkNew<DirectionalLight> whiteLight;
-        whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-        whiteLight->setIntensity(1.0);
-        scene->addLight("whitelight", whiteLight);
+    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 10.0, 10.0, 8, 8);
+    scene->addSceneObject(clothObj);
 
-        // Light (red)
-        imstkNew<SpotLight> colorLight;
-        colorLight->setPosition(Vec3d(-5.0, -3.0, 5.0));
-        colorLight->setFocalPoint(Vec3d(0.0, -5.0, 5.0));
-        colorLight->setIntensity(100.);
-        colorLight->setColor(Color::Red);
-        colorLight->setSpotAngle(30.0);
-        scene->addLight("colorlight", colorLight);
+    // Light (white)
+    imstkNew<DirectionalLight> whiteLight;
+    whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    whiteLight->setIntensity(1.0);
+    scene->addLight("whitelight", whiteLight);
 
-        // Adjust camera
-        scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 5.0);
-        scene->getActiveCamera()->setPosition(-15.0, -5.0, 25.0);
-    }
+    // Light (red)
+    imstkNew<SpotLight> colorLight;
+    colorLight->setPosition(Vec3d(-5.0, -3.0, 5.0));
+    colorLight->setFocalPoint(Vec3d(0.0, -5.0, 5.0));
+    colorLight->setIntensity(100.);
+    colorLight->setColor(Color::Red);
+    colorLight->setSpotAngle(30.0);
+    scene->addLight("colorlight", colorLight);
 
     // Run the simulation
     {

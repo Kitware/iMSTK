@@ -20,6 +20,7 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
@@ -38,39 +39,6 @@ limitations under the License.
 using namespace imstk;
 
 ///
-/// \brief Create pbd string geometry
-///
-static std::shared_ptr<LineMesh>
-makeStringGeometry(const Vec3d& pos, const int numVerts, const double stringLength)
-{
-    const double vertexSpacing = stringLength / numVerts;
-
-    // Create the geometry
-    imstkNew<LineMesh> stringGeometry;
-
-    imstkNew<VecDataArray<double, 3>> verticesPtr;
-    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
-    vertices.resize(numVerts);
-    for (int j = 0; j < numVerts; j++)
-    {
-        vertices[j] = pos - Vec3d(0.0, static_cast<double>(j) * vertexSpacing, 0.0);
-    }
-    stringGeometry->setInitialVertexPositions(verticesPtr);
-    stringGeometry->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*verticesPtr.get()));
-
-    // Add connectivity data
-    imstkNew<VecDataArray<int, 2>> segmentsPtr;
-    VecDataArray<int, 2>&          segments = *segmentsPtr.get();
-    for (int j = 0; j < numVerts - 1; j++)
-    {
-        segments.push_back(Vec2i(j, j + 1));
-    }
-
-    stringGeometry->setLinesIndices(segmentsPtr);
-    return stringGeometry;
-}
-
-///
 /// \brief Create pbd string object
 ///
 static std::shared_ptr<PbdObject>
@@ -85,7 +53,8 @@ makePbdString(
     imstkNew<PbdObject> stringObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<LineMesh> stringMesh = makeStringGeometry(pos, numVerts, stringLength);
+    std::shared_ptr<LineMesh> stringMesh =
+        GeometryUtils::toLineGrid(pos, Vec3d(0.0, -1.0, 0.0), stringLength, numVerts);
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;

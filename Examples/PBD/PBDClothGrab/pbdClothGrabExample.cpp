@@ -20,27 +20,27 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkCollisionUtils.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
-#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectCollision.h"
+#include "imstkPbdObjectGrasping.h"
+#include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkPbdObjectCollision.h"
-#include "imstkPlane.h"
-#include "imstkMouseDeviceClient.h"
-#include "imstkCollisionUtils.h"
-#include "imstkSphere.h"
-#include "imstkTaskGraph.h"
 
 using namespace imstk;
 
@@ -67,75 +67,6 @@ setFleshTextures(std::shared_ptr<RenderMaterial> material)
 }
 
 ///
-/// \brief Creates cloth geometry
-/// \param cloth width
-/// \param cloth height
-/// \param cloth row count
-/// \param cloth column count
-///
-static std::shared_ptr<SurfaceMesh>
-makeClothGeometry(const Vec2d  size,
-                  const Vec2i  dim,
-                  const Vec3d  shift,
-                  const double uvScale)
-{
-    imstkNew<SurfaceMesh> clothMesh;
-
-    imstkNew<VecDataArray<double, 3>> verticesPtr(dim[0] * dim[1]);
-    VecDataArray<double, 3>&          vertices  = *verticesPtr.get();
-    const Vec2d                       dx        = size.cwiseQuotient((dim - Vec2i(1, 1)).cast<double>());
-    const Vec3d                       halfShift = Vec3d(size[0], 0.0, size[1]) * 0.5;
-    for (int i = 0; i < dim[1]; i++)
-    {
-        for (int j = 0; j < dim[0]; j++)
-        {
-            vertices[i * dim[0] + j] = Vec3d(dx[0] * static_cast<double>(i), 0.0, dx[1] * static_cast<double>(j)) - halfShift + shift;
-        }
-    }
-
-    // Add connectivity data
-    imstkNew<VecDataArray<int, 3>> indicesPtr;
-    VecDataArray<int, 3>&          indices = *indicesPtr.get();
-    for (int i = 0; i < dim[1] - 1; i++)
-    {
-        for (int j = 0; j < dim[0] - 1; j++)
-        {
-            const int index1 = i * dim[0] + j;
-            const int index2 = index1 + dim[0];
-            const int index3 = index1 + 1;
-            const int index4 = index2 + 1;
-
-            // Interleave [/][\]
-            if (i % 2 ^ j % 2)
-            {
-                indices.push_back(Vec3i(index1, index2, index3));
-                indices.push_back(Vec3i(index4, index3, index2));
-            }
-            else
-            {
-                indices.push_back(Vec3i(index2, index4, index1));
-                indices.push_back(Vec3i(index4, index3, index1));
-            }
-        }
-    }
-
-    imstkNew<VecDataArray<float, 2>> uvCoordsPtr(dim[0] * dim[1]);
-    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
-    for (int i = 0; i < dim[1]; ++i)
-    {
-        for (int j = 0; j < dim[0]; j++)
-        {
-            uvCoords[i * dim[0] + j] = Vec2f(static_cast<float>(i) / dim[1], static_cast<float>(j) / dim[0]) * uvScale;
-        }
-    }
-
-    clothMesh->initialize(verticesPtr, indicesPtr);
-    clothMesh->setVertexTCoords("uvs", uvCoordsPtr);
-
-    return clothMesh;
-}
-
-///
 /// \brief Creates cloth object
 /// \param name
 /// \param cloth width
@@ -152,7 +83,9 @@ makeClothObj(const std::string& name,
     imstkNew<PbdObject> clothObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(size, dim, pos, 2.0);
+    std::shared_ptr<SurfaceMesh> clothMesh =
+        GeometryUtils::toTriangleGrid(pos, size, dim,
+            Quatd::Identity(), 2.0);
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
@@ -218,19 +151,15 @@ main()
     auto clothCollision = std::make_shared<PbdObjectCollision>(clothObj, planeObj, "PointSetToPlaneCD");
     scene->addInteraction(clothCollision);
 
+    auto pbdGrasping = std::make_shared<PbdObjectGrasping>(clothObj);
+    scene->addInteraction(pbdGrasping);
+
     // Make two sphere's for indication
     imstkNew<SceneObject> clickObj("clickObj");
-    imstkNew<Sphere>      clickSphere1(Vec3d(0.0, 0.0, 0.0), 0.1);
-    imstkNew<Sphere>      clickSphere2(Vec3d(0.0, 0.0, 0.0), 0.1);
-    imstkNew<VisualModel> clickSphere1Model;
-    clickSphere1Model->setGeometry(clickSphere1);
-    imstkNew<VisualModel> clickSphere2Model;
-    clickSphere2Model->setGeometry(clickSphere2);
-    clickObj->addVisualModel(clickSphere1Model);
-    clickObj->addVisualModel(clickSphere2Model);
+    imstkNew<Sphere>      clickSphere(Vec3d(0.0, 0.0, 0.0), 0.1);
+    clickObj->setVisualGeometry(clickSphere);
     clickObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::None);
-    clickObj->getVisualModel(1)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::None);
-    clickObj->getVisualModel(1)->getRenderMaterial()->setColor(Color::Red);
+    clickObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Red);
     scene->addSceneObject(clickObj);
 
     // Run the simulation
@@ -261,16 +190,6 @@ main()
             viewer->addControl(keyControl);
         }
 
-        // Picking allows movement along plane orthogonal to the view
-        int   triangleSelected       = -1;
-        Vec3d triangleSelectionPtUvw = Vec3d::Zero();
-
-        auto                                     colSurfMesh    = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getCollidingGeometry());
-        std::shared_ptr<VecDataArray<double, 3>> colVerticesPtr = colSurfMesh->getVertexPositions();
-        VecDataArray<double, 3>&                 colVertices    = *colVerticesPtr;
-        std::shared_ptr<VecDataArray<int, 3>>    colIndicesPtr  = colSurfMesh->getTriangleIndices();
-        const VecDataArray<int, 3>&              colIndices     = *colIndicesPtr;
-
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
             [&](MouseEvent* e)
             {
@@ -283,31 +202,24 @@ main()
                         Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
                     const Vec3d rayStart = scene->getActiveCamera()->getPosition();
 
-                    // Comptue the nearest triangle intersection along the picking ray
-                    double minDist   = IMSTK_DOUBLE_MAX;
-                    triangleSelected = -1;
-                    Vec3d uvw = Vec3d::Zero();
-                    for (int i = 0; i < colIndices.size(); i++)
-                    {
-                        const Vec3d& a = colVertices[colIndices[i][0]];
-                        const Vec3d& b = colVertices[colIndices[i][1]];
-                        const Vec3d& c = colVertices[colIndices[i][2]];
-                        if (CollisionUtils::testSegmentTriangle(rayStart, rayStart + rayDir * 1000.0, a, b, c, uvw))
-                        {
-                            Vec3d iPt =
-                                a * triangleSelectionPtUvw[0] +
-                                b * triangleSelectionPtUvw[1] +
-                                c * triangleSelectionPtUvw[2];
-                            double dist = (rayStart - iPt).norm();
+                    pbdGrasping->beginRayPointGrasp(clickSphere, rayStart, rayDir);
+                }
+            });
+        connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseMove,
+            [&](MouseEvent* e)
+            {
+                // Get mouse position (0, 1) with origin at bot left of screen
+                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                // To NDC coordinates
+                const Vec3d rayDir = scene->getActiveCamera()->getEyeRayDir(
+                    Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
+                const Vec3d rayStart = scene->getActiveCamera()->getPosition();
 
-                            if (dist < minDist)
-                            {
-                                minDist = dist;
-                                triangleSelected       = i;
-                                triangleSelectionPtUvw = uvw;
-                            }
-                        }
-                    }
+                Vec3d iPt = Vec3d::Zero();
+                if (CollisionUtils::testRayToPlane(rayStart, rayDir,
+                    plane->getPosition(), plane->getNormal(), iPt))
+                {
+                    clickSphere->setPosition(iPt);
                 }
             });
         // Unselect/drop the sphere
@@ -316,7 +228,7 @@ main()
             {
                 if (e->m_buttonId == 0)
                 {
-                    triangleSelected = -1;
+                    pbdGrasping->endGrasp();
                 }
             });
 
@@ -324,55 +236,6 @@ main()
             {
                 // Run the model in real time
                 clothObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
-            });
-
-        auto updatePickingFunc = std::make_shared<TaskNode>([&]()
-            {
-                if (triangleSelected != -1)
-                {
-                    // Get mouses current position
-                    const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-                    const Vec3d rayDir   = scene->getActiveCamera()->getEyeRayDir(
-                        Vec2d(mousePos[0] * 2.0 - 1.0, mousePos[1] * 2.0 - 1.0));
-                    const Vec3d rayStart = scene->getActiveCamera()->getPosition();
-
-                    // Compute new intersection point along view plane this is the location to move too
-                    Vec3d curr_iPt;
-                    CollisionUtils::testRayToPlane(rayStart, rayDir, plane->getPosition(),
-                        plane->getNormal(), curr_iPt);
-
-                    // Visualize the clicked point on the plane
-                    clickSphere1->setPosition(curr_iPt);
-                    clickSphere1->updatePostTransformData();
-
-                    Vec3d& a       = colVertices[colIndices[triangleSelected][0]];
-                    Vec3d& b       = colVertices[colIndices[triangleSelected][1]];
-                    Vec3d& c       = colVertices[colIndices[triangleSelected][2]];
-                    Vec3d prev_iPt =
-                        a * triangleSelectionPtUvw[0] +
-                        b * triangleSelectionPtUvw[1] +
-                        c * triangleSelectionPtUvw[2];
-
-                    // Visualize the interpolated point
-                    clickSphere2->setPosition(prev_iPt);
-                    clickSphere2->updatePostTransformData();
-
-                    double stiffness = 0.1;
-                    Vec3d diff       = curr_iPt - prev_iPt;
-
-                    a += diff * stiffness;
-                    b += diff * stiffness;
-                    c += diff * stiffness;
-                }
-            }, "PickingUpdate");
-
-        // Insert a step into the model
-        // Another, possibly better solution would be to add an internal constraint for it
-        connect<Event>(scene, &Scene::configureTaskGraph, [&](Event*)
-            {
-                std::shared_ptr<TaskGraph> taskGraph = scene->getTaskGraph();
-                // Compute picking update position after internal solve, but before velocities are updated
-                taskGraph->insertAfter(clothObj->getPbdModel()->getSolveNode(), updatePickingFunc);
             });
 
         driver->start();

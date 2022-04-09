@@ -112,7 +112,7 @@ public class PbdVolume
         deformableObj.setDynamicalModel(pbdModel);
         deformableObj.addVisualModel(visualModel);
         deformableObj.setPhysicsGeometry(tetMesh);
-        deformableObj.setPhysicsToVisualMap(new PointToTetMap(tetMesh, surfMesh));
+        deformableObj.setPhysicsToVisualMap(new PointwiseMap(tetMesh, surfMesh));
 
         return deformableObj;
     }

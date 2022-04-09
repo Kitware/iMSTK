@@ -24,6 +24,7 @@
 #include "imstkCollisionDataDebugObject.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkLineMesh.h"
 #include "imstkOrientedBox.h"
 #include "imstkPbdModel.h"
@@ -44,182 +45,6 @@
 using namespace imstk;
 
 ///
-/// \brief Creates triangle grid geometry
-/// \param cloth width (x), height (z)
-/// \param cloth dimensions/divisions
-/// \param center of tissue/translation control
-/// \param tex coord scale
-///
-static std::shared_ptr<SurfaceMesh>
-makeTriangleGrid(const Vec2d& size,
-                 const Vec2i& dim,
-                 const Vec3d& center,
-                 const Quatd& orientation)
-{
-    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1]);
-    VecDataArray<double, 3>& vertices    = *verticesPtr;
-    const Vec3d              size3       = Vec3d(size[0], 0.0, size[1]);
-    const Vec3i              dim3 = Vec3i(dim[0], 0, dim[1]);
-    Vec3d                    dx   = size3.cwiseQuotient((dim3 - Vec3i(1, 0, 1)).cast<double>());
-    dx[1] = 0.0;
-    int iter = 0;
-    for (int y = 0; y < dim[1]; y++)
-    {
-        for (int x = 0; x < dim[0]; x++, iter++)
-        {
-            vertices[iter] = Vec3i(x, 0, y).cast<double>().cwiseProduct(dx) + center - size3 * 0.5;
-        }
-    }
-
-    // Add connectivity data
-    auto                  indicesPtr = std::make_shared<VecDataArray<int, 3>>();
-    VecDataArray<int, 3>& indices    = *indicesPtr;
-    for (int y = 0; y < dim[1] - 1; y++)
-    {
-        for (int x = 0; x < dim[0] - 1; x++)
-        {
-            const int index1 = y * dim[0] + x;
-            const int index2 = index1 + dim[0];
-            const int index3 = index1 + 1;
-            const int index4 = index2 + 1;
-
-            // Interleave [/][\]
-            if (x % 2 ^ y % 2)
-            {
-                indices.push_back(Vec3i(index1, index2, index3));
-                indices.push_back(Vec3i(index4, index3, index2));
-            }
-            else
-            {
-                indices.push_back(Vec3i(index2, index4, index1));
-                indices.push_back(Vec3i(index4, index3, index1));
-            }
-        }
-    }
-
-    auto triMesh = std::make_shared<SurfaceMesh>();
-    triMesh->initialize(verticesPtr, indicesPtr);
-    triMesh->rotate(orientation, Geometry::TransformType::ApplyToData);
-    return triMesh;
-}
-
-///
-/// \brief Creates a tetraheral grid
-/// \param physical dimension of tissue
-/// \param dimensions of tetrahedral grid used for tissue
-/// \param center of grid
-///
-static std::shared_ptr<TetrahedralMesh>
-makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center,
-            const Quatd& orientation)
-{
-    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1] * dim[2]);
-    VecDataArray<double, 3>& vertices    = *verticesPtr;
-    const Vec3d              dx   = size.cwiseQuotient((dim - Vec3i(1, 1, 1)).cast<double>());
-    int                      iter = 0;
-    for (int z = 0; z < dim[2]; z++)
-    {
-        for (int y = 0; y < dim[1]; y++)
-        {
-            for (int x = 0; x < dim[0]; x++, iter++)
-            {
-                vertices[iter] = Vec3i(x, y, z).cast<double>().cwiseProduct(dx) - size * 0.5 + center;
-            }
-        }
-    }
-
-    // Add connectivity data
-    auto                  indicesPtr = std::make_shared<VecDataArray<int, 4>>();
-    VecDataArray<int, 4>& indices    = *indicesPtr;
-    for (int z = 0; z < dim[2] - 1; z++)
-    {
-        for (int y = 0; y < dim[1] - 1; y++)
-        {
-            for (int x = 0; x < dim[0] - 1; x++)
-            {
-                int cubeIndices[8] =
-                {
-                    x + dim[0] * (y + dim[1] * z),
-                    (x + 1) + dim[0] * (y + dim[1] * z),
-                    (x + 1) + dim[0] * (y + dim[1] * (z + 1)),
-                    x + dim[0] * (y + dim[1] * (z + 1)),
-                    x + dim[0] * ((y + 1) + dim[1] * z),
-                    (x + 1) + dim[0] * ((y + 1) + dim[1] * z),
-                    (x + 1) + dim[0] * ((y + 1) + dim[1] * (z + 1)),
-                    x + dim[0] * ((y + 1) + dim[1] * (z + 1))
-                };
-
-                // Alternate the pattern so the edges line up on the sides of each voxel
-                if ((z % 2 ^ x % 2) ^ y % 2)
-                {
-                    indices.push_back(Vec4i(cubeIndices[0], cubeIndices[7], cubeIndices[5], cubeIndices[4]));
-                    indices.push_back(Vec4i(cubeIndices[3], cubeIndices[7], cubeIndices[2], cubeIndices[0]));
-                    indices.push_back(Vec4i(cubeIndices[2], cubeIndices[7], cubeIndices[5], cubeIndices[0]));
-                    indices.push_back(Vec4i(cubeIndices[1], cubeIndices[2], cubeIndices[0], cubeIndices[5]));
-                    indices.push_back(Vec4i(cubeIndices[2], cubeIndices[6], cubeIndices[7], cubeIndices[5]));
-                }
-                else
-                {
-                    indices.push_back(Vec4i(cubeIndices[3], cubeIndices[7], cubeIndices[6], cubeIndices[4]));
-                    indices.push_back(Vec4i(cubeIndices[1], cubeIndices[3], cubeIndices[6], cubeIndices[4]));
-                    indices.push_back(Vec4i(cubeIndices[3], cubeIndices[6], cubeIndices[2], cubeIndices[1]));
-                    indices.push_back(Vec4i(cubeIndices[1], cubeIndices[6], cubeIndices[5], cubeIndices[4]));
-                    indices.push_back(Vec4i(cubeIndices[0], cubeIndices[3], cubeIndices[1], cubeIndices[4]));
-                }
-            }
-        }
-    }
-
-    // Ensure correct windings
-    for (int i = 0; i < indices.size(); i++)
-    {
-        if (tetVolume(vertices[indices[i][0]], vertices[indices[i][1]], vertices[indices[i][2]], vertices[indices[i][3]]) < 0.0)
-        {
-            std::swap(indices[i][0], indices[i][2]);
-        }
-    }
-
-    auto tetMesh = std::make_shared<TetrahedralMesh>();
-    tetMesh->initialize(verticesPtr, indicesPtr);
-    tetMesh->rotate(orientation, Geometry::TransformType::ApplyToData);
-    return tetMesh;
-}
-
-///
-/// \brief Creates a set of connected lines
-/// \param Total length of the line mesh
-/// \param divisions
-/// \param start of the line mesh
-/// \param direction to build the lines
-///
-static std::shared_ptr<LineMesh>
-makeLineGrid(const double length, const int dim,
-             const Vec3d& start, const Vec3d& dir)
-{
-    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(dim);
-    const Vec3d              dirN     = dir.normalized();
-    VecDataArray<double, 3>& vertices = *verticesPtr;
-    for (int i = 0; i < dim; i++)
-    {
-        double t = static_cast<double>(i) / dim;
-        vertices[i] = start + dirN * t * length;
-    }
-
-    // Add connectivity data
-    auto                  indicesPtr = std::make_shared<VecDataArray<int, 2>>();
-    VecDataArray<int, 2>& indices    = *indicesPtr;
-    for (int i = 0; i < dim - 1; i++)
-    {
-        indices.push_back(Vec2i(i, i + 1));
-    }
-
-    // Create the geometry
-    auto lineMesh = std::make_shared<LineMesh>();
-    lineMesh->initialize(verticesPtr, indicesPtr);
-    return lineMesh;
-}
-
-///
 /// \brief Creates tetrahedral tissue object
 /// \param name
 /// \param physical dimension of tissue
@@ -235,7 +60,8 @@ makeTetTissueObj(const std::string& name,
     auto tissueObj = std::make_shared<PbdObject>(name);
 
     // Setup the Geometry
-    std::shared_ptr<TetrahedralMesh> tetMesh = makeTetGrid(size, dim, center, orientation);
+    std::shared_ptr<TetrahedralMesh> tetMesh =
+        GeometryUtils::toTetGrid(center, size, dim, orientation);
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
@@ -296,7 +122,8 @@ makeTriTissueObj(const std::string& name,
     auto tissueObj = std::make_shared<PbdObject>(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> triMesh = makeTriangleGrid(size, dim, center, orientation);
+    std::shared_ptr<SurfaceMesh> triMesh =
+        GeometryUtils::toTriangleGrid(center, size, dim, orientation);
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
@@ -341,7 +168,8 @@ makeLineThreadObj(const std::string& name,
     auto tissueObj = std::make_shared<PbdObject>(name);
 
     // Setup the Geometry
-    std::shared_ptr<LineMesh> lineMesh = makeLineGrid(length, dim, start, dir);
+    std::shared_ptr<LineMesh> lineMesh =
+        GeometryUtils::toLineGrid(start, dir, length, dim);
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();

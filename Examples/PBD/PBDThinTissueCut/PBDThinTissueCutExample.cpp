@@ -21,6 +21,7 @@
 
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
@@ -41,60 +42,6 @@
 using namespace imstk;
 
 ///
-/// \brief Creates cloth geometry
-///
-static std::shared_ptr<SurfaceMesh>
-makePlaneGeometry(const double width,
-                  const double height,
-                  const int    nRows,
-                  const int    nCols)
-{
-    imstkNew<SurfaceMesh> clothMesh;
-
-    imstkNew<VecDataArray<double, 3>> verticesPtr(nRows * nCols);
-    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
-    const double                      dy       = width / static_cast<double>(nCols - 1);
-    const double                      dx       = height / static_cast<double>(nRows - 1);
-    for (int i = 0; i < nRows; i++)
-    {
-        for (int j = 0; j < nCols; j++)
-        {
-            vertices[i * nCols + j] = Vec3d(dx * static_cast<double>(i), 1.0, dy * static_cast<double>(j));
-        }
-    }
-
-    // Add connectivity data
-    imstkNew<VecDataArray<int, 3>> indicesPtr;
-    VecDataArray<int, 3>&          indices = *indicesPtr.get();
-    for (int i = 0; i < nRows - 1; i++)
-    {
-        for (int j = 0; j < nCols - 1; j++)
-        {
-            const int index1 = i * nCols + j;
-            const int index2 = index1 + nCols;
-            const int index3 = index1 + 1;
-            const int index4 = index2 + 1;
-
-            // Interleave [/][\] pattern
-            if (i % 2 ^ j % 2)
-            {
-                indices.push_back(Vec3i(index1, index2, index3));
-                indices.push_back(Vec3i(index4, index3, index2));
-            }
-            else
-            {
-                indices.push_back(Vec3i(index2, index4, index1));
-                indices.push_back(Vec3i(index4, index3, index1));
-            }
-        }
-    }
-
-    clothMesh->initialize(verticesPtr, indicesPtr);
-
-    return clothMesh;
-}
-
-///
 /// \brief Creates cloth object
 ///
 static std::shared_ptr<PbdObject>
@@ -107,14 +54,16 @@ makeClothObj(const std::string& name,
     imstkNew<PbdObject> clothObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh(makePlaneGeometry(width, height, nRows, nCols));
+    std::shared_ptr<SurfaceMesh> clothMesh =
+        GeometryUtils::toTriangleGrid(Vec3d::Zero(),
+            Vec2d(width, height), Vec2i(nRows, nCols));
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e3);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e3);
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
-    pbdParams->m_uniformMassValue = width * height / ((double)nRows * (double)nCols);
+    pbdParams->m_uniformMassValue = width * height / static_cast<double>(nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 5;
@@ -156,7 +105,9 @@ main()
     imstkNew<Scene> scene("PBDThinTissueCut");
 
     // Create a cutting plane object in the scene
-    std::shared_ptr<SurfaceMesh> cutGeom(makePlaneGeometry(40, 40, 2, 2));
+    std::shared_ptr<SurfaceMesh> cutGeom =
+        GeometryUtils::toTriangleGrid(Vec3d::Zero(),
+            Vec2d(40.0, 40.0), Vec2i(2, 2));
     cutGeom->setTranslation(Vec3d(-10, -20, 0));
     cutGeom->updatePostTransformData();
     imstkNew<CollidingObject> cutObj("CuttingObject");

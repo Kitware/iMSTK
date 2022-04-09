@@ -22,6 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
 #include "imstkDirectionalLight.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkImageData.h"
@@ -45,70 +46,6 @@
 using namespace imstk;
 
 ///
-/// \brief Creates tissue geometry
-///
-static std::shared_ptr<SurfaceMesh>
-makeTriangleGrid(const double width,
-                 const double height,
-                 const int    nRows,
-                 const int    nCols,
-                 const double uvScale)
-{
-    imstkNew<VecDataArray<double, 3>> verticesPtr(nRows * nCols);
-    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
-    const double                      dy       = width / static_cast<double>(nCols - 1);
-    const double                      dx       = height / static_cast<double>(nRows - 1);
-    for (int i = 0; i < nRows; i++)
-    {
-        for (int j = 0; j < nCols; j++)
-        {
-            vertices[i * nCols + j] = Vec3d(dx * static_cast<double>(i), 0.0, dy * static_cast<double>(j)) - Vec3d(height, 0.0, width) * 0.5;
-        }
-    }
-
-    // Add connectivity data
-    imstkNew<VecDataArray<int, 3>> indicesPtr;
-    VecDataArray<int, 3>&          indices = *indicesPtr.get();
-    for (int i = 0; i < nRows - 1; i++)
-    {
-        for (int j = 0; j < nCols - 1; j++)
-        {
-            const int index1 = i * nCols + j;
-            const int index2 = index1 + nCols;
-            const int index3 = index1 + 1;
-            const int index4 = index2 + 1;
-
-            // Interleave [/][\] pattern
-            if (i % 2 ^ j % 2)
-            {
-                indices.push_back(Vec3i(index1, index2, index3));
-                indices.push_back(Vec3i(index4, index3, index2));
-            }
-            else
-            {
-                indices.push_back(Vec3i(index2, index4, index1));
-                indices.push_back(Vec3i(index4, index3, index1));
-            }
-        }
-    }
-
-    imstkNew<VecDataArray<float, 2>> uvCoordsPtr(nRows * nCols);
-    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
-    for (int i = 0; i < nRows; ++i)
-    {
-        for (int j = 0; j < nCols; j++)
-        {
-            uvCoords[i * nCols + j] = Vec2f(static_cast<float>(i) / nRows, static_cast<float>(j) / nCols) * uvScale;
-        }
-    }
-
-    imstkNew<SurfaceMesh> mesh;
-    mesh->initialize(verticesPtr, indicesPtr);
-    mesh->setVertexTCoords("uvs", uvCoordsPtr);
-    return mesh;
-}
-
-///
 /// \brief Creates tissue object
 ///
 static std::shared_ptr<PbdObject>
@@ -120,7 +57,9 @@ makeTissueObj(const std::string& name,
 {
     // Setup the Geometry
     std::shared_ptr<SurfaceMesh> mesh =
-        makeTriangleGrid(width, height, rowCount, colCount, 2.0);
+        GeometryUtils::toTriangleGrid(Vec3d::Zero(),
+            Vec2d(width, height), Vec2i(rowCount, colCount),
+            Quatd::Identity(), 2.0);
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;

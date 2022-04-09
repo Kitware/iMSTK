@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkMeshIO.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
@@ -36,60 +37,6 @@
 #include <gtest/gtest.h>
 
 using namespace imstk;
-
-///
-/// \brief Creates cloth geometry
-///
-static std::shared_ptr<SurfaceMesh>
-makeClothGeometry(const double width,
-                  const double height,
-                  const int    nRows,
-                  const int    nCols)
-{
-    auto clothMesh = std::make_shared<SurfaceMesh>();
-
-    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(nRows * nCols);
-    VecDataArray<double, 3>& vertices    = *verticesPtr.get();
-    const double             dy = width / static_cast<double>(nCols - 1);
-    const double             dx = height / static_cast<double>(nRows - 1);
-    for (int i = 0; i < nRows; ++i)
-    {
-        for (int j = 0; j < nCols; j++)
-        {
-            vertices[i * nCols + j] = Vec3d(dx * static_cast<double>(i), 1.0, dy * static_cast<double>(j));
-        }
-    }
-
-    // Add connectivity data
-    auto                  indicesPtr = std::make_shared<VecDataArray<int, 3>>();
-    VecDataArray<int, 3>& indices    = *indicesPtr.get();
-    for (int i = 0; i < nRows - 1; ++i)
-    {
-        for (int j = 0; j < nCols - 1; j++)
-        {
-            const int index1 = i * nCols + j;
-            const int index2 = index1 + nCols;
-            const int index3 = index1 + 1;
-            const int index4 = index2 + 1;
-
-            // Interleave [/][\]
-            if (i % 2 ^ j % 2)
-            {
-                indices.push_back(Vec3i(index1, index2, index3));
-                indices.push_back(Vec3i(index4, index3, index2));
-            }
-            else
-            {
-                indices.push_back(Vec3i(index2, index4, index1));
-                indices.push_back(Vec3i(index4, index3, index1));
-            }
-        }
-    }
-
-    clothMesh->initialize(verticesPtr, indicesPtr);
-
-    return clothMesh;
-}
 
 std::shared_ptr<Scene>
 createSoftBodyScene(std::string sceneName)
@@ -138,17 +85,17 @@ createClothScene(std::string sceneName)
     auto clothObj = std::make_shared<PbdObject>("Cloth");
     {
         // Setup the Geometry
-        const double                 width     = 10.0;
-        const double                 height    = 10.0;
-        const int                    dim       = 4;
-        std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(width, height, dim, dim);
+        Vec2d                        size      = Vec2d(10.0, 10.0);
+        Vec2i                        dim       = Vec2i(4, 4);
+        std::shared_ptr<SurfaceMesh> clothMesh =
+            GeometryUtils::toTriangleGrid(Vec3d::Zero(), size, dim);
 
         // Setup the Parameters
         auto pbdConfig = std::make_shared<PbdModelConfig>();
         pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e2);
         pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e1);
-        pbdConfig->m_fixedNodeIds     = { 0, static_cast<size_t>(dim) - 1 };
-        pbdConfig->m_uniformMassValue = width * height / static_cast<double>(dim * dim);
+        pbdConfig->m_fixedNodeIds     = { 0, static_cast<size_t>(dim[0]) - 1 };
+        pbdConfig->m_uniformMassValue = size[0] * size[1] / static_cast<double>(dim[0] * dim[1]);
         pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
         pbdConfig->m_dt         = 0.03;
         pbdConfig->m_iterations = 5;

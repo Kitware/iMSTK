@@ -21,6 +21,7 @@
 
 #include "imstkCamera.h"
 #include "imstkColorFunction.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
@@ -39,62 +40,12 @@
 
 using namespace imstk;
 
-static std::shared_ptr<SurfaceMesh>
-makeClothGeometry(
-    const double width, const double height, const int nRows, const int nCols)
-{
-    // Create surface mesh
-    imstkNew<SurfaceMesh>             clothMesh;
-    imstkNew<VecDataArray<double, 3>> verticesPtr;
-    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
-
-    vertices.resize(nRows * nCols);
-    const double dy = width / (double)(nCols - 1);
-    const double dx = height / (double)(nRows - 1);
-    for (int i = 0; i < nRows; ++i)
-    {
-        for (int j = 0; j < nCols; j++)
-        {
-            vertices[i * nCols + j] = Vec3d((double)dx * i, 1.0, (double)dy * j);
-        }
-    }
-
-    // Add connectivity data
-    imstkNew<VecDataArray<int, 3>> trianglesPtr;
-    VecDataArray<int, 3>&          triangles = *trianglesPtr.get();
-    for (int i = 0; i < nRows - 1; ++i)
-    {
-        for (int j = 0; j < nCols - 1; j++)
-        {
-            const int index1 = i * nCols + j;
-            const int index2 = index1 + nCols;
-            const int index3 = index1 + 1;
-            const int index4 = index2 + 1;
-
-            // Interleave [/][\]
-            if (i % 2 ^ j % 2)
-            {
-                triangles.push_back(Vec3i(index1, index2, index3));
-                triangles.push_back(Vec3i(index4, index3, index2));
-            }
-            else
-            {
-                triangles.push_back(Vec3i(index2, index4, index1));
-                triangles.push_back(Vec3i(index4, index3, index1));
-            }
-        }
-    }
-    clothMesh->initialize(verticesPtr, trianglesPtr);
-
-    return clothMesh;
-}
-
 static std::shared_ptr<PbdObject>
 makeClothObj(const std::string& name, double width, double height, int nRows, int nCols)
 {
-    auto clothObj = std::make_shared<PbdObject>(name);
-
-    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(width, height, nRows, nCols);
+    std::shared_ptr<SurfaceMesh> clothMesh =
+        GeometryUtils::toTriangleGrid(Vec3d::Zero(),
+            Vec2d(width, height), Vec2i(nRows, nCols));
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
@@ -124,11 +75,11 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     clothSurfaceNormals->getRenderMaterial()->setPointSize(0.5);
 
     // Setup the Object
+    auto clothObj = std::make_shared<PbdObject>(name);
     clothObj->addVisualModel(clothModel);
     clothObj->addVisualModel(clothSurfaceNormals);
     clothObj->setPhysicsGeometry(clothMesh);
     clothObj->setDynamicalModel(pbdModel);
-
     return clothObj;
 }
 
@@ -142,17 +93,12 @@ main()
     Logger::startLogger();
 
     imstkNew<Scene> scene("PBDCloth");
+    scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 0.0);
+    scene->getActiveCamera()->setPosition(0.0, 1.5, 25.0);
+    scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-    const double               width    = 10.0;
-    const double               height   = 10.0;
-    const int                  nRows    = 16;
-    const int                  nCols    = 16;
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
+    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
     scene->addSceneObject(clothObj);
-
-    // Adjust camera
-    scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 5.0);
-    scene->getActiveCamera()->setPosition(-15.0, -5.0, 15.0);
 
     // Setup some scalars
     auto clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
