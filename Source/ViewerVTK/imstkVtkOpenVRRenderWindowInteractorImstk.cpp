@@ -226,7 +226,7 @@ vtkOpenVRRenderWindowInteractorImstk::ConvertPoseMatrixToWorldCoordinates(
 //---------------------------------------------------------------------------------------------------------------------
 // Purpose: Returns true if the action is active and its state is true
 //---------------------------------------------------------------------------------------------------------------------
-bool
+static bool
 GetDigitalActionState(
     vr::VRActionHandle_t action, vr::VRInputValueHandle_t* pDevicePath = nullptr)
 {
