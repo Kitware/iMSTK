@@ -18,7 +18,7 @@
 
 project(Example-ReducedFEM)
 
-if (${iMSTK_USE_MODEL_REDUCTION})
+if (iMSTK_USE_MODEL_REDUCTION)
     #-----------------------------------------------------------------------------
     # Create executable
     #-----------------------------------------------------------------------------
@@ -32,5 +32,8 @@ if (${iMSTK_USE_MODEL_REDUCTION})
     #-----------------------------------------------------------------------------
     # Link libraries to executable
     #-----------------------------------------------------------------------------
-    target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
+    target_link_libraries(${PROJECT_NAME}
+        SimulationManager
+        ViewerVTK
+        )
 endif()

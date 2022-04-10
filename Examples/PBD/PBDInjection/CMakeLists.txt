@@ -22,9 +22,12 @@ project(Example-PBDInjection)
 # Create executable
 #-----------------------------------------------------------------------------
 imstk_add_executable(${PROJECT_NAME}
-    PBDInjectExample.cpp InflatableObject.h InflatableObject.cpp
+    PBDInjectExample.cpp
+    InflatableObject.h
+    InflatableObject.cpp
     imstkPbdInflatableVolumeConstraint.h
-    imstkPbdInflatableDistanceConstraint.h)
+    imstkPbdInflatableDistanceConstraint.h
+    )
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

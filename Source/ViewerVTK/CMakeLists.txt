@@ -26,7 +26,9 @@ imstk_add_library(ViewerVTK
     imstkVTKViewer.cpp
   DEPENDS
     ViewerCore
-    RenderingVTK)
+    RenderingVTK
+    VTK::InteractionStyle
+  )
 
 # Install VR actions json
 file(GLOB VTK_VR_JSON_FILES vtk_openvr_*.json)

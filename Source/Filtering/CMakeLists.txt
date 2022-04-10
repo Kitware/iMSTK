@@ -46,6 +46,7 @@ imstk_add_library( Filtering
     imstkSurfaceMeshTextureProject.cpp
   DEPENDS
     FilteringCore
+    VTK::ImagingGeneral
     VTK::ImagingMath
     VTK::ImagingStencil
     VTK::FiltersExtraction
