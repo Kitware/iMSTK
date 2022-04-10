@@ -68,6 +68,6 @@ imstk_add_external_project( VTK
   #VERBOSE
 )
 if(NOT USE_SYSTEM_VTK)
-  set(VTK_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/vtk-9.0)
+  set(VTK_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/vtk-9.1)
   #message(STATUS "VTK_DIR : ${VTK_DIR}")
 endif()
