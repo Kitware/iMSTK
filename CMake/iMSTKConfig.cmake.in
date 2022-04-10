@@ -43,7 +43,7 @@ find_dependency( Assimp )
 find_dependency( Eigen3 )
 
 # FTD2XX
-if(WIN32)
+if(WIN32 AND iMSTK_USE_VRPN)
   find_dependency( FTD2XX )
 endif()
 
@@ -61,12 +61,13 @@ if (iMSTK_BUILD_BENCHMARK)
   find_package( benchmark REQUIRED )
 endif()
 
+if (iMSTK_USE_VRPN)
+  # LibNiFalcon
+  find_dependency( LibNiFalcon )
 
-# LibNiFalcon
-find_dependency( LibNiFalcon )
-
-# Libusb
-find_dependency( Libusb )
+  # Libusb
+  find_dependency( Libusb )
+endif()
 
 # OpenVR
 find_dependency( OpenVR )
