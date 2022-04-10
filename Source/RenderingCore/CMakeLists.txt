@@ -11,7 +11,8 @@ imstk_add_library(RenderingCore
   CPP_FILES
     imstkRenderer.cpp
   DEPENDS
-    Scene)
+    Scene
+  )
 
 #-----------------------------------------------------------------------------
 # Testing

@@ -1,19 +1,17 @@
 #-----------------------------------------------------------------------------
 # Create target
 #-----------------------------------------------------------------------------
-file(GLOB hFiles *.h)
-file(GLOB cppFiles *cpp)
 
 include(imstkAddLibrary)
 imstk_add_library( FilteringCore
   H_FILES
-    ${hFiles}
+    imstkGeometryAlgorithm.h
   CPP_FILES
-    ${cppFiles}
+    imstkGeometryAlgorithm.cpp
   DEPENDS
     Geometry
     DataStructures
-    ${VTK_LIBRARIES})
+    )
 
 #-----------------------------------------------------------------------------
 # Testing

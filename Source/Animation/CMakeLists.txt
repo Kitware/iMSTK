@@ -1,8 +1,13 @@
 #-----------------------------------------------------------------------------
 # Create target
 #-----------------------------------------------------------------------------
+
 include(imstkAddLibrary)
 imstk_add_library( Animation
+  H_FILES
+    Particles/imstkRenderParticleEmitter.h
+  CPP_FILES
+    Particles/imstkRenderParticleEmitter.cpp
   DEPENDS
     Common
     Geometry

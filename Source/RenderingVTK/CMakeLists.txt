@@ -54,7 +54,8 @@ imstk_add_library(RenderingVTK
     OpenVR::OpenVR
     Animation
     RenderingCore
-    ${VTK_LIBRARIES})
+    ${VTK_LIBRARIES}
+  )
 
 vtk_module_autoinit(TARGETS RenderingVTK MODULES ${VTK_LIBRARIES})
 

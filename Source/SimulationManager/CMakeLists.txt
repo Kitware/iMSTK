@@ -7,14 +7,16 @@ set(H_FILES
   imstkKeyboardSceneControl.h
   imstkMouseSceneControl.h
   imstkSceneManager.h
-  imstkSimulationManager.h)
+  imstkSimulationManager.h
+  )
 
 set(SRC_FILES
   imstkConsoleModule.cpp
   imstkKeyboardSceneControl.cpp
   imstkMouseSceneControl.cpp
   imstkSceneManager.cpp
-  imstkSimulationManager.cpp)
+  imstkSimulationManager.cpp
+  )
 
 include(imstkAddLibrary)
 imstk_add_library(SimulationManager
@@ -24,7 +26,8 @@ imstk_add_library(SimulationManager
     ${SRC_FILES}
   DEPENDS
     Scene
-    ViewerCore)
+    ViewerCore
+  )
 
 #-----------------------------------------------------------------------------
 # Testing

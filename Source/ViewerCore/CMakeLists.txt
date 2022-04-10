@@ -2,21 +2,17 @@
 # Create target
 #-----------------------------------------------------------------------------
 
-set(H_FILES
-  imstkViewer.h)
-set(CPP_FILES
-  imstkViewer.cpp)
-
 include(imstkAddLibrary)
 imstk_add_library(ViewerCore
   H_FILES
-    ${H_FILES}
+    imstkViewer.h
   CPP_FILES
-    ${CPP_FILES}
+    imstkViewer.cpp
   EXCLUDE_FILES
     ${ExclusionFiles}
   DEPENDS
-    RenderingCore)
+    RenderingCore
+  )
 
 #-----------------------------------------------------------------------------
 # Testing

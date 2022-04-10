@@ -1,18 +1,57 @@
 #-----------------------------------------------------------------------------
 # Create target
 #-----------------------------------------------------------------------------
-file(GLOB hFiles *.h)
-file(GLOB cppFiles *cpp)
 
 include(imstkAddLibrary)
 imstk_add_library( Filtering
   H_FILES
-    ${hFiles}
+    imstkAppendMesh.h
+    imstkCleanMesh.h
+    imstkExtractEdges.h
+    imstkFastMarch.h
+    imstkImageDistanceTransform.h
+    imstkImageGradient.h
+    imstkImageResample.h
+    imstkImageReslice.h
+    imstkImplicitGeometryToImageData.h
+    imstkLocalMarchingCubes.h
+    imstkQuadricDecimate.h
+    imstkSelectEnclosedPoints.h
+    imstkSurfaceMeshCut.h
+    imstkSurfaceMeshDistanceTransform.h
+    imstkSurfaceMeshFlyingEdges.h
+    imstkSurfaceMeshImageMask.h
+    imstkSurfaceMeshSmoothen.h
+    imstkSurfaceMeshSubdivide.h
+    imstkSurfaceMeshTextureProject.h
   CPP_FILES
-    ${cppFiles}
+    imstkAppendMesh.cpp
+    imstkCleanMesh.cpp
+    imstkExtractEdges.cpp
+    imstkFastMarch.cpp
+    imstkImageDistanceTransform.cpp
+    imstkImageGradient.cpp
+    imstkImageResample.cpp
+    imstkImageReslice.cpp
+    imstkImplicitGeometryToImageData.cpp
+    imstkLocalMarchingCubes.cpp
+    imstkQuadricDecimate.cpp
+    imstkSelectEnclosedPoints.cpp
+    imstkSurfaceMeshCut.cpp
+    imstkSurfaceMeshDistanceTransform.cpp
+    imstkSurfaceMeshFlyingEdges.cpp
+    imstkSurfaceMeshImageMask.cpp
+    imstkSurfaceMeshSmoothen.cpp
+    imstkSurfaceMeshSubdivide.cpp
+    imstkSurfaceMeshTextureProject.cpp
   DEPENDS
     FilteringCore
-    ${VTK_LIBRARIES})
+    VTK::ImagingMath
+    VTK::ImagingStencil
+    VTK::FiltersExtraction
+    VTK::FiltersGeneral
+    VTK::FiltersModeling
+    )
 
 #-----------------------------------------------------------------------------
 # Testing
