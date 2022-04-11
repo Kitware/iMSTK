@@ -42,11 +42,6 @@ find_dependency( Assimp )
 # Eigen3
 find_dependency( Eigen3 )
 
-# FTD2XX
-if(WIN32 AND iMSTK_USE_VRPN)
-  find_dependency( FTD2XX )
-endif()
-
 # g3log
 find_dependency( g3log )
 
@@ -62,9 +57,6 @@ if (iMSTK_BUILD_BENCHMARK)
 endif()
 
 if (iMSTK_USE_VRPN)
-  # LibNiFalcon
-  find_dependency( LibNiFalcon )
-
   # Libusb
   find_dependency( Libusb )
 endif()

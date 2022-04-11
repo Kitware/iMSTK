@@ -206,9 +206,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(Assimp)
   imstk_define_dependency(Eigen3)
   imstk_define_dependency(g3log)
-  if (${PROJECT_NAME}_USE_VRPN)
-    imstk_define_dependency(LibNiFalcon)
-  endif()
   imstk_define_dependency(OpenVR)
   imstk_define_dependency(TBB)
   imstk_define_dependency(VegaFEM)
@@ -219,7 +216,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   if (${PROJECT_NAME}_USE_VRPN)
     if(WIN32)
       imstk_define_dependency(Libusb) #for VRPN
-      imstk_define_dependency(FTD2XX) #for LibNiFalcon
     endif()
     imstk_define_dependency(VRPN)
   endif()
@@ -287,17 +283,10 @@ find_package( Assimp REQUIRED )
 # Eigen
 find_package( Eigen3 3.1.2 REQUIRED )
 
-if(WIN32 AND ${PROJECT_NAME}_USE_VRPN)
-  # FTD2XX
-  find_package( FTD2XX REQUIRED )
-endif()
-
 # g3log
 find_package( g3log REQUIRED )
 
 if (${PROJECT_NAME}_USE_VRPN)
-  # LibNiFalcon
-  find_package( LibNiFalcon REQUIRED)
   # Libusb
   find_package( Libusb REQUIRED)
 endif()
@@ -560,16 +549,6 @@ set(CONFIG_CODE "${CONFIG_CODE}set(GTest_DIR \"${GTest_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(benchmark_DIR \"${benchmark_DIR}\")\n")
 
 if(WIN32 AND ${PROJECT_NAME}_USE_VRPN)
-  set(CONFIG_CODE "${CONFIG_CODE}# Required by FindFTD2XX CMake module used in and provided by the iMSTK project\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(FTD2XX_ROOT_DIR \"${FTD2XX_ROOT_DIR}\")\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(FTD2XX_LIB_DIR \"${FTD2XX_LIB_DIR}\")\n")
-  set(CONFIG_CODE "${CONFIG_CODE}# Required by Findlibftd2xx CMake module provided and used by the LibNiFalcon project\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(LIBFTD2XX_INCLUDE_DIR \"${LIBFTD2XX_INCLUDE_DIR}\")\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(LIBFTD2XX_LIBRARY \"${LIBFTD2XX_LIBRARY}\")\n")
-
-  set(CONFIG_CODE "${CONFIG_CODE}set(LibNiFalcon_ROOT_DIR \"${LibNiFalcon_ROOT_DIR}\")\n")
-  set(CONFIG_CODE "${CONFIG_CODE}set(LibNiFalcon_LIB_DIR \"${LibNiFalcon_LIB_DIR}\")\n")
-
   set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_ROOT_DIR \"${Libusb_ROOT_DIR}\")\n")
   set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_LIB_DIR \"${Libusb_LIB_DIR}\")\n")
 endif()

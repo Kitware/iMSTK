@@ -13,10 +13,9 @@ endif()
 #-----------------------------------------------------------------------------
 # Dependencies
 #-----------------------------------------------------------------------------
-set(VRPN_DEPENDENCIES "LibNiFalcon")
+set(VRPN_DEPENDENCIES "")
 if(WIN32)
   list(APPEND VRPN_DEPENDENCIES "Libusb")
-  list(APPEND VRPN_DEPENDENCIES "FTD2XX")
 endif(WIN32)
 if(VRPN_USE_OpenHaptics)
   list(APPEND VRPN_DEPENDENCIES "OpenHaptics")
