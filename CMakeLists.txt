@@ -163,10 +163,17 @@ endif()
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_VRPN:BOOL)
 
-option(iMSTK_USE_OpenHaptics "Use OpenHaptic Support." OFF)
-mark_as_superbuild(iMSTK_USE_OpenHaptics:BOOL)
-if(NOT WIN32 AND iMSTK_USE_OpenHaptics)
-  message(FATAL_ERROR "Setting iMSTK_USE_OpenHaptics to ON is only supported on Windows")
+option(${PROJECT_NAME}_USE_RENDERING_VTK "Build with/out VTK rendering support" ON)
+mark_as_superbuild(${PROJECT_NAME}_USE_RENDERING_VTK:BOOL)
+
+if (${PROJECT_NAME}_USE_RENDERING_VTK AND ${PROJECT_NAME}_USE_VTK_OSMESA)
+  message(FATAL_ERROR "Setting ${PROJECT_NAME}_USE_VTK_OSMESA ON is only supported when ${PROJECT_NAME}_USE_RENDERING_VTK is ON")
+endif()
+
+option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
+mark_as_superbuild(${PROJECT_NAME}_USE_OpenHaptics:BOOL)
+if(NOT WIN32 AND ${PROJECT_NAME}_USE_OpenHaptics)
+  message(FATAL_ERROR "Setting ${PROJECT_NAME}_USE_OpenHaptics to ON is only supported on Windows")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -206,7 +213,9 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(Assimp)
   imstk_define_dependency(Eigen3)
   imstk_define_dependency(g3log)
-  imstk_define_dependency(OpenVR)
+  if (${PROJECT_NAME}_USE_RENDERING_VTK)
+    imstk_define_dependency(OpenVR)
+  endif()
   imstk_define_dependency(TBB)
   imstk_define_dependency(VegaFEM)
   imstk_define_dependency(VTK)
@@ -291,8 +300,10 @@ if (${PROJECT_NAME}_USE_VRPN)
   find_package( Libusb REQUIRED)
 endif()
 
-# OpenVR
-find_package( OpenVR REQUIRED )
+if (${PROJECT_NAME}_USE_RENDERING_VTK)
+  # OpenVR
+  find_package( OpenVR REQUIRED )
+endif()
 
 # SFML
 if(NOT iMSTK_AUDIO_ENABLED)
@@ -329,8 +340,10 @@ find_package(VTK REQUIRED CONFIG)
 # modules are linked via `VTK::CommonCore`
 # vtk_module_autoinit is needed
 
-find_package(vtkRenderingOpenVR QUIET)
-find_package(vtkRenderingExternal QUIET)
+if (${PROJECT_NAME}_USE_RENDERING_VTK)
+  find_package(vtkRenderingOpenVR QUIET)
+  find_package(vtkRenderingExternal QUIET)
+endif()
 
 list(APPEND iMSTK_VTK_DEPENDENCIES
   ChartsCore
@@ -349,17 +362,20 @@ list(APPEND iMSTK_VTK_DEPENDENCIES
   ImagingCore
   ImagingGeneral
   ImagingStencil
-  InteractionStyle
-  RenderingAnnotation
-  RenderingContext2D
-  RenderingContextOpenGL2
-  RenderingCore
-  RenderingExternal
-  RenderingOpenGL2
-  RenderingOpenVR
-  RenderingVolume
-  RenderingVolumeOpenGL2
-  ViewsContext2D)
+  InteractionStyle)
+if (${PROJECT_NAME}_USE_RENDERING_VTK)
+  list(APPEND iMSTK_VTK_DEPENDENCIES
+    RenderingAnnotation
+    RenderingContext2D
+    RenderingContextOpenGL2
+    RenderingCore
+    RenderingExternal
+    RenderingOpenGL2
+    RenderingOpenVR
+    RenderingVolume
+    RenderingVolumeOpenGL2
+    ViewsContext2D)
+endif()
 find_package(VTK COMPONENTS ${iMSTK_VTK_DEPENDENCIES} REQUIRED)
 if(${PROJECT_NAME}_USE_VTK_OSMESA)
   add_definitions(-DiMSTK_USE_VTK_OSMESA)
@@ -438,7 +454,9 @@ add_subdirectory(Source/DataStructures)
 add_subdirectory(Source/Constraint)
 add_subdirectory(Source/Devices)
 add_subdirectory(Source/RenderingCore)
-add_subdirectory(Source/RenderingVTK)
+if (${PROJECT_NAME}_USE_RENDERING_VTK)
+  add_subdirectory(Source/RenderingVTK)
+endif()
 add_subdirectory(Source/Solvers)
 add_subdirectory(Source/DynamicalModels)
 add_subdirectory(Source/SceneEntities)
@@ -449,7 +467,9 @@ add_subdirectory(Source/CollisionHandling)
 add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/ViewerCore)
-add_subdirectory(Source/ViewerVTK)
+if (${PROJECT_NAME}_USE_RENDERING_VTK)
+  add_subdirectory(Source/ViewerVTK)
+endif()
 add_subdirectory(Source/Testing)
 add_subdirectory(Source/Filtering)
 add_subdirectory(Source/FilteringCore)
@@ -553,20 +573,24 @@ if(WIN32 AND ${PROJECT_NAME}_USE_VRPN)
   set(CONFIG_CODE "${CONFIG_CODE}set(Libusb_LIB_DIR \"${Libusb_LIB_DIR}\")\n")
 endif()
 
-set(CONFIG_CODE "${CONFIG_CODE}# Add variables to CACHE to workaround issue related to use of\n")
-set(CONFIG_CODE "${CONFIG_CODE}# mark_as_advanced command in FindOpenVR and described in CMP0102\n")
-set(CONFIG_CODE "${CONFIG_CODE}# See https://cmake.org/cmake/help/latest/policy/CMP0102.html\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_INCLUDE_DIR \"${OpenVR_INCLUDE_DIR}\" CACHE PATH \"\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_LIBRARY \"${OpenVR_LIBRARY}\" CACHE FILEPATH \"\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_ROOT_DIR \"${OpenVR_ROOT_DIR}\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_LIB_DIR \"${OpenVR_LIB_DIR}\")\n")
+if (${PROJECT_NAME}_USE_RENDERING_VTK)
+  set(CONFIG_CODE "${CONFIG_CODE}# Add variables to CACHE to workaround issue related to use of\n")
+  set(CONFIG_CODE "${CONFIG_CODE}# mark_as_advanced command in FindOpenVR and described in CMP0102\n")
+  set(CONFIG_CODE "${CONFIG_CODE}# See https://cmake.org/cmake/help/latest/policy/CMP0102.html\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_INCLUDE_DIR \"${OpenVR_INCLUDE_DIR}\" CACHE PATH \"\")\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_LIBRARY \"${OpenVR_LIBRARY}\" CACHE FILEPATH \"\")\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_ROOT_DIR \"${OpenVR_ROOT_DIR}\")\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_LIB_DIR \"${OpenVR_LIB_DIR}\")\n")
+endif()
 
 set(CONFIG_CODE "${CONFIG_CODE}set(TBB_DIR \"${TBB_DIR}\")\n")
 
 set(CONFIG_CODE "${CONFIG_CODE}set(VegaFEM_DIR \"${VegaFEM_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(VTK_DIR \"${VTK_DIR}\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(vtkRenderingOpenVR_DIR \"${vtkRenderingOpenVR_DIR}\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(vtkRenderingExternal_DIR \"${vtkRenderingExternal_DIR}\")\n")
+if (${PROJECT_NAME}_USE_RENDERING_VTK)
+  set(CONFIG_CODE "${CONFIG_CODE}set(vtkRenderingOpenVR_DIR \"${vtkRenderingOpenVR_DIR}\")\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(vtkRenderingExternal_DIR \"${vtkRenderingExternal_DIR}\")\n")
+endif()
 
 set(CONFIG_CODE "${CONFIG_CODE}##################################################")
 set(build_config ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake)
@@ -595,12 +619,14 @@ set(CONFIG_CODE "${CONFIG_CODE}set(TBB_DIR \"${TBB_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(VegaFEM_DIR \"${VegaFEM_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(VTK_DIR \"${VTK_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(benchmark_DIR \"${benchmark_DIR}\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}# Add variables to CACHE to workaround issue related to use of\n")
-set(CONFIG_CODE "${CONFIG_CODE}# mark_as_advanced command in FindOpenVR and described in CMP0102\n")
-set(CONFIG_CODE "${CONFIG_CODE}# See https://cmake.org/cmake/help/latest/policy/CMP0102.html\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_INCLUDE_DIR \"${OpenVR_INCLUDE_DIR}\" CACHE PATH \"\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_LIBRARY \"${OpenVR_LIBRARY}\" CACHE FILEPATH \"\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}##################################################")
+if (${PROJECT_NAME}_USE_RENDERING_VTK)
+  set(CONFIG_CODE "${CONFIG_CODE}# Add variables to CACHE to workaround issue related to use of\n")
+  set(CONFIG_CODE "${CONFIG_CODE}# mark_as_advanced command in FindOpenVR and described in CMP0102\n")
+  set(CONFIG_CODE "${CONFIG_CODE}# See https://cmake.org/cmake/help/latest/policy/CMP0102.html\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_INCLUDE_DIR \"${OpenVR_INCLUDE_DIR}\" CACHE PATH \"\")\n")
+  set(CONFIG_CODE "${CONFIG_CODE}set(OpenVR_LIBRARY \"${OpenVR_LIBRARY}\" CACHE FILEPATH \"\")\n")
+  set(CONFIG_CODE "${CONFIG_CODE}##################################################")
+endif()
 
 set(install_config ${PROJECT_BINARY_DIR}/CMakeFiles/${PROJECT_NAME}Config.cmake)
 configure_package_config_file(
