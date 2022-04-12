@@ -16,22 +16,24 @@
 #
 ###########################################################################
 
-project(Example-Vessel)
+if (iMSTK_USE_RENDERING_VTK)
+  project(Example-Vessel)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} vesselExample.cpp)
+  #-----------------------------------------------------------------------------
+  # Create executable
+  #-----------------------------------------------------------------------------
+  imstk_add_executable(${PROJECT_NAME} vesselExample.cpp)
 
-#-----------------------------------------------------------------------------
-# Add the target to Examples folder
-#-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+  #-----------------------------------------------------------------------------
+  # Add the target to Examples folder
+  #-----------------------------------------------------------------------------
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME}
-	SimulationManager
-	Filtering
-	ViewerVTK)
+  #-----------------------------------------------------------------------------
+  # Link libraries to executable
+  #-----------------------------------------------------------------------------
+  target_link_libraries(${PROJECT_NAME}
+    SimulationManager
+    Filtering
+    ViewerVTK)
+endif()

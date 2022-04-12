@@ -16,21 +16,28 @@
 #
 ###########################################################################
 
-project(Example-SPHFluid-BallDrop)
+if (iMSTK_USE_RENDERING_VTK)
+  project(Example-SPHFluid-BallDrop)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} SPHFluid-BallDrop.cpp ../Fluid.hpp ../Solid.hpp ../SPHFluidExample.hpp)
+  #-----------------------------------------------------------------------------
+  # Create executable
+  #-----------------------------------------------------------------------------
+  imstk_add_executable(${PROJECT_NAME}
+    SPHFluid-BallDrop.cpp
+    ../Fluid.hpp
+    ../Solid.hpp
+    ../SPHFluidExample.hpp
+    )
 
-#-----------------------------------------------------------------------------
-# Add the target to Examples folder
-#-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/SPH)
+  #-----------------------------------------------------------------------------
+  # Add the target to Examples folder
+  #-----------------------------------------------------------------------------
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/SPH)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME}
-	SimulationManager
-	ViewerVTK)
+  #-----------------------------------------------------------------------------
+  # Link libraries to executable
+  #-----------------------------------------------------------------------------
+  target_link_libraries(${PROJECT_NAME}
+    SimulationManager
+    ViewerVTK)
+endif()

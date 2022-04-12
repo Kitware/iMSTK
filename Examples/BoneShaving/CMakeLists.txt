@@ -16,8 +16,7 @@
 #
 ###########################################################################
 
-if(iMSTK_USE_OpenHaptics)
-
+if(iMSTK_USE_OpenHaptics AND iMSTK_USE_RENDERING_VTK)
   project(Example-BoneShaving)
 
   #-----------------------------------------------------------------------------
@@ -28,20 +27,12 @@ if(iMSTK_USE_OpenHaptics)
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
 
   #-----------------------------------------------------------------------------
   # Link libraries to executable
   #-----------------------------------------------------------------------------
-  if(UNIX)
-    target_link_libraries(${PROJECT_NAME}
-        SimulationManager
-        ViewerVTK)
-  else()
-    target_link_libraries(${PROJECT_NAME}
-      SimulationManager
-      SFML::SFML
-      ViewerVTK)
-  endif()
-  
+  target_link_libraries(${PROJECT_NAME}
+    SimulationManager
+    ViewerVTK)
 endif()

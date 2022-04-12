@@ -16,21 +16,29 @@
 #
 ###########################################################################
 
-project(Example-SPHFluid-BunnyShape)
+if (iMSTK_USE_RENDERING_VTK)
+  project(Example-SPHFluid-BunnyShape)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} SPHFluid-BunnyShape.cpp Bunny.cpp ../Fluid.hpp ../Solid.hpp ../SPHFluidExample.hpp)
+  #-----------------------------------------------------------------------------
+  # Create executable
+  #-----------------------------------------------------------------------------
+  imstk_add_executable(${PROJECT_NAME}
+    SPHFluid-BunnyShape.cpp
+    Bunny.cpp
+    ../Fluid.hpp
+    ../Solid.hpp
+    ../SPHFluidExample.hpp
+    )
 
-#-----------------------------------------------------------------------------
-# Add the target to Examples folder
-#-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/SPH)
+  #-----------------------------------------------------------------------------
+  # Add the target to Examples folder
+  #-----------------------------------------------------------------------------
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/SPH)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME}
-	SimulationManager
-	ViewerVTK)
+  #-----------------------------------------------------------------------------
+  # Link libraries to executable
+  #-----------------------------------------------------------------------------
+  target_link_libraries(${PROJECT_NAME}
+    SimulationManager
+    ViewerVTK)
+endif()

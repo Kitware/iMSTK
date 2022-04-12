@@ -16,23 +16,23 @@
 #
 ###########################################################################
 
-if(iMSTK_USE_OpenHaptics)
-    project(Example-CameraController)
+if(iMSTK_USE_OpenHaptics AND iMSTK_USE_RENDERING_VTK)
+  project(Example-CameraController)
 
-    #-----------------------------------------------------------------------------
-    # Create executable
-    #-----------------------------------------------------------------------------
-    imstk_add_executable(${PROJECT_NAME} CameraControllerExample.cpp)
+  #-----------------------------------------------------------------------------
+  # Create executable
+  #-----------------------------------------------------------------------------
+  imstk_add_executable(${PROJECT_NAME} CameraControllerExample.cpp)
 
-    #-----------------------------------------------------------------------------
-    # Add the target to Examples folder
-    #-----------------------------------------------------------------------------
-    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
+  #-----------------------------------------------------------------------------
+  # Add the target to Examples folder
+  #-----------------------------------------------------------------------------
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
 
-    #-----------------------------------------------------------------------------
-    # Link libraries to executable
-    #-----------------------------------------------------------------------------
-    target_link_libraries(${PROJECT_NAME}
-        SimulationManager
-        ViewerVTK)
+  #-----------------------------------------------------------------------------
+  # Link libraries to executable
+  #-----------------------------------------------------------------------------
+  target_link_libraries(${PROJECT_NAME}
+    SimulationManager
+    ViewerVTK)
 endif()

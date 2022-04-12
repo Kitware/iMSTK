@@ -16,21 +16,23 @@
 #
 ###########################################################################
 
-project(Example-RenderingHead)
+if (iMSTK_USE_RENDERING_VTK)
+  project(Example-RenderingHead)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} RenderingHeadExample.cpp)
+  #-----------------------------------------------------------------------------
+  # Create executable
+  #-----------------------------------------------------------------------------
+  imstk_add_executable(${PROJECT_NAME} RenderingHeadExample.cpp)
 
-#-----------------------------------------------------------------------------
-# Add the target to Examples folder
-#-----------------------------------------------------------------------------
-set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/Rendering)
+  #-----------------------------------------------------------------------------
+  # Add the target to Examples folder
+  #-----------------------------------------------------------------------------
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/Rendering)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME}
-	SimulationManager
-	ViewerVTK)
+  #-----------------------------------------------------------------------------
+  # Link libraries to executable
+  #-----------------------------------------------------------------------------
+  target_link_libraries(${PROJECT_NAME}
+    SimulationManager
+    ViewerVTK)
+endif()

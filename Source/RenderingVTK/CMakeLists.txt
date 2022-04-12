@@ -48,13 +48,17 @@ imstk_add_library(RenderingVTK
     RenderDelegate/imstkVTKSurfaceNormalRenderDelegate.cpp
     RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.cpp
     RenderDelegate/imstkVTKVolumeRenderDelegate.cpp
-  SUBDIR_LIST
-    RenderDelegate
   DEPENDS
     OpenVR::OpenVR
     Animation
     RenderingCore
-    ${VTK_LIBRARIES})
+    VTK::RenderingContextOpenGL2
+    VTK::RenderingOpenGL2
+    VTK::RenderingVolumeOpenGL2
+    VTK::RenderingOpenVR
+    VTK::RenderingAnnotation
+    VTK::ChartsCore
+  )
 
 vtk_module_autoinit(TARGETS RenderingVTK MODULES ${VTK_LIBRARIES})
 

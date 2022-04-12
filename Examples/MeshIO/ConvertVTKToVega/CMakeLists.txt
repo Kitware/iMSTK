@@ -26,7 +26,7 @@ imstk_add_executable(${PROJECT_NAME} ConvertVTKToVega.cpp)
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/MeshIO)
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/MeshIO)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

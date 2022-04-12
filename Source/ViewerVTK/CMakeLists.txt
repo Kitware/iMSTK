@@ -2,18 +2,33 @@
 # Create target
 #-----------------------------------------------------------------------------
 
-file(GLOB H_FILES imstk*.h)
-file(GLOB CPP_FILES imstk*.cpp)
-
 include(imstkAddLibrary)
 imstk_add_library(ViewerVTK
   H_FILES
-    ${H_FILES}
+    imstkAbstractVTKViewer.h
+    imstkScreenCaptureUtility.h
+    imstkVTKInteractorStyle.h
+    imstkVTKInteractorStyleVR.h
+    imstkVtkOpenVRRenderWindowInteractorImstk.h
+    imstkVTKOpenVRViewer.h
+    imstkVTKScreenCaptureUtility.h
+    imstkVTKTextStatusManager.h
+    imstkVTKViewer.h
   CPP_FILES
-    ${CPP_FILES}
+    imstkAbstractVTKViewer.cpp
+    imstkScreenCaptureUtility.cpp
+    imstkVTKInteractorStyle.cpp
+    imstkVTKInteractorStyleVR.cpp
+    imstkVtkOpenVRRenderWindowInteractorImstk.cpp
+    imstkVTKOpenVRViewer.cpp
+    imstkVTKScreenCaptureUtility.cpp
+    imstkVTKTextStatusManager.cpp
+    imstkVTKViewer.cpp
   DEPENDS
     ViewerCore
-    RenderingVTK)
+    RenderingVTK
+    VTK::InteractionStyle
+  )
 
 # Install VR actions json
 file(GLOB VTK_VR_JSON_FILES vtk_openvr_*.json)

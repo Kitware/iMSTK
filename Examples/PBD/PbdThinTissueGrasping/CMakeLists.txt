@@ -15,7 +15,8 @@
 #  limitations under the License.
 #
 ###########################################################################
-if(iMSTK_USE_OpenHaptics)
+
+if(iMSTK_USE_OpenHaptics AND iMSTK_USE_RENDERING_VTK)
   project(Example-PbdThinTissueGrasping)
 
   #-----------------------------------------------------------------------------
@@ -26,7 +27,7 @@ if(iMSTK_USE_OpenHaptics)
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
   
   #-----------------------------------------------------------------------------
   # Link libraries to executable

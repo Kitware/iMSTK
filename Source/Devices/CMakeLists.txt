@@ -4,35 +4,57 @@
 
 list(APPEND Dependencies Common)
 
+set(H_FILES
+  imstkDeviceClient.h
+  imstkDummyClient.h
+  imstkKeyboardDeviceClient.h
+  imstkMouseDeviceClient.h
+  imstkOpenVRDeviceClient.h
+  )
+
+set(SRC_FILES
+  imstkDeviceClient.cpp
+  imstkDummyClient.cpp
+  imstkKeyboardDeviceClient.cpp
+  imstkMouseDeviceClient.cpp
+  imstkOpenVRDeviceClient.cpp
+  )
+
 if(iMSTK_USE_OpenHaptics)
   list(APPEND Dependencies OpenHapticsSDK::OpenHapticsSDK)
-endif()
-if(iMSTK_USE_VRPN)
-  list(APPEND Dependencies VRPN::VRPN)
+
+  list(APPEND H_FILES
+    imstkHapticDeviceClient.h
+    imstkHapticDeviceManager.h
+    )
+  list(APPEND SRC_FILES
+    imstkHapticDeviceClient.cpp
+    imstkHapticDeviceManager.cpp
+    )
 endif()
 
-list(APPEND ExclusionFiles "")
-if(NOT iMSTK_USE_OpenHaptics)
-  list(APPEND ExclusionFiles
-    imstkHapticDeviceClient.h
-    imstkHapticDeviceClient.cpp
-    imstkHapticDeviceManager.h
-    imstkHapticDeviceManager.cpp)
-endif()
-if(NOT iMSTK_USE_VRPN)
-  list(APPEND ExclusionFiles
-    imstkVRPNDeviceManager.h
-    imstkVRPNDeviceManager.cpp
+if(iMSTK_USE_VRPN)
+  list(APPEND Dependencies VRPN::VRPN)
+
+  list(APPEND H_FILES
     imstkVRPNDeviceClient.h
-    imstkVRPNDeviceClient.cpp)
+    imstkVRPNDeviceManager.h
+    )
+  list(APPEND SRC_FILES
+    imstkVRPNDeviceClient.cpp
+    imstkVRPNDeviceManager.cpp
+    )
 endif()
 
 include(imstkAddLibrary)
 imstk_add_library(Devices
-  EXCLUDE_FILES
-    ${ExclusionFiles}
+  H_FILES
+    ${H_FILES}
+  CPP_FILES
+    ${SRC_FILES}
   DEPENDS
-    ${Dependencies})
+    ${Dependencies}
+  )
 
 #-----------------------------------------------------------------------------
 # Testing

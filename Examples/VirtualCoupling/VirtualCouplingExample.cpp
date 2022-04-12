@@ -24,7 +24,6 @@
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkIsometricMap.h"
-#include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
@@ -42,8 +41,12 @@
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
+
+#ifdef iMSTK_USE_RENDERING_VTK
+#include "imstkKeyboardSceneControl.h"
 #include "imstkVTKViewer.h"
 #include "imstkVTKRenderer.h"
+#endif
 
 using namespace imstk;
 
@@ -155,17 +158,18 @@ main()
 
     // Run the simulation
     {
-        // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
-        viewer->setActiveScene(scene);
-
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager;
         sceneManager->setActiveScene(scene);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(hapticsManager);
+#ifdef iMSTK_USE_RENDERING_VTK
+        // Setup a viewer to render
+        imstkNew<VTKViewer> viewer;
+        viewer->setActiveScene(scene);
         driver->addModule(viewer);
+#endif
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
@@ -184,16 +188,16 @@ main()
             });
 
         // Add mouse and keyboard controls to the viewer
-        {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
+#ifdef iMSTK_USE_RENDERING_VTK
+        imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+        mouseControl->setSceneManager(sceneManager);
+        viewer->addControl(mouseControl);
 
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
-        }
+        imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+        keyControl->setSceneManager(sceneManager);
+        keyControl->setModuleDriver(driver);
+        viewer->addControl(keyControl);
+#endif
 
         driver->start();
     }

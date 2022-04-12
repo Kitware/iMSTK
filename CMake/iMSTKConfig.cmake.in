@@ -15,6 +15,8 @@ set(iMSTK_DATA_DIR ${PACKAGE_PREFIX_DIR}/data)
 set(iMSTK_AUDIO_ENABLED @iMSTK_AUDIO_ENABLED@)
 set(iMSTK_USE_OpenHaptics @iMSTK_USE_OpenHaptics@)
 set(iMSTK_USE_VTK_OSMESA @iMSTK_USE_VTK_OSMESA@)
+set(iMSTK_USE_RENDERING_VTK @iMSTK_USE_RENDERING_VTK@)
+set(iMSTK_BUILD_BENCHMARK @iMSTK_BUILD_BENCHMARK@)
 set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)
 set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)
 set(iMSTK_BUILD_VISUAL_TESTING @iMSTK_BUILD_VISUAL_TESTING@)
@@ -42,11 +44,6 @@ find_dependency( Assimp )
 # Eigen3
 find_dependency( Eigen3 )
 
-# FTD2XX
-if(WIN32)
-  find_dependency( FTD2XX )
-endif()
-
 # g3log
 find_dependency( g3log )
 
@@ -56,20 +53,20 @@ if(iMSTK_BUILD_TESTING OR iMSTK_BUILD_VISUAL_TESTING)
 endif()
 
 # Google Benchmark
-set(iMSTK_BUILD_BENCHMARK @iMSTK_BUILD_BENCHMARK@)
 if (iMSTK_BUILD_BENCHMARK)
   find_package( benchmark REQUIRED )
 endif()
 
-
-# LibNiFalcon
-find_dependency( LibNiFalcon )
-
 # Libusb
-find_dependency( Libusb )
+if (iMSTK_USE_VRPN)
+ 
+  find_dependency( Libusb )
+endif()
 
 # OpenVR
-find_dependency( OpenVR )
+if (iMSTK_USE_RENDERING_VTK)
+  find_dependency( OpenVR )
+endif()
 
 # SFML
 if(iMSTK_AUDIO_ENABLED)
@@ -96,8 +93,10 @@ endif()
 
 # VTK
 find_dependency(VTK CONFIG)
-find_package(vtkRenderingOpenVR QUIET)
-find_package(vtkRenderingExternal QUIET)
+if (iMSTK_USE_RENDERING_VTK)
+  find_package(vtkRenderingOpenVR QUIET)
+  find_package(vtkRenderingExternal QUIET)
+endif()
 find_dependency(VTK COMPONENTS ${iMSTK_VTK_DEPENDENCIES})
 
 if(iMSTK_USE_VTK_OSMESA)

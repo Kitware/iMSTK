@@ -11,7 +11,8 @@ imstk_add_library(Materials
     imstkRenderMaterial.cpp
     imstkTexture.cpp
   DEPENDS
-    Common)
+    Common
+  )
 
 #-----------------------------------------------------------------------------
 # Testing
