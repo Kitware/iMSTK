@@ -16,24 +16,24 @@
 #
 ###########################################################################
 
-project(Example-ReducedFEM)
+if (iMSTK_USE_MODEL_REDUCTION AND iMSTK_USE_RENDERING_VTK)
+  project(Example-ReducedFEM)
 
-if (iMSTK_USE_MODEL_REDUCTION)
-    #-----------------------------------------------------------------------------
-    # Create executable
-    #-----------------------------------------------------------------------------
-    imstk_add_executable(${PROJECT_NAME} ReducedFEM.cpp)
+  #-----------------------------------------------------------------------------
+  # Create executable
+  #-----------------------------------------------------------------------------
+  imstk_add_executable(${PROJECT_NAME} ReducedFEM.cpp)
 
-    #-----------------------------------------------------------------------------
-    # Add the target to Examples folder
-    #-----------------------------------------------------------------------------
-    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+  #-----------------------------------------------------------------------------
+  # Add the target to Examples folder
+  #-----------------------------------------------------------------------------
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples)
 
-    #-----------------------------------------------------------------------------
-    # Link libraries to executable
-    #-----------------------------------------------------------------------------
-    target_link_libraries(${PROJECT_NAME}
-        SimulationManager
-        ViewerVTK
-        )
+  #-----------------------------------------------------------------------------
+  # Link libraries to executable
+  #-----------------------------------------------------------------------------
+  target_link_libraries(${PROJECT_NAME}
+    SimulationManager
+    ViewerVTK
+    )
 endif()

@@ -16,12 +16,13 @@
 #
 ###########################################################################
 
-project(Example-PBDTissueVolumeNeedleContact)
+if (iMSTK_USE_RENDERING_VTK)
+  project(Example-PBDTissueVolumeNeedleContact)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME}
+  #-----------------------------------------------------------------------------
+  # Create executable
+  #-----------------------------------------------------------------------------
+  imstk_add_executable(${PROJECT_NAME}
     PBDTissueVolumeNeedleContactExample.cpp
     EmbeddingConstraint.h
     EmbeddingConstraint.cpp
@@ -33,15 +34,16 @@ imstk_add_executable(${PROJECT_NAME}
     NeedlePbdCH.h
     NeedleRigidBodyCH.h)
 
-#-----------------------------------------------------------------------------
-# Add the target to Examples folder
-#-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
+  #-----------------------------------------------------------------------------
+  # Add the target to Examples folder
+  #-----------------------------------------------------------------------------
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME}
+  #-----------------------------------------------------------------------------
+  # Link libraries to executable
+  #-----------------------------------------------------------------------------
+  target_link_libraries(${PROJECT_NAME}
     SimulationManager
     Filtering
     ViewerVTK)
+endif()

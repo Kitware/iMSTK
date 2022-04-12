@@ -26,7 +26,7 @@ imstk_add_executable(${PROJECT_NAME} AudioExample.cpp)
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
@@ -36,10 +36,10 @@ if(UNIX)
   find_package(Threads REQUIRED)
 
   target_link_libraries(${PROJECT_NAME}
-	Common
-	Threads::Threads)
+    Common
+    Threads::Threads)
 else()
   target_link_libraries(${PROJECT_NAME}
-	Common
-	${SFML_LIBRARIES})
+    Common
+    ${SFML_LIBRARIES})
 endif()

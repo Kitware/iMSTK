@@ -15,8 +15,8 @@
 #  limitations under the License.
 #
 ###########################################################################
-if(iMSTK_USE_OpenHaptics)
 
+if(iMSTK_USE_OpenHaptics)
   project(Example-VirtualCoupling)
 
   #-----------------------------------------------------------------------------
@@ -27,13 +27,19 @@ if(iMSTK_USE_OpenHaptics)
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
-  
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
+
   #-----------------------------------------------------------------------------
   # Link libraries to executable
   #-----------------------------------------------------------------------------
-  target_link_libraries(${PROJECT_NAME}
-	SimulationManager
-	ViewerVTK)
+  if (iMSTK_USE_RENDERING_VTK)
+    target_link_libraries(${PROJECT_NAME}
+      SimulationManager
+      ViewerVTK)
 
+    target_compile_definitions(${PROJECT_NAME} PUBLIC -DiMSTK_USE_RENDERING_VTK)
+  else()
+    target_link_libraries(${PROJECT_NAME}
+      SimulationManager)
+  endif()
 endif()
