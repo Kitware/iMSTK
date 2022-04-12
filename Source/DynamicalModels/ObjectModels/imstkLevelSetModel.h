@@ -34,8 +34,8 @@ class ImageData;
 
 struct LevelSetModelConfig
 {
-    double m_dt = 0.001;             ///> Time step size
-    bool m_sparseUpdate = false;     ///> Only updates nodes that recieve force
+    double m_dt = 0.001;             ///< Time step size
+    bool m_sparseUpdate = false;     ///< Only updates nodes that recieve force
     bool m_useCurvature = false;
     double m_k = 0.05;               // Curvature term
     double m_constantVelocity = 0.0; // Constant velocity
@@ -97,7 +97,7 @@ protected:
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-    std::shared_ptr<ImplicitGeometry> m_mesh = nullptr; ///> Geometry on which the levelset evolves with
+    std::shared_ptr<ImplicitGeometry> m_mesh = nullptr; ///< Geometry on which the levelset evolves with
 
     std::vector<std::shared_ptr<TaskNode>> m_evolveQuantitiesNodes;
 
@@ -111,7 +111,7 @@ protected:
     size_t noteUpdatePoolSize;
     size_t m_maxVelocitiesParallel = 100;                      // In sparse mode, if surpass this value, switch to parallel
 
-    std::shared_ptr<ImageData> m_gradientMagnitudes = nullptr; ///> Gradient magnitude field when using dense
+    std::shared_ptr<ImageData> m_gradientMagnitudes = nullptr; ///< Gradient magnitude field when using dense
     std::shared_ptr<ImageData> m_velocities = nullptr;
     std::shared_ptr<ImageData> m_curvatures = nullptr;
 

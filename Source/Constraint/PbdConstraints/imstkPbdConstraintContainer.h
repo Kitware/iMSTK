@@ -99,8 +99,8 @@ public:
     void clearPartitions() { m_partitionedConstraints.clear(); }
 
 protected:
-    std::vector<std::shared_ptr<PbdConstraint>> m_constraints;                         ///> Not partitioned constraints
-    std::vector<std::vector<std::shared_ptr<PbdConstraint>>> m_partitionedConstraints; ///> Partitioned pbd constraints
-    ParallelUtils::SpinLock m_constraintLock;                                          ///> Used to deal with concurrent addition/removal of constraints
+    std::vector<std::shared_ptr<PbdConstraint>> m_constraints;                         ///< Not partitioned constraints
+    std::vector<std::vector<std::shared_ptr<PbdConstraint>>> m_partitionedConstraints; ///< Partitioned pbd constraints
+    ParallelUtils::SpinLock m_constraintLock;                                          ///< Used to deal with concurrent addition/removal of constraints
 };
 } // namespace imstk

@@ -81,6 +81,6 @@ protected:
 
     Vec3d m_normal;
     mutable Vec3d m_normalPostTransform;
-    double m_width; ///> Width of plane, only used for visual purposes
+    double m_width; ///< Width of plane, only used for visual purposes
 };
 } // namespace imstk

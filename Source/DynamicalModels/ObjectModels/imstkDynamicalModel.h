@@ -64,8 +64,8 @@ public:
 
 protected:
     // Body states
-    std::shared_ptr<StateType> m_initialState;  ///> Initial state
-    std::shared_ptr<StateType> m_currentState;  ///> Current state
-    std::shared_ptr<StateType> m_previousState; ///> Previous state
+    std::shared_ptr<StateType> m_initialState;  ///< Initial state
+    std::shared_ptr<StateType> m_currentState;  ///< Current state
+    std::shared_ptr<StateType> m_previousState; ///< Previous state
 };
 } // namespace imstk

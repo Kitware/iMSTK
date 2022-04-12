@@ -72,6 +72,6 @@ public:
         double& c,
         std::vector<Vec3d>& dcdx) const override;
 public:
-    double m_restLength = 0.; ///> Rest length
+    double m_restLength = 0.; ///< Rest length
 };
 } // namespace imstk

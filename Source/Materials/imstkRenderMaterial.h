@@ -345,7 +345,7 @@ protected:
     DisplayMode  m_displayMode  = DisplayMode::Surface;
     ShadingModel m_shadingModel = ShadingModel::Phong;
 
-    bool m_recomputeVertexNormals = true; ///> Update vertex normals when vertex or index data is changed
+    bool m_recomputeVertexNormals = true; ///< Update vertex normals when vertex or index data is changed
 
     std::shared_ptr<ColorFunction> m_lookupTable;
     bool m_scalarVisibility = false;

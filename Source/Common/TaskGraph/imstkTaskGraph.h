@@ -278,8 +278,8 @@ public:
 
 protected:
     TaskNodeVector  m_nodes;
-    TaskNodeAdjList m_adjList;    ///> This gives the outputs of every node
-    TaskNodeAdjList m_invAdjList; ///> This gives the inputs of every node
+    TaskNodeAdjList m_adjList;    ///< This gives the outputs of every node
+    TaskNodeAdjList m_invAdjList; ///< This gives the inputs of every node
 
     std::shared_ptr<TaskNode> m_source = nullptr;
     std::shared_ptr<TaskNode> m_sink   = nullptr;

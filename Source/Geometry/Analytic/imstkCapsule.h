@@ -92,9 +92,9 @@ public:
 protected:
     void applyTransform(const Mat4d& m) override;
 
-    double m_radius = 1.0;                      ///> Radius of the hemispheres at the end of the capsule
-    mutable double m_radiusPostTransform = 1.0; ///> Radius after transform
-    double m_length = 1.0;                      ///> Length between the centers of two hemispheres
-    mutable double m_lengthPostTransform = 1.0; ///> Length after transform
+    double m_radius = 1.0;                      ///< Radius of the hemispheres at the end of the capsule
+    mutable double m_radiusPostTransform = 1.0; ///< Radius after transform
+    double m_length = 1.0;                      ///< Length between the centers of two hemispheres
+    mutable double m_lengthPostTransform = 1.0; ///< Length after transform
 };
 } // namespace imstk

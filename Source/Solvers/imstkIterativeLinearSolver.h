@@ -77,7 +77,7 @@ public:
     }
 
 protected:
-    size_t  m_maxIterations = 100;  ///> Maximum number of iterations to be performed.
-    Vectord m_residual;             ///> Storage for residual vector.
+    size_t  m_maxIterations = 100;  ///< Maximum number of iterations to be performed.
+    Vectord m_residual;             ///< Storage for residual vector.
 };
 } // namespace imstk

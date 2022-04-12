@@ -150,12 +150,12 @@ protected:
     ///
     virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
 
-    DynamicalModelType m_type;                      ///> Mathematical model type
+    DynamicalModelType m_type;                      ///< Mathematical model type
 
-    std::size_t m_numDof;                           ///> Total number of degree of freedom
+    std::size_t m_numDof;                           ///< Total number of degree of freedom
 
-    std::shared_ptr<Geometry> m_geometry = nullptr; ///> Physics geometry of the model
-    std::set<std::string>     m_validGeometryTypes; ///> Valid geometry types of this model
+    std::shared_ptr<Geometry> m_geometry = nullptr; ///< Physics geometry of the model
+    std::set<std::string>     m_validGeometryTypes; ///< Valid geometry types of this model
 
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::Fixed;
 

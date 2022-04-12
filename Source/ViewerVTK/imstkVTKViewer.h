@@ -96,13 +96,13 @@ protected:
 
     void updateModule() override;
 
-    std::chrono::high_resolution_clock::time_point m_pre;           ///> time point pre-rendering
-    std::chrono::high_resolution_clock::time_point m_post;          ///> time point post-rendering
-    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///> time point for last framerate display update
+    std::chrono::high_resolution_clock::time_point m_pre;           ///< time point pre-rendering
+    std::chrono::high_resolution_clock::time_point m_post;          ///< time point post-rendering
+    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///< time point for last framerate display update
 
-    std::shared_ptr<VTKTextStatusManager> m_textStatusManager;      ///> Handle text statuses, including fps status and custom text status
+    std::shared_ptr<VTKTextStatusManager> m_textStatusManager;      ///< Handle text statuses, including fps status and custom text status
 
-    bool   m_displayFps = false;                                    ///> hide or display framerate
-    double m_lastFps;                                               ///> last framerate value used for moving average estimate
+    bool   m_displayFps = false;                                    ///< hide or display framerate
+    double m_lastFps;                                               ///< last framerate value used for moving average estimate
 };
 } // namespace imstk

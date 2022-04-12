@@ -103,7 +103,7 @@ private:
     TimerState state;
     std::vector<double>      lapTimes;
     std::vector<std::string> lapNames;
-    std::chrono::high_resolution_clock::time_point wallClockTimeKeeper; ///> time keeper for wall clock time
+    std::chrono::high_resolution_clock::time_point wallClockTimeKeeper; ///< time keeper for wall clock time
 };
 
 ///
@@ -137,7 +137,7 @@ public:
     double getTimeElapsed(const TimeUnitType unitType = TimeUnitType::milliSeconds) override;
 
 private:
-    std::clock_t cpuTimeKeeper; ///> time keeper for cpu time
+    std::clock_t cpuTimeKeeper; ///< time keeper for cpu time
 };
 
 ///
@@ -180,10 +180,10 @@ public:
 
 protected:
 
-    std::shared_ptr<StopWatch> m_timer; ///> Timer
+    std::shared_ptr<StopWatch> m_timer; ///< Timer
 
-    double       m_accumulatedTimer;    ///> Accumulated time (always < 1 sec)
-    unsigned int m_ups;                 ///> Most up-to-date ups
-    unsigned int m_updateCount;         ///> Current update count
+    double       m_accumulatedTimer;    ///< Accumulated time (always < 1 sec)
+    unsigned int m_ups;                 ///< Most up-to-date ups
+    unsigned int m_updateCount;         ///< Current update count
 };
 } // namespace imstk

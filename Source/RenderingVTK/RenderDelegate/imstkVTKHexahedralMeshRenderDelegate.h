@@ -60,8 +60,8 @@ protected:
 
     vtkSmartPointer<vtkUnstructuredGrid> m_mesh;
 
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
-    vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
-    vtkSmartPointer<vtkCellArray>   m_cellArray;               ///> Array of cells
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///< Mapped array of vertices
+    vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///< Mapped array of scalars
+    vtkSmartPointer<vtkCellArray>   m_cellArray;               ///< Array of cells
 };
 } // namespace imstk

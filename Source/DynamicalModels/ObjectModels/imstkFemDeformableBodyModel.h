@@ -300,35 +300,35 @@ protected:
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
     std::shared_ptr<SolverBase> m_solver = nullptr;
-    std::shared_ptr<InternalForceModel> m_internalForceModel = nullptr;          ///> Mathematical model for intenal forces
-    std::shared_ptr<TimeIntegrator>     m_timeIntegrator     = nullptr;          ///> Time integrator
-    std::shared_ptr<NonLinearSystem<SparseMatrixd>> m_nonLinearSystem = nullptr; ///> Nonlinear system resulting from TI and force model
+    std::shared_ptr<InternalForceModel> m_internalForceModel = nullptr;          ///< Mathematical model for intenal forces
+    std::shared_ptr<TimeIntegrator>     m_timeIntegrator     = nullptr;          ///< Time integrator
+    std::shared_ptr<NonLinearSystem<SparseMatrixd>> m_nonLinearSystem = nullptr; ///< Nonlinear system resulting from TI and force model
 
     std::shared_ptr<FemModelConfig> m_FEModelConfig = nullptr;
 
     /// Matrices typical to a elastodynamics and 2nd order analogous systems
-    SparseMatrixd m_M;                                                            ///> Mass matrix
-    SparseMatrixd m_C;                                                            ///> Damping coefficient matrix
-    SparseMatrixd m_K;                                                            ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
-    SparseMatrixd m_Keff;                                                         ///> Effective stiffness matrix (dependent on internal force model and time integrator)
+    SparseMatrixd m_M;                                                            ///< Mass matrix
+    SparseMatrixd m_C;                                                            ///< Damping coefficient matrix
+    SparseMatrixd m_K;                                                            ///< Tangent (derivative of internal force w.r.t displacements) stiffness matrix
+    SparseMatrixd m_Keff;                                                         ///< Effective stiffness matrix (dependent on internal force model and time integrator)
 
-    Vectord m_Finternal;                                                          ///> Vector of internal forces
-    Vectord m_Feff;                                                               ///> Vector of effective forces
-    Vectord m_Fcontact;                                                           ///> Vector of contact forces
-    Vectord m_Fgravity;                                                           ///> Vector of gravity forces
-    Vectord m_FexplicitExternal;                                                  ///> Vector of explicitly defined external forces
-    Vectord m_qSol;                                                               ///> Vector to maintain solution at each iteration of nonlinear solver
+    Vectord m_Finternal;                                                          ///< Vector of internal forces
+    Vectord m_Feff;                                                               ///< Vector of effective forces
+    Vectord m_Fcontact;                                                           ///< Vector of contact forces
+    Vectord m_Fgravity;                                                           ///< Vector of gravity forces
+    Vectord m_FexplicitExternal;                                                  ///< Vector of explicitly defined external forces
+    Vectord m_qSol;                                                               ///< Vector to maintain solution at each iteration of nonlinear solver
 
-    std::shared_ptr<vega::VolumetricMesh> m_vegaPhysicsMesh = nullptr;            ///> Mesh used for Physics
-    std::shared_ptr<vega::SparseMatrix>   m_vegaMassMatrix  = nullptr;            ///> Vega mass matrix
-    std::shared_ptr<vega::SparseMatrix>   m_vegaTangentStiffnessMatrix = nullptr; ///> Vega Tangent stiffness matrix
-    std::shared_ptr<vega::SparseMatrix>   m_vegaDampingMatrix = nullptr;          ///> Vega Laplacian damping matrix
+    std::shared_ptr<vega::VolumetricMesh> m_vegaPhysicsMesh = nullptr;            ///< Mesh used for Physics
+    std::shared_ptr<vega::SparseMatrix>   m_vegaMassMatrix  = nullptr;            ///< Vega mass matrix
+    std::shared_ptr<vega::SparseMatrix>   m_vegaTangentStiffnessMatrix = nullptr; ///< Vega Tangent stiffness matrix
+    std::shared_ptr<vega::SparseMatrix>   m_vegaDampingMatrix = nullptr;          ///< Vega Laplacian damping matrix
 
-    std::vector<std::size_t> m_fixedNodeIds;                                      ///> Nodal IDs of the nodes that are fixed
+    std::vector<std::size_t> m_fixedNodeIds;                                      ///< Nodal IDs of the nodes that are fixed
 
-    StateUpdateType m_updateType = StateUpdateType::DeltaVelocity;                ///> Update type of the model
+    StateUpdateType m_updateType = StateUpdateType::DeltaVelocity;                ///< Update type of the model
 
-    bool m_damped = false;                                                        ///> Viscous or structurally damped system
+    bool m_damped = false;                                                        ///< Viscous or structurally damped system
 
     // If this is true, the tangent stiffness and force vector will be modified to
     // accommodate (the rows and columns will be nullified) the fixed boundary conditions

@@ -63,8 +63,8 @@ public:
     ~MouseEvent() override = default;
 
 public:
-    double m_scrollDx;          ///> Mouse scroll
-    MouseButtonType m_buttonId; ///> Button id
+    double m_scrollDx;          ///< Mouse scroll
+    MouseButtonType m_buttonId; ///< Button id
 };
 
 ///

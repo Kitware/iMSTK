@@ -61,7 +61,7 @@ public:
     void resetRestLength() { m_restLength = m_initialRestLength; }
 
 public:
-    double m_initialRestLength = 0.0; ///> Rest measurement(length, area, volume, etc.)
+    double m_initialRestLength = 0.0; ///< Rest measurement(length, area, volume, etc.)
 };
 
 struct PbdInflatableDistanceConstraintFunctor : public PbdDistanceConstraintFunctor

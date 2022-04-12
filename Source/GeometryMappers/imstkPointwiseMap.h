@@ -84,8 +84,8 @@ protected:
 
 public:
     // A map and vector are maintained. The vector for parallel processing, the map for fast lookup
-    std::unordered_map<int, int>     m_oneToOneMap;       ///> One to one mapping data
-    std::vector<std::pair<int, int>> m_oneToOneMapVector; ///> One to one mapping data
+    std::unordered_map<int, int>     m_oneToOneMap;       ///< One to one mapping data
+    std::vector<std::pair<int, int>> m_oneToOneMapVector; ///< One to one mapping data
 
     double m_epsilon = IMSTK_DOUBLE_EPS;                  // Tolerance for considering two points equivalent
 };

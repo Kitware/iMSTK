@@ -91,6 +91,6 @@ protected:
     void applyTransform(const Mat4d& m) override;
 
     Vec3d m_extents = Vec3d(0.5, 0.5, 0.5);                      // Half dimensions of the oriented box
-    mutable Vec3d m_extentsPostTransform = Vec3d(0.5, 0.5, 0.5); ///> Half dimensions of the oriented box once transform applied
+    mutable Vec3d m_extentsPostTransform = Vec3d(0.5, 0.5, 0.5); ///< Half dimensions of the oriented box once transform applied
 };
 } // namespace imstk

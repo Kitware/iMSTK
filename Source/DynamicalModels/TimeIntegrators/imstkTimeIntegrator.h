@@ -79,8 +79,8 @@ public:
     virtual void updateStateGivenU(std::shared_ptr<FeDeformBodyState> prevState, std::shared_ptr<FeDeformBodyState> currentState, Vectord& u)   = 0;
 
 protected:
-    Type   m_type; ///> Type of the time integrator
-    double m_dT;   ///> Delta T
+    Type   m_type; ///< Type of the time integrator
+    double m_dT;   ///< Delta T
     double m_defaultDt;
 };
 } // namespace imstk

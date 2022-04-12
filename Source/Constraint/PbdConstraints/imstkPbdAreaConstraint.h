@@ -58,6 +58,6 @@ public:
         std::vector<Vec3d>& dcdx) const override;
 
 public:
-    double m_restArea = 0.;  ///> Area at the rest position
+    double m_restArea = 0.;  ///< Area at the rest position
 };
 } // namespace imstk

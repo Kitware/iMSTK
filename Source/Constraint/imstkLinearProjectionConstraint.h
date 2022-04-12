@@ -85,9 +85,9 @@ public:
     inline bool isFixed() const { return m_isFixedConstraint; }
 
 private:
-    size_t m_nodeId;            ///> Node id
-    bool   m_isFixedConstraint; ///> Flag to know if that node is fixed
-    Mat3d  m_projection;        ///> Orthogonal projector
-    Vec3d  m_value;             ///> Value in the subspace: range(I-m_projector)
+    size_t m_nodeId;            ///< Node id
+    bool   m_isFixedConstraint; ///< Flag to know if that node is fixed
+    Mat3d  m_projection;        ///< Orthogonal projector
+    Vec3d  m_value;             ///< Value in the subspace: range(I-m_projector)
 };
 } // imstk

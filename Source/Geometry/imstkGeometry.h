@@ -226,9 +226,9 @@ protected:
 protected:
     mutable bool m_transformApplied = true; // Internally used for lazy evaluation
 
-    Mat4d m_transform = Mat4d::Identity();  ///> Transformation matrix
+    Mat4d m_transform = Mat4d::Identity();  ///< Transformation matrix
 
-    size_t      m_globalId;                 ///> Unique ID assigned to each geometry upon construction
+    size_t      m_globalId;                 ///< Unique ID assigned to each geometry upon construction
     std::string m_name = "unnamed";
 
     /// Total number of geometries that have been created in this program

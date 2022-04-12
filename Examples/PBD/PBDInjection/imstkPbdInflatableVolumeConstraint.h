@@ -61,7 +61,7 @@ public:
     void resetRestVolume() { m_restVolume = m_initialRestVolume; }
 
 protected:
-    double m_initialRestVolume = 0.0; ///> Rest measurement(length, area, volume, etc.)
+    double m_initialRestVolume = 0.0; ///< Rest measurement(length, area, volume, etc.)
 };
 
 struct PbdInflatableVolumeConstraintFunctor : public PbdVolumeConstraintFunctor

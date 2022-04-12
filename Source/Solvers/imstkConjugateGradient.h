@@ -130,7 +130,7 @@ private:
     ///
     void modifiedCGSolve(Vectord& x);
 
-    ///> Pointer to the Eigen's Conjugate gradient solver
+    ///< Pointer to the Eigen's Conjugate gradient solver
     Eigen::ConjugateGradient<SparseMatrixd> m_cgSolver;
 
     std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;

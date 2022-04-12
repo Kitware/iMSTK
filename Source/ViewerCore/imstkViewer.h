@@ -155,14 +155,14 @@ public:
 protected:
     void updateModule() override;
 
-    std::vector<std::shared_ptr<DeviceControl>> m_controls; ///> Set of controls updated on the viewer thread
+    std::vector<std::shared_ptr<DeviceControl>> m_controls; ///< Set of controls updated on the viewer thread
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 
     std::shared_ptr<Scene>  m_activeScene;
     std::shared_ptr<Camera> m_debugCamera;
-    std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
+    std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///< Screen shot utility
 
     std::shared_ptr<ViewerConfig> m_config;
-    int m_infoLevel = 0; ///> Info level
+    int m_infoLevel = 0; ///< Info level
 };
 } // namespace imstk

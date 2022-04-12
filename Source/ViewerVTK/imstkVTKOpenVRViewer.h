@@ -86,7 +86,7 @@ protected:
 
     void updateModule() override;
 
-    ///> The VR controllers are tied to the view
+    ///< The VR controllers are tied to the view
     std::list<std::shared_ptr<OpenVRDeviceClient>> m_vrDeviceClients;
 };
 } // imstk

@@ -126,7 +126,7 @@ protected:
     }
 
 protected:
-    double m_needleForceThreshold = 250.0; ///> When needle body exceeds this it inserts
+    double m_needleForceThreshold = 250.0; ///< When needle body exceeds this it inserts
 
     Vec3d m_initContactPt  = Vec3d::Zero();
     Vec3d m_initNeedleAxes = Vec3d::Zero();

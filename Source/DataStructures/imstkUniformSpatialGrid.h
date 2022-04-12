@@ -252,14 +252,14 @@ public:
     }
 
 private:
-    Vec3d  m_LowerCorner;                     ///> Lower corner of the grid
-    Vec3d  m_UpperCorner;                     ///> Upper corner of the grid
-    double m_CellSize;                        ///> Length of grid cell
-    double m_InvCellSize;                     ///> Inverse length of grid cell
+    Vec3d  m_LowerCorner;                     ///< Lower corner of the grid
+    Vec3d  m_UpperCorner;                     ///< Upper corner of the grid
+    double m_CellSize;                        ///< Length of grid cell
+    double m_InvCellSize;                     ///< Inverse length of grid cell
 
-    unsigned int m_NTotalCells;               ///> Number of total cells
-    std::array<unsigned int, 3> m_Resolution; ///> Grid resolution (number of cells in x/y/z dimensions)
+    unsigned int m_NTotalCells;               ///< Number of total cells
+    std::array<unsigned int, 3> m_Resolution; ///< Grid resolution (number of cells in x/y/z dimensions)
 
-    std::vector<CellData> m_CellData;         ///> Data stored for each cell
+    std::vector<CellData> m_CellData;         ///< Data stored for each cell
 };
 } // namespace imstk

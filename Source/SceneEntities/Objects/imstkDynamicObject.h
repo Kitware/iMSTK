@@ -100,12 +100,12 @@ protected:
 
     DynamicObject(const std::string& name) : CollidingObject(name) { }
 
-    std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel = nullptr; ///> Dynamical model
-    std::shared_ptr<Geometry> m_physicsGeometry = nullptr;              ///> Geometry used for Physics
+    std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel = nullptr; ///< Dynamical model
+    std::shared_ptr<Geometry> m_physicsGeometry = nullptr;              ///< Geometry used for Physics
 
     // Maps
-    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap = nullptr; ///> Maps from Physics to collision geometry
-    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap    = nullptr; ///> Maps from Physics to visual geometry
-    bool m_updateVisualFromPhysicsGeometry = true;                      ///> Defines if visual is updated from colliding mapping or physics mapping
+    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap = nullptr; ///< Maps from Physics to collision geometry
+    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap    = nullptr; ///< Maps from Physics to visual geometry
+    bool m_updateVisualFromPhysicsGeometry = true;                      ///< Defines if visual is updated from colliding mapping or physics mapping
 };
 } // namespace imstk

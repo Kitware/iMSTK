@@ -35,8 +35,8 @@ template<typename T, int N> class VecDataArray;
 ///
 struct NeighborInfo
 {
-    Vec3d relativePos;      ///> relative position
-    double density;         ///> density of neighbor particle
+    Vec3d relativePos;      ///< relative position
+    double density;         ///< density of neighbor particle
 };
 
 ///
@@ -142,15 +142,15 @@ private:
     std::shared_ptr<VecDataArray<double, 3>> m_halfStepVelocities;
     std::shared_ptr<VecDataArray<double, 3>> m_velocities;
 
-    std::shared_ptr<VecDataArray<double, 3>> m_boundaryParticlePositions;   ///> positions of boundary particles, if generated
+    std::shared_ptr<VecDataArray<double, 3>> m_boundaryParticlePositions;   ///< positions of boundary particles, if generated
 
-    std::shared_ptr<DataArray<double>>       m_densities;                   ///>  particle densities
-    std::shared_ptr<VecDataArray<double, 3>> m_normals;                     ///>  surface normals
-    std::shared_ptr<VecDataArray<double, 3>> m_acceleration;                ///>  acceleration
-    std::shared_ptr<VecDataArray<double, 3>> m_diffuseVelocities;           ///>  velocity diffusion, used for computing viscosity
+    std::shared_ptr<DataArray<double>>       m_densities;                   ///<  particle densities
+    std::shared_ptr<VecDataArray<double, 3>> m_normals;                     ///<  surface normals
+    std::shared_ptr<VecDataArray<double, 3>> m_acceleration;                ///<  acceleration
+    std::shared_ptr<VecDataArray<double, 3>> m_diffuseVelocities;           ///<  velocity diffusion, used for computing viscosity
 
-    std::vector<std::vector<size_t>>       m_neighborLists;                 ///>  store a list of neighbors for each particle, updated each time step
-    std::vector<std::vector<size_t>>       m_boundaryParticleNeighborLists; ///>  store a list of boundary particle neighbors for each particle, updated each time step
-    std::vector<std::vector<NeighborInfo>> m_neighborInfo;                  ///>  store a list of Vec4d(Vec3d(relative position), density) for neighbors, including boundary particle
+    std::vector<std::vector<size_t>>       m_neighborLists;                 ///<  store a list of neighbors for each particle, updated each time step
+    std::vector<std::vector<size_t>>       m_boundaryParticleNeighborLists; ///<  store a list of boundary particle neighbors for each particle, updated each time step
+    std::vector<std::vector<NeighborInfo>> m_neighborInfo;                  ///<  store a list of Vec4d(Vec3d(relative position), density) for neighbors, including boundary particle
 };
 } // namespace imstk
