@@ -129,6 +129,9 @@ option(${PROJECT_NAME}_BUILD_TESTING "Build iMSTK tests" ON)
 mark_as_superbuild(${PROJECT_NAME}_BUILD_TESTING:BOOL)
 
 option(${PROJECT_NAME}_BUILD_VISUAL_TESTING "Build iMSTK visual tests" ON)
+if (${PROJECT_NAME}_BUILD_VISUAL_TESTING)
+    set(${PROJECT_NAME}_BUILD_TESTING ON)
+endif()
 mark_as_superbuild(${PROJECT_NAME}_BUILD_VISUAL_TESTING:BOOL)
 
 set(BUILD_TESTING OFF)
@@ -168,6 +171,9 @@ mark_as_superbuild(${PROJECT_NAME}_USE_RENDERING_VTK:BOOL)
 
 if (NOT ${PROJECT_NAME}_USE_RENDERING_VTK AND ${PROJECT_NAME}_USE_VTK_OSMESA)
   message(FATAL_ERROR "Setting ${PROJECT_NAME}_USE_VTK_OSMESA ON is only supported when ${PROJECT_NAME}_USE_RENDERING_VTK is ON")
+endif()
+if (NOT ${PROJECT_NAME}_USE_RENDERING_VTK AND ${PROJECT_NAME}_BUILD_VISUAL_TESTING)
+  message(FATAL_ERROR "Setting ${PROJECT_NAME}_BUILD_VISUAL_TESTING ON is only supported when ${PROJECT_NAME}_USE_RENDERING_VTK is ON")
 endif()
 
 option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
@@ -233,7 +239,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(SFML)
   endif()
 
-  if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_VISUAL_TESTING)
+  if(${PROJECT_NAME}_BUILD_TESTING)
     imstk_define_dependency(GTest)
 
     #-----------------------------------------------------------------------------
@@ -250,7 +256,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
   endif()
 
   if (${PROJECT_NAME}_BUILD_TESTING OR 
-      ${PROJECT_NAME}_BUILD_VISUAL_TESTING OR 
       ${PROJECT_NAME}_BUILD_EXAMPLES)
     imstk_define_dependency(iMSTKData)
   endif()
@@ -470,7 +475,12 @@ add_subdirectory(Source/ViewerCore)
 if (${PROJECT_NAME}_USE_RENDERING_VTK)
   add_subdirectory(Source/ViewerVTK)
 endif()
-add_subdirectory(Source/Testing)
+if( ${PROJECT_NAME}_BUILD_TESTING )
+  add_subdirectory(Source/Testing)
+  if (${PROJECT_NAME}_USE_RENDERING_VTK AND ${PROJECT_NAME}_BUILD_VISUAL_TESTING)
+    add_subdirectory(Source/VisualTesting)
+  endif()
+endif()
 add_subdirectory(Source/Filtering)
 add_subdirectory(Source/FilteringCore)
 

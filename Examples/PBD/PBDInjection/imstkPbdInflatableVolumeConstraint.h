@@ -32,9 +32,6 @@ namespace imstk
 class PbdInflatableVolumeConstraint : public PbdVolumeConstraint
 {
 public:
-    ///
-    /// \brief constructor
-    ///
     PbdInflatableVolumeConstraint() : PbdVolumeConstraint() { }
 
     ///
@@ -59,9 +56,28 @@ public:
     /// \brief Reset constraint rest volume
     ///
     void resetRestVolume() { m_restVolume = m_initialRestVolume; }
+    void resetStiffness() { m_stiffness = m_initialStiffness; }
+
+    bool isInflated() const { return m_inflated; }
+    void setInflated() { m_inflated = true; }
+
+    double getCurrentVolume(std::shared_ptr<VecDataArray<double, 3>> currVertexPositions)
+    {
+        VecDataArray<double, 3> positions = *currVertexPositions;
+        Vec3d                   p0 = positions[m_vertexIds[0]];
+        Vec3d                   p1 = positions[m_vertexIds[1]];
+        Vec3d                   p2 = positions[m_vertexIds[2]];
+        Vec3d                   p3 = positions[m_vertexIds[3]];
+
+        return ((p1 - p0).cross(p2 - p0)).dot(p3 - p0) / 6.0;
+    }
 
 protected:
-    double m_initialRestVolume = 0.0; ///< Rest measurement(length, area, volume, etc.)
+    double m_initialRestVolume = 0.0;
+    double m_initialStiffness  = 1.0;
+    double m_diffusionRate     = 0.00001;
+
+    bool m_inflated = false;
 };
 
 struct PbdInflatableVolumeConstraintFunctor : public PbdVolumeConstraintFunctor
@@ -69,7 +85,7 @@ struct PbdInflatableVolumeConstraintFunctor : public PbdVolumeConstraintFunctor
     PbdInflatableVolumeConstraintFunctor() : PbdVolumeConstraintFunctor() {}
     ~PbdInflatableVolumeConstraintFunctor() override = default;
 
-    virtual void operator()(PbdConstraintContainer& constraints) override
+    void operator()(PbdConstraintContainer& constraints) override
     {
         // Check for correct mesh type
         CHECK(std::dynamic_pointer_cast<TetrahedralMesh>(m_geom) != nullptr)

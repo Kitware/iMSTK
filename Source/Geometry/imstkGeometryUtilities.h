@@ -210,6 +210,39 @@ std::shared_ptr<SurfaceMesh> toUVSphereSurfaceMesh(std::shared_ptr<Sphere> spher
 std::shared_ptr<SurfaceMesh> toSurfaceMesh(std::shared_ptr<AnalyticalGeometry> geom);
 
 ///
+/// \brief Produces a tetrahedral grid given the OrientedBox with the given divisions
+/// \param Center of the grid
+/// \param Size of the grid
+/// \param x,y,z divisions of the grid
+/// \param orientation of the grid
+///
+std::shared_ptr<TetrahedralMesh> toTetGrid(
+    const Vec3d& center, const Vec3d& size, const Vec3i& divisions,
+    const Quatd orientation = Quatd::Identity());
+
+///
+/// \brief Produces a triangle grid on a plane given the imstkPlane
+/// \param Center of the grid plane
+/// \param Size of the grid
+/// \param x,y divisions of the grid
+/// \param orientation of the grid
+///
+std::shared_ptr<SurfaceMesh> toTriangleGrid(
+    const Vec3d& center, const Vec2d& size, const Vec2i& dim,
+    const Quatd orientation = Quatd::Identity(),
+    const double uvScale    = 1.0);
+
+///
+/// \brief Creates a set of connected lines
+/// \param Total length of the line mesh
+/// \param divisions
+/// \param start of the line mesh
+/// \param direction to build the lines
+///
+std::shared_ptr<LineMesh> toLineGrid(const Vec3d& start, const Vec3d& dir,
+                                     const double length, const int dim);
+
+///
 /// \brief Returns the number of open edges, use to tell if manifold (==0)
 ///
 int getOpenEdgeCount(std::shared_ptr<SurfaceMesh> surfMesh);

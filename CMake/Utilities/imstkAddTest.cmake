@@ -42,13 +42,23 @@ function(imstk_add_test_internal target kind)
   imstk_add_executable(${test_driver_executable} ${test_files})
 
   # Link test driver against current target and GTest
-  target_link_libraries(${test_driver_executable}
+  set(DEPENDENCIES
     ${target}
     Testing
     GTest::gtest
     GTest::gmock
+    )
 
-  )
+  # Visual tests link to VisualTesting library
+  if (${kind} STREQUAL "VisualTests")
+    list(APPEND DEPENDENCIES
+      VisualTesting
+      )
+  endif()
+
+  target_link_libraries(${test_driver_executable} PUBLIC
+    ${DEPENDENCIES}
+    )
 
 if (MSVC)
   gtest_discover_tests(${test_driver_executable} WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin" DISCOVERY_MODE PRE_TEST)
@@ -68,7 +78,9 @@ function(imstk_add_test target)
 endfunction()
 
 function(imstk_add_visual_test target)
-  imstk_add_test_internal(${target} VisualTests)
+  if (iMSTK_USE_RENDERING_VTK AND iMSTK_BUILD_VISUAL_TESTING)
+    imstk_add_test_internal(${target} VisualTests)
+  endif()
 endfunction()
 
 #.rst:

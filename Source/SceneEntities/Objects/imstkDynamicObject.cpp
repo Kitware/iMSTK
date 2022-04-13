@@ -45,17 +45,17 @@ DynamicObject::updateGeometries()
 {
     updatePhysicsGeometry();
 
-    if (m_updateVisualFromPhysicsGeometry)
+    CollidingObject::updateGeometries();
+    if (m_physicsToCollidingGeomMap)
     {
-        if (m_physicsToVisualGeomMap)
-        {
-            m_physicsToVisualGeomMap->update();
-            m_physicsToVisualGeomMap->getChildGeometry()->postModified();
-        }
+        m_physicsToCollidingGeomMap->update();
+        m_physicsToCollidingGeomMap->getChildGeometry()->postModified();
     }
-    else
+
+    if (m_physicsToVisualGeomMap)
     {
-        CollidingObject::updateGeometries();
+        m_physicsToVisualGeomMap->update();
+        m_physicsToVisualGeomMap->getChildGeometry()->postModified();
     }
 }
 
@@ -63,13 +63,6 @@ void
 DynamicObject::updatePhysicsGeometry()
 {
     m_dynamicalModel->updatePhysicsGeometry();
-
-    if (m_physicsToCollidingGeomMap)
-    {
-        m_physicsToCollidingGeomMap->update();
-        m_physicsToCollidingGeomMap->getChildGeometry()->postModified();
-    }
-
     if (m_physicsGeometry != nullptr)
     {
         m_physicsGeometry->postModified();

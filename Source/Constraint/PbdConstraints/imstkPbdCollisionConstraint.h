@@ -75,9 +75,9 @@ public:
 
     ///
     /// \brief compute value and gradient of constraint function
-    ///
-    /// \param[inout] c constraint value
-    /// \param[inout] dcdx constraint gradient
+    /// \param Constraint value
+    /// \param Normalized constraint gradients of A (per vertex)
+    /// \param Normalized constraint gradients of B (per vertex)
     ///
     virtual bool computeValueAndGradient(double&             c,
                                          std::vector<Vec3d>& dcdxA,
@@ -100,7 +100,7 @@ protected:
     double m_stiffnessA = 1.0;
     double m_stiffnessB = 1.0;
 
-    std::vector<Vec3d> m_dcdxA; ///< Constraint gradients (per vertex)
-    std::vector<Vec3d> m_dcdxB; ///< Constraint gradients (per vertex)
+    std::vector<Vec3d> m_dcdxA; ///< Normalized constraint gradients (per vertex)
+    std::vector<Vec3d> m_dcdxB; ///< Normalized constraint gradients (per vertex)
 };
 } // namespace imstk

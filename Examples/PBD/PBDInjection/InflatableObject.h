@@ -53,7 +53,6 @@ public:
     InflatableObject(const std::string& name, const Vec3d& tissueSize, const Vec3i& tissueDim, const Vec3d& tissueCenter);
 
 public:
-
     IMSTK_TYPE_NAME(InflatableObject)
 
     bool initialize() override;

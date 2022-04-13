@@ -64,17 +64,18 @@ ImplicitGeometryToPointSetCD::computeCollisionDataAB(
             const double signedDistance = implicitGeom->getFunctionValue(pt);
             if (signedDistance < 0.0)
             {
-                const Vec3d n = m_centralGrad(pt).normalized(); // Contact Normal
+                const Vec3d n      = m_centralGrad(pt).normalized(); // Contact Normal
+                const double depth = std::abs(signedDistance);
 
                 PointDirectionElement elemA;
                 elemA.dir = -n; // Direction to resolve SDF-based object from point
-                elemA.pt  = pt;
-                elemA.penetrationDepth = std::abs(signedDistance);
+                elemA.pt  = pt + n * depth;
+                elemA.penetrationDepth = depth;
 
                 PointIndexDirectionElement elemB;
                 elemB.dir     = n; // Direction to resolve point from SDF
                 elemB.ptIndex = i;
-                elemB.penetrationDepth = std::abs(signedDistance);
+                elemB.penetrationDepth = depth;
 
                 lock.lock();
                 elementsA.push_back(elemA);
@@ -110,12 +111,13 @@ ImplicitGeometryToPointSetCD::computeCollisionDataA(
             const double signedDistance = implicitGeom->getFunctionValue(pt);
             if (signedDistance < 0.0)
             {
-                const Vec3d n = m_centralGrad(pt).normalized(); // Contact Normal
+                const Vec3d n      = m_centralGrad(pt).normalized(); // Contact Normal
+                const double depth = std::abs(signedDistance);
 
                 PointDirectionElement elemA;
                 elemA.dir = -n; // Direction to resolve SDF-based object from point
-                elemA.pt  = pt;
-                elemA.penetrationDepth = std::abs(signedDistance);
+                elemA.pt  = pt + n * depth;
+                elemA.penetrationDepth = depth;
 
                 lock.lock();
                 elementsA.push_back(elemA);

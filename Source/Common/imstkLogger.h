@@ -20,8 +20,6 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
-#include "imstkDataLogger.h"
-
 #include <g3log/logmessage.hpp>
 #include <g3log/logworker.hpp>
 
@@ -51,18 +49,6 @@ struct stdSink
 // Available through namespace
 extern void Log(std::string name, std::string message);
 
-///
-/// \struct LogManager
-///
-/// \brief
-///
-
-struct LogManager
-{
-    std::map<std::string, DataLogger*> loggers;
-    std::map<std::string, std::thread*> loggerThreads;
-};
-
 using FileSinkHandle   = g3::SinkHandle<g3::FileSink>;
 using StdoutSinkHandle = g3::SinkHandle<stdSink>;
 
@@ -75,7 +61,8 @@ class Logger
 {
 public:
     ///
-    /// \brief Gets logger instances, creates if doesn't exist yet
+    /// \brief Gets logger instances without sinks, creates if
+    /// doesn't exist yet
     ///
     static Logger& getInstance()
     {
@@ -97,8 +84,12 @@ public:
     static Logger& startLogger()
     {
         Logger& logger = Logger::getInstance();
-        logger.addFileSink("simulation");
-        logger.addStdoutSink();
+        // If no sinks have been added to the logger yet
+        if (logger.m_sinkCount == 0)
+        {
+            logger.addFileSink("simulation");
+            logger.addStdoutSink();
+        }
         return logger;
     }
 
@@ -125,6 +116,7 @@ public:
     template<typename T, typename DefaultLogCall>
     void addSink(std::unique_ptr<T> real_sink, DefaultLogCall call)
     {
+        m_sinkCount++;
         m_g3logWorker->addSink(std::move(real_sink), call);
     }
 
@@ -136,11 +128,16 @@ public:
     ///
     /// \brief Manual destruction of the logger members
     ///
-    void destroy() { m_g3logWorker = nullptr; }
+    void destroy()
+    {
+        m_g3logWorker = nullptr;
+        m_sinkCount   = 0;
+    }
 
 private:
     Logger() { initialize(); }
 
     std::shared_ptr<g3::LogWorker> m_g3logWorker;
+    int m_sinkCount = 0;
 };
 } // namespace imstk

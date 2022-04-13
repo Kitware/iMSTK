@@ -19,11 +19,10 @@
 
 =========================================================================*/
 
-#include <vtksys/SystemTools.hxx>
+#include "imstkLogger.h"
 
 #include <gtest/gtest.h>
-
-#include "imstkLogger.h"
+#include <vtksys/SystemTools.hxx>
 
 int
 main(int argc, char** argv)

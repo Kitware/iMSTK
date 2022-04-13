@@ -45,7 +45,7 @@ TEST(imstkPointSetToPlaneCDTest, IntersectionTestAB)
 
     std::shared_ptr<CollisionData> colData = m_pointSetToPlaneCD.getCollisionData();
 
-    // Should be one element on side A, 0 on side B (default CD data is not generated for the sphere)
+    // Should be one element on side A, 0 on side B
     EXPECT_EQ(1, colData->elementsA.size());
     EXPECT_EQ(1, colData->elementsB.size());
 
@@ -64,8 +64,8 @@ TEST(imstkPointSetToPlaneCDTest, IntersectionTestAB)
     // The contact point on A should be the point
     EXPECT_EQ(0, colData->elementsA[0].m_element.m_PointIndexDirectionElement.ptIndex);
 
-    // The contact point on B should be the nearest point on the surface of the sphere
-    EXPECT_NEAR(-0.5, colData->elementsB[0].m_element.m_PointDirectionElement.pt[1], 1.0e-4);
+    // The contact point on B should be the nearest point on the plane
+    EXPECT_NEAR(0.0, colData->elementsB[0].m_element.m_PointDirectionElement.pt[1], 1.0e-4);
 }
 
 TEST(imstkPointSetToPlaneCDTest, NonIntersectionTestAB)

@@ -23,7 +23,6 @@ limitations under the License.
 #include "imstkCollidingObject.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkCollisionHandling.h"
-#include "imstkDynamicObject.h"
 #include "imstkTaskGraph.h"
 
 namespace imstk
@@ -109,13 +108,13 @@ CollisionInteraction::updateCollisionGeometry()
     // Ensure the collision geometry is updatedbefore checking collision
     // this could involve a geometry map or something, ex: simulated
     // tet mesh mapped to a collision surface mesh
-    if (auto dynObj1 = std::dynamic_pointer_cast<DynamicObject>(m_objA))
+    if (auto colObj1 = std::dynamic_pointer_cast<CollidingObject>(m_objA))
     {
-        dynObj1->updateGeometries();
+        colObj1->updateGeometries();
     }
-    if (auto dynObj2 = std::dynamic_pointer_cast<DynamicObject>(m_objB))
+    if (auto colObj2 = std::dynamic_pointer_cast<CollidingObject>(m_objB))
     {
-        dynObj2->updateGeometries();
+        colObj2->updateGeometries();
     }
 }
 

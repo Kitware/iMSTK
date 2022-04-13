@@ -43,6 +43,7 @@ DISABLE_WARNING_PUSH
 #include <configFile.h>
 
 DISABLE_WARNING_POP
+#include <fstream>
 
 namespace imstk
 {

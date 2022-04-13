@@ -65,13 +65,13 @@ PointSetToPlaneCD::computeCollisionDataAB(
                 contactPt, contactNormal, depth))
             {
                 PointIndexDirectionElement elemA;
-                elemA.dir     = planeNormal; // Direction to resolve pointset point
-                elemA.ptIndex = idx;
+                elemA.dir     = planeNormal; // Direction to resolve pointset point to
+                elemA.ptIndex = idx;         // Point on pointset
                 elemA.penetrationDepth = depth;
 
                 PointDirectionElement elemB;
-                elemB.dir = -planeNormal; // Direction to resolve plane
-                elemB.pt  = vertices[idx];
+                elemB.dir = -planeNormal;                        // Direction to resolve plane
+                elemB.pt  = vertices[idx] + planeNormal * depth; // Point on plane
                 elemB.penetrationDepth = depth;
 
                 lock.lock();
@@ -145,8 +145,8 @@ PointSetToPlaneCD::computeCollisionDataB(
                 contactPt, contactNormal, depth))
             {
                 PointDirectionElement elemB;
-                elemB.dir = -planeNormal; // Direction to resolve plane
-                elemB.pt  = vertices[idx];
+                elemB.dir = -planeNormal;                        // Direction to resolve plane
+                elemB.pt  = vertices[idx] + planeNormal * depth; // Point on plane
                 elemB.penetrationDepth = depth;
 
                 lock.lock();

@@ -21,52 +21,41 @@
 
 #pragma once
 
-#include "gtest/gtest.h"
+#include "imstkVisualTestingUtils.h"
 
-#include <memory>
-
-#include "imstkCamera.h"
-#include "imstkDirectionalLight.h"
-#include "imstkGeometry.h"
-#include "imstkRenderMaterial.h"
-#include "imstkScene.h"
-#include "imstkSceneObject.h"
-#include "imstkVisualModel.h"
-#include "imstkVTKViewer.h"
+namespace imstk
+{
+class DirectionalLight;
+class Geometry;
+class RenderMaterial;
+class SceneObject;
+class VisualModel;
+} // namespace imstk
 
 using namespace imstk;
 
-class RenderTest : public testing::Test
+class RenderTest : public VisualTest
 {
 public:
-    void runFor(const int seconds);
     void runAllMaterials();
 
 protected:
-    void SetUp() override;
-
-    virtual void createGeometry() = 0;
+    void createScene();
 
     void updateMaterial();
 
     void applyColor();
 
-    // Render Frame
-    std::shared_ptr<Scene>     scene;
-    std::shared_ptr<VTKViewer> viewer;
-    std::shared_ptr<DirectionalLight> light;
-
     // Render Contents
+    std::shared_ptr<DirectionalLight> light;
     std::shared_ptr<Geometry>       geom;
     std::shared_ptr<RenderMaterial> renderMaterial;
     std::shared_ptr<VisualModel>    visualModel;
     std::shared_ptr<SceneObject>    sceneObj;
 
-    double      elapsedTime = 0;
-    bool        complete    = false;
-    int         displayMode;
-    int         color;
-    int         shadingModel;
-    int         blendMode;
+    int displayMode;
+    int color;
+    int shadingModel;
+    int blendMode;
     std::string dm, c, sm, bm;
 };

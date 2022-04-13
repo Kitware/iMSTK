@@ -55,9 +55,9 @@ public:
 
     ///
     /// \brief Compute value and gradient of the constraint
-    ///
-    /// \param[in] currVertexPositions vector of current positions
-    /// \param[inout] c constraint value
+    /// \param Vertex positions of particles
+    /// \param Constraint value
+    /// \param Normalized constraint gradients (per vertex)
     ///
     virtual bool computeValueAndGradient(
         const VecDataArray<double, 3>& currVertexPositions,
@@ -110,6 +110,6 @@ protected:
     double m_compliance     = 1e-7;    ///< used in xPBD, inverse of Young's Modulus
     mutable double m_lambda = 0.0;     ///< Lagrange multiplier
 
-    std::vector<Vec3d> m_dcdx;
+    std::vector<Vec3d> m_dcdx;         ///< Normalized constraint gradients (per vertex)
 };
 } // namespace imstk

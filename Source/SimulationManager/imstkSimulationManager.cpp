@@ -223,6 +223,16 @@ SimulationManager::addModule(std::shared_ptr<Module> module)
 }
 
 void
+SimulationManager::clearModules()
+{
+    ModuleDriver::clearModules();
+    m_viewers.clear();
+    m_syncModules.clear();
+    m_asyncModules.clear();
+    m_adaptiveModules.clear();
+}
+
+void
 SimulationManager::runModuleParallel(std::shared_ptr<Module> module)
 {
     module->init();

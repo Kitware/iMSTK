@@ -96,7 +96,7 @@
 %shared_ptr(imstk::BackwardEuler)
 
 /* 
- * Rendering
+ * Materials
  */
 %shared_ptr(imstk::RenderMaterial)
 %shared_ptr(imstk::Texture)
@@ -182,13 +182,19 @@
  */
 %shared_ptr(imstk::Module)
 %shared_ptr(imstk::Viewer)
-%shared_ptr(imstk::AbstractVTKViewer)
-%shared_ptr(imstk::VTKViewer)
-%shared_ptr(imstk::VTKTextStatusManager)
 %shared_ptr(imstk::SceneManager)
 %shared_ptr(imstk::SimulationManager)
 %shared_ptr(imstk::MouseSceneControl)
 %shared_ptr(imstk::KeyboardSceneControl)
+
+#ifdef iMSTK_USE_RENDERING_VTK
+/*
+ * ViewerVTK & RenderingVTK
+ */
+%shared_ptr(imstk::AbstractVTKViewer)
+%shared_ptr(imstk::VTKViewer)
+%shared_ptr(imstk::VTKTextStatusManager)
+#endif
 
 /*
  * Devices

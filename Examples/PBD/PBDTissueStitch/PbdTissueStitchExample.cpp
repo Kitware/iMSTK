@@ -22,6 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
 #include "imstkDirectionalLight.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
@@ -57,171 +58,6 @@ using namespace imstk;
 #endif
 
 ///
-/// \brief Creates a tetraheral grid
-/// \param physical dimension of tissue
-/// \param dimensions of tetrahedral grid used for tissue
-/// \param center of grid
-///
-static std::shared_ptr<TetrahedralMesh>
-makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center)
-{
-    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1] * dim[2]);
-    VecDataArray<double, 3>& vertices    = *verticesPtr;
-    const Vec3d              dx   = size.cwiseQuotient((dim - Vec3i(1, 1, 1)).cast<double>());
-    int                      iter = 0;
-    for (int z = 0; z < dim[2]; z++)
-    {
-        for (int y = 0; y < dim[1]; y++)
-        {
-            for (int x = 0; x < dim[0]; x++, iter++)
-            {
-                vertices[iter] = Vec3i(x, y, z).cast<double>().cwiseProduct(dx) - size * 0.5 + center;
-            }
-        }
-    }
-
-    // Add connectivity data
-    auto                  indicesPtr = std::make_shared<VecDataArray<int, 4>>();
-    VecDataArray<int, 4>& indices    = *indicesPtr;
-    for (int z = 0; z < dim[2] - 1; z++)
-    {
-        for (int y = 0; y < dim[1] - 1; y++)
-        {
-            for (int x = 0; x < dim[0] - 1; x++)
-            {
-                int cubeIndices[8] =
-                {
-                    x + dim[0] * (y + dim[1] * z),
-                    (x + 1) + dim[0] * (y + dim[1] * z),
-                    (x + 1) + dim[0] * (y + dim[1] * (z + 1)),
-                    x + dim[0] * (y + dim[1] * (z + 1)),
-                    x + dim[0] * ((y + 1) + dim[1] * z),
-                    (x + 1) + dim[0] * ((y + 1) + dim[1] * z),
-                    (x + 1) + dim[0] * ((y + 1) + dim[1] * (z + 1)),
-                    x + dim[0] * ((y + 1) + dim[1] * (z + 1))
-                };
-
-                // Alternate the pattern so the edges line up on the sides of each voxel
-                if ((z % 2 ^ x % 2) ^ y % 2)
-                {
-                    indices.push_back(Vec4i(cubeIndices[0], cubeIndices[7], cubeIndices[5], cubeIndices[4]));
-                    indices.push_back(Vec4i(cubeIndices[3], cubeIndices[7], cubeIndices[2], cubeIndices[0]));
-                    indices.push_back(Vec4i(cubeIndices[2], cubeIndices[7], cubeIndices[5], cubeIndices[0]));
-                    indices.push_back(Vec4i(cubeIndices[1], cubeIndices[2], cubeIndices[0], cubeIndices[5]));
-                    indices.push_back(Vec4i(cubeIndices[2], cubeIndices[6], cubeIndices[7], cubeIndices[5]));
-                }
-                else
-                {
-                    indices.push_back(Vec4i(cubeIndices[3], cubeIndices[7], cubeIndices[6], cubeIndices[4]));
-                    indices.push_back(Vec4i(cubeIndices[1], cubeIndices[3], cubeIndices[6], cubeIndices[4]));
-                    indices.push_back(Vec4i(cubeIndices[3], cubeIndices[6], cubeIndices[2], cubeIndices[1]));
-                    indices.push_back(Vec4i(cubeIndices[1], cubeIndices[6], cubeIndices[5], cubeIndices[4]));
-                    indices.push_back(Vec4i(cubeIndices[0], cubeIndices[3], cubeIndices[1], cubeIndices[4]));
-                }
-            }
-        }
-    }
-
-    auto                    uvCoordsPtr = std::make_shared<VecDataArray<float, 2>>(dim[0] * dim[1] * dim[2]);
-    VecDataArray<float, 2>& uvCoords    = *uvCoordsPtr;
-    for (int z = 0; z < dim[2]; z++)
-    {
-        for (int y = 0; y < dim[1]; y++)
-        {
-            for (int x = 0; x < dim[0]; x++)
-            {
-                uvCoords[x + dim[0] * (y + dim[1] * z)] = Vec2f(static_cast<float>(x) / dim[0], static_cast<float>(z) / dim[2]) * 3.0;
-            }
-        }
-    }
-
-    // Ensure correct windings
-    for (int i = 0; i < indices.size(); i++)
-    {
-        if (tetVolume(vertices[indices[i][0]], vertices[indices[i][1]], vertices[indices[i][2]], vertices[indices[i][3]]) < 0.0)
-        {
-            std::swap(indices[i][0], indices[i][2]);
-        }
-    }
-
-    auto tetMesh = std::make_shared<TetrahedralMesh>();
-    tetMesh->initialize(verticesPtr, indicesPtr);
-    tetMesh->setVertexTCoords("uvs", uvCoordsPtr);
-    return tetMesh;
-}
-
-///
-/// \brief Creates triangle grid geometry
-/// \param cloth width (x), height (z)
-/// \param cloth dimensions/divisions
-/// \param center of tissue/translation control
-/// \param tex coord scale
-///
-static std::shared_ptr<SurfaceMesh>
-makeTriangleGrid(const Vec2d  size,
-                 const Vec2i  dim,
-                 const Vec3d  center,
-                 const double uvScale)
-{
-    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(dim[0] * dim[1]);
-    VecDataArray<double, 3>& vertices    = *verticesPtr;
-    const Vec3d              size3       = Vec3d(size[0], 0.0, size[1]);
-    const Vec3i              dim3 = Vec3i(dim[0], 0, dim[1]);
-    Vec3d                    dx   = size3.cwiseQuotient((dim3 - Vec3i(1, 0, 1)).cast<double>());
-    dx[1] = 0.0;
-    int iter = 0;
-    for (int y = 0; y < dim[1]; y++)
-    {
-        for (int x = 0; x < dim[0]; x++, iter++)
-        {
-            vertices[iter] = Vec3i(x, 0, y).cast<double>().cwiseProduct(dx) + center - size3 * 0.5;
-        }
-    }
-
-    // Add connectivity data
-    auto                  indicesPtr = std::make_shared<VecDataArray<int, 3>>();
-    VecDataArray<int, 3>& indices    = *indicesPtr;
-    for (int y = 0; y < dim[1] - 1; y++)
-    {
-        for (int x = 0; x < dim[0] - 1; x++)
-        {
-            const int index1 = y * dim[0] + x;
-            const int index2 = index1 + dim[0];
-            const int index3 = index1 + 1;
-            const int index4 = index2 + 1;
-
-            // Interleave [/][\]
-            if (x % 2 ^ y % 2)
-            {
-                indices.push_back(Vec3i(index1, index2, index3));
-                indices.push_back(Vec3i(index4, index3, index2));
-            }
-            else
-            {
-                indices.push_back(Vec3i(index2, index4, index1));
-                indices.push_back(Vec3i(index4, index3, index1));
-            }
-        }
-    }
-
-    auto                    uvCoordsPtr = std::make_shared<VecDataArray<float, 2>>(dim[0] * dim[1]);
-    VecDataArray<float, 2>& uvCoords    = *uvCoordsPtr;
-    iter = 0;
-    for (int y = 0; y < dim[1]; y++)
-    {
-        for (int x = 0; x < dim[0]; x++, iter++)
-        {
-            uvCoords[iter] = Vec2f(static_cast<float>(x) / dim[0], static_cast<float>(y) / dim[1]) * uvScale;
-        }
-    }
-
-    auto triMesh = std::make_shared<SurfaceMesh>();
-    triMesh->initialize(verticesPtr, indicesPtr);
-    triMesh->setVertexTCoords("uvs", uvCoordsPtr);
-    return triMesh;
-}
-
-///
 /// \brief Creates tetrahedral tissue object
 /// \param name
 /// \param physical dimension of tissue
@@ -235,7 +71,7 @@ makeTetTissueObj(const std::string& name,
     auto tissueObj = std::make_shared<PbdObject>(name);
 
     // Setup the Geometry
-    std::shared_ptr<TetrahedralMesh> tissueMesh = makeTetGrid(size, dim, center);
+    std::shared_ptr<TetrahedralMesh> tissueMesh = GeometryUtils::toTetGrid(center, size, dim);
     std::shared_ptr<SurfaceMesh>     surfMesh   = tissueMesh->extractSurfaceMesh();
 
     // Setup the Parameters
@@ -302,7 +138,9 @@ makeTriTissueObj(const std::string& name,
     auto tissueObj = std::make_shared<PbdObject>(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> triMesh = makeTriangleGrid(size, dim, center, 1.0);
+    std::shared_ptr<SurfaceMesh> triMesh =
+        GeometryUtils::toTriangleGrid(center, size, dim,
+        Quatd::Identity(), 1.0);
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();

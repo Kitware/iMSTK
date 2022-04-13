@@ -18,4 +18,3 @@
 
 include(imstkAddTest)
 imstk_add_test( MeshIO )
-target_link_libraries( MeshIOTests Common Geometry )

@@ -37,7 +37,7 @@ class UnidirectionalPlaneToSphereCD : public CollisionDetectionAlgorithm
 {
 public:
     UnidirectionalPlaneToSphereCD();
-    virtual ~UnidirectionalPlaneToSphereCD() override = default;
+    ~UnidirectionalPlaneToSphereCD() override = default;
 
     IMSTK_TYPE_NAME(UnidirectionalPlaneToSphereCD)
 
@@ -45,7 +45,7 @@ protected:
     ///
     /// \brief Compute collision data for AB simultaneously
     ///
-    virtual void computeCollisionDataAB(
+    void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsA,

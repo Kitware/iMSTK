@@ -177,7 +177,7 @@ main()
                         tissueObj->setUpdateAffectedConstraint();
                     }
 
-                    tissueObj->inject(toolTip, radius, 0.01);
+                    tissueObj->inject(toolTip, radius, 0.001);
                 }
                 else if (hapticDeviceClient->getButton(1))
                 {
@@ -191,7 +191,7 @@ main()
                         tissueObj->setUpdateAffectedConstraint();
                     }
 
-                    tissueObj->inject(toolTip, radius, -0.01);
+                    tissueObj->inject(toolTip, radius, -0.001);
                 }
             });
 #else

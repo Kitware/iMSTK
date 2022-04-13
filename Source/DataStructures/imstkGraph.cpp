@@ -24,6 +24,7 @@
 #include "imstkParallelUtils.h"
 
 #include <numeric>
+#include <iostream>
 
 namespace imstk
 {

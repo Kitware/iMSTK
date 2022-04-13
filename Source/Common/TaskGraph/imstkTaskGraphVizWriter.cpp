@@ -24,6 +24,8 @@ limitations under the License.
 #include "imstkTaskGraph.h"
 #include "imstkColor.h"
 
+#include <fstream>
+
 namespace imstk
 {
 void

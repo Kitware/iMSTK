@@ -38,7 +38,7 @@ class TetraToPointSetCD : public CollisionDetectionAlgorithm
 {
 public:
     TetraToPointSetCD();
-    virtual ~TetraToPointSetCD() override = default;
+    ~TetraToPointSetCD() override = default;
 
     IMSTK_TYPE_NAME(TetraToPointSetCD)
 
@@ -46,7 +46,7 @@ public:
     ///
     /// \brief Compute collision data for both sides simultaneously
     ///
-    virtual void computeCollisionDataAB(
+    void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsA,

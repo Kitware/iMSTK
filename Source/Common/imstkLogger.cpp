@@ -21,6 +21,7 @@ limitations under the License.
 
 #include "imstkLogger.h"
 
+#include <iostream>
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -95,12 +96,14 @@ stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
 std::unique_ptr<StdoutSinkHandle>
 Logger::addStdoutSink()
 {
+    m_sinkCount++;
     return std::unique_ptr<StdoutSinkHandle>(std::move(m_g3logWorker->addSink(std2::make_unique<stdSink>(), &stdSink::ReceiveLogMessage)));
 }
 
 std::unique_ptr<FileSinkHandle>
 Logger::addFileSink(const std::string& name, const std::string& path)
 {
+    m_sinkCount++;
     return std::unique_ptr<FileSinkHandle>(m_g3logWorker->addDefaultLogger(name, path, "imstk"));
 }
 
@@ -108,6 +111,7 @@ void
 Logger::initialize()
 {
     m_g3logWorker = g3::LogWorker::createLogWorker();
+    m_sinkCount   = 0;
     g3::initializeLogging(m_g3logWorker.get());
 }
 } // namespace imstk

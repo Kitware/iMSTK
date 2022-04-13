@@ -89,6 +89,8 @@ Scene::initialize()
         m_cameras["debug"]->setPosition(center + Vec3d(0.0, 1.0, 1.0).normalized() * size);
     }
 
+    m_sceneTime = 0.0;
+
     LOG(INFO) << "Scene '" << this->getName() << "' initialized!";
     return true;
 }
@@ -470,10 +472,11 @@ Scene::advance(const double dt)
         controller->setTrackerToOutOfDate();
     }
 
+    m_sceneTime += dt;
     if (m_resetRequested)
     {
         resetSceneObjects();
-        //\note May need to reset CD, CH and other components of the scene in the future
+        m_sceneTime      = 0.0;
         m_resetRequested = false;
     }
 

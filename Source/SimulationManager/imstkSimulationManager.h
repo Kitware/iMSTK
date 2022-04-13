@@ -73,7 +73,12 @@ public:
     /// \brief Add a module to run
     /// \param The module to run
     ///
-    void addModule(std::shared_ptr<Module> module);
+    void addModule(std::shared_ptr<Module> module) override;
+
+    ///
+    /// \brief Remove all modules
+    ///
+    void clearModules() override;
 
     ///
     /// \brief Sets the target fixed timestep (may violate), seconds
