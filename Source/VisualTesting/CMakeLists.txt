@@ -4,13 +4,15 @@
 
 include(imstkAddLibrary)
 
-imstk_add_library( Testing
+# Links to a great deal of imstk to provide
+# visual testing capabilities
+imstk_add_library( VisualTesting
   H_FILES
-    imstkTestingUtils.h
+    imstkVisualTestingUtils.h
   CPP_FILES
-    imstkTestingMain.cpp
+    imstkVisualTestingUtils.cpp
   DEPENDS
-    Common
-    GTest::gtest
-    VTK::CommonSystem
+    Testing
+    SimulationManager
+    ViewerVTK
   )

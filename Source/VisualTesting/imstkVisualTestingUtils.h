@@ -31,8 +31,6 @@ class SimulationManager;
 class VTKViewer;
 } // namespace imstk
 
-using namespace imstk;
-
 class VisualTest : public testing::Test
 {
 public:
@@ -51,8 +49,8 @@ protected:
     bool   m_timerPaused = false; ///< Pauses the test timer
     bool   m_useStdOut   = false; //< Enables std out in the logger, default off for testing
 
-    std::shared_ptr<VTKViewer>         m_viewer       = nullptr;
-    std::shared_ptr<SceneManager>      m_sceneManager = nullptr;
-    std::shared_ptr<SimulationManager> m_driver       = nullptr;
-    std::shared_ptr<Scene> m_scene = nullptr;
+    std::shared_ptr<imstk::VTKViewer>         m_viewer       = nullptr;
+    std::shared_ptr<imstk::SceneManager>      m_sceneManager = nullptr;
+    std::shared_ptr<imstk::SimulationManager> m_driver       = nullptr;
+    std::shared_ptr<imstk::Scene> m_scene = nullptr;
 };
