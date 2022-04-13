@@ -96,8 +96,8 @@ public:
     }
 
 protected:
-    std::shared_ptr<vega::IsotropicHyperelasticFEM> m_isotropicHyperelasticFem; ///>
-    std::shared_ptr<vega::IsotropicMaterial> m_isotropicMaterial;               ///>
-    std::shared_ptr<vega::SparseMatrix>      m_vegaTangentStiffnessMatrix;      ///>
+    std::shared_ptr<vega::IsotropicHyperelasticFEM> m_isotropicHyperelasticFem; ///<
+    std::shared_ptr<vega::IsotropicMaterial> m_isotropicMaterial;               ///<
+    std::shared_ptr<vega::SparseMatrix>      m_vegaTangentStiffnessMatrix;      ///<
 };
 } // namespace imstk

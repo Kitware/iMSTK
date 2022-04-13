@@ -130,9 +130,9 @@ private:
     ///
     std::array<int, 2> computeStatusLocation(const DisplayCorner corner, const int fontSize, const std::string& text);
 
-    vtkTextActor* m_StatusActors[static_cast<int>(StatusType::NumStatusTypes)];         ///> Statuses to display
-    DisplayCorner m_StatusDisplayCorners[static_cast<int>(StatusType::NumStatusTypes)]; ///> Location (corner) of the statuses
-    int m_StatusFontSizes[static_cast<int>(StatusType::NumStatusTypes)];                ///> Size of the statuses
+    vtkTextActor* m_StatusActors[static_cast<int>(StatusType::NumStatusTypes)];         ///< Statuses to display
+    DisplayCorner m_StatusDisplayCorners[static_cast<int>(StatusType::NumStatusTypes)]; ///< Location (corner) of the statuses
+    int m_StatusFontSizes[static_cast<int>(StatusType::NumStatusTypes)];                ///< Size of the statuses
 
     VTKViewer* m_viewer;                                                                // Used for dimensions
 };

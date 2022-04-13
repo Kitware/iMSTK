@@ -126,7 +126,7 @@ protected:
     void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
                                 const int expectedNumComponents, const ScalarTypeId expectedScalarType);
 
-    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;   ///> line connectivity
+    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;   ///< line connectivity
 
     std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> m_cellAttributes;
     std::string m_activeCellScalars = "";

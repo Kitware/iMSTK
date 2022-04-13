@@ -64,20 +64,20 @@ struct OctreePrimitive
     OctreePrimitive(Geometry* const pGeometry, const uint32_t geomIdx, const uint32_t idx = 0) :
         m_pGeometry(pGeometry), m_GeomIdx(geomIdx), m_Idx(idx) {}
 
-    Geometry* const m_pGeometry;        ///> Pointer to the parent geometry that the primitive belong to
-    const uint32_t m_GeomIdx;           ///> Global index of the parent geometry
-    const uint32_t m_Idx;               ///> Index of the primitive in the parent geometry (such as index of the triangle in a mesh)
+    Geometry* const m_pGeometry;        ///< Pointer to the parent geometry that the primitive belong to
+    const uint32_t m_GeomIdx;           ///< Global index of the parent geometry
+    const uint32_t m_Idx;               ///< Index of the primitive in the parent geometry (such as index of the triangle in a mesh)
 
-    OctreeNode* m_pNode      = nullptr; ///> Pointer to the octree node containing the primitive
-    OctreePrimitive* m_pNext = nullptr; ///> Pointer to the next node in the primitive list of the octree node
+    OctreeNode* m_pNode      = nullptr; ///< Pointer to the octree node containing the primitive
+    OctreePrimitive* m_pNext = nullptr; ///< Pointer to the next node in the primitive list of the octree node
 
     union
     {
-        std::array<double, 3> m_Position;   ///> For a point primitive, store its position
+        std::array<double, 3> m_Position;   ///< For a point primitive, store its position
         struct
         {
-            std::array<double, 3> m_LowerCorner;   ///> For a non-point primitive, store its AABB's lower corner
-            std::array<double, 3> m_UpperCorner;   ///> For a non-point primitive, store its AABB's upper corner
+            std::array<double, 3> m_LowerCorner;   ///< For a non-point primitive, store its AABB's lower corner
+            std::array<double, 3> m_UpperCorner;   ///< For a non-point primitive, store its AABB's upper corner
         };
     };
 
@@ -280,19 +280,19 @@ public:
 
 // \todo: Make private or protected once a proper public element iteration structure is implemented
 public:
-    LooseOctree*     m_pTree;               ///> Pointer to the octree, used to request children from memory pool during splitting node
-    OctreeNode*      m_pParent;             ///> Pointer to the parent node
-    OctreeNodeBlock* m_pChildren = nullptr; ///> Pointer to a memory block containing 8 children nodes
+    LooseOctree*     m_pTree;               ///< Pointer to the octree, used to request children from memory pool during splitting node
+    OctreeNode*      m_pParent;             ///< Pointer to the parent node
+    OctreeNodeBlock* m_pChildren = nullptr; ///< Pointer to a memory block containing 8 children nodes
 
-    const Vec3d    m_Center;                ///> Center of this node
-    const Vec3d    m_LowerBound;            ///> The AABB's lower corner of the node
-    const Vec3d    m_UpperBound;            ///> The AABB's upper corner of the node
-    const Vec3d    m_LowerExtendedBound;    ///> The extended AABB's lower corner of the node, which is 2X bigger than the exact AABB
-    const Vec3d    m_UpperExtendedBound;    ///> The extended AABB's upper corner of the node, which is 2X bigger than the exact AABB
-    const double   m_HalfWidth;             ///> Half width of the node AABB
-    const uint32_t m_Depth;                 ///> Depth of this node (depth > 0, depth = 1 starting at the root node)
-    uint32_t       m_MaxDepth;              ///> Cache the max depth of the tree (maximum depth level possible)
-    bool m_bIsLeaf = true;                  ///> True if this node does not have any child node (a node should have either 0 or 8 children)
+    const Vec3d    m_Center;                ///< Center of this node
+    const Vec3d    m_LowerBound;            ///< The AABB's lower corner of the node
+    const Vec3d    m_UpperBound;            ///< The AABB's upper corner of the node
+    const Vec3d    m_LowerExtendedBound;    ///< The extended AABB's lower corner of the node, which is 2X bigger than the exact AABB
+    const Vec3d    m_UpperExtendedBound;    ///< The extended AABB's upper corner of the node, which is 2X bigger than the exact AABB
+    const double   m_HalfWidth;             ///< Half width of the node AABB
+    const uint32_t m_Depth;                 ///< Depth of this node (depth > 0, depth = 1 starting at the root node)
+    uint32_t       m_MaxDepth;              ///< Cache the max depth of the tree (maximum depth level possible)
+    bool m_bIsLeaf = true;                  ///< True if this node does not have any child node (a node should have either 0 or 8 children)
 
     /// Heads of the link lists storing (Classified) primitives
     OctreePrimitive* m_pPrimitiveListHeads[OctreePrimitiveType::NumPrimitiveTypes];
@@ -315,7 +315,7 @@ public:
 struct OctreeNodeBlock
 {
     OctreeNode m_Nodes[8];
-    OctreeNodeBlock* m_NextBlock = nullptr; ///> Pointer to the next block in the memory pool
+    OctreeNodeBlock* m_NextBlock = nullptr; ///< Pointer to the next block in the memory pool
 };
 
 ///
@@ -525,22 +525,22 @@ protected:
     ///
     void deallocateMemoryPool();
 
-    const std::string m_Name;   ///> Name of the tree
-    const Vec3d       m_Center; ///> Center of the tree
-    const double      m_Width;  ///> Width of the tree bounding box
+    const std::string m_Name;   ///< Name of the tree
+    const Vec3d       m_Center; ///< Center of the tree
+    const double      m_Width;  ///< Width of the tree bounding box
 
     /// If there is no point primitive, minWidth will be recomputed as minWidth = min(width of all non-point primitives) * minWidthRatio
     const double m_MinWidthRatio;
 
-    double   m_MinWidth;                                         ///> Minimum width allowed for the tree nodes
-    uint32_t m_MaxDepth;                                         ///> Max depth of the tree, which is computed based on m_MinWidth
-    bool     m_useMaxDepth;                                      ///> If on max depth specified by user will be used, otherwise maxdepth is based of minwidth
+    double   m_MinWidth;                                         ///< Minimum width allowed for the tree nodes
+    uint32_t m_MaxDepth;                                         ///< Max depth of the tree, which is computed based on m_MinWidth
+    bool     m_useMaxDepth;                                      ///< If on max depth specified by user will be used, otherwise maxdepth is based of minwidth
 
-    OctreeNode* const m_pRootNode;                               ///> Root node, should not be reassigned throughout the existence of the tree
-    OctreeNodeBlock*  m_pNodeBlockPoolHead = nullptr;            ///> The pool of tree nodes, storing pre-allocated nodes as a linked list
-    uint32_t m_NumAvaiableBlocksInPool     = 0;                  ///> Count the number of nodes available in memory pool
-    uint32_t m_NumAllocatedNodes;                                ///> Count the total number of allocated nodes so far
-    ParallelUtils::SpinLock m_PoolLock;                          ///> Atomic lock for multi-threading modification of the memory pool
+    OctreeNode* const m_pRootNode;                               ///< Root node, should not be reassigned throughout the existence of the tree
+    OctreeNodeBlock*  m_pNodeBlockPoolHead = nullptr;            ///< The pool of tree nodes, storing pre-allocated nodes as a linked list
+    uint32_t m_NumAvaiableBlocksInPool     = 0;                  ///< Count the number of nodes available in memory pool
+    uint32_t m_NumAllocatedNodes;                                ///< Count the total number of allocated nodes so far
+    ParallelUtils::SpinLock m_PoolLock;                          ///< Atomic lock for multi-threading modification of the memory pool
 
     /// Set of node blocks that are in use (node blocks that have been taken from memory pool)
     tbb::concurrent_unordered_set<OctreeNodeBlock*> m_sActiveTreeNodeBlocks;
@@ -559,8 +559,8 @@ protected:
     /// List of all indices of the added geometries, to check for duplication such that one geometry cannot be mistakenly added multiple times
     std::unordered_set<uint32_t> m_sGeometryIndices;
 
-    bool m_bAlwaysRebuild = false;                        ///> If true, the octree is always be rebuit from scratch every time calling to update()
-    bool m_bCompleteBuild = false;                        ///> This is set to true after tree has been built, otherwise false
+    bool m_bAlwaysRebuild = false;                        ///< If true, the octree is always be rebuit from scratch every time calling to update()
+    bool m_bCompleteBuild = false;                        ///< This is set to true after tree has been built, otherwise false
 
     /// If true, all non-empty nodes are rendered during debug rendering (including nodes containing primitives and all other non-leaf nodes)
     /// otherwise only nodes containing primitives are rendered

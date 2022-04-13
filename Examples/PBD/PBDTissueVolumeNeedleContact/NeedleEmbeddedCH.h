@@ -82,12 +82,12 @@ private:
     std::unordered_map<TriCell, std::shared_ptr<EmbeddingConstraint>> m_faceConstraints;
 
     std::shared_ptr<PbdCollisionSolver>  m_solver = nullptr;
-    std::vector<PbdCollisionConstraint*> m_solverConstraints; ///> List of PBD constraints
+    std::vector<PbdCollisionConstraint*> m_solverConstraints; ///< List of PBD constraints
 
-    //double m_restitution = 0.0; ///> Coefficient of restitution (1.0 = perfect elastic, 0.0 = inelastic)
-    double m_friction = 0.001; ///> Coefficient of friction (1.0 = full frictional force, 0.0 = none)
+    //double m_restitution = 0.0; ///< Coefficient of restitution (1.0 = perfect elastic, 0.0 = inelastic)
+    double m_friction = 0.001; ///< Coefficient of friction (1.0 = full frictional force, 0.0 = none)
 
 public:
-    std::vector<Vec3d> m_debugEmbeddingPoints; ///> Used for debug visualization
+    std::vector<Vec3d> m_debugEmbeddingPoints; ///< Used for debug visualization
     std::vector<Vec3i> m_debugEmbeddedTriangles;
 };

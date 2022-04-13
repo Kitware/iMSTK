@@ -58,6 +58,6 @@ public:
         std::vector<Vec3d>& dcdx) const override;
 
 public:
-    double m_restLength = 0.0; ///> Rest length between the nodes
+    double m_restLength = 0.0; ///< Rest length between the nodes
 };
 } // namespace imstk

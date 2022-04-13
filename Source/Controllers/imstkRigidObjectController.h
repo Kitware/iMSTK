@@ -161,10 +161,10 @@ public:
 protected:
     std::shared_ptr<RigidObject2> m_rigidObject;
 
-    double m_linearKd  = 10000.0;                                ///> Damping coefficient, linear
-    double m_angularKd = 300.0;                                  ///> Damping coefficient, rotational
-    Vec3d  m_linearKs  = Vec3d(8000000.0, 8000000.0, 8000000.0); ///> Spring coefficient, linear
-    Vec3d  m_angularKs = Vec3d(10000.0, 10000.0, 10000.0);       ///> Spring coefficient, rotational
+    double m_linearKd  = 10000.0;                                ///< Damping coefficient, linear
+    double m_angularKd = 300.0;                                  ///< Damping coefficient, rotational
+    Vec3d  m_linearKs  = Vec3d(8000000.0, 8000000.0, 8000000.0); ///< Spring coefficient, linear
+    Vec3d  m_angularKs = Vec3d(10000.0, 10000.0, 10000.0);       ///< Spring coefficient, rotational
 
     // Linear spring force and damper force
     Vec3d m_fS = Vec3d::Zero();
@@ -175,8 +175,8 @@ protected:
     Vec3d m_tD = Vec3d::Zero();
 
     double m_forceScaling       = 0.0000075;
-    bool   m_useSpring          = true; ///> If off, pos & orientation directly set
-    bool   m_useCriticalDamping = true; ///> If on, kd is automatically computed
+    bool   m_useSpring          = true; ///< If off, pos & orientation directly set
+    bool   m_useCriticalDamping = true; ///< If on, kd is automatically computed
 
     bool m_forceSmoothening    = true;
     int  m_smoothingKernelSize = 15;

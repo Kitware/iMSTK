@@ -62,6 +62,6 @@ public:
     }
 
 private:
-    Quatd  m_fixedOrientation; ///> Orientation to fix too
+    Quatd  m_fixedOrientation; ///< Orientation to fix too
     double m_beta = 0.05;
 };

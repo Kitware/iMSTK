@@ -331,8 +331,8 @@ protected:
     void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
                                 const int expectedNumComponents, const ScalarTypeId expectedScalarType);
     std::shared_ptr<VecDataArray<int, 3>> m_triangleIndices;
-    std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices
-    std::vector<NeighborsType> m_vertexNeighborVertices;  ///> Neighbor vertices to vertices
+    std::vector<NeighborsType> m_vertexNeighborTriangles; ///< Neighbor triangles to vertices
+    std::vector<NeighborsType> m_vertexNeighborVertices;  ///< Neighbor vertices to vertices
 
     std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
 

@@ -53,6 +53,6 @@ public:
     bool initialize() override;
 
 protected:
-    std::shared_ptr<LevelSetModel> m_levelSetModel = nullptr; ///> LevelSet mathematical model
+    std::shared_ptr<LevelSetModel> m_levelSetModel = nullptr; ///< LevelSet mathematical model
 };
 } // namespace imstk

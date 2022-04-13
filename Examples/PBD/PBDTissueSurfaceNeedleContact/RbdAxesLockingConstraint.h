@@ -75,7 +75,7 @@ public:
     }
 
 private:
-    Vec3d  m_axesPt;  ///> Point on the axes to constrain too
-    Vec3d  m_axesDir; //> Axes to constrain too
+    Vec3d  m_axesPt;  ///< Point on the axes to constrain too
+    Vec3d  m_axesDir; ///< Axes to constrain too
     double m_beta = 0.05;
 };

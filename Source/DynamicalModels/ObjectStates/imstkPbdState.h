@@ -84,8 +84,8 @@ public:
     void setState(std::shared_ptr<PbdState> rhs);
 
 private:
-    std::shared_ptr<VecDataArray<double, 3>> m_pos;   ///> Nodal positions
-    std::shared_ptr<VecDataArray<double, 3>> m_vel;   ///> Nodal velocities
-    std::shared_ptr<VecDataArray<double, 3>> m_acc;   ///> Nodal acelerations
+    std::shared_ptr<VecDataArray<double, 3>> m_pos;   ///< Nodal positions
+    std::shared_ptr<VecDataArray<double, 3>> m_vel;   ///< Nodal velocities
+    std::shared_ptr<VecDataArray<double, 3>> m_acc;   ///< Nodal acelerations
 };
 } // namespace imstk

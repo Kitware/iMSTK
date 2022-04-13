@@ -80,7 +80,7 @@ public:
 protected:
     void applyTransform(const Mat4d& m) override;
 
-    double m_radius = 1.0;                      ///> Radius of the sphere
-    mutable double m_radiusPostTransform = 1.0; ///> Radius of the sphere once transform applied
+    double m_radius = 1.0;                      ///< Radius of the sphere
+    mutable double m_radiusPostTransform = 1.0; ///< Radius of the sphere once transform applied
 };
 } // namespace imstk

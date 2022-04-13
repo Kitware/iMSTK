@@ -37,11 +37,11 @@ struct PbdFemConstraintConfig
     {
     }
 
-    double m_mu     = 0.0;        ///> Lame constant, if constraint type is Fem
-    double m_lambda = 0.0;        ///> Lame constant, if constraint type is Fem
+    double m_mu     = 0.0;        ///< Lame constant, if constraint type is Fem
+    double m_lambda = 0.0;        ///< Lame constant, if constraint type is Fem
 
-    double m_YoungModulus = 1000; ///> Fem parameter, if constraint type is Fem
-    double m_PoissonRatio = 0.2;  ///> Fem parameter, if constraint type is Fem
+    double m_YoungModulus = 1000; ///< Fem parameter, if constraint type is Fem
+    double m_PoissonRatio = 0.2;  ///< Fem parameter, if constraint type is Fem
 };
 
 ///
@@ -66,8 +66,8 @@ public:
     PbdFemConstraint(const unsigned int cardinality, MaterialType mtype = MaterialType::StVK);
 
 public:
-    double       m_elementVolume = 0.0; ///> Volume of the element
-    MaterialType m_material;            ///> Material type
+    double       m_elementVolume = 0.0; ///< Volume of the element
+    MaterialType m_material;            ///< Material type
     Mat3d m_invRestMat;
 
     std::shared_ptr<PbdFemConstraintConfig> m_config = nullptr;

@@ -104,6 +104,6 @@ protected:
     Color  m_color       = Color::White;
     bool   m_switchState = true;
     Vec3d  m_focalPoint  = Vec3d::Zero();
-    Vec3d  m_attenuation = Vec3d(1.0, 0.0, 0.0); ///> c, b, a (ax^2+bx+c)
+    Vec3d  m_attenuation = Vec3d(1.0, 0.0, 0.0); ///< c, b, a (ax^2+bx+c)
 };
 } // namespace imstk

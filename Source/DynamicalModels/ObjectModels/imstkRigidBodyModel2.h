@@ -36,7 +36,7 @@ struct RigidBody;
 
 struct RigidBodyModel2Config
 {
-    double m_dt     = 0.001; ///> Time step size
+    double m_dt     = 0.001; ///< Time step size
     Vec3d m_gravity = Vec3d(0.0, -9.8, 0.0);
     unsigned int m_maxNumIterations = 10;
     double m_velocityDamping = 1.0;

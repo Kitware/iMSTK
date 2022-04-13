@@ -118,9 +118,9 @@ public:
 private:
     unsigned int m_maxIterations = 3;
     Scalar       m_relaxation    = static_cast<Scalar>(0.1);
-    Scalar       m_epsilon       = 1.0e-4; ///> Convergence criteria
+    Scalar       m_epsilon       = 1.0e-4; ///< Convergence criteria
     Scalar       m_conv = 0.0;
-    Eigen::Matrix<Scalar, -1, 1> m_x;      ///> Results
+    Eigen::Matrix<Scalar, -1, 1> m_x;      ///< Results
     Eigen::SparseMatrix<Scalar>* m_A = nullptr;
 };
 } // namespace imstk

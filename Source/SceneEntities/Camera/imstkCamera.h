@@ -245,19 +245,19 @@ public:
 
 protected:
     // Base camera values
-    Mat4d m_view    = Mat4d::Identity(); ///> Actual view matrix used
-    Mat4d m_invView = Mat4d::Identity(); ///> Inverse is often needed so we maintain it
-    Mat4d m_proj;                        ///> Only modifiable through projection parameters (fov,near,far)
+    Mat4d m_view    = Mat4d::Identity(); ///< Actual view matrix used
+    Mat4d m_invView = Mat4d::Identity(); ///< Inverse is often needed so we maintain it
+    Mat4d m_proj;                        ///< Only modifiable through projection parameters (fov,near,far)
     bool  m_viewModified = true;
 
     // Base projection parameters
-    double m_fieldOfView = 40.0; ///> field of view in degrees
-    double m_nearZ       = 0.01; ///> near plane of the camera
-    double m_farZ = 1000.0;      ///> far plane of the camera
+    double m_fieldOfView = 40.0; ///< field of view in degrees
+    double m_nearZ       = 0.01; ///< near plane of the camera
+    double m_farZ = 1000.0;      ///< far plane of the camera
 
     // Lookat camera parameters
-    Vec3d m_position   = Vec3d(0.0, 0.0, 0.0); ///> camera position
-    Vec3d m_focalPoint = -Vec3d::UnitZ();      ///> camera focal point
-    Vec3d m_viewUp     = Vec3d::UnitY();       ///> camera up vector
+    Vec3d m_position   = Vec3d(0.0, 0.0, 0.0); ///< camera position
+    Vec3d m_focalPoint = -Vec3d::UnitZ();      ///< camera focal point
+    Vec3d m_viewUp     = Vec3d::UnitY();       ///< camera up vector
 };
 } // namespace imstk

@@ -61,6 +61,6 @@ public:
         std::vector<Vec3d>& dcdx) const override;
 
 protected:
-    double m_restVolume = 0.0; ///> Rest volume
+    double m_restVolume = 0.0; ///< Rest volume
 };
 } // namespace imstk

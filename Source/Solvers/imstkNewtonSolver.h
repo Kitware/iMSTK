@@ -214,14 +214,14 @@ public:
     }
 
 private:
-    std::shared_ptr<LinearSolverType> m_linearSolver; ///> Linear solver to use
-    double m_forcingTerm;                             ///> Method's forcing term
-    double m_absoluteTolerance;                       ///> Tolerance for the method
-    double m_relativeTolerance;                       ///> Relative (to the rhs) tolerance
-    double m_gamma;                                   ///> Internal parameter used to update the forcing term
-    double m_etaMax;                                  ///> Maximum tolerance for the linear solver
-    size_t m_maxIterations;                           ///> Maximum number of nonlinear iterations
-    bool   m_useArmijo;                               ///> True if Armijo liner search is desired
-    std::vector<double> m_fnorms;                     ///> Consecutive function norms
+    std::shared_ptr<LinearSolverType> m_linearSolver; ///< Linear solver to use
+    double m_forcingTerm;                             ///< Method's forcing term
+    double m_absoluteTolerance;                       ///< Tolerance for the method
+    double m_relativeTolerance;                       ///< Relative (to the rhs) tolerance
+    double m_gamma;                                   ///< Internal parameter used to update the forcing term
+    double m_etaMax;                                  ///< Maximum tolerance for the linear solver
+    size_t m_maxIterations;                           ///< Maximum number of nonlinear iterations
+    bool   m_useArmijo;                               ///< True if Armijo liner search is desired
+    std::vector<double> m_fnorms;                     ///< Consecutive function norms
 };
 } // namespace imstk

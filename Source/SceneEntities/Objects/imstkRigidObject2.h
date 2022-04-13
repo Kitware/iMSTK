@@ -73,6 +73,6 @@ public:
 
 protected:
     std::shared_ptr<RigidBodyModel2> m_rigidBodyModel2;
-    std::shared_ptr<RigidBody>       m_rigidBody; ///> Gives the actual body within the model
+    std::shared_ptr<RigidBody>       m_rigidBody; ///< Gives the actual body within the model
 };
 } // namespace imstk

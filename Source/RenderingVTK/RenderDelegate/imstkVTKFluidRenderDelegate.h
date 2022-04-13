@@ -63,6 +63,6 @@ protected:
 
     vtkSmartPointer<vtkPolyData> m_polydata;
 
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///< Mapped array of vertices
 };
 } // namespace imstk

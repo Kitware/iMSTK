@@ -97,6 +97,6 @@ private:
     double m_isoValue = 0.0;
 
     Vec3i  m_numChunks  = Vec3i(0, 0, 0); // Number of chunks along x, y, z
-    size_t m_chunkCount = 0;              ///> Total chunk count x * y * z
+    size_t m_chunkCount = 0;              ///< Total chunk count x * y * z
 };
 } // namespace imstk

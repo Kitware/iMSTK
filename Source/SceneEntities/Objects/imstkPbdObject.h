@@ -53,6 +53,6 @@ public:
     bool initialize() override;
 
 protected:
-    std::shared_ptr<PbdModel> m_pbdModel = nullptr; ///> Pbd mathematical model
+    std::shared_ptr<PbdModel> m_pbdModel = nullptr; ///< Pbd mathematical model
 };
 } // namespace imstk

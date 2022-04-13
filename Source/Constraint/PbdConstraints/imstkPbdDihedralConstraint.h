@@ -78,6 +78,6 @@ public:
         std::vector<Vec3d>& dcdx) const override;
 
 public:
-    double m_restAngle = 0.0; ///> Rest angle
+    double m_restAngle = 0.0; ///< Rest angle
 };
 } // namespace imstk

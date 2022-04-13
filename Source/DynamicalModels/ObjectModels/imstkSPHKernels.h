@@ -136,12 +136,12 @@ public:
     }
 
 protected:
-    double m_radius;        ///> Kernel radius
-    double m_radiusSquared; ///> Kernel radius squared
-    double m_k;             ///> Kernel coefficient for W()
-    double m_l;             ///> Kernel coefficient for gradW()
-    double m_m;             ///> Kernel coefficient for laplacian()
-    double m_W0;            ///> Precomputed W(0)
+    double m_radius;        ///< Kernel radius
+    double m_radiusSquared; ///< Kernel radius squared
+    double m_k;             ///< Kernel coefficient for W()
+    double m_l;             ///< Kernel coefficient for gradW()
+    double m_m;             ///< Kernel coefficient for laplacian()
+    double m_W0;            ///< Precomputed W(0)
 };
 
 ///
@@ -236,11 +236,11 @@ public:
     }
 
 protected:
-    double m_radius;        ///> Kernel radius
-    double m_radiusSquared; ///> Kernel radius squared
-    double m_k;             ///> Kernel coefficient for W()
-    double m_l;             ///> Kernel coefficient for gradW()
-    double m_W0;            ///> Precomputed W(0)
+    double m_radius;        ///< Kernel radius
+    double m_radiusSquared; ///< Kernel radius squared
+    double m_k;             ///< Kernel coefficient for W()
+    double m_l;             ///< Kernel coefficient for gradW()
+    double m_W0;            ///< Precomputed W(0)
 };
 
 ///
@@ -339,11 +339,11 @@ public:
     double W0() const { return m_W0; }
 
 protected:
-    double m_radius;        ///> Kernel radius
-    double m_radiusSquared; ///> Kernel radius squared
-    double m_k;             ///> Kernel coefficient for W()
-    double m_c;             ///> Kernel coefficient for W()
-    double m_W0;            ///> Precomputed W(0)
+    double m_radius;        ///< Kernel radius
+    double m_radiusSquared; ///< Kernel radius squared
+    double m_k;             ///< Kernel coefficient for W()
+    double m_c;             ///< Kernel coefficient for W()
+    double m_W0;            ///< Precomputed W(0)
 };
 
 ///
@@ -420,10 +420,10 @@ public:
     double W0() const { return m_W0; }
 
 protected:
-    double m_radius;        ///> Kernel radius
-    double m_radiusSquared; ///> Kernel radius squared
-    double m_k;             ///> Kernel coefficient for W()
-    double m_W0;            ///> Precomputed W(0)
+    double m_radius;        ///< Kernel radius
+    double m_radiusSquared; ///< Kernel radius squared
+    double m_k;             ///< Kernel coefficient for W()
+    double m_W0;            ///< Precomputed W(0)
 };
 
 ///
@@ -469,9 +469,9 @@ public:
     }
 
 protected:
-    double m_radius;        ///> Kernel radius
-    double m_radiusSquared; ///> Kernel radius squared
-    double m_k;             ///> Kernel coefficient for laplacian()
+    double m_radius;        ///< Kernel radius
+    double m_radiusSquared; ///< Kernel radius squared
+    double m_k;             ///< Kernel coefficient for laplacian()
 };
 } // namespace sph
 

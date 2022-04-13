@@ -83,7 +83,7 @@ protected:
     vtkSmartPointer<vtkPolyData> m_polydata;
     vtkSmartPointer<vtkPolyData> m_glyphPolyData;
 
-    vtkSmartPointer<vtkDataArray> m_mappedVertexArray;  ///> Mapped array of vertices
-    vtkSmartPointer<vtkDataArray> m_mappedNormalsArray; ///> Mapped array of orientations
+    vtkSmartPointer<vtkDataArray> m_mappedVertexArray;  ///< Mapped array of vertices
+    vtkSmartPointer<vtkDataArray> m_mappedNormalsArray; ///< Mapped array of orientations
 };
 } // namespace imstk

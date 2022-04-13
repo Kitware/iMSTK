@@ -105,7 +105,7 @@ private:
 
     StdVectorOfVec3d m_velocities;
     StdVectorOfVec3d m_angularVelocities;
-    StdVectorOfVec3d m_tentativeVelocities; ///> Tentative velocities for mid update
+    StdVectorOfVec3d m_tentativeVelocities; ///< Tentative velocities for mid update
     StdVectorOfVec3d m_tentativeAngularVelocities;
 
     StdVectorOfVec3d m_forces;

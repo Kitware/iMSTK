@@ -115,7 +115,7 @@ public:
     void updateModule() override;
 
 protected:
-    std::shared_ptr<Scene> m_activeScene;                               ///> Scene that is being managed
+    std::shared_ptr<Scene> m_activeScene;                               ///< Scene that is being managed
     std::unordered_map<std::string, std::shared_ptr<Scene>> m_sceneMap; // used in backend mode where m_sceneManagerMap is not used
     Mode m_mode;
     std::string m_prevCamName;

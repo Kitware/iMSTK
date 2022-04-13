@@ -52,15 +52,15 @@ public:
 
     // particle parameters
     double m_particleRadius    = 0.0;
-    double m_particleRadiusSqr = 0.0; ///> \note derived quantity
+    double m_particleRadiusSqr = 0.0; ///< \note derived quantity
 
     // material parameters
     double m_restDensity       = 1000.0;
-    double m_restDensitySqr    = 1000000.0;    ///> \note derived quantity
-    double m_restDensityInv    = 1.0 / 1000.0; ///> \note derived quantity
+    double m_restDensitySqr    = 1000000.0;    ///< \note derived quantity
+    double m_restDensityInv    = 1.0 / 1000.0; ///< \note derived quantity
     double m_particleMass      = 1.0;
-    double m_particleMassScale = 1.0;          ///> scale particle mass to a smaller value to maintain stability
-    double m_eta = 0.5;                        ///> proportion of position change due to neighbors velocity (XSPH method)
+    double m_particleMassScale = 1.0;          ///< scale particle mass to a smaller value to maintain stability
+    double m_eta = 0.5;                        ///< proportion of position change due to neighbors velocity (XSPH method)
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
@@ -76,8 +76,8 @@ public:
 
     // kernel properties
     double m_kernelOverParticleRadiusRatio = 4.0;
-    double m_kernelRadius;    ///> \note derived quantity
-    double m_kernelRadiusSqr; ///> \note derived quantity
+    double m_kernelRadius;    ///< \note derived quantity
+    double m_kernelRadiusSqr; ///< \note derived quantity
 
     // gravity
     Vec3d m_gravity = Vec3d(0.0, -9.81, 0.0);
@@ -260,12 +260,12 @@ protected:
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
 
-    double m_dt = 0.0;                                  ///> time step size
-    double m_defaultDt;                                 ///> default time step size
+    double m_dt = 0.0;                                  ///< time step size
+    double m_defaultDt;                                 ///< default time step size
 
-    SphSimulationKernels m_kernels;                     ///> SPH kernels (must be initialized during model initialization)
-    std::shared_ptr<SphModelConfig> m_modelParameters;  ///> SPH Model parameters (must be set before simulation)
-    std::shared_ptr<NeighborSearch> m_neighborSearcher; ///> Neighbor Search (must be initialized during model initialization)
+    SphSimulationKernels m_kernels;                     ///< SPH kernels (must be initialized during model initialization)
+    std::shared_ptr<SphModelConfig> m_modelParameters;  ///< SPH Model parameters (must be set before simulation)
+    std::shared_ptr<NeighborSearch> m_neighborSearcher; ///< Neighbor Search (must be initialized during model initialization)
 
     std::shared_ptr<VecDataArray<double, 3>> m_pressureAccels       = nullptr;
     std::shared_ptr<VecDataArray<double, 3>> m_surfaceTensionAccels = nullptr;

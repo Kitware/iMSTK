@@ -121,7 +121,7 @@ protected:
         std::vector<CollisionElement>& imstkNotUsed(elementsB)) { m_computeColDataBImplemented = false; }
 
 protected:
-    std::shared_ptr<CollisionData> m_colData = nullptr;     ///> Collision data
+    std::shared_ptr<CollisionData> m_colData = nullptr;     ///< Collision data
 
     bool m_flipOutput   = false;
     bool m_generateCD_A = true;

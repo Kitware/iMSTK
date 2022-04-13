@@ -109,8 +109,8 @@ public:
     Type getType() { return m_type; }
 
 protected:
-    Type   m_type      = Type::None;                  ///> Type of the scene object
-    double m_tolerance = 1.0e-4;                      ///> default tolerance
-    std::shared_ptr<LinearSystemType> m_linearSystem; ///> Linear system of equations
+    Type   m_type      = Type::None;                  ///< Type of the scene object
+    double m_tolerance = 1.0e-4;                      ///< default tolerance
+    std::shared_ptr<LinearSystemType> m_linearSystem; ///< Linear system of equations
 };
 } // namespace imstk

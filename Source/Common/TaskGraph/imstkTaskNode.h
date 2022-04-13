@@ -111,7 +111,7 @@ public:
     bool   m_enableTiming = false;
 
 protected:
-    std::function<void()> m_func = nullptr; ///> Don't allow user to call directly (must use execute)
+    std::function<void()> m_func = nullptr; ///< Don't allow user to call directly (must use execute)
 
     /// Mutex lock for thread-safe counter update
     size_t m_globalId = static_cast<size_t>(-1);
