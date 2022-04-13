@@ -172,14 +172,24 @@
  * SimulationManager
  */
 #include "imstkModule.h"
-#include "imstkViewer.h"
-#include "imstkAbstractVTKViewer.h"
-#include "imstkVTKViewer.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkKeyboardSceneControl.h"
+
+/*
+ * ViewerCore
+ */
+#include "imstkViewer.h"
+
+#ifdef iMSTK_USE_RENDERING_VTK
+/*
+ * ViewerVTK
+ */
+#include "imstkAbstractVTKViewer.h"
+#include "imstkVTKTextStatusManager.h"
+#include "imstkVTKViewer.h"
+#endif
 
 /*
  * Devices
@@ -402,16 +412,18 @@ namespace std
 %include "../../Scene/imstkSphObjectCollision.h"
 
 /*
- * ViewerCore & ViewerVTK
+ * ViewerCore
  */
 %include "../../ViewerCore/imstkViewer.h";
 
+#ifdef iMSTK_USE_RENDERING_VTK
 /*
  * ViewerVTK
  */
 %include "../../ViewerVTK/imstkAbstractVTKViewer.h";
 %include "../../ViewerVTK/imstkVTKViewer.h";
 %include "../../ViewerVTK/imstkVTKTextStatusManager.h";
+#endif
 
 /*
  * SimulationManager

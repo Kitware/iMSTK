@@ -52,6 +52,9 @@ set(imstk_SWIG_DEFINITIONS "")
 if(iMSTK_SWIG_PINNED_ARRAY)
     list(APPEND imstk_SWIG_DEFINITIONS "SWIG_PINNED_ARRAY")
 endif()
+if (iMSTK_USE_RENDERING_VTK)
+    list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_RENDERING_VTK")
+endif()
 if(iMSTK_USE_OpenHaptics)
     list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_OpenHaptics")
 endif()
@@ -64,7 +67,7 @@ set_property(TARGET iMSTKCWrapper PROPERTY SWIG_COMPILE_DEFINITIONS ${imstk_SWIG
 target_compile_definitions(iMSTKCWrapper PRIVATE  ${imstk_SWIG_DEFINITIONS})
 
 # Link C Wrapper to the imstk libraries
-target_link_libraries(iMSTKCWrapper PRIVATE
+set(CWRAPPER_DEPENDENCIES
     Common
     Materials
 	Geometry
@@ -74,7 +77,6 @@ target_link_libraries(iMSTKCWrapper PRIVATE
 	FilteringCore
 	Materials
 	RenderingCore
-    RenderingVTK
 	Solvers
 	DynamicalModels
 	CollisionDetection
@@ -83,9 +85,16 @@ target_link_libraries(iMSTKCWrapper PRIVATE
 	Scene
 	SimulationManager
     ViewerCore
-    ViewerVTK
 	Constraints
-	Animation)
+	Animation
+    )
+if (iMSTK_USE_RENDERING_VTK)
+    list(APPEND CWRAPPER_DEPENDENCIES
+        RenderingVTK
+        ViewerVTK
+        )
+endif()
+target_link_libraries(iMSTKCWrapper PRIVATE ${CWRAPPER_DEPENDENCIES})
 target_compile_options(iMSTKCWrapper PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
         -Wall -Wno-unused-function>
@@ -116,7 +125,7 @@ configure_file(iMSTKCWrapperConfig.cmake.in
 	"${CMAKE_CURRENT_BINARY_DIR}/iMSTKCWrapperConfig.cmake"
 	@ONLY)
 
-# If we're on msvc we will generate a library/.dll out of our generated C# files
+# If on msvc, generate a library/.dll out of our generated C# files
 if (MSVC)
     # Because the files aren't generated until build time of the iMSTKCWrapper target
     # we must wait to configure it until after it's done building
@@ -136,11 +145,16 @@ if (MSVC)
             -DSWIG_OUTPUT_DIR:PATH=${SWIG_CSHARP_OUTPUT_DIR}
             -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_PREFIX_PATH}
             -DiMSTK_SWIG_PINNED_ARRAY:BOOL=${iMSTK_SWIG_PINNED_ARRAY}
+            -DiMSTK_USE_RENDERING_VTK:BOOL=${iMSTK_USE_RENDERING_VTK}
             -DiMSTK_USE_OpenHaptics:BOOL=${iMSTK_USE_OpenHaptics}
             -DiMSTK_USE_VRPN:BOOL=${iMSTK_USE_VRPN}
         )
     set_target_properties (iMSTKSharp PROPERTIES
         FOLDER Wrappers)
+# If on unix, a library/.so can still be generated through mono, but cmake does not support mono
+elseif(UNIX)
+    message(WARNING "C# library/.so cannot be built on unix systems through cmake, please build manually using generated \".cs\" files")
+    #find_package(Mono) # Provided with cmake to find mono bits
 endif()
 
 # Clear the ".cs" wrapper code in the install directory and install new ones

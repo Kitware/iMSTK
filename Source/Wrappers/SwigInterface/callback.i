@@ -5,8 +5,10 @@ std::string Module_getPostUpdate();
 std::string Module_getPreUpdate();
 std::string SceneManager_getPreUpdate();
 std::string SceneManager_getPostUpdate();
+#ifdef iMSTK_USE_RENDERING_VTK
 std::string VTKViewer_getPreUpdate();
 std::string VTKViewer_getPostUpdate();
+#endif
 %nocallback;
 
 %{
@@ -35,6 +37,7 @@ std::string VTKViewer_getPostUpdate();
     {
         return imstk::SceneManager::preUpdate();
     }
+#ifdef iMSTK_USE_RENDERING_VTK
     std::string VTKViewer_getPostUpdate()
     {
         return imstk::VTKViewer::postUpdate();
@@ -43,4 +46,5 @@ std::string VTKViewer_getPostUpdate();
     {
         return imstk::VTKViewer::preUpdate();
     }
+#endif
 %}
