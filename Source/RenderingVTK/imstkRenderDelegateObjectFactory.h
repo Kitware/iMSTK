@@ -21,6 +21,8 @@ limitations under the License.
 
 #pragma once
 
+#include "imstkCDObjectFactory.h"
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -45,40 +47,16 @@ class VTKRenderDelegate;
 /// Note: Does not auto register VTKRenderDelegate's. If one creates
 /// their own VTKRenderDelegate they must register themselves.
 ///
-class RenderDelegateObjectFactory
+class VTKRenderDelegate;
+
+class RenderDelegateObjectFactory : public ObjectFactory<std::shared_ptr<VTKRenderDelegate>, std::shared_ptr<VisualModel>>
 {
 public:
-    using DelegateMakeFunc = std::function<std::shared_ptr<VTKRenderDelegate>(std::shared_ptr<VisualModel>)>;
-
-    ///
-    /// \brief Register the RenderDelegate creation function with
-    /// template type. Provide a delegateHint in the VisualModel to use
-    /// this creation function instead. Creation functions can be overridden
-    ///
-    template<typename T>
-    static void registerDelegate(std::string name)
-    {
-        static_assert(std::is_base_of<VTKRenderDelegate, T>::value,
-            "T must be a subclass of VTKRenderDelegate");
-        m_objCreationMap[name] = makeFunc<T>();
-    }
-
-    template<typename T>
-    static DelegateMakeFunc makeFunc()
-    {
-        return [](std::shared_ptr<VisualModel> visualModel)
-               {
-                   return std::make_shared<T>(visualModel);
-               };
-    }
-
-    ///
-    /// \brief Creates a VTKRenderDelegate object by VisualModel if registered to factory
-    ///
     static std::shared_ptr<VTKRenderDelegate> makeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-private:
-    static std::unordered_map<std::string, DelegateMakeFunc> m_objCreationMap;
 };
-#define REGISTER_RENDER_DELEGATE(delegateType) RenderDelegateObjectFactory::registerDelegate<delegateType>(#delegateType)
+
+template<typename T>
+using RenderDelegateRegistrar = SharedObjectRegistrar<VTKRenderDelegate, T, std::shared_ptr<VisualModel>>;
+
+#define IMSTK_REGISTER_RENDERDELEGATE(geomType, objType) RenderDelegateRegistrar<objType> _imstk_registerrenderdelegate ## geomType(#geomType);
 } // namespace imstk

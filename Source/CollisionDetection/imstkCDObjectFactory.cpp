@@ -40,38 +40,34 @@ limitations under the License.
 
 namespace imstk
 {
-// Manually register creation functions
-std::unordered_map<std::string, CDObjectFactory::CDMakeFunc> CDObjectFactory::cdObjCreationMap =
-    std::unordered_map<std::string, CDObjectFactory::CDMakeFunc>();
-
-REGISTER_COLLISION_DETECTION(BidirectionalPlaneToSphereCD);
-REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCD);
-REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCCD);
-REGISTER_COLLISION_DETECTION(MeshToMeshBruteForceCD);
-REGISTER_COLLISION_DETECTION(PointSetToCapsuleCD);
-REGISTER_COLLISION_DETECTION(PointSetToPlaneCD);
-REGISTER_COLLISION_DETECTION(PointSetToSphereCD);
-REGISTER_COLLISION_DETECTION(PointSetToOrientedBoxCD);
-REGISTER_COLLISION_DETECTION(SphereToCylinderCD);
-REGISTER_COLLISION_DETECTION(SphereToSphereCD);
-REGISTER_COLLISION_DETECTION(SurfaceMeshToSurfaceMeshCD);
-REGISTER_COLLISION_DETECTION(SurfaceMeshToCapsuleCD);
-REGISTER_COLLISION_DETECTION(SurfaceMeshToSphereCD);
-REGISTER_COLLISION_DETECTION(TetraToPointSetCD);
-REGISTER_COLLISION_DETECTION(TetraToLineMeshCD);
-REGISTER_COLLISION_DETECTION(UnidirectionalPlaneToSphereCD);
+IMSTK_REGISTER_COLLISION_DETECTION(BidirectionalPlaneToSphereCD);
+IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCD);
+IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCCD);
+IMSTK_REGISTER_COLLISION_DETECTION(MeshToMeshBruteForceCD);
+IMSTK_REGISTER_COLLISION_DETECTION(PointSetToCapsuleCD);
+IMSTK_REGISTER_COLLISION_DETECTION(PointSetToPlaneCD);
+IMSTK_REGISTER_COLLISION_DETECTION(PointSetToSphereCD);
+IMSTK_REGISTER_COLLISION_DETECTION(PointSetToOrientedBoxCD);
+IMSTK_REGISTER_COLLISION_DETECTION(SphereToCylinderCD);
+IMSTK_REGISTER_COLLISION_DETECTION(SphereToSphereCD);
+IMSTK_REGISTER_COLLISION_DETECTION(SurfaceMeshToSurfaceMeshCD);
+IMSTK_REGISTER_COLLISION_DETECTION(SurfaceMeshToCapsuleCD);
+IMSTK_REGISTER_COLLISION_DETECTION(SurfaceMeshToSphereCD);
+IMSTK_REGISTER_COLLISION_DETECTION(TetraToPointSetCD);
+IMSTK_REGISTER_COLLISION_DETECTION(TetraToLineMeshCD);
+IMSTK_REGISTER_COLLISION_DETECTION(UnidirectionalPlaneToSphereCD);
 
 std::shared_ptr<CollisionDetectionAlgorithm>
 CDObjectFactory::makeCollisionDetection(const std::string collisionTypeName)
 {
-    if (cdObjCreationMap.count(collisionTypeName) == 0)
+    if (!contains(collisionTypeName))
     {
         LOG(FATAL) << "No collision detection type named: " << collisionTypeName;
         return nullptr;
     }
     else
     {
-        return cdObjCreationMap.at(collisionTypeName)();
+        return create(collisionTypeName);
     }
 }
 } // namespace imstk

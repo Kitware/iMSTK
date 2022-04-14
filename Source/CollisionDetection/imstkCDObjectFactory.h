@@ -21,6 +21,8 @@ limitations under the License.
 
 #pragma once
 
+#include "imstkFactory.h"
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -30,51 +32,15 @@ namespace imstk
 {
 class CollisionDetectionAlgorithm;
 
-///
-/// \class CDObjectFactory
-///
-/// \brief This is the factory class for CollisionDetectionAlgorithm. It may be
-/// used to construct CollisionDetectionAlgorithm objects by name.
-/// Note: Does not auto register CollisionDetectionAlgorithm's. If one creates
-/// their own CollisionDetectionAlgorithm they must register themselves.
-///
-class CDObjectFactory
+class CDObjectFactory : public ObjectFactory<std::shared_ptr<CollisionDetectionAlgorithm>>
 {
 public:
-    using CDMakeFunc = std::function<std::shared_ptr<CollisionDetectionAlgorithm>()>;
-
-    ///
-    /// \brief Register the CollisionDetectionAlgorithm creation function given name
-    ///
-    static void registerCD(std::string name, CDMakeFunc func)
-    {
-        cdObjCreationMap[name] = func;
-    }
-
-    ///
-    /// \brief Creates a CollisionDetectionAlgorithm object by name if registered to factory
-    ///
-    static std::shared_ptr<CollisionDetectionAlgorithm> makeCollisionDetection(const std::string collisionTypeName);
-
-private:
-    static std::unordered_map<std::string, CDMakeFunc> cdObjCreationMap;
+static std::shared_ptr<CollisionDetectionAlgorithm> 
+makeCollisionDetection(const std::string collisionTypeName);
 };
 
-///
-/// \class CDObjectRegistrar
-///
-/// \brief Construction of this object will register to the CDObjectFactory. One could
-/// construct this at the bottom of their CollisionDetectionAlgorithm when building
-/// dynamic libraries or executables for static initialization.
-///
 template<typename T>
-class CDObjectRegistrar
-{
-public:
-    CDObjectRegistrar(std::string name)
-    {
-        CDObjectFactory::registerCD(name, []() { return std::make_shared<T>(); });
-    }
-};
-#define REGISTER_COLLISION_DETECTION(cdType) CDObjectRegistrar<cdType> __register ## cdType(#cdType)
+using CDObjectRegistrar = SharedObjectRegistrar<CollisionDetectionAlgorithm, T>;
+
+#define IMSTK_REGISTER_COLLISION_DETECTION(objType) CDObjectRegistrar<objType> _imstk_registercd ## objType(#objType)
 } // namespace imstk
