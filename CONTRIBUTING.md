@@ -4,7 +4,7 @@
 * [Coding guidelines](#coding-guidelines)
   * [Coding style](#coding-style)
   * [Documenting your code](#documenting-your-code)
-  <!--- * [Testing your code](#testing-your-code) -->
+* [Testing code](#testing-code)
 * [Commit guidelines](#commit-guidelines)
   * [Commit 101](#commit-101)
   * [Commit messages](#commit-messages)
@@ -15,9 +15,8 @@
   * [Syncing repositories](#syncing-repositories)
 * [Data Management](#data-management)
   * [Add Data](#add-data)
-  * [Fetch Data for your examples](#fetch-data-for-your-examples)
-  * [Use external data in your examples](#use-external-data-in-your-examples)
-  * [Update your Data](#update-your-data)
+  * [Fetch Data](#fetch-data)
+  * [Data Usage](#data-usage)
 * [Dashboards](#dashboards)
 
 
@@ -45,7 +44,7 @@ git checkout -b new-feature
 git push myremote new-feature
 ```
 
-7. [Create a merge request] once your branch is ready for merging, or earlier as [WIP] if this is a long merge request and need other developpers to discuss it.
+7. [Create a merge request] once your branch is ready for merging, or earlier as [WIP] if this is a long merge request and need other developers to discuss it.
 
 8. Stay available for the review process: you might need to address some issues and push new changes.
 
@@ -64,26 +63,21 @@ git pull origin master
 See the [Imstk Coding Guide](https://gitlab.kitware.com/iMSTK/iMSTK/-/tree/master/Docs/CodingGuide.md)
 
 #### Code style check
-You should use the `uncrustify` tool to check and/or adjust code style of your files. It is run as part of git's pre-commit hook, as part of test suite invoked by CTest or by building *RUN_TESTS* target in Visual Studio. You can also run it manually by building *uncrustifyRun* target, but in that mode your files will be overwritten so make sure you commit your work beforehand to easily see the style changes automatically made by `uncrustify`.
+You should use the `uncrustify` tool to check and/or adjust code style of your files.
 
-To temporarily disable style checking as part of a commit hook, run:
-```sh
-git config uncrustify.skip true
-```
-Then commit your changes. Then build *uncrustify* target, e.g.:
-```sh
-make uncrustify
-```
-You can view the changes by running `git diff`. If the changes are minor, add them to your previous commit, `git commit --amend`. If the changes make the style uglier (it can happen sometimes), the best solution is usually to re-write your original code to avoid the questionable style changes from having to be made. Only rarely should you use \*INDENT-ON\* and \*INDENT-OFF\* keywords in comments to disable uncrustify's style check for a portion of the code. Once everything is sorted out, enable uncrustify:
-```sh
-git config uncrustify.skip false
-```
+* Visual Studios: Build the uncrustify target in the Innerbuild.sln.
+* Linux: Run `./install/bin/uncrustify --replace --no-backup -c ../iMSTK/Utilities/Uncrustify/iMSTKUncrustify.cfg -F Innerbuild/uncrustify.list`. Ensure your uncrustify.list is up to date by running cmake.
 
-<!---
-### Testing your code
-*Coming soon - Please refer to the rest of the code in the meantime*
--->
+\*INDENT-ON\* and \*INDENT-OFF\* keywords in comments can be used to disable uncrustify's style check for a portion of the code, this is currently used to avoid some issues uncrustify has with macros.
 
+#### Testing Code
+A developer with `Developer` role in giltab may run tests on MRs submitted. Assign or ping one for review and to run tests on our machines. A developer may run:
+ * `do: test`: To run an incremental build
+ * `do: test --clean`: To run a clean build. May be useful for dependency, build, or data changes.
+ * `do: test --stop`: Will stop issuing build commands, does not currently stop mid build.
+ * `do: test --help`: For information on more commands.
+
+Test results are repoted to our [CDash](https://open.cdash.org/index.php?project=iMSTK). Here you will find a Merge Requests section with cmake configure, build, & test sections.
 
 ## Commit guidelines
 
@@ -137,13 +131,15 @@ Proper commit messages are important as they allow to speed up the review proces
     Describe the topic in a couple words while being as specific as possible. "Improve rendering" or "Fix controllers" would be considered too broad.
 
 6. Use the appropriate title prefix to help quickly understand broad context
-  * **ENH:** For enhancement, new features, etc.
-  * **PERF:** For improved compile and runtime performance and algorithmic optimizations.
-  * **BUG:** For fixing bugs of all kinds.
-  * **COMP:** For compilation error fix.
-  * **TEST:** For new or improved testing.
-  * **DOC:** For documentation improvements.
-  * **STYLE:** For changes which do not impact the code output but rather the way the code is presented or organized.
+   * `BUG`: Fix for runtime crash or incorrect result
+   * `COMP`: Compiler error or warning fix
+   * `DOC`: Documentation change
+   * `ENH`: New functionality
+   * `REFAC`: Rework of existing functionality
+   * `PERF`: Performance improvement
+   * `TEST`: Test change
+   * `STYLE`: No logic impact (indentation, comments)
+   * `WIP`: Work In Progress not ready for merge
 
 ### Editing previous commits
 
@@ -290,34 +286,26 @@ This process consists of rewriting the branch history, therefore re-syncing it w
 
 ## Data Management
 
-* ### Add Data
-The proper way to add data to iMSTK, is to:
-    - Contact a project manager to upload your data in the [Girder's iMSTK collection](https://data.kitware.com/#collection/58ab34918d777f073240dc02).
-    - Add the key file to `iMSTK-Source/Data` (Download the key file from girder as shown on the following picture).
-      ![Download Key File](https://data.kitware.com/api/v1/item/58acc5588d777f0aef5cff96/download?contentDisposition=inline)
+iMSTKs data sits in a separate repository https://gitlab.kitware.com/iMSTK/imstk-data managed with git LFS. It is downloaded by iMSTK's superbuild when either the testing or the examples is enabled.
 
-* ### Fetch Data for your examples
-To fetch the external data before building your example, you will need to list it using `imstk_add_data` in your example CMakeLists.txt:
+### Add Data:
 
-    ```cmake
-    imstk_add_data(exampleExecutableName dataList)
-    ```
-    > * `exampleExecutableName` is usually `${PROJECT_NAME}` in an example CMakeLists.txt.
-    > * `dataList` need to contain the list of data names which are needed in the example. Those names are relative to `iMSTK-Source/Data`.
-    > * Regular expressions can be used to populate the file list using [REGEX](https://cmake.org/cmake/help/v3.8/module/ExternalData.html#referencing-associated-files).
+1. Checkout imstk-data repository. [imstk-data](https://gitlab.kitware.com/iMSTK/imstk-data).
 
-    The data will be downloaded from Girder to `iMSTK-build/Innerbuild/ExternalData/Data`: the `Objects` directory is the datastore, and the `Data` directory holds symbolic links to that data with expected file names.
+2. Commit & push changes.
 
-* ### Use external data in your examples
+3. Copy the sha of the desired commit to pull in iMSTK's `CMake/External/External_iMSTKData.cmake` file.
+
+4. Clean build or rebuild the iMSTKData target.
+
+### Fetch Data:
+A clean build will always acquire the latest changes. If incrementally building, go up to the superbuild and rebuild the iMSTKData target.
+
+### Data Usage:
 The path to the data directory is defined by iMSTK_DATA_ROOT which can be used in your C++ code as shown below :
 ```c++
-imstk::MeshIO::read(iMSTK\_DATA\_ROOT"/relative/path/to/mesh.vtk");
+imstk::MeshIO::read<TetrahedralMesh>(iMSTK\_DATA\_ROOT"/relative/path/to/mesh.vtk");
 ```
-
-* ### Update your Data
-    - Contact the project manager to update your data in the [Girder iMSTK collection](https://data.kitware.com/#collection/58ab34918d777f073240dc02).
-    - Update the key file to `iMSTK-Source/Data` as described in the [Add Data section](#add-data).
-
 
 ## Dashboards
 

@@ -457,7 +457,9 @@ should be wrapped at 72 characters.
     * `COMP`: Compiler error or warning fix
     * `DOC`: Documentation change
     * `ENH`: New functionality
+    * `REFAC`: Rework of existing functionality
     * `PERF`: Performance improvement
+    * `TEST`: Test change
     * `STYLE`: No logic impact (indentation, comments)
     * `WIP`: Work In Progress not ready for merge
 
