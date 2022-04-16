@@ -12,6 +12,12 @@
   * [Getting the source code](#1-getting-the-source-code)
   * [Setting up your SSH key](#2-setting-up-your-ssh-key)
   * [Building iMSTK](#3-building-imstk)
+    * [On Linux/macOS](#on-linuxmacos)
+    * [On Windows](#on-windows)
+    * [Phantom Omni Support](#phantom-omni-support)
+    * [VRPN Support](#vrpn-support)
+    * [Offscreen Rendering](#offscreen-rendering)
+    * [Renderless](#renderless)
 
 ## About
 ### Overview
@@ -32,7 +38,7 @@ iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.
 
 ## Resources
 ### Documentation
-Click [here](https://imstk.readthedocs.io/en/latest/) for detailed documentation.
+Click [here](https://imstk.readthedocs.io/en/latest/) for user documentation.
 
 Click [here](https://imstk.gitlab.io/) for doxygen code documentation.
 
@@ -74,59 +80,65 @@ The build process will check out external dependency sources with the SSH protoc
 
 ### 3. Building iMSTK
 We use [CMake] to configure the project on every platform. See how to run it [HERE](https://cmake.org/runningcmake/).
-* ##### On Linux/macOS
-Type the following commands from the same location you cloned the code. This will configure the build in a directory adjacent to the source directory. To easily change some configuration variables like `CMAKE_BUILD_TYPE`, use `ccmake` instead of `cmake`.
-```sh
-mkdir iMSTK-build
-cd iMSTK-build
-cmake ../iMSTK #/path/to/source/directory
-make -j4 #to build using 4 cores
-```
-You can also use [Ninja] for a faster build instead of Unix Makefiles. To do so, configure the cmake project with `-GNinja`:
-```
-cmake -GNinja ../iMSTK
-ninja
-```
-This will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `Innerbuild` directory.
 
-* ##### On Windows
-Run CMake-GUI and follow the directions described [HERE](https://cmake.org/runningcmake/). You will have to choose which version of Visual Studio you'd like to use when configuring the project, make sure to select **Microsoft Visual Studio C++ 15 2017 or 2019**. CMake will generate a `iMSTK.sln` solution file for Visual Studio at the top level. Open this file and build all targets, which will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `iMSTK.sln` solution file located in the `Innerbuild` directory.
-If you would like to build on multiple cores add /MP[N] to CMAKE_CXX_FLAGS in CMake-GUI, where N is optional representing the number of cores (without N supplied, the build will use as many cores as available on the device).
-If you check out the unit tests or the examples make sure to run `git install lfs` to make sure that `git lfs` is installed.
+* #### On Linux/macOS
+  Type the following commands from the same location you cloned the code. This will configure the build in a directory adjacent to the source directory. To easily change some configuration variables like `CMAKE_BUILD_TYPE`, use `ccmake` instead of `cmake`.
+  ```sh
+  mkdir iMSTK-build
+  cd iMSTK-build
+  cmake ../iMSTK #/path/to/source/directory
+  make -j4 #to build using 4 cores
+  ```
+  You can also use [Ninja] for a faster build instead of Unix Makefiles. To do so, configure the cmake project with `-GNinja`:
+  ```
+  cmake -GNinja ../iMSTK
+  ninja
+  ```
+  This will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `Innerbuild` directory.
 
-* ##### Phantom Omni Support
-To support the [Geomagic Touch (formerly Sensable Phantom Omni)](http://www.geomagic.com/en/products/phantom-omni/overview) haptic device, follow the steps below:
-  1. Install the [OpenHaptics] SDK as well as the device drivers:
-       - for [Windows](https://3dsystems.teamplatform.com/pages/102774?t=r4nk8zvqwa91)
-       - for [Linux](https://3dsystems.teamplatform.com/pages/102863?t=fptvcy2zbkcc)
-  2. Reboot your system.
-  3. Configure your CMake project with the variable `iMSTK_USE_OpenHaptics` set to `ON`.
-  4. After configuration, the CMake variable `OPENHAPTICS_ROOT_DIR` should be set to the OpenHaptics path on your system.
+* #### On Windows
+  Run CMake-GUI and follow the directions described [HERE](https://cmake.org/runningcmake/). You will have to choose which version of Visual Studio you'd like to use when configuring the project, make sure to select **Microsoft Visual Studio C++ 15 2017 or 2019**. CMake will generate a `iMSTK.sln` solution file for Visual Studio at the top level. Open this file and build all targets, which will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `iMSTK.sln` solution file located in the `Innerbuild` directory.
+  If you would like to build on multiple cores add /MP[N] to CMAKE_CXX_FLAGS in CMake-GUI, where N is optional representing the number of cores (without N supplied, the build will use as many cores as available on the device).
+  If you check out the unit tests or the examples make sure to run `git install lfs` to make sure that `git lfs` is installed.
+
+* #### Phantom Omni Support
+  To support the [Geomagic Touch (formerly Sensable Phantom Omni)](http://www.geomagic.com/en/products/phantom-omni/overview) haptic device, follow the steps below:
+    1. Install the [OpenHaptics] SDK as well as the device drivers:
+        - for [Windows](https://3dsystems.teamplatform.com/pages/102774?t=r4nk8zvqwa91)
+        - for [Linux](https://3dsystems.teamplatform.com/pages/102863?t=fptvcy2zbkcc)
+    2. Reboot your system.
+    3. Configure your CMake project with the variable `iMSTK_USE_OpenHaptics` set to `ON`.
+    4. After configuration, the CMake variable `OPENHAPTICS_ROOT_DIR` should be set to the OpenHaptics path on your system.
   
-* ##### VRPN Support
+* #### VRPN Support
 
-The `VRPNDeviceModule` enables access to a large number devices supported by VRPN. The `VRPNDeviceModule` expects a `vrpn_server` to be running. The iMSTK superbuild builds and
-installs a server with some default settings but if you want to configure a specific server
-it might be easier to separately build a server. The file `CMake\External\External_VRPN.cmake`
-shows how to pass configuration into VRPN in case you want to modify the modules enabled and
-disabled by the build
+  The `VRPNDeviceModule` enables access to a large number devices supported by VRPN. The `VRPNDeviceModule` expects a `vrpn_server` to be running. The iMSTK superbuild builds and
+  installs a server with some default settings but if you want to configure a specific server
+  it might be easier to separately build a server. The file `CMake\External\External_VRPN.cmake`
+  shows how to pass configuration into VRPN in case you want to modify the modules enabled and
+  disabled by the build
 
-The `vrpn.cfg` that is installed by default doesn't have any devices enabled, before use you 
-will need to uncomment the devices that you would like to use. If you use the one inside the 
-iMSTK install directory please note that it will be overwritten every time the superbuild is 
-run. 
+  The `vrpn.cfg` that is installed by default doesn't have any devices enabled, before use you 
+  will need to uncomment the devices that you would like to use. If you use the one inside the 
+  iMSTK install directory please note that it will be overwritten every time the superbuild is 
+  run. 
 
-Currently iMSTK supports VRPN `Analog`, `Button` and `Tracker` devices. Future support will
-depend on user demand.
+  Currently iMSTK supports VRPN `Analog`, `Button` and `Tracker` devices. Future support will
+  depend on user demand.
 
-* ##### Offscreen Rendering
-To render without the usage of a GPU or without the usage of a screen on linux (or WSL), iMSTK's VTK renderer may be built with OSMesa.
-  1. Install osmesa libraries via:
-```bash
-sudo apt install mesa-common-dev libosmesa6-dev libglu1-mesa-dev`
-```
-  2. Set `iMSTK_USE_VTK_OSMESA` to `ON`
-  3. Proceed to build iMSTK
+* #### Offscreen Rendering
+  To render without the usage of a GPU or without the usage of a screen on linux (or WSL), iMSTK's VTK renderer may be built with OSMesa.
+    1. Install osmesa libraries via:
+  ```bash
+  sudo apt install mesa-common-dev libosmesa6-dev libglu1-mesa-dev`
+  ```
+    2. Set `iMSTK_USE_VTK_OSMESA` to `ON`
+    3. Proceed to build iMSTK
+
+* #### Renderless
+  To build iMSTK without any rendering & completely as a physics backend, use:
+    1. Set `iMSTK_USE_RENDERING_VTK` to `OFF`
+    2. Set `iMSTK_BUILD_VISUAL_TESTING` to `OFF`
 
 ---
 [NIH-OD]: <https://www.nih.gov/about-nih/what-we-do/nih-almanac/office-director-nih>

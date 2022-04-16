@@ -137,15 +137,3 @@ Most dependencies in iMSTK are forked. This way we don't depend on the remote re
  - Push your changes
 
 After updating your fork you can proceed with the beginning of this guide on how to pull a different source.
-
-# Adding data to the data repository
-
-iMSTKs data sits in a separate repository https://gitlab.kitware.com/iMSTK/imstk-data. It is downloaded by iMSTK's superbuild when either the testing or the examples is enabled. To add new data to the repository two steps are necessary
-
-**1. Add Data to repository**
-
-The repository is already checked out as an external dependency in your build directory (if using superbuild) as `<build_dir>\External\iMSTKData\src\Data`, data can be added to the folder here and directly commited and pushed. 
-
-**2. Update SHA in `ExternalData.cmake`**
-
-The file that controls the downloading of the data is `CMake/External/External_iMSTKData.cmake`. After commiting and pushing a change in the `iMSTKData` repository, the SHA to checkout needs to be updated to the SHA matching the latest commit.
