@@ -21,21 +21,17 @@ limitations under the License.
 
 #include "imstkPbdObjectCutting.h"
 #include "imstkAnalyticalGeometry.h"
-#include "imstkCollidingObject.h"
-#include "imstkLogger.h"
-#include "imstkNew.h"
 #include "imstkPbdConstraintContainer.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshCut.h"
-#include "imstkVecDataArray.h"
 
 namespace imstk
 {
 PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj) :
-    SceneObject("PbdObjectCutting_" + pbdObj->getName() + "_vs_" + cutObj->getName()), m_objA(pbdObj), m_objB(cutObj)
+    m_objA(pbdObj), m_objB(cutObj)
 {
     // check whether pbd object is a surfacemesh
     if (std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getPhysicsGeometry()) == nullptr)
@@ -63,15 +59,15 @@ PbdObjectCutting::apply()
     m_removeConstraintVertices->clear();
 
     // Perform cutting
-    imstkNew<SurfaceMeshCut> surfCut;
-    surfCut->setInputMesh(pbdMesh);
-    surfCut->setCutGeometry(m_objB->getCollidingGeometry());
-    surfCut->update();
-    auto newPbdMesh = surfCut->getOutputMesh();
+    SurfaceMeshCut surfCut;
+    surfCut.setInputMesh(pbdMesh);
+    surfCut.setCutGeometry(m_objB->getCollidingGeometry());
+    surfCut.update();
+    std::shared_ptr<SurfaceMesh> newPbdMesh = surfCut.getOutputMesh();
 
     // Only remove and add constraints related to the topological changes
-    m_removeConstraintVertices = surfCut->getRemoveConstraintVertices();
-    m_addConstraintVertices    = surfCut->getAddConstraintVertices();
+    m_removeConstraintVertices = surfCut.getRemoveConstraintVertices();
+    m_addConstraintVertices    = surfCut.getAddConstraintVertices();
 
     // update pbd mesh
     pbdMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newPbdMesh->getInitialVertexPositions()));
