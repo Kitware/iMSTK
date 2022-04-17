@@ -190,7 +190,7 @@ public:
         other.m_mapped = true;         // The others destructor should then not delete
     }
 
-    virtual ~DataArray() override
+    ~DataArray() override
     {
         if (!m_mapped)
         {
