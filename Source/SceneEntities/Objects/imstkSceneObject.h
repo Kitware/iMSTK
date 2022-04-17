@@ -44,7 +44,7 @@ class TaskNode;
 class SceneObject : public SceneEntity
 {
 public:
-    SceneObject(const std::string& name);
+    SceneObject(const std::string& name = "unnamed");
     ~SceneObject() override = default;
 
     IMSTK_TYPE_NAME(SceneObject)
