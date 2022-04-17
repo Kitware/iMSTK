@@ -31,8 +31,6 @@ class Geometry;
 class KeyEvent;
 } // namespace imstk
 
-using namespace imstk;
-
 ///
 /// \class CollisionDetectionVisualTest
 ///
@@ -56,18 +54,18 @@ public:
     /// \return Whether or not geom was moved
     ///
     bool moveGeometryByKey(const unsigned char       key,
-                           std::shared_ptr<Geometry> geom);
+                           std::shared_ptr<imstk::Geometry> geom);
 
 public:
-    std::shared_ptr<CollidingObject> m_cdObj2 = nullptr;
-    std::shared_ptr<CollidingObject> m_cdObj1 = nullptr;
-    std::shared_ptr<Geometry> m_cdGeom1       = nullptr;
-    std::shared_ptr<Geometry> m_cdGeom2       = nullptr;
+    std::shared_ptr<imstk::CollidingObject> m_cdObj2 = nullptr;
+    std::shared_ptr<imstk::CollidingObject> m_cdObj1 = nullptr;
+    std::shared_ptr<imstk::Geometry> m_cdGeom1       = nullptr;
+    std::shared_ptr<imstk::Geometry> m_cdGeom2       = nullptr;
 
-    std::shared_ptr<Camera> m_camera = nullptr;
+    std::shared_ptr<imstk::Camera> m_camera = nullptr;
 
-    std::shared_ptr<CollisionDetectionAlgorithm> m_collisionMethod = nullptr;
-    std::shared_ptr<CollisionDataDebugObject>    m_cdDebugObject   = nullptr;
+    std::shared_ptr<imstk::CollisionDetectionAlgorithm> m_collisionMethod = nullptr;
+    std::shared_ptr<imstk::CollisionDataDebugObject>    m_cdDebugObject   = nullptr;
 
     bool m_geom1Moveable = false;
     bool m_geom2Moveable = true;
