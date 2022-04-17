@@ -241,7 +241,7 @@ Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
     }
 
     // Ensure the name is unique
-    const std::string orgName = newSceneObject->getName();
+    const std::string orgName    = newSceneObject->getName();
     const std::string uniqueName = getUniqueName(orgName);
     if (orgName != uniqueName)
     {
@@ -343,7 +343,7 @@ Scene::removeLight(const std::string& lightName)
 std::string
 Scene::getUniqueName(const std::string& name) const
 {
-    int i = 1;
+    int         i = 1;
     std::string uniqueName = name;
     // While name is not unique, iterate it
     while (getSceneObject(uniqueName) != nullptr)

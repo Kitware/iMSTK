@@ -215,7 +215,7 @@ public:
     /// \brief Given a desired name, produce a unique one.
     /// This name would be iterated with a postfix # should one
     /// already exist
-    /// 
+    ///
     std::string getUniqueName(const std::string& name) const;
 
     ///

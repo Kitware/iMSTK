@@ -53,7 +53,7 @@ public:
     /// \param Geometry to move
     /// \return Whether or not geom was moved
     ///
-    bool moveGeometryByKey(const unsigned char       key,
+    bool moveGeometryByKey(const unsigned char              key,
                            std::shared_ptr<imstk::Geometry> geom);
 
 public:
