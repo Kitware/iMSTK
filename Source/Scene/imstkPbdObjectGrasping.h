@@ -34,7 +34,6 @@ class AnalyticalGeometry;
 class PbdCollisionConstraint;
 class PbdObject;
 class PickingAlgorithm;
-class PointSet;
 class PointwiseMap;
 
 ///
