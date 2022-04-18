@@ -175,3 +175,42 @@ TEST(imstkSceneTest, add_remove_scene_objects)
     EXPECT_EQ(m_scene.getSceneObject("sceneObject0"), nullptr);
     EXPECT_EQ(m_scene.getSceneObjects().size(), 0);
 }
+
+///
+/// \brief Test that adding the same object twice does not result
+/// in adding it twice
+///
+TEST(imstkSceneTest, add_same_object)
+{
+    Scene m_scene("sample scene");
+
+    // Add two separate scene objects with the same name
+    auto obj = std::make_shared<SceneObject>("TestObj");
+    m_scene.addSceneObject(obj);
+    m_scene.addSceneObject(obj);
+
+    // Expect the key to be iterated on the second object
+    EXPECT_EQ(m_scene.getSceneObject("TestObj"), obj);
+    EXPECT_EQ(m_scene.getSceneObjects().size(), 1);
+}
+
+///
+/// \brief Test that adding differing objects with the same name
+/// results in both being added but the name changing
+///
+TEST(imstkSceneTest, add_same_name_scene_objects)
+{
+    Scene m_scene("sample scene");
+
+    // Add two separate scene objects with the same name
+    auto obj1 = std::make_shared<SceneObject>("TestObj");
+    m_scene.addSceneObject(obj1);
+    auto obj2 = std::make_shared<SceneObject>("TestObj");
+    m_scene.addSceneObject(obj2);
+
+    // Expect the key to be iterated on the second object
+    EXPECT_EQ(m_scene.getSceneObject("TestObj"), obj1);
+    EXPECT_EQ(m_scene.getSceneObject("TestObj_1"), obj2);
+    EXPECT_EQ(obj2->getName(), "TestObj_1");
+    EXPECT_EQ(m_scene.getSceneObjects().size(), 2);
+}
