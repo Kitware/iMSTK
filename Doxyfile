@@ -159,9 +159,11 @@ FILE_PATTERNS          = *.c \
                          *.ucf \
                          *.qsf
 RECURSIVE              = YES
-EXCLUDE                = 
+EXCLUDE                = ./Examples,./Docs
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       = 
+# Exclude all Testing directories
+EXCLUDE_PATTERNS       = */Testing/*
+EXCLUDE_PATTERNS       += */VisualTesting/*
 EXCLUDE_SYMBOLS        = 
 EXAMPLE_PATH           = 
 EXAMPLE_PATTERNS       = *
