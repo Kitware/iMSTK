@@ -138,7 +138,11 @@ public:
     ///
     /// \brief Get the simulation parameters
     ///
-    std::shared_ptr<PbdModelConfig> getConfig() const { assert(m_config); return m_config; }
+    std::shared_ptr<PbdModelConfig> getConfig() const
+    {
+        CHECK(m_config != nullptr) << "Cannot PbdModel::getConfig, config is nullptr";
+        return m_config;
+    }
 
     ///
     /// \brief Add constraints related to a set of vertices.
