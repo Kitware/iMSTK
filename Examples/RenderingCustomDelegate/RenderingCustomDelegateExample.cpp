@@ -81,7 +81,8 @@ seqArray(int size)
 int
 main()
 {
-    REGISTER_RENDER_DELEGATE(VTKChartRenderDelegate);
+    // Tell the factory to utilize the VTKChartRenderDelegate, for the delegate hint "Chart"
+    RenderDelegateRegistrar<VTKChartRenderDelegate> registerChartDelegate("Chart");
 
     // Setup logger (write to file and stdout)
     Logger::startLogger();

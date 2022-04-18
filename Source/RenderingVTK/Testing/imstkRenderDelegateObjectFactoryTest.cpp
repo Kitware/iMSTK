@@ -47,10 +47,10 @@ public:
 
 TEST(imstkRenderDelegateFactoryTest, CustomRenderDelegate)
 {
-    REGISTER_RENDER_DELEGATE(RenderDelegateMock);
+    RenderDelegateRegistrar<RenderDelegateMock> registerMockDelegate("MockDelegateHint");
 
     auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setDelegateHint("RenderDelegateMock");
+    visualModel->setDelegateHint("MockDelegateHint");
     std::shared_ptr<VTKRenderDelegate> renderDelegate =
         RenderDelegateObjectFactory::makeRenderDelegate(visualModel);
 

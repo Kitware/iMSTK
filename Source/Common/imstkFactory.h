@@ -78,6 +78,9 @@ private:
 /// \brief Templated class that can add to the object factory with objects that will
 ///        be generated via `std::make_shared`
 ///
+/// As most objects in iMSTK are passed via std::shared_ptr this can be used as a default
+/// way to create a construction function
+///
 /// \tparam T The base class type (see ObjectFactory)
 /// \tparam U The class that should be generated here (needs to be a subclass of T)
 /// \tparam Args constructor parameter types, these can then be pass in ObjectFactory::create
@@ -87,6 +90,7 @@ class SharedObjectRegistrar
 public:
     /// \brief The constructor can automatically register the given class in the Factory
     /// For example it can be used in global scope in an implementation file
+    /// \param name is the name that will be used in the factory for this class
     SharedObjectRegistrar(std::string name)
     {
         static_assert(std::is_base_of<T, U>::value,
