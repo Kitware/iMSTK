@@ -147,7 +147,7 @@ public:
     ///
     void addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices);
 
-    virtual void setTimeStep(const double timeStep) override { m_config->m_dt = timeStep; }
+    void setTimeStep(const double timeStep) override { m_config->m_dt = timeStep; }
     double getTimeStep() const override { return m_config->m_dt; }
 
     ///
