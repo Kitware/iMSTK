@@ -58,9 +58,14 @@ PbdPointTriangleConstraint::computeValueAndGradient(double&             c,
     const double d20   = v2.dot(v0);
     const double d21   = v2.dot(v1);
     const double denom = d00 * d11 - d01 * d01;
-    const double v     = (d11 * d20 - d01 * d21) / denom;
-    const double w     = (d00 * d21 - d01 * d20) / denom;
-    const double u     = 1.0 - v - w;
+    if (fabs(denom) < 1e-12)
+    {
+        c = 0.0;
+        return false;
+    }
+    const double v = (d11 * d20 - d01 * d21) / denom;
+    const double w = (d00 * d21 - d01 * d20) / denom;
+    const double u = 1.0 - v - w;
 
     // This constraint becomes invalid if moved out of the triangle
     if (u < 0.0 || v < 0.0 || w < 0.0)
