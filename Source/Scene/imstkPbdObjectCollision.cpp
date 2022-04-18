@@ -84,6 +84,7 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
         m_taskGraph->addNode(pbdModel2->getIntegratePositionNode());
         m_taskGraph->addNode(pbdModel2->getUpdateVelocityNode());
         m_taskGraph->addNode(pbdModel2->getSolveNode());
+        m_taskGraph->addNode(pbdModel2->getTaskGraph()->getSink());
     }
     else
     {
