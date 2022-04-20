@@ -130,6 +130,10 @@ PointwiseMap::requestUpdate()
 
     // Check data
     CHECK(m_oneToOneMap.size() == m_oneToOneMapVector.size()) << "Internal data is corrupted";
+    if (m_oneToOneMap.size() == 0)
+    {
+        return;
+    }
 
     std::shared_ptr<VecDataArray<double, 3>> childVerticesPtr  = meshChild->getVertexPositions();
     VecDataArray<double, 3>&                 childVertices     = *childVerticesPtr;

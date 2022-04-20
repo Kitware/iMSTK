@@ -32,7 +32,6 @@ namespace imstk
 {
 class PbdBaryPointToPointConstraint;
 class PbdObject;
-class PointSet;
 class PickingAlgorithm;
 class PointwiseMap;
 

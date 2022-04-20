@@ -38,7 +38,7 @@ PbdObject::initialize()
     m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
     if (m_pbdModel == nullptr)
     {
-        LOG(FATAL) << "Dynamics pointer cast failure in PbdObject::initialize()";
+        LOG(FATAL) << "PbdObject " << m_name << " was not given a PbdModel. Please PbdObject::setDynamicalModel";
         return false;
     }
 

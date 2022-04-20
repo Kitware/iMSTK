@@ -233,18 +233,25 @@ Scene::getSceneObject(const std::string& name) const
 void
 Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 {
-    std::string name = newSceneObject->getName();
-
-    if (this->getSceneObject(name) != nullptr)
+    // If already exists, exit
+    if (m_sceneObjects.find(newSceneObject) != m_sceneObjects.end())
     {
-        LOG(WARNING) << "Can not add object: '" << name
-                     << "' is already registered in this scene.";
+        LOG(WARNING) << "SceneObject " << newSceneObject->getName() << " already in the scene, not added";
         return;
+    }
+
+    // Ensure the name is unique
+    const std::string orgName    = newSceneObject->getName();
+    const std::string uniqueName = getUniqueName(orgName);
+    if (orgName != uniqueName)
+    {
+        LOG(INFO) << "SceneObject with name " << orgName << " already in scene. Renamed to " << uniqueName;
+        newSceneObject->setName(uniqueName);
     }
 
     m_sceneObjects.insert(newSceneObject);
     this->postEvent(Event(modified()));
-    LOG(INFO) << name << " object added to " << m_name;
+    LOG(INFO) << uniqueName << " object added to " << m_name << " scene";
 }
 
 void
@@ -309,7 +316,7 @@ Scene::addLight(const std::string& name, std::shared_ptr<Light> newLight)
 {
     if (m_lightsMap.find(name) != m_lightsMap.cend())
     {
-        LOG(WARNING) << "Can not add light: '" << name
+        LOG(WARNING) << "Cannot add light: '" << name
                      << "' is already registered in this scene.";
         return;
     }
@@ -331,6 +338,20 @@ Scene::removeLight(const std::string& lightName)
 
     m_lightsMap.erase(lightName);
     LOG(INFO) << lightName << " light removed from " << m_name;
+}
+
+std::string
+Scene::getUniqueName(const std::string& name) const
+{
+    int         i = 1;
+    std::string uniqueName = name;
+    // While name is not unique, iterate it
+    while (getSceneObject(uniqueName) != nullptr)
+    {
+        uniqueName = name + "_" + std::to_string(i);
+        i++;
+    }
+    return uniqueName;
 }
 
 std::string

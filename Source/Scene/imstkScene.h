@@ -212,6 +212,13 @@ public:
     const std::string& getName() const { return m_name; }
 
     ///
+    /// \brief Given a desired name, produce a unique one.
+    /// This name would be iterated with a postfix # should one
+    /// already exist
+    ///
+    std::string getUniqueName(const std::string& name) const;
+
+    ///
     /// \brief Get the computational graph of the scene
     ///
     std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }

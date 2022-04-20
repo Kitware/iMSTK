@@ -183,7 +183,7 @@ public:
         other.m_mapped = true;
     }
 
-    virtual ~VecDataArray() override = default;
+    ~VecDataArray() override = default;
 
     ///
     /// \brief Templated copy the current array with a new internal data type, does not change the number

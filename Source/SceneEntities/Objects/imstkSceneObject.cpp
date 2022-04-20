@@ -30,11 +30,11 @@ namespace imstk
 {
 SceneObject::SceneObject(const std::string& name) : SceneEntity(), m_name(name),
     m_taskGraph(std::make_shared<TaskGraph>(
-        "SceneObject_" + name + "_Source",
-        "SceneObject_" + name + "_Sink"))
+        "SceneObject_" + m_name + "_Source",
+        "SceneObject_" + m_name + "_Sink"))
 {
-    m_updateNode = m_taskGraph->addFunction("SceneObject_" + name + "_Update", std::bind(&SceneObject::update, this));
-    m_updateGeometryNode = m_taskGraph->addFunction("SceneObject_" + name + "_UpdateGeometry", std::bind(&SceneObject::updateGeometries, this));
+    m_updateNode = m_taskGraph->addFunction("SceneObject_" + m_name + "_Update", std::bind(&SceneObject::update, this));
+    m_updateGeometryNode = m_taskGraph->addFunction("SceneObject_" + m_name + "_UpdateGeometry", std::bind(&SceneObject::updateGeometries, this));
 }
 
 std::shared_ptr<Geometry>

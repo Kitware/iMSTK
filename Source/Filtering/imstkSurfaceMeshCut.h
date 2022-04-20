@@ -21,14 +21,18 @@
 #pragma once
 
 #include "imstkGeometryAlgorithm.h"
-#include "imstkSurfaceMesh.h"
+#include "imstkMath.h"
+
 #include <map>
 #include <unordered_set>
+#include <set>
 
 namespace imstk
 {
-class Geometry;
 class AnalyticalGeometry;
+class Geometry;
+class SurfaceMesh;
+template<typename T, int N> class VecDataArray;
 
 // vertex on the plane (0), positive side (+1), negative side (-1)
 // pt0 and pt1 follows the triangle's indexing order when tri is presented

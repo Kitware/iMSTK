@@ -20,11 +20,11 @@
 =========================================================================*/
 
 #include "imstkSurfaceMeshCut.h"
-
+#include "imstkAnalyticalGeometry.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkLogger.h"
 #include "imstkPlane.h"
-#include "imstkAnalyticalGeometry.h"
+#include "imstkSurfaceMesh.h"
 
 #include <set>
 

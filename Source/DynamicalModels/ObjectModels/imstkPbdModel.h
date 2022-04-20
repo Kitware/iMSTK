@@ -122,7 +122,22 @@ struct PbdModelConfig
 ///
 /// \class PbdModel
 ///
-/// \brief This class implements position based dynamics mathematical model
+/// \brief This class implements the position based dynamics model. The
+/// PbdModel is a constraint based model that iteratively solves constraints
+/// to simulate the dynamics of a body. PbdModel supports SurfaceMesh,
+/// LineMesh, or TetrahedralMesh. PointSet is also supported for PBD fluids.
+///
+/// One of the distinct properties of the PbdModel is that it is first order.
+/// This means it simulates dynamics by modifying positions directly. Velocities
+/// of the model are computed after positions are solved. Velocities from the
+/// previous iteration are applied at the start of the update.
+///
+/// The PbdModel only takes care of internal body simulation. Collisions
+/// are solved in separate systems afterwards to ensure non-penetration.
+///
+/// References:
+/// Matthias Muller, Bruno Heidelberger, Marcus Hennix, and John Ratcliff. 2007. Position based dynamics. J. Vis. Comun. Image Represent. 18, 2 (April 2007), 109-118.
+/// Miles Macklin, Matthias Muller, and Nuttapong Chentanez 1. XPBD: position-based simulation of compliant constrained dynamics. In Proc. of Motion in Games. 49-54
 ///
 class PbdModel : public DynamicalModel<PbdState>
 {
@@ -138,7 +153,11 @@ public:
     ///
     /// \brief Get the simulation parameters
     ///
-    std::shared_ptr<PbdModelConfig> getConfig() const { assert(m_config); return m_config; }
+    std::shared_ptr<PbdModelConfig> getConfig() const
+    {
+        CHECK(m_config != nullptr) << "Cannot PbdModel::getConfig, config is nullptr";
+        return m_config;
+    }
 
     ///
     /// \brief Add constraints related to a set of vertices.
@@ -147,7 +166,7 @@ public:
     ///
     void addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices);
 
-    virtual void setTimeStep(const double timeStep) override { m_config->m_dt = timeStep; }
+    void setTimeStep(const double timeStep) override { m_config->m_dt = timeStep; }
     double getTimeStep() const override { return m_config->m_dt; }
 
     ///

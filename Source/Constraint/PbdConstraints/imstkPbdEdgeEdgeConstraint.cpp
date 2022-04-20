@@ -69,10 +69,6 @@ PbdEdgeEdgeConstraint::computeValueAndGradient(double&             c,
             return false;
         }
     }
-    else
-    {
-        //LOG(WARNING) << "det is null";
-    }
 
     // Two closest points on the line segments
     const Vec3d P = x0 + t * (x1 - x0);

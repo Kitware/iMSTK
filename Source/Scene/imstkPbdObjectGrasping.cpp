@@ -93,11 +93,6 @@ PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> obj) :
     SceneObject("PbdObjectGrasping_" + obj->getName()),
     m_objectToGrasp(obj), m_pickMethod(std::make_shared<CellPicker>())
 {
-    // We have 3 implementations for 3 methods
-    //  - picking all points inside the primitive (uses CD)
-    //  - picking nearest point to obj2 geometry center
-    //  - picking point on element via interpolation
-
     m_pickingNode = std::make_shared<TaskNode>(std::bind(&PbdObjectGrasping::updatePicking, this),
         "PbdPickingUpdate", true);
     m_taskGraph->addNode(m_pickingNode);
