@@ -4,12 +4,13 @@ include(FetchContent)
 # Download project template
 set(proj "iMSTKExternalProjectTemplate")
 set(templates_src_dir "${CMAKE_CURRENT_BINARY_DIR}/${proj}")
+set(SHA a03f02db4b5871f780d26ac69f5b1cf8071a4ed7)
 FetchContent_Populate(${proj}
   SOURCE_DIR     "${templates_src_dir}"
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/imstkexternalprojecttemplate
-  GIT_TAG        8a90e0b67da782ee52f61d7e982ee64ade7f1c17
+  URL https://gitlab.kitware.com/iMSTK/imstkexternalprojecttemplate/-/archive/${SHA}/imstkexternalprojecttemplate-${SHA}.zip
   QUIET
   )
+
 
 imstk_add_project_test(iMSTKBuildSystemTest.iMSTKProjectAgainstBuildTree
   SOURCE_DIR ${templates_src_dir}/iMSTKProject
