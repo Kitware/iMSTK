@@ -51,12 +51,30 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
     setCollisionHandlingAB(ch);
 
     // Setup collision constraint solve step, should occur after internal constraint solve
-    m_collisionSolveNode = std::make_shared<TaskNode>([ch]() { ch->getCollisionSolver()->solve(); },
+    m_collisionSolveNode = std::make_shared<TaskNode>([&]()
+        {
+            auto pbdCh = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingAB());
+            if (pbdCh == nullptr)
+            {
+                LOG(FATAL) << "Invalid handler type, must be of type PbdCollisionHandling on " <<
+                m_name << " collision solve";
+            }
+            pbdCh->getCollisionSolver()->solve();
+        },
         obj1->getName() + "_vs_" + obj2->getName() + "_CollisionSolver", true);
     m_taskGraph->addNode(m_collisionSolveNode);
 
     // Setup a step to correct velocities for restitution & friction after the PBD velocity computation
-    m_correctVelocitiesNode = std::make_shared<TaskNode>([ch]() { ch->correctVelocities(); },
+    m_correctVelocitiesNode = std::make_shared<TaskNode>([&]()
+        {
+            auto pbdCh = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingAB());
+            if (pbdCh == nullptr)
+            {
+                LOG(FATAL) << "Invalid handler type, must be of type PbdCollisionHandling on " <<
+                m_name << " correct velocities";
+            }
+            pbdCh->correctVelocities();
+        },
         obj1->getName() + "_vs_" + obj2->getName() + "_VelocityCorrect", true);
     m_taskGraph->addNode(m_correctVelocitiesNode);
 
