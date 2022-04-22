@@ -53,7 +53,7 @@ public:
     /// \brief adds a new creation function to the factory
     /// \param name Name to use, will overwrite an already defined name
     /// \param c function to be called when create() is called with the given name
-    static void add(const std::string& name, typename Creator c)
+    static void add(const std::string& name, Creator c)
     {
         registry()[name] = std::move(c);
     }
