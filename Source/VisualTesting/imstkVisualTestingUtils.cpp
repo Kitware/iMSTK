@@ -46,6 +46,11 @@ VisualTest::SetUp()
     m_viewer       = std::make_shared<VTKViewer>();
 }
 
+void VisualTest::TearDown()
+{
+    Logger::getInstance().destroy();
+}
+
 void
 VisualTest::runFor(const double duration, const double fixedTimestep)
 {

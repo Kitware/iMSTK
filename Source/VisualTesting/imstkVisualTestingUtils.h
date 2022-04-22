@@ -35,6 +35,8 @@ class VisualTest : public testing::Test
 {
 public:
     void SetUp() override;
+    
+    void TearDown() override;
 
     ///
     /// \brief Run the simulation for given duration at given fixed timestep
