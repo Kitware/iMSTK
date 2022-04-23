@@ -137,3 +137,7 @@ Most dependencies in iMSTK are forked. This way we don't depend on the remote re
  - Push your changes
 
 After updating your fork you can proceed with the beginning of this guide on how to pull a different source.
+
+## Coverage
+
+iMSTK supports calculating the test coverage via a manual process on Linux only. As a prerequisite `lcov` needs to be installed. To enable coverage calcuation set `iMSTK_COVERAGE` to `ON`, make sure `Debug` build is selected and run the superbuild as normal. When this is completed `cd` into the innerbuild directory and execute `<makeCommand> Coverage` this will start executing the coverage calculation, this may take some time. For the process to succeed _all_ of the tests need to succeed otherwise the command will fail and the process will be aborted. The final information will be under `Coverage/index.html` 

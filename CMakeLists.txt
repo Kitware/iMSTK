@@ -439,8 +439,8 @@ if(${PROJECT_NAME}_COVERAGE)
   append_coverage_compiler_flags()
   setup_target_for_coverage_lcov(
     NAME Coverage
-    EXECUTABLE ctest -E "(CodeFormatTest|RenderTest.*)"
-    EXCLUDE "${CMAKE_BINARY_DIR}/../install/include/*" "/usr/*" "*/Testing/*"
+    EXECUTABLE ctest -E "(CodeFormatTest)"
+    EXCLUDE "${CMAKE_BINARY_DIR}/../install/include/*" "/usr/*" "*/Testing/*" "*/Examples/*" "*/Wrappers/*"
   )
 endif()
 
