@@ -50,22 +50,21 @@ limitations under the License.
 
 namespace imstk
 {
-std::unordered_map<std::string, RenderDelegateObjectFactory::DelegateMakeFunc> RenderDelegateObjectFactory::m_objCreationMap =
-{
-    { SurfaceMesh::getStaticTypeName(), makeFunc<VTKSurfaceMeshRenderDelegate>() },
-    { TetrahedralMesh::getStaticTypeName(), makeFunc<VTKTetrahedralMeshRenderDelegate>() },
-    { LineMesh::getStaticTypeName(), makeFunc<VTKLineMeshRenderDelegate>() },
-    { HexahedralMesh::getStaticTypeName(), makeFunc<VTKHexahedralMeshRenderDelegate>() },
-    { PointSet::getStaticTypeName(), makeFunc<VTKPointSetRenderDelegate>() },
-    { Plane::getStaticTypeName(), makeFunc<VTKPlaneRenderDelegate>() },
-    { Sphere::getStaticTypeName(), makeFunc<VTKSphereRenderDelegate>() },
-    { Capsule::getStaticTypeName(), makeFunc<VTKCapsuleRenderDelegate>() },
-    { OrientedBox::getStaticTypeName(), makeFunc<VTKOrientedCubeRenderDelegate>() },
-    { Cylinder::getStaticTypeName(), makeFunc<VTKCylinderRenderDelegate>() },
-    { ImageData::getStaticTypeName(), makeFunc<VTKImageDataRenderDelegate>() },
-    { "Fluid", makeFunc<VTKFluidRenderDelegate>() },
-    { "SurfaceNormals", makeFunc<VTKSurfaceNormalRenderDelegate>() }
-};
+IMSTK_REGISTER_RENDERDELEGATE(SurfaceMesh, VTKSurfaceMeshRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(Cylinder, VTKCylinderRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(TetrahedralMesh, VTKTetrahedralMeshRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(LineMesh, VTKLineMeshRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(HexahedralMesh, VTKHexahedralMeshRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(PointSet, VTKPointSetRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(Plane, VTKPlaneRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(Sphere, VTKSphereRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(Capsule, VTKCapsuleRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(OrientedBox, VTKOrientedCubeRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(ImageData, VTKImageDataRenderDelegate)
+
+// Custom algorithms
+RenderDelegateRegistrar<VTKFluidRenderDelegate>         _imstk_registerrenderdelegate_fluid("Fluid");
+RenderDelegateRegistrar<VTKSurfaceNormalRenderDelegate> _imstk_registerrenderdelegate_surfacenormals("SurfaceNormals");
 
 std::shared_ptr<VTKRenderDelegate>
 RenderDelegateObjectFactory::makeRenderDelegate(std::shared_ptr<VisualModel> visualModel)
@@ -78,15 +77,15 @@ RenderDelegateObjectFactory::makeRenderDelegate(std::shared_ptr<VisualModel> vis
                    << visualModel->getName();
         return nullptr;
     }
-    auto found = m_objCreationMap.find(delegateHint);
 
-    if (found == m_objCreationMap.end())
+    if (!contains(delegateHint))
     {
         LOG(FATAL) << "RenderDelegate::makeDelegate error: can't find delegate with hint: "
                    << delegateHint << " for visual model " << visualModel->getName();
         return nullptr;
     }
 
-    return found->second(visualModel);
+    // Still a bug, should be able to copy the visual model ptr as well
+    return create(delegateHint, std::move(visualModel));
 }
 } // namespace imstk

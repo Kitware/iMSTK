@@ -10,6 +10,7 @@ imstk_add_library( Common
     imstkColorFunction.h
     imstkDataArray.h
     imstkEventObject.h
+    imstkFactory.h
     imstkLogger.h
     imstkMacros.h
     imstkMath.h

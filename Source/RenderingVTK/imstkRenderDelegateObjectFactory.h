@@ -21,6 +21,8 @@ limitations under the License.
 
 #pragma once
 
+#include "imstkFactory.h"
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -34,51 +36,41 @@ class VTKRenderDelegate;
 ///
 /// \class RenderDelegateObjectFactory
 ///
-/// \brief This is the factory class for VTKRenderDelegates.
+/// \brief Manages and generates the VTKRenderdelegates for all VisualModels.
 ///
-/// VTKRenderDelegate's are constructed with a VisualModel.
+/// The factory is a singleton and can be accessed anywhere.
+/// Given a visual model this will, if available generate a renderdelegate that
+/// may be able to render the model. \sa VisualModel::delegateHint() is used to
+/// determine what delegate should be returned. delegateHint() has some functionality
+/// to determine a default Hint and can be overridden by the user.
+/// The generation Will fail if the name is not known to the factory
 ///
-/// The factory implements its own creation scheme/logic, but if a
-/// delegateHint is provided in the VisualModel it will search for a
-/// creation function by that name.
+/// There are multiple ways to register a renderdelegate
+/// \code
+/// IMSTK_REGISTER_RENDERDELEGATE(geometryType, delegateType)
+/// \endcode
+/// will register the delegate for the class-name of the geometry,
+/// this will satisfy the default mechanism
+/// If a custom delegate is wanted this form may be preferable
+/// \code
+/// RenderDelegateRegistrar<delegateType> registrar("HintName");
+/// \endcode
 ///
-/// Note: Does not auto register VTKRenderDelegate's. If one creates
-/// their own VTKRenderDelegate they must register themselves.
-///
-class RenderDelegateObjectFactory
+class VTKRenderDelegate;
+
+class RenderDelegateObjectFactory : public ObjectFactory<std::shared_ptr<VTKRenderDelegate>, std::shared_ptr<VisualModel>>
 {
 public:
-    using DelegateMakeFunc = std::function<std::shared_ptr<VTKRenderDelegate>(std::shared_ptr<VisualModel>)>;
-
     ///
-    /// \brief Register the RenderDelegate creation function with
-    /// template type. Provide a delegateHint in the VisualModel to use
-    /// this creation function instead. Creation functions can be overridden
-    ///
-    template<typename T>
-    static void registerDelegate(std::string name)
-    {
-        static_assert(std::is_base_of<VTKRenderDelegate, T>::value,
-            "T must be a subclass of VTKRenderDelegate");
-        m_objCreationMap[name] = makeFunc<T>();
-    }
-
-    template<typename T>
-    static DelegateMakeFunc makeFunc()
-    {
-        return [](std::shared_ptr<VisualModel> visualModel)
-               {
-                   return std::make_shared<T>(visualModel);
-               };
-    }
-
-    ///
-    /// \brief Creates a VTKRenderDelegate object by VisualModel if registered to factory
-    ///
+    /// \brief attempt to create a delegate for the given visual model
+    /// \param visualModel the model we need a delegate for
     static std::shared_ptr<VTKRenderDelegate> makeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-private:
-    static std::unordered_map<std::string, DelegateMakeFunc> m_objCreationMap;
 };
-#define REGISTER_RENDER_DELEGATE(delegateType) RenderDelegateObjectFactory::registerDelegate<delegateType>(#delegateType)
+
+/// \brief class for automatically registering a delegate
+/// \tparam T type of the delegate object to register
+template<typename T>
+using RenderDelegateRegistrar = SharedObjectRegistrar<VTKRenderDelegate, T, std::shared_ptr<VisualModel>>;
+
+#define IMSTK_REGISTER_RENDERDELEGATE(geomType, objType) RenderDelegateRegistrar<objType> _imstk_registerrenderdelegate ## geomType(#geomType);
 } // namespace imstk

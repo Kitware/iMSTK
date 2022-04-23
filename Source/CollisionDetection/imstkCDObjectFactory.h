@@ -21,6 +21,8 @@ limitations under the License.
 
 #pragma once
 
+#include "imstkFactory.h"
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -30,51 +32,39 @@ namespace imstk
 {
 class CollisionDetectionAlgorithm;
 
+/// \brief Manages and generates the CollisionDetectionAlgorithms.
 ///
-/// \class CDObjectFactory
+/// The factory is a singleton and can be accessed anywhere.
+/// Given a the name of a geometry/geometry algorithm this will generate
+/// the appropriate object that should be executed. In by default the class
+/// name is the name that is used to look up the algorithm.
+/// The generation Will fail if the name is not known to the factory
 ///
-/// \brief This is the factory class for CollisionDetectionAlgorithm. It may be
-/// used to construct CollisionDetectionAlgorithm objects by name.
-/// Note: Does not auto register CollisionDetectionAlgorithm's. If one creates
-/// their own CollisionDetectionAlgorithm they must register themselves.
+/// There are multiple ways to register an collision detection algorithm,
+/// preferred should be ...
+/// \code
+/// IMSTK_REGISTER_COLLISION_DETECTION(collisionDetectionType)
+/// \endcode
+/// will register the delegate for the class-name of the algorithm,
+/// this will satisfy the default mechanism
+/// If want to register a custom delegate with more customization you can use
+/// \code
+/// CDObjectRegistrar<delegateType> registrar("LookupTypeName");
+/// \endcode
 ///
-class CDObjectFactory
+class CDObjectFactory : public ObjectFactory<std::shared_ptr<CollisionDetectionAlgorithm>>
 {
 public:
-    using CDMakeFunc = std::function<std::shared_ptr<CollisionDetectionAlgorithm>()>;
-
-    ///
-    /// \brief Register the CollisionDetectionAlgorithm creation function given name
-    ///
-    static void registerCD(std::string name, CDMakeFunc func)
-    {
-        cdObjCreationMap[name] = func;
-    }
-
-    ///
-    /// \brief Creates a CollisionDetectionAlgorithm object by name if registered to factory
-    ///
+///
+/// \brief attempts to create a new CD algorithm
+/// \param collisionTypeName name of the class to look up
     static std::shared_ptr<CollisionDetectionAlgorithm> makeCollisionDetection(const std::string collisionTypeName);
-
-private:
-    static std::unordered_map<std::string, CDMakeFunc> cdObjCreationMap;
 };
 
-///
-/// \class CDObjectRegistrar
-///
-/// \brief Construction of this object will register to the CDObjectFactory. One could
-/// construct this at the bottom of their CollisionDetectionAlgorithm when building
-/// dynamic libraries or executables for static initialization.
-///
+/// \brief Auto registration class
+/// \tparam T type of the class to register
 template<typename T>
-class CDObjectRegistrar
-{
-public:
-    CDObjectRegistrar(std::string name)
-    {
-        CDObjectFactory::registerCD(name, []() { return std::make_shared<T>(); });
-    }
-};
-#define REGISTER_COLLISION_DETECTION(cdType) CDObjectRegistrar<cdType> __register ## cdType(#cdType)
+using CDObjectRegistrar = SharedObjectRegistrar<CollisionDetectionAlgorithm, T>;
+
+#define IMSTK_REGISTER_COLLISION_DETECTION(objType) CDObjectRegistrar<objType> _imstk_registercd ## objType(#objType)
 } // namespace imstk

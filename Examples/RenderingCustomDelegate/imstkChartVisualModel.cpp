@@ -27,7 +27,7 @@ using namespace imstk;
 
 ChartVisualModel::ChartVisualModel()
 {
-    setDelegateHint("VTKChartRenderDelegate");
+    setDelegateHint("Chart");
 
     m_viewBounds[0] = 0.0;
     m_viewBounds[1] = 320.0;
