@@ -151,7 +151,7 @@ AbstractVTKViewer::initModule()
 
 void
 AbstractVTKViewer::uninitModule()
-{ 
+{
     auto iren = m_vtkRenderWindow->GetInteractor();
     iren->SetDone(true);
     m_vtkRenderWindow->Finalize();

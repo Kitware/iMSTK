@@ -46,7 +46,8 @@ VisualTest::SetUp()
     m_viewer       = std::make_shared<VTKViewer>();
 }
 
-void VisualTest::TearDown()
+void
+VisualTest::TearDown()
 {
     Logger::getInstance().destroy();
 }
