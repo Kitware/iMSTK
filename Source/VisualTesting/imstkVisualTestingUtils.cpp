@@ -47,6 +47,12 @@ VisualTest::SetUp()
 }
 
 void
+VisualTest::TearDown()
+{
+    Logger::getInstance().destroy();
+}
+
+void
 VisualTest::runFor(const double duration, const double fixedTimestep)
 {
     m_duration = duration;
