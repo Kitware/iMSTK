@@ -42,6 +42,10 @@ Click [here](https://imstk.readthedocs.io/en/latest/) for user documentation.
 
 Click [here](https://imstk.gitlab.io/) for doxygen code documentation.
 
+Click [here](https://gitlab.kitware.com/iMSTK/iMSTK/-/blob/master/Docs/CodingGuide.md) for iMSTK coding style
+
+Click [here](https://gitlab.kitware.com/iMSTK/iMSTK/-/blob/master/Docs/Maintainance.md) to view information about iMSTK maintenance tasks
+
 ### Dashboard
 Click [here](https://open.cdash.org/index.php?project=iMSTK) for nightly build & MR results.
 
