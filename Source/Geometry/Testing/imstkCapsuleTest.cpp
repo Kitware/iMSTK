@@ -38,7 +38,8 @@ TEST(imstkCapsuleTest, SetGetRadius)
    capsule.setRadius(0.0000002);
    EXPECT_DOUBLE_EQ(0.0000002, capsule.getRadius());
 
-   EXPECT_DEATH(capsule.setRadius(-50), "Capsule::setRadius error: radius should be positive.");
+   EXPECT_DEATH(capsule.setRadius(0.0), "Capsule::setRadius error: radius should be positive.");
+   EXPECT_DEATH(capsule.setRadius(-50.0), "Capsule::setRadius error: radius should be positive.");
 }
 
 TEST(imstkCapsuleTest, SetGetLength)
@@ -54,8 +55,7 @@ TEST(imstkCapsuleTest, SetGetLength)
    capsule.setLength(1000000000);
    EXPECT_DOUBLE_EQ(1000000000, capsule.getLength());
 
-   EXPECT_DEATH(capsule.setLength(0), "Capsule::setLength error: length should be positive.");
-   EXPECT_DEATH(capsule.setLength(-10), "Capsule::setLength error: length should be positive.");
+   EXPECT_DEATH(capsule.setLength(-10.0), "Capsule::setLength error: length should be positive.");
 }
 
 TEST(imstkCapsuleTest, GetVolume)

@@ -47,7 +47,6 @@ void
 Capsule::setRadius(const double r)
 {
     CHECK(r > 0) << "Capsule::setRadius error: radius should be positive.";
-
     m_radius = r;
     m_transformApplied = false;
     this->postModified();
@@ -67,8 +66,7 @@ Capsule::getLength(DataType type /* = DataType::PostTransform */)
 void
 Capsule::setLength(const double l)
 {
-    CHECK(l > 0) << "Capsule::setLength error: length should be positive.";
-
+    CHECK(l >= 0) << "Capsule::setLength error: length should be positive.";
     m_length = l;
     m_transformApplied = false;
     this->postModified();
