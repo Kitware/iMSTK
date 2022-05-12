@@ -289,7 +289,7 @@ ImplicitGeometryToPointSetCD
 * This is your traditional point vs SDF collision resolution.
 * This method produces N PointIndexDirectionElements for every point.
 
-MeshToMeshBruteForceCD
+ClosedSurfaceMeshToMeshCD
 --------------------------------
 
 * Static Collision Method

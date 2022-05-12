@@ -260,7 +260,7 @@ PbdObjectStitching::addStitchConstraints()
     if (std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick) != nullptr)
     {
         // ** Warning **, surface triangles are not 100% garunteed to tell inside/out
-        // Should use angle-weighted psuedonormals as done in MeshToMeshBruteForceCD
+        // Should use angle-weighted pseudonormals
         surfMesh->computeTrianglesNormals();
         std::shared_ptr<VecDataArray<double, 3>> faceNormalsPtr = surfMesh->getCellNormals();
         const VecDataArray<double, 3>&           faceNormals    = *faceNormalsPtr;

@@ -118,6 +118,7 @@
 /*
  * CollisionDetection
  */
+#include "imstkClosedSurfaceMeshToMeshCD.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkBidirectionalPlaneToSphereCD.h"
@@ -125,7 +126,6 @@
 #include "imstkCollisionUtils.h"
 #include "imstkImplicitGeometryToPointSetCCD.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
-#include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkPointSetToCapsuleCD.h"
 #include "imstkPointSetToOrientedBoxCD.h"
 #include "imstkPointSetToPlaneCD.h"
@@ -365,10 +365,11 @@ namespace std
 %include "../../CollisionDetection/imstkCollisionData.h"
 %include "../../CollisionDetection/imstkCollisionDetectionAlgorithm.h"
 %include "../../CollisionDetection/imstkCollisionUtils.h"
+
 %include "../../CollisionDetection/CollisionDetection/imstkBidirectionalPlaneToSphereCD.h"
+%include "../../CollisionDetection/CollisionDetection/imstkClosedSurfaceMeshToMeshCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkImplicitGeometryToPointSetCCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkImplicitGeometryToPointSetCD.h"
-%include "../../CollisionDetection/CollisionDetection/imstkMeshToMeshBruteForceCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkPointSetToCapsuleCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkPointSetToOrientedBoxCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkPointSetToPlaneCD.h"

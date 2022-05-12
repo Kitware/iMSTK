@@ -61,7 +61,7 @@ The PbdCollisionHandling can be used through the PbdObjectCollision interaction 
 ::
 
     // Add collision between the two objects with the following collision strategy
-    imstkNew<PbdObjectCollision> myCollision(tissueObj, toolObj, "MeshToMeshBruteForceCD");
+    imstkNew<PbdObjectCollision> myCollision(tissueObj, toolObj, "ClosedSurfaceMeshToMeshCD");
     scene->getCollisionGraph()->addInteraction(myCollision);
 
 If more control is needed that is not available in the PbdObjectCollision, you may attain the handler like so:

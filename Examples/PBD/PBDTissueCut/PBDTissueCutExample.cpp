@@ -222,7 +222,7 @@ main()
     std::shared_ptr<RigidObject2> toolObj = makeToolObj();
     scene->addSceneObject(toolObj);
 
-    /*auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, toolObj, "MeshToMeshBruteForceCD");
+    /*auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, toolObj, "ClosedSurfaceMeshToMeshCD");
     scene->addInteraction(interaction);*/
 
     // Light

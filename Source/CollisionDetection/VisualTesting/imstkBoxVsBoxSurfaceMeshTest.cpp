@@ -20,9 +20,9 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkClosedSurfaceMeshToMeshCD.h"
 #include "imstkCollisionDetectionVisualTest.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkOrientedBox.h"
 #include "imstkSurfaceMesh.h"
 
@@ -30,7 +30,7 @@ using namespace imstk;
 
 ///
 /// \brief This test is used to investigate Triangle Vs Triangle collision
-/// of the MeshToMeshBruteForceCD method.
+/// of the ClosedSurfaceMeshToMeshCD method.
 /// It displays the collision data, and allows users to investigate various cases
 ///
 TEST_F(CollisionDetectionVisualTest, BoxVsBoxSurfaceMesh)
@@ -52,7 +52,7 @@ TEST_F(CollisionDetectionVisualTest, BoxVsBoxSurfaceMesh)
     m_cdGeom2->rotate(Vec3d(1.0, 0.0, 0.0), PI_2 * 0.5);
     m_cdGeom2->translate(Vec3d(0.0, 0.8, 0.8));
 
-    auto cd = std::make_shared<MeshToMeshBruteForceCD>();
+    auto cd = std::make_shared<ClosedSurfaceMeshToMeshCD>();
     cd->setInputGeometryA(m_cdGeom1);
     cd->setInputGeometryB(m_cdGeom2);
     cd->setGenerateEdgeEdgeContacts(true);

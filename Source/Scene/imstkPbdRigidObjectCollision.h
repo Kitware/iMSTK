@@ -42,7 +42,7 @@ public:
     /// \brief Constructor for PbdObject-PbdObject or PbdObject-CollidingObject collisions
     ///
     PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<RigidObject2> obj2,
-                            std::string cdType = "MeshToMeshBruteForceCD");
+                            std::string cdType = "ClosedSurfaceMeshToMeshCD");
 
     ~PbdRigidObjectCollision() override = default;
 
