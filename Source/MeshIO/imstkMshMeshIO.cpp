@@ -21,7 +21,8 @@
 
 #include "imstkMshMeshIO.h"
 #include "imstkHexahedralMesh.h"
-#include "imstkLogger.h"
+#include "imstkLineMesh.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVecDataArray.h"
 
@@ -29,389 +30,312 @@
 
 namespace imstk
 {
-std::shared_ptr<imstk::VolumetricMesh>
-MshMeshIO::read(const std::string& filePath, const MeshFileType meshType)
+///
+/// \brief Consume all characters up to delimiters
+///
+static void
+readToDelimiter(std::ifstream& file)
 {
-    CHECK(meshType == MeshFileType::MSH) << "Error: file type other than .msh not supported for input " << filePath;
-
-    // based on the format provided on
-    // http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
-
-    size_t                                   nNodes    = 0;           // number-of-nodes
-    size_t                                   nElements = 0;           // number-of-elements
-    std::vector<size_t>                      nodeIDs;                 // number assigned to each node (node number)
-    std::shared_ptr<VecDataArray<double, 3>> vertices    = std::make_shared<VecDataArray<double, 3>>();
-    VecDataArray<double, 3>&                 nodesCoords = *vertices; // nodes coordinates
-    std::vector<size_t>                      tetrahedronIDs;          // tet elements IDs
-    std::vector<size_t>                      hexahedronIDs;           // hex elements IDs
-    std::shared_ptr<VecDataArray<int, 4>>    tetrahedronConnectivityPtr = std::make_shared<VecDataArray<int, 4>>();
-    VecDataArray<int, 4>&                    tetrahedronConnectivity    = *tetrahedronConnectivityPtr;
-    std::shared_ptr<VecDataArray<int, 8>>    hexahedronConnectivityPtr  = std::make_shared<VecDataArray<int, 8>>();
-    VecDataArray<int, 8>&                    hexahedronConnectivity     = *hexahedronConnectivityPtr;
-    std::map<ElemType, size_t>               elemCountMap;            // map of the element types to their number of counts
-    std::string                              subString;               // to store space separated strings in a line
-    std::string                              mshLine;                 // a msh file line
-    std::stringstream                        mshLineStream;           // sting stream object which represent a line in the .msh file
-
-    // Open the file
-    std::ifstream mshStream(filePath);
-
-    CHECK(mshStream.is_open()) << "Error: Failed to open the input file" << filePath;
-
-    // Look for "$MeshFormat"
-    while (getline(mshStream, mshLine))
+    char next = file.peek();
+    while (next == '\n' || next == ' ' || next == '\t' || next == '\r')
     {
-        mshLineStream.str(std::string());
-        mshLineStream.clear();
-        if (!mshLine.empty())
+        file.get();
+        next = file.peek();
+    }
+}
+
+std::shared_ptr<PointSet>
+MshMeshIO::read(const std::string& filePath)
+{
+    // based on the format provided on (ASCII version)
+    // ASCII: http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
+    // Binary: https://www.manpagez.com/info/gmsh/gmsh-2.4.0/gmsh_57.php
+
+    std::shared_ptr<PointSet> results = nullptr;
+
+    // Reopen as binary
+    std::ifstream file;
+    file.open(filePath, std::ios::binary | std::ios::in);
+    CHECK(file.is_open()) << "Failed to read file, ifstream failed to open " << filePath;
+
+    // Read $MeshFormat\n
+    std::string bufferStr;
+    file >> bufferStr;
+
+    // Read version, type, dataSize (refers to floats/doubles)
+    double version;
+    int    fileType;
+    int    dataSize;
+    file >> version >> fileType >> dataSize;
+    CHECK(dataSize == 8) << "Failed to read file, data size must be 8 bytes";
+    CHECK(sizeof(int) == 4) << "Failed to read file, code must be compiled with int size 4 bytes";
+
+    const bool isBinary = (fileType == 1);
+
+    // Read the number one written in binary to check endianness
+    // If it's not one then file was written with different endian
+    if (isBinary)
+    {
+        int oneFromBinary;
+        readToDelimiter(file);
+        file.read(reinterpret_cast<char*>(&oneFromBinary), sizeof(int));
+        CHECK(oneFromBinary == 1) << "Failed to read file, file saved with different endianness than this machine";
+    }
+
+    file >> bufferStr; // Read $EndMeshFormat
+    CHECK(bufferStr == "$EndMeshFormat") << "Failed to read file, invalid format";
+
+    CHECK(!file.fail()) << "Failed to read file, ifstream error";
+
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = nullptr;
+    while (!file.eof())
+    {
+        bufferStr.clear();
+        file >> bufferStr;
+        CHECK(!file.fail()) << "Failed to read file, ifstream error";
+
+        if (bufferStr == "$Nodes")
         {
-            mshLineStream << mshLine;
-            mshLineStream >> subString;
-            if (subString == "$MeshFormat")
+            int nNodes = -1;
+            file >> nNodes; // Read # of Nodes
+
+            // Get the node IDs and the node coordinates
+            verticesPtr = std::make_shared<VecDataArray<double, 3>>(nNodes);
+            VecDataArray<double, 3>& vertices = *verticesPtr;
+            std::vector<size_t>      nodeIDs(nNodes);
+
+            if (isBinary)
             {
-                break;
+                // Read entire buffer as bytes
+                size_t numBytes = (4 + 3 * dataSize) * nNodes;
+                char*  data     = new char[numBytes];
+                readToDelimiter(file);
+                file.read(data, numBytes);
+                for (int i = 0; i < nNodes; i++)
+                {
+                    int id = *reinterpret_cast<int*>(&data[i * (4 + 3 * dataSize)]) - 1;
+                    nodeIDs[i] = id;
+                    // \todo: dataSize determines if float or double
+                    vertices[id][0] = *reinterpret_cast<double*>(&data[i * (4 + 3 * dataSize) + 4]);
+                    vertices[id][1] = *reinterpret_cast<double*>(&data[i * (4 + 3 * dataSize) + 4 + dataSize]);
+                    vertices[id][2] = *reinterpret_cast<double*>(&data[i * (4 + 3 * dataSize) + 4 + 2 * dataSize]);
+                }
+                delete[] data;
             }
-        }
-    }
-
-    if (mshStream.eof())
-    {
-        LOG(INFO) << "Warning:  version number, file-type, data-size not found in the msh file.";
-    }
-    mshStream.clear();
-    mshStream.seekg(0, std::ios::beg);
-
-    // Look for "$NodeData"
-    while (getline(mshStream, mshLine))
-    {
-        mshLineStream.str(std::string());
-        mshLineStream.clear();
-        if (!mshLine.empty())
-        {
-            mshLineStream << mshLine;
-            mshLineStream >> subString;
-            if (!subString.compare("$NOD") || !subString.compare("$Nodes"))
+            else
             {
-                break;
+                for (int i = 0; i < nNodes; i++)
+                {
+                    int   id;
+                    Vec3d pos;
+                    file >> id >> pos[0] >> pos[1] >> pos[2];
+                    nodeIDs[i]       = id - 1;
+                    vertices[id - 1] = pos;
+                }
             }
-        }
-    }
-    if (mshStream.eof())
-    {
-        LOG(WARNING) << "Error: Elements not defined in the file for input file " << filePath;
-        return nullptr;
-    }
 
-    // Get the total number-of-nodes specified in $Node field
-    while (getline(mshStream, mshLine))
-    {
-        if (!mshLine.empty())
-        {
-            mshLineStream.str(std::string());
-            mshLineStream.clear();
-            mshLineStream << mshLine;
-            mshLineStream >> subString;
-            nNodes = stoi(subString);
-            break;
+            file >> bufferStr; // Read $EndNodes
+            CHECK(bufferStr == "$EndNodes") << "Failed to read file, invalid format";
         }
-    }
-    LOG(INFO) << "MSH mesh comprises of: \n" << '\t' << "Number of NODES: " << nNodes;
-
-    // Get the node IDs and the node coordinates
-    nodeIDs.resize(nNodes);
-    std::string node_xC;
-    std::string node_yC;
-    std::string node_zC;
-    size_t      nodes_count = 0;
-    while (getline(mshStream, mshLine))
-    {
-        mshLineStream.str(std::string());
-        mshLineStream.clear();
-        if (!mshLine.empty())
+        else if (bufferStr == "$Elements")
         {
-            mshLineStream << mshLine;
-            mshLineStream >> subString;
-            if (!subString.compare("$ENDNOD") || !subString.compare("$EndNodes"))
+            std::array<int, 6> elemTypeToCount;
+            elemTypeToCount[0] = 0;
+            elemTypeToCount[1] = 2; // Line
+            elemTypeToCount[2] = 3; // Triangle
+            elemTypeToCount[3] = 4; // Quad
+            elemTypeToCount[4] = 4; // Tetrahedron
+            elemTypeToCount[5] = 8; // Hexahedron
+
+            // 1 - line, 2 - triangle, 3 - quad, 4 - tet, 5 - hex
+            //std::array<std::vector<int>, 6> elementsIds;
+            std::array<std::vector<int>, 6> elementVertIds;
+            for (int i = 0; i < 6; i++)
             {
-                break;
+                //elementsIds[i] = std::vector<int>();
+                elementVertIds[i] = std::vector<int>();
             }
-            nodeIDs[nodes_count] = stoul(subString);
-            // x coordinate
-            mshLineStream >> node_xC;
-            // y coordinate
-            mshLineStream >> node_yC;
-            // z coordinate
-            mshLineStream >> node_zC;
-            nodesCoords.push_back(Vec3d{ stod(node_xC), stod(node_yC), stod(node_zC) });
-            ++nodes_count;
-        }
-    }
 
-    // Check to the $Nodes field is in the correct format in .msh file
-    if (nodes_count != nNodes)
-    {
-        LOG(WARNING) << "Error: number of nodes read (" << nodes_count << ") "
-                     << "inconsistent with number of nodes defined in file (" << nNodes << "). Input file: " << filePath;
-        return nullptr;
-    }
+            int numElements;
+            file >> numElements;
+            CHECK(!file.fail()) << "Failed to read file, ifstream error";
+            readToDelimiter(file);
 
-    // Look for "$Elements" field
-    mshStream.clear();
-    mshStream.seekg(0, std::ios::beg);
-    while (getline(mshStream, mshLine))
-    {
-        if (!mshLine.empty())
-        {
-            mshLineStream.str(std::string());
-            mshLineStream.clear();
-            mshLineStream << mshLine;
-            mshLineStream >> subString;
-            if (!subString.compare("$ELM") || !subString.compare("$Elements"))
+            if (isBinary)
             {
-                break;
-            }
-        }
-    }
-    if (mshStream.eof())
-    {
-        LOG(WARNING) << "Error: Elements not defined in the file " << filePath;
-        return nullptr;
-    }
+                int elemIter = 0;
+                // Why not use a for loop?
+                while (elemIter < numElements)
+                {
+                    // Parse element header.
+                    int elemType, numElems, numTags;
+                    file.read((char*)&elemType, sizeof(int));
+                    file.read((char*)&numElems, sizeof(int));
+                    file.read((char*)&numTags, sizeof(int));
 
-    // Get the total number-of-elements
-    while (getline(mshStream, mshLine))
-    {
-        if (!mshLine.empty())
-        {
-            mshLineStream.str(std::string());
-            mshLineStream.clear();
-            mshLineStream << mshLine;
-            mshLineStream >> subString;
-            nElements = stoul(subString);
-            break;
-        }
-    }
+                    CHECK(elemType > 0 && elemType < 6) <<
+                        "Failed to read file, unsupported element type";
+                    int               vertexCount = elemTypeToCount[elemType];
+                    std::vector<int>& elemVertIds = elementVertIds[elemType];
+                    //std::vector<int>& elemIds = elementsIds[elemType];
 
-    // Get the total number of elements of each type
-    int    elemType;                            // Store an element type
-    size_t elemID;                              // Stores an element ID
-    while (getline(mshStream, mshLine))
-    {
-        if (!mshLine.empty())
-        {
-            mshLineStream.str(std::string());
-            mshLineStream.clear();
-            mshLineStream << mshLine;
-            mshLineStream >> subString;
-            if (!subString.compare("$ENDELM") || !subString.compare("$EndElements"))
-            {
-                break;
-            }
-            //elemID = stoul(subString);  // Read the element ID
-            subString.clear();
-            mshLineStream >> subString; // Read the element type
-            elemType = stoul(subString);
+                    for (int i = 0; i < numElems; i++)
+                    {
+                        int elementId;
+                        file.read((char*)&elementId, sizeof(int));
+                        //elemIds.push_back(elementId - 1); // Msh starts from 1
 
-            // To avoid out of range casting, and to check validity of the .msh file
-            if (elemType < ElemType::line || elemType > ElemType::tetrahedronFifthOrder)
-            {
-                LOG(FATAL) << "Error : elm-type ( " << elemType << " ) "
-                           << "is not in the range" << "(" << ElemType::line << " to "
-                           << ElemType::tetrahedronFifthOrder << "), so is not a valid element type. Input: " << filePath;
-                return nullptr;
-            }
-            ++elemCountMap[ElemType(elemType)];
-        }
-    }
-
-    // Check to the $Elements field is in the correct format in .msh file
-    size_t totalElem = 0;
-    for (auto& kv : elemCountMap)
-    {
-        totalElem += kv.second;
-    }
-
-    // Set the stream back to the elem field
-    if (!(nElements == totalElem))
-    {
-        LOG(WARNING) << "Error: number of elements read (" << nElements << ") "
-                     << "inconsistent with number of elements defined in file (" << totalElem << "). Input: " << filePath;
-        return nullptr;
-    }
-    if (elemCountMap[ElemType::tetrahedron] == 0 && elemCountMap[ElemType::hexahedron] == 0)
-    {
-        LOG(WARNING) << "Error: No tet or hex elements present in the mesh! Input: " << filePath;
-        return nullptr;
-    }
-
-    // Lambda to determine number of nodes per element of given type
-    auto numElemNodes = [&filePath](const ElemType& elType) -> size_t
+                        // Read the tags but don't do anything with them
+                        for (int j = 0; j < numTags; j++)
                         {
-                            switch (elType)
-                            {
-                            case ElemType::line:                            return 2;
-                            case ElemType::triangle:                        return 3;
-                            case ElemType::quadrangle:                      return 4;
-                            case ElemType::tetrahedron:                     return 4;
-                            case ElemType::hexahedron:                      return 8;
-                            case ElemType::prism:                           return 6;
-                            case ElemType::pyramid:                         return 5;
-                            case ElemType::lineSecondOrder:                 return 3;
-                            case ElemType::triangleSecondOrder:             return 6;
-                            case ElemType::quadrangleSecondOrderType1:      return 9;
-                            case ElemType::tetrahedronSecondOrder:          return 10;
-                            case ElemType::hexahedronSecondOrderType1:      return 27;
-                            case ElemType::prismSecondOrderType1:           return 18;
-                            case ElemType::pyramidSecondOrderType1:         return 14;
-                            case ElemType::point:                           return 1;
-                            case ElemType::quadrangleSecondOrderType2:      return 8;
-                            case ElemType::hexahedronSecondOrderType2:      return 20;
-                            case ElemType::prismSecondOrderType2:           return 15;
-                            case ElemType::pyramidSecondOrderType2:         return 13;
-                            case ElemType::triangleThirdOrderIncomplete:    return 9;
-                            case ElemType::triangleThirdOrder:              return 10;
-                            case ElemType::triangleFourthOrderIncomplete:   return 12;
-                            case ElemType::triangleFourthOrder:             return 15;
-                            case ElemType::triangleFifthOrderIncomplete:    return 15;
-                            case ElemType::triangleFifthOrder:              return 21;
-                            case ElemType::edgeThirdOrder:                  return 4;
-                            case ElemType::edgeFourthOrder:                 return 5;
-                            case ElemType::edgeFifthOrder:                  return 6;
-                            case ElemType::tetrahedronThirdOrder:           return 20;
-                            case ElemType::tetrahedronFourthOrder:          return 35;
-                            case ElemType::tetrahedronFifthOrder:           return 56;
-                            default:
-                                LOG(FATAL) << "Error: Unknown element type to compute number of nodes. Input: " << filePath;
-                                return 0;
-                            }
-                        };
+                            int tag;
+                            file.read((char*)&tag, sizeof(int));
+                        }
 
-    // Read the tet and hex (if any) elements IDs and connectivity in the $Element field in the .msh file
-    tetrahedronIDs.resize(elemCountMap[ElemType::tetrahedron]);
-    hexahedronIDs.resize(elemCountMap[ElemType::hexahedron]);
-    tetrahedronConnectivity.resize(static_cast<int>(elemCountMap[ElemType::tetrahedron]));
-    hexahedronConnectivity.resize(static_cast<int>(elemCountMap[ElemType::hexahedron]));
-    size_t tetElemCount = 0;
-    size_t hexElemCount = 0;
-    Vec4i  tmp_4arr;  // Temp array to store the connectivity of a tet element (if any)
-    Vec8i  tmp_8arr;  // Temp array to store the connectivity of a hex element (if any)
-    // Look for "$Elements" field
-    mshStream.clear();
-    mshStream.seekg(0, std::ios::beg);
-    while (getline(mshStream, mshLine))
-    {
-        if (!mshLine.empty())
-        {
-            mshLineStream.str(std::string());
-            mshLineStream.clear();
-            mshLineStream << mshLine;
-            mshLineStream >> subString;
-            if (!subString.compare("$ELM") || !subString.compare("$Elements"))
-            {
-                getline(mshStream, mshLine);   // To skipe the line specifying the total number of elements
-                break;
-            }
-        }
-    }
-    while (getline(mshStream, mshLine))
-    {
-        if (!mshLine.empty())
-        {
-            mshLineStream.str(std::string());
-            mshLineStream.clear();
-            mshLineStream << mshLine;
-            mshLineStream >> subString;
-            if (!subString.compare("$ENDELM") || !subString.compare("$EndElements"))
-            {
-                break;
-            }
-            elemID = stoul(subString);  // Read the element ID
-            subString.clear();
-            mshLineStream >> subString; // Read the element type
-            elemType = stoul(subString);
-            // Reverse the string stream
-            mshLineStream.str(std::string());
-            mshLineStream.clear();
-            reverse(mshLine.begin(), mshLine.end());
-            mshLineStream << mshLine;
-            switch (elemType)
-            {
-            case ElemType::tetrahedron: // for volumetric elements  (tets)
-                tetrahedronIDs[tetElemCount] = elemID;
-                for (size_t jj = numElemNodes(ElemType::tetrahedron); jj > 0; --jj)
-                {
-                    subString.clear();
-                    mshLineStream >> subString;
-                    reverse(subString.begin(), subString.end());
-                    tmp_4arr[jj - 1] = stoul(subString);
+                        // Vertex ids
+                        for (int j = 0; j < vertexCount; j++)
+                        {
+                            int vertId;
+                            file.read((char*)&vertId, sizeof(int));
+                            elemVertIds.push_back(vertId - 1);
+                        }
+                    }
+
+                    elemIter += numElems;
                 }
-                tetrahedronConnectivity[tetElemCount] = tmp_4arr;
-                ++tetElemCount;
-                break;
-            case ElemType::hexahedron: // for volumetric elements  (hexs)
-                hexahedronIDs.push_back(elemID);
-                for (size_t jj = numElemNodes(ElemType::hexahedron); jj > 0; --jj)
+            }
+            else
+            {
+                for (int i = 0; i < numElements; i++)
                 {
-                    subString.clear();
-                    mshLineStream >> subString;
-                    reverse(subString.begin(), subString.end());
-                    tmp_8arr[jj - 1] = stoul(subString);
+                    // Parse element header.
+                    int elemGroupId = -1;
+                    int elemType    = -1;
+                    int numTags     = 0;
+                    file >> elemGroupId >> elemType >> numTags;
+                    CHECK(elemType > 0 && elemType < 6) <<
+                        "Failed to read file, unsupported element type";
+
+                    int               vertexCount = elemTypeToCount[elemType];
+                    std::vector<int>& elemVertIds = elementVertIds[elemType];
+
+                    // Read the tags but don't do anything with them
+                    for (int j = 0; j < numTags; j++)
+                    {
+                        int tag;
+                        file >> tag;
+                    }
+
+                    // Vertex ids
+                    for (int j = 0; j < vertexCount; j++)
+                    {
+                        int vertId;
+                        file >> vertId;
+                        elemVertIds.push_back(vertId - 1);
+                    }
                 }
-                hexahedronConnectivity[hexElemCount] = tmp_8arr;
-                ++hexElemCount;
-                break;
-            default:
-                break;
             }
-        }
-    }
-    mshStream.close(); // Close the file
 
-    // Perform a manipulation to correct the node IDs (in case they are weirdly numbered).
-    std::map<size_t, size_t> nodeIDMap;
-    for (size_t iNode = 0; iNode < nNodes; ++iNode)
-    {
-        nodeIDMap.insert(std::pair<size_t, size_t>(nodeIDs[iNode], iNode));
-    }
-
-    // Generate iMSTK volumetric mesh
-    if (elemCountMap[ElemType::tetrahedron] != 0)
-    {
-        std::shared_ptr<VecDataArray<int, 4>> cellsPtr = std::make_shared<VecDataArray<int, 4>>();
-        VecDataArray<int, 4>&                 cells    = *cellsPtr;
-        for (size_t iTet = 0; iTet < elemCountMap[ElemType::tetrahedron]; ++iTet)
-        {
-            for (size_t jNode = 0; jNode < numElemNodes(ElemType::tetrahedron); ++jNode)
+            // We only support homogenous element types
+            int typeToUse = 0;
+            int typeCount = 0;
+            for (int i = 0; i < 6; i++)
             {
-                tetrahedronConnectivity[iTet][jNode] = static_cast<int>(nodeIDMap[tetrahedronConnectivity[iTet][jNode]]);
+                if (elementVertIds[i].size() > 0)
+                {
+                    typeCount++;
+                    typeToUse = i;
+                }
             }
-            cells.push_back(tetrahedronConnectivity[iTet]);
-        }
-
-        auto volMesh = std::make_shared<TetrahedralMesh>();
-        volMesh->initialize(vertices, cellsPtr);
-        return volMesh;
-    }
-    else if (elemCountMap[ElemType::hexahedron] != 0)
-    {
-        std::shared_ptr<VecDataArray<int, 8>> cellsPtr = std::make_shared<VecDataArray<int, 8>>();
-        VecDataArray<int, 8>&                 cells    = *cellsPtr;
-        for (size_t iHex = 0; iHex < elemCountMap[ElemType::hexahedron]; ++iHex)
-        {
-            for (size_t jNode = 0; jNode < numElemNodes(ElemType::hexahedron); ++jNode)
+            // If we have more than one only choose the highest in vertex count of the element
+            // so hex > tet > quad > tri > line
+            if (typeCount > 1)
             {
-                hexahedronConnectivity[iHex][jNode] = static_cast<int>(nodeIDMap[hexahedronConnectivity[iHex][jNode]]);
+                LOG(WARNING) << "MshMeshIO::read only supports homogenous types of elements, " <<
+                    typeCount << " types of elements were found, choosing one";
             }
-            cells.push_back(hexahedronConnectivity[iHex]);
+
+            if (typeToUse == 1)
+            {
+                const int                             count      = elementVertIds[typeToUse].size() / 2;
+                std::shared_ptr<VecDataArray<int, 2>> indicesPtr =
+                    std::make_shared<VecDataArray<int, 2>>(count);
+                VecDataArray<int, 2>& indices = *indicesPtr;
+                for (int i = 0, j = 0; i < count; i++, j += 2)
+                {
+                    indices[i] = Vec2i(elementVertIds[typeToUse][j],
+                        elementVertIds[typeToUse][j + 1]);
+                }
+                auto mesh = std::make_shared<LineMesh>();
+                mesh->initialize(verticesPtr, indicesPtr);
+                results = mesh;
+            }
+            else if (typeToUse == 2)
+            {
+                const int                             count      = elementVertIds[typeToUse].size() / 3;
+                std::shared_ptr<VecDataArray<int, 3>> indicesPtr =
+                    std::make_shared<VecDataArray<int, 3>>(count);
+                VecDataArray<int, 3>& indices = *indicesPtr;
+                for (int i = 0, j = 0; i < count; i++, j += 3)
+                {
+                    indices[i] = Vec3i(elementVertIds[typeToUse][j],
+                        elementVertIds[typeToUse][j + 1],
+                        elementVertIds[typeToUse][j + 2]);
+                }
+                auto mesh = std::make_shared<SurfaceMesh>();
+                mesh->initialize(verticesPtr, indicesPtr);
+                results = mesh;
+            }
+            else if (typeToUse == 4)
+            {
+                const int                             count      = elementVertIds[typeToUse].size() / 4;
+                std::shared_ptr<VecDataArray<int, 4>> indicesPtr =
+                    std::make_shared<VecDataArray<int, 4>>(count);
+                VecDataArray<int, 4>& indices = *indicesPtr;
+                for (int i = 0, j = 0; i < count; i++, j += 4)
+                {
+                    indices[i] = Vec4i(elementVertIds[typeToUse][j],
+                        elementVertIds[typeToUse][j + 1],
+                        elementVertIds[typeToUse][j + 2],
+                        elementVertIds[typeToUse][j + 3]);
+                }
+                auto mesh = std::make_shared<TetrahedralMesh>();
+                mesh->initialize(verticesPtr, indicesPtr);
+                results = mesh;
+            }
+            else if (typeToUse == 5)
+            {
+                const int                             count      = elementVertIds[typeToUse].size() / 8;
+                std::shared_ptr<VecDataArray<int, 8>> indicesPtr =
+                    std::make_shared<VecDataArray<int, 8>>(count);
+                VecDataArray<int, 8>& indices = *indicesPtr;
+                for (int i = 0, j = 0; i < count; i++, j += 8)
+                {
+                    Vec8i hex;
+                    hex[0]     = elementVertIds[typeToUse][j];
+                    hex[1]     = elementVertIds[typeToUse][j + 1];
+                    hex[2]     = elementVertIds[typeToUse][j + 2];
+                    hex[3]     = elementVertIds[typeToUse][j + 3];
+                    hex[4]     = elementVertIds[typeToUse][j + 4];
+                    hex[5]     = elementVertIds[typeToUse][j + 5];
+                    hex[6]     = elementVertIds[typeToUse][j + 6];
+                    hex[7]     = elementVertIds[typeToUse][j + 7];
+                    indices[i] = hex;
+                }
+                auto mesh = std::make_shared<HexahedralMesh>();
+                mesh->initialize(verticesPtr, indicesPtr);
+                results = mesh;
+            }
+
+            file >> bufferStr; // Read $EndElements
+            CHECK(bufferStr == "$EndElements") << "Failed to read file, invalid format";
+
+            // File is considered read after elements
+            break;
         }
-        auto volMesh = std::make_shared<HexahedralMesh>();
-        volMesh->initialize(vertices, cellsPtr);
-        return volMesh;
     }
-    else
-    {
-        LOG(FATAL) << "Error: Element types other than tetrahedron and hexahedron not supported! Input: " << filePath;
-        return nullptr;
-    }
+
+    file.close();
+    return results;
 }
 } // namespace imstk
