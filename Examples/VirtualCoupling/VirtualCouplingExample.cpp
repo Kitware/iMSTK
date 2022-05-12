@@ -98,7 +98,7 @@ main()
         rbdModel->getConfig()->m_gravity = Vec3d::Zero();
         rbdObj->setDynamicalModel(rbdModel);
         rbdObj->getRigidBody()->m_mass = 0.5;
-        rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 1000000.0;
+        rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 1000000000.0;
 
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
         rbdObj->setCollidingGeometry(surfMesh);
@@ -131,8 +131,8 @@ main()
 
     // Create a virtual coupling controller
     imstkNew<RigidObjectController> controller(rbdObj, client);
-    controller->setLinearKs(10000.0);
-    controller->setAngularKs(1000000000.0);
+    controller->setLinearKs(30000.0);
+    controller->setAngularKs(10000000000.0);
     controller->setTranslationScaling(0.02);
     controller->setForceScaling(0.001);
     controller->setUseCritDamping(true);
