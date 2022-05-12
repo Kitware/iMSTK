@@ -51,6 +51,10 @@ PbdDistanceConstraint::computeValueAndGradient(
 
     dcdx[0] = p0 - p1;
     const double len = dcdx[0].norm();
+    if (len == 0.0)
+    {
+        return false;
+    }
     dcdx[0] /= len;
     dcdx[1]  = -dcdx[0];
     c        = len - m_restLength;
