@@ -44,6 +44,22 @@ readToDelimiter(std::ifstream& file)
     }
 }
 
+///
+/// \brief Converts a flat vector of ints to VecDataArray of ints of specified stride
+///
+template<int N>
+static std::shared_ptr<VecDataArray<int, N>>
+toVecDataArray(const std::vector<int>& vertIds)
+{
+    const int cellCount = vertIds.size() / N;
+    CHECK(vertIds.size() % N == 0) << "Failed to convert array stride not divisable";
+    std::shared_ptr<VecDataArray<int, N>> indicesPtr =
+        std::make_shared<VecDataArray<int, N>>(cellCount);
+    std::copy(vertIds.data(), vertIds.data() + cellCount * N,
+        std::dynamic_pointer_cast<DataArray<int>>(indicesPtr)->getPointer());
+    return indicesPtr;
+}
+
 std::shared_ptr<PointSet>
 MshMeshIO::read(const std::string& filePath)
 {
@@ -107,20 +123,22 @@ MshMeshIO::read(const std::string& filePath)
             if (isBinary)
             {
                 // Read entire buffer as bytes
-                size_t numBytes = (4 + 3 * dataSize) * nNodes;
-                char*  data     = new char[numBytes];
+                size_t            numBytes = (4 + 3 * dataSize) * nNodes;
+                std::vector<char> data(numBytes);
                 readToDelimiter(file);
-                file.read(data, numBytes);
+                file.read(data.data(), numBytes);
                 for (int i = 0; i < nNodes; i++)
                 {
                     int id = *reinterpret_cast<int*>(&data[i * (4 + 3 * dataSize)]) - 1;
                     nodeIDs[i] = id;
-                    // \todo: dataSize determines if float or double
-                    vertices[id][0] = *reinterpret_cast<double*>(&data[i * (4 + 3 * dataSize) + 4]);
-                    vertices[id][1] = *reinterpret_cast<double*>(&data[i * (4 + 3 * dataSize) + 4 + dataSize]);
-                    vertices[id][2] = *reinterpret_cast<double*>(&data[i * (4 + 3 * dataSize) + 4 + 2 * dataSize]);
+
+                    // Note in code above we restrict to only double (8 byte floating pt), but in
+                    // the spec support could be added here for float (4 byte floating pt)
+
+                    // Copy the next 3 doubles
+                    double* x = reinterpret_cast<double*>(&data[i * (4 + 3 * dataSize) + 4]);
+                    std::copy(x, x + 3, &vertices[id][0]);
                 }
-                delete[] data;
             }
             else
             {
@@ -139,22 +157,19 @@ MshMeshIO::read(const std::string& filePath)
         }
         else if (bufferStr == "$Elements")
         {
-            std::array<int, 6> elemTypeToCount;
-            elemTypeToCount[0] = 0;
-            elemTypeToCount[1] = 2; // Line
-            elemTypeToCount[2] = 3; // Triangle
-            elemTypeToCount[3] = 4; // Quad
-            elemTypeToCount[4] = 4; // Tetrahedron
-            elemTypeToCount[5] = 8; // Hexahedron
+            std::array<int, 6> elemTypeToCount =
+            {
+                0,
+                2, // Line
+                3, // Triangle
+                4, // Quad
+                4, // Tetrahedron
+                8  // Hexahedron
+            };
 
             // 1 - line, 2 - triangle, 3 - quad, 4 - tet, 5 - hex
             //std::array<std::vector<int>, 6> elementsIds;
             std::array<std::vector<int>, 6> elementVertIds;
-            for (int i = 0; i < 6; i++)
-            {
-                //elementsIds[i] = std::vector<int>();
-                elementVertIds[i] = std::vector<int>();
-            }
 
             int numElements;
             file >> numElements;
@@ -257,73 +272,26 @@ MshMeshIO::read(const std::string& filePath)
 
             if (typeToUse == 1)
             {
-                const int                             count      = elementVertIds[typeToUse].size() / 2;
-                std::shared_ptr<VecDataArray<int, 2>> indicesPtr =
-                    std::make_shared<VecDataArray<int, 2>>(count);
-                VecDataArray<int, 2>& indices = *indicesPtr;
-                for (int i = 0, j = 0; i < count; i++, j += 2)
-                {
-                    indices[i] = Vec2i(elementVertIds[typeToUse][j],
-                        elementVertIds[typeToUse][j + 1]);
-                }
                 auto mesh = std::make_shared<LineMesh>();
-                mesh->initialize(verticesPtr, indicesPtr);
+                mesh->initialize(verticesPtr, toVecDataArray<2>(elementVertIds[typeToUse]));
                 results = mesh;
             }
             else if (typeToUse == 2)
             {
-                const int                             count      = elementVertIds[typeToUse].size() / 3;
-                std::shared_ptr<VecDataArray<int, 3>> indicesPtr =
-                    std::make_shared<VecDataArray<int, 3>>(count);
-                VecDataArray<int, 3>& indices = *indicesPtr;
-                for (int i = 0, j = 0; i < count; i++, j += 3)
-                {
-                    indices[i] = Vec3i(elementVertIds[typeToUse][j],
-                        elementVertIds[typeToUse][j + 1],
-                        elementVertIds[typeToUse][j + 2]);
-                }
                 auto mesh = std::make_shared<SurfaceMesh>();
-                mesh->initialize(verticesPtr, indicesPtr);
+                mesh->initialize(verticesPtr, toVecDataArray<3>(elementVertIds[typeToUse]));
                 results = mesh;
             }
             else if (typeToUse == 4)
             {
-                const int                             count      = elementVertIds[typeToUse].size() / 4;
-                std::shared_ptr<VecDataArray<int, 4>> indicesPtr =
-                    std::make_shared<VecDataArray<int, 4>>(count);
-                VecDataArray<int, 4>& indices = *indicesPtr;
-                for (int i = 0, j = 0; i < count; i++, j += 4)
-                {
-                    indices[i] = Vec4i(elementVertIds[typeToUse][j],
-                        elementVertIds[typeToUse][j + 1],
-                        elementVertIds[typeToUse][j + 2],
-                        elementVertIds[typeToUse][j + 3]);
-                }
                 auto mesh = std::make_shared<TetrahedralMesh>();
-                mesh->initialize(verticesPtr, indicesPtr);
+                mesh->initialize(verticesPtr, toVecDataArray<4>(elementVertIds[typeToUse]));
                 results = mesh;
             }
             else if (typeToUse == 5)
             {
-                const int                             count      = elementVertIds[typeToUse].size() / 8;
-                std::shared_ptr<VecDataArray<int, 8>> indicesPtr =
-                    std::make_shared<VecDataArray<int, 8>>(count);
-                VecDataArray<int, 8>& indices = *indicesPtr;
-                for (int i = 0, j = 0; i < count; i++, j += 8)
-                {
-                    Vec8i hex;
-                    hex[0]     = elementVertIds[typeToUse][j];
-                    hex[1]     = elementVertIds[typeToUse][j + 1];
-                    hex[2]     = elementVertIds[typeToUse][j + 2];
-                    hex[3]     = elementVertIds[typeToUse][j + 3];
-                    hex[4]     = elementVertIds[typeToUse][j + 4];
-                    hex[5]     = elementVertIds[typeToUse][j + 5];
-                    hex[6]     = elementVertIds[typeToUse][j + 6];
-                    hex[7]     = elementVertIds[typeToUse][j + 7];
-                    indices[i] = hex;
-                }
                 auto mesh = std::make_shared<HexahedralMesh>();
-                mesh->initialize(verticesPtr, indicesPtr);
+                mesh->initialize(verticesPtr, toVecDataArray<8>(elementVertIds[typeToUse]));
                 results = mesh;
             }
 

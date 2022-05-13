@@ -32,7 +32,13 @@ class SurfaceMesh;
 /// \class MshMeshIO
 ///
 /// \brief Can read/return LineMesh, SurfaceMesh, TetrahedralMesh, or
-/// HexahedralMesh from given file. Can only read homogenous elements.
+/// HexahedralMesh from given .msh file. Can only read homogenous elements.
+///
+/// If given a file with mixed elements it will always choose the elements
+/// with the most vertices. Ex: Given both tetrahedral and triangle data,
+/// only the tetrahedral will be read.
+///
+/// Only supports vertex data that is doubles (8 byte sized floating point).
 ///
 class MshMeshIO
 {
