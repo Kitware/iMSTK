@@ -165,7 +165,7 @@ main()
 
         imstkNew<RigidObjectController> controller(rbdObj, hapticDeviceClient);
         {
-            controller->setLinearKs(100000.0);
+            controller->setLinearKs(300000.0);
             controller->setAngularKs(300000000.0);
             controller->setUseCritDamping(true);
             controller->setForceScaling(0.001);

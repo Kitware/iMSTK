@@ -103,6 +103,6 @@ protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     vtkSmartPointer<vtkInteractorStyle> m_vtkInteractorStyle;
     vtkSmartPointer<vtkCallbackCommand> exitCallback;
-    bool m_useVsync = true;
+    bool m_useVsync = false;
 };
 } // namespace imstk

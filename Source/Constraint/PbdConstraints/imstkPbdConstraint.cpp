@@ -26,9 +26,13 @@ namespace imstk
 void
 PbdConstraint::projectConstraint(const DataArray<double>& invMasses, const double dt, const SolverType& solverType, VecDataArray<double, 3>& pos)
 {
-    double c;
+    if (dt == 0.0)
+    {
+        return;
+    }
 
-    bool update = this->computeValueAndGradient(pos, c, m_dcdx);
+    double c      = 0.0;
+    bool   update = this->computeValueAndGradient(pos, c, m_dcdx);
     if (!update)
     {
         return;
@@ -36,7 +40,7 @@ PbdConstraint::projectConstraint(const DataArray<double>& invMasses, const doubl
 
     double dcMidc = 0.0;
     double lambda = 0.0;
-    double alpha;
+    double alpha  = 0.0;
 
     for (size_t i = 0; i < m_vertexIds.size(); ++i)
     {

@@ -50,10 +50,6 @@ Sphere::setRadius(const double r)
         LOG(WARNING) << "error: radius supplied is negative";
         return;
     }
-    if (std::abs(m_radius - r) < 1e-20)
-    {
-        return;
-    }
     m_radius = r;
     m_transformApplied = false;
     this->postModified();
