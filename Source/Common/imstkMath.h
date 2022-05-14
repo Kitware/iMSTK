@@ -228,7 +228,7 @@ tetVolume(Vec3d p0, Vec3d p1, Vec3d p2, Vec3d p3)
 
 ///
 /// \brief Compute barycentric coordinates (u,v) of point in 3d space, given a line
-/// Projects point to line
+/// Projects point to line axes
 /// Barycentric coords give distances on line split by point (u, 1-u)
 ///
 static Vec2d
@@ -238,7 +238,7 @@ baryCentric(const Vec3d& pt, const Vec3d& p, const Vec3d& q)
     const double length = dir.norm();
     dir /= length;
     const double t = (pt - p).dot(dir) / length;
-    return Vec2d(t, 1.0 - t);
+    return Vec2d(1.0 - t, t);
 }
 
 ///
@@ -260,7 +260,7 @@ baryCentric(const Vec2d& p, const Vec2d& a, const Vec2d& b, const Vec2d& c)
 
 ///
 /// \brief Compute barycentric coordinates (u,v,w) of point p in 3d space, given a triangle
-/// Projects point to triangle
+/// Projects point to triangle plane
 /// Barycentric coords give areas on triangle split by point (1-v-w, v, w)
 ///
 static Vec3d
