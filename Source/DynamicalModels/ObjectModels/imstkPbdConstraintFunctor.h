@@ -38,6 +38,8 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkPbdConstraintContainer.h"
 
+#include <set>
+
 namespace imstk
 {
 ///

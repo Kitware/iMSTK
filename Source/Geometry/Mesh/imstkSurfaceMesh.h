@@ -26,7 +26,7 @@
 #include "imstkVecDataArray.h"
 
 #include <array>
-#include <set>
+#include <unordered_set>
 
 namespace imstk
 {
@@ -140,8 +140,6 @@ namespace imstk
 class SurfaceMesh : public PointSet
 {
 public:
-    using NeighborsType = std::set<size_t>;
-
     SurfaceMesh();
     ~SurfaceMesh() override = default;
 
@@ -177,12 +175,12 @@ public:
     ///
     /// \brief Computes neighboring triangles for all vertices
     ///
-    void computeVertexNeighborTriangles();
+    void computeVertexToCellMap();
 
     ///
     /// \brief Computes neighboring vertices for all vertices
     ///
-    void computeVertexNeighborVertices();
+    void computeVertexNeighbors();
 
     ///
     /// \brief Compute the normals of all the triangles
@@ -265,15 +263,15 @@ public:
 
     ///
     /// \brief Returns the indices of the faces neighboring a vertex
-    /// ComputeVertexNeighborTriangles can be called to produce these
+    /// ComputeVertexToCellMap can be called to produce these
     ///
-    const std::vector<NeighborsType>& getVertexNeighborTriangles() { return m_vertexNeighborTriangles; }
+    const std::vector<std::unordered_set<int>>& getVertexToCellMap() { return m_vertexToCells; }
 
     ///
     /// \brief Returns the indices of the vertices neighboring a vertex
     /// ComputeVertexNeighborVertices can be called to produce these
     ///
-    const std::vector<NeighborsType>& getVertexNeighborVertices() { return m_vertexNeighborVertices; }
+    const std::vector<std::unordered_set<int>>& getVertexNeighbors() { return m_vertexToNeighborVertex; }
 
     ///
     /// \brief Get cells as abstract array.
@@ -336,9 +334,11 @@ public:
 protected:
     void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
                                 const int expectedNumComponents, const ScalarTypeId expectedScalarType);
+
     std::shared_ptr<VecDataArray<int, 3>> m_triangleIndices;
-    std::vector<NeighborsType> m_vertexNeighborTriangles; ///< Neighbor triangles to vertices
-    std::vector<NeighborsType> m_vertexNeighborVertices;  ///< Neighbor vertices to vertices
+
+    std::vector<std::unordered_set<int>> m_vertexToCells;          ///< Neighbor triangles to vertices
+    std::vector<std::unordered_set<int>> m_vertexToNeighborVertex; ///< Neighbor vertices to vertices
 
     std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
 

@@ -129,9 +129,9 @@ TEST(imstkSurfaceMeshTest, VertexNeighborVertices)
 
     auto mesh = makeRect();
 
-    mesh->computeVertexNeighborVertices();
+    mesh->computeVertexNeighbors();
 
-    auto neighbors = mesh->getVertexNeighborVertices();
+    auto neighbors = mesh->getVertexNeighbors();
     EXPECT_THAT(neighbors[0], UnorderedElementsAre(1, 2));
     EXPECT_THAT(neighbors[1], UnorderedElementsAre(0, 2, 3));
     EXPECT_THAT(neighbors[3], UnorderedElementsAre(1, 2, 4, 5));
@@ -143,9 +143,9 @@ TEST(imstkSurfaceMeshTest, VertexTriangleNeigbors)
 
     auto mesh = makeRect();
 
-    mesh->computeVertexNeighborTriangles();
+    mesh->computeVertexToCellMap();
 
-    auto neighbors = mesh->getVertexNeighborTriangles();
+    auto neighbors = mesh->getVertexToCellMap();
     EXPECT_THAT(neighbors[0], UnorderedElementsAre(0));
     EXPECT_THAT(neighbors[1], UnorderedElementsAre(0, 1));
     EXPECT_THAT(neighbors[3], UnorderedElementsAre(1, 2, 3));

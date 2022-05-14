@@ -118,7 +118,7 @@ struct SurfMeshData
     std::shared_ptr<SurfaceMesh> m_surfMesh;
     const VecDataArray<int, 3>& cells;
     const VecDataArray<double, 3>& vertices;
-    const std::vector<std::set<size_t>>& vertexFaces;
+    const std::vector<std::unordered_set<int>>& vertexFaces;
     const VecDataArray<double, 3>& faceNormals;
 };
 
@@ -132,7 +132,7 @@ SurfMeshData::SurfMeshData(std::shared_ptr<SurfaceMesh> surfMesh) :
     m_surfMesh(surfMesh),
     cells(*surfMesh->getTriangleIndices()),
     vertices(*surfMesh->getVertexPositions()),
-    vertexFaces(surfMesh->getVertexNeighborTriangles()),
+    vertexFaces(surfMesh->getVertexToCellMap()),
     faceNormals(*surfMesh->getCellNormals())
 {
 }
@@ -147,7 +147,7 @@ vertexPseudoNormalFromTriangle(const int vertexIndex, const SurfMeshData& surfMe
     // Identify incident faces to the point and weight sum their normals
     double sum  = 0.0;
     Vec3d  nSum = Vec3d::Zero();
-    for (size_t neighborFaceIndex : surfMeshData.vertexFaces[vertexIndex])
+    for (int neighborFaceIndex : surfMeshData.vertexFaces[vertexIndex])
     {
         Vec3i cell = surfMeshData.cells[neighborFaceIndex];
         // Ensure vertexIndex is in 0
@@ -180,7 +180,7 @@ edgePseudoNormalFromTriangle(const Vec2i& vertexIds, const SurfMeshData& surfMes
     // Find the two cells that have both vertexIds
     double sum  = 0.0;
     Vec3d  nSum = Vec3d::Zero();
-    for (size_t neighborFaceIndex : surfMeshData.vertexFaces[vertexIds[0]])
+    for (int neighborFaceIndex : surfMeshData.vertexFaces[vertexIds[0]])
     {
         const Vec3i& cell     = surfMeshData.cells[neighborFaceIndex];
         bool         found[2] = { false, false };
@@ -323,7 +323,7 @@ ClosedSurfaceMeshToMeshCD::computeCollisionDataAB(
         auto pointSet = std::dynamic_pointer_cast<PointSet>(geomA);
         auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(geomB);
         surfMesh->computeTrianglesNormals();
-        surfMesh->computeVertexNeighborTriangles();
+        surfMesh->computeVertexToCellMap();
 
         // Narrow phase
         if (m_generateVertexTriangleContacts)

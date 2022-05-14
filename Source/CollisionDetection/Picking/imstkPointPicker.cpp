@@ -29,6 +29,8 @@ limitations under the License.
 #include "imstkTetrahedralMesh.h"
 #include "imstkVecDataArray.h"
 
+#include <set>
+
 namespace imstk
 {
 void
