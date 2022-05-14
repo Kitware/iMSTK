@@ -730,13 +730,13 @@ testSegmentTriangle(
 Vec3d closestPointOnSegment(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, int& caseType);
 
 ///
-/// \brief Returns the position closest to triangle a-b-c and the case
-/// type=0: a is the closest point
-/// type=1: b is the closest point
-/// type=2: c is the closest point
-/// type=3: closest point on ab
-/// type=4: closest point on bc
-/// type=5: closest point on ca
+/// \brief Returns the position closest to triangle a-b-c and the case <br>
+/// type=0: a is the closest point <br>
+/// type=1: b is the closest point <br>
+/// type=2: c is the closest point <br>
+/// type=3: closest point on ab <br>
+/// type=4: closest point on bc <br>
+/// type=5: closest point on ca <br>
 /// type=6: closest point on face
 ///
 Vec3d closestPointOnTriangle(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c, int& caseType);
