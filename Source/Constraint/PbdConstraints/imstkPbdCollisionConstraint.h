@@ -33,9 +33,9 @@ namespace imstk
 ///
 struct VertexMassPair
 {
-    Vec3d* vertex;
-    double invMass;
-    Vec3d* velocity;
+    Vec3d* vertex   = nullptr;
+    double invMass  = 0.0;
+    Vec3d* velocity = nullptr;
 };
 
 ///

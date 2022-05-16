@@ -16,6 +16,7 @@ imstk_add_library( Constraints
     PbdConstraints/imstkPbdConstraintContainer.h
     PbdConstraints/imstkPbdDihedralConstraint.h
     PbdConstraints/imstkPbdDistanceConstraint.h
+    PbdConstraints/imstkPbdEdgeEdgeCCDConstraint.h
     PbdConstraints/imstkPbdEdgeEdgeConstraint.h
     PbdConstraints/imstkPbdFemConstraint.h
     PbdConstraints/imstkPbdFemTetConstraint.h
@@ -39,6 +40,7 @@ imstk_add_library( Constraints
     PbdConstraints/imstkPbdConstraintContainer.cpp
     PbdConstraints/imstkPbdDihedralConstraint.cpp
     PbdConstraints/imstkPbdDistanceConstraint.cpp
+    PbdConstraints/imstkPbdEdgeEdgeCCDConstraint.cpp
     PbdConstraints/imstkPbdEdgeEdgeConstraint.cpp
     PbdConstraints/imstkPbdFemConstraint.cpp
     PbdConstraints/imstkPbdFemTetConstraint.cpp
@@ -51,6 +53,7 @@ imstk_add_library( Constraints
     RigidBodyConstraints/imstkRbdDistanceConstraint.cpp
     RigidBodyConstraints/imstkRbdFrictionConstraint.cpp
   DEPENDS
+    CollisionDetection
     Common
     DataStructures
     Geometry
