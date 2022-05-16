@@ -23,6 +23,7 @@
 
 #include "imstkMacros.h"
 #include "imstkPointSet.h"
+#include "imstkVecDataArray.h"
 
 #include <array>
 #include <set>
@@ -273,6 +274,11 @@ public:
     /// ComputeVertexNeighborVertices can be called to produce these
     ///
     const std::vector<NeighborsType>& getVertexNeighborVertices() { return m_vertexNeighborVertices; }
+
+    ///
+    /// \brief Get cells as abstract array.
+    ///
+    const AbstractDataArray* getCellIndices() const override { return m_triangleIndices.get(); }
 
 // Attributes
     ///

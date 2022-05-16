@@ -22,6 +22,7 @@ limitations under the License.
 #include "imstkPbdObjectCollision.h"
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
+#include "imstkCCDAlgorithm.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
@@ -48,6 +49,7 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
     ch->setInputObjectA(obj1);
     ch->setInputObjectB(obj2);
     ch->setInputCollisionData(cd->getCollisionData());
+
     setCollisionHandlingAB(ch);
 
     // Setup collision constraint solve step, should occur after internal constraint solve
@@ -60,6 +62,13 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
                 m_name << " collision solve";
             }
             pbdCh->getCollisionSolver()->solve();
+
+            // Confirm if the collision detection algorithm is a CCD algorithm,
+            // and update the cached geometry accordingly.
+            if (auto pbdCCD = std::dynamic_pointer_cast<CCDAlgorithm>(getCollisionDetection()))
+            {
+                pbdCCD->updatePreviousTimestepGeometry(pbdCCD->getInput(0), pbdCCD->getInput(1));
+            }
         },
         obj1->getName() + "_vs_" + obj2->getName() + "_CollisionSolver", true);
     m_taskGraph->addNode(m_collisionSolveNode);

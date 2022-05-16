@@ -87,11 +87,6 @@ public:
     void setVertexPositions(std::shared_ptr<VecDataArray<double, 3>> positions);
 
     ///
-    /// \brief Copies vertex positions from provided VecDataArray.
-    ///
-    void copyVertexPositions(const VecDataArray<double, 3>& positions);
-
-    ///
     /// \brief Returns the vector of current positions of the mesh vertices
     ///
     std::shared_ptr<VecDataArray<double, 3>> getVertexPositions(DataType type = DataType::PostTransform) const;
@@ -112,6 +107,12 @@ public:
     /// \brief Returns the number of total vertices in the mesh
     ///
     int getNumVertices() const;
+
+    ///
+    /// \brief Get cells as abstract array. Overridden by derived classes to return
+    ///     cells as point indices.
+    ///
+    virtual const AbstractDataArray* getCellIndices() const { return nullptr; }
 
 // Attributes
     ///

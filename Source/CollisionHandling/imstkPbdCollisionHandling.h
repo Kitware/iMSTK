@@ -26,13 +26,16 @@
 
 namespace imstk
 {
+class LineMeshToLineMeshCCD;
 class PbdCollisionSolver;
 class PbdEdgeEdgeConstraint;
+class PbdEdgeEdgeCCDConstraint;
 class PbdObject;
 class PbdPointEdgeConstraint;
 class PbdPointPointConstraint;
 class PbdPointTriangleConstraint;
 
+struct MeshSide;
 ///
 /// \class PbdCollisionHandling
 ///
@@ -103,6 +106,16 @@ protected:
         double stiffnessA, double stiffnessB);
 
     ///
+    /// \brief Add an edge-edge CCD constraint
+    ///
+    virtual void addEECCDConstraint(
+        VertexMassPair prev_ptA1, VertexMassPair prev_ptA2,
+        VertexMassPair prev_ptB1, VertexMassPair prev_ptB2,
+        VertexMassPair ptA1, VertexMassPair ptA2,
+        VertexMassPair ptB1, VertexMassPair ptB2,
+        double stiffnessA, double stiffnessB);
+
+    ///
     /// \brief Add a point-edge constraint
     ///
     virtual void addPEConstraint(
@@ -128,6 +141,7 @@ private:
     std::list<Vec3d> m_fixedPointVelocities;
 
     std::vector<PbdEdgeEdgeConstraint*>      m_EEConstraintPool;
+    std::vector<PbdEdgeEdgeCCDConstraint*>   m_EECCDConstraintPool;
     std::vector<PbdPointTriangleConstraint*> m_VTConstraintPool;
     std::vector<PbdPointEdgeConstraint*>     m_PEConstraintPool;
     std::vector<PbdPointPointConstraint*>    m_PPConstraintPool;
