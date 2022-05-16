@@ -174,7 +174,15 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
             }
 
         case MeshFileType::VTK:
-            if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(vMesh))
+            if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(vMesh))
+            {
+                return VTKMeshIO::writeVtkPolyData<vtkGenericDataObjectWriter>(lineMesh, filePath);
+            }
+            else if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(vMesh))
+            {
+                return VTKMeshIO::writeVtkPolyData<vtkGenericDataObjectWriter>(surfMesh, filePath);
+            }
+            else if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(vMesh))
             {
                 return VTKMeshIO::writeVtkUnstructuredGrid<vtkGenericDataObjectWriter>(tetMesh, filePath);
             }
