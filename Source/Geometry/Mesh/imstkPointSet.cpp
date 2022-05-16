@@ -113,6 +113,17 @@ PointSet::setVertexPositions(std::shared_ptr<VecDataArray<double, 3>> vertices)
     this->updatePostTransformData();
 }
 
+void
+PointSet::copyVertexPositions(const VecDataArray<double, 3>& positions)
+{
+    if (!m_vertexPositions)
+    {
+        m_vertexPositions = std::make_shared<VecDataArray<double, 3>>(positions.size());
+    }
+
+    *m_vertexPositions = positions;
+}
+
 std::shared_ptr<VecDataArray<double, 3>>
 PointSet::getVertexPositions(DataType type) const
 {

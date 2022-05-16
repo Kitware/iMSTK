@@ -87,6 +87,11 @@ public:
     void setVertexPositions(std::shared_ptr<VecDataArray<double, 3>> positions);
 
     ///
+    /// \brief Copies vertex positions from provided VecDataArray.
+    ///
+    void copyVertexPositions(const VecDataArray<double, 3>& positions);
+
+    ///
     /// \brief Returns the vector of current positions of the mesh vertices
     ///
     std::shared_ptr<VecDataArray<double, 3>> getVertexPositions(DataType type = DataType::PostTransform) const;
