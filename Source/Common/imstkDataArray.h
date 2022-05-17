@@ -279,13 +279,21 @@ public:
         m_data[newSize - 1] = val;
     }
 
+    ///
+    /// \brief begin(), end() to mirror std::vector
+    ///@{
     iterator begin() { return iterator(m_data, m_data + m_size); }
 
+    const_iterator begin() const { return const_iterator(m_data, m_data + m_size); }
+
     iterator end() { return iterator(m_data + m_size, m_data + m_size); }
+
+    const_iterator end() const { return const_iterator(m_data + m_size, m_data + m_size); }
 
     const_iterator cbegin() const { return const_iterator(m_data, m_data + m_size); }
 
     const_iterator cend() const { return const_iterator(m_data + m_size, m_data + m_size); }
+    ///@}
 
     ///
     /// \brief Allocates extra capacity, for the number of values, conservative reallocate
