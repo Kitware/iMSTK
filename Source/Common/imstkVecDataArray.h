@@ -303,13 +303,21 @@ public:
         m_dataCast[newVecSize - 1] = val;
     }
 
+    ///
+    /// \brief begin(), end() to mirror std::vector
+    ///@{
     iterator begin() { return iterator(m_dataCast, m_dataCast + m_vecSize); }
 
+    const_iterator begin() const { return const_iterator(m_dataCast, m_dataCast + m_vecSize); }
+
     iterator end() { return iterator(m_dataCast + m_vecSize, m_dataCast + m_vecSize); }
+
+    const_iterator end() const { return const_iterator(m_dataCast + m_vecSize, m_dataCast + m_vecSize); }
 
     const_iterator cbegin() const { return const_iterator(m_dataCast, m_dataCast + m_vecSize); }
 
     const_iterator cend() const { return const_iterator(m_dataCast + m_vecSize, m_dataCast + m_vecSize); }
+    ///@}
 
     ///
     /// \brief Allocates extra capacity, for the number of values, conservative reallocate

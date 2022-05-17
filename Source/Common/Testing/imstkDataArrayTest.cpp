@@ -196,6 +196,8 @@ TEST(imstkDataArrayTest, Iterators)
     while (it != itEnd)
     {
         EXPECT_EQ(expected, *it);
+        *it = 0;
+        EXPECT_EQ(a[expected - 1], 0);
         ++it;
         ++expected;
     }
@@ -251,4 +253,39 @@ TEST(imstkDataArrayTest, ResizeToOne)
     DataArray<int> a;
     a.resize(1);
     EXPECT_EQ(1, a.size());
+}
+
+TEST(imstkDataArrayTest, RangedBasedFor)
+{
+    {
+        DataArray<int> a{ 1, 2, 3, 4 };
+        SCOPED_TRACE("NonConst Read");
+        int expected = 1;
+        for (const auto value : a)
+        {
+            EXPECT_EQ(value, expected++);
+        }
+    }
+
+    {
+        DataArray<int> a{ 1, 2, 3, 4 };
+        SCOPED_TRACE("NonConst Write");
+        int index = 0;
+        for (auto& value : a)
+        {
+            value = 0;
+            EXPECT_EQ(0, a[index]);
+            ++index;
+        }
+    }
+
+    {
+        SCOPED_TRACE("Const Read");
+        const DataArray<int> aConst{ 1, 2, 3, 4 };
+        int                  expected = 1;
+        for (const auto value : aConst)
+        {
+            EXPECT_EQ(value, expected++);
+        }
+    }
 }

@@ -211,6 +211,8 @@ TEST(imstkVecDataArrayTest, Iterators)
     while (it != itEnd)
     {
         EXPECT_EQ(Vec2i(expected, expected), *it);
+        *it = Vec2i(0, 0);
+        EXPECT_EQ(a[expected - 1], Vec2i(0, 0));
         ++it;
         ++expected;
     }
@@ -285,4 +287,45 @@ TEST(imstkVecDataArrayTest, ResizeToOne)
     VecDataArray<int, 2> a;
     a.resize(1);
     EXPECT_EQ(1, a.size());
+}
+
+TEST(imstkVecDataArrayTest, RangedBasedFor)
+{
+    {
+        SCOPED_TRACE("Non Const Read");
+        VecDataArray<int, 2> a{ Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6), Vec2i(7, 8) };
+
+        Vec2i expected = Vec2i(1, 2);
+        for (const auto value : a)
+        {
+            EXPECT_EQ(value, expected);
+            expected += Vec2i(2, 2);
+        }
+    }
+
+    {
+        SCOPED_TRACE("Non Const Write");
+        VecDataArray<int, 2> a{ Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6), Vec2i(7, 8) };
+
+        Vec2i expected = Vec2i(0, 0);
+        int   index    = 0;
+        for (auto& value : a)
+        {
+            value = Vec2i(0, 0);
+            EXPECT_EQ(a[index], expected);
+            ++index;
+        }
+    }
+
+    {
+        SCOPED_TRACE("Const Read");
+        const VecDataArray<int, 2> aConst{ Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6), Vec2i(7, 8) };
+
+        Vec2i expected = Vec2i(1, 2);
+        for (const auto value : aConst)
+        {
+            EXPECT_EQ(value, expected);
+            expected += Vec2i(2, 2);
+        }
+    }
 }
