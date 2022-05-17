@@ -23,6 +23,7 @@
 #include "imstkLogger.h"
 #include "imstkMacros.h"
 
+#include <functional>
 #include <memory>
 #include <unordered_map>
 
