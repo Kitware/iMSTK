@@ -12,6 +12,8 @@ imstk_add_library( Common
     imstkEventObject.h
     imstkFactory.h
     imstkLogger.h
+    imstkLoggerG3.h
+    imstkLoggerUnity.h
     imstkMacros.h
     imstkMath.h
     imstkModule.h
@@ -35,6 +37,8 @@ imstk_add_library( Common
   CPP_FILES
     imstkColor.cpp
     imstkLogger.cpp
+    imstkLoggerG3.cpp
+    imstkLoggerUnity.cpp
     imstkModule.cpp
     imstkModuleDriver.cpp
     Parallel/imstkThreadManager.cpp
