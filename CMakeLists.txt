@@ -121,6 +121,14 @@ set(_msg "${PROJECT_NAME} Audio support")
 message(STATUS "${_msg} - ${_enable_audio} (${_reason})")
 set(${PROJECT_NAME}_AUDIO_ENABLED ${_enable_audio})
 
+if (WIN32)
+  option(${PROJECT_NAME}_BUILD_FOR_UNITY "Build iMSTK libraries for the unity asset" OFF)
+  mark_as_superbuild(${PROJECT_NAME}_BUILD_FOR_UNITY:BOOL)
+  if (${PROJECT_NAME}_BUILD_FOR_UNITY)
+    set(${PROJECT_NAME}_WRAP_CSHARP ON)
+  endif()
+endif()
+
 # General Options
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build iMSTK examples" ON)
 mark_as_superbuild(${PROJECT_NAME}_BUILD_EXAMPLES:BOOL)
@@ -398,6 +406,14 @@ if(Uncrustify_EXECUTABLE)
 else(Uncrustify_EXECUTABLE)
   message(WARNING "uncrustify not found! Cannot run code-style test.")
 endif(Uncrustify_EXECUTABLE)
+
+#--------------------------------------------------------------------------
+# Unity
+#--------------------------------------------------------------------------
+if (${PROJECT_NAME}_BUILD_FOR_UNITY)
+  add_definitions( -DiMSTK_SYNCHRONOUS_LOGGING)
+  
+endif()
 
 
 #-----------------------------------------------------------------------------
