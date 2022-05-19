@@ -31,8 +31,14 @@ class SurfaceMesh;
 ///
 /// \class MshMeshIO
 ///
-/// \brief Contains utility to generate imstk::VolumetricMesh from mesh given in msh
-/// file format. Only works for tet meshes.
+/// \brief Can read/return LineMesh, SurfaceMesh, TetrahedralMesh, or
+/// HexahedralMesh from given .msh file. Can only read homogenous elements.
+///
+/// If given a file with mixed elements it will always choose the elements
+/// with the most vertices. Ex: Given both tetrahedral and triangle data,
+/// only the tetrahedral will be read.
+///
+/// Only supports vertex data that is doubles (8 byte sized floating point).
 ///
 class MshMeshIO
 {
@@ -43,51 +49,6 @@ public:
     ///
     /// \brief Read and generate a volumetric mesh given a external msh file
     ///
-    static std::shared_ptr<VolumetricMesh> read(const std::string& filePath, const MeshFileType meshType);
-
-protected:
-    ///
-    /// \brief Possible element types in a MSH file format
-    /// as mentioned at http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
-    ///
-    enum ElemType
-    {
-        line = 1,
-        triangle,
-        quadrangle,
-        tetrahedron,
-        hexahedron,
-        prism,
-        pyramid,
-        lineSecondOrder,
-        triangleSecondOrder,
-        quadrangleSecondOrderType1,
-        tetrahedronSecondOrder,
-        hexahedronSecondOrderType1,
-        prismSecondOrderType1,
-        pyramidSecondOrderType1,
-        point,
-        quadrangleSecondOrderType2,
-        hexahedronSecondOrderType2,
-        prismSecondOrderType2,
-        pyramidSecondOrderType2,
-        triangleThirdOrderIncomplete,
-        triangleThirdOrder,
-        triangleFourthOrderIncomplete,
-        triangleFourthOrder,
-        triangleFifthOrderIncomplete,
-        triangleFifthOrder,
-        edgeThirdOrder,
-        edgeFourthOrder,
-        edgeFifthOrder,
-        tetrahedronThirdOrder,
-        tetrahedronFourthOrder,
-        tetrahedronFifthOrder,
-    };
-
-    //
-    // \brief Returns the number of nodes in an element of a given type
-    //
-    static size_t numElemNodes(const ElemType& elType);
+    static std::shared_ptr<PointSet> read(const std::string& filePath);
 };
 } // namespace imstk
