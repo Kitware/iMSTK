@@ -27,6 +27,7 @@ if (MSVC)
 		${SWIG_INTERFACE_DIR}/callback.i
 		${SWIG_INTERFACE_DIR}/common.i
 		${SWIG_INTERFACE_DIR}/debug.i
+		${SWIG_INTERFACE_DIR}/except.i
 		${SWIG_INTERFACE_DIR}/ignored.i
 		${SWIG_INTERFACE_DIR}/modifiers.i
 		${SWIG_INTERFACE_DIR}/shared_ptr_instantiation.i
@@ -60,6 +61,9 @@ if(iMSTK_USE_OpenHaptics)
 endif()
 if(iMSTK_USE_VRPN)
     list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_VRPN")
+endif()
+if(iMSTK_BUILD_FOR_UNITY)
+    list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_SYNCHRONOUS_LOGGING")
 endif()
 
 set_property(TARGET iMSTKCWrapper PROPERTY SWIG_COMPILE_DEFINITIONS ${imstk_SWIG_DEFINITIONS})

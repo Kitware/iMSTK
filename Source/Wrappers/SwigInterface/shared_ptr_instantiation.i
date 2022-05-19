@@ -205,3 +205,15 @@
 %shared_ptr(imstk::HapticDeviceManager)
 %shared_ptr(imstk::VRPNDeviceClient)
 %shared_ptr(imstk::VRPNDeviceManager)
+
+#ifdef iMSTK_SYNCHRONOUS_LOGGING
+/*
+ * Logging for unity
+ */
+%shared_ptr(imstk::Logger)
+%shared_ptr(imstk::LoggerUnity)
+%shared_ptr(imstk::LogOutput)
+%shared_ptr(imstk::NullOutput)
+%shared_ptr(imstk::StreamOutput)
+%shared_ptr(imstk::CacheOutput)
+#endif

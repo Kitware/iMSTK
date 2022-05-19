@@ -8,6 +8,11 @@
 #include "imstkDataArray.h"
 #include "imstkVecDataArray.h"
 #include "imstkLogger.h"
+#ifdef iMSTK_SYNCHRONOUS_LOGGING
+#include "imstkLoggerUnity.h"
+#else
+#include "imstkLoggerG3.h"
+#endif
 #include "imstkModule.h"
 #include "imstkModuleDriver.h"
 #include "imstkColor.h"
@@ -224,6 +229,10 @@ namespace std
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
 }
 
+%include <std_except.i>
+%include <exception.i>
+
+
 %include "shared_ptr_instantiation.i"
 %include "weak_ptr.i"
 %include "ignored.i"
@@ -231,6 +240,7 @@ namespace std
 %include "type_cast.i"
 %include "std_function.i"
 %include "callback.i"
+%include "except.i"
 
 /* rename these operators to "compute" due to lack of operator overloading */
 %rename(compute) imstk::ImplicitFunctionGradient::operator();
