@@ -9,4 +9,4 @@
  */
 
 %catches(std::exception, ...) imstk::Scene::advance;
-
+%catches(std::exception, ...) imstk::Scene::initialize;

@@ -20,13 +20,13 @@
 %ignore imstk::VecDataArray::setData();
 %ignore imstk::stdSink;
 %ignore imstk::LogManager;
-%ignore imstk::Logger::Logger();
-%ignore imstk::Logger::getInstance();
-%ignore imstk::Logger::addStdoutSink();
-%ignore imstk::Logger::addFileSink;
-%ignore imstk::Logger::addSink;
-%ignore imstk::Logger::initialize();
-%ignore imstk::Logger::destroy();
+%ignore imstk::LoggerG3::Logger();
+%ignore imstk::LoggerG3::getInstance();
+%ignore imstk::LoggerG3::addStdoutSink();
+%ignore imstk::LoggerG3::addFileSink;
+%ignore imstk::LoggerG3::addSink;
+%ignore imstk::LoggerG3::initialize();
+%ignore imstk::LoggerG3::destroy();
 %ignore imstk::Log;
 %rename("%s") imstk::Logger::startLogger();
 

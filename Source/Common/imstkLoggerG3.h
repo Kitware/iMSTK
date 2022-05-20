@@ -23,6 +23,8 @@ limitations under the License.
 #include <g3log/logmessage.hpp>
 #include <g3log/logworker.hpp>
 
+#include <memory>
+
 namespace imstk
 {
 ///
@@ -48,9 +50,6 @@ struct stdSink
 
 using FileSinkHandle   = g3::SinkHandle<g3::FileSink>;
 using StdoutSinkHandle = g3::SinkHandle<stdSink>;
-
-#define IMSTK_CHECK(expr) \
-    if (!expr)throw std::runtime_error("an error");
 
 ///
 /// \struct Logger
