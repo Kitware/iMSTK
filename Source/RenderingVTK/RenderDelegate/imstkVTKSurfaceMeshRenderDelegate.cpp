@@ -609,9 +609,9 @@ VTKSurfaceMeshRenderDelegate::initializeTextures()
             }
             }
         }
-        else
+        else if (texture->getType() == Texture::Type::Diffuse)
         {
-            actor->GetProperty()->SetTexture(textureDelegate->getTextureName().c_str(), currentTexture);
+            actor->SetTexture(currentTexture);
         }
 
         currentUnit++;
