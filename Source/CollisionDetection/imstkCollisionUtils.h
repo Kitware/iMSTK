@@ -34,6 +34,8 @@ namespace CollisionUtils
 ///
 /// \brief Do ranges [\p a,\p b] and [\p c,\p d] intersect?
 /// inclusive
+/// a must be < b
+/// c must be < d
 ///
 inline bool
 isIntersect(const double a, const double b, const double c, const double d)
@@ -1025,14 +1027,14 @@ int triangleToTriangle(
 
 ///
 /// \brief Computes the closest point on two edges, reports midpoint
-/// when colinear
+/// when colinear. From "Real Time Collision Detection"
 /// \param first vertex of edge A
 /// \param second vertex of edge A
 /// \param first vertex of edge B
 /// \param second vertex of edge B
 /// \param closest point on edge A
 /// \param closest point on edge B
-/// \return case, 0 - closest point on edge, 1 - closest point on point of edge
+/// \return case, 0 - closest point on edge, 1 - closest point on point of at least one edge
 ///
 inline int
 edgeToEdgeClosestPoints(
@@ -1040,41 +1042,84 @@ edgeToEdgeClosestPoints(
     const Vec3d& b0, const Vec3d& b1,
     Vec3d& ptA, Vec3d& ptB)
 {
-    const Vec3d aDiff   = a1 - a0;
-    const Vec3d bDiff   = b1 - b0;
-    const Vec3d srcDiff = a0 - b0;
+    double s = 0.0;
+    double t = 0.0;
+    int    caseType = 0;
 
-    const double a  = bDiff.dot(aDiff);
-    const double b  = aDiff.dot(aDiff);
-    const double cc = srcDiff.dot(aDiff);
-    const double d  = bDiff.dot(bDiff);
-    const double e  = a;
-    const double f  = srcDiff.dot(bDiff);
+    const Vec3d  d1 = a1 - a0;    // Direction vector of segment S1
+    const Vec3d  d2 = b1 - b0;    // Direction vector of segment S2
+    const Vec3d  r  = a0 - b0;
+    const double a  = d1.dot(d1); // Squared length of segment S1, always nonnegative
+    const double e  = d2.dot(d2); // Squared length of segment S2, always nonnegative
+    const double f  = d2.dot(r);
 
-    const double det      = a * e - d * b;
-    double       s        = 0.5;
-    double       t        = 0.5;
-    int          caseType = 0;
-    if (fabs(det) > 1e-12)
+    // Check if either or both segments degenerate into points
+    if (a <= IMSTK_DOUBLE_EPS && e <= IMSTK_DOUBLE_EPS)
     {
-        s = (cc * e - b * f) / det;
-        t = (cc * d - a * f) / det;
-
-        if (s < 0 || s > 1.0 || t < 0 || t > 1.0)
-        {
-            s = std::max(std::min(s, 1.0), 0.0);
-            t = std::max(std::min(t, 1.0), 0.0);
-            caseType = 1;
-        }
+        // Both segments degenerate into points
+        s        = t = 0.0;
+        ptA      = a0;
+        ptB      = b0;
+        caseType = 1;
+        return caseType;
+    }
+    if (a <= IMSTK_DOUBLE_EPS)
+    {
+        // First segment degenerates into a point
+        s = 0.0;
+        t = f / e; // s = 0 => t = (b*s + f) / e = f / e
+        t = std::min(std::max(t, 0.0), 1.0);
+        caseType = 1;
     }
     else
     {
-        //LOG(WARNING) << "det is null";
+        const double c = d1.dot(r);
+        if (e <= IMSTK_DOUBLE_EPS)
+        {
+            // Second segment degenerates into a point
+            t = 0.0;
+            s = std::min(std::max(-c / a, 0.0), 1.0); // t = 0 => s = (b*t - c) / a = -c / a
+            caseType = 1;
+        }
+        else
+        {
+            // The general nondegenerate case starts here
+            const double b     = d1.dot(d2);
+            const double denom = a * e - b * b; // Always nonnegative
+            // If segments not parallel, compute closest point on L1 to L2 and
+            // clamp to segment S1. Else pick arbitrary s (here 0)
+            if (denom != 0.0)
+            {
+                s = std::min(std::max((b * f - c * e) / denom, 0.0), 1.0);
+            }
+            else
+            {
+                s = 0.0;
+                caseType = 1;
+            }
+            // Compute point on L2 closest to S1(s) using
+            // t = Dot((P1 + D1*s) - P2,D2) / Dot(D2,D2) = (b*s + f) / e
+            t = (b * s + f) / e;
+            // If t in [0,1] done. Else clamp t, recompute s for the new value
+            // of t using s = Dot((P2 + D2*t) - P1,D1) / Dot(D1,D1)= (t*b - c) / a
+            // and clamp s to [0, 1]
+            if (t < 0.0)
+            {
+                t = 0.0;
+                s = std::min(std::max(-c / a, 0.0), 1.0);
+                caseType = 1;
+            }
+            else if (t > 1.0)
+            {
+                t = 1.0;
+                s = std::min(std::max((b - c) / a, 0.0), 1.0);
+                caseType = 1;
+            }
+        }
     }
+    ptA = a0 + d1 * s;
+    ptB = b0 + d2 * t;
 
-    // Two closest points on the line segments
-    ptA = a0 + t * aDiff;
-    ptB = b0 + s * bDiff;
     return caseType;
 }
 } // namespace CollisionUtils
