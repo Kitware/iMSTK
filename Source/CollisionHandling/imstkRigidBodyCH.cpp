@@ -136,7 +136,7 @@ RigidBodyCH::handleRbdRbdTwoWay(
         {
             const Vec3d& dir       = colElemA.m_element.m_PointDirectionElement.dir;
             const double depth     = colElemA.m_element.m_PointDirectionElement.penetrationDepth;
-            const Vec3d& contactPt = colElemA.m_element.m_PointDirectionElement.pt + dir * depth;
+            const Vec3d& contactPt = colElemA.m_element.m_PointDirectionElement.pt;
 
             addConstraint(rbdObjA, rbdObjB, contactPt, dir, depth);
         }
@@ -145,7 +145,7 @@ RigidBodyCH::handleRbdRbdTwoWay(
             // Doesn't support mapping yet
             const Vec3d& dir       = colElemA.m_element.m_PointIndexDirectionElement.dir;
             const double depth     = colElemA.m_element.m_PointIndexDirectionElement.penetrationDepth;
-            const Vec3d& contactPt = (*geom->getVertexPositions())[colElemA.m_element.m_PointIndexDirectionElement.ptIndex] + dir * depth;
+            const Vec3d& contactPt = (*geom->getVertexPositions())[colElemA.m_element.m_PointIndexDirectionElement.ptIndex];
 
             addConstraint(rbdObjA, rbdObjB, contactPt, dir, depth);
         }
@@ -167,7 +167,7 @@ RigidBodyCH::handleRbdStaticOneWay(
         {
             const Vec3d& dir       = colElem.m_element.m_PointDirectionElement.dir;
             const double depth     = colElem.m_element.m_PointDirectionElement.penetrationDepth;
-            const Vec3d& contactPt = colElem.m_element.m_PointDirectionElement.pt + dir * depth;
+            const Vec3d& contactPt = colElem.m_element.m_PointDirectionElement.pt;
 
             addConstraint(rbdObj, contactPt, dir, depth);
         }
@@ -177,7 +177,7 @@ RigidBodyCH::handleRbdStaticOneWay(
             auto         geom      = std::dynamic_pointer_cast<PointSet>(rbdObj->getCollidingGeometry());
             const Vec3d& dir       = colElem.m_element.m_PointIndexDirectionElement.dir;
             const double depth     = colElem.m_element.m_PointIndexDirectionElement.penetrationDepth;
-            const Vec3d& contactPt = (*geom->getVertexPositions())[colElem.m_element.m_PointIndexDirectionElement.ptIndex] + dir * depth;
+            const Vec3d& contactPt = (*geom->getVertexPositions())[colElem.m_element.m_PointIndexDirectionElement.ptIndex];
 
             addConstraint(rbdObj, contactPt, dir, depth);
         }
