@@ -21,6 +21,7 @@ limitations under the License.
 
 #include "imstkCDObjectFactory.h"
 #include "imstkBidirectionalPlaneToSphereCD.h"
+#include "imstkCapsuleToCapsuleCD.h"
 #include "imstkClosedSurfaceMeshToMeshCD.h"
 #include "imstkImplicitGeometryToPointSetCCD.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
@@ -43,6 +44,7 @@ limitations under the License.
 namespace imstk
 {
 IMSTK_REGISTER_COLLISION_DETECTION(BidirectionalPlaneToSphereCD);
+IMSTK_REGISTER_COLLISION_DETECTION(CapsuleToCapsuleCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ClosedSurfaceMeshToMeshCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCCD);
