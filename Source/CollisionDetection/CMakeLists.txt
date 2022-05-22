@@ -10,6 +10,7 @@ imstk_add_library( CollisionDetection
     CollisionDetection/imstkImplicitGeometryToPointSetCD.h
     CollisionDetection/imstkMeshToMeshBruteForceCD.h
     CollisionDetection/imstkPointSetToCapsuleCD.h
+    CollisionDetection/imstkPointSetToCylinderCD.h
     CollisionDetection/imstkPointSetToOrientedBoxCD.h
     CollisionDetection/imstkPointSetToPlaneCD.h
     CollisionDetection/imstkPointSetToSphereCD.h
@@ -35,6 +36,7 @@ imstk_add_library( CollisionDetection
     CollisionDetection/imstkImplicitGeometryToPointSetCD.cpp
     CollisionDetection/imstkMeshToMeshBruteForceCD.cpp
     CollisionDetection/imstkPointSetToCapsuleCD.cpp
+    CollisionDetection/imstkPointSetToCylinderCD.cpp
     CollisionDetection/imstkPointSetToOrientedBoxCD.cpp
     CollisionDetection/imstkPointSetToPlaneCD.cpp
     CollisionDetection/imstkPointSetToSphereCD.cpp
