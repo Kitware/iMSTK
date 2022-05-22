@@ -254,7 +254,7 @@ testPlaneToSphere(
     planeContactPt      = spherePos - d * planeNormal;
     sphereContactPt     = spherePos - r * planeNormal;
 
-    penetrationDepth = r + std::abs(d);
+    penetrationDepth = r - d;
     return d < r;
 }
 
@@ -502,6 +502,71 @@ testCapsuleToPoint(
         return true;
     }
     return false;
+}
+
+///
+/// \brief Check if point and cylinder intersect, with contact info (normal and surface contact point)
+/// \return true if intersecting, false if not
+///
+inline bool
+testCylinderToPoint(
+    const Vec3d& cylinderPos, const Vec3d& cylinderAxis, const double cylinderLength, const double cylinderRadius,
+    const Vec3d& point,
+    Vec3d& cylinderContactPt, Vec3d& cylinderContactNormal, Vec3d& pointContactNormal, double& depth)
+{
+    // First, check collision with bounding sphere
+    if ((cylinderPos - point).squaredNorm() > (cylinderRadius * cylinderRadius + 0.25 * cylinderLength * cylinderLength))
+    {
+        return false;
+    }
+
+    // Get position of end points of the cylinder
+    const Vec3d  mid    = cylinderPos;
+    const Vec3d  p1     = mid + 0.5 * cylinderAxis * cylinderLength;
+    const Vec3d  p0     = 2.0 * mid - p1;
+    const Vec3d  pDiff  = p1 - p0;
+    const double pDotp0 = pDiff.dot(p0);
+
+    // Do the actual check
+    const double alpha = (point.dot(pDiff) - pDotp0) / (cylinderLength * cylinderLength);
+    if ((alpha > 1.0) || (alpha < 0.0))
+    {
+        return false;
+    }
+    else
+    {
+        Vec3d        closestPointOnAxis = p0 + alpha * pDiff;
+        const Vec3d  diff = (point - closestPointOnAxis);
+        const double dist = diff.norm();
+        if (dist < cylinderRadius)
+        {
+            const double distToEnd = (alpha * pDiff).norm();
+
+            if (distToEnd < (cylinderRadius - dist))
+            {
+                depth = distToEnd;
+                cylinderContactNormal = pDiff.normalized();
+                pointContactNormal    = -cylinderContactNormal;
+                cylinderContactPt     = point + pointContactNormal * distToEnd;
+            }
+            else if ((cylinderLength - distToEnd) < (cylinderRadius - dist))
+            {
+                depth = cylinderLength - distToEnd;
+                cylinderContactNormal = -pDiff.normalized();
+                pointContactNormal    = -cylinderContactNormal;
+                cylinderContactPt     = point + pointContactNormal * (cylinderLength - distToEnd);
+            }
+            else
+            {
+                depth = cylinderRadius - dist;
+                pointContactNormal    = diff.normalized();
+                cylinderContactNormal = -pointContactNormal;
+                cylinderContactPt     = closestPointOnAxis + pointContactNormal * cylinderRadius;
+            }
+            return true;
+        }
+        return false;
+    }
 }
 
 ///
