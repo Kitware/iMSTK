@@ -98,13 +98,13 @@ RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1
 }
 
 void
-RigidObjectCollision::setStiffness(double stiffness)
+RigidObjectCollision::setBeta(double beta)
 {
-    std::dynamic_pointer_cast<RigidBodyCH>(getCollisionHandlingA())->setBeta(stiffness);
+    std::dynamic_pointer_cast<RigidBodyCH>(getCollisionHandlingA())->setBeta(beta);
 }
 
 const double
-RigidObjectCollision::getStiffness() const
+RigidObjectCollision::getBeta() const
 {
     return std::dynamic_pointer_cast<RigidBodyCH>(getCollisionHandlingA())->getBeta();
 }
