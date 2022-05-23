@@ -55,10 +55,16 @@ StreamOutput::writeMessage(const std::string& message)
     return result;
 }
 
+CacheOutput::CacheOutput()
+{
+    m_outFile.open("imstk.log");
+}
+
 bool
 CacheOutput::writeMessage(const std::string& message)
 {
     m_mutex.lock();
+    m_outFile << message << std::endl;
     m_messages.push_back(message);
     m_mutex.unlock();
     return true;

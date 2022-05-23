@@ -25,6 +25,7 @@ limitations under the License.
 #include <memory>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 #include "imstkSpinLock.h"
 
@@ -130,6 +131,7 @@ private:
 class CacheOutput : public LogOutput
 {
 public:
+    CacheOutput();
     /// Writes a message to the stream.
     /// \param	message	Message to be written to the stream
     /// \return	True on success
@@ -140,6 +142,8 @@ public:
     std::string popLastMessage();
 
 private:
+    std::ofstream m_outFile;
+    std::shared_ptr<StreamOutput> m_fileOutput;
     std::deque<std::string> m_messages;
     ParallelUtils::SpinLock mutable m_mutex;
 };
