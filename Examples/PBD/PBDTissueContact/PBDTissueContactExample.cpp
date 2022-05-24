@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkClosedSurfaceMeshToMeshCD.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
@@ -27,7 +28,6 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
-#include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
@@ -255,14 +255,14 @@ main()
     // With PbdRigidObjectCollision we have Pbd-Rigid coupling
     // The toolObj responds to the tissue (the tool is pushed partly out of the way of the tissue whilst the
     // tissue deforms)
-    auto interaction = std::make_shared<PbdRigidObjectCollision>(tissueObj, toolObj, "MeshToMeshBruteForceCD");
-    std::dynamic_pointer_cast<MeshToMeshBruteForceCD>(interaction->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
+    auto interaction = std::make_shared<PbdRigidObjectCollision>(tissueObj, toolObj, "ClosedSurfaceMeshToMeshCD");
+    std::dynamic_pointer_cast<ClosedSurfaceMeshToMeshCD>(interaction->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
     scene->addInteraction(interaction);
 #else
     // With PbdObjectCollision we only have one-way coupling
     // The toolObj does not respond to the tissue (only the tissueObj responds to the tool, moving out of the way)
-    auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, toolObj);
-    std::dynamic_pointer_cast<MeshToMeshBruteForceCD>(interaction->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
+    auto interaction = std::make_shared<PbdObjectCollision>(tissueObj, toolObj, "ClosedSurfaceMeshToMeshCD");
+    std::dynamic_pointer_cast<ClosedSurfaceMeshToMeshCD>(interaction->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
     scene->addInteraction(interaction);
 #endif
 

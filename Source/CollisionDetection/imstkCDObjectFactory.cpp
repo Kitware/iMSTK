@@ -21,9 +21,9 @@ limitations under the License.
 
 #include "imstkCDObjectFactory.h"
 #include "imstkBidirectionalPlaneToSphereCD.h"
+#include "imstkClosedSurfaceMeshToMeshCD.h"
 #include "imstkImplicitGeometryToPointSetCCD.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
-#include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkPointSetToCapsuleCD.h"
 #include "imstkPointSetToCylinderCD.h"
 #include "imstkPointSetToOrientedBoxCD.h"
@@ -42,9 +42,9 @@ limitations under the License.
 namespace imstk
 {
 IMSTK_REGISTER_COLLISION_DETECTION(BidirectionalPlaneToSphereCD);
+IMSTK_REGISTER_COLLISION_DETECTION(ClosedSurfaceMeshToMeshCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCCD);
-IMSTK_REGISTER_COLLISION_DETECTION(MeshToMeshBruteForceCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToCapsuleCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToCylinderCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToPlaneCD);
@@ -62,6 +62,11 @@ IMSTK_REGISTER_COLLISION_DETECTION(UnidirectionalPlaneToSphereCD);
 std::shared_ptr<CollisionDetectionAlgorithm>
 CDObjectFactory::makeCollisionDetection(const std::string collisionTypeName)
 {
+    if (collisionTypeName == "MeshToMeshBruteForceCD")
+    {
+        LOG(WARNING) << "MeshToMeshBruteForceCD deprecated. Using ClosedSurfaceMeshToMeshCD instead.";
+        return create("ClosedSurfaceMeshToMeshCD");
+    }
     if (!contains(collisionTypeName))
     {
         LOG(FATAL) << "No collision detection type named: " << collisionTypeName;

@@ -155,7 +155,7 @@ main()
     scene->addSceneObject(toolObj);
 
     // Add a collision interaction between the tools
-    scene->addInteraction(std::make_shared<PbdObjectCollision>(tissueObj, toolObj.get(), "MeshToMeshBruteForceCD"));
+    scene->addInteraction(std::make_shared<PbdObjectCollision>(tissueObj, toolObj.get(), "ClosedSurfaceMeshToMeshCD"));
 
     // Light
     imstkNew<DirectionalLight> light;

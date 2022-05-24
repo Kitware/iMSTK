@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkDataArray.h"
 #include "imstkMacros.h"
 
 namespace imstk
@@ -31,37 +32,40 @@ class PointSet;
 class SurfaceMesh;
 
 ///
-/// \class MeshToMeshBruteForceCD
+/// \class ClosedSurfaceMeshToMeshCD
 ///
-/// \brief Mesh to mesh collision with brute force strategy.
-/// It can handle SurfaceMesh vs PointSet, LineMesh, & SurfaceMesh.
+/// \brief Closed mesh to mesh collision with brute force strategy.
+/// It can handle closed SurfaceMesh vs PointSet, LineMesh, & SurfaceMesh.
+/// Note: This CD method cannot yet automatically determine the closed
+/// SurfaceMesh given two unordered inputs. Ensure the second input/B is
+/// the closed SurfaceMesh.
 ///
-/// It does not work with self-intersections. It performs static CD
-/// to exactly find the neareset elements to resolve. It can handle
-/// deep penetrations as well. Designed for closed and manifold meshes
-/// but will work for open meshes so long as there is an "inside"/"outside"
-/// such as a triangle quad or plane
+/// It produces vertex-triangle, edge-edge, vertex-edge, & vertex-vertex
+/// collision data.
 ///
-/// It produces edge-edge, vertex-triangle, vertex-edge, vertex-vertex data.
-/// Edge-edge is off by default due to cost and effectiveness
-///
-/// It's exact implementation follows roughly along with Pierre Terdiman's
-/// "Contact Generation for Meshes" but further described in with GJK instead
+/// It's exact implementation roughly follows along with Pierre Terdiman's
+/// "Contact Generation for Meshes" but further described with GJK instead
 /// of brute force closest point determination in "Game Physics Pearls"
 ///
-/// \todo: Test computing normal of each triangle first when computing signed
-/// distances and backface culling
-/// \todo: To greatly speed up edge-edge and reduce potential for bad contacts
-/// we can use maximum distance parameter which is dealt with during the first
-/// pass
+/// It resolves vertices by computing signed distances using the psuedonormal
+/// method. This allows it to resolve very deep penetrations.
 ///
-class MeshToMeshBruteForceCD : public CollisionDetectionAlgorithm
+/// If enabled, it may resolve edge-edge contact by brute force as well. This
+/// is an extremely costly operation in brute force and is off by default.
+/// Additionally it cannot find the globally best edge to resolve too.
+///
+/// Extrapolation is used past an opening based on the nearest elements normal.
+/// So some openings are ok depending on the intention. For instance, a
+/// triangle mesh plane is valid, assuming "beneath" the plane is inside and
+/// above is outside.
+///
+class ClosedSurfaceMeshToMeshCD : public CollisionDetectionAlgorithm
 {
 public:
-    MeshToMeshBruteForceCD();
-    ~MeshToMeshBruteForceCD() override = default;
+    ClosedSurfaceMeshToMeshCD();
+    ~ClosedSurfaceMeshToMeshCD() override = default;
 
-    IMSTK_TYPE_NAME(MeshToMeshBruteForceCD)
+    IMSTK_TYPE_NAME(ClosedSurfaceMeshToMeshCD)
 
 public:
     ///
@@ -77,10 +81,19 @@ public:
     void setGenerateVertexTriangleContacts(bool genVertexTriangleContacts) { m_generateVertexTriangleContacts = genVertexTriangleContacts; }
 
     ///
-    /// \brief Set padding to the broad phase
-    ///
+    /// \brief Set padding to the broad phase (AABB tests)
+    ///@{
     void setPadding(const Vec3d& padding) { m_padding = padding; }
     const Vec3d& getPadding() const { return m_padding; }
+    ///@}
+
+    ///
+    /// \brief Any edges with vertices not within this proximity will not have
+    /// edges checked. This can be used to greatly reduce the # of edge-edge checks
+    ///@{
+    void setProximity(const double proximity) { m_proximity = proximity; }
+    double getProximity() const { return m_proximity; }
+///@}
 
 protected:
     ///
@@ -123,6 +136,8 @@ private:
     bool m_generateVertexTriangleContacts = true;
 
     std::vector<bool> m_vertexInside;
-    Vec3d m_padding = Vec3d(0.001, 0.001, 0.001);
+    DataArray<double> m_signedDistances;
+    Vec3d  m_padding   = Vec3d(0.001, 0.001, 0.001);
+    double m_proximity = -1.0; // Default off -1
 };
 } // namespace imstk

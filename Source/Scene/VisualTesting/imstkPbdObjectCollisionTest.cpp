@@ -374,7 +374,7 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_Crevice)
         std::make_shared<VecDataArray<int, 3>>(indices));
     m_collidingGeometry = surfMesh;
 
-    m_collisionName = "MeshToMeshBruteForceCD";
+    m_collisionName = "ClosedSurfaceMeshToMeshCD";
     m_friction      = 0.0;
     m_restitution   = 0.0;
 
@@ -386,9 +386,9 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_Crevice)
 }
 
 ///
-/// \brief Test MeshToMeshBruteForceCD with PbdObjectCollision
+/// \brief Test ClosedSurfaceMeshToMeshCD with PbdObjectCollision
 ///
-TEST_F(PbdObjectCollisionTest, PbdTissue_MeshToMeshBruteForceCD_LineMeshVsSurfMesh)
+TEST_F(PbdObjectCollisionTest, PbdTissue_ClosedSurfaceMeshToMeshCD_LineMeshVsSurfMesh)
 {
     // Setup the tissue
     m_pbdObj = makeLineThreadObj("Thread",
@@ -406,7 +406,7 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_MeshToMeshBruteForceCD_LineMeshVsSurfMe
         std::make_shared<VecDataArray<int, 3>>(indices));
     m_collidingGeometry = surfMesh;
 
-    m_collisionName = "MeshToMeshBruteForceCD";
+    m_collisionName = "ClosedSurfaceMeshToMeshCD";
     m_friction      = 0.0;
     m_restitution   = 0.0;
 
@@ -418,9 +418,9 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_MeshToMeshBruteForceCD_LineMeshVsSurfMe
 }
 
 ///
-/// \brief Test MeshToMeshBruteForceCD with PbdObjectCollision
+/// \brief Test ClosedSurfaceMeshToMeshCD with PbdObjectCollision
 ///
-TEST_F(PbdObjectCollisionTest, PbdTissue_MeshToMeshBruteForceCD_SurfMeshVsSurfMesh)
+TEST_F(PbdObjectCollisionTest, PbdTissue_ClosedSurfaceMeshToMeshCD_SurfMeshVsSurfMesh)
 {
     // Setup the tissue
     m_pbdObj = makeTriTissueObj("Tissue",
@@ -439,7 +439,7 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_MeshToMeshBruteForceCD_SurfMeshVsSurfMe
         std::make_shared<VecDataArray<int, 3>>(indices));
     m_collidingGeometry = surfMesh;
 
-    m_collisionName = "MeshToMeshBruteForceCD";
+    m_collisionName = "ClosedSurfaceMeshToMeshCD";
     m_friction      = 0.0;
     m_restitution   = 0.0;
 

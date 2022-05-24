@@ -128,10 +128,11 @@
  * CollisionDetection
  */
 %shared_ptr(imstk::CollisionDetectionAlgorithm)
+
+%shared_ptr(imstk::ClosedSurfaceMeshToMeshCD)
 %shared_ptr(imstk::BidirectionalPlaneToSphereCD)
 %shared_ptr(imstk::ImplicitGeometryToPointSetCCD)
 %shared_ptr(imstk::ImplicitGeometryToPointSetCD)
-%shared_ptr(imstk::MeshToMeshBruteForceCD)
 %shared_ptr(imstk::PointSetToCapsuleCD)
 %shared_ptr(imstk::PointSetToOrientedBoxCD)
 %shared_ptr(imstk::PointSetToSphereCD)

@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkMeshToMeshBruteForceCD.h"
+#include "imstkClosedSurfaceMeshToMeshCD.h"
 #include "imstkCollisionUtils.h"
 #include "imstkLineMesh.h"
 #include "imstkSurfaceMesh.h"
@@ -304,14 +304,14 @@ polySignedDist(const Vec3d& pos, const SurfMeshData& surfMeshData,
     }
 }
 
-MeshToMeshBruteForceCD::MeshToMeshBruteForceCD()
+ClosedSurfaceMeshToMeshCD::ClosedSurfaceMeshToMeshCD()
 {
     setRequiredInputType<PointSet>(0);
     setRequiredInputType<SurfaceMesh>(1);
 }
 
 void
-MeshToMeshBruteForceCD::computeCollisionDataAB(
+ClosedSurfaceMeshToMeshCD::computeCollisionDataAB(
     std::shared_ptr<Geometry>      geomA,
     std::shared_ptr<Geometry>      geomB,
     std::vector<CollisionElement>& elementsA,
@@ -332,12 +332,9 @@ MeshToMeshBruteForceCD::computeCollisionDataAB(
             {
                 m_vertexInside = std::vector<bool>(pointSet->getNumVertices(), false);
             }
-            else
+            if (m_signedDistances.size() < pointSet->getNumVertices())
             {
-                for (int i = 0; i < m_vertexInside.size(); i++)
-                {
-                    m_vertexInside[i] = false;
-                }
+                m_signedDistances = DataArray<double>(pointSet->getNumVertices());
             }
 
             vertexToTriangleTest(geomA, geomB, elementsA, elementsB);
@@ -358,7 +355,7 @@ MeshToMeshBruteForceCD::computeCollisionDataAB(
 }
 
 void
-MeshToMeshBruteForceCD::vertexToTriangleTest(
+ClosedSurfaceMeshToMeshCD::vertexToTriangleTest(
     std::shared_ptr<Geometry>      geomA,
     std::shared_ptr<Geometry>      geomB,
     std::vector<CollisionElement>& elementsA,
@@ -375,8 +372,11 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
         int          caseType   = -1;
         Vec3i        vertexIds  = Vec3i::Zero();
         const double signedDist = polySignedDist(p, surfMeshData, caseType, vertexIds);
+        m_signedDistances[i] = signedDist;
         if (signedDist <= 0.0)
         {
+            m_vertexInside[i] = true;
+            // The nearest feature to this vertex is another vertex
             if (caseType == 0)
             {
                 CellIndexElement elemA;
@@ -391,8 +391,8 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
 
                 elementsA.push_back(elemA);
                 elementsB.push_back(elemB);
-                m_vertexInside[i] = true;
             }
+            // The nearest feature to this vertex is an edge
             else if (caseType == 1)
             {
                 CellIndexElement elemA;
@@ -408,8 +408,8 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
 
                 elementsA.push_back(elemA);
                 elementsB.push_back(elemB);
-                m_vertexInside[i] = true;
             }
+            // The nearest feature to this vertex is a triangle face
             else if (caseType == 2)
             {
                 CellIndexElement elemA;
@@ -426,14 +426,17 @@ MeshToMeshBruteForceCD::vertexToTriangleTest(
 
                 elementsA.push_back(elemA);
                 elementsB.push_back(elemB);
-                m_vertexInside[i] = true;
             }
+        }
+        else
+        {
+            m_vertexInside[i] = false;
         }
     }
 }
 
 void
-MeshToMeshBruteForceCD::lineMeshEdgeToTriangleTest(
+ClosedSurfaceMeshToMeshCD::lineMeshEdgeToTriangleTest(
     std::shared_ptr<Geometry>      geomA,
     std::shared_ptr<Geometry>      geomB,
     std::vector<CollisionElement>& elementsA,
@@ -522,7 +525,7 @@ MeshToMeshBruteForceCD::lineMeshEdgeToTriangleTest(
 }
 
 void
-MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
+ClosedSurfaceMeshToMeshCD::surfMeshEdgeToTriangleTest(
     std::shared_ptr<Geometry>      geomA,
     std::shared_ptr<Geometry>      geomB,
     std::vector<CollisionElement>& elementsA,
@@ -539,7 +542,19 @@ MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
 
     std::unordered_set<EdgePair> hashedEdges;
 
+    // We find the nearest points on every edge with every other edge. Sampling this point we
+    // can determine the signed distance and whether that edge is "inside" another.
+    //
+    // We choose the nearest edge to resolve. Unfortunately we resolving to the nearest doesn't
+    // give the same effect as in the vertex-triangle case.
+    //
+    // This works so long as the edges don't move too far past each other.
+    // This is ultimately an effect of not having signs on the edges.
+    //
+    // Additionally we don't check edges whose vertices are already inside the closed surface (determined
+    // in the vertex-triangle pass)
     const int triEdgePattern[3][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 } };
+    int       edgeCheckCount       = 0;
     if (m_generateEdgeEdgeContacts)
     {
         // For every edge/line segment of the line mesh
@@ -559,38 +574,43 @@ MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
                     int    closestTriId  = -1;
                     int    closestEdgeId = -1;
 
-                    // For every triangle/cell of meshB
-                    for (int k = 0; k < surfMeshBData.cells.size(); k++)
+                    // If proximity is used, only check edges with vertices within proximity of the closed surface
+                    if (m_proximity <= 0.0 || (m_signedDistances[edgeA[0]] < m_proximity && m_signedDistances[edgeA[1]] < m_proximity))
                     {
-                        const Vec3i& cellB = surfMeshBData.cells[k];
-
-                        // For every edge of that triangle
-                        for (int l = 0; l < 3; l++)
+                        edgeCheckCount++;
+                        // For every triangle/cell of meshB
+                        for (int k = 0; k < surfMeshBData.cells.size(); k++)
                         {
-                            const Vec2i edgeB(cellB[triEdgePattern[l][0]], cellB[triEdgePattern[l][1]]);
+                            const Vec3i& cellB = surfMeshBData.cells[k];
 
-                            // Compute the closest point on the two edges
-                            // Check the case, the edges must be within each others bounds/ranges
-                            Vec3d ptA, ptB;
-                            if (CollisionUtils::edgeToEdgeClosestPoints(
-                                meshAVertices[edgeA[0]], meshAVertices[edgeA[1]],
-                                surfMeshBData.vertices[edgeB[0]], surfMeshBData.vertices[edgeB[1]],
-                                ptA, ptB) == 0)
+                            // For every edge of that triangle
+                            for (int edgeId = 0; edgeId < 3; edgeId++)
                             {
-                                // Find the closest element to this point on the edge
-                                const double sqrDist = (ptB - ptA).squaredNorm();
-                                // Use the closest one only
-                                if (sqrDist < minSqrDist)
+                                const Vec2i edgeB(cellB[triEdgePattern[edgeId][0]], cellB[triEdgePattern[edgeId][1]]);
+
+                                // Compute the closest point on the two edges
+                                // Check the case, the edges must be within each others bounds/ranges
+                                Vec3d ptA, ptB;
+                                if (CollisionUtils::edgeToEdgeClosestPoints(
+                                    meshAVertices[edgeA[0]], meshAVertices[edgeA[1]],
+                                    surfMeshBData.vertices[edgeB[0]], surfMeshBData.vertices[edgeB[1]],
+                                    ptA, ptB) == 0)
                                 {
-                                    // Check if the point on the oppositie edge nearest to edgeB is inside B
-                                    int          caseType   = -1;
-                                    Vec3i        vIds       = Vec3i::Zero();
-                                    const double signedDist = polySignedDist(ptA, surfMeshBData, caseType, vIds);
-                                    if (signedDist <= 0.0)
+                                    // Find the closest element to this point on the edge
+                                    const double sqrDist = (ptB - ptA).squaredNorm();
+                                    // Use the closest one only
+                                    if (sqrDist < minSqrDist)
                                     {
-                                        minSqrDist    = sqrDist;
-                                        closestTriId  = k;
-                                        closestEdgeId = l;
+                                        // Check if the point on the oppositie edge nearest to edgeB is inside B
+                                        int          caseType   = -1;
+                                        Vec3i        vIds       = Vec3i::Zero();
+                                        const double signedDist = polySignedDist(ptA, surfMeshBData, caseType, vIds);
+                                        if (signedDist <= 0.0)
+                                        {
+                                            minSqrDist    = sqrDist;
+                                            closestTriId  = k;
+                                            closestEdgeId = edgeId;
+                                        }
                                     }
                                 }
                             }
@@ -631,7 +651,7 @@ MeshToMeshBruteForceCD::surfMeshEdgeToTriangleTest(
 }
 
 bool
-MeshToMeshBruteForceCD::doBroadPhaseCollisionCheck(
+ClosedSurfaceMeshToMeshCD::doBroadPhaseCollisionCheck(
     std::shared_ptr<Geometry> geomA,
     std::shared_ptr<Geometry> geomB) const
 {
