@@ -143,27 +143,27 @@ public:
 
 private:
     std::ofstream m_outFile;
-    std::shared_ptr<StreamOutput> m_fileOutput;
-    std::deque<std::string> m_messages;
+    std::shared_ptr<StreamOutput>   m_fileOutput;
+    std::deque<std::string>         m_messages;
     ParallelUtils::SpinLock mutable m_mutex;
 };
 
-class LoggerUnity
+class LoggerSynchronous
 {
 public:
     /// Constructor.
     /// \param output The LogOutput instance used to display or log the data.
-    LoggerUnity(std::shared_ptr<LogOutput> output) : m_threshold(DEBUG.value), m_output(output), m_name("imstk") {}
+    LoggerSynchronous(std::shared_ptr<LogOutput> output) : m_threshold(DEBUG.value), m_output(output), m_name("imstk") {}
 
-    static std::shared_ptr<LoggerUnity> instance()
+    static std::shared_ptr<LoggerSynchronous> instance()
     {
-        static std::shared_ptr<LoggerUnity> defaultLogger = std::make_shared<LoggerUnity>(
+        static std::shared_ptr<LoggerSynchronous> defaultLogger = std::make_shared<LoggerSynchronous>(
             std::make_shared<CacheOutput>());
         return defaultLogger;
     }
 
     /// Destructor.
-    ~LoggerUnity() = default;
+    ~LoggerSynchronous() = default;
 
     /// For compatibility
     static void startLogger() {}
@@ -224,7 +224,7 @@ public:
     /// Construct a LogMessage
     /// \param logger The logger to be used
     /// \param level The logging level for this message
-    LogMessageBase(LoggerUnity* logger, int level);
+    LogMessageBase(LoggerSynchronous* logger, int level);
 
     ~LogMessageBase() noexcept(false) {
         flush();
@@ -272,7 +272,7 @@ protected:
 
 private:
     std::ostringstream m_stream;
-    LoggerUnity*       m_logger;
+    LoggerSynchronous* m_logger;
 };
 
 class AssertMessage : public LogMessageBase
@@ -283,19 +283,19 @@ public:
 
     /// Constructor.
     /// \param logger %Logger used to log this message.
-    explicit AssertMessage(LoggerUnity* logger) : LogMessageBase(logger, FATAL.value)
+    explicit AssertMessage(LoggerSynchronous* logger) : LogMessageBase(logger, FATAL.value)
     {
     }
 
     /// Constructor.
     /// \param logger %Logger used to log this message.
-    explicit AssertMessage(const std::unique_ptr<LoggerUnity>& logger) : LogMessageBase(logger.get(), FATAL.value)
+    explicit AssertMessage(const std::unique_ptr<LoggerSynchronous>& logger) : LogMessageBase(logger.get(), FATAL.value)
     {
     }
 
     /// Constructor.
     /// \param logger %Logger used to log this message.
-    explicit AssertMessage(const std::shared_ptr<LoggerUnity>& logger) : LogMessageBase(logger.get(), FATAL.value)
+    explicit AssertMessage(const std::shared_ptr<LoggerSynchronous>& logger) : LogMessageBase(logger.get(), FATAL.value)
     {
     }
 
@@ -345,13 +345,13 @@ private:
 };
 } // namespace imstk
 
-#define LOG(level)                                                        \
-    if (level.value < (::imstk::LoggerUnity::instance())->getThreshold()) \
-    {                                                                     \
-    }                                                                     \
-    else                                                                  \
-    /* important: no curly braces around this! */                         \
-    ::imstk::LogMessageBase(::imstk::LoggerUnity::instance().get(), level.value)
+#define LOG(level)                                                              \
+    if (level.value < (::imstk::LoggerSynchronous::instance())->getThreshold()) \
+    {                                                                           \
+    }                                                                           \
+    else                                                                        \
+    /* important: no curly braces around this! */                               \
+    ::imstk::LogMessageBase(::imstk::LoggerSynchronous::instance().get(), level.value)
 
 #define LOG_IF(level, condition)                  \
     if (!(condition))                             \
@@ -361,13 +361,13 @@ private:
     /* important: no curly braces around this! */ \
     LOG(level)
 
-#define CHECK(condition)                                                                          \
-    if ((condition))                                                                              \
-    {                                                                                             \
-    }                                                                                             \
-    else                                                                                          \
-    /* important: no curly braces around this! */                                                 \
-    ::imstk::AssertMessage(::imstk::LoggerUnity::instance().get()) << "*** Assertion failed: " << \
-        IMSTK_MAKE_STRING(condition) << " ***" << std::endl <<                                    \
-        "    in " << IMSTK_CURRENT_FUNCTION << std::endl <<                                       \
+#define CHECK(condition)                                                                                \
+    if ((condition))                                                                                    \
+    {                                                                                                   \
+    }                                                                                                   \
+    else                                                                                                \
+    /* important: no curly braces around this! */                                                       \
+    ::imstk::AssertMessage(::imstk::LoggerSynchronous::instance().get()) << "*** Assertion failed: " << \
+        IMSTK_MAKE_STRING(condition) << " ***" << std::endl <<                                          \
+        "    in " << IMSTK_CURRENT_FUNCTION << std::endl <<                                             \
         "    at " << __FILE__ << ":" << __LINE__ << std::endl

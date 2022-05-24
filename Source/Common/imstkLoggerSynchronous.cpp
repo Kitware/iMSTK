@@ -19,7 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkLoggerUnity.h"
+#include "imstkLoggerSynchronous.h"
 
 #include <ctime>
 #include <iomanip>
@@ -94,7 +94,7 @@ CacheOutput::popLastMessage()
     return result;
 }
 
-LogMessageBase::LogMessageBase(LoggerUnity* logger, int level)
+LogMessageBase::LogMessageBase(LoggerSynchronous* logger, int level)
     : m_stream(), m_logger(logger)
 {
     CHECK(logger) << "logger should not be a null pointer";

@@ -9,7 +9,7 @@
 #include "imstkVecDataArray.h"
 #include "imstkLogger.h"
 #ifdef iMSTK_SYNCHRONOUS_LOGGING
-#include "imstkLoggerUnity.h"
+#include "imstkLoggerSynchronous.h"
 #else
 #include "imstkLoggerG3.h"
 #endif

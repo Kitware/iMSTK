@@ -13,7 +13,7 @@ imstk_add_library( Common
     imstkFactory.h
     imstkLogger.h
     imstkLoggerG3.h
-    imstkLoggerUnity.h
+    imstkLoggerSynchronous.h
     imstkMacros.h
     imstkMath.h
     imstkModule.h
@@ -38,7 +38,7 @@ imstk_add_library( Common
     imstkColor.cpp
     imstkLogger.cpp
     imstkLoggerG3.cpp
-    imstkLoggerUnity.cpp
+    imstkLoggerSynchronous.cpp
     imstkModule.cpp
     imstkModuleDriver.cpp
     Parallel/imstkThreadManager.cpp

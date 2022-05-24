@@ -20,11 +20,11 @@
 =========================================================================*/
 
 #ifdef iMSTK_SYNCHRONOUS_LOGGING
-#include "imstkLoggerUnity.h"
+#include "imstkLoggerSynchronous.h"
 
 namespace imstk
 {
-using Logger = LoggerUnity;
+using Logger = LoggerSynchronous;
 } // namespace imstk
 
 #else

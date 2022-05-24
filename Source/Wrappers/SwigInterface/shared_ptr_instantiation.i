@@ -211,7 +211,7 @@
  * Logging for unity
  */
 %shared_ptr(imstk::Logger)
-%shared_ptr(imstk::LoggerUnity)
+%shared_ptr(imstk::LoggerSynchronous)
 %shared_ptr(imstk::LogOutput)
 %shared_ptr(imstk::NullOutput)
 %shared_ptr(imstk::StreamOutput)
