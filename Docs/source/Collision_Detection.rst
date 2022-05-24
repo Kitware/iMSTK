@@ -29,7 +29,7 @@ Supported Collision Detection
 .. csv-table:: 
    :header: "", "Capsule", "Cylinder", "ImplicitGeometry", "LineMesh", "OrientedBox", "Plane", "PointSet", "Sphere", "SurfaceMesh"
 
-   "Capsule",	         `-`,          ,                   ,           ,              ,        ,           ,         ,      
+   "Capsule",	            X,         ,                   ,           ,              ,        ,           ,         ,      
    "Cylinder",	        `-`,      `-`,                   ,           ,              ,        ,           ,         ,      
    "ImplicitGeometry",  `-`,      `-`,                `-`,           ,              ,        ,           ,         ,      
    "LineMesh",          `-`,      `-`,                `-`,          X,              ,        ,           ,         ,      
@@ -477,6 +477,15 @@ SphereToSphereCD
 **Additional Notes**
 
 * Only one contact is needed.
+
+CapsuleToCapsuleCD
+--------------------------------
+
+* Static Collision Method
+
+**Method**
+
+* To compute intersection between two capsules we first find the nearest point on the edges/centerlines of the capsules. We then perform sphere to sphere intersection between two spheres of capsules radius at these two points.
 
 BidirectionalSurfaceMeshToSphereCD
 --------------------------------

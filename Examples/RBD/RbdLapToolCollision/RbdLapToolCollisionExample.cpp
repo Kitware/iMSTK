@@ -94,7 +94,7 @@ main()
 
     auto bodyObject = std::make_shared<CollidingObject>("body");
     {
-        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT"/human/full_body/body.obj");
+        auto surfMesh  = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/human/full_body/body.obj");
         auto bodyPlane = std::make_shared<Plane>(Vec3d(0.0, 0.09, -1.0), Vec3d(0.0, 1.0, 0.0));
         bodyObject->setCollidingGeometry(bodyPlane);
         bodyObject->setVisualGeometry(surfMesh);

@@ -31,6 +31,11 @@ namespace imstk
 ///
 /// \brief Capsule to Capsule collision detection.
 ///
+/// To compute intersection between two capsules first find the nearest
+/// point on the edges/centerlines of the capsules. Then perform sphere to
+/// sphere intersection between two spheres of capsules radius at these
+/// two points.
+///
 class CapsuleToCapsuleCD : public CollisionDetectionAlgorithm
 {
 public:
