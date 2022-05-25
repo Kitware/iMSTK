@@ -27,7 +27,7 @@ the PR message.
 - [ ] No new dependecies were added (or the new dependencies have been approved)
 - [ ] Added test (or behavior not changed)
 - [ ] Updated API documentation (or API not changed)
-- [ ] Ran the `CodeFormatEnforcer` task and verified the header is in all new files 
+- [ ] Ran the `CodeFormatEnforcer` task and verified the license header is in all new files 
 - [ ] Added [iMSTK examples](https://gitlab.kitware.com/iMSTK/iMSTK/-/tree/master/Examples) for all new major features (if any)
 
 <!-- **Thanks for contributing to iMSTK!** -->
