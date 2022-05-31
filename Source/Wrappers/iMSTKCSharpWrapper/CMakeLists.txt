@@ -6,6 +6,17 @@ project(iMSTKSharp VERSION 0.1.0 LANGUAGES CSharp C CXX)
 # When iMSTKSharp is modified this target is not reinstalled/copied. This trips up visual studios and
 # especially intellisense
 
+# Create inlcude file with definitions so we can detect imstk build
+# configurations on the source side, capitalize all symbols as well
+# Do this before the glob so that the new file will be found
+if(iMSTK_USE_OpenHaptics)
+    set(IMSTK_USE_OPENHAPTICS ON)
+endif()
+if(iMSTK_USE_VRPN)
+    set(IMSTK_USE_VRPN ON)
+endif()
+configure_file("Configuration.cs.in" ${SWIG_OUTPUT_DIR}/Configuration.cs)
+
 # Get all the csharp files from the output directory
 file(GLOB SRC_FILES "${SWIG_OUTPUT_DIR}/*.cs")
 
