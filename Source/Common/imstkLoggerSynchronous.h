@@ -199,6 +199,13 @@ public:
         return m_output;
     }
 
+    /// TODO HS-2022-06-03 There is some issue in Unity where the cast
+    /// to CacheOutput isn't working, this is a patch to get around that
+    std::shared_ptr<CacheOutput> getCacheOutput() const
+    {
+        return std::dynamic_pointer_cast<CacheOutput>(m_output);
+    }
+
     /// Sets the output object used by this logger.
     /// \param val The output object to be used.
     void setOutput(std::shared_ptr<LogOutput> val)
