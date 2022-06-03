@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.9)
 project(iMSTK VERSION 5.0.0 LANGUAGES C CXX)
 
+include(CMakeDependentOption)
+
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
 #-----------------------------------------------------------------------------
@@ -68,8 +70,19 @@ endif()
 # Options
 #-----------------------------------------------------------------------------
 
+# Unity Switch
+if (WIN32)
+  option(${PROJECT_NAME}_BUILD_FOR_UNITY "Build iMSTK libraries for the unity asset" OFF)
+  mark_as_superbuild(${PROJECT_NAME}_BUILD_FOR_UNITY:BOOL)
+  if (${PROJECT_NAME}_BUILD_FOR_UNITY)
+    set(${PROJECT_NAME}_ENABLE_AUDIO OFF)
+  endif()
+endif()
+
 # SWIG 
-option(${PROJECT_NAME}_WRAP_CSHARP "Build iMSTK-C# wrapper code and lib" OFF)
+cmake_dependent_option(${PROJECT_NAME}_WRAP_CSHARP "Build iMSTK-C# wrapper code and lib" OFF "NOT ${PROJECT_NAME}_BUILD_FOR_UNITY" ON)
+
+#option(${PROJECT_NAME}_WRAP_CSHARP "Build iMSTK-C# wrapper code and lib" OFF)
 mark_as_superbuild(${PROJECT_NAME}_WRAP_CSHARP:BOOL)
 
 # SWIG will generate managed array using pinning if this option is ON. Otherwise using P/Invoke default array marshalling.
@@ -121,14 +134,6 @@ set(_msg "${PROJECT_NAME} Audio support")
 message(STATUS "${_msg} - ${_enable_audio} (${_reason})")
 set(${PROJECT_NAME}_AUDIO_ENABLED ${_enable_audio})
 
-if (WIN32)
-  option(${PROJECT_NAME}_BUILD_FOR_UNITY "Build iMSTK libraries for the unity asset" OFF)
-  mark_as_superbuild(${PROJECT_NAME}_BUILD_FOR_UNITY:BOOL)
-  if (${PROJECT_NAME}_BUILD_FOR_UNITY)
-    set(${PROJECT_NAME}_WRAP_CSHARP ON)
-  endif()
-endif()
-
 # General Options
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build iMSTK examples" ON)
 mark_as_superbuild(${PROJECT_NAME}_BUILD_EXAMPLES:BOOL)
@@ -174,7 +179,8 @@ endif()
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_VRPN:BOOL)
 
-option(${PROJECT_NAME}_USE_RENDERING_VTK "Build with/out VTK rendering support" ON)
+cmake_dependent_option(${PROJECT_NAME}_USE_RENDERING_VTK "Build with/out VTK rendering support" ON "NOT ${PROJECT_NAME}_BUILD_FOR_UNITY" OFF)
+
 mark_as_superbuild(${PROJECT_NAME}_USE_RENDERING_VTK:BOOL)
 
 if (NOT ${PROJECT_NAME}_USE_RENDERING_VTK AND ${PROJECT_NAME}_USE_VTK_OSMESA)
@@ -412,7 +418,6 @@ endif(Uncrustify_EXECUTABLE)
 #--------------------------------------------------------------------------
 if (${PROJECT_NAME}_BUILD_FOR_UNITY)
   add_definitions( -DiMSTK_SYNCHRONOUS_LOGGING)
-  
 endif()
 
 
