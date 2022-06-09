@@ -136,6 +136,24 @@ TEST(imstkColliosUtilsTest, PlaneToSphere)
     EXPECT_DOUBLE_EQ(depth, 2);
     EXPECT_TRUE(sphereContactP.isApprox(Vec3d(0, -2, 0)));
     EXPECT_TRUE(planeContactP.isApprox(Vec3d(0, 0, 0)));
+
+    // Plane above center
+    sphereP = Vec3d(0, -1, 0);
+    EXPECT_TRUE(testPlaneToSphere(planeP, planeN, sphereP, sphereR,
+        planeContactP, planeContactN, sphereContactP, sphereContactN, depth));
+    EXPECT_TRUE(testPlaneToSphere(planeP, planeN, sphereP, sphereR));
+    EXPECT_DOUBLE_EQ(depth, 3);
+    EXPECT_TRUE(sphereContactP.isApprox(Vec3d(0, -3, 0)));
+    EXPECT_TRUE(planeContactP.isApprox(Vec3d(0, 0, 0)));
+
+    // Sphere fully under plane
+    sphereP = Vec3d(0, -2, 0);
+    EXPECT_TRUE(testPlaneToSphere(planeP, planeN, sphereP, sphereR,
+        planeContactP, planeContactN, sphereContactP, sphereContactN, depth));
+    EXPECT_TRUE(testPlaneToSphere(planeP, planeN, sphereP, sphereR));
+    EXPECT_DOUBLE_EQ(depth, 4);
+    EXPECT_TRUE(sphereContactP.isApprox(Vec3d(0, -4, 0))) << sphereContactP.transpose();
+    EXPECT_TRUE(planeContactP.isApprox(Vec3d(0, 0, 0))) << planeContactP.transpose();
 }
 } // namespace CollisionUtils
 } // namespace imstk
