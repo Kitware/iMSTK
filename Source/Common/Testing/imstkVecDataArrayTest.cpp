@@ -104,7 +104,27 @@ TEST(imstkVecDataArrayTest, AccessorsConst)
     EXPECT_ANY_THROW(a[4]);
 }
 
-TEST(imstkVecDataArrayTest, Assignment)
+TEST(imstkVecDataArrayTest, AssignmentSufficientCapacity)
+{
+    VecDataArray<int, 2> a;
+    a = { Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6) };
+    EXPECT_EQ(3, a.size());
+    EXPECT_EQ(3 * 2, a.getCapacity());
+    EXPECT_TRUE(isEqualTo(a, { Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6) }));
+
+    VecDataArray<int, 2> b{ Vec2i(0, 2), Vec2i(4, 6) };
+    int                  capacity = a.getCapacity();
+    auto                 ptr      = a.getPointer();
+    a = b;
+    EXPECT_TRUE(isEqualTo(a, { Vec2i(0, 2), Vec2i(4, 6) }));
+    EXPECT_EQ(a.size(), b.size());
+    EXPECT_EQ(capacity, a.getCapacity());
+    EXPECT_NE(a.getCapacity(), b.getCapacity());
+    EXPECT_NE(a.getPointer(), b.getPointer());
+    EXPECT_EQ(ptr, a.getPointer());
+}
+
+TEST(imstkVecDataArrayTest, AssignmentIncreaseCapacity)
 {
     VecDataArray<int, 2> a;
     a = { Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6) };

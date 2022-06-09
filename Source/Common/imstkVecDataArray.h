@@ -410,23 +410,21 @@ public:
 
     VecDataArray& operator=(const VecDataArray& other)
     {
-        DataArray<T>::m_mapped = other.m_mapped;
-        AbstractDataArray::m_scalarType = other.m_scalarType;
-        AbstractDataArray::m_size       = other.m_size;
-        AbstractDataArray::m_capacity   = other.m_capacity;
-        m_vecSize     = other.m_vecSize;
-        m_vecCapacity = other.m_vecCapacity;
-        if (DataArray<T>::m_mapped)
+        if (other.m_mapped)
         {
             DataArray<T>::m_data = other.m_data;
         }
         else
         {
-            delete[] DataArray<T>::m_data;
-            DataArray<T>::m_data = new T[AbstractDataArray::m_capacity];
-            std::copy_n(other.m_data, AbstractDataArray::m_size, DataArray<T>::m_data);
+            reserve(other.size());
+            std::copy_n(other.m_data, other.m_size, DataArray<T>::m_data);
         }
-        m_dataCast = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+
+        DataArray<T>::m_mapped = other.m_mapped;
+        AbstractDataArray::m_scalarType = other.m_scalarType;
+        AbstractDataArray::m_size       = other.m_size;
+        m_vecSize = other.m_vecSize;
+
         return *this;
     }
 

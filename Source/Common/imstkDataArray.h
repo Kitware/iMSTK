@@ -352,20 +352,19 @@ public:
 
     DataArray& operator=(const DataArray& other)
     {
-        m_mapped     = other.m_mapped;
-        m_scalarType = other.m_scalarType;
-        m_size       = other.m_size;
-        m_capacity   = other.m_capacity;
-        if (m_mapped)
+        if (other.m_mapped)
         {
             m_data = other.m_data;
         }
         else
         {
-            delete[] m_data;
-            m_data = new T[m_size];
-            std::copy_n(other.m_data, m_size, m_data);
+            reserve(other.m_size);
+            std::copy_n(other.m_data, other.m_size, m_data);
         }
+        m_mapped     = other.m_mapped;
+        m_scalarType = other.m_scalarType;
+        m_size       = other.m_size;
+
         return *this;
     }
 
