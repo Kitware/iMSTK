@@ -77,6 +77,10 @@ TEST(imstkVecDataArrayTest, Constructors)
     EXPECT_EQ(4, d.getCapacity());
     EXPECT_TRUE(isEqualTo(d, { Vec2i(0, 1), Vec2i(2, 3) }));
     EXPECT_EQ(ptr, d.getPointer());
+
+    using TestType = VecDataArray<int, 2>;
+
+    EXPECT_EQ(2, TestType::NumComponents);
 }
 
 TEST(imstkVecDataArrayTest, Accessors)

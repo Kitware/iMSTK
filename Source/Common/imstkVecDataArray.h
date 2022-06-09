@@ -38,7 +38,9 @@ template<typename T, int N>
 class VecDataArray : public DataArray<T>
 {
 public:
-    using VecType = Eigen::Matrix<T, N, 1>;
+    using ScalarType = T;
+    using ValueType  = Eigen::Matrix<T, N, 1>;
+    static constexpr int NumComponents = N;
 
     class iterator
     {

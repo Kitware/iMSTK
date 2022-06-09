@@ -37,6 +37,11 @@ template<typename T>
 class DataArray : public AbstractDataArray
 {
 public:
+
+    using ScalarType = T;
+    using ValueType  = T;
+    static constexpr int NumComponents = 1;
+
     class iterator
     {
     public:

@@ -67,6 +67,8 @@ TEST(imstkDataArrayTest, Constructors)
     EXPECT_EQ(4, d.size());
     EXPECT_EQ(4, d.getCapacity());
     EXPECT_TRUE(isEqualTo(d, { 0, 1, 2, 3 }));
+
+    EXPECT_EQ(1, DataArray<int>::NumComponents);
 }
 
 TEST(imstkDataArrayTest, Accessors)
