@@ -15,8 +15,12 @@ if(CMAKE_PROJECT_NAME STREQUAL "iMSTK")
 endif()
 
 if(MSVC)
+  set(config_subdir "")
+  if(CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(config_subdir "$(Configuration)/")
+  endif ()
   set(g3log_built_library ${CMAKE_COMMAND} -E copy
-                          ${g3log_BINARY_DIR}/$(Configuration)/g3logger$<$<CONFIG:Debug>:d>.lib
+                          ${g3log_BINARY_DIR}/${config_subdir}g3logger$<$<CONFIG:Debug>:d>.lib
                           ${g3log_INSTALL_DIR}/lib/g3logger$<$<CONFIG:Debug>:d>.lib)
   set(g3log_built_shared)
 else()
