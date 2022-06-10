@@ -2,6 +2,7 @@ include:
     # Metadata shared my many jobs
     - local: .gitlab/rules.yml
     - local: .gitlab/artifacts.yml
+    - local: .gitlab/doxygen.yml
 
     # OS builds.
     - local: .gitlab/os-windows.yml
@@ -9,6 +10,7 @@ include:
 stages:
     - build
     - test
+    - deploy
 
 ################################################################################
 # Job declarations
@@ -25,6 +27,11 @@ stages:
 #   - artifacts
 #   - dependency/needs jobs for required jobs
 ################################################################################
+
+pages:
+    extends:
+        - .doxygen_build
+        - .doxygen_on_mirror
 
 # Windows
 

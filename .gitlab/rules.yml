@@ -29,3 +29,19 @@
         - if: '$CI_PROJECT_PATH == "iMSTK/iMSTK"'
           when: on_success
         - when: never
+
+.merged_only:
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
+          when: never
+        # When the fork-based workflow is used, the protected condition can be
+        # dropped.
+        - if: '$CI_PROJECT_PATH == "iMSTK/iMSTK" && $CI_COMMIT_REF_PROTECTED == "true"'
+          when: on_success
+        - when: never
+
+.doxygen_on_mirror:
+    rules:
+        - if: '$CI_SERVER_URL == "gitlab.com" && $CI_PROJECT_PATH == "imstk/imstk.gitlab.io"'
+          when: on_success
+        - when: never
