@@ -1,0 +1,38 @@
+# Lists of paths for artifacts of various stages.
+
+.cmake_build_artifacts:
+    artifacts:
+        expire_in: 1d
+        paths:
+            # The artifacts of the build.
+            - build/install/
+
+            # CTest files.
+            - build/CTestCustom*.cmake
+            - build/CTestTestfile.cmake
+            - build/**/CTestTestfile.cmake
+            - build/imstkCTestAddInnerbuild.cmake
+            - build/Testing/
+
+            # Files used in the test suite.
+            - build/**/*_include.cmake
+            - build/Innerbuild/uncrustify.list
+            - build/Innerbuild/Source/*/Testing/*Tests
+            - build/Innerbuild/Source/*/Testing/*Tests.exe
+            - build/Innerbuild/Source/*/VisualTesting/*Tests
+            - build/Innerbuild/Source/*/VisualTesting/*Tests.exe
+            - build/Innerbuild/Testing/iMSTKExternalProjectTemplate/iMSTKProject
+
+            # Build tree SDK
+            - build/Innerbuild/iMSTK*.cmake
+            - build/Innerbuild/Source/*/*.lib
+
+            # CDash files.
+            - build/DartConfiguration.tcl
+
+.cmake_test_artifacts:
+    artifacts:
+        expire_in: 1d
+        reports:
+            junit:
+                - build/junit.xml

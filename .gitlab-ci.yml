@@ -1,20 +1,51 @@
-image: alpine
+include:
+    # Metadata shared my many jobs
+    - local: .gitlab/rules.yml
+    - local: .gitlab/artifacts.yml
 
-before_script:
-- apk update
-- apk add doxygen
-## Uncomment the following line if you use graphviz dot graphs
-- apk add ttf-freefont graphviz
-  
-pages:
-  script:
-  - cd Docs
-  - mkdir html
-  - cd ..
-  - doxygen Doxyfile
-  - mv Docs/html/ public/
-  artifacts:
-    paths:
-    - public
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # OS builds.
+    - local: .gitlab/os-windows.yml
+
+stages:
+    - build
+    - test
+
+################################################################################
+# Job declarations
+#
+# Each job must pull in each of the following keys:
+#
+#   - a "base image"
+#   - a build script
+#   - tags for the jobs
+#   - rules for when to run the job
+#
+# Additionally, jobs may also contain:
+#
+#   - artifacts
+#   - dependency/needs jobs for required jobs
+################################################################################
+
+# Windows
+
+## Build and test
+
+windows-vs2022-ninja:build:
+    extends:
+        - .windows_vs2022_ninja
+        - .cmake_build_windows
+        - .cmake_build_artifacts
+        - .windows_builder_tags
+        - .run_manually
+
+windows-vs2022-ninja:test:
+    extends:
+        - .windows_vs2022_ninja
+        - .cmake_test_windows
+        - .cmake_test_artifacts
+        - .windows_builder_tags
+        - .run_dependent
+    dependencies:
+        - windows-vs2022-ninja:build
+    needs:
+        - windows-vs2022-ninja:build
