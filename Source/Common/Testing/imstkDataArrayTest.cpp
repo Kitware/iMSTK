@@ -103,9 +103,10 @@ TEST(imstkDataArrayTest, AssignmentSufficientSpace)
     EXPECT_EQ(4, a.size());
     EXPECT_TRUE(isEqualTo(a, { 1, 2, 3, 4 }));
 
-    DataArray<int> b{ 0, 2, 4, 6, 8, 10 };
-    int            capacity = b.getCapacity();
-    auto           ptr      = b.getPointer();
+    DataArray<int>    b{ 0, 2, 4, 6, 8, 10 };
+    DataArray<double> d{ 0, 2, 4, 6, 8, 10 };
+    int               capacity = b.getCapacity();
+    auto              ptr      = b.getPointer();
 
     b = a;
     EXPECT_TRUE(isEqualTo(b, { 1, 2, 3, 4 }));
@@ -123,6 +124,33 @@ TEST(imstkDataArrayTest, AssignmentIncreaseCapacity)
     EXPECT_TRUE(isEqualTo(a, { 0, 2, 4, 6, 8, 10 }));
     EXPECT_EQ(b.getCapacity(), a.getCapacity());
     EXPECT_EQ(a.size(), b.size());
+}
+
+TEST(imstkDataArrayTest, AssignmentMappedAndUnmapped)
+{
+    {
+        SCOPED_TRACE("Assign mapped to unmapped");
+        std::vector<int> other{ -1, -2, -3 };
+        DataArray<int>   mapped{ 1, 2, 3, 4 };
+        mapped.setData(other.data(), static_cast<int>(other.size()));
+        DataArray<int> unmapped{ 0, 2, 4, 6, 8, 10 };
+        unmapped = mapped;
+
+        EXPECT_TRUE(isEqualTo(unmapped, { -1, -2, -3 }));
+        EXPECT_EQ(unmapped.size(), mapped.size());
+    }
+
+    {
+        SCOPED_TRACE("Assign unmapped to mapped");
+        std::vector<int> other{ -1, -2, -3 };
+        DataArray<int>   mapped{ 1, 2, 3, 4 };
+        mapped.setData(other.data(), static_cast<int>(other.size()));
+        DataArray<int> unmapped{ 0, 2, 4, 6, 8, 10 };
+        mapped = unmapped;
+
+        EXPECT_TRUE(isEqualTo(mapped, { 0, 2, 4, 6, 8, 10 }));
+        EXPECT_EQ(unmapped.size(), mapped.size());
+    }
 }
 
 TEST(imstkDataArrayTest, Mapping)
