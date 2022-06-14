@@ -180,7 +180,6 @@ option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_VRPN:BOOL)
 
 cmake_dependent_option(${PROJECT_NAME}_USE_RENDERING_VTK "Build with/out VTK rendering support" ON "NOT ${PROJECT_NAME}_BUILD_FOR_UNITY" OFF)
-
 mark_as_superbuild(${PROJECT_NAME}_USE_RENDERING_VTK:BOOL)
 
 if (NOT ${PROJECT_NAME}_USE_RENDERING_VTK AND ${PROJECT_NAME}_USE_VTK_OSMESA)
@@ -195,6 +194,9 @@ mark_as_superbuild(${PROJECT_NAME}_USE_OpenHaptics:BOOL)
 if(NOT WIN32 AND ${PROJECT_NAME}_USE_OpenHaptics)
   message(FATAL_ERROR "Setting ${PROJECT_NAME}_USE_OpenHaptics to ON is only supported on Windows")
 endif()
+
+cmake_dependent_option(${PROJECT_NAME}_USE_BUILTIN_LOGGING "Uses iMSTK local logger when g3log and its error behavior is not wanted" OFF "NOT ${PROJECT_NAME}_BUILD_FOR_UNITY" ON)
+mark_as_superbuild(${PROJECT_NAME}_USE_BUILTIN_LOGGING:BOOL)
 
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
@@ -414,9 +416,9 @@ else(Uncrustify_EXECUTABLE)
 endif(Uncrustify_EXECUTABLE)
 
 #--------------------------------------------------------------------------
-# Unity
+# Logger switch
 #--------------------------------------------------------------------------
-if (${PROJECT_NAME}_BUILD_FOR_UNITY)
+if (${PROJECT_NAME}_USE_BUILTIN_LOGGING)
   add_definitions( -DiMSTK_SYNCHRONOUS_LOGGING)
 endif()
 
