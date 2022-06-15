@@ -1,0 +1,13 @@
+.doxygen_build:
+    image: alpine:latest
+    stage: deploy
+
+    script:
+        - apk update
+        - apk add doxygen ttf-freefont graphviz
+        - mkdir Docs/html
+        - doxygen Doxyfile
+        - mv Docs/html/ public/
+    artifacts:
+        paths:
+            - public/
