@@ -20,40 +20,29 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCDObjectFactory.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
-#include "imstkLineMeshToLineMeshCCD.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkOrientedBox.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkTaskGraph.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "../PBDStaticSuture/NeedleObject.h"
 
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
-#else
 #include "../PBDStaticSuture/imstkMouseDeviceClient3D.h"
-#endif
+#include "../PBDStaticSuture/NeedleObject.h"
 
 using namespace imstk;
 
 /// String geometry for interactive example.
-const std::vector<Eigen::Vector3d> selfCCDStringMesh = {
+const std::vector<Vec3d> selfCCDStringMesh = {
     // move right
     { 0.00, 0.02, 0 },
     { 0.01, 0.02, 0 },
@@ -192,7 +181,7 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
-    imstkNew<Scene> scene("PBDStaticSuture");
+    imstkNew<Scene> scene("PbdSutureSelfCCD");
 
     std::shared_ptr<PbdObject> movingLine =
         // makePbdString("selfCCDLine", "");
@@ -274,11 +263,6 @@ main()
                 (*movingLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
                 (*movingLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
 #endif // USE_NEEDLE
-            });
-        // Constrain the first two vertices of the string to the needle
-        connect<Event>(sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
-            {
             });
 
         // Add mouse and keyboard controls to the viewer
