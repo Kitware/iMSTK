@@ -44,8 +44,8 @@ public:
 
     IMSTK_TYPE_NAME(RigidObjectCollision)
 
-    void setStiffness(double stiffness);
-    const double getStiffness() const;
+    void setBaumgarteStabilization(double stiffness);
+    const double getBeta() const;
 
     void setFriction(double frictionalCoefficient);
     const double getFriction() const;

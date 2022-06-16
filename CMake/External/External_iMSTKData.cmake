@@ -16,7 +16,7 @@ set(copy_data_command
   )
 
 include(imstkAddExternalProject)
-set(GIT_SHA "980c9d759daa38aba75e5d0b2342d937ea0c6c2c")
+set(GIT_SHA "deb4cca02312241da375c1a4967a82a25e41d73a")
 set(DATA_URL "https://gitlab.kitware.com/iMSTK/imstk-data/-/archive/${GIT_SHA}/imstk-data-${GIT_SHA}.zip")
 
 imstk_add_external_project( iMSTKData

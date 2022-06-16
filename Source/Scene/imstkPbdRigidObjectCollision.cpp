@@ -57,7 +57,7 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
     rbdCH->setInputRigidObjectA(obj2);
     rbdCH->setInputCollidingObjectB(obj1);
     rbdCH->setInputCollisionData(cd->getCollisionData());
-    rbdCH->setBeta(0.1);
+    rbdCH->setBaumgarteStabilization(0.1);
     setCollisionHandlingB(rbdCH);
 
     // Setup compute node for collision solver (true/critical node)

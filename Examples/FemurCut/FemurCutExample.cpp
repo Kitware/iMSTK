@@ -120,7 +120,7 @@ main()
     {
         auto colHandlerA = std::dynamic_pointer_cast<RigidBodyCH>(interaction->getCollisionHandlingA());
         colHandlerA->setUseFriction(false);
-        colHandlerA->setBeta(0.05); // inelastic collision
+        colHandlerA->setBaumgarteStabilization(0.05); // inelastic collision
 
         auto colHandlerB = std::dynamic_pointer_cast<LevelSetCH>(interaction->getCollisionHandlingB());
         colHandlerB->setLevelSetVelocityScaling(0.01);
