@@ -20,12 +20,7 @@
 =========================================================================*/
 
 #include "imstkCapsuleToCapsuleCD.h"
-#include "imstkCapsule.h"
-#include "imstkCollisionData.h"
 #include "imstkCollisionUtils.h"
-#include "imstkParallelUtils.h"
-#include "imstkPointSet.h"
-#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -69,8 +64,6 @@ CapsuleToCapsuleCD::computeCollisionDataAB(
     {
         return;
     }
-
-    // \todo: This gives bad normals
 
     // We can interpret spheres around these two points of capsule radius
     // The point of contact should be between these two spheres

@@ -20,18 +20,14 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkCapsule.h"
+#include "imstkCapsuleToCapsuleCD.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionDetectionVisualTest.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkRenderMaterial.h"
-#include "imstkCapsule.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkCapsuleToCapsuleCD.h"
-#include "imstkVecDataArray.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkKeyboardDeviceClient.h"
-
-#include "imstkSphere.h"
 
 using namespace imstk;
 

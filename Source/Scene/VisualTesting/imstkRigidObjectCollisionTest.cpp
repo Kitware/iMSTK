@@ -24,11 +24,9 @@
 #include "imstkCollisionDataDebugObject.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
-#include "imstkGeometryUtilities.h"
-#include "imstkLineMesh.h"
-#include "imstkOrientedBox.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkPlane.h"
-#include "imstkPointwiseMap.h"
+#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
@@ -38,12 +36,8 @@
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTestingUtils.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
-#include "imstkRbdConstraint.h"
 #include "imstkVisualTestingUtils.h"
-
-#include "imstkKeyboardDeviceClient.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -157,8 +151,6 @@ TEST_F(RigidObjectCollisionTest, RbdObj_CapsuleToCapsuleCD)
     m_rbdObj = std::make_shared<RigidObject2>("obj1");
     {
         auto colGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.05, 0.2);
-        /*auto colGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.05, 0.2,
-            Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 1.0, 0.0).normalized()));*/
 
         // Setup the Model
         auto rbdModel = std::make_shared<RigidBodyModel2>();
