@@ -49,7 +49,7 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
     needleRbdCH->setInputRigidObjectA(needleObj);
     needleRbdCH->setInputCollidingObjectB(tissueObj);
     needleRbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
-    needleRbdCH->setBeta(0.001);
+    needleRbdCH->setBaumgarteStabilization(0.001);
     setCollisionHandlingB(needleRbdCH);
 
     // This handler consumes the collision data to resolve the tissue from the tool

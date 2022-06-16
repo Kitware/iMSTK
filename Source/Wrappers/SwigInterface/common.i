@@ -299,7 +299,7 @@ Vec<T, N> vec_scale(const Vec<T, N>& v, const T c)
 }
 
 template <typename T, int N>
-Vec<T, N> vec_to_eigen(typename VecDataArray<T, N>::VecType* v2, const Vec<T, N>& v1)
+Vec<T, N> vec_to_eigen(typename VecDataArray<T, N>::ValueType* v2, const Vec<T, N>& v1)
 {
     /* *v2 = v1; */
     *v2 = v1.get();
@@ -314,7 +314,7 @@ Vec<double, 6> vec_to_eigen_6d(imstk::Vec6d* v2, const Vec<double, 6>& v1)
 }
 
 template <typename T, int N>
-Vec<T, N> vec_from_eigen(const typename VecDataArray<T, N>::VecType& v1)
+Vec<T, N> vec_from_eigen(const typename VecDataArray<T, N>::ValueType& v1)
 {
     return Vec<T, N>(v1);
 }

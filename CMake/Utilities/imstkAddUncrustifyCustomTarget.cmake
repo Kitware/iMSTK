@@ -26,7 +26,9 @@
   # Explicitly write a zero byte file when no source files are specified.
   # Otherwise, configure_file() creates a file with a single blank line, and
   # uncrustify interprets the blank line as a file name.
-  file(GLOB_RECURSE UNCRUSTIFY_SOURCE_FILES *.h *.cpp)
+  file(GLOB_RECURSE UNCRUSTIFY_SOURCE_FILES
+    "${CMAKE_SOURCE_DIR}/Source/*.h" "${CMAKE_SOURCE_DIR}/Source/*.cpp"
+    "${CMAKE_SOURCE_DIR}/Examples/*.h" "${CMAKE_SOURCE_DIR}/Examples/*.cpp")
   set(_uncrustify_list_in ${CMAKE_CURRENT_LIST_DIR}/../../Utilities/Uncrustify/uncrustify.list.in)
   set(_uncrustify_list_out ${CMAKE_CURRENT_BINARY_DIR}/uncrustify.list)
   if(UNCRUSTIFY_SOURCE_FILES)

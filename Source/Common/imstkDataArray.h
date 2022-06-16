@@ -37,6 +37,11 @@ template<typename T>
 class DataArray : public AbstractDataArray
 {
 public:
+
+    using ScalarType = T;
+    using ValueType  = T;
+    static constexpr int NumComponents = 1;
+
     class iterator
     {
     public:
@@ -352,20 +357,27 @@ public:
 
     DataArray& operator=(const DataArray& other)
     {
-        m_mapped     = other.m_mapped;
-        m_scalarType = other.m_scalarType;
-        m_size       = other.m_size;
-        m_capacity   = other.m_capacity;
-        if (m_mapped)
+        // Delegate to the appropriate functions while maintaining state
+        // No need to copy type as it's static and this will only be used
+        // for `=` of equivalent types
+        if (other.m_mapped)
         {
-            m_data = other.m_data;
+            setData(other.m_data, other.size());
         }
         else
         {
-            delete[] m_data;
-            m_data = new T[m_size];
-            std::copy_n(other.m_data, m_size, m_data);
+            if (m_mapped)
+            {
+                m_data     = nullptr;
+                m_capacity = 0;
+                m_size     = 0;
+                m_mapped   = false;
+            }
+            reserve(other.size());
+            std::copy_n(other.m_data, other.m_size, m_data);
+            m_size = other.m_size;
         }
+
         return *this;
     }
 
@@ -397,7 +409,7 @@ public:
         m_size   = m_capacity = size;
     }
 
-    inline virtual int getNumberOfComponents() const override { return 1; }
+    inline virtual int getNumberOfComponents() const override { return NumComponents; }
 
     ///
     /// \brief Cast array to specific c++ type

@@ -77,6 +77,10 @@ TEST(imstkVecDataArrayTest, Constructors)
     EXPECT_EQ(4, d.getCapacity());
     EXPECT_TRUE(isEqualTo(d, { Vec2i(0, 1), Vec2i(2, 3) }));
     EXPECT_EQ(ptr, d.getPointer());
+
+    using TestType = VecDataArray<int, 2>;
+
+    EXPECT_EQ(2, TestType::NumComponents);
 }
 
 TEST(imstkVecDataArrayTest, Accessors)
@@ -104,7 +108,27 @@ TEST(imstkVecDataArrayTest, AccessorsConst)
     EXPECT_ANY_THROW(a[4]);
 }
 
-TEST(imstkVecDataArrayTest, Assignment)
+TEST(imstkVecDataArrayTest, AssignmentSufficientCapacity)
+{
+    VecDataArray<int, 2> a;
+    a = { Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6) };
+    EXPECT_EQ(3, a.size());
+    EXPECT_EQ(3 * 2, a.getCapacity());
+    EXPECT_TRUE(isEqualTo(a, { Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6) }));
+
+    VecDataArray<int, 2> b{ Vec2i(0, 2), Vec2i(4, 6) };
+    int                  capacity = a.getCapacity();
+    auto                 ptr      = a.getPointer();
+    a = b;
+    EXPECT_TRUE(isEqualTo(a, { Vec2i(0, 2), Vec2i(4, 6) }));
+    EXPECT_EQ(a.size(), b.size());
+    EXPECT_EQ(capacity, a.getCapacity());
+    EXPECT_NE(a.getCapacity(), b.getCapacity());
+    EXPECT_NE(a.getPointer(), b.getPointer());
+    EXPECT_EQ(ptr, a.getPointer());
+}
+
+TEST(imstkVecDataArrayTest, AssignmentIncreaseCapacity)
 {
     VecDataArray<int, 2> a;
     a = { Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6) };
@@ -119,6 +143,39 @@ TEST(imstkVecDataArrayTest, Assignment)
     EXPECT_EQ(a.size(), b.size());
     EXPECT_EQ(a.getCapacity(), b.getCapacity());
     EXPECT_NE(a.getPointer(), b.getPointer());
+}
+
+TEST(imstkVecDataArrayTest, AssignmentMappedAndUnmapped)
+{
+    {
+        SCOPED_TRACE("Assign mapped to unmapped");
+        std::vector<Vec2i>   other{ { -1, -2, }, { -3, -4 } };
+        VecDataArray<int, 2> mapped;
+        mapped.setData(other.data(), static_cast<int>(other.size()));
+
+        VecDataArray<int, 2> unmapped;
+        unmapped = { Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6) };
+
+        unmapped = mapped;
+
+        EXPECT_TRUE(isEqualTo(unmapped, { { -1, -2, }, { -3, -4 } }));
+        EXPECT_EQ(unmapped.size(), mapped.size());
+    }
+
+    {
+        SCOPED_TRACE("Assign unmapped to mapped");
+        std::vector<Vec2i>   other{ { -1, -2, }, { -3, -4 } };
+        VecDataArray<int, 2> mapped;
+        mapped.setData(other.data(), static_cast<int>(other.size()));
+
+        VecDataArray<int, 2> unmapped;
+        unmapped = { Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6) };
+
+        mapped = unmapped;
+
+        EXPECT_TRUE(isEqualTo(unmapped, { Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6) }));
+        EXPECT_EQ(unmapped.size(), mapped.size());
+    }
 }
 
 TEST(imstkVecDataArrayTest, Mapping)

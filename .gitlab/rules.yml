@@ -1,0 +1,47 @@
+# Rules for where jobs can run
+
+.run_manually:
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
+          when: manual
+        - if: '$CI_PROJECT_PATH == "iMSTK/iMSTK" && $CI_PIPELINE_SOURCE == "schedule"'
+          when: on_success
+        - if: '$CI_PROJECT_PATH == "iMSTK/iMSTK"'
+          when: delayed
+          start_in: 30 minutes
+        - when: never
+
+.run_automatically:
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
+          when: on_success
+        - if: '$CI_PROJECT_PATH == "iMSTK/iMSTK" && $CI_PIPELINE_SOURCE == "schedule"'
+          when: on_success
+        - if: '$CI_PROJECT_PATH == "iMSTK/iMSTK"'
+          when: delayed
+          start_in: 30 minutes
+        - when: never
+
+.run_dependent:
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
+          when: on_success
+        - if: '$CI_PROJECT_PATH == "iMSTK/iMSTK"'
+          when: on_success
+        - when: never
+
+.merged_only:
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
+          when: never
+        # When the fork-based workflow is used, the protected condition can be
+        # dropped.
+        - if: '$CI_PROJECT_PATH == "iMSTK/iMSTK" && $CI_COMMIT_REF_PROTECTED == "true"'
+          when: on_success
+        - when: never
+
+.doxygen_on_mirror:
+    rules:
+        - if: '$CI_SERVER_URL == "gitlab.com" && $CI_PROJECT_PATH == "imstk/imstk.gitlab.io"'
+          when: on_success
+        - when: never

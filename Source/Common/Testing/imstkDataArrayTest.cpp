@@ -67,6 +67,8 @@ TEST(imstkDataArrayTest, Constructors)
     EXPECT_EQ(4, d.size());
     EXPECT_EQ(4, d.getCapacity());
     EXPECT_TRUE(isEqualTo(d, { 0, 1, 2, 3 }));
+
+    EXPECT_EQ(1, DataArray<int>::NumComponents);
 }
 
 TEST(imstkDataArrayTest, Accessors)
@@ -94,17 +96,61 @@ TEST(imstkDataArrayTest, AccessorsConst)
     EXPECT_ANY_THROW(b[4]);
 }
 
-TEST(imstkDataArrayTest, Assignment)
+TEST(imstkDataArrayTest, AssignmentSufficientSpace)
 {
     DataArray<int> a;
     a = { 1, 2, 3, 4 };
     EXPECT_EQ(4, a.size());
     EXPECT_TRUE(isEqualTo(a, { 1, 2, 3, 4 }));
 
-    DataArray<int> b{ 0, 2, 4, 6 };
+    DataArray<int>    b{ 0, 2, 4, 6, 8, 10 };
+    DataArray<double> d{ 0, 2, 4, 6, 8, 10 };
+    int               capacity = b.getCapacity();
+    auto              ptr      = b.getPointer();
 
     b = a;
     EXPECT_TRUE(isEqualTo(b, { 1, 2, 3, 4 }));
+    EXPECT_EQ(capacity, b.getCapacity());
+    EXPECT_EQ(a.size(), b.size());
+    EXPECT_EQ(ptr, b.getPointer());
+}
+
+TEST(imstkDataArrayTest, AssignmentIncreaseCapacity)
+{
+    DataArray<int> a{ 1, 2, 3, 4 };
+    DataArray<int> b{ 0, 2, 4, 6, 8, 10 };
+
+    a = b;
+    EXPECT_TRUE(isEqualTo(a, { 0, 2, 4, 6, 8, 10 }));
+    EXPECT_EQ(b.getCapacity(), a.getCapacity());
+    EXPECT_EQ(a.size(), b.size());
+}
+
+TEST(imstkDataArrayTest, AssignmentMappedAndUnmapped)
+{
+    {
+        SCOPED_TRACE("Assign mapped to unmapped");
+        std::vector<int> other{ -1, -2, -3 };
+        DataArray<int>   mapped{ 1, 2, 3, 4 };
+        mapped.setData(other.data(), static_cast<int>(other.size()));
+        DataArray<int> unmapped{ 0, 2, 4, 6, 8, 10 };
+        unmapped = mapped;
+
+        EXPECT_TRUE(isEqualTo(unmapped, { -1, -2, -3 }));
+        EXPECT_EQ(unmapped.size(), mapped.size());
+    }
+
+    {
+        SCOPED_TRACE("Assign unmapped to mapped");
+        std::vector<int> other{ -1, -2, -3 };
+        DataArray<int>   mapped{ 1, 2, 3, 4 };
+        mapped.setData(other.data(), static_cast<int>(other.size()));
+        DataArray<int> unmapped{ 0, 2, 4, 6, 8, 10 };
+        mapped = unmapped;
+
+        EXPECT_TRUE(isEqualTo(mapped, { 0, 2, 4, 6, 8, 10 }));
+        EXPECT_EQ(unmapped.size(), mapped.size());
+    }
 }
 
 TEST(imstkDataArrayTest, Mapping)
