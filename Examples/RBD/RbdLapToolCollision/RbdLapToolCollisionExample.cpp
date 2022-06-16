@@ -120,7 +120,7 @@ main()
 
     auto rbdInteraction = std::make_shared<RigidObjectCollision>(lapTool1, lapTool2, "CapsuleToCapsuleCD");
     rbdInteraction->setFriction(0.0); // Don't use friction
-    rbdInteraction->setBeta(0.01);
+    rbdInteraction->setBaumgarteStabilization(0.01);
     scene->addInteraction(rbdInteraction);
 
     auto mousePlane = std::make_shared<Plane>(Vec3d(0.03, 0.0, -1.23), Vec3d(0.1, 0.0, 1.0));

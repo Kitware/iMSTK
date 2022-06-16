@@ -69,7 +69,7 @@ public:
     /// The higher it is, the faster constraint violations are dealt with
     /// (bigger steps), but could introduce erroneous velocity
     ///
-    void setBeta(double beta) { m_beta = beta; }
+    void setBaumgarteStabilization(double beta) { m_beta = beta; }
     const double getBeta() const { return m_beta; }
 
     void setFriction(double frictionalCoefficient)

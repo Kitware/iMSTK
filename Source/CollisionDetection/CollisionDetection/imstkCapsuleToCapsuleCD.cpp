@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCapsuleToCapsuleCD.h"
+#include "imstkCapsule.h"
 #include "imstkCollisionUtils.h"
 
 namespace imstk

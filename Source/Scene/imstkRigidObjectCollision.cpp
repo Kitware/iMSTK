@@ -98,9 +98,9 @@ RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1
 }
 
 void
-RigidObjectCollision::setBeta(double beta)
+RigidObjectCollision::setBaumgarteStabilization(double beta)
 {
-    std::dynamic_pointer_cast<RigidBodyCH>(getCollisionHandlingA())->setBeta(beta);
+    std::dynamic_pointer_cast<RigidBodyCH>(getCollisionHandlingA())->setBaumgarteStabilization(beta);
 }
 
 const double

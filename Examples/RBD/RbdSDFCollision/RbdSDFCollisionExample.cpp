@@ -141,7 +141,7 @@ main()
 
         auto rbdInteraction = std::make_shared<RigidObjectCollision>(cubeObj, planeObj, "ImplicitGeometryToPointSetCD");
         rbdInteraction->setFriction(0.0); // Don't use friction
-        rbdInteraction->setBeta(0.05);
+        rbdInteraction->setBaumgarteStabilization(0.05);
         scene->addInteraction(rbdInteraction);
 
         // Camera

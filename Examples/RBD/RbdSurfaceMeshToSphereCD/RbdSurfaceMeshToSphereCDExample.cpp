@@ -162,7 +162,7 @@ main()
         {
             auto rbdInteraction = std::make_shared<RigidObjectCollision>(rigidObjects[i], floorObj, "SurfaceMeshToSphereCD");
             rbdInteraction->setFriction(0.0);
-            rbdInteraction->setBeta(0.0001);
+            rbdInteraction->setBaumgarteStabilization(0.0001);
             scene->addInteraction(rbdInteraction);
         }
 
@@ -172,7 +172,7 @@ main()
             {
                 auto rbdInteraction = std::make_shared<RigidObjectCollision>(rigidObjects[i], rigidObjects[j], "SphereToSphereCD");
                 rbdInteraction->setFriction(0.0);
-                rbdInteraction->setBeta(0.0001);
+                rbdInteraction->setBaumgarteStabilization(0.0001);
                 scene->addInteraction(rbdInteraction);
             }
         }

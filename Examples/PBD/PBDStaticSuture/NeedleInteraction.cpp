@@ -49,6 +49,6 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<CollidingObject> tissueObj,
     needleRbdCH->setInputRigidObjectA(needleObj);
     needleRbdCH->setInputCollidingObjectB(tissueObj);
     needleRbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
-    needleRbdCH->setBeta(0.01);
+    needleRbdCH->setBaumgarteStabilization(0.01);
     setCollisionHandlingA(needleRbdCH);
 }

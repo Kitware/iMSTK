@@ -74,7 +74,7 @@ public:
 
         m_rbdCollision = std::make_shared<RigidObjectCollision>(m_rbdObj, m_cdObj, m_collisionName);
         m_rbdCollision->setFriction(m_friction);
-        m_rbdCollision->setBeta(m_beta);
+        m_rbdCollision->setBaumgarteStabilization(m_beta);
         m_scene->addInteraction(m_rbdCollision);
 
         // Debug geometry to visualize collision data
