@@ -23,6 +23,7 @@
 
 #include "imstkMacros.h"
 #include "imstkPointSet.h"
+#include "imstkVecDataArray.h"
 
 #include <array>
 
@@ -86,6 +87,11 @@ public:
     const Vec2i& getLineIndices(const size_t pos) const;
     Vec2i& getLineIndices(const size_t pos);
     ///@}
+
+    ///
+    /// \brief Get cells as abstract array.
+    ///
+    const AbstractDataArray* getCellIndices() const override { return m_segmentIndices.get(); }
 
 // Attributes
     ///

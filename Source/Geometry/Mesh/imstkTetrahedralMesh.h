@@ -23,6 +23,7 @@
 
 #include "imstkMacros.h"
 #include "imstkVolumetricMesh.h"
+#include "imstkVecDataArray.h"
 
 #include <array>
 
@@ -115,6 +116,11 @@ public:
     /// \brief Compute and return the volume of the tetrahedral mesh
     ///
     double getVolume() override;
+
+    ///
+    /// \brief Get cells as abstract array.
+    ///
+    const AbstractDataArray* getCellIndices() const override { return m_tetrahedraIndices.get(); }
 
 protected:
     std::shared_ptr<VecDataArray<int, 4>> m_tetrahedraIndices;

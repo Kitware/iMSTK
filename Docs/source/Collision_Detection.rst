@@ -32,7 +32,7 @@ Supported Collision Detection
    "Capsule",	         `-`,          ,                   ,           ,              ,        ,           ,         ,      
    "Cylinder",	        `-`,      `-`,                   ,           ,              ,        ,           ,         ,      
    "ImplicitGeometry",  `-`,      `-`,                `-`,           ,              ,        ,           ,         ,      
-   "LineMesh",          `-`,      `-`,                `-`,        `-`,              ,        ,           ,         ,      
+   "LineMesh",          `-`,      `-`,                `-`,          X,              ,        ,           ,         ,      
    "OrientedBox",     	`-`,      `-`,                `-`,        `-`,           `-`,        ,           ,         ,     
    "Plane",	            `-`,      `-`,                `-`,        `-`,           `-`,     N/A,           ,         ,      
    "PointSet",        	  X,        X,                  X,        N/A,             X,       X,        N/A,         ,      
@@ -84,6 +84,9 @@ Collision manifolds define the areas/points/patches of contact should two bodies
   * Ignored, covered with Face-Vertex.
   
 * Edge-Edge:
+
+  * Required for line mesh vs line mesh (polylines).
+
 * Edge-Vertex:
   
   * Ignored, covered with Face-Vertex.
@@ -149,6 +152,11 @@ With this approach it is required to store contact pairs of elements. Vertex-tri
 * **CellVertexElement**: Same as a CellIndexElement but gives the vertices by value instead.
 
   * Useful when the other geometry doesn't contain vertices with ids (implicit geometry).
+
+* **TransientCellIndexElement**: Encapsulates one CellVertexElement and one CellIndexElement to store a transient (moving in time) cell required by CCD algorithms.
+
+     * The CellVertexElement stores the previous time state of the cell directly in terms of 3D points.
+     * The CellIndexElement stores the current time state of the cell using cell ids from the colliding geometries.
 
 iMSTK collision methods prefer to produce contact element pairs over point-based contacts. This is because point-based contacts can be computed from element pairs when needed. But element pairs cannot so easily be computed from point-based contacts.
 
@@ -540,6 +548,12 @@ SurfaceMeshToCapsuleCD
 * Completely embedded triangles aren't handle well.
 * Only one PointDirection contact is currently generated at the center of the triangle edge, when that edge is parallel with the capsule.
 
+LineMeshToLineMeshCCD
+--------------------------------
+
+* Continuous collision detection for LineMesh vs LineMesh including self-collision. Self collision is indicated by `input0 == input1` to the algorithm.
+
+* The implementation uses Algorithm 1 described by Qi et al [lfs]_ in Section 4.
 
 References & Resources
 --------------------------------
@@ -557,4 +571,6 @@ Much of the math for geometric intersections can be derived from SAT and GJK. I 
 
 .. [gpp] den, B. G. van. (2010). Game physics pearls. A.K. Peters. 
   
-.. [rcd] Ericson, C. (n.d.). Real-time collision detection. Elsevier. 
+.. [rcd] Ericson, C. (n.d.). Real-time collision detection. Elsevier.
+  
+.. [lfs] Qi, Di, Karthikeyan Panneerselvam, Woojin Ahn, Venkata Arikatla, Andinet Enquobahrie, and Suvranu De. "Virtual interactive suturing for the Fundamentals of Laparoscopic Surgery (FLS)." Journal of biomedical informatics 75 (2017): 48-62.

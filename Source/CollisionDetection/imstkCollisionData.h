@@ -148,7 +148,8 @@ struct CollisionElement
 
     CollisionElement(const CollisionElement& other)
     {
-        m_type = other.m_type;
+        m_type    = other.m_type;
+        m_ccdData = other.m_ccdData;
         switch (m_type)
         {
         case CollisionElementType::Empty:
@@ -170,7 +171,8 @@ struct CollisionElement
 
     CollisionElement& operator=(const CollisionElement& other)
     {
-        m_type = other.m_type;
+        m_type    = other.m_type;
+        m_ccdData = other.m_ccdData;
         switch (m_type)
         {
         case CollisionElementType::Empty:
@@ -209,6 +211,7 @@ struct CollisionElement
     } m_element;
 
     CollisionElementType m_type;
+    bool m_ccdData = false;
 };
 
 ///
@@ -221,5 +224,7 @@ public:
     std::vector<CollisionElement> elementsB;
     std::shared_ptr<Geometry>     geomA;
     std::shared_ptr<Geometry>     geomB;
+    std::shared_ptr<Geometry>     prevGeomA;
+    std::shared_ptr<Geometry>     prevGeomB;
 };
 } // namespace imstk

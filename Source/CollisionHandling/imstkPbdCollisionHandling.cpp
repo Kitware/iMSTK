@@ -23,6 +23,7 @@
 #include "imstkCollisionData.h"
 #include "imstkGeometryMap.h"
 #include "imstkPbdEdgeEdgeConstraint.h"
+#include "imstkPbdEdgeEdgeCCDConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdPointEdgeConstraint.h"
@@ -39,17 +40,69 @@ namespace imstk
 ///
 struct MeshSide
 {
-    MeshSide(VecDataArray<double, 3>& vertices, VecDataArray<double, 3>& velocities, DataArray<double>& invMasses,
-             GeometryMap* mapPtr, AbstractDataArray* indicesPtr) : m_vertices(vertices), m_velocities(velocities),
+    MeshSide() {}
+
+    MeshSide(VecDataArray<double, 3>* vertices, VecDataArray<double, 3>* velocities, DataArray<double>* invMasses,
+             const GeometryMap* mapPtr, const AbstractDataArray* indicesPtr) : m_vertices(vertices), m_velocities(velocities),
         m_invMasses(invMasses), m_mapPtr(mapPtr), m_indicesPtr(indicesPtr)
     {
     }
 
-    VecDataArray<double, 3>& m_vertices;
-    VecDataArray<double, 3>& m_velocities;
-    DataArray<double>& m_invMasses;
-    GeometryMap* m_mapPtr = nullptr;
-    AbstractDataArray* m_indicesPtr = nullptr;
+    bool isValid() const
+    {
+        return m_vertices != nullptr;
+    }
+
+    Vec3d& Vertex(size_t id) const
+    {
+        return (*m_vertices)[id];
+    }
+
+    Vec3d& Velocity(size_t id) const
+    {
+        return (*m_velocities)[id];
+    }
+
+    double InvMass(size_t id) const
+    {
+        return (m_invMasses && m_invMasses->size() != 0) ? (*m_invMasses)[id] : 0.0;
+    }
+
+    // Since the MeshSide::create function modifies pointSet while constructing the MeshSide object,
+    // we don't want to make this a MeshSide constructor.
+    static MeshSide create(PointSet* pointSet, GeometryMap* mapPtr)
+    {
+        if (pointSet)
+        {
+            // For something to be a PbdObject it must have a pointset, it must also have invMasses defined
+            std::shared_ptr<VecDataArray<double, 3>> verticesPtr  = pointSet->getVertexPositions();
+            std::shared_ptr<DataArray<double>>       invMassesPtr = std::dynamic_pointer_cast<DataArray<double>>(pointSet->getVertexAttribute("InvMass"));
+            if (invMassesPtr == nullptr)
+            {
+                invMassesPtr = std::make_shared<DataArray<double>>(pointSet->getNumVertices());
+                invMassesPtr->fill(0.0); // Assume infinite mass if no mass given
+                pointSet->setVertexAttribute("InvMass", invMassesPtr);
+            }
+
+            // get velocities array or create if it doesn't exist.
+            std::shared_ptr<VecDataArray<double, 3>> velocitiesPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSet->getVertexAttribute("Velocities"));
+            if (velocitiesPtr == nullptr)
+            {
+                velocitiesPtr = std::make_shared<VecDataArray<double, 3>>(pointSet->getNumVertices());
+                velocitiesPtr->fill(Vec3d::Zero());
+                pointSet->setVertexAttribute("Velocities", velocitiesPtr);
+            }
+
+            return MeshSide(verticesPtr.get(), velocitiesPtr.get(), invMassesPtr.get(), mapPtr, pointSet->getCellIndices());
+        }
+        return MeshSide();
+    }
+
+    VecDataArray<double, 3>* m_vertices   = nullptr;
+    VecDataArray<double, 3>* m_velocities = nullptr;
+    DataArray<double>* m_invMasses = nullptr;
+    const GeometryMap* m_mapPtr    = nullptr;
+    const AbstractDataArray* m_indicesPtr = nullptr;
 };
 
 static std::array<VertexMassPair, 1>
@@ -67,46 +120,50 @@ getVertex(const CollisionElement& elem, const MeshSide& side)
     std::array<VertexMassPair, 1> results;
     if (ptId != -1)
     {
-        auto geomMap = dynamic_cast<PointwiseMap*>(side.m_mapPtr);
+        auto geomMap = dynamic_cast<const PointwiseMap*>(side.m_mapPtr);
         if (geomMap != nullptr)
         {
             ptId = geomMap->getParentVertexId(ptId);
         }
-        results[0] = { &side.m_vertices[ptId], side.m_invMasses[ptId], &side.m_velocities[ptId] };
+        results[0] = { &side.Vertex(ptId), side.InvMass(ptId), &side.Velocity(ptId) };
     }
     return results;
 }
 
 static std::array<VertexMassPair, 2>
-getEdge(const CollisionElement& elem, const MeshSide& side)
+getEdge(const CellIndexElement& cellIndexElement, const MeshSide& side)
 {
     int v1, v2;
     v1 = v2 = -1;
-    if (elem.m_type == CollisionElementType::CellIndex && elem.m_element.m_CellIndexElement.cellType == IMSTK_EDGE)
+    if (cellIndexElement.idCount == 1)
     {
-        if (elem.m_element.m_CellIndexElement.idCount == 1)
-        {
-            const Vec2i& cell = (*dynamic_cast<VecDataArray<int, 2>*>(side.m_indicesPtr))[elem.m_element.m_CellIndexElement.ids[0]];
-            v1 = cell[0];
-            v2 = cell[1];
-        }
-        else if (elem.m_element.m_CellIndexElement.idCount == 2)
-        {
-            v1 = elem.m_element.m_CellIndexElement.ids[0];
-            v2 = elem.m_element.m_CellIndexElement.ids[1];
-        }
+        const Vec2i& cell = (*dynamic_cast<const VecDataArray<int, 2>*>(side.m_indicesPtr))[cellIndexElement.ids[0]];
+        v1 = cell[0];
+        v2 = cell[1];
     }
+    else if (cellIndexElement.idCount == 2)
+    {
+        v1 = cellIndexElement.ids[0];
+        v2 = cellIndexElement.ids[1];
+    }
+
     std::array<VertexMassPair, 2> results;
     if (v1 != -1)
     {
-        auto geomMap = dynamic_cast<PointwiseMap*>(side.m_mapPtr);
+        auto geomMap = dynamic_cast<const PointwiseMap*>(side.m_mapPtr);
         if (side.m_mapPtr && geomMap != nullptr)
         {
             v1 = geomMap->getParentVertexId(v1);
             v2 = geomMap->getParentVertexId(v2);
         }
-        results[0] = { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] };
-        results[1] = { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] };
+        results[0] = { &side.Vertex(v1),
+                       side.InvMass(v1),
+                       &side.Velocity(v1)
+        };
+        results[1] = { &side.Vertex(v2),
+                       side.InvMass(v2),
+                       &side.Velocity(v2)
+        };
     }
     return results;
 }
@@ -120,7 +177,7 @@ getTriangle(const CollisionElement& elem, const MeshSide& side)
     {
         if (elem.m_element.m_CellIndexElement.idCount == 1)
         {
-            const Vec3i& cell = (*dynamic_cast<VecDataArray<int, 3>*>(side.m_indicesPtr))[elem.m_element.m_CellIndexElement.ids[0]];
+            const Vec3i& cell = (*dynamic_cast<const VecDataArray<int, 3>*>(side.m_indicesPtr))[elem.m_element.m_CellIndexElement.ids[0]];
             v1 = cell[0];
             v2 = cell[1];
             v3 = cell[2];
@@ -135,16 +192,16 @@ getTriangle(const CollisionElement& elem, const MeshSide& side)
     std::array<VertexMassPair, 3> results;
     if (v1 != -1)
     {
-        auto geomMap = dynamic_cast<PointwiseMap*>(side.m_mapPtr);
+        auto geomMap = dynamic_cast<const PointwiseMap*>(side.m_mapPtr);
         if (side.m_mapPtr && geomMap != nullptr)
         {
             v1 = geomMap->getParentVertexId(v1);
             v2 = geomMap->getParentVertexId(v2);
             v3 = geomMap->getParentVertexId(v3);
         }
-        results[0] = { &side.m_vertices[v1], side.m_invMasses[v1], &side.m_velocities[v1] };
-        results[1] = { &side.m_vertices[v2], side.m_invMasses[v2], &side.m_velocities[v2] };
-        results[2] = { &side.m_vertices[v3], side.m_invMasses[v3], &side.m_velocities[v3] };
+        results[0] = { &side.Vertex(v1), side.InvMass(v1), &side.Velocity(v1) };
+        results[1] = { &side.Vertex(v2), side.InvMass(v2), &side.Velocity(v2) };
+        results[2] = { &side.Vertex(v3), side.InvMass(v3), &side.Velocity(v3) };
     }
     return results;
 }
@@ -157,6 +214,10 @@ PbdCollisionHandling::PbdCollisionHandling() :
 PbdCollisionHandling::~PbdCollisionHandling()
 {
     for (const auto ptr: m_EEConstraintPool)
+    {
+        delete ptr;
+    }
+    for (const auto ptr: m_EECCDConstraintPool)
     {
         delete ptr;
     }
@@ -184,6 +245,7 @@ PbdCollisionHandling::handle(
     // \todo: Test counting them first
     m_VTConstraintPool.resize(0);
     m_EEConstraintPool.resize(0);
+    m_EECCDConstraintPool.resize(0);
     m_PEConstraintPool.resize(0);
     m_PPConstraintPool.resize(0);
 
@@ -200,12 +262,16 @@ PbdCollisionHandling::handle(
     }
     m_PBDConstraints.resize(0);
     m_PBDConstraints.reserve(
-        m_EEConstraintPool.size() + m_VTConstraintPool.size() +
+        m_EEConstraintPool.size() + m_EECCDConstraintPool.size() + m_VTConstraintPool.size() +
         m_PEConstraintPool.size() + m_PPConstraintPool.size());
 
     for (size_t i = 0; i < m_EEConstraintPool.size(); i++)
     {
         m_PBDConstraints.push_back(static_cast<PbdCollisionConstraint*>(m_EEConstraintPool[i]));
+    }
+    for (size_t i = 0; i < m_EECCDConstraintPool.size(); i++)
+    {
+        m_PBDConstraints.push_back(static_cast<PbdCollisionConstraint*>(m_EECCDConstraintPool[i]));
     }
     for (size_t i = 0; i < m_VTConstraintPool.size(); i++)
     {
@@ -234,23 +300,14 @@ PbdCollisionHandling::generateMeshNonMeshConstraints(
     const std::vector<CollisionElement>& elementsB)
 {
     // \todo: For when elementsA == 0 or elementsB == 0 and only one side of collision is handled
-    std::shared_ptr<PbdObject>       pbdObjectA = std::dynamic_pointer_cast<PbdObject>(getInputObjectA()); // Garunteed
-    std::shared_ptr<CollidingObject> objectB    = getInputObjectB();
+    std::shared_ptr<PbdObject> pbdObjectA = std::dynamic_pointer_cast<PbdObject>(getInputObjectA()); // Guaranteed
 
     // For something to be a PbdObject it must have a pointset, it must also have invMasses defined
-    std::shared_ptr<PointSet>                pointSetA      = std::dynamic_pointer_cast<PointSet>(pbdObjectA->getPhysicsGeometry());
-    std::shared_ptr<VecDataArray<double, 3>> verticesAPtr   = pointSetA->getVertexPositions();
-    std::shared_ptr<DataArray<double>>       invMassesAPtr  = std::dynamic_pointer_cast<DataArray<double>>(pointSetA->getVertexAttribute("InvMass"));
-    std::shared_ptr<VecDataArray<double, 3>> velocitiesAPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSetA->getVertexAttribute("Velocities"));
+    std::shared_ptr<PointSet> pointSetA = std::dynamic_pointer_cast<PointSet>(pbdObjectA->getPhysicsGeometry());
 
     const double stiffnessA = pbdObjectA->getPbdModel()->getConfig()->m_contactStiffness;
 
-    MeshSide sideA(
-        *verticesAPtr,
-        *velocitiesAPtr,
-        *invMassesAPtr,
-        pbdObjectA->getPhysicsToCollidingMap().get(),
-        nullptr);
+    const MeshSide sideA = MeshSide::create(pointSetA.get(), pbdObjectA->getPhysicsToCollidingMap().get());
 
     // \todo: Test if splitting constraints by type is more efficient
     for (int i = 0; i < elementsA.size(); i++)
@@ -323,7 +380,7 @@ PbdCollisionHandling::generateMeshNonMeshConstraints(
             // Edge vs ...
             else if (cellTypeA == IMSTK_EDGE)
             {
-                std::array<VertexMassPair, 2> vertexMassA = getEdge(colElemA, sideA);
+                std::array<VertexMassPair, 2> vertexMassA = getEdge(colElemA.m_element.m_CellIndexElement, sideA);
 
                 bool shouldAddConstraint = false;
                 // Edge vs vertex
@@ -375,52 +432,25 @@ PbdCollisionHandling::generateMeshMeshConstraints(
     std::shared_ptr<PointSet> pointSetA = std::dynamic_pointer_cast<PointSet>(pbdObjectA->getPhysicsGeometry());
     std::shared_ptr<PointSet> pointSetB = std::dynamic_pointer_cast<PointSet>((pbdObjectB != nullptr) ? pbdObjectB->getPhysicsGeometry() : objectB->getCollidingGeometry());
 
+    std::shared_ptr<PointSet> prevPointSetA = std::dynamic_pointer_cast<PointSet>(m_colData->prevGeomA);
+    std::shared_ptr<PointSet> prevPointSetB = std::dynamic_pointer_cast<PointSet>(m_colData->prevGeomB);
+
     // objectB may not have a pointSet, this func is only for handling mesh vs mesh constraints
     if (pointSetB == nullptr)
     {
         return;
     }
 
-    // Get Vertex buffers
-    std::shared_ptr<VecDataArray<double, 3>> verticesAPtr = pointSetA->getVertexPositions();
-    std::shared_ptr<VecDataArray<double, 3>> verticesBPtr = pointSetB->getVertexPositions();
-
-    // Get the Mass buffers
-    std::shared_ptr<DataArray<double>> invMassesAPtr = std::dynamic_pointer_cast<DataArray<double>>(pointSetA->getVertexAttribute("InvMass"));
-    std::shared_ptr<DataArray<double>> invMassesBPtr = std::dynamic_pointer_cast<DataArray<double>>(pointSetB->getVertexAttribute("InvMass"));
-    if (invMassesBPtr == nullptr)
-    {
-        invMassesBPtr = std::make_shared<DataArray<double>>(pointSetB->getNumVertices());
-        invMassesBPtr->fill(0.0); // Assume infinite mass if no mass given
-        pointSetB->setVertexAttribute("InvMass", invMassesBPtr);
-    }
-
-    // Get the velocities
-    std::shared_ptr<VecDataArray<double, 3>> velocitiesAPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSetA->getVertexAttribute("Velocities"));
-    std::shared_ptr<VecDataArray<double, 3>> velocitiesBPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSetB->getVertexAttribute("Velocities"));
-    if (velocitiesBPtr == nullptr)
-    {
-        velocitiesBPtr = std::make_shared<VecDataArray<double, 3>>(pointSetB->getNumVertices());
-        velocitiesBPtr->fill(Vec3d::Zero());
-        pointSetB->setVertexAttribute("Velocities", velocitiesBPtr);
-    }
-
     // Get the configs (one may be nullptr)
     const double stiffnessA = pbdObjectA->getPbdModel()->getConfig()->m_contactStiffness;
     const double stiffnessB = (pbdObjectB == nullptr) ? 0.0 : pbdObjectB->getPbdModel()->getConfig()->m_contactStiffness;
 
-    MeshSide sideA(
-        *verticesAPtr,
-        *velocitiesAPtr,
-        *invMassesAPtr,
-        pbdObjectA->getPhysicsToCollidingMap().get(),
-        nullptr);
-    MeshSide sideB(
-        *verticesBPtr,
-        *velocitiesBPtr,
-        *invMassesBPtr,
-        (pbdObjectB == nullptr) ? nullptr : pbdObjectB->getPhysicsToCollidingMap().get(),
-        nullptr);
+    // Create prev timestep MeshSide structures if the previous geometries are available.
+    MeshSide prevSideA = MeshSide::create(prevPointSetA.get(), pbdObjectA->getPhysicsToCollidingMap().get());
+    MeshSide prevSideB = MeshSide::create(prevPointSetB.get(), (pbdObjectB == nullptr) ? nullptr : pbdObjectB->getPhysicsToCollidingMap().get());
+
+    auto sideA = MeshSide::create(pointSetA.get(), pbdObjectA->getPhysicsToCollidingMap().get());
+    auto sideB = MeshSide::create(pointSetB.get(), (pbdObjectB == nullptr) ? nullptr : pbdObjectB->getPhysicsToCollidingMap().get());
 
     // \todo: Test if splitting constraints by type is more efficient
     for (int i = 0; i < elementsA.size(); i++)
@@ -428,83 +458,97 @@ PbdCollisionHandling::generateMeshMeshConstraints(
         const CollisionElement& colElemA = elementsA[i];
         const CollisionElement& colElemB = elementsB[i];
 
-        if (colElemA.m_type != CollisionElementType::CellIndex || colElemB.m_type != CollisionElementType::CellIndex)
+        if (colElemA.m_type == CollisionElementType::CellIndex && colElemB.m_type == CollisionElementType::CellIndex)
         {
-            continue;
-        }
+            const CellTypeId cellTypeA = colElemA.m_element.m_CellIndexElement.cellType;
+            const CellTypeId cellTypeB = colElemB.m_element.m_CellIndexElement.cellType;
 
-        const CellTypeId cellTypeA = colElemA.m_element.m_CellIndexElement.cellType;
-        const CellTypeId cellTypeB = colElemB.m_element.m_CellIndexElement.cellType;
+            // Vertex vs Triangle
+            if (cellTypeA == IMSTK_VERTEX && cellTypeB == IMSTK_TRIANGLE)
+            {
+                std::array<VertexMassPair, 1> vertexMassA = getVertex(colElemA, sideA);
+                std::array<VertexMassPair, 3> vertexMassB = getTriangle(colElemB, sideB);
 
-        // Vertex vs Triangle
-        if (cellTypeA == IMSTK_VERTEX && cellTypeB == IMSTK_TRIANGLE)
-        {
-            std::array<VertexMassPair, 1> vertexMassA = getVertex(colElemA, sideA);
-            std::array<VertexMassPair, 3> vertexMassB = getTriangle(colElemB, sideB);
+                // Setup a constraint to solve both sides (move both the triangle vertices and point vertex)
+                addVTConstraint(
+                    vertexMassA[0],
+                    vertexMassB[0], vertexMassB[1], vertexMassB[2],
+                    stiffnessA, stiffnessB);
+            }
+            // Triangle vs Vertex
+            else if (cellTypeA == IMSTK_TRIANGLE && cellTypeB == IMSTK_VERTEX)
+            {
+                std::array<VertexMassPair, 3> vertexMassA = getTriangle(colElemA, sideA);
+                std::array<VertexMassPair, 1> vertexMassB = getVertex(colElemB, sideB);
 
-            // Setup a constraint to solve both sides (move both the triangle vertices and point vertex)
-            addVTConstraint(
-                vertexMassA[0],
-                vertexMassB[0], vertexMassB[1], vertexMassB[2],
-                stiffnessA, stiffnessB);
-        }
-        // Triangle vs Vertex
-        else if (cellTypeA == IMSTK_TRIANGLE && cellTypeB == IMSTK_VERTEX)
-        {
-            std::array<VertexMassPair, 3> vertexMassA = getTriangle(colElemA, sideA);
-            std::array<VertexMassPair, 1> vertexMassB = getVertex(colElemB, sideB);
+                // Setup a constraint to solve both sides (move both the triangle vertices and point vertex)
+                addVTConstraint(
+                    vertexMassB[0],
+                    vertexMassA[0], vertexMassA[1], vertexMassA[2],
+                    stiffnessB, stiffnessA);
+            }
+            // Edge vs Edge
+            else if (cellTypeA == IMSTK_EDGE && cellTypeB == IMSTK_EDGE)
+            {
+                std::array<VertexMassPair, 2> vertexMassA = getEdge(colElemA.m_element.m_CellIndexElement, sideA);
+                std::array<VertexMassPair, 2> vertexMassB = getEdge(colElemB.m_element.m_CellIndexElement, sideB);
+                if (colElemA.m_ccdData && prevSideA.isValid() && prevSideB.isValid())
+                {
+                    std::array<VertexMassPair, 2> prevVertexMassA = getEdge(colElemA.m_element.m_CellIndexElement, prevSideA);
+                    std::array<VertexMassPair, 2> prevVertexMassB = getEdge(colElemB.m_element.m_CellIndexElement, prevSideB);
 
-            // Setup a constraint to solve both sides (move both the triangle vertices and point vertex)
-            addVTConstraint(
-                vertexMassB[0],
-                vertexMassA[0], vertexMassA[1], vertexMassA[2],
-                stiffnessB, stiffnessA);
-        }
-        // Edge vs Edge
-        else if (cellTypeA == IMSTK_EDGE && cellTypeB == IMSTK_EDGE)
-        {
-            std::array<VertexMassPair, 2> vertexMassA = getEdge(colElemA, sideA);
-            std::array<VertexMassPair, 2> vertexMassB = getEdge(colElemB, sideB);
+                    // Set inv masses to zero, since we do not wish to modify the previous geometries.
+                    prevVertexMassA[0].invMass = 0;
+                    prevVertexMassA[1].invMass = 0;
+                    prevVertexMassB[0].invMass = 0;
+                    prevVertexMassB[1].invMass = 0;
 
-            addEEConstraint(
-                vertexMassA[0], vertexMassA[1],
-                vertexMassB[0], vertexMassB[1],
-                stiffnessA, stiffnessB);
-        }
-        // Edge vs Vertex
-        else if (cellTypeA == IMSTK_EDGE && cellTypeB == IMSTK_VERTEX)
-        {
-            std::array<VertexMassPair, 2> vertexMassA = getEdge(colElemA, sideA);
-            std::array<VertexMassPair, 1> vertexMassB = getVertex(colElemB, sideB);
+                    addEECCDConstraint(prevVertexMassA[0], prevVertexMassA[1], prevVertexMassB[0], prevVertexMassB[1],
+                        vertexMassA[0], vertexMassA[1], vertexMassB[0], vertexMassB[1], stiffnessA, stiffnessB);
+                }
+                else
+                {
+                    addEEConstraint(
+                        vertexMassA[0], vertexMassA[1],
+                        vertexMassB[0], vertexMassB[1],
+                        stiffnessA, stiffnessB);
+                }
+            }
+            // Edge vs Vertex
+            else if (cellTypeA == IMSTK_EDGE && cellTypeB == IMSTK_VERTEX)
+            {
+                std::array<VertexMassPair, 2> vertexMassA = getEdge(colElemA.m_element.m_CellIndexElement, sideA);
+                std::array<VertexMassPair, 1> vertexMassB = getVertex(colElemB, sideB);
 
-            // Setup a constraint to solve both sides (move both the triangle vertices and point vertex)
-            addPEConstraint(
-                vertexMassB[0],
-                vertexMassA[0], vertexMassA[1],
-                stiffnessB, stiffnessA);
-        }
-        // Vertex vs Edge
-        else if (cellTypeA == IMSTK_VERTEX && cellTypeB == IMSTK_EDGE)
-        {
-            std::array<VertexMassPair, 1> vertexMassA = getVertex(colElemA, sideA);
-            std::array<VertexMassPair, 2> vertexMassB = getEdge(colElemB, sideB);
+                // Setup a constraint to solve both sides (move both the triangle vertices and point vertex)
+                addPEConstraint(
+                    vertexMassB[0],
+                    vertexMassA[0], vertexMassA[1],
+                    stiffnessB, stiffnessA);
+            }
+            // Vertex vs Edge
+            else if (cellTypeA == IMSTK_VERTEX && cellTypeB == IMSTK_EDGE)
+            {
+                std::array<VertexMassPair, 1> vertexMassA = getVertex(colElemA, sideA);
+                std::array<VertexMassPair, 2> vertexMassB = getEdge(colElemB.m_element.m_CellIndexElement, sideB);
 
-            // Setup a constraint to solve both sides (move both the triangle vertices and point vertex)
-            addPEConstraint(
-                vertexMassA[0],
-                vertexMassB[0], vertexMassB[1],
-                stiffnessA, stiffnessB);
-        }
-        // Vertex vs Vertex
-        else if (cellTypeA == IMSTK_VERTEX && cellTypeB == IMSTK_VERTEX)
-        {
-            std::array<VertexMassPair, 1> vertexMassA = getVertex(colElemA, sideA);
-            std::array<VertexMassPair, 1> vertexMassB = getVertex(colElemB, sideB);
+                // Setup a constraint to solve both sides (move both the triangle vertices and point vertex)
+                addPEConstraint(
+                    vertexMassA[0],
+                    vertexMassB[0], vertexMassB[1],
+                    stiffnessA, stiffnessB);
+            }
+            // Vertex vs Vertex
+            else if (cellTypeA == IMSTK_VERTEX && cellTypeB == IMSTK_VERTEX)
+            {
+                std::array<VertexMassPair, 1> vertexMassA = getVertex(colElemA, sideA);
+                std::array<VertexMassPair, 1> vertexMassB = getVertex(colElemB, sideB);
 
-            addPPConstraint(
-                vertexMassA[0],
-                vertexMassB[0],
-                stiffnessA, stiffnessB);
+                addPPConstraint(
+                    vertexMassA[0],
+                    vertexMassB[0],
+                    stiffnessA, stiffnessB);
+            }
         }
     }
 }
@@ -538,6 +582,22 @@ PbdCollisionHandling::addEEConstraint(
     PbdEdgeEdgeConstraint* constraint = new PbdEdgeEdgeConstraint();
     constraint->initConstraint(ptA1, ptA2, ptB1, ptB2, stiffnessA, stiffnessB);
     m_EEConstraintPool.push_back(constraint);
+}
+
+void
+PbdCollisionHandling::addEECCDConstraint(
+    VertexMassPair prev_ptA1, VertexMassPair prev_ptA2,
+    VertexMassPair prev_ptB1, VertexMassPair prev_ptB2,
+    VertexMassPair ptA1, VertexMassPair ptA2,
+    VertexMassPair ptB1, VertexMassPair ptB2,
+    double stiffnessA, double stiffnessB)
+{
+    PbdEdgeEdgeCCDConstraint* constraint = new PbdEdgeEdgeCCDConstraint();
+    constraint->initConstraint(
+        prev_ptA1, prev_ptA2, prev_ptB1, prev_ptB2,
+        ptA1, ptA2, ptB1, ptB2,
+        stiffnessA, stiffnessB);
+    m_EECCDConstraintPool.push_back(constraint);
 }
 
 void
