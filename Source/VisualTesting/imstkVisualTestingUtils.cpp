@@ -36,10 +36,12 @@ using namespace imstk;
 void
 VisualTest::SetUp()
 {
+#ifndef iMSTK_SYNCHRONOUS_LOGGING
     if (m_useStdOut)
     {
         Logger::getInstance().addStdoutSink();
     }
+#endif
     // Constructed early so user can subscribe calls to them
     m_driver       = std::make_shared<SimulationManager>();
     m_sceneManager = std::make_shared<SceneManager>();
@@ -49,7 +51,9 @@ VisualTest::SetUp()
 void
 VisualTest::TearDown()
 {
+#ifndef iMSTK_SYNCHRONOUS_LOGGING
     Logger::getInstance().destroy();
+#endif
 }
 
 void

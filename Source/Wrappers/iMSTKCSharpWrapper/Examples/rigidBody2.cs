@@ -97,7 +97,7 @@ public class RigidBody2
 
             RigidObjectCollision rbdInteraction = new RigidObjectCollision(cubeObj, planeObj, "ImplicitGeometryToPointSetCD");
             rbdInteraction.setFriction(0.0);
-            rbdInteraction.setStiffness(0.05);
+            rbdInteraction.setBaumgarteStabilization(0.05);
             scene.addInteraction(rbdInteraction);
             scene.getActiveCamera().setPosition(0.0, 40.0, 40.0);
 
