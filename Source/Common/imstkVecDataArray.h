@@ -38,17 +38,19 @@ template<typename T, int N>
 class VecDataArray : public DataArray<T>
 {
 public:
-    using VecType = Eigen::Matrix<T, N, 1>;
+    using ScalarType = T;
+    using ValueType  = Eigen::Matrix<T, N, 1>;
+    static constexpr int NumComponents = N;
 
     class iterator
     {
     public:
         using self_type  = iterator;
-        using value_type = VecType;
+        using value_type = ValueType;
         using iterator_category = std::forward_iterator_tag;
         using difference_type   = std::ptrdiff_t;
-        using pointer   = VecType*;
-        using reference = VecType&;
+        using pointer   = ValueType*;
+        using reference = ValueType&;
 
     public:
         iterator(pointer ptr, pointer end) : ptr_(ptr), end_(end) { }
@@ -89,11 +91,11 @@ public:
     {
     public:
         using self_type  = const_iterator;
-        using value_type = VecType;
+        using value_type = ValueType;
         using iterator_category = std::forward_iterator_tag;
         using difference_type   = std::ptrdiff_t;
-        using pointer   = VecType*;
-        using reference = const VecType&;
+        using pointer   = ValueType*;
+        using reference = const ValueType&;
 
     public:
         const_iterator(pointer ptr, pointer end) : ptr_(ptr), end_(end) { }
@@ -127,12 +129,12 @@ public:
     ///
     /// \brief Constructs an empty data array
     ///
-    VecDataArray() : DataArray<T>(N), m_vecSize(0), m_vecCapacity(1), m_dataCast(reinterpret_cast<VecType*>(DataArray<T>::m_data)) { }
+    VecDataArray() : DataArray<T>(N), m_vecSize(0), m_vecCapacity(1), m_dataCast(reinterpret_cast<ValueType*>(DataArray<T>::m_data)) { }
 
     ///
     /// \brief Constructs a data array of size
     ///
-    VecDataArray(const int size) : DataArray<T>(size * N), m_vecSize(size), m_vecCapacity(size), m_dataCast(reinterpret_cast<VecType*>(DataArray<T>::m_data)) { }
+    VecDataArray(const int size) : DataArray<T>(size * N), m_vecSize(size), m_vecCapacity(size), m_dataCast(reinterpret_cast<ValueType*>(DataArray<T>::m_data)) { }
 
     ///
     /// \brief Constructs from intializer list
@@ -140,7 +142,7 @@ public:
     VecDataArray(std::initializer_list<Eigen::Matrix<T, N, 1>> list) : DataArray<T>(static_cast<int>(list.size() * N)),
         m_vecSize(static_cast<int>(list.size())),
         m_vecCapacity(static_cast<int>(list.size())),
-        m_dataCast(reinterpret_cast<VecType*>(DataArray<T>::m_data))
+        m_dataCast(reinterpret_cast<ValueType*>(DataArray<T>::m_data))
     {
         int j = 0;
         for (auto i : list)
@@ -167,7 +169,7 @@ public:
         }
         m_vecSize     = other.m_vecSize;
         m_vecCapacity = other.m_vecCapacity;
-        m_dataCast    = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+        m_dataCast    = reinterpret_cast<ValueType*>(DataArray<T>::m_data);
     }
 
     VecDataArray(VecDataArray&& other)
@@ -241,33 +243,33 @@ public:
         if (size == 0)
         {
             DataArray<T>::resize(N);
-            m_dataCast = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+            m_dataCast = reinterpret_cast<ValueType*>(DataArray<T>::m_data);
             AbstractDataArray::m_size = m_vecSize = 0;
         }
         else
         {
             DataArray<T>::resize(size * N);
-            m_dataCast    = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+            m_dataCast    = reinterpret_cast<ValueType*>(DataArray<T>::m_data);
             m_vecSize     = size;
             m_vecCapacity = DataArray<T>::m_capacity / N;
         }
     }
 
-    inline void fill(const VecType& val) { std::fill_n(m_dataCast, m_vecSize, val); }
+    inline void fill(const ValueType& val) { std::fill_n(m_dataCast, m_vecSize, val); }
 
     inline int size() const { return m_vecSize; }
 
     inline void squeeze() override
     {
         DataArray<T>::squeeze();
-        m_dataCast    = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+        m_dataCast    = reinterpret_cast<ValueType*>(DataArray<T>::m_data);
         m_vecCapacity = DataArray<T>::m_capacity / N;
     }
 
     ///
     /// \brief Append the data array to hold the new value, resizes if neccesary
     ///
-    inline void push_back(const VecType& val)
+    inline void push_back(const ValueType& val)
     {
         // Can't push back to a mapped vector
         if (DataArray<T>::m_mapped)
@@ -285,7 +287,7 @@ public:
         m_dataCast[newVecSize - 1] = val;
     }
 
-    inline void push_back(const VecType&& val) // Move
+    inline void push_back(const ValueType&& val) // Move
     {
         // Can't push back to a mapped vector
         if (DataArray<T>::m_mapped)
@@ -338,9 +340,9 @@ public:
         m_vecSize = currVecSize; // Keep current size
     }
 
-    inline VecType* getPointer() { return m_dataCast; }
+    inline ValueType* getPointer() { return m_dataCast; }
 
-    inline VecType& operator[](const size_t pos)
+    inline ValueType& operator[](const size_t pos)
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
         if (pos >= m_vecSize) { throw std::runtime_error("Index out of range"); }
@@ -348,7 +350,7 @@ public:
         return m_dataCast[pos];
     }
 
-    inline const VecType& operator[](const size_t pos) const
+    inline const ValueType& operator[](const size_t pos) const
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
         if (pos >= m_vecSize) { throw std::runtime_error("Index out of range"); }
@@ -395,7 +397,7 @@ public:
             delete[] DataArray<T>::m_data;
         }
         DataArray<T>::m_data = new T[list.size() * N];
-        m_dataCast = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+        m_dataCast = reinterpret_cast<ValueType*>(DataArray<T>::m_data);
         int j = 0;
         for (auto i : list)
         {
@@ -410,23 +412,31 @@ public:
 
     VecDataArray& operator=(const VecDataArray& other)
     {
-        DataArray<T>::m_mapped = other.m_mapped;
-        AbstractDataArray::m_scalarType = other.m_scalarType;
-        AbstractDataArray::m_size       = other.m_size;
-        AbstractDataArray::m_capacity   = other.m_capacity;
-        m_vecSize     = other.m_vecSize;
-        m_vecCapacity = other.m_vecCapacity;
-        if (DataArray<T>::m_mapped)
+        // Delegate to the appropriate functions while maintaining state
+        // No need to copy type as it's static and this will only be used
+        // for `=` of equivalent types
+        if (other.m_mapped)
         {
-            DataArray<T>::m_data = other.m_data;
+            setData(other.m_dataCast, other.size());
         }
         else
         {
-            delete[] DataArray<T>::m_data;
-            DataArray<T>::m_data = new T[AbstractDataArray::m_capacity];
-            std::copy_n(other.m_data, AbstractDataArray::m_size, DataArray<T>::m_data);
+            if (DataArray<T>::m_mapped)
+            {
+                DataArray<T>::m_data     = nullptr;
+                DataArray<T>::m_capacity = 0;
+                DataArray<T>::m_size     = 0;
+                m_vecCapacity = 0;
+                m_vecSize     = 0;
+                DataArray<T>::m_mapped = false;
+            }
+
+            reserve(other.size());
+            std::copy_n(other.m_data, other.m_size, DataArray<T>::m_data);
+            AbstractDataArray::m_size = other.m_size;
+            m_vecSize = other.m_vecSize;
         }
-        m_dataCast = reinterpret_cast<VecType*>(DataArray<T>::m_data);
+
         return *this;
     }
 
@@ -447,7 +457,7 @@ public:
     /// \param: Number of values (per ValueType * number of components)
     /// \param: If manage is true, the data will be deleted when the array is, default false
     ///
-    inline void setData(VecType* ptr, const int size)
+    inline void setData(ValueType* ptr, const int size)
     {
         if (!DataArray<T>::m_mapped)
         {
@@ -464,8 +474,8 @@ public:
     inline int getNumberOfComponents() const override { return N; }
 
 private:
-    int      m_vecSize;
-    int      m_vecCapacity;
-    VecType* m_dataCast;
+    int m_vecSize;
+    int m_vecCapacity;
+    ValueType* m_dataCast;
 };
 } // namespace imstk

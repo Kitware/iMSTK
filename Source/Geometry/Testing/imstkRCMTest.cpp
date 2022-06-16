@@ -153,13 +153,13 @@ template<int N>
 void
 toSTLVector(const VecDataArray<int, N>& inArr, std::vector<std::array<size_t, static_cast<size_t>(N)>>& outArr)
 {
-    using VecType = typename VecDataArray<int, N>::VecType;
+    using ValueType = typename VecDataArray<int, N>::ValueType;
 
     outArr.clear();
     outArr.reserve(inArr.size());
     for (int i = 0; i < inArr.size(); i++)
     {
-        const VecType&                             vec = inArr[i];
+        const ValueType&                           vec = inArr[i];
         std::array<size_t, static_cast<size_t>(N)> conn;
         for (int j = 0; j < vec.size(); j++)
         {
