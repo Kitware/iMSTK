@@ -43,8 +43,10 @@ main(int argc, char** argv)
 
     vtksys::SystemTools::MakeDirectory("log");
 
+#ifndef iMSTK_SYNCHRONOUS_LOGGING
     auto& logger = imstk::Logger::getInstance();
     logger.addFileSink("test", "log");
+#endif
 
     ::testing::InitGoogleTest(&argc, argv);
     GTEST_FLAG_SET(death_test_style, "threadsafe");
