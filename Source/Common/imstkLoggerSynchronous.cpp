@@ -75,7 +75,7 @@ CacheOutput::hasMessages() const
 {
     bool result;
     m_mutex.lock();
-    result = m_messages.empty();
+    result = !m_messages.empty();
     m_mutex.unlock();
     return result;
 }

@@ -823,8 +823,10 @@ EigenType cs2Eigen(const csType& cs_data, EigenType* eigen_data)
 %template(DataArrayuc) imstk::DataArray<unsigned char>;
 %include "../../Common/imstkLogger.h";
 #ifdef iMSTK_SYNCHRONOUS_LOGGING
+%rename (Logger) LoggerSynchronous;
 %include "../../Common/imstkLoggerSynchronous.h"
 #else 
+%rename (Logger) LoggerG3;
 %include "../../Common/imstkLoggerG3.h"
 #endif
 %include "../../Common/imstkModule.h";
