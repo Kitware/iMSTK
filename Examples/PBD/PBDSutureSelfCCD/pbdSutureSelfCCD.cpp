@@ -120,14 +120,14 @@ makePbdString(const std::string& name, const std::string& filename)
     {
         pbdParams->m_fixedNodeIds = { 0, 1, size_t(stringMesh->getNumVertices() - 2), size_t(stringMesh->getNumVertices() - 1) };
         pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 2.0);
-        // pbdParams->enableBendConstraint(1.0, 1);
-        // pbdParams->enableBendConstraint(.5, 2);
+        pbdParams->enableBendConstraint(0.01, 1);
+        //pbdParams->enableBendConstraint(.5, 2);
     }
     else
     {
         pbdParams->m_fixedNodeIds = { 9, 10, selfCCDStringMesh.size() - 2, selfCCDStringMesh.size() - 1 };
         pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 2.0);
-        pbdParams->enableBendConstraint(0.1, 1);
+        pbdParams->enableBendConstraint(0.01, 1);
         //pbdParams->enableBendConstraint(.5, 2);
     }
 
