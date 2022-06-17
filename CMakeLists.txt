@@ -391,6 +391,7 @@ if (${PROJECT_NAME}_USE_RENDERING_VTK)
     RenderingContextOpenGL2
     RenderingCore
     RenderingExternal
+    RenderingLabel
     RenderingOpenGL2
     RenderingOpenVR
     RenderingVolume

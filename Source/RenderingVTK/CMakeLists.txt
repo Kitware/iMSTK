@@ -25,6 +25,7 @@ imstk_add_library(RenderingVTK
     RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.h
     RenderDelegate/imstkVTKSurfaceNormalRenderDelegate.h
     RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.h
+    RenderDelegate/imstkVTKVertexLabelRenderDelegate.h
     RenderDelegate/imstkVTKVolumeRenderDelegate.h
   CPP_FILES
     imstkRenderDelegateObjectFactory.cpp
@@ -47,6 +48,7 @@ imstk_add_library(RenderingVTK
     RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.cpp
     RenderDelegate/imstkVTKSurfaceNormalRenderDelegate.cpp
     RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.cpp
+    RenderDelegate/imstkVTKVertexLabelRenderDelegate.cpp
     RenderDelegate/imstkVTKVolumeRenderDelegate.cpp
   DEPENDS
     OpenVR::OpenVR
@@ -56,6 +58,7 @@ imstk_add_library(RenderingVTK
     VTK::RenderingOpenGL2
     VTK::RenderingVolumeOpenGL2
     VTK::RenderingOpenVR
+    VTK::RenderingLabel
     VTK::RenderingAnnotation
     VTK::ChartsCore
   )
