@@ -113,7 +113,7 @@ private:
     double m_epsilon = 1e-10;
 
     // Thickness of colliding LineMeshes.
-    double m_thickness = 0.0016;
+    double m_thickness = 0.0016; // 0.0016
 
     double a() const
     {
