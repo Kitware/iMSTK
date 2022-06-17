@@ -72,9 +72,11 @@ struct PbdModelConfig
         ///
         /// \brief Enables a bend constraint with given stiffness, stride, and flag for 0 rest length
         /// You may enable multiple with differing strides
+        /// If constraint with same stride already exists, updates the stiffness and restLength0 on it
         /// \param Stiffness, how much bend is enforced
-        /// \param Stride, amount of vertices skipped before connection
-        /// \param When true rest length (and angle) are constrained to 0
+        /// \param Stride, distance between vertex connections
+        /// \param When true rest length (and angle) are constrained to 0, useful when mesh initial/resting state
+        /// is not 0 angled
         ///
         void enableBendConstraint(const double stiffness, const int stride, const bool restLength0 = true);
 
