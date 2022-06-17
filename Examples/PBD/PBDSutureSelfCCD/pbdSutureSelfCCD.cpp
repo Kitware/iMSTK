@@ -38,7 +38,13 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
-#include "../PBDStaticSuture/imstkMouseDeviceClient3D.h"
+#ifdef iMSTK_USE_OPENHAPTICS
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
+#else
+#include "imstkDummyClient.h"
+#include "imstkMouseDeviceClient.h"
+#endif
 #include "../PBDStaticSuture/NeedleObject.h"
 
 using namespace imstk;
@@ -150,7 +156,7 @@ makePbdString(const std::string& name, const std::string& filename)
     imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
     material->setColor(Color::Red);
-    material->setLineWidth(2.0);
+    material->setLineWidth(4.0);
     material->setPointSize(6.0);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
@@ -191,10 +197,11 @@ main()
 
     scene->addSceneObject(movingLine);
 
-    std::shared_ptr<PbdObjectCollision> interaction = std::make_shared<PbdObjectCollision>(movingLine, movingLine, "LineMeshToLineMeshCCD");
+    auto interaction = std::make_shared<PbdObjectCollision>(movingLine, movingLine, "LineMeshToLineMeshCCD");
     interaction->setFriction(0.0);
-    auto colSolver = std::dynamic_pointer_cast<PbdCollisionHandling>(interaction->getCollisionHandlingAB())->getCollisionSolver();
-    colSolver->setCollisionIterations(50);
+    interaction->setRestitution(0.0);
+    auto colHandler = std::dynamic_pointer_cast<PbdCollisionHandling>(interaction->getCollisionHandlingAB());
+    colHandler->getCollisionSolver()->setCollisionIterations(25);
     scene->addInteraction(interaction);
 
     // Create the arc needle
@@ -203,8 +210,8 @@ main()
     scene->addSceneObject(needleObj);
 
     // Adjust the camera
-    scene->getActiveCamera()->setFocalPoint(0, 0, 0);
-    scene->getActiveCamera()->setPosition(0, 0, 0.4);
+    scene->getActiveCamera()->setFocalPoint(0.022, -0.045, -0.01);
+    scene->getActiveCamera()->setPosition(0.02, -0.02, 0.2);
     scene->getActiveCamera()->setViewUp(0, 1, 0);
 
     // Run the simulation
@@ -213,6 +220,7 @@ main()
         imstkNew<VTKViewer> viewer;
         viewer->setActiveScene(scene);
         viewer->setDebugAxesLength(0.01, 0.01, 0.01);
+        viewer->setBackgroundColors(Color(202.0 / 255.0, 212.0 / 255.0, 157.0 / 255.0));
 
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager;
@@ -225,17 +233,26 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.0005); // 1ms, 1000hz //timestep
 
-        imstkNew<MouseDeviceClient3D> deviceClient(viewer->getMouseDevice());
+#ifdef iMSTK_USE_OPENHAPTICS
+        imstkNew<HapticDeviceManager> deviceManager;
+        driver->addModule(deviceManager);
+        std::shared_ptr<HapticDeviceClient> deviceClient       = deviceManager->makeDeviceClient();
+        const double                        translationScaling = 0.001;
+        const Vec3d                         offset = Vec3d(-0.02, 0.02, 0.0);
+#else
+        imstkNew<DummyClient> deviceClient;
         deviceClient->setOrientation(Quatd(Rotd(1.57, Vec3d(0.0, 1.0, 0.0))));
-        const double translationScaling = 0.2;
-        const Vec3d  offset = Vec3d(-0.1, -0.1, 0.0);
+        const double translationScaling = 0.1;
+        const Vec3d  offset = Vec3d(-0.02, 0.02, 0.0);
 
-        connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseScroll,
+        connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseMove,
             [&](MouseEvent* e)
             {
-                const Quatd delta = Quatd(Rotd(e->m_scrollDx * 0.1, Vec3d(0.0, 0.0, 1.0)));
-                deviceClient->setOrientation(deviceClient->getOrientation() * delta);
+                const Vec2d& mousePos = viewer->getMouseDevice()->getPos();
+                const Vec2d pos       = (mousePos - Vec2d(0.5, 0.5));
+                deviceClient->setPosition(Vec3d(pos[0], pos[1], 0.0));
             });
+#endif
 
 #define USE_NEEDLE
 #ifdef USE_NEEDLE
@@ -245,9 +262,7 @@ main()
         controller->setLinearKs(1000.0);
         controller->setAngularKs(10000000.0);
         controller->setUseCritDamping(true);
-        controller->setForceScaling(0.2);
-        controller->setSmoothingKernelSize(5);
-        controller->setUseForceSmoothening(true);
+        controller->setForceScaling(0.0);
         scene->addController(controller);
 #else
         imstkNew<SceneObjectController> controller(movingLine, deviceClient);
