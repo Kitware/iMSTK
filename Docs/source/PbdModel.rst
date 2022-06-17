@@ -9,13 +9,74 @@ The general pbd pipeline is as follows:
 - **Solve Internal Constraints**: Solve all internal constraints (directly changing positions). Resolving any violations.
 - **Update Velocities**: Compute new velocities from the displacements produced.
 
+Code/Setup
+--------------------------------
+To setup position based dynamics create a PbdObject. Then create a PbdModel (the system) and set it on the object.
+
+::
+
+    auto pbdObject = std::make_shared<PbdObject>();
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdObject->setDynamicalModel(pbdModel);
+
+The PbdModel can further be configured with the PbdConfig:
+
+::
+
+    // Setup the config
+    imstkNew<PbdModelConfig> pbdConfig;
+
+    // Constraints
+    pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e2);
+    pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e1);
+    pbdConfig->m_fixedNodeIds = { 0, 1 };
+
+    // Other parameters
+    pbdConfig->m_uniformMassValue = 1.0;
+    pbdConfig->m_gravity   = Vec3d(0, -9.8, 0);
+    pbdConfig->m_dt = 0.005;
+    pbdConfig->m_iterations = 10;
+
+    // Setup the model
+    imstkNew<PbdModel> pbdModel;
+    pbdModel->setModelGeometry(surfMesh);
+    pbdModel->configure(pbdConfig);
+
+PbdObject's may share a PbdModel or each have their own. This changes whether the constraints are solved in the same system, or solved in separate systems.
+
+**Constraints**: Constraints of varying types may be used via ``PbdModelConfig::enableConstraint``, internally this uses PbdConstraintFunctor's which defines how to generate constraints. If one needs more hands on with constraints you may write your own ``PbdConstraintFunctor``. Implemented by subclassing PbdConstraintFunctor and overriding the operator() function. See existing functors in ``imstkPbdConstraintFunctor.h``.
+
+::
+
+    auto myCustomFunctor = std::make_shared<MySuperCustomFunctor>();
+    myCustomFunctor->setStiffness(0.95);
+    pbdModel->addPbdConstraintFunctor(myCustomFunctor);
+
+**Fixed Node Ids**: This indicates the indices of the particles/nodes that are immovable. Immovable nodes have their inverse masses set to 0 which indicates infinite mass (hence immovable).
+
+**Uniform Mass Value**: This mass value is assigned to all particles/nodes on initialization if masses are not provided as a vertex attribute in the input mesh.
+
+**dt**: The timestep is used during integration to move the particles. Small timesteps are preferable for stability. Real time steps may be used by varying dt every update of the simulation.
+
+::
+
+    connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+    {
+        pbdConfig->m_dt = sceneManager->getDt();
+    });
+
+**Iterations**: The iterations of the solver used in the internal constraints. More iterations give changes more time to percolate through the body. For example, a really long thread with numerous segments may have a really high stiffness but if it doesn't have enough iterations it will never be able to reach maximum stiffness. In the original PBD paper stiffness varied with the number of iterations. In xPBD (default) it does not.
+
 Constraints
 --------------------------------
 
 Pbd is a constraint based model. Constraints are made for particles in pbd. This constrains the movement of a particle. Constraints are given via a constraint function q, and the gradient of the function q. To solve a constraint is to reduce the scalar, q, to 0. The gradient gives the direction to move the particle to do this. The following constraints are available in iMSTK and referred to in later sections on how to use them:
 
-There are two types of constraints in iMSTK. PbdConstraints and PbdCollisionConstraints. PbdConstraints are generally inernal constraints and work by particle index. They often exist for the entire duration of a simulation. PbdCollisionConstraints are often external, they are added at runtime upon contact, they work by particle pointer value (position and velocity). Among the PbdConstraints are:
+There are two types of constraints in iMSTK. PbdConstraints and PbdCollisionConstraints.
+ - PbdConstraints are inernal constraints that reference particles/vertices by index. This allows vertex buffers & topologies to resize without needing to update all the constraints. They normally exist for the entire duration of a simulation but can be removed during topology change.
+ - PbdCollisionConstraints are often external, they are added at runtime upon contact for short durations, they work by pointer value (position and velocity).
 
+ Among the PbdConstraints are:
 - **PbdDistanceConstraint**: Constraints two points by the initial distance between them.
 - **PbdDihedralConstraint**: Constrains two triangles by the initial angle between their planes.
 - **PbdVolumeConstraint**: Constrains all points of a tetrahedron by the initial volume.
@@ -29,7 +90,7 @@ To implement your own custom constraint one needs to subclass either ``PbdConstr
 Deformable Membranes
 --------------------------------
 
-For thin deformable membraneous tissues (cloth like) we use surfaces made of triangles. For this simulation one may use **PbdDistanceConstraint**, **PbdDihedralConstraint**, and/or **PbdAreaConstraint**. The most common setup is just distance and dihedral constraints though. The distance constraints keep the cloth together, whilst the dihedral constraint controls how resistent to bending the membrane is.
+For thin deformable membraneous tissues (cloth like) we use surfaces made of triangles. For this simulation one may use **PbdDistanceConstraint**, **PbdDihedralConstraint**, and/or **PbdAreaConstraint**. The most common setup is just distance and dihedral constraints though. The distance constraints keep the cloth together, whilst the dihedral constraint controls how resistent to bending the membrane is. It's useful to note that tissues can stretch but most cloths cannot (only bend), thus larger stiffness for **PBDDistanceConstraint** is ideal.
 
 .. image:: media/PbdModel/tissue1Gif.gif
   :width: 400
@@ -64,9 +125,9 @@ For volumetric deformable tissues discretized with tetrahedrons may be used. Wit
 Deformable Threads
 --------------------------------
 
-Surture threads are very common in surgical scenarios. For threads one may use **PbdDistanceConstraint** & **PbdBendConstraint** constraints. The distance constraints keep the particles of the thread together, whilst the bend controls the rigidity of the the thread. The bend constraints may also be generated between multiple sets of particles to reduce iteration count.
+Surture threads are very common in surgical scenarios. For threads one may use **PbdDistanceConstraint** & **PbdBendConstraint** constraints. The distance constraints keep the particles of the thread together, whilst the bend controls the rigidity of the the thread. The bend constraints may also be generated between multiple sets of particles to reduce iteration count. It's useful to note that a LineMesh threads **PbdDistanceConstraint**'s will be solved in fewer iterations if the lines are ordered from end effector to tail.
 
-.. image:: media/PbdModel/thread1.png
+.. image:: media/PbdModel/thread_wrap.gif
   :width: 400
   :alt: Cloth simulation
   :align: center
@@ -85,54 +146,6 @@ Liquids can be modeled with pbd using **PbdConstantDensityConstraint**. Generall
   --------------------------------
 
   The primary usage for gas is particles during electrocautery. Often these would be billboarded smoke images on particles that fade fairly quickly. There are currently no examples for gas in iMSTK. It is a fluid though, so its approach is not much different than liquids. The **PbdConstantDensityConstraint** may be used. I would suggest using a lower stiffness as liquids tend to be incompressible (constant density) whereas gasses are compressible. The other issue is the lack of proper boundary conditions. Often we are modeling a gas suspended in air. This air must be modeled too if you want accuracy. There do exist some solutions with "ghost particles" to approximate air without adding air particles, but iMSTK does not have such solutions yet. If this is for visual purposes I might suggest lowering gravity, fiddling with mass, etc to get believable behaviour without being suspended in anything.```
-
-Code
-====
-To setup a PbdModel we do:
-
-::
-
-    // Setup the config
-    imstkNew<PbdModelConfig> pbdConfig;
-
-    // Constraints
-    pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e2);
-    pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e1);
-    pbdConfig->m_fixedNodeIds = { 0, 1 };
-
-    // Other parameters
-    pbdConfig->m_uniformMassValue = 1.0;
-    pbdConfig->m_gravity   = Vec3d(0, -9.8, 0);
-    pbdConfig->m_dt = 0.005;
-    pbdConfig->m_iterations = 10;
-
-    // Setup the model
-    imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(surfMesh);
-    pbdModel->configure(pbdConfig);
-
-**Constraints**: Constraints of varying types may be used via ``PbdModelConfig::enableConstraint``, internally this uses PbdConstraintFunctor's which defines how to generate constraints. If one needs more hands on with constraints you may write your own ``PbdConstraintFunctor``. Implemented by subclassing PbdConstraintFunctor and overriding the operator() function. See existing functors in ``imstkPbdConstraintFunctor.h``.
-
-::
-
-    auto myCustomFunctor = std::make_shared<MySuperCustomFunctor>();
-    myCustomFunctor->setStiffness(0.95);
-    pbdModel->addPbdConstraintFunctor(myCustomFunctor);
-
-**Fixed Node Ids**: This indicates the indices of the particles/nodes that are immovable. Immovable nodes have their inverse masses set to 0 which indicates infinite mass (hence immovable).
-
-**Uniform Mass Value**: This mass value is assigned to all particles/nodes on initialization if masses are not provided as a vertex attribute in the input mesh.
-
-**dt**: The timestep is used during integration to move the particles. Small timesteps are preferable for stability. Real time steps may be used by varying dt every update of the simulation.
-
-::
-
-    connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-    {
-        pbdConfig->m_dt = sceneManager->getDt();
-    });
-
-**Iterations**: The iterations of the solver used in the internal constraints. More iterations give changes more time to percolate through the body. For example, a really long thread with numerous segments may have a really high stiffness but if it doesn't have enough iterations it will never be able to reach maximum stiffness. In the original PBD paper stiffness varied with the number of iterations. In xPBD (default) it does not.
 
 Bibliography
 ------------

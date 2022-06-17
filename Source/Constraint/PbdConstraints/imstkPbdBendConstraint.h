@@ -61,8 +61,12 @@ public:
     */
     void initConstraint(
         const VecDataArray<double, 3>& initVertexPositions,
-        const size_t& pIdx1, const size_t& pIdx2,
-        const size_t& pIdx3, const double k);
+        const size_t pIdx1, const size_t pIdx2, const size_t pIdx3,
+        const double k);
+    void initConstraint(
+        const size_t pIdx1, const size_t pIdx2, const size_t pIdx3,
+        const double restLength,
+        const double k);
 
     ///
     /// \brief Compute the value and gradient of constraint

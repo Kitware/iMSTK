@@ -469,7 +469,14 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
                     }
 
                     auto c = std::make_shared<PbdBendConstraint>();
-                    c->initConstraint(vertices, i1, i2, i3, k);
+                    if (m_restLengthOverride >= 0.0)
+                    {
+                        c->initConstraint(i1, i2, i3, m_restLengthOverride, k);
+                    }
+                    else
+                    {
+                        c->initConstraint(vertices, i1, i2, i3, k);
+                    }
                     constraints.addConstraint(c);
                 };
 
@@ -498,11 +505,20 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
         }
 
         int getStride() const { return m_stride; }
-    ///@}
+        ///@}
+
+        ///
+        /// \brief Get/Set the rest length, if not specified or negative
+        /// the rest length will default to what it was when initialized
+        /// @{
+        double getRestLength() const { return m_restLengthOverride; }
+        void setRestLength(const double restLength) { m_restLengthOverride = restLength; }
+    /// @}
 
     protected:
         double m_stiffness = 0.0;
         int m_stride       = 3;
+        double m_restLengthOverride = -1.0;
 };
 
 ///

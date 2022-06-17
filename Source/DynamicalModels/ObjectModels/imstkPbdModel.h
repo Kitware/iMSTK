@@ -70,10 +70,15 @@ struct PbdModelConfig
         void enableConstraint(ConstraintGenType type, double stiffness);
 
         ///
-        /// \brief Enables a bend constraint with given stride (stride=1 connects every neighbor vertex
-        /// so a constraint is formed every 3 verts, stride=2 forms between 5 verts)
+        /// \brief Enables a bend constraint with given stiffness, stride, and flag for 0 rest length
+        /// You may enable multiple with differing strides
+        /// If constraint with same stride already exists, updates the stiffness and restLength0 on it
+        /// \param Stiffness, how much bend is enforced
+        /// \param Stride, distance between vertex connections
+        /// \param When true rest length (and angle) are constrained to 0, useful when mesh initial/resting state
+        /// is not 0 angled
         ///
-        void enableBendConstraint(const double stiffness, const int stride);
+        void enableBendConstraint(const double stiffness, const int stride, const bool restLength0 = true);
 
         ///
         /// \brief Enable a Fem constraint with the material provided

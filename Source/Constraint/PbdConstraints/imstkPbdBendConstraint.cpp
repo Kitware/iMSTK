@@ -25,18 +25,9 @@ namespace imstk
 {
 void
 PbdBendConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                                  const size_t& pIdx0,
-                                  const size_t& pIdx1,
-                                  const size_t& pIdx2,
+                                  const size_t pIdx0, const size_t pIdx1, const size_t pIdx2,
                                   const double k)
 {
-    m_vertexIds[0] = pIdx0;
-    m_vertexIds[1] = pIdx1;
-    m_vertexIds[2] = pIdx2;
-
-    m_stiffness  = k;
-    m_compliance = 1.0 / k;
-
     const Vec3d& p0 = initVertexPositions[pIdx0];
     const Vec3d& p1 = initVertexPositions[pIdx1];
     const Vec3d& p2 = initVertexPositions[pIdx2];
@@ -44,7 +35,23 @@ PbdBendConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPosit
     // Instead of using the angle between the segments we can use the distance
     // from the center of the triangle
     const Vec3d& center = (p0 + p1 + p2) / 3.0;
-    m_restLength = (p1 - center).norm();
+
+    initConstraint(pIdx0, pIdx1, pIdx2, (p1 - center).norm(), k);
+}
+
+void
+PbdBendConstraint::initConstraint(
+    const size_t pIdx0, const size_t pIdx1, const size_t pIdx2,
+    const double restLength,
+    const double k)
+{
+    m_vertexIds[0] = pIdx0;
+    m_vertexIds[1] = pIdx1;
+    m_vertexIds[2] = pIdx2;
+
+    setStiffness(k);
+
+    m_restLength = restLength;
 }
 
 bool

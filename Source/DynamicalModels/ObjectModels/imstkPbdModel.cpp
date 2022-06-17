@@ -118,7 +118,7 @@ PbdModelConfig::enableConstraint(ConstraintGenType type, double stiffness)
 }
 
 void
-PbdModelConfig::enableBendConstraint(const double stiffness, const int stride)
+PbdModelConfig::enableBendConstraint(const double stiffness, const int stride, const bool restLength0)
 {
     auto& funcs = m_functors[ConstraintGenType::Bend];
 
@@ -142,6 +142,7 @@ PbdModelConfig::enableBendConstraint(const double stiffness, const int stride)
         funcs.push_back(foundFunctor);
     }
 
+    foundFunctor->setRestLength(restLength0 ? 0.0 : -1.0);
     foundFunctor->setStiffness(stiffness);
     foundFunctor->setStride(stride);
 }
