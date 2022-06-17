@@ -25,9 +25,11 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
+#include "imstkPbdSolver.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
@@ -119,24 +121,24 @@ makePbdString(const std::string& name, const std::string& filename)
     if (name == "granny_knot")
     {
         pbdParams->m_fixedNodeIds = { 0, 1, size_t(stringMesh->getNumVertices() - 2), size_t(stringMesh->getNumVertices() - 1) };
-        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 2.0);
+        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
         pbdParams->enableBendConstraint(0.01, 1);
         //pbdParams->enableBendConstraint(.5, 2);
     }
     else
     {
         pbdParams->m_fixedNodeIds = { 9, 10, selfCCDStringMesh.size() - 2, selfCCDStringMesh.size() - 1 };
-        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 2.0);
+        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
         pbdParams->enableBendConstraint(0.01, 1);
         //pbdParams->enableBendConstraint(.5, 2);
     }
 
     pbdParams->m_uniformMassValue = 0.0001 / numVerts; // grams
     pbdParams->m_gravity = Vec3d(0.0, -9.8, 0.0);
-    pbdParams->m_dt      = 0.001;
+    pbdParams->m_dt      = 0.0005;
     // Very important parameter for stability of solver, keep lower than 1.0:
-    pbdParams->m_contactStiffness    = 0.1;
-    pbdParams->m_iterations          = 20;
+    pbdParams->m_contactStiffness    = 0.05;
+    pbdParams->m_iterations          = 1;
     pbdParams->m_viscousDampingCoeff = 0.03;
 
     // Setup the Model
@@ -191,6 +193,8 @@ main()
 
     std::shared_ptr<PbdObjectCollision> interaction = std::make_shared<PbdObjectCollision>(movingLine, movingLine, "LineMeshToLineMeshCCD");
     interaction->setFriction(0.0);
+    auto colSolver = std::dynamic_pointer_cast<PbdCollisionHandling>(interaction->getCollisionHandlingAB())->getCollisionSolver();
+    colSolver->setCollisionIterations(50);
     scene->addInteraction(interaction);
 
     // Create the arc needle
@@ -219,7 +223,7 @@ main()
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(0.001); // 1ms, 1000hz //timestep
+        driver->setDesiredDt(0.0005); // 1ms, 1000hz //timestep
 
         imstkNew<MouseDeviceClient3D> deviceClient(viewer->getMouseDevice());
         deviceClient->setOrientation(Quatd(Rotd(1.57, Vec3d(0.0, 1.0, 0.0))));
