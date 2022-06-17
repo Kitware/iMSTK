@@ -71,7 +71,7 @@ makePbdString(
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100.0);
     pbdParams->enableBendConstraint(100000.0, 1);
     pbdParams->enableBendConstraint(100000.0, 2);
-    pbdParams->m_fixedNodeIds     = { 0, 1 };
+    pbdParams->m_fixedNodeIds     = { 0, 1, 19, 20 };
     pbdParams->m_uniformMassValue = 0.002 / numVerts; // grams
     pbdParams->m_gravity = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt      = 0.0005;                    // Overwritten for real time
@@ -263,7 +263,7 @@ main()
             [&](Event*)
             {
                 needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-                sutureThreadObj->getPbdModel()->getConfig()->m_dt  = sceneManager->getDt();
+                // sutureThreadObj->getPbdModel()->getConfig()->m_dt  = sceneManager->getDt();
             });
         // Constrain the first two vertices of the string to the needle
         connect<Event>(sceneManager, &SceneManager::postUpdate,
