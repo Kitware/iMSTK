@@ -25,7 +25,7 @@ namespace imstk
 {
 void
 PbdBendConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                                  const size_t& pIdx0, const size_t& pIdx1, const size_t& pIdx2,
+                                  const size_t pIdx0, const size_t pIdx1, const size_t pIdx2,
                                   const double k)
 {
     const Vec3d& p0 = initVertexPositions[pIdx0];
@@ -41,7 +41,7 @@ PbdBendConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPosit
 
 void
 PbdBendConstraint::initConstraint(
-    const size_t& pIdx0, const size_t& pIdx1, const size_t& pIdx2,
+    const size_t pIdx0, const size_t pIdx1, const size_t pIdx2,
     const double restLength,
     const double k)
 {

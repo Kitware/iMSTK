@@ -142,7 +142,7 @@ PbdModelConfig::enableBendConstraint(const double stiffness, const int stride, c
         funcs.push_back(foundFunctor);
     }
 
-    restLength0 ? foundFunctor->setRestLength(0.0) : foundFunctor->setRestLength(-1.0);
+    foundFunctor->setRestLength(restLength0 ? 0.0 : -1.0);
     foundFunctor->setStiffness(stiffness);
     foundFunctor->setStride(stride);
 }
