@@ -80,7 +80,7 @@ TEST(imstkVecDataArrayTest, Constructors)
 
     using TestType = VecDataArray<int, 2>;
 
-    EXPECT_EQ(2, TestType::NumComponents);
+    EXPECT_EQ(2, int(TestType::NumComponents));
 }
 
 TEST(imstkVecDataArrayTest, Accessors)
