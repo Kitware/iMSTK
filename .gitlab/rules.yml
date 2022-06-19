@@ -43,8 +43,6 @@
 .doxygen_on_mirror:
     rules:
         # Only build/host the website off one branch (remove for testing/development)
-        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-          when: on_success
-        - if: '$CI_SERVER_URL == "https://gitlab.com" && $CI_PROJECT_PATH == "imstk/imstk.gitlab.io"'
+        - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_SERVER_URL == "https://gitlab.com" && $CI_PROJECT_PATH == "imstk/imstk.gitlab.io"'
           when: on_success
         - when: never
