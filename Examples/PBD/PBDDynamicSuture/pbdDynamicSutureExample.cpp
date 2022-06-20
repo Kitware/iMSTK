@@ -21,14 +21,16 @@
 
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
-
 #include "imstkGeometryUtilities.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
 #include "imstkImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
@@ -37,6 +39,7 @@
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
+#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -44,17 +47,8 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
-
-#include "imstkNew.h"
-
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkRigidObjectController.h"
-#endif
 
 using namespace imstk;
 
@@ -63,8 +57,6 @@ std::shared_ptr<PbdObject>
 createTissueHole(std::shared_ptr<TetrahedralMesh> tetMesh)
 {
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
-
-    std::shared_ptr<SurfaceMesh> tissueHoleVisual = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "Tissues/tissue_hole_surf.obj");
 
     auto pbdObject = std::make_shared<PbdObject>("meshHole");
     auto pbdParams = std::make_shared<PbdModelConfig>();
@@ -97,10 +89,6 @@ createTissueHole(std::shared_ptr<TetrahedralMesh> tetMesh)
     tetMesh->scale(0.018, Geometry::TransformType::ApplyToData); // 0.015
     surfMesh->scale(0.018, Geometry::TransformType::ApplyToData);
 
-    tissueHoleVisual->rotate(Vec3d(0.0, 0.0, 1.0), -PI_2, Geometry::TransformType::ApplyToData);
-    tissueHoleVisual->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2 / 1.0, Geometry::TransformType::ApplyToData);
-    tissueHoleVisual->scale(0.018, Geometry::TransformType::ApplyToData);
-
     surfMesh->computeVertexNormals();
     surfMesh->computeTrianglesNormals();
 
@@ -115,7 +103,7 @@ createTissueHole(std::shared_ptr<TetrahedralMesh> tetMesh)
 
     // Add a visual model to render the surface of the tet mesh
     auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(tissueHoleVisual);
+    visualModel->setGeometry(surfMesh);
     visualModel->setRenderMaterial(material);
     pbdObject->addVisualModel(visualModel);
 
@@ -123,9 +111,6 @@ createTissueHole(std::shared_ptr<TetrahedralMesh> tetMesh)
     pbdObject->setPhysicsGeometry(tetMesh);
     pbdObject->setCollidingGeometry(surfMesh);
     pbdObject->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
-    auto map = std::make_shared<PointwiseMap>(tetMesh, tissueHoleVisual);
-    map->setTolerance(0.01);
-    pbdObject->setPhysicsToVisualMap(map);
     pbdObject->setDynamicalModel(pbdModel);
 
     return pbdObject;
@@ -256,7 +241,7 @@ main()
     scene->addInteraction(sutureInteraction);
 
     // Add thread CCD
-    std::shared_ptr<PbdObjectCollision> interactionCCDThread = std::make_shared<PbdObjectCollision>(sutureThreadObj, sutureThreadObj, "LineMeshToLineMeshCCD");
+    auto interactionCCDThread = std::make_shared<PbdObjectCollision>(sutureThreadObj, sutureThreadObj, "LineMeshToLineMeshCCD");
     interactionCCDThread->setFriction(0.0);
     auto colSolver = std::dynamic_pointer_cast<PbdCollisionHandling>(interactionCCDThread->getCollisionHandlingAB())->getCollisionSolver();
 
@@ -288,7 +273,7 @@ main()
         driver->addModule(hapticManager);
 
         auto hapController = std::make_shared<RigidObjectController>(needleObj, deviceClient);
-        hapController->setTranslationScaling(0.002);
+        hapController->setTranslationScaling(0.0005);
         hapController->setLinearKs(10000.0);
         hapController->setAngularKs(100000000.0);
         hapController->setUseCritDamping(true);
