@@ -48,6 +48,12 @@ public:
     ///
     /// \brief initialize constraint with current distance between
     /// the points as the resting length
+    /// \param points of cell a
+    /// \param barycentric weights for the point in cell a
+    /// \param points of cell b
+    /// \param barycentric weights for the point in cell b
+    /// \param Stiffness which to resolve a
+    /// \param stiffness which to resolve b
     ///
     void initConstraintToRest(
         const std::vector<VertexMassPair>& ptsA,
@@ -63,6 +69,13 @@ public:
 
     ///
     /// \brief Initialize the constraint with given resting length
+    /// \param points of cell a
+    /// \param barycentric weights for the point in cell a
+    /// \param points of cell b
+    /// \param barycentric weights for the point in cell b
+    /// \param stiffness which to resolve a
+    /// \param stiffness which to resolve b
+    /// \param the rest length to resolve to
     ///
     void initConstraint(
         const std::vector<VertexMassPair>& ptsA,
