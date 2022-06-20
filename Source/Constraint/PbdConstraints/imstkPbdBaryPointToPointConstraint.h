@@ -41,6 +41,9 @@ public:
     PbdBaryPointToPointConstraint() : PbdCollisionConstraint(0, 0) { }
     ~PbdBaryPointToPointConstraint() override = default;
 
+    double getRestLength() const { return m_restLength; }
+    void setRestLength(const double length) { m_restLength = length; }
+
     Vec3d computePtA() const;
     Vec3d computePtB() const;
     Vec3d computeInterpolantDifference() const { return computePtB() - computePtA(); }
@@ -62,8 +65,7 @@ public:
         const std::vector<double>& weightsB,
         const double stiffnessA, const double stiffnessB)
     {
-        initConstraint(ptsA, weightsA, ptsB, weightsB,
-            0.0, stiffnessA, stiffnessB);
+        initConstraint(ptsA, weightsA, ptsB, weightsB, stiffnessA, stiffnessB);
         m_restLength = (computePtB() - computePtA()).norm();
     }
 
