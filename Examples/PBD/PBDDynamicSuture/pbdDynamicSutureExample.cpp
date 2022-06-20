@@ -21,14 +21,16 @@
 
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
-
 #include "imstkGeometryUtilities.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
 #include "imstkImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
@@ -37,6 +39,7 @@
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
+#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -44,17 +47,8 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
-
-#include "imstkNew.h"
-
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkRigidObjectController.h"
-#endif
 
 using namespace imstk;
 

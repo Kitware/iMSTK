@@ -36,8 +36,6 @@ if(iMSTK_USE_OpenHaptics AND iMSTK_USE_RENDERING_VTK)
         ThreadInsertionConstraint.cpp
     )
 
-
-
     #-----------------------------------------------------------------------------
     # Add the target to Examples folder
     #-----------------------------------------------------------------------------
