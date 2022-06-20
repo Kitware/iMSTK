@@ -46,14 +46,31 @@ public:
     Vec3d computeInterpolantDifference() const { return computePtB() - computePtA(); }
 
     ///
-    /// \brief initialize constraint
+    /// \brief initialize constraint with current distance between
+    /// the points as the resting length
+    ///
+    void initConstraintToRest(
+        const std::vector<VertexMassPair>& ptsA,
+        const std::vector<double>& weightsA,
+        const std::vector<VertexMassPair>& ptsB,
+        const std::vector<double>& weightsB,
+        const double stiffnessA, const double stiffnessB)
+    {
+        initConstraint(ptsA, weightsA, ptsB, weightsB,
+            0.0, stiffnessA, stiffnessB);
+        m_restLength = (computePtB() - computePtA()).norm();
+    }
+
+    ///
+    /// \brief Initialize the constraint with given resting length
     ///
     void initConstraint(
         const std::vector<VertexMassPair>& ptsA,
         const std::vector<double>& weightsA,
         const std::vector<VertexMassPair>& ptsB,
         const std::vector<double>& weightsB,
-        const double stiffnessA, const double stiffnessB);
+        const double stiffnessA, const double stiffnessB,
+        const double restLength = 0.0);
 
     ///
     /// \brief compute value and gradient of constraint function
@@ -70,5 +87,7 @@ protected:
     // Bary weights
     std::vector<double> m_weightsA;
     std::vector<double> m_weightsB;
+
+    double m_restLength = 0.0;
 };
 } // namespace imstk
