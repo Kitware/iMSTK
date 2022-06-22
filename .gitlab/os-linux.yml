@@ -1,0 +1,59 @@
+# Linux-specific builder configurations and build commands
+
+## Base images
+
+### Fedora
+
+.fedora36:
+    image: "kitware/imstk:ci-fedora36-20220621"
+
+    variables:
+        GIT_SUBMODULE_STRATEGY: recursive
+        CMAKE_CONFIGURATION: fedora36
+        GIT_CLONE_PATH: $CI_BUILDS_DIR/gitlab-kitware-sciviz-ci
+
+## Tags
+
+.linux_builder_tags:
+    tags:
+        - build
+        - imstk
+        - docker
+        - linux
+
+.linux_test_tags:
+    tags:
+        - imstk
+        - docker
+        - linux
+        - x11
+
+## Linux-specific scripts
+
+.before_script_linux: &before_script_linux
+    - .gitlab/ci/cmake.sh
+    - .gitlab/ci/ninja.sh
+    - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PATH
+    - cmake --version
+    - ninja --version
+
+.cmake_build_linux:
+    stage: build
+
+    script:
+        - *before_script_linux
+        - .gitlab/ci/sccache.sh
+        - sccache --start-server
+        - sccache --show-stats
+        - "$LAUNCHER ctest -V -S .gitlab/ci/ctest_configure.cmake"
+        - "$LAUNCHER ctest -VV -S .gitlab/ci/ctest_build.cmake"
+        - sccache --show-stats
+    interruptible: true
+
+.cmake_test_linux:
+    stage: test
+
+    script:
+        - *before_script_linux
+        - "$LAUNCHER ctest --output-on-failure -V -S .gitlab/ci/ctest_test.cmake"
+    interruptible: true
