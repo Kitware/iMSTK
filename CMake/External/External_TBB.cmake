@@ -5,14 +5,14 @@ include(imstkAddExternalProject)
 
 # Download options
 if(NOT DEFINED iMSTK_TBB_GIT_SHA)
-  # Version 2021.1.1
-  set(iMSTK_TBB_GIT_SHA "46fb877ef1618d9de9a9ba10cee107592b7cdb2d")
+  # Version 2021.5.0
+  set(iMSTK_TBB_GIT_SHA "3df08fe234f23e732a122809b40eb129ae22733f")
 endif()
 if(NOT DEFINED iMSTK_TBB_GIT_REPOSITORY)
   set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
-    # 2021.1
+    # 2021.5
     URL https://github.com/oneapi-src/oneTBB/archive/${iMSTK_TBB_GIT_SHA}.zip
-    URL_HASH MD5=1a0d5676ab568c8b9de57c7ecc082505
+    URL_HASH MD5=8e42b09da31adb346d741f187f96594e
     )
 else()
   set(EXTERNAL_PROJECT_DOWNLOAD_OPTIONS
