@@ -24,5 +24,6 @@ endif()
 imstk_add_external_project( TBB
   ${EXTERNAL_PROJECT_DOWNLOAD_OPTIONS}
   CMAKE_CACHE_ARGS
+    -DTBB_STRICT:BOOL=OFF
     -DTBB_TEST:BOOL=OFF
 )
