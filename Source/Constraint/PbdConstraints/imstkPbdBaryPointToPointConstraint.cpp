@@ -51,7 +51,8 @@ PbdBaryPointToPointConstraint::initConstraint(
     const std::vector<double>& weightsA,
     const std::vector<VertexMassPair>& ptsB,
     const std::vector<double>& weightsB,
-    const double stiffnessA, const double stiffnessB)
+    const double stiffnessA, const double stiffnessB,
+    const double restLength)
 {
     m_dcdxA.resize(ptsA.size());
     m_bodiesFirst = ptsA;
@@ -63,6 +64,8 @@ PbdBaryPointToPointConstraint::initConstraint(
 
     m_stiffnessA = stiffnessA;
     m_stiffnessB = stiffnessB;
+
+    m_restLength = restLength;
 }
 
 bool
@@ -73,7 +76,7 @@ PbdBaryPointToPointConstraint::computeValueAndGradient(double&             c,
     // Compute the difference between the interpolant points (points in the two cells)
     Vec3d diff = computeInterpolantDifference();
 
-    c = diff.norm();
+    c = diff.norm() - m_restLength;
 
     if (c < IMSTK_DOUBLE_EPS)
     {
