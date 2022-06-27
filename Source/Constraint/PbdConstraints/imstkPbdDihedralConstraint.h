@@ -39,11 +39,6 @@ public:
         m_dcdx.resize(4);
     }
 
-    ///
-    /// \brief Returns PBD constraint of type Type::Dihedral
-    ///
-    std::string getType() const override { return "Dihedral"; }
-
     /**
       \brief initConstraint
              p3

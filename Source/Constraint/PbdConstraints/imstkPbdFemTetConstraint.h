@@ -38,11 +38,6 @@ public:
         PbdFemConstraint(4, mType) {}
 
     ///
-    /// \brief Get the type of Fem constraint
-    ///
-    std::string getType() const override { return "FemTet"; }
-
-    ///
     /// \brief Initialize the tetrahedral FEM constraint
     ///
     bool initConstraint(const VecDataArray<double, 3>& initVertexPositions,

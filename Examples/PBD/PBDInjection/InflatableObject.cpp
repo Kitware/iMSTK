@@ -218,17 +218,15 @@ InflatableObject::inject(const Vec3d& toolTip, const double radius, double dx)
         const double dv = id.second * de;
 
         auto& c = (m_constraintContainer->getConstraints())[id.first];
-        if (c->getType() == "Volume")
+        if (auto volConstraint = std::dynamic_pointer_cast<PbdInflatableVolumeConstraint>(c))
         {
-            const auto& constraint = std::dynamic_pointer_cast<PbdInflatableVolumeConstraint>(c);
-            constraint->setRestVolume(dv + constraint->getRestVolume());
-            constraint->setStiffness(1.0);
+            volConstraint->setRestVolume(dv + volConstraint->getRestVolume());
+            volConstraint->setStiffness(1.0);
         }
-        else if (c->getType() == "Distance")
+        else if (auto distConstraint = std::dynamic_pointer_cast<PbdInflatableDistanceConstraint>(c))
         {
-            const auto& constraint = std::dynamic_pointer_cast<PbdInflatableDistanceConstraint>(c);
-            constraint->setRestLength(0.00001 * cbrt(dv) + constraint->getRestLength());
-            constraint->setStiffness(0.1);
+            distConstraint->setRestLength(0.00001 * cbrt(dv) + distConstraint->getRestLength());
+            distConstraint->setStiffness(0.1);
         }
     }
 }
@@ -264,15 +262,13 @@ InflatableObject::reset()
 
     for (auto& c : m_constraintContainer->getConstraints())
     {
-        if (c->getType() == "Volume")
+        if (auto volConstraint = std::dynamic_pointer_cast<PbdInflatableVolumeConstraint>(c))
         {
-            const auto& constraint = std::dynamic_pointer_cast<PbdInflatableVolumeConstraint>(c);
-            constraint->resetRestVolume();
+            volConstraint->resetRestVolume();
         }
-        else if (c->getType() == "Distance")
+        else if (auto distConstraint = std::dynamic_pointer_cast<PbdInflatableDistanceConstraint>(c))
         {
-            const auto& constraint = std::dynamic_pointer_cast<PbdInflatableDistanceConstraint>(c);
-            constraint->resetRestLength();
+            distConstraint->resetRestLength();
         }
     }
 }

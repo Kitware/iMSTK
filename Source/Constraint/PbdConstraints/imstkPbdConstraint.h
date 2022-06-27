@@ -48,12 +48,6 @@ public:
     virtual ~PbdConstraint() = default;
 
     ///
-    /// \brief abstract interface to know the type of constraint
-    /// \return particular type
-    ///
-    virtual std::string getType() const = 0;
-
-    ///
     /// \brief Compute value and gradient of the constraint
     /// \param Vertex positions of particles
     /// \param Constraint value
