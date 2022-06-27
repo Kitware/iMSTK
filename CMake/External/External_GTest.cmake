@@ -25,6 +25,7 @@ imstk_add_external_project( GTest
     -DBUILD_SHARED_LIBS:BOOL=ON
     -DBUILD_GMOCK:BOOL=ON
     -DBUILD_GTEST:BOOL=ON
+    -DCMAKE_INSTALL_LIBDIR:STRING=lib
     -Dgtest_force_shared_crt:BOOL=ON
   DEPENDENCIES ""
   RELATIVE_INCLUDE_PATH ""

@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <cstdlib>
 #include <unordered_set>
 #include <vector>
 

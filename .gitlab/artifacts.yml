@@ -26,6 +26,7 @@
             # Build tree SDK
             - build/Innerbuild/iMSTK*.cmake
             - build/Innerbuild/Source/*/*.lib
+            - build/Innerbuild/Source/*/*.a
 
             # CDash files.
             - build/DartConfiguration.tcl
