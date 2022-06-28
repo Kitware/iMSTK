@@ -47,9 +47,13 @@ limitations under the License.
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 #include "imstkVTKSurfaceNormalRenderDelegate.h"
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
+#include "imstkVTKVertexLabelRenderDelegate.h"
 
 namespace imstk
 {
+///
+/// \brie Note, these do not refer to geometry classes
+///
 IMSTK_REGISTER_RENDERDELEGATE(SurfaceMesh, VTKSurfaceMeshRenderDelegate)
 IMSTK_REGISTER_RENDERDELEGATE(Cylinder, VTKCylinderRenderDelegate)
 IMSTK_REGISTER_RENDERDELEGATE(TetrahedralMesh, VTKTetrahedralMeshRenderDelegate)
@@ -61,6 +65,7 @@ IMSTK_REGISTER_RENDERDELEGATE(Sphere, VTKSphereRenderDelegate)
 IMSTK_REGISTER_RENDERDELEGATE(Capsule, VTKCapsuleRenderDelegate)
 IMSTK_REGISTER_RENDERDELEGATE(OrientedBox, VTKOrientedCubeRenderDelegate)
 IMSTK_REGISTER_RENDERDELEGATE(ImageData, VTKImageDataRenderDelegate)
+IMSTK_REGISTER_RENDERDELEGATE(VertexLabel, VTKVertexLabelRenderDelegate)
 
 // Custom algorithms
 RenderDelegateRegistrar<VTKFluidRenderDelegate>         _imstk_registerrenderdelegate_fluid("Fluid");

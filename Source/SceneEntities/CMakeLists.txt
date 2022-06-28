@@ -23,6 +23,7 @@ set(H_FILES
   Objects/imstkSceneObject.h
   Objects/imstkSphObject.h
   Objects/imstkVisualModel.h
+  Objects/imstkVertexLabelVisualModel.h
   imstkSceneEntity.h
   )
 

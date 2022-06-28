@@ -36,7 +36,7 @@
 #include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkVisualModel.h"
+#include "imstkVertexLabelVisualModel.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -82,8 +82,14 @@ makeClothObj(const std::string& name,
     visualModel->setGeometry(clothMesh);
     visualModel->setRenderMaterial(material);
 
+    imstkNew<VertexLabelVisualModel> vertexLabelModel;
+    vertexLabelModel->setGeometry(clothMesh);
+    vertexLabelModel->setFontSize(20.0);
+    vertexLabelModel->setTextColor(Color::Red);
+
     // Setup the Object
     clothObj->addVisualModel(visualModel);
+    clothObj->addVisualModel(vertexLabelModel);
     clothObj->setPhysicsGeometry(clothMesh);
     clothObj->setCollidingGeometry(clothMesh);
     clothObj->setDynamicalModel(pbdModel);
@@ -118,7 +124,7 @@ main()
     scene->addSceneObject(cutObj);
 
     // Create a pbd cloth object in the scene
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 12, 12);
+    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 7, 7);
     scene->addSceneObject(clothObj);
 
     // Add interaction pair for pbd cutting
