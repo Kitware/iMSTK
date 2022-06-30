@@ -219,16 +219,11 @@ RigidBodyModel2::computeTentativeVelocities()
     StdVectorOfVec3d&          torques = getCurrentState()->getTorques();
     const Vec3d&               fG      = m_config->m_gravity;
 
-    // Sum gravity to the forces
-    ParallelUtils::parallelFor(forces.size(), [&forces, &fG](const size_t& i)
-        {
-            forces[i] += fG;
-        }, forces.size() > m_maxBodiesParallel);
-
     // Compute the desired velocites, later we will solve for the proper velocities,
     // adjusted for the constraints
     ParallelUtils::parallelFor(tentativeVelocities.size(), [&](const size_t& i)
         {
+            forces[i] += fG * (1.0 / invMasses[i]);
             tentativeVelocities[i] += forces[i] * invMasses[i] * dt;
             tentativeAngularVelocities[i] += invInteriaTensors[i] * torques[i] * dt;
         }, tentativeVelocities.size() > m_maxBodiesParallel);

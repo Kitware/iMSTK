@@ -105,7 +105,6 @@ main()
 
     // This model is shared among interacting rigid bodies
     imstkNew<RigidBodyModel2> rbdModel;
-    rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
     rbdModel->getConfig()->m_maxNumIterations = 10;
 
     // Create the first rbd, plane floor
