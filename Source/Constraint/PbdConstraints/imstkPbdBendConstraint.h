@@ -39,11 +39,6 @@ public:
         m_dcdx.resize(3);
     }
 
-    ///
-    /// \brief Returns PBD constraint of type Type::Bend
-    ///
-    std::string getType() const override { return "Bend"; }
-
     /**
         \brief initConstraint
             p0

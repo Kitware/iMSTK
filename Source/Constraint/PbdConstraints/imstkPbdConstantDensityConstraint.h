@@ -47,11 +47,6 @@ public:
     void initConstraint(const VecDataArray<double, 3>& initVertexPositions, const double k);
 
     ///
-    /// \brief Returns PBD constraint of type ConstantDensity
-    ///
-    std::string getType() const override { return "ConstantDensity"; }
-
-    ///
     /// \brief Solves the constant density constraint
     ///
     void projectConstraint(const DataArray<double>& currInvMasses,

@@ -40,11 +40,6 @@ public:
     }
 
     ///
-    /// \brief Returns PBD constraint of type Type::Volume
-    ///
-    std::string getType() const override { return "Volume"; }
-
-    ///
     /// \brief Initializes the volume constraint
     ///
     void initConstraint(const VecDataArray<double, 3>& initVertexPositions,

@@ -40,11 +40,6 @@ public:
     }
 
     ///
-    /// \brief Returns PBD constraint of type Type::Distance
-    ///
-    std::string getType() const override { return "Distance"; }
-
-    ///
     /// \brief Initializes the distance constraint
     ///
     void initConstraint(const VecDataArray<double, 3>& initVertexPositions,

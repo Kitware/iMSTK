@@ -40,11 +40,6 @@ public:
     }
 
     ///
-    /// \brief Returns PBD constraint of type Area
-    ///
-    std::string getType() const override { return "Area"; }
-
-    ///
     /// \brief Initializes the area constraint
     ///
     void initConstraint(
@@ -58,6 +53,6 @@ public:
         std::vector<Vec3d>& dcdx) const override;
 
 public:
-    double m_restArea = 0.;  ///< Area at the rest position
+    double m_restArea = 0.0;  ///< Area at the rest position
 };
 } // namespace imstk

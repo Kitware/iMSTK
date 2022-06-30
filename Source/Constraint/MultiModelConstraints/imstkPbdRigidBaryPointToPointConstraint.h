@@ -34,7 +34,6 @@ private:
     double m_beta = 0.0001;
 
 public:
-
     PbdRigidBaryPointToPointConstraint(std::shared_ptr<RigidBody> obj1);
     ~PbdRigidBaryPointToPointConstraint() override = default;
 
