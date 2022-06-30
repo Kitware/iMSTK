@@ -27,7 +27,6 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkOrientedBox.h"
 #include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
@@ -58,50 +57,48 @@ main()
     // Write log to stdout and file
     Logger::startLogger();
 
-    imstkNew<Scene> scene("Rigid Body Dynamics");
-    scene->getConfig()->writeTaskGraph = true;
-    imstkNew<RigidObject2> cubeObj("Cube");
+    auto scene   = std::make_shared<Scene>("RbdSDFCollision");
+    auto cubeObj = std::make_shared<RigidObject2>("Cube");
     {
         // This model is shared among interacting rigid bodies
-        imstkNew<RigidBodyModel2> rbdModel;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -2500.0, 0.0);
+        auto rbdModel = std::make_shared<RigidBodyModel2>();
         rbdModel->getConfig()->m_maxNumIterations = 10;
 
         // Create the first rbd, plane floor
-        imstkNew<CollidingObject> planeObj("Plane");
+        auto planeObj = std::make_shared<CollidingObject>("Plane");
         {
             // Subtract the sphere from the plane to make a crater
-            imstkNew<Plane> planeGeom;
-            planeGeom->setWidth(40.0);
-            imstkNew<Sphere> sphereGeom;
-            sphereGeom->setRadius(25.0);
-            sphereGeom->setPosition(0.0, 10.0, 0.0);
-            imstkNew<CompositeImplicitGeometry> compGeom;
+            auto planeGeom = std::make_shared<Plane>();
+            planeGeom->setWidth(1.0);
+            auto sphereGeom = std::make_shared<Sphere>();
+            sphereGeom->setRadius(0.625);
+            sphereGeom->setPosition(0.0, 0.4, 0.0);
+            auto compGeom = std::make_shared<CompositeImplicitGeometry>();
             compGeom->addImplicitGeometry(planeGeom, CompositeImplicitGeometry::GeometryBoolType::Union);
             compGeom->addImplicitGeometry(sphereGeom, CompositeImplicitGeometry::GeometryBoolType::Difference);
 
             // Rasterize the SDF into an image
-            imstkNew<ImplicitGeometryToImageData> toImage;
-            toImage->setInputGeometry(compGeom);
+            ImplicitGeometryToImageData toImage;
+            toImage.setInputGeometry(compGeom);
             Vec6d bounds;
-            bounds[0] = -20.0;
-            bounds[1] = 20.0;
-            bounds[2] = -20.0;
-            bounds[3] = 20.0;
-            bounds[4] = -20.0;
-            bounds[5] = 20.0;
-            toImage->setBounds(bounds);
-            toImage->setDimensions(Vec3i(80, 80, 80));
-            toImage->update();
+            bounds[0] = -0.5;
+            bounds[1] = 0.5;
+            bounds[2] = -0.5;
+            bounds[3] = 0.5;
+            bounds[4] = -0.5;
+            bounds[5] = 0.5;
+            toImage.setBounds(bounds);
+            toImage.setDimensions(Vec3i(80, 80, 80));
+            toImage.update();
 
             // Extract surface
-            imstkNew<SurfaceMeshFlyingEdges> toSurfMesh;
-            toSurfMesh->setInputImage(toImage->getOutputImage());
-            toSurfMesh->update();
-            toSurfMesh->getOutputMesh()->flipNormals();
+            SurfaceMeshFlyingEdges toSurfMesh;
+            toSurfMesh.setInputImage(toImage.getOutputImage());
+            toSurfMesh.update();
+            toSurfMesh.getOutputMesh()->flipNormals();
 
             // Create the object
-            planeObj->setVisualGeometry(toSurfMesh->getOutputMesh());
+            planeObj->setVisualGeometry(toSurfMesh.getOutputMesh());
             planeObj->setCollidingGeometry(compGeom);
 
             scene->addSceneObject(planeObj);
@@ -109,30 +106,30 @@ main()
 
         // Create surface mesh cube (so we can use pointset for point->implicit collision)
         {
-            imstkNew<OrientedBox>        cubeGeom(Vec3d::Zero(), Vec3d(1.5, 3.0, 1.0));
+            auto                         cubeGeom = std::make_shared<OrientedBox>(Vec3d::Zero(), Vec3d(0.0375, 0.075, 0.025));
             std::shared_ptr<SurfaceMesh> surfMesh = GeometryUtils::toSurfaceMesh(cubeGeom);
 
-            imstkNew<SurfaceMeshSubdivide> subdivide;
-            subdivide->setInputMesh(surfMesh);
-            subdivide->setNumberOfSubdivisions(1);
-            subdivide->update();
+            SurfaceMeshSubdivide subdivide;
+            subdivide.setInputMesh(surfMesh);
+            subdivide.setNumberOfSubdivisions(1);
+            subdivide.update();
 
             // Create the visual model
-            imstkNew<VisualModel> visualModel;
-            visualModel->setGeometry(subdivide->getOutputMesh());
-            imstkNew<RenderMaterial> mat;
-            mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-            mat->setLineWidth(2.0);
-            mat->setColor(Color::Orange);
-            visualModel->setRenderMaterial(mat);
+            auto visualModel = std::make_shared<VisualModel>();
+            visualModel->setGeometry(subdivide.getOutputMesh());
+            auto material = std::make_shared<RenderMaterial>();
+            material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+            material->setLineWidth(2.0);
+            material->setColor(Color::Orange);
+            visualModel->setRenderMaterial(material);
 
             // Create the cube rigid object
             cubeObj->setDynamicalModel(rbdModel);
-            cubeObj->setPhysicsGeometry(subdivide->getOutputMesh());
-            cubeObj->setCollidingGeometry(subdivide->getOutputMesh());
+            cubeObj->setPhysicsGeometry(subdivide.getOutputMesh());
+            cubeObj->setCollidingGeometry(subdivide.getOutputMesh());
             cubeObj->addVisualModel(visualModel);
             cubeObj->getRigidBody()->m_mass    = 100.0;
-            cubeObj->getRigidBody()->m_initPos = Vec3d(0.0, 8.0, 0.0);
+            cubeObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.2, 0.0);
             cubeObj->getRigidBody()->m_initOrientation = Quatd(Rotd(0.4, Vec3d(1.0, 0.0, 0.0)));
             cubeObj->getRigidBody()->m_intertiaTensor  = Mat3d::Identity();
 
@@ -145,10 +142,10 @@ main()
         scene->addInteraction(rbdInteraction);
 
         // Camera
-        scene->getActiveCamera()->setPosition(0.0, 40.0, 40.0);
+        scene->getActiveCamera()->setPosition(0.0, 1.0, 1.0);
 
         // Light
-        imstkNew<DirectionalLight> light;
+        auto light = std::make_shared<DirectionalLight>();
         light->setIntensity(1.0);
         scene->addLight("light", light);
     }
@@ -156,26 +153,26 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause();
 
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
         // Add mouse and keyboard controls to the viewer
         {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
@@ -191,7 +188,9 @@ main()
         LOG(INFO) << " | o - rotate right";
 
         std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
-        const Vec3d                           dx = scene->getActiveCamera()->getPosition() - scene->getActiveCamera()->getFocalPoint();
+
+        const Vec3d  dx    = scene->getActiveCamera()->getPosition() - scene->getActiveCamera()->getFocalPoint();
+        const double speed = 200.0;
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
                 Vec3d extForce  = Vec3d(0.0, 0.0, 0.0);
@@ -199,19 +198,19 @@ main()
                 // If w down, move forward
                 if (keyDevice->getButton('i') == KEY_PRESS)
                 {
-                    extForce += Vec3d(0.0, 0.0, -900.0);
+                    extForce += Vec3d(0.0, 0.0, -1.0) * speed;
                 }
                 if (keyDevice->getButton('k') == KEY_PRESS)
                 {
-                    extForce += Vec3d(0.0, 0.0, 900.0);
+                    extForce += Vec3d(0.0, 0.0, 1.0) * speed;
                 }
                 if (keyDevice->getButton('j') == KEY_PRESS)
                 {
-                    extForce += Vec3d(-900.0, 0.0, 0.0);
+                    extForce += Vec3d(-1.0, 0.0, 0.0) * speed;
                 }
                 if (keyDevice->getButton('l') == KEY_PRESS)
                 {
-                    extForce += Vec3d(900.0, 0.0, 0.0);
+                    extForce += Vec3d(1.0, 0.0, 0.0) * speed;
                 }
                 if (keyDevice->getButton('u') == KEY_PRESS)
                 {
