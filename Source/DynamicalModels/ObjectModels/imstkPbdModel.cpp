@@ -148,6 +148,31 @@ PbdModelConfig::enableBendConstraint(const double stiffness, const int stride, c
 }
 
 void
+PbdModelConfig::enableConstantDensityConstraint(const double stiffness,
+                                                const double particleRadius, const double restDensity)
+{
+    auto& funcs = m_functors[ConstraintGenType::ConstantDensity];
+
+    // Find the functor with the same stride
+    std::shared_ptr<PbdConstantDensityConstraintFunctor> foundFunctor = nullptr;
+    if (funcs.size() != 0)
+    {
+        foundFunctor = std::dynamic_pointer_cast<PbdConstantDensityConstraintFunctor>(funcs[0]);
+    }
+
+    // If not found, create it
+    if (foundFunctor == nullptr)
+    {
+        foundFunctor = std::make_shared<PbdConstantDensityConstraintFunctor>();
+        funcs.push_back(foundFunctor);
+    }
+
+    foundFunctor->setParticleRadius(particleRadius);
+    foundFunctor->setStiffness(stiffness);
+    foundFunctor->setRestDensity(restDensity);
+}
+
+void
 PbdModelConfig::enableFemConstraint(PbdFemConstraint::MaterialType material)
 {
     auto& funcs = m_functors[ConstraintGenType::FemTet];
