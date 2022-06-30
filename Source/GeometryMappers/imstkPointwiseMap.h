@@ -87,6 +87,11 @@ public:
     std::unordered_map<int, int>     m_oneToOneMap;       ///< One to one mapping data
     std::vector<std::pair<int, int>> m_oneToOneMapVector; ///< One to one mapping data
 
-    double m_epsilon = IMSTK_DOUBLE_EPS;                  // Tolerance for considering two points equivalent
+    ///
+    /// \brief Tolernace for considering two points equivalent/mapped.
+    /// The tolerance is set a bit higher here since 32bit float PointSets are very
+    /// commonly mapped to 64 bit double PointSets (because of file formats/IO)
+    ///
+    double m_epsilon = 0.00000001;
 };
 } // namespace imstk
