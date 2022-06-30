@@ -37,7 +37,7 @@ class LevelSetModel;
 class LevelSetDeformableObject : public DynamicObject
 {
 public:
-    LevelSetDeformableObject(const std::string& name) : DynamicObject(name) { }
+    LevelSetDeformableObject(const std::string& name = "LevelSetDeformableObject") : DynamicObject(name) { }
     ~LevelSetDeformableObject() override = default;
 
     IMSTK_TYPE_NAME(LevelSetDeformableObject)

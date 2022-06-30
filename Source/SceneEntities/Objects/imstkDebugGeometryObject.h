@@ -43,7 +43,7 @@ template<typename T, int N> class VecDataArray;
 class DebugGeometryObject : public SceneObject
 {
 public:
-    DebugGeometryObject();
+    DebugGeometryObject(const std::string& name = "DebugGeometryObject");
     ~DebugGeometryObject() override = default;
 
     ///

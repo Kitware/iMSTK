@@ -35,7 +35,7 @@ class AnimationModel;
 class AnimationObject : public SceneObject
 {
 public:
-    AnimationObject(const std::string& name) : SceneObject(name) { }
+    AnimationObject(const std::string& name = "AnimationObject") : SceneObject(name) { }
     ~AnimationObject() override = default;
 
     IMSTK_TYPE_NAME(AnimationObject)

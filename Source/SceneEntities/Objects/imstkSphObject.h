@@ -37,7 +37,7 @@ class SphModel;
 class SphObject : public DynamicObject
 {
 public:
-    SphObject(const std::string& name) : DynamicObject(name) { }
+    SphObject(const std::string& name = "SphObject") : DynamicObject(name) { }
     ~SphObject() override = default;
 
     IMSTK_TYPE_NAME(SphObject)

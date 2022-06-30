@@ -28,7 +28,7 @@
 
 namespace imstk
 {
-DebugGeometryObject::DebugGeometryObject() : SceneObject("DebugGeometryObject"),
+DebugGeometryObject::DebugGeometryObject(const std::string& name) : SceneObject(name),
     m_arrowScale(1.0),
     m_arrowColor(Color(0.0, 1.0, 0.0)),
     m_debugLineMesh(std::make_shared<LineMesh>()),

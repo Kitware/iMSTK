@@ -38,7 +38,7 @@ class GeometryMap;
 class CollidingObject : public SceneObject
 {
 public:
-    CollidingObject(const std::string& name) : SceneObject(name) { }
+    CollidingObject(const std::string& name = "CollidingObject") : SceneObject(name) { }
     ~CollidingObject() override = default;
 
     IMSTK_TYPE_NAME(CollidingObject)
