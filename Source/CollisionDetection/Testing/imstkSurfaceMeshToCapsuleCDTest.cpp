@@ -268,6 +268,46 @@ TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_FaceInteriorEnd)
     EXPECT_EQ(IMSTK_TRIANGLE, colData->elementsA[0].m_element.m_CellIndexElement.cellType);
 }
 
+///
+/// \brief Test for intersection when only the face is in contact with the
+/// midpiece/cylinder of the capsule
+/// \todo: Edge case not currently implemented in SurfaceMeshToCapsuleCD
+///
+TEST(imstkSurfaceMeshToCapsuleCDTest, DISABLED_IntersectionTestAB_FaceInteriorMidpiece)
+{
+    // Vertex-to-capsule edge face case
+    auto capsule = std::make_shared<Capsule>(Vec3d::Zero(), 0.5, 1.0);
+
+    // Create surafce mesh (single triangle)
+    auto                    surfMesh = std::make_shared<SurfaceMesh>();
+    VecDataArray<double, 3> triangleVertices(3);
+    triangleVertices[0] = Vec3d(-1.33, 0.24, -1.0);
+    triangleVertices[1] = Vec3d(1.33, 0.24, -1.0);
+    triangleVertices[2] = Vec3d(0.0, 0.24, 1.0);
+    VecDataArray<int, 3> triangleIndices(1);
+    triangleIndices[0] = Vec3i(0, 1, 2);
+    surfMesh->initialize(
+        std::make_shared<VecDataArray<double, 3>>(triangleVertices),
+        std::make_shared<VecDataArray<int, 3>>(triangleIndices));
+
+    // manually test for collision
+    SurfaceMeshToCapsuleCD colDetect;
+    colDetect.setInput(surfMesh, 0);
+    colDetect.setInput(capsule, 1);
+    colDetect.setGenerateCD(true, true);
+    colDetect.update();
+
+    std::shared_ptr<CollisionData> colData = colDetect.getCollisionData();
+
+    EXPECT_EQ(1, colData->elementsA.size());
+    EXPECT_EQ(1, colData->elementsB.size());
+
+    EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsA[0].m_type);
+    EXPECT_EQ(CollisionElementType::PointDirection, colData->elementsB[0].m_type);
+
+    EXPECT_EQ(IMSTK_TRIANGLE, colData->elementsA[0].m_element.m_CellIndexElement.cellType);
+}
+
 // Test for no intersection
 TEST(imstkSurfaceMeshToCapsuleCDTest, NonIntersectionTestAB)
 {
