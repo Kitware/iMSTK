@@ -47,6 +47,7 @@ struct NeighborInfo
 class SphState
 {
 public:
+    SphState() = default;
     SphState(const int numElements);
     virtual ~SphState() = default;
 
