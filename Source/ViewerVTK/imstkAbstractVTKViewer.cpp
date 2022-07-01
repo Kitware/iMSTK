@@ -154,9 +154,9 @@ AbstractVTKViewer::uninitModule()
 {
     auto iren = m_vtkRenderWindow->GetInteractor();
     iren->SetDone(true);
-    m_vtkRenderWindow->Finalize();
 
     iren->TerminateApp();
     iren->ProcessEvents();
+    m_vtkRenderWindow->Finalize();
 }
 } // namespace imstk
