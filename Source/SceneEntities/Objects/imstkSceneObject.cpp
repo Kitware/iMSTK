@@ -33,8 +33,8 @@ SceneObject::SceneObject(const std::string& name) : SceneEntity(), m_name(name),
         "SceneObject_" + m_name + "_Source",
         "SceneObject_" + m_name + "_Sink"))
 {
-    m_updateNode = m_taskGraph->addFunction("SceneObject_" + m_name + "_Update", std::bind(&SceneObject::update, this));
-    m_updateGeometryNode = m_taskGraph->addFunction("SceneObject_" + m_name + "_UpdateGeometry", std::bind(&SceneObject::updateGeometries, this));
+    m_updateNode = m_taskGraph->addFunction("SceneObject_" + m_name + "_Update", [this](){ update(); });
+    m_updateGeometryNode = m_taskGraph->addFunction("SceneObject_" + m_name + "_UpdateGeometry", [this]() { updateGeometries(); });
 }
 
 std::shared_ptr<Geometry>
