@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-class VolumetricMesh;
 class SurfaceMesh;
 
 ///
