@@ -129,7 +129,6 @@ TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_VertexInterior)
    |   |
    \   /
     ***
-
 */
 TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_EdgeShell)
 {
@@ -198,7 +197,7 @@ TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_EdgeInterior)
     EXPECT_EQ(IMSTK_EDGE, colData->elementsA[0].m_element.m_CellIndexElement.cellType);
 }
 
-// Test for interseaction with a face on the shell
+// Test for intersection with a face on the shell
 TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_FaceShell)
 {
     // Vertex-to-capsule edge face case
@@ -232,8 +231,11 @@ TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_FaceShell)
     EXPECT_EQ(IMSTK_TRIANGLE, colData->elementsA[0].m_element.m_CellIndexElement.cellType);
 }
 
-// Test for interseaction with a face on the interior
-TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_FaceInterior)
+///
+/// \brief Test for intersection when only the face is in contact with the
+/// tip/sphere of the capsule
+///
+TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_FaceInteriorEnd)
 {
     // Vertex-to-capsule edge face case
     auto capsule = std::make_shared<Capsule>(Vec3d::Zero(), 0.5, 1.0);
