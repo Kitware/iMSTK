@@ -79,15 +79,6 @@ public:
     bool isInflated() const { return m_inflated; }
     void setInflated() { m_inflated = true; }
 
-    double getCurrentLength(std::shared_ptr<VecDataArray<double, 3>> currVertexPositions)
-    {
-        VecDataArray<double, 3> positions = *currVertexPositions;
-        Vec3d                   p0 = positions[m_vertexIds[0]];
-        Vec3d                   p1 = positions[m_vertexIds[1]];
-
-        return (p1 - p0).norm();
-    }
-
 public:
     double m_initialRestLength = 0.0;
     double m_initialStiffness  = 1.0;
