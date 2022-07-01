@@ -5,12 +5,14 @@
 %ignore imstk::PbdModel::getSolveNode();
 %ignore imstk::PbdModel::getUpdateVelocityNode();
 
+%ignore imstk::AbstractDataArray::clone();
 %ignore imstk::DataArray::iterator; /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::const_iterator; /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::begin(); /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::cbegin() const; /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::end(); /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::cend() const; /* fix the multiple-definition problem. */
+%ignore imstk::DataArray::clone();
 %ignore imstk::VecDataArray::iterator; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::const_iterator;
 %ignore imstk::VecDataArray::begin(); /* fix the multiple-definition problem. */ 
@@ -18,6 +20,7 @@
 %ignore imstk::VecDataArray::end(); /* fix the multiple-definition problem. */ 
 %ignore imstk::VecDataArray::cend() const; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::setData();
+%ignore imstk::VecDataArray::clone();
 %ignore imstk::stdSink;
 %ignore imstk::LogManager;
 %ignore imstk::LoggerG3::Logger();

@@ -167,6 +167,10 @@ public:
         m_size = m_capacity = static_cast<int>(list.size());
     }
 
+    ///
+    /// \brief Copy Constructor
+    /// \note The Copy constructor *does not* copy the event subscribers of this object
+    ///
     DataArray(const DataArray& other) : AbstractDataArray(other)
     {
         // Copy the buffer instead of the pointer
@@ -463,8 +467,25 @@ public:
         }
     }
 
+    ///
+    /// \brief Polymorphic clone, shadows the declaration in the superclasss
+    ///        but returns own type
+    ///
+    std::unique_ptr<DataArray<T>> clone()
+    {
+        return std::unique_ptr<DataArray<T>>(cloneImplementation());
+    }
+
 protected:
+
     bool m_mapped;
     T*   m_data;
+
+private:
+
+    DataArray<T>* cloneImplementation()
+    {
+        return new DataArray<T>(*this);
+    };
 };
 } // namespace imstk

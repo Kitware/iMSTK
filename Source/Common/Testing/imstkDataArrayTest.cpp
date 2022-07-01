@@ -340,3 +340,22 @@ TEST(imstkDataArrayTest, RangedBasedFor)
         }
     }
 }
+
+TEST(imstkDataArrayTest, Cloning)
+{
+    using Base = DataArray<int>;
+    DataArray<int> a{ 1, 2, 3, 4 };
+
+    // Cloning known type
+    std::shared_ptr<DataArray<int>> b = a.clone();
+    EXPECT_TRUE(isEqualTo(a, *b));
+
+    // Cloning unknown type
+    std::unique_ptr<AbstractDataArray> c = std::make_unique<DataArray<int>>(a);
+    auto                               d = (c->clone());
+
+    DataArray<int>* cloned = dynamic_cast<DataArray<int>*>(d.get());
+
+    EXPECT_NE(cloned, nullptr);
+    EXPECT_TRUE(isEqualTo(a, *cloned));
+}

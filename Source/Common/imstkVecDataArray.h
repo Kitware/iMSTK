@@ -489,7 +489,22 @@ public:
 
     inline int getNumberOfComponents() const override { return N; }
 
+    ///
+    /// \brief Polymorphic clone, shadows the declaration in the superclasss
+    ///        but returns own type
+    ///
+    std::unique_ptr<VecDataArray<T, N>> clone()
+    {
+        return std::unique_ptr<VecDataArray<T, N>>(cloneImplementation());
+    }
+
 private:
+
+    VecDataArray<T, N>* cloneImplementation()
+    {
+        return new VecDataArray<T, N>(*this);
+    };
+
     int m_vecSize;
     int m_vecCapacity;
     ValueType* m_dataCast;

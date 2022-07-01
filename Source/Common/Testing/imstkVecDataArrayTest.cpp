@@ -391,3 +391,21 @@ TEST(imstkVecDataArrayTest, RangedBasedFor)
         }
     }
 }
+
+TEST(imstkVecDataArrayTest, Cloning)
+{
+    VecDataArray<int, 2> a{ Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6), Vec2i(7, 8) };
+
+    // Cloning known type
+    std::shared_ptr<VecDataArray<int, 2>> b = a.clone();
+    EXPECT_TRUE(isEqualTo(a, *b));
+
+    // Cloning unknown type
+    std::unique_ptr<AbstractDataArray> c = std::make_unique<VecDataArray<int, 2>>(a);
+    auto                               d = (c->clone());
+
+    VecDataArray<int, 2>* cloned = dynamic_cast<VecDataArray<int, 2>*>(d.get());
+
+    EXPECT_NE(cloned, nullptr);
+    EXPECT_TRUE(isEqualTo(a, *cloned));
+}
