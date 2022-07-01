@@ -332,6 +332,22 @@ public:
         return m_data[pos];
     }
 
+    inline T& at(const size_t pos)
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+#endif
+        return m_data[pos];
+    }
+
+    inline const T& at(const size_t pos) const
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+#endif
+        return m_data[pos];
+    }
+
     ///
     /// \brief Allow initialization from initializer list, ie: DataArray<int> arr = { 1, 2 }
     ///

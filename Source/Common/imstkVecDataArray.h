@@ -358,6 +358,22 @@ public:
         return m_dataCast[pos];
     }
 
+    inline ValueType& at(const size_t pos)
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_vecSize) { throw std::runtime_error("Index out of range"); }
+#endif
+        return m_dataCast[pos];
+    }
+
+    inline const ValueType& at(const size_t pos) const
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_vecSize) { throw std::runtime_error("Index out of range"); }
+#endif
+        return m_dataCast[pos];
+    }
+
     inline void erase(const int vecPos)
     {
         // If array is mapped or pos is not in bounds, don't erase
