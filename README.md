@@ -105,11 +105,11 @@ We use [CMake] to configure the project on every platform. See how to run it [HE
   If you would like to build on multiple cores add /MP[N] to CMAKE_CXX_FLAGS in CMake-GUI, where N is optional representing the number of cores (without N supplied, the build will use as many cores as available on the device).
   If you check out the unit tests or the examples make sure to run `git install lfs` to make sure that `git lfs` is installed.
 
-* #### Phantom Omni Support
-  To support the [Geomagic Touch (formerly Sensable Phantom Omni)](http://www.geomagic.com/en/products/phantom-omni/overview) haptic device, follow the steps below:
+* #### 3DSystems Touch Support
+  To support the [3DSystems Touch (formerly Geomagic Touch or Sensable Phantom Omni)](https://www.3dsystems.com/haptics-devices/touch) haptic device, follow the steps below:
     1. Install the [OpenHaptics] SDK as well as the device drivers:
-        - for [Windows](https://3dsystems.teamplatform.com/pages/102774?t=r4nk8zvqwa91)
-        - for [Linux](https://3dsystems.teamplatform.com/pages/102863?t=fptvcy2zbkcc)
+        - for [Windows](https://support.3dsystems.com/s/article/OpenHaptics-for-Windows-Developer-Edition-v35?language=en_US)
+        - for [Linux](https://support.3dsystems.com/s/article/OpenHaptics-for-Linux-Developer-Edition-v34?language=en_US)
     2. Reboot your system.
     3. Configure your CMake project with the variable `iMSTK_USE_OpenHaptics` set to `ON`.
     4. After configuration, the CMake variable `OPENHAPTICS_ROOT_DIR` should be set to the OpenHaptics path on your system.
@@ -153,4 +153,4 @@ We use [CMake] to configure the project on every platform. See how to run it [HE
 [Git]: <https://git-scm.com>
 [CMake]: <https://cmake.org>
 [Ninja]: <https://ninja-build.org/>
-[OpenHaptics]: <http://www.geomagic.com/en/products/open-haptics/overview/>
+[OpenHaptics]: <https://www.3dsystems.com/haptics-devices/openhaptics>
