@@ -84,8 +84,6 @@ static std::shared_ptr<PbdObject>
 makeTissueObj(const std::string& name,
               const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
-    imstkNew<PbdObject> clothObj(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tissueMesh = GeometryUtils::toTetGrid(center, size, dim);
     std::shared_ptr<SurfaceMesh>     surfMesh   = tissueMesh->extractSurfaceMesh();
@@ -93,12 +91,12 @@ makeTissueObj(const std::string& name,
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
-    const bool               useFem = false;
+    const bool               useFem = true;
     if (useFem)
     {
         // Actual skin young's modulus, 0.42MPa to 0.85Mpa, as reported in papers
         // Actual skin possion ratio, 0.48, as reported in papers
-        pbdParams->m_femParams->m_YoungModulus = 420000.0;
+        pbdParams->m_femParams->m_YoungModulus = 40000.0;
         pbdParams->m_femParams->m_PoissonRatio = 0.48;
         // FYI:
         //  - Poisson ratio gives shear to bulk, with 0.5 being complete shear
@@ -163,15 +161,16 @@ makeTissueObj(const std::string& name,
     imstkNew<VisualModel> visualModel;
     visualModel->setGeometry(surfMesh);
     visualModel->setRenderMaterial(material);
-    clothObj->addVisualModel(visualModel);
 
     // Setup the Object
-    clothObj->setPhysicsGeometry(tissueMesh);
-    clothObj->setCollidingGeometry(surfMesh);
-    clothObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
-    clothObj->setDynamicalModel(pbdModel);
+    imstkNew<PbdObject> tissueObj(name);
+    tissueObj->addVisualModel(visualModel);
+    tissueObj->setPhysicsGeometry(tissueMesh);
+    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
+    tissueObj->setDynamicalModel(pbdModel);
 
-    return clothObj;
+    return tissueObj;
 }
 
 ///
