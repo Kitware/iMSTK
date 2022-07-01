@@ -175,9 +175,12 @@ PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics)
     };
 
     // Setup PBD compute nodes
-    m_integrationPositionNode = m_taskGraph->addFunction("PbdModel_IntegratePosition", std::bind(&PbdModel::integratePosition, this));
-    m_solveConstraintsNode    = m_taskGraph->addFunction("PbdModel_SolveConstraints", [&]() { m_pbdSolver->solve(); }); // Avoids rebinding on solver swap
-    m_updateVelocityNode      = m_taskGraph->addFunction("PbdModel_UpdateVelocity", std::bind(&PbdModel::updateVelocity, this));
+    m_integrationPositionNode = m_taskGraph->addFunction("PbdModel_IntegratePosition",
+        [&]() { integratePosition(); });
+    m_solveConstraintsNode = m_taskGraph->addFunction("PbdModel_SolveConstraints",
+        [&]() { solveConstraints(); });
+    m_updateVelocityNode = m_taskGraph->addFunction("PbdModel_UpdateVelocity",
+        [&]() { updateVelocity(); });
 }
 
 void
@@ -419,5 +422,17 @@ PbdModel::updateVelocity()
                 }
             }, m_mesh->getNumVertices() > 50);
     }
+}
+
+void
+PbdModel::solveConstraints()
+{
+    m_pbdSolver->setPositions(m_currentState->getPositions());
+    m_pbdSolver->setInvMasses(m_invMass);
+    m_pbdSolver->setConstraints(getConstraints());
+    m_pbdSolver->setTimeStep(m_config->m_dt);
+    m_pbdSolver->setIterations(m_config->m_iterations);
+    m_pbdSolver->setSolverType(m_config->m_solverType);
+    m_pbdSolver->solve();
 }
 } // namespace imstk

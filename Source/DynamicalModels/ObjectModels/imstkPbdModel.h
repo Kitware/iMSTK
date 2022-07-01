@@ -215,6 +215,11 @@ public:
     void updateVelocity();
 
     ///
+    /// \brief Solve the internal constraints
+    ///
+    void solveConstraints();
+
+    ///
     /// \brief Initialize the PBD model
     ///
     virtual bool initialize() override;
