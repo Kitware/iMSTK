@@ -40,6 +40,7 @@
 %ignore imstk::FemDeformableBodyModel::initializeEigenMatrixFromVegaMatrix;
 
 %ignore imstk::RbdConstraint;
+%ignore imstk::PbdConstraintContainer;
 %ignore imstk::CollisionHandling::getTaskNode();
 
 %ignore imstk::VTKTextStatusManager::getTextActor();
