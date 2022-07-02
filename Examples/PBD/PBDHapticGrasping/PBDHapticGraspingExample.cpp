@@ -22,6 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
 #include "imstkDirectionalLight.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
