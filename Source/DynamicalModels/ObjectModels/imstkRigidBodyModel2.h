@@ -51,6 +51,11 @@ struct RigidBodyModel2Config
 /// \brief This class implements a constraint based rigid body linear system
 /// with pgs solver
 ///
+/// References:
+/// David Baraff. 1997. An Introduction to Physically Based Modeling: Rigid Body Simulation II - Nonpenetration Constraints
+/// Marijn Tamis and Giuseppe Maggiore. 2015. Constraint based physics solver.
+/// David Baraff. 1989. Analyltical Methods for Dynamic Simulation of Non-Penetrating Rigid Bodies. In Computer Graphics (Proc. SIGGRAPH), volume 23, pages 223-232. ACM.
+///
 class RigidBodyModel2 : public DynamicalModel<RigidBodyState2>
 {
 public:

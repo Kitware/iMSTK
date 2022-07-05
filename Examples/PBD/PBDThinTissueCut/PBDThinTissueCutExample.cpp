@@ -45,14 +45,12 @@ using namespace imstk;
 /// \brief Creates cloth object
 ///
 static std::shared_ptr<PbdObject>
-makeClothObj(const std::string& name,
-             const double       width,
-             const double       height,
-             const int          nRows,
-             const int          nCols)
+makeTissueObj(const std::string& name,
+              const double       width,
+              const double       height,
+              const int          nRows,
+              const int          nCols)
 {
-    imstkNew<PbdObject> clothObj(name);
-
     // Setup the Geometry
     std::shared_ptr<SurfaceMesh> clothMesh =
         GeometryUtils::toTriangleGrid(Vec3d::Zero(),
@@ -88,13 +86,14 @@ makeClothObj(const std::string& name,
     vertexLabelModel->setTextColor(Color::Red);
 
     // Setup the Object
-    clothObj->addVisualModel(visualModel);
-    clothObj->addVisualModel(vertexLabelModel);
-    clothObj->setPhysicsGeometry(clothMesh);
-    clothObj->setCollidingGeometry(clothMesh);
-    clothObj->setDynamicalModel(pbdModel);
+    imstkNew<PbdObject> tissueObj(name);
+    tissueObj->addVisualModel(visualModel);
+    tissueObj->addVisualModel(vertexLabelModel);
+    tissueObj->setPhysicsGeometry(clothMesh);
+    tissueObj->setCollidingGeometry(clothMesh);
+    tissueObj->setDynamicalModel(pbdModel);
 
-    return clothObj;
+    return tissueObj;
 }
 
 ///
@@ -108,7 +107,7 @@ main()
     Logger::startLogger();
 
     // Scene
-    imstkNew<Scene> scene("PBDThinTissueCut");
+    imstkNew<Scene> scene("PbdThinTissueCut");
 
     // Create a cutting plane object in the scene
     std::shared_ptr<SurfaceMesh> cutGeom =
@@ -124,7 +123,7 @@ main()
     scene->addSceneObject(cutObj);
 
     // Create a pbd cloth object in the scene
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 7, 7);
+    std::shared_ptr<PbdObject> clothObj = makeTissueObj("Tissue", 50.0, 50.0, 12, 12);
     scene->addSceneObject(clothObj);
 
     // Add interaction pair for pbd cutting

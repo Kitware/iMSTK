@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkDynamicalModel.h"
-#include "imstkLevelSetState.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 
 #include <unordered_map>
@@ -48,7 +47,7 @@ struct LevelSetModelConfig
 /// \brief This class implements a generic level set model, it requires both a forward
 /// and backward finite differencing method
 ///
-class LevelSetModel : public DynamicalModel<LevelSetState>
+class LevelSetModel : public AbstractDynamicalModel
 {
 public:
     LevelSetModel();
@@ -90,6 +89,8 @@ public:
     std::shared_ptr<TaskNode> getGenerateVelocitiesEndNode() const { return m_generateVelocitiesEnd; }
 
     std::unordered_map<size_t, std::tuple<Vec3i, double>>& getNodesToUpdate() { return m_nodesToUpdate; }
+
+    void resetToInitialState() override;
 
 protected:
     ///

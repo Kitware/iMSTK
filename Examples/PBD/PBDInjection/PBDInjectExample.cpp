@@ -96,7 +96,7 @@ main()
     Logger::startLogger();
 
     // Setup the scene
-    imstkNew<Scene> scene("PBD inflatable object example");
+    imstkNew<Scene> scene("PbdInjectExample");
     scene->getActiveCamera()->setPosition(0.12, 4.51, 16.51);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
@@ -106,12 +106,12 @@ main()
     const Vec3i                tissueDim    = Vec3i(20, 5, 20);
     const Vec3d                tissueCenter = Vec3d(0.1, -1.0, 0.0);
     const double               radius       = tissueSize[0] / 5.0;
-    imstkNew<InflatableObject> tissueObj("PBDTissue", tissueSize, tissueDim, tissueCenter);
+    imstkNew<InflatableObject> tissueObj("PbdTissue", tissueSize, tissueDim, tissueCenter);
     scene->addSceneObject(tissueObj);
 
     // Setup a tool
     Vec3d                         toolTip = tissueCenter + Vec3d(0.0, tissueSize[1] / 2.0, 0.0);
-    std::shared_ptr<RigidObject2> toolObj = makeToolObj("RBDTool");
+    std::shared_ptr<RigidObject2> toolObj = makeToolObj("RbdTool");
     scene->addSceneObject(toolObj);
 
     // Light

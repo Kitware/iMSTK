@@ -37,7 +37,6 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
     // Setup the Geometry
     m_objectTetMesh  = GeometryUtils::toTetGrid(tissueCenter, tissueSize, tissueDim);
     m_objectSurfMesh = m_objectTetMesh->extractSurfaceMesh();
-    //setXZPlaneTexCoords(4.0);
     setSphereTexCoords(4.0);
 
     // Setup the Parameters

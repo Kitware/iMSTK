@@ -55,6 +55,7 @@ public:
     /// \brief Sets the one-to-one correspondence directly
     ///
     void setMap(const std::unordered_map<int, int>& sourceMap);
+    const std::unordered_map<int, int>& getMap() const { return m_oneToOneMap; }
 
     ///
     /// \brief Get the mapped/corresponding parent index, given a child index.

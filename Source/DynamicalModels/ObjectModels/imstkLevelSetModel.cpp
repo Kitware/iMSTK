@@ -323,6 +323,13 @@ LevelSetModel::setImpulse(const Vec3i& coord, double f)
 }
 
 void
+LevelSetModel::resetToInitialState()
+{
+    // Due to having to store a copy of the initial image which is quite large reset is not implemented
+    LOG(WARNING) << "LevelSetModel cannot reset";
+}
+
+void
 LevelSetModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     m_taskGraph->addEdge(source, m_generateVelocitiesBegin);

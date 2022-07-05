@@ -374,7 +374,7 @@ public:
             return;
         }
 
-        const int pos = vecPos * N; // Position in type T instead of VecType
+        const int pos = vecPos * N; // Position in type T instead of ValueType
 
         if (vecPos != m_vecSize - 1)
         {

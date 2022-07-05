@@ -35,7 +35,6 @@ set(H_FILES
   ObjectModels/imstkSphBoundaryConditions.h
   ObjectModels/imstkSPHKernels.h
   ObjectModels/imstkSphModel.h
-  ObjectStates/imstkLevelSetState.h
   ObjectStates/imstkPbdState.h
   ObjectStates/imstkRigidBodyState2.h
   ObjectStates/imstkSphState.h

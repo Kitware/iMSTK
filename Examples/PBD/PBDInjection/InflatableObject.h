@@ -79,16 +79,6 @@ public:
 
 protected:
     ///
-    /// \brief Creates a tetraheral grid
-    ///
-    void makeTetGrid(const Vec3d& size, const Vec3i& dim, const Vec3d& center);
-
-    ///
-    /// \brief Compute the texture coordinates of the tissue on a plane
-    ///
-    void setXZPlaneTexCoords(const double uvScale);
-
-    ///
     /// \brief Spherically project the texture coordinates
     ///
     void setSphereTexCoords(const double uvScale);
