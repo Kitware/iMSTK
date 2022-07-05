@@ -31,11 +31,6 @@
 
 namespace imstk
 {
-KeyboardSceneControl::KeyboardSceneControl(std::shared_ptr<KeyboardDeviceClient> keyDevice) :
-    KeyboardControl(keyDevice)
-{
-}
-
 void
 KeyboardSceneControl::printControls()
 {

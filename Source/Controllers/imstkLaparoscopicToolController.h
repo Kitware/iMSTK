@@ -46,15 +46,17 @@ public:
     };
 
 public:
-    LaparoscopicToolController(
+    LaparoscopicToolController(const std::string& name = "LaparoscopicToolController") : TrackingDeviceControl(name) { }
+    ~LaparoscopicToolController() override = default;
+
+    void setParts(
         std::shared_ptr<CollidingObject> shaft,
         std::shared_ptr<CollidingObject> upperJaw,
         std::shared_ptr<CollidingObject> lowerJaw,
-        std::shared_ptr<Geometry>        pickGeom,
-        std::shared_ptr<DeviceClient>    trackingDevice);
-    ~LaparoscopicToolController() override = default;
+        std::shared_ptr<Geometry>        pickGeom);
 
-public:
+    void setDevice(std::shared_ptr<DeviceClient> device) override;
+
     // *INDENT-OFF*
     ///
     /// \brief Fired once when the jaw transitions to closed state
@@ -115,7 +117,7 @@ protected:
     double   m_maxJawAngle = PI / 6.0;                      ///< Maximum angle of the jaws
     JawState m_jawState    = JawState::Opened;
 
-    Vec3d m_jawRotationAxis;                                ///< Angle of the jaws
+    Vec3d m_jawRotationAxis = Vec3d(1.0, 0.0, 0.0);         ///< Angle of the jaws
 
     Mat4d m_controllerWorldTransform = Mat4d::Identity();   // Final world transform of the controller
     Mat4d m_pickGeomTransform = Mat4d::Identity();

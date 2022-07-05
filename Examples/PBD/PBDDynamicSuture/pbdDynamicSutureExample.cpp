@@ -272,7 +272,9 @@ main()
         std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        auto hapController = std::make_shared<RigidObjectController>(needleObj, deviceClient);
+        auto hapController = std::make_shared<RigidObjectController>();
+        hapController->setControlledObject(needleObj);
+        hapController->setDevice(deviceClient);
         hapController->setTranslationScaling(0.0005);
         hapController->setLinearKs(10000.0);
         hapController->setAngularKs(100000000.0);
@@ -301,11 +303,13 @@ main()
 
         // Add mouse and keyboard controls to the viewer
         {
-            auto mouseControl = std::make_shared<MouseSceneControl>(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>();
+            mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            auto keyControl = std::make_shared<KeyboardSceneControl>(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>();
+            keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);

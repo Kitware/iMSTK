@@ -32,7 +32,7 @@ namespace imstk
 /// \brief Base class for all DeviceControls that track
 /// something in space (position and orientation)
 ///
-class TrackingDeviceControl : public DeviceControl
+class TrackingDeviceControl : public DeviceControl<DeviceClient>
 {
 public:
     enum InvertFlag
@@ -46,11 +46,10 @@ public:
     };
 
 protected:
-    TrackingDeviceControl();
-    TrackingDeviceControl(std::shared_ptr<DeviceClient> device);
+    TrackingDeviceControl(const std::string& name = "TrackingDeviceControl");
 
 public:
-    virtual ~TrackingDeviceControl() override = default;
+    ~TrackingDeviceControl() override = default;
 
     ///
     /// \brief Apply forces to the haptic device

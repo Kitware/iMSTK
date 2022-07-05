@@ -36,15 +36,14 @@ class KeyEvent;
 /// You can construct this and observe it or subclass and override
 /// to implement controls.
 ///
-class KeyboardControl : public DeviceControl
+class KeyboardControl : public DeviceControl<KeyboardDeviceClient>
 {
 public:
-    KeyboardControl() = default;
-    KeyboardControl(std::shared_ptr<KeyboardDeviceClient> keyDevice);
-    virtual ~KeyboardControl() override = default;
+    KeyboardControl(const std::string& name = "KeyboardControl") : DeviceControl(name) { }
+    ~KeyboardControl() override = default;
 
 public:
-    virtual void setDevice(std::shared_ptr<DeviceClient> device) override;
+    void setDevice(std::shared_ptr<KeyboardDeviceClient> device) override;
 
 public:
     virtual void OnKeyPress(const char imstkNotUsed(key)) { }
@@ -60,8 +59,5 @@ public:
     /// \brief Recieves key release event
     ///
     virtual void keyReleaseEvent(KeyEvent* e);
-
-protected:
-    std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;
 };
 } // namespace imstk

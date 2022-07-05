@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-class DeviceControl;
 class Scene;
 
 ///

@@ -28,10 +28,6 @@
 
 namespace imstk
 {
-MouseSceneControl::MouseSceneControl(std::shared_ptr<MouseDeviceClient> device) : MouseControl(device)
-{
-}
-
 void
 MouseSceneControl::printControls()
 {

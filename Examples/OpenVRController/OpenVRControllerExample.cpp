@@ -142,10 +142,14 @@ main()
         driver->setDesiredDt(0.01); // Spend less time updating & more time rendering
 
         // Add a VR controller for the scalpel handle
-        imstkNew<SceneObjectController> controller1(scalpelHandle, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
+        imstkNew<SceneObjectController> controller1;
+        controller1->setControlledObject(scalpelHandle);
+        controller1->setDevice(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
         scene->addController(controller1);
         // Add a VR controller for the scalpel blade
-        imstkNew<SceneObjectController> controller2(scalpelBlade10, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
+        imstkNew<SceneObjectController> controller2;
+        controller2->setControlledObject(scalpelBlade10);
+        controller2->setDevice(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
         scene->addController(controller2);
 
         imstkNew<CameraOpenVRControl> camControl;
@@ -180,7 +184,7 @@ main()
                             const Mat3d r = scalpelBlade15->getVisualGeometry()->getRotation();
 
                             // Set the new blade to move
-                            controller2->setControlledSceneObject(scalpelBlade15);
+                            controller2->setControlledObject(scalpelBlade15);
                             blade10InHand = false;
 
                             scalpelBlade10->getVisualGeometry()->setTranslation(t);
@@ -200,7 +204,7 @@ main()
                             const Vec3d t = scalpelBlade10->getVisualGeometry()->getTranslation();
                             const Mat3d r = scalpelBlade10->getVisualGeometry()->getRotation();
 
-                            controller2->setControlledSceneObject(scalpelBlade10);
+                            controller2->setControlledObject(scalpelBlade10);
                             blade10InHand = true;
 
                             // Swap transforms of the blades

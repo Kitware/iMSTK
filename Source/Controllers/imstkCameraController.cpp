@@ -25,13 +25,6 @@
 
 namespace imstk
 {
-CameraController::CameraController(std::shared_ptr<Camera>       camera,
-                                   std::shared_ptr<DeviceClient> deviceClient) :
-    TrackingDeviceControl(deviceClient),
-    m_camera(camera)
-{
-}
-
 void
 CameraController::update(const double dt)
 {

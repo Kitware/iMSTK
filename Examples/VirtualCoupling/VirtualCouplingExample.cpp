@@ -130,7 +130,9 @@ main()
     scene->addSceneObject(ghostToolObj);
 
     // Create a virtual coupling controller
-    imstkNew<RigidObjectController> controller(rbdObj, client);
+    imstkNew<RigidObjectController> controller;
+    controller->setControlledObject(rbdObj);
+    controller->setDevice(client);
     controller->setLinearKs(30000.0);
     controller->setAngularKs(10000000000.0);
     controller->setTranslationScaling(0.02);
@@ -189,11 +191,13 @@ main()
 
         // Add mouse and keyboard controls to the viewer
 #ifdef iMSTK_USE_RENDERING_VTK
-        imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+        auto mouseControl = std::make_shared<MouseSceneControl>();
+        mouseControl->setDevice(viewer->getMouseDevice());
         mouseControl->setSceneManager(sceneManager);
         viewer->addControl(mouseControl);
 
-        imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+        auto keyControl = std::make_shared<KeyboardSceneControl>();
+        keyControl->setDevice(viewer->getKeyboardDevice());
         keyControl->setSceneManager(sceneManager);
         keyControl->setModuleDriver(driver);
         viewer->addControl(keyControl);

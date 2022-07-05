@@ -39,11 +39,11 @@ using namespace imstk;
 /// \brief Controls pose of a camera given two trackpads from OpenVRDeviceClient's
 ///
 ///
-class CameraOpenVRControl : public DeviceControl
+class CameraOpenVRControl : public DeviceControl<OpenVRDeviceClient>
 {
 public:
-    CameraOpenVRControl() = default;
-    virtual ~CameraOpenVRControl() override = default;
+    CameraOpenVRControl(const std::string& name = "CameraOpenVRControl") : DeviceControl(name) { }
+    ~CameraOpenVRControl() override = default;
 
 public:
     ///

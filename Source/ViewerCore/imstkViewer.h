@@ -28,8 +28,8 @@
 
 namespace imstk
 {
+class AbstractDeviceControl;
 class Camera;
-class DeviceControl;
 class InteractorStyle;
 class Scene;
 class ScreenCaptureUtility;
@@ -135,14 +135,14 @@ public:
     ///
     /// \brief Add a control whose events should be handled
     ///
-    void addControl(std::shared_ptr<DeviceControl> control) { m_controls.push_back(control); }
+    void addControl(std::shared_ptr<AbstractDeviceControl> control) { m_controls.push_back(control); }
 
     ///
     /// \brief Remove an existing control if it exists
     ///
-    void removeControl(std::shared_ptr<DeviceControl> control)
+    void removeControl(std::shared_ptr<AbstractDeviceControl> control)
     {
-        std::vector<std::shared_ptr<DeviceControl>>::iterator i =
+        std::vector<std::shared_ptr<AbstractDeviceControl>>::iterator i =
             std::find(m_controls.begin(), m_controls.end(), control);
         if (i != m_controls.end())
         {
@@ -155,7 +155,7 @@ public:
 protected:
     void updateModule() override;
 
-    std::vector<std::shared_ptr<DeviceControl>> m_controls; ///< Set of controls updated on the viewer thread
+    std::vector<std::shared_ptr<AbstractDeviceControl>> m_controls; ///< Set of controls updated on the viewer thread
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 
     std::shared_ptr<Scene>  m_activeScene;

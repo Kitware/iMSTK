@@ -139,10 +139,10 @@ main()
     auto hapticManager = std::make_shared<HapticDeviceManager>();
     hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
     std::shared_ptr<HapticDeviceClient> hapticDevice    = hapticManager->makeDeviceClient();
-    auto                                rightController =
-        std::make_shared<RigidObjectController>(lapTool1, hapticDevice);
+    auto                                rightController = std::make_shared<RigidObjectController>();
     {
-        // rightController->setDevice(hapticDevice);
+        rightController->setDevice(hapticDevice);
+        rightController->setControlledObject(lapTool1);
         rightController->setTranslationScaling(0.001);
         rightController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
         rightController->setLinearKs(5000.0);
@@ -157,8 +157,10 @@ main()
     const Rotd rotX = Rotd(1.3, Vec3d(0.0, 0.0, 1.0));
     const Rotd rotY = Rotd(1.0, Vec3d(0.0, 1.0, 0.0));
     dummyClient->setOrientation(Quatd(rotX.matrix() * rotY.matrix()));
-    auto leftController = std::make_shared<RigidObjectController>(lapTool2, dummyClient);
+    auto leftController = std::make_shared<RigidObjectController>();
     {
+        leftController->setDevice(dummyClient);
+        leftController->setControlledObject(lapTool2);
         leftController->setLinearKs(5000.0);
         leftController->setAngularKs(100000000.0);
         leftController->setForceScaling(0.1);
@@ -186,11 +188,13 @@ main()
 
         // Add mouse and keyboard controls to the viewer
         {
-            auto mouseControl = std::make_shared<MouseSceneControl>(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>();
+            mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            auto keyControl = std::make_shared<KeyboardSceneControl>(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>();
+            keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);

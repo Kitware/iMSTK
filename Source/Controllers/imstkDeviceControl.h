@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkEventObject.h"
+#include "imstkSceneObject.h"
 #include "imstkMacros.h"
 
 #include <memory>
@@ -30,34 +30,15 @@ namespace imstk
 {
 class DeviceClient;
 
-///
-/// \class DeviceControl
-///
-/// \brief While the DeviceClient provides quantities from the device, the control
-/// defines what to do with those quantities
-///
-class DeviceControl : public EventObject
+class AbstractDeviceControl : public SceneObject
 {
 protected:
-    DeviceControl() = default;
-    DeviceControl(std::shared_ptr<DeviceClient> device) : m_deviceClient(device) { }
+    AbstractDeviceControl(const std::string& name = "AbstractDeviceControl") : SceneObject(name) { }
 
 public:
-    virtual ~DeviceControl() = default;
+    ~AbstractDeviceControl() override = default;
 
-public:
-    // *INDENT-OFF*
-    SIGNAL(TrackingDeviceControl, modified);
-    // *INDENT-ON*
-
-public:
-    ///
-    /// \brief Set/Get the device client used in the control
-    ///
-    ///@{
-    std::shared_ptr<DeviceClient> getDevice() const { return m_deviceClient; }
-    virtual void setDevice(std::shared_ptr<DeviceClient> device) { m_deviceClient = device; }
-    ///@}
+    using SceneObject::update;
 
     ///
     /// \brief Prints the controls
@@ -69,7 +50,32 @@ public:
     ///
     virtual void update(const double imstkNotUsed(dt)) { }
 
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+};
+
+///
+/// \class DeviceControl
+///
+/// \brief While the DeviceClient provides quantities from the device, the control
+/// defines what to do with those quantities
+///
+template<typename DeviceType>
+class DeviceControl : public AbstractDeviceControl
+{
+protected:
+    DeviceControl(const std::string& name = "DeviceControl") : AbstractDeviceControl(name) { }
+
 public:
-    std::shared_ptr<DeviceClient> m_deviceClient;
+    virtual ~DeviceControl() = default;
+
+    ///
+    /// \brief Set/Get the device client used in the control
+    ///@{
+    std::shared_ptr<DeviceType> getDevice() const { return m_deviceClient; }
+    virtual void setDevice(std::shared_ptr<DeviceType> device) { m_deviceClient = device; }
+///@}
+
+protected:
+    std::shared_ptr<DeviceType> m_deviceClient;
 };
 } // namespace imstk

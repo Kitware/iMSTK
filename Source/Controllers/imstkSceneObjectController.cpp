@@ -27,10 +27,8 @@
 
 namespace imstk
 {
-SceneObjectController::SceneObjectController(std::shared_ptr<SceneObject>  sceneObject,
-                                             std::shared_ptr<DeviceClient> trackingDevice) :
-    TrackingDeviceControl(trackingDevice),
-    m_sceneObject(sceneObject)
+SceneObjectController::SceneObjectController(const std::string& name) :
+    TrackingDeviceControl(name)
 {
 }
 

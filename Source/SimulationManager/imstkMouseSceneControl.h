@@ -46,8 +46,7 @@ public:
         Rotate
     };
 
-    MouseSceneControl() = default;
-    MouseSceneControl(std::shared_ptr<MouseDeviceClient> device);
+    MouseSceneControl(const std::string& name = "MouseSceneControl") : MouseControl(name) { }
     ~MouseSceneControl() override = default;
 
     ///

@@ -29,19 +29,10 @@
 
 namespace imstk
 {
-RigidObjectController::RigidObjectController(std::shared_ptr<RigidObject2> rigidObject,
-                                             std::shared_ptr<DeviceClient> trackingDevice) :
-    SceneObjectController(rigidObject, trackingDevice),
-    m_rigidObject(rigidObject)
-{
-    /*m_currentPos = rigidObject->getRigidBody()->getPosition();
-    m_currentRot = rigidObject->getRigidBody()->getOrientation();*/
-}
-
 void
-RigidObjectController::setControlledSceneObject(std::shared_ptr<SceneObject> obj)
+RigidObjectController::setControlledObject(std::shared_ptr<SceneObject> obj)
 {
-    SceneObjectController::setControlledSceneObject(obj);
+    SceneObjectController::setControlledObject(obj);
     m_rigidObject = std::dynamic_pointer_cast<RigidObject2>(obj);
 }
 

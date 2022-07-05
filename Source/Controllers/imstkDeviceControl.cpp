@@ -19,38 +19,16 @@
 
 =========================================================================*/
 
-#include "imstkKeyboardControl.h"
-#include "imstkKeyboardDeviceClient.h"
+#include "imstkDeviceControl.h"
+#include "imstkTaskGraph.h"
+#include "imstkTaskNode.h"
 
 namespace imstk
 {
 void
-KeyboardControl::setDevice(std::shared_ptr<KeyboardDeviceClient> device)
+AbstractDeviceControl::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    // Remove old observer if it exists
-    if (m_deviceClient != nullptr)
-    {
-        disconnect(m_deviceClient, this, &KeyboardDeviceClient::keyPress);
-        disconnect(m_deviceClient, this, &KeyboardDeviceClient::keyRelease);
-    }
-
-    // Set the new device
-    DeviceControl::setDevice(device);
-
-    // Subscribe to the device clients events
-    connect(device, &KeyboardDeviceClient::keyPress, this, &KeyboardControl::keyPressEvent);
-    connect(device, &KeyboardDeviceClient::keyRelease, this, &KeyboardControl::keyReleaseEvent);
-}
-
-void
-KeyboardControl::keyPressEvent(KeyEvent* keyPressEvent)
-{
-    OnKeyPress(keyPressEvent->m_key);
-}
-
-void
-KeyboardControl::keyReleaseEvent(KeyEvent* keyPressEvent)
-{
-    OnKeyRelease(keyPressEvent->m_key);
+    // Remove the update node from the TaskGraph, updates invoked
+    m_taskGraph->addEdge(source, sink);
 }
 } // namespace imstk

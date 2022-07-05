@@ -37,9 +37,8 @@ class SceneObject;
 class SceneObjectController : public TrackingDeviceControl
 {
 public:
-    SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceClient> trackingDevice);
-    SceneObjectController() = delete;
-    virtual ~SceneObjectController() override = default;
+    SceneObjectController(const std::string& name = "SceneObjectController");
+    ~SceneObjectController() override = default;
 
     ///
     /// \brief Update controlled scene object using latest tracking information
@@ -49,8 +48,8 @@ public:
     ///
     /// \brief Get/Set controlled scene object
     ///@{
-    std::shared_ptr<SceneObject> getControlledSceneObject() const { return m_sceneObject; }
-    virtual void setControlledSceneObject(std::shared_ptr<SceneObject> so) { m_sceneObject = so; }
+    std::shared_ptr<SceneObject> getControlledObject() const { return m_sceneObject; }
+    virtual void setControlledObject(std::shared_ptr<SceneObject> so) { m_sceneObject = so; }
 ///@}
 
 protected:

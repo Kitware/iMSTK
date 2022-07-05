@@ -36,10 +36,12 @@ class Camera;
 class CameraController : public TrackingDeviceControl
 {
 public:
-    CameraController(std::shared_ptr<Camera> camera, std::shared_ptr<DeviceClient> deviceClient);
-    virtual ~CameraController() = default;
+    CameraController(const std::string& name = "CameraController") : TrackingDeviceControl(name) { }
+    ~CameraController() override = default;
 
-public:
+    std::shared_ptr<Camera> getCamera() const { return m_camera; }
+    void setCamera(std::shared_ptr<Camera> cam) { m_camera = cam; }
+
     ///
     /// \brief Set the offsets based on the current camera pose
     ///

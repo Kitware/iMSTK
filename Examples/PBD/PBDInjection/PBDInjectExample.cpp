@@ -139,10 +139,13 @@ main()
         driver->setDesiredDt(0.01);
 
         // Add mouse and keyboard controls to the viewer
-        imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+        auto mouseControl = std::make_shared<MouseSceneControl>();
+        mouseControl->setDevice(viewer->getMouseDevice());
         mouseControl->setSceneManager(sceneManager);
         viewer->addControl(mouseControl);
-        imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+
+        auto keyControl = std::make_shared<KeyboardSceneControl>();
+        keyControl->setDevice(viewer->getKeyboardDevice());
         keyControl->setSceneManager(sceneManager);
         keyControl->setModuleDriver(driver);
         viewer->addControl(keyControl);
@@ -152,7 +155,9 @@ main()
         std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        imstkNew<RigidObjectController> controller(toolObj, hapticDeviceClient);
+        imstkNew<RigidObjectController> controller;
+        controller->setControlledObject(toolObj);
+        controller->setDevice(hapticDeviceClient);
         controller->setTranslationScaling(0.1);
         controller->setLinearKs(20000.0);
         controller->setLinearKd(400.0);

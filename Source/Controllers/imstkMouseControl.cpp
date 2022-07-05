@@ -24,33 +24,26 @@
 
 namespace imstk
 {
-MouseControl::MouseControl(std::shared_ptr<MouseDeviceClient> mouseDevice) :
-    DeviceControl(mouseDevice)
-{
-    setDevice(mouseDevice);
-}
-
 void
-MouseControl::setDevice(std::shared_ptr<DeviceClient> device)
+MouseControl::setDevice(std::shared_ptr<MouseDeviceClient> device)
 {
     // Remove old observer if it exists
-    if (m_mouseDeviceClient != nullptr)
+    if (m_deviceClient != nullptr)
     {
-        disconnect(m_mouseDeviceClient, this, &MouseDeviceClient::mouseButtonPress);
-        disconnect(m_mouseDeviceClient, this, &MouseDeviceClient::mouseButtonRelease);
-        disconnect(m_mouseDeviceClient, this, &MouseDeviceClient::mouseScroll);
-        disconnect(m_mouseDeviceClient, this, &MouseDeviceClient::mouseMove);
+        disconnect(m_deviceClient, this, &MouseDeviceClient::mouseButtonPress);
+        disconnect(m_deviceClient, this, &MouseDeviceClient::mouseButtonRelease);
+        disconnect(m_deviceClient, this, &MouseDeviceClient::mouseScroll);
+        disconnect(m_deviceClient, this, &MouseDeviceClient::mouseMove);
     }
 
     // Set the new device
-    m_mouseDeviceClient = std::dynamic_pointer_cast<MouseDeviceClient>(device);
     DeviceControl::setDevice(device);
 
     // Subscribe to the device clients events
-    connect(m_mouseDeviceClient, &MouseDeviceClient::mouseButtonPress, this, &MouseControl::mouseButtonPressEvent);
-    connect(m_mouseDeviceClient, &MouseDeviceClient::mouseButtonRelease, this, &MouseControl::mouseButtonReleaseEvent);
-    connect(m_mouseDeviceClient, &MouseDeviceClient::mouseScroll, this, &MouseControl::mouseScrollEvent);
-    connect(m_mouseDeviceClient, &MouseDeviceClient::mouseMove, this, &MouseControl::mouseMoveEvent);
+    connect(device, &MouseDeviceClient::mouseButtonPress, this, &MouseControl::mouseButtonPressEvent);
+    connect(device, &MouseDeviceClient::mouseButtonRelease, this, &MouseControl::mouseButtonReleaseEvent);
+    connect(device, &MouseDeviceClient::mouseScroll, this, &MouseControl::mouseScrollEvent);
+    connect(device, &MouseDeviceClient::mouseMove, this, &MouseControl::mouseMoveEvent);
 }
 
 void
@@ -74,6 +67,6 @@ MouseControl::mouseScrollEvent(MouseEvent* e)
 void
 MouseControl::mouseMoveEvent(MouseEvent* imstkNotUsed(e))
 {
-    OnMouseMove(m_mouseDeviceClient->getPos());
+    OnMouseMove(m_deviceClient->getPos());
 }
 } // namespace imstk
