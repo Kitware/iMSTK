@@ -22,7 +22,7 @@ CameraOpenVRControl::printControls()
 }
 
 void
-CameraOpenVRControl::update(const double dt)
+CameraOpenVRControl::update(const double& dt)
 {
     // We may switch cameras on the controller
     if (m_camera == nullptr)

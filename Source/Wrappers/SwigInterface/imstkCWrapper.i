@@ -116,7 +116,6 @@
 /* 
  * SceneEntities
  */
-#include "imstkSceneEntity.h"
 #include "imstkSceneObject.h"
 #include "imstkCollidingObject.h"
 #include "imstkDynamicObject.h"
@@ -382,7 +381,6 @@ namespace std
 /*
  * SceneEntities
  */
-%include "../../SceneEntities/imstkSceneEntity.h"
 %include "../../SceneEntities/Objects/imstkSceneObject.h";
 %include "../../SceneEntities/Objects/imstkCollidingObject.h";
 %include "../../SceneEntities/Objects/imstkDynamicObject.h";

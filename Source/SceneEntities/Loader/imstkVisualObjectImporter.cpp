@@ -122,13 +122,12 @@ ObjectIO::importSceneObject(
             // Copy, transform, and insert the mesh (\todo: Better deep copy support)
             std::shared_ptr<PointSet> copyMesh = meshes[meshIndex]->clone();
 
-            auto visualModel = std::make_shared<VisualModel>();
+            auto visualModel = visualObject->addComponent<VisualModel>();
             visualModel->setGeometry(copyMesh);
             visualModel->setName(std::string(currNode->mName.C_Str()));
 
             copyMesh->transform(currWorldTransform, Geometry::TransformType::ApplyToData);
             visualModel->setRenderMaterial(meshMaterials[meshIndex]);
-            visualObject->addVisualModel(visualModel);
         }
 
         for (unsigned int i = 0; i < currNode->mNumChildren; i++)

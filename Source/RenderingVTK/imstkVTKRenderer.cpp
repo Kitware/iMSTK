@@ -537,7 +537,7 @@ VTKRenderer::removeSceneObject(std::shared_ptr<SceneObject> sceneObject)
     auto iter = m_renderedObjects.erase(m_renderedObjects.find(sceneObject));
 
     // Remove every delegate associated and remove its actors from the scene
-    for (auto visualModel : sceneObject->getVisualModels())
+    for (auto visualModel : sceneObject->getComponents<VisualModel>())
     {
         removeVisualModel(sceneObject, visualModel);
     }
@@ -553,11 +553,14 @@ void
 VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
 {
     // If the SceneObject is in the scene but not being rendered
-    for (auto sceneObject : m_scene->getSceneObjects())
+    for (auto ent : m_scene->getSceneObjects())
     {
-        if (m_renderedObjects.count(sceneObject) == 0)
+        if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
         {
-            addSceneObject(sceneObject);
+            if (m_renderedObjects.count(obj) == 0)
+            {
+                addSceneObject(obj);
+            }
         }
     }
     // If the SceneObject is being rendered but not in the scene
@@ -599,7 +602,8 @@ VTKRenderer::sceneObjectModified(std::shared_ptr<SceneObject> sceneObject)
     // Now check for added/removed VisualModels
 
     // If the VisualModel of the SceneObject is in the SceneObject but not being rendered
-    for (auto visualModel : sceneObject->getVisualModels())
+    const auto& visualModels = sceneObject->getComponents<VisualModel>();
+    for (auto visualModel : visualModels)
     {
         if (m_renderedVisualModels[sceneObject].count(visualModel) == 0)
         {
@@ -607,7 +611,6 @@ VTKRenderer::sceneObjectModified(std::shared_ptr<SceneObject> sceneObject)
         }
     }
     // If the VisualModel of the SceneObject is being rendered but not part of the SceneObject anymore
-    const auto& visualModels = sceneObject->getVisualModels();
     for (auto i = m_renderedVisualModels[sceneObject].begin(); i != m_renderedVisualModels[sceneObject].end(); i++)
     {
         auto iter = std::find(visualModels.begin(), visualModels.end(), *i);

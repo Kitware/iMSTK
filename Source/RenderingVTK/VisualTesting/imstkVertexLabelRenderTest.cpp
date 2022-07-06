@@ -24,11 +24,9 @@ TEST_F(VisualTest, VertexLabel)
     pointSet->initialize(
         std::make_shared<VecDataArray<double, 3>>(vertices));
 
-    auto visualModel = std::make_shared<VertexLabelVisualModel>();
-    visualModel->setGeometry(pointSet);
-
     auto sceneObject = std::make_shared<SceneObject>();
-    sceneObject->addVisualModel(visualModel);
+    auto visualModel = sceneObject->addComponent<VertexLabelVisualModel>();
+    visualModel->setGeometry(pointSet);
 
     m_scene = std::make_shared<Scene>("VertexLabelScene");
     m_scene->addSceneObject(sceneObject);

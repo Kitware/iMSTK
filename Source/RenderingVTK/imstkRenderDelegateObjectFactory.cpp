@@ -61,6 +61,12 @@ RenderDelegateRegistrar<VTKSurfaceNormalRenderDelegate> _imstk_registerrenderdel
 std::shared_ptr<VTKRenderDelegate>
 RenderDelegateObjectFactory::makeRenderDelegate(std::shared_ptr<VisualModel> visualModel)
 {
+    if (visualModel == nullptr)
+    {
+        LOG(FATAL) << "RenderDelegate::makeDelegate error: Called with null visualModel";
+        return nullptr;
+    }
+
     // If delegate hint is provided & it exists in map, override the creation of the delegate
     const std::string& delegateHint = visualModel->getDelegateHint();
     if (delegateHint == "")

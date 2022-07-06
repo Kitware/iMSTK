@@ -4,7 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkSceneEntity.h"
+#include "imstkEntity.h"
 #include "imstkMacros.h"
 
 #include <gtest/gtest.h>
@@ -13,10 +13,10 @@ using namespace imstk;
 
 namespace
 {
-class MockEntity : public SceneEntity
+class MockEntity : public Entity
 {
 public:
-    IMSTK_TYPE_NAME(MockEntity)
+    IMSTK_TYPE_NAME(Entity)
 };
 } // namespace
 

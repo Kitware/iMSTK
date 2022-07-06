@@ -58,7 +58,7 @@ public:
     ///
     /// \brief Update controlled laparoscopic tool using latest tracking information
     ///
-    void update(const double dt) override;
+    void update(const double& dt) override;
 
     ///
     /// \brief Set the maximum jaw angle

@@ -45,7 +45,7 @@ LaparoscopicToolController::setDevice(std::shared_ptr<DeviceClient> device)
 }
 
 void
-LaparoscopicToolController::update(const double dt)
+LaparoscopicToolController::update(const double& dt)
 {
     if (!updateTrackingData(dt))
     {
@@ -53,8 +53,8 @@ LaparoscopicToolController::update(const double dt)
         return;
     }
 
-    const Vec3d controllerPosition    = getPosition();
-    const Quatd controllerOrientation = getOrientation();
+    const Vec3d& controllerPosition    = getPosition();
+    const Quatd& controllerOrientation = getOrientation();
 
     // Controller transform
     m_controllerWorldTransform = mat4dTranslate(controllerPosition) * mat4dRotation(controllerOrientation);

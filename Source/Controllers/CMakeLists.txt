@@ -16,7 +16,6 @@ imstk_add_library( Controllers
     imstkTrackingDeviceControl.h
   CPP_FILES
     imstkCameraController.cpp
-    imstkDeviceControl.cpp
     imstkKeyboardControl.cpp
     imstkLaparoscopicToolController.cpp
     imstkMouseControl.cpp

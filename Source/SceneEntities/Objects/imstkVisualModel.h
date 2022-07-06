@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "imstkComponent.h"
 #include "imstkEventObject.h"
 
 #include <memory>
@@ -23,10 +24,10 @@ class Renderer;
 ///
 /// \brief Contains geometric, material, and render information
 ///
-class VisualModel : public EventObject
+class VisualModel : public Component, public EventObject
 {
 public:
-    VisualModel();
+    VisualModel(const std::string& name = "VisualModel");
     ~VisualModel() override = default;
 
     // *INDENT-OFF*
@@ -81,7 +82,6 @@ public:
     void postModified() { this->postEvent(Event(VisualModel::modified())); }
 
 protected:
-    std::string m_name;
     std::string m_delegateHint;
 
     std::shared_ptr<Geometry>       m_geometry;

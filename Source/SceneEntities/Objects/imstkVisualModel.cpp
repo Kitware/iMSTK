@@ -14,8 +14,7 @@
 
 namespace imstk
 {
-VisualModel::VisualModel() :
-    m_name(""),
+VisualModel::VisualModel(const std::string& name) : Component(name),
     m_delegateHint(""),
     m_geometry(nullptr),
     m_renderMaterial(std::make_shared<RenderMaterial>()),

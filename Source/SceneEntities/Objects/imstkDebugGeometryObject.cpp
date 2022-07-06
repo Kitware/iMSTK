@@ -43,10 +43,9 @@ DebugGeometryObject::DebugGeometryObject(const std::string& name) : SceneObject(
     lineMaterial->setLineWidth(20.0);
     lineMaterial->setColor(Color::Blue);
 
-    auto lineModel = std::make_shared<VisualModel>();
+    auto lineModel = addComponent<VisualModel>();
     lineModel->setGeometry(m_debugLineMesh);
     lineModel->setRenderMaterial(lineMaterial);
-    addVisualModel(lineModel);
 
     auto pointMaterial = std::make_shared<RenderMaterial>();
     pointMaterial->setDisplayMode(RenderMaterial::DisplayMode::Points);
@@ -55,20 +54,18 @@ DebugGeometryObject::DebugGeometryObject(const std::string& name) : SceneObject(
     pointMaterial->setPointSize(10.0);
     pointMaterial->setColor(Color::Red);
 
-    auto pointModel = std::make_shared<VisualModel>();
+    auto pointModel = addComponent<VisualModel>();
     pointModel->setGeometry(m_debugPointSet);
     pointModel->setRenderMaterial(pointMaterial);
-    addVisualModel(pointModel);
 
     auto faceMaterial = std::make_shared<RenderMaterial>();
     faceMaterial->setRecomputeVertexNormals(false);
     faceMaterial->setBackFaceCulling(false);
     faceMaterial->setColor(Color::Orange);
 
-    auto faceModel = std::make_shared<VisualModel>();
+    auto faceModel = addComponent<VisualModel>();
     faceModel->setGeometry(m_debugSurfMesh);
     faceModel->setRenderMaterial(faceMaterial);
-    addVisualModel(faceModel);
 }
 
 void
@@ -212,55 +209,43 @@ DebugGeometryObject::visualUpdate()
 std::shared_ptr<RenderMaterial>
 DebugGeometryObject::getPointMaterial() const
 {
-    return m_visualModels[1]->getRenderMaterial();
+    return getVisualModel(1)->getRenderMaterial();
 }
 
 std::shared_ptr<RenderMaterial>
 DebugGeometryObject::getLineMaterial() const
 {
-    return m_visualModels[0]->getRenderMaterial();
+    return getVisualModel(0)->getRenderMaterial();
 }
 
 std::shared_ptr<RenderMaterial>
 DebugGeometryObject::getFaceMaterial() const
 {
-    return m_visualModels[2]->getRenderMaterial();
+    return getVisualModel(2)->getRenderMaterial();
 }
 
 void
 DebugGeometryObject::setLineWidth(const double width)
 {
-    if (m_visualModels.size() > 0)
-    {
-        getVisualModel(0)->getRenderMaterial()->setLineWidth(width);
-    }
+    getVisualModel(0)->getRenderMaterial()->setLineWidth(width);
 }
 
 void
 DebugGeometryObject::setTriColor(const Color& color)
 {
-    if (m_visualModels.size() > 2)
-    {
-        getVisualModel(2)->getRenderMaterial()->setColor(color);
-    }
+    getVisualModel(2)->getRenderMaterial()->setColor(color);
 }
 
 void
 DebugGeometryObject::setLineColor(const Color& color)
 {
-    if (m_visualModels.size() > 0)
-    {
-        getVisualModel(0)->getRenderMaterial()->setColor(color);
-    }
+    getVisualModel(0)->getRenderMaterial()->setColor(color);
 }
 
 void
 DebugGeometryObject::setPointColor(const Color& color)
 {
-    if (m_visualModels.size() > 1)
-    {
-        getVisualModel(1)->getRenderMaterial()->setColor(color);
-    }
+    getVisualModel(1)->getRenderMaterial()->setColor(color);
 }
 
 void
@@ -272,10 +257,7 @@ DebugGeometryObject::setArrowColor(const Color& color)
 void
 DebugGeometryObject::setPointSize(const double size)
 {
-    if (m_visualModels.size() > 1)
-    {
-        getVisualModel(1)->getRenderMaterial()->setPointSize(size);
-    }
+    getVisualModel(1)->getRenderMaterial()->setPointSize(size);
 }
 
 int

@@ -121,7 +121,6 @@
 /* 
  * SceneEntities
  */
-%shared_ptr(imstk::SceneEntity)
 %shared_ptr(imstk::SceneObject)
 %shared_ptr(imstk::CollidingObject)
 %shared_ptr(imstk::DynamicObject)

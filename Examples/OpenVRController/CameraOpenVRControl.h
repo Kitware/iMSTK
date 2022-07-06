@@ -67,7 +67,7 @@ public:
     ///
     /// \brief Updates control based on current device state
     ///
-    void update(const double dt) override;
+    void update(const double& dt) override;
 
 protected:
     std::shared_ptr<OpenVRDeviceClient> m_translateDevice = nullptr;

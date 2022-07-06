@@ -51,23 +51,26 @@ Scene::initialize()
     // Gather all the systems from the object components
     // Right now this just includes DynamicalModel's
     std::unordered_set<std::shared_ptr<AbstractDynamicalModel>> systems;
-    for (const auto& obj : m_sceneObjects)
+    for (const auto& ent : m_sceneEntities)
     {
-        if (auto dynObj = std::dynamic_pointer_cast<DynamicObject>(obj))
+        if (auto dynObj = std::dynamic_pointer_cast<DynamicObject>(ent))
         {
             systems.insert(dynObj->getDynamicalModel());
         }
     }
 
     // Initialize all the SceneObjects
-    for (const auto& obj : m_sceneObjects)
+    for (const auto& ent : m_sceneEntities)
     {
-        CHECK(obj->initialize()) << "Error initializing scene object: " << obj->getName();
-
-        // Print any controls
-        if (auto deviceObj = std::dynamic_pointer_cast<DeviceControl>(obj))
+        if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
         {
-            deviceObj->printControls();
+            CHECK(obj->initialize()) << "Error initializing scene object: " << obj->getName();
+
+            // Print any controls
+            if (auto deviceObj = std::dynamic_pointer_cast<DeviceControl>(obj))
+            {
+                deviceObj->printControls();
+            }
         }
     }
 
@@ -117,9 +120,9 @@ Scene::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double p
     lowerCorner = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
     upperCorner = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
 
-    for (const auto& obj : m_sceneObjects)
+    for (const auto& ent : m_sceneEntities)
     {
-        for (const auto& visualModel : obj->getVisualModels())
+        for (const auto& visualModel : ent->getComponents<VisualModel>())
         {
             Vec3d                     min  = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
             Vec3d                     max  = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
@@ -147,21 +150,27 @@ Scene::buildTaskGraph()
     m_taskGraph->addEdge(m_taskGraph->getSource(), m_taskGraph->getSink());
 
     // Setup all SceneObject compute graphs
-    for (const auto& obj : m_sceneObjects)
+    for (const auto& ent : m_sceneEntities)
     {
-        obj->initGraphEdges();
+        if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
+        {
+            obj->initGraphEdges();
+        }
     }
 
     // Nest all the SceneObject graphs within this Scene's ComputeGraph
-    for (const auto& obj : m_sceneObjects)
+    for (const auto& ent : m_sceneEntities)
     {
-        std::shared_ptr<TaskGraph> objComputeGraph = obj->getTaskGraph();
-        if (objComputeGraph != nullptr)
+        if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
         {
-            // Remove any unused nodes
-            objComputeGraph = TaskGraph::removeUnusedNodes(objComputeGraph);
-            // Sum and nest the graph
-            m_taskGraph->nestGraph(objComputeGraph, m_taskGraph->getSource(), m_taskGraph->getSink());
+            std::shared_ptr<TaskGraph> objComputeGraph = obj->getTaskGraph();
+            if (objComputeGraph != nullptr)
+            {
+                // Remove any unused nodes
+                objComputeGraph = TaskGraph::removeUnusedNodes(objComputeGraph);
+                // Sum and nest the graph
+                m_taskGraph->nestGraph(objComputeGraph, m_taskGraph->getSource(), m_taskGraph->getSink());
+            }
         }
     }
 
@@ -226,68 +235,68 @@ Scene::setEnableTaskTiming(const bool enabled)
 }
 
 void
-Scene::addInteraction(std::shared_ptr<SceneObject> interaction)
+Scene::addInteraction(std::shared_ptr<Entity> interaction)
 {
     addSceneObject(interaction);
 }
 
-std::shared_ptr<SceneObject>
+std::shared_ptr<Entity>
 Scene::getSceneObject(const std::string& name) const
 {
-    auto iter = std::find_if(m_sceneObjects.begin(), m_sceneObjects.end(),
-        [name](const std::shared_ptr<SceneObject>& i) { return i->getName() == name; });
-    return (iter == m_sceneObjects.end()) ? nullptr : *iter;
+    auto iter = std::find_if(m_sceneEntities.begin(), m_sceneEntities.end(),
+        [name](const std::shared_ptr<Entity>& i) { return i->getName() == name; });
+    return (iter == m_sceneEntities.end()) ? nullptr : *iter;
 }
 
 void
-Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
+Scene::addSceneObject(std::shared_ptr<Entity> entity)
 {
     // If already exists, exit
-    if (m_sceneObjects.find(newSceneObject) != m_sceneObjects.end())
+    if (m_sceneEntities.find(entity) != m_sceneEntities.end())
     {
-        LOG(WARNING) << "SceneObject " << newSceneObject->getName() << " already in the scene, not added";
+        LOG(WARNING) << "Entity " << entity->getName() << " already in the scene, not added";
         return;
     }
 
     // Ensure the name is unique
-    const std::string orgName    = newSceneObject->getName();
+    const std::string orgName    = entity->getName();
     const std::string uniqueName = getUniqueName(orgName);
     if (orgName != uniqueName)
     {
-        LOG(INFO) << "SceneObject with name " << orgName << " already in scene. Renamed to " << uniqueName;
-        newSceneObject->setName(uniqueName);
+        LOG(INFO) << "Entity with name " << orgName << " already in scene. Renamed to " << uniqueName;
+        entity->setName(uniqueName);
     }
 
-    m_sceneObjects.insert(newSceneObject);
+    m_sceneEntities.insert(entity);
     this->postEvent(Event(modified()));
-    LOG(INFO) << uniqueName << " object added to " << m_name << " scene";
+    LOG(INFO) << uniqueName << " entity added to " << m_name << " scene";
 }
 
 void
 Scene::removeSceneObject(const std::string& name)
 {
-    std::shared_ptr<SceneObject> obj = getSceneObject(name);
-    if (obj == nullptr)
+    std::shared_ptr<Entity> ent = getSceneObject(name);
+    if (ent == nullptr)
     {
-        LOG(WARNING) << "No object named '" << name
+        LOG(WARNING) << "No entity named '" << name
                      << "' was registered in this scene.";
         return;
     }
-    removeSceneObject(obj);
+    removeSceneObject(ent);
 }
 
 void
-Scene::removeSceneObject(std::shared_ptr<SceneObject> sceneObject)
+Scene::removeSceneObject(std::shared_ptr<Entity> entity)
 {
-    if (m_sceneObjects.count(sceneObject) != 0)
+    if (m_sceneEntities.count(entity) != 0)
     {
-        m_sceneObjects.erase(sceneObject);
+        m_sceneEntities.erase(entity);
         this->postEvent(Event(modified()));
-        LOG(INFO) << sceneObject->getName() << " object removed from scene " << m_name;
+        LOG(INFO) << entity->getName() << " object removed from scene " << m_name;
     }
     else
     {
-        LOG(WARNING) << "Could not remove SceneObject '" << sceneObject->getName() << "', does not exist in the scene";
+        LOG(WARNING) << "Could not remove Entity '" << entity->getName() << "', does not exist in the scene";
         return;
     }
 }
@@ -446,9 +455,12 @@ void
 Scene::resetSceneObjects()
 {
     // Apply the geometry and apply maps to all the objects
-    for (auto obj : m_sceneObjects)
+    for (const auto& ent : m_sceneEntities)
     {
-        obj->reset();
+        if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
+        {
+            obj->reset();
+        }
     }
 }
 
@@ -521,9 +533,12 @@ Scene::advance(const double dt)
 void
 Scene::updateVisuals()
 {
-    for (auto obj : m_sceneObjects)
+    for (const auto& ent : m_sceneEntities)
     {
-        obj->visualUpdate();
+        if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
+        {
+            obj->visualUpdate();
+        }
     }
 }
 

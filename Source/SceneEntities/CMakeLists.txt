@@ -24,8 +24,6 @@ set(H_FILES
   Objects/imstkSphObject.h
   Objects/imstkVisualModel.h
   Objects/imstkVertexLabelVisualModel.h
-  Objects/imstkTextVisualModel.h
-  imstkSceneEntity.h
   )
 
 set(SRC_FILES
@@ -45,7 +43,6 @@ set(SRC_FILES
   Objects/imstkSceneObject.cpp
   Objects/imstkSphObject.cpp
   Objects/imstkVisualModel.cpp
-  imstkSceneEntity.cpp
   )
 
 if (iMSTK_USE_MODEL_REDUCTION)
@@ -63,9 +60,8 @@ imstk_add_library(SceneEntities
     ${H_FILES}
   CPP_FILES
     ${SRC_FILES}
-  DEPENDS    
-    Common
-    Geometry
+  DEPENDS
+    ComponentModel
     GeometryMappers
     Materials
     MeshIO

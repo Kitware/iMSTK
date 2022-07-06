@@ -31,14 +31,12 @@ CollisionDetectionVisualTest::SetUp()
     defaultMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
     m_cdObj1 = std::make_shared<CollidingObject>("cdObj1");
-    auto model1 = std::make_shared<VisualModel>();
+    auto model1 = m_cdObj1->addComponent<VisualModel>();
     model1->setRenderMaterial(defaultMaterial);
-    m_cdObj1->addVisualModel(model1);
 
     m_cdObj2 = std::make_shared<CollidingObject>("cdObj2");
-    auto model2 = std::make_shared<VisualModel>();
+    auto model2 = m_cdObj2->addComponent<VisualModel>();
     model2->setRenderMaterial(defaultMaterial);
-    m_cdObj2->addVisualModel(model2);
 }
 
 void
