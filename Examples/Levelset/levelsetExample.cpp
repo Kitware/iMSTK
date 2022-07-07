@@ -21,10 +21,12 @@
 
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkScene.h"

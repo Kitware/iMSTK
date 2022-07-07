@@ -23,10 +23,12 @@
 #include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
@@ -37,10 +39,9 @@
 #include "imstkSimulationManager.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkUnidirectionalPlaneToSphereCD.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkPlane.h"
-#include "imstkUnidirectionalPlaneToSphereCD.h"
 
 using namespace imstk;
 

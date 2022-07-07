@@ -157,7 +157,7 @@
 /*
  * Controller
  */
-%shared_ptr(imstk::AbstractDeviceControl)
+%shared_ptr(imstk::DeviceControl)
 %shared_ptr(imstk::MouseControl)
 %shared_ptr(imstk::KeyboardControl)
 %shared_ptr(imstk::TrackingDeviceControl)

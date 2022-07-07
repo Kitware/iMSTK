@@ -24,19 +24,30 @@
 #include "imstkSceneObject.h"
 #include "imstkMacros.h"
 
-#include <memory>
-
 namespace imstk
 {
 class DeviceClient;
 
-class AbstractDeviceControl : public SceneObject
+///
+/// \class DeviceControl
+///
+/// \brief While the DeviceClient provides quantities from the device, the control
+/// defines what to do with those quantities
+///
+class DeviceControl : public SceneObject
 {
 protected:
-    AbstractDeviceControl(const std::string& name = "AbstractDeviceControl") : SceneObject(name) { }
+    DeviceControl(const std::string& name = "DeviceControl") : SceneObject(name) { }
 
 public:
-    ~AbstractDeviceControl() override = default;
+    ~DeviceControl() override = default;
+
+    ///
+    /// \brief Set/Get the device client used in the control
+    ///@{
+    std::shared_ptr<DeviceClient> getDevice() const { return m_deviceClient; }
+    virtual void setDevice(std::shared_ptr<DeviceClient> device) { m_deviceClient = device; }
+    ///@}
 
     using SceneObject::update;
 
@@ -51,31 +62,8 @@ public:
     virtual void update(const double imstkNotUsed(dt)) { }
 
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
-};
-
-///
-/// \class DeviceControl
-///
-/// \brief While the DeviceClient provides quantities from the device, the control
-/// defines what to do with those quantities
-///
-template<typename DeviceType>
-class DeviceControl : public AbstractDeviceControl
-{
-protected:
-    DeviceControl(const std::string& name = "DeviceControl") : AbstractDeviceControl(name) { }
-
-public:
-    virtual ~DeviceControl() = default;
-
-    ///
-    /// \brief Set/Get the device client used in the control
-    ///@{
-    std::shared_ptr<DeviceType> getDevice() const { return m_deviceClient; }
-    virtual void setDevice(std::shared_ptr<DeviceType> device) { m_deviceClient = device; }
-///@}
 
 protected:
-    std::shared_ptr<DeviceType> m_deviceClient;
+    std::shared_ptr<DeviceClient> m_deviceClient;
 };
 } // namespace imstk

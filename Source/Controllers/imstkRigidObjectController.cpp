@@ -136,6 +136,7 @@ RigidObjectController::update(const double dt)
         (*m_rigidObject->getRigidBody()->m_orientation) = getOrientation();
     }
 
+    applyForces();
     this->postEvent(Event(RigidObjectController::modified()));
 }
 

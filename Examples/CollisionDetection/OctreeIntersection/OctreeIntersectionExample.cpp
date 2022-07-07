@@ -21,8 +21,10 @@
 
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLooseOctree.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkRenderMaterial.h"

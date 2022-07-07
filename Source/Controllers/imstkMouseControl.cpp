@@ -25,7 +25,7 @@
 namespace imstk
 {
 void
-MouseControl::setDevice(std::shared_ptr<MouseDeviceClient> device)
+MouseControl::setDevice(std::shared_ptr<DeviceClient> device)
 {
     // Remove old observer if it exists
     if (m_deviceClient != nullptr)
@@ -37,6 +37,7 @@ MouseControl::setDevice(std::shared_ptr<MouseDeviceClient> device)
     }
 
     // Set the new device
+    m_mouseDevice = std::dynamic_pointer_cast<MouseDeviceClient>(device);
     DeviceControl::setDevice(device);
 
     // Subscribe to the device clients events
@@ -67,6 +68,6 @@ MouseControl::mouseScrollEvent(MouseEvent* e)
 void
 MouseControl::mouseMoveEvent(MouseEvent* imstkNotUsed(e))
 {
-    OnMouseMove(m_deviceClient->getPos());
+    OnMouseMove(m_mouseDevice->getPos());
 }
 } // namespace imstk

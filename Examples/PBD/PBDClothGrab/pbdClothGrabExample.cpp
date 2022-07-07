@@ -23,6 +23,7 @@
 #include "imstkCollisionUtils.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"

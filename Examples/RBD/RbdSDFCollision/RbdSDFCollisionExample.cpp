@@ -26,6 +26,7 @@
 #include "imstkImplicitGeometryToImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkOrientedBox.h"
 #include "imstkPlane.h"

@@ -25,7 +25,7 @@
 namespace imstk
 {
 void
-KeyboardControl::setDevice(std::shared_ptr<KeyboardDeviceClient> device)
+KeyboardControl::setDevice(std::shared_ptr<DeviceClient> device)
 {
     // Remove old observer if it exists
     if (m_deviceClient != nullptr)

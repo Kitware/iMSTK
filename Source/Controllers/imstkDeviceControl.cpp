@@ -26,7 +26,7 @@
 namespace imstk
 {
 void
-AbstractDeviceControl::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+DeviceControl::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Remove the update node from the TaskGraph, updates invoked
     m_taskGraph->addEdge(source, sink);

@@ -20,9 +20,12 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
+#include "imstkKeyboardDeviceClient.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkRenderMaterial.h"
@@ -33,7 +36,6 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkLogger.h"
 
 using namespace imstk;
 

@@ -39,7 +39,7 @@ using namespace imstk;
 /// \brief Controls pose of a camera given two trackpads from OpenVRDeviceClient's
 ///
 ///
-class CameraOpenVRControl : public DeviceControl<OpenVRDeviceClient>
+class CameraOpenVRControl : public DeviceControl
 {
 public:
     CameraOpenVRControl(const std::string& name = "CameraOpenVRControl") : DeviceControl(name) { }

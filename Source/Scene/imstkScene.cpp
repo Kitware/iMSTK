@@ -481,12 +481,6 @@ Scene::advance(const double dt)
         m_taskGraphController->execute();
     }
 
-    // Apply updated forces on device
-    for (auto controller : this->getControllers())
-    {
-        controller->applyForces();
-    }
-
     m_sceneTime += dt;
     if (m_resetRequested)
     {

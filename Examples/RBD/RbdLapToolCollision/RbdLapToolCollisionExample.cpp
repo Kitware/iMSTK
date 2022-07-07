@@ -25,6 +25,7 @@
 #include "imstkDummyClient.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"

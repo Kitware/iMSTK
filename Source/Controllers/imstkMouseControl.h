@@ -37,13 +37,13 @@ class MouseEvent;
 /// It can be constructed and observed or subclassed and overridden
 /// to implement controls.
 ///
-class MouseControl : public DeviceControl<MouseDeviceClient>
+class MouseControl : public DeviceControl
 {
 public:
     MouseControl(const std::string& name = "MouseControl") : DeviceControl(name) { }
     ~MouseControl() override = default;
 
-    void setDevice(std::shared_ptr<MouseDeviceClient> device) override;
+    void setDevice(std::shared_ptr<DeviceClient> device) override;
 
     virtual void OnButtonPress(const int imstkNotUsed(key)) { }
 
@@ -73,5 +73,8 @@ private:
     /// \brief Recieves moves
     ///
     virtual void mouseMoveEvent(MouseEvent* e);
+
+protected:
+    std::shared_ptr<MouseDeviceClient> m_mouseDevice = nullptr;
 };
 } // namespace imstk

@@ -32,7 +32,7 @@ namespace imstk
 /// \brief Base class for all DeviceControls that track
 /// something in space (position and orientation)
 ///
-class TrackingDeviceControl : public DeviceControl<DeviceClient>
+class TrackingDeviceControl : public DeviceControl
 {
 public:
     enum InvertFlag
@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Apply forces to the haptic device
     ///
-    virtual void applyForces();
+    virtual void applyForces() { }
 
     ///
     /// \brief Set/Get the position of the tracker

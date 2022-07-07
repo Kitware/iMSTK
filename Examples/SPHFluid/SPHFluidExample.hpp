@@ -31,6 +31,8 @@
 #include "imstkSphObjectCollision.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
+#include "imstkMouseDeviceClient.h"
+#include "imstkKeyboardDeviceClient.h"
 
 #include "Fluid.hpp"
 #include "Solid.hpp"

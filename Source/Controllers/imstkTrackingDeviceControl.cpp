@@ -112,11 +112,6 @@ TrackingDeviceControl::updateTrackingData(const double dt)
     return true;
 }
 
-void
-TrackingDeviceControl::applyForces()
-{
-}
-
 const imstk::Vec3d&
 TrackingDeviceControl::getPosition() const
 {
