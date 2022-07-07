@@ -39,7 +39,7 @@ struct RigidBody;
 class RigidObject2 : public DynamicObject
 {
 public:
-    RigidObject2(const std::string& name) : DynamicObject(name) { }
+    RigidObject2(const std::string& name = "RigidObject2") : DynamicObject(name) { }
     ~RigidObject2() override = default;
 
     IMSTK_TYPE_NAME(RigidObject2)

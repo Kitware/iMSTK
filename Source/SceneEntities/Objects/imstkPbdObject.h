@@ -37,7 +37,7 @@ class PbdModel;
 class PbdObject : public DynamicObject
 {
 public:
-    PbdObject(const std::string& name) : DynamicObject(name) { }
+    PbdObject(const std::string& name = "PbdObject") : DynamicObject(name) { }
     ~PbdObject() override = default;
 
     IMSTK_TYPE_NAME(PbdObject)

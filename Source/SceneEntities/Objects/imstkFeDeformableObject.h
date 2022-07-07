@@ -37,7 +37,7 @@ class FemDeformableBodyModel;
 class FeDeformableObject : public DynamicObject
 {
 public:
-    FeDeformableObject(const std::string& name) : DynamicObject(name) { }
+    FeDeformableObject(const std::string& name = "FeDeformableObject") : DynamicObject(name) { }
     ~FeDeformableObject() override = default;
 
     IMSTK_TYPE_NAME(FeDeformableObject)
