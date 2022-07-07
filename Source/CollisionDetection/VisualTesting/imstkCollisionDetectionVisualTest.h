@@ -28,7 +28,6 @@ class CollisionDataDebugObject;
 class CollisionDetectionAlgorithm;
 class CollidingObject;
 class Geometry;
-class KeyEvent;
 } // namespace imstk
 
 ///
