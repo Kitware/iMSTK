@@ -109,31 +109,12 @@ TrackingDeviceControl::updateTrackingData(const double dt)
         m_currentAngularVelocity = m_currentRotation.toRotationMatrix().eulerAngles(0, 1, 2) /= dt;
     }
 
-    m_trackingDataUptoDate = true;
     return true;
 }
 
 void
 TrackingDeviceControl::applyForces()
 {
-}
-
-void
-TrackingDeviceControl::setTrackerToOutOfDate()
-{
-    m_trackingDataUptoDate = false;
-}
-
-void
-TrackingDeviceControl::setTrackerToUpToDate()
-{
-    m_trackingDataUptoDate = true;
-}
-
-bool
-TrackingDeviceControl::isTrackerUpToDate() const
-{
-    return m_trackingDataUptoDate;
 }
 
 const imstk::Vec3d&

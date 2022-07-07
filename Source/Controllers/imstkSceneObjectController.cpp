@@ -35,13 +35,10 @@ SceneObjectController::SceneObjectController(const std::string& name) :
 void
 SceneObjectController::update(const double dt)
 {
-    if (!isTrackerUpToDate())
+    if (!updateTrackingData(dt))
     {
-        if (!updateTrackingData(dt))
-        {
-            LOG(WARNING) << "warning: could not update tracking info.";
-            return;
-        }
+        LOG(WARNING) << "warning: could not update tracking info.";
+        return;
     }
 
     if (m_sceneObject == nullptr)

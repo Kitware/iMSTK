@@ -487,12 +487,6 @@ Scene::advance(const double dt)
         controller->applyForces();
     }
 
-    // Set the trackers of the scene object controllers to out-of-date
-    for (auto controller : this->getControllers())
-    {
-        controller->setTrackerToOutOfDate();
-    }
-
     m_sceneTime += dt;
     if (m_resetRequested)
     {
