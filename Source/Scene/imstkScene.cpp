@@ -481,18 +481,6 @@ Scene::advance(const double dt)
         m_taskGraphController->execute();
     }
 
-    // Apply updated forces on device
-    for (auto controller : this->getControllers())
-    {
-        controller->applyForces();
-    }
-
-    // Set the trackers of the scene object controllers to out-of-date
-    for (auto controller : this->getControllers())
-    {
-        controller->setTrackerToOutOfDate();
-    }
-
     m_sceneTime += dt;
     if (m_resetRequested)
     {

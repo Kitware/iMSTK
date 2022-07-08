@@ -26,6 +26,7 @@
 #include "imstkImplicitGeometryToImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkOrientedBox.h"
 #include "imstkPlane.h"
@@ -168,11 +169,13 @@ main()
 
         // Add mouse and keyboard controls to the viewer
         {
-            auto mouseControl = std::make_shared<MouseSceneControl>(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>();
+            mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            auto keyControl = std::make_shared<KeyboardSceneControl>(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>();
+            keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);

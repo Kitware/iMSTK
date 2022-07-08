@@ -21,20 +21,22 @@
 
 #include "imstkCamera.h"
 #include "imstkCylinder.h"
-#include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
+#include "imstkKeyboardDeviceClient.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
+#include "imstkMeshIO.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOrientedBox.h"
 #include "imstkPlane.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkMeshIO.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -148,11 +150,13 @@ main()
 
         // Add mouse and keyboard controls to the viewer
         {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>();
+            mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>();
+            keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);

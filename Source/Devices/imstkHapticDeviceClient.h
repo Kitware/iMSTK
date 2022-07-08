@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkDeviceClient.h"
-#include "imstkParallelUtils.h"
 
 #include <HD/hd.h>
 
@@ -52,7 +51,7 @@ class HapticDeviceClient : public DeviceClient
 friend class HapticDeviceManager;
 
 public:
-    virtual ~HapticDeviceClient() = default;
+    ~HapticDeviceClient() override = default;
 
     ///
     /// \brief Use callback to get tracking data from phantom omni
@@ -64,7 +63,7 @@ protected:
     /// \brief Constructor/Destructor, only the DeviceManager can construct
     /// \param Device name or use empty string for default device
     ///
-    HapticDeviceClient(std::string name = "") : DeviceClient(name, "localhost"), m_handle(HD_INVALID_HANDLE) { }
+    HapticDeviceClient(const std::string& name = "") : DeviceClient(name, "localhost") { }
 
     ///
     /// \brief Initialize the phantom omni device
@@ -77,15 +76,15 @@ protected:
     void disable();
 
 private:
+    typedef unsigned int HDCallbackCode;
+
     ///
     /// \brief Phantom omni device api callback
     ///
-
-    typedef unsigned int HDCallbackCode;
     static HDCallbackCode HDCALLBACK hapticCallback(void* pData);
 
-    HHD     m_handle; ///< device handle
-    HDstate m_state;  ///< device reading state
+    HHD     m_handle = HD_INVALID_HANDLE; ///< device handle
+    HDstate m_state;                      ///< device reading state
     HDSchedulerHandle m_schedulerHandle = 0;
     std::vector<std::pair<int, int>> m_events;
 };

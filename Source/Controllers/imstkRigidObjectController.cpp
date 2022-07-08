@@ -29,32 +29,20 @@
 
 namespace imstk
 {
-RigidObjectController::RigidObjectController(std::shared_ptr<RigidObject2> rigidObject,
-                                             std::shared_ptr<DeviceClient> trackingDevice) :
-    SceneObjectController(rigidObject, trackingDevice),
-    m_rigidObject(rigidObject)
-{
-    /*m_currentPos = rigidObject->getRigidBody()->getPosition();
-    m_currentRot = rigidObject->getRigidBody()->getOrientation();*/
-}
-
 void
-RigidObjectController::setControlledSceneObject(std::shared_ptr<SceneObject> obj)
+RigidObjectController::setControlledObject(std::shared_ptr<SceneObject> obj)
 {
-    SceneObjectController::setControlledSceneObject(obj);
+    SceneObjectController::setControlledObject(obj);
     m_rigidObject = std::dynamic_pointer_cast<RigidObject2>(obj);
 }
 
 void
 RigidObjectController::update(const double dt)
 {
-    if (!isTrackerUpToDate())
+    if (!updateTrackingData(dt))
     {
-        if (!updateTrackingData(dt))
-        {
-            LOG(WARNING) << "warning: could not update tracking info.";
-            return;
-        }
+        LOG(WARNING) << "warning: could not update tracking info.";
+        return;
     }
 
     if (m_rigidObject == nullptr)
@@ -148,6 +136,7 @@ RigidObjectController::update(const double dt)
         (*m_rigidObject->getRigidBody()->m_orientation) = getOrientation();
     }
 
+    applyForces();
     this->postEvent(Event(RigidObjectController::modified()));
 }
 

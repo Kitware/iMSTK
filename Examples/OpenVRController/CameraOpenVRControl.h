@@ -42,8 +42,8 @@ using namespace imstk;
 class CameraOpenVRControl : public DeviceControl
 {
 public:
-    CameraOpenVRControl() = default;
-    virtual ~CameraOpenVRControl() override = default;
+    CameraOpenVRControl(const std::string& name = "CameraOpenVRControl") : DeviceControl(name) { }
+    ~CameraOpenVRControl() override = default;
 
 public:
     ///

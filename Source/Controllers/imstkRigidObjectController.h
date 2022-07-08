@@ -40,13 +40,10 @@ class RigidObject2;
 class RigidObjectController : public SceneObjectController
 {
 public:
-    RigidObjectController(std::shared_ptr<RigidObject2> rigidObject, std::shared_ptr<DeviceClient> trackingDevice);
-    RigidObjectController() = delete;
+    RigidObjectController(const std::string& name = "RigidObjectController") : SceneObjectController(name) { }
+    ~RigidObjectController() override = default;
 
-    virtual ~RigidObjectController() override = default;
-
-public:
-    void setControlledSceneObject(std::shared_ptr<SceneObject> obj) override;
+    void setControlledObject(std::shared_ptr<SceneObject> obj) override;
 
     ///
     /// \brief Set/Get the linear damping coefficient. Default 10000.0

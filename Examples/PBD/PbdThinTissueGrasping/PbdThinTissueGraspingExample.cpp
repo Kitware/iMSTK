@@ -26,9 +26,11 @@
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkImageData.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLaparoscopicToolController.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
@@ -170,7 +172,9 @@ main()
     std::shared_ptr<HapticDeviceClient> client = deviceManager->makeDeviceClient();
 
     // Create and add virtual coupling object controller in the scene
-    imstkNew<LaparoscopicToolController> controller(objShaft, objUpperJaw, objLowerJaw, pickGeom, client);
+    imstkNew<LaparoscopicToolController> controller;
+    controller->setParts(objShaft, objUpperJaw, objLowerJaw, pickGeom);
+    controller->setDevice(client);
     controller->setJawAngleChange(1.0);
     controller->setTranslationScaling(0.001);
     scene->addController(controller);
@@ -211,11 +215,13 @@ main()
 
         // Add mouse and keyboard controls to the viewer
         {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>();
+            mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>();
+            keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);

@@ -23,10 +23,12 @@
 #include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
@@ -37,10 +39,9 @@
 #include "imstkSimulationManager.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkUnidirectionalPlaneToSphereCD.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkPlane.h"
-#include "imstkUnidirectionalPlaneToSphereCD.h"
 
 using namespace imstk;
 
@@ -155,11 +156,13 @@ main()
     simulationManager->addModule(sceneManager);
     simulationManager->setDesiredDt(0.001);
 
-    auto mouseControl = std::make_shared<MouseSceneControl>(viewer->getMouseDevice());
+    auto mouseControl = std::make_shared<MouseSceneControl>();
+    mouseControl->setDevice(viewer->getMouseDevice());
     mouseControl->setSceneManager(sceneManager);
     viewer->addControl(mouseControl);
 
-    auto keyControl = std::make_shared<KeyboardSceneControl>(viewer->getKeyboardDevice());
+    auto keyControl = std::make_shared<KeyboardSceneControl>();
+    keyControl->setDevice(viewer->getKeyboardDevice());
     keyControl->setSceneManager(sceneManager);
     keyControl->setModuleDriver(simulationManager);
     viewer->addControl(keyControl);

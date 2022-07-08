@@ -22,10 +22,12 @@
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
 #include "imstkIsometricMap.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPlane.h"
@@ -192,7 +194,9 @@ main()
         std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        imstkNew<RigidObjectController> controller(needleObj, deviceClient);
+        imstkNew<RigidObjectController> controller;
+        controller->setControlledObject(needleObj);
+        controller->setDevice(deviceClient);
         controller->setTranslationScaling(0.001);
         controller->setLinearKs(8000.0);
         controller->setLinearKd(200.0);
@@ -255,11 +259,13 @@ main()
 
         // Add mouse and keyboard controls to the viewer
         {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>();
+            mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>();
+            keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);

@@ -22,10 +22,12 @@
 #include "FemurObject.h"
 #include "imstkCamera.h"
 #include "imstkDirectionalLight.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetCH.h"
 #include "imstkLevelSetModel.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkRbdConstraint.h"
@@ -163,8 +165,10 @@ main()
         driver->addModule(hapticManager);
         std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
 
-        imstkNew<RigidObjectController> controller(rbdObj, hapticDeviceClient);
+        imstkNew<RigidObjectController> controller;
         {
+            controller->setControlledObject(rbdObj);
+            controller->setDevice(hapticDeviceClient);
             controller->setLinearKs(300000.0);
             controller->setAngularKs(300000000.0);
             controller->setUseCritDamping(true);
@@ -216,11 +220,13 @@ main()
 #endif
 
         {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>();
+            mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>();
+            keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);

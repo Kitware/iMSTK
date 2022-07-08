@@ -23,6 +23,7 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -127,11 +128,13 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
 
     // Add mouse and keyboard controls to the viewer
     {
-        auto mouseControl = std::make_shared<MouseSceneControl>(m_viewer->getMouseDevice());
+        auto mouseControl = std::make_shared<MouseSceneControl>();
+        mouseControl->setDevice(m_viewer->getMouseDevice());
         mouseControl->setSceneManager(m_sceneManager);
         m_viewer->addControl(mouseControl);
 
-        auto keyControl = std::make_shared<KeyboardSceneControl>(m_viewer->getKeyboardDevice());
+        auto keyControl = std::make_shared<KeyboardSceneControl>();
+        keyControl->setDevice(m_viewer->getKeyboardDevice());
         keyControl->setSceneManager(m_sceneManager);
         keyControl->setModuleDriver(m_driver);
         m_viewer->addControl(keyControl);

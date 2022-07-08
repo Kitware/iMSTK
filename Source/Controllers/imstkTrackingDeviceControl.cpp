@@ -26,14 +26,8 @@
 
 namespace imstk
 {
-TrackingDeviceControl::TrackingDeviceControl() :
-    m_translationOffset(Vec3d::Zero()),
-    m_rotationOffset(Quatd::Identity())
-{
-}
-
-TrackingDeviceControl::TrackingDeviceControl(std::shared_ptr<DeviceClient> device) :
-    DeviceControl(device),
+TrackingDeviceControl::TrackingDeviceControl(const std::string& name) :
+    DeviceControl(name),
     m_translationOffset(Vec3d::Zero()),
     m_rotationOffset(Quatd::Identity())
 {
@@ -115,31 +109,7 @@ TrackingDeviceControl::updateTrackingData(const double dt)
         m_currentAngularVelocity = m_currentRotation.toRotationMatrix().eulerAngles(0, 1, 2) /= dt;
     }
 
-    m_trackingDataUptoDate = true;
     return true;
-}
-
-void
-TrackingDeviceControl::applyForces()
-{
-}
-
-void
-TrackingDeviceControl::setTrackerToOutOfDate()
-{
-    m_trackingDataUptoDate = false;
-}
-
-void
-TrackingDeviceControl::setTrackerToUpToDate()
-{
-    m_trackingDataUptoDate = true;
-}
-
-bool
-TrackingDeviceControl::isTrackerUpToDate() const
-{
-    return m_trackingDataUptoDate;
 }
 
 const imstk::Vec3d&

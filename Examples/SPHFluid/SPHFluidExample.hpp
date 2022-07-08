@@ -31,6 +31,8 @@
 #include "imstkSphObjectCollision.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
+#include "imstkMouseDeviceClient.h"
+#include "imstkKeyboardDeviceClient.h"
 
 #include "Fluid.hpp"
 #include "Solid.hpp"
@@ -129,11 +131,13 @@ main(int argc, char* argv[])
 
         // Add mouse and keyboard controls to the viewer
         {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>();
+            mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>();
+            keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);

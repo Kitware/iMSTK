@@ -27,20 +27,18 @@
 
 namespace imstk
 {
-LaparoscopicToolController::LaparoscopicToolController(
+void
+LaparoscopicToolController::setParts(
     std::shared_ptr<CollidingObject> shaft,
     std::shared_ptr<CollidingObject> upperJaw,
     std::shared_ptr<CollidingObject> lowerJaw,
-    std::shared_ptr<Geometry>        pickGeom,
-    std::shared_ptr<DeviceClient>    trackingDevice) :
-    TrackingDeviceControl(trackingDevice),
-    m_shaft(shaft),
-    m_upperJaw(upperJaw),
-    m_lowerJaw(lowerJaw),
-    m_pickGeom(pickGeom),
-    m_jawRotationAxis(Vec3d(1, 0, 0))
+    std::shared_ptr<Geometry>        pickGeom)
 {
-    trackingDevice->setButtonsEnabled(true);
+    m_shaft    = shaft;
+    m_upperJaw = upperJaw;
+    m_lowerJaw = lowerJaw;
+    m_pickGeom = pickGeom;
+    m_jawRotationAxis = Vec3d(1, 0, 0);
 
     // Record the transforms as 4x4 matrices (this should capture initial displacement/rotation of the jaws/shaft from controller)
     m_shaftVisualTransform    = m_shaft->getVisualGeometry()->getTransform();
@@ -55,15 +53,19 @@ LaparoscopicToolController::LaparoscopicToolController(
 }
 
 void
+LaparoscopicToolController::setDevice(std::shared_ptr<DeviceClient> device)
+{
+    TrackingDeviceControl::setDevice(device);
+    device->setButtonsEnabled(true);
+}
+
+void
 LaparoscopicToolController::update(const double dt)
 {
-    if (!isTrackerUpToDate())
+    if (!updateTrackingData(dt))
     {
-        if (!updateTrackingData(dt))
-        {
-            LOG(WARNING) << "warning: could not update tracking info.";
-            return;
-        }
+        LOG(WARNING) << "warning: could not update tracking info.";
+        return;
     }
 
     const Vec3d controllerPosition    = getPosition();

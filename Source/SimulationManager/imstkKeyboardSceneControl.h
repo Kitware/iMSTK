@@ -40,8 +40,7 @@ class SceneManager;
 class KeyboardSceneControl : public KeyboardControl
 {
 public:
-    KeyboardSceneControl() = default;
-    KeyboardSceneControl(std::shared_ptr<KeyboardDeviceClient> keyDevice);
+    KeyboardSceneControl(const std::string& name = "KeyboardSceneControl") : KeyboardControl(name) { }
     ~KeyboardSceneControl() override = default;
 
     ///

@@ -28,8 +28,8 @@
 
 namespace imstk
 {
-class Camera;
 class DeviceControl;
+class Camera;
 class InteractorStyle;
 class Scene;
 class ScreenCaptureUtility;

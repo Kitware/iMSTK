@@ -23,10 +23,13 @@
 #include "imstkCapsule.h"
 #include "imstkCollidingObject.h"
 #include "imstkCylinder.h"
+#include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkDirectionalLight.h"
+#include "imstkLogger.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOrientedBox.h"
@@ -69,7 +72,9 @@ main()
     object->setVisualGeometry(geometries[0]);
     scene->addSceneObject(object);
 
-    imstkNew<SceneObjectController> controller(object, client);
+    imstkNew<SceneObjectController> controller;
+    controller->setControlledObject(object);
+    controller->setDevice(client);
     controller->setTranslationScaling(0.1);
     scene->addController(controller);
 
@@ -102,11 +107,13 @@ main()
 
         // Add mouse and keyboard controls to the viewer
         {
-            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            auto mouseControl = std::make_shared<MouseSceneControl>();
+            mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
             viewer->addControl(mouseControl);
 
-            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            auto keyControl = std::make_shared<KeyboardSceneControl>();
+            keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);

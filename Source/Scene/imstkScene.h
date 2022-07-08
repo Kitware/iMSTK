@@ -37,12 +37,10 @@ class Camera;
 class CameraController;
 class IblProbe;
 class Light;
-class ObjectInteractionPair;
 class SceneObject;
 class TaskGraph;
 class TaskGraphController;
 class TrackingDeviceControl;
-class VisualModel;
 
 namespace ParallelUtils { class SpinLock; }
 

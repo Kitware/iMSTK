@@ -46,28 +46,15 @@ public:
     };
 
 protected:
-    TrackingDeviceControl();
-    TrackingDeviceControl(std::shared_ptr<DeviceClient> device);
+    TrackingDeviceControl(const std::string& name = "TrackingDeviceControl");
 
 public:
-    virtual ~TrackingDeviceControl() override = default;
+    ~TrackingDeviceControl() override = default;
 
     ///
     /// \brief Apply forces to the haptic device
     ///
-    virtual void applyForces();
-
-    ///
-    /// \brief Sets the tracking data to be out of date or up to date
-    ///@{
-    void setTrackerToOutOfDate();
-    void setTrackerToUpToDate();
-    ///@}
-
-    ///
-    /// \brief Returns true if the tracking data is already updated in current frame. Else, false.
-    ///
-    bool isTrackerUpToDate() const;
+    virtual void applyForces() { }
 
     ///
     /// \brief Set/Get the position of the tracker
@@ -171,7 +158,6 @@ protected:
     Vec3d m_currentDisplacement = Vec3d::Zero();
     Quatd m_currentRotation     = Quatd::Identity();
 
-    bool m_trackingDataUptoDate = false;
     /// If true, will use current and previous positions to produce velocity, if off, will ask device for velocity
     bool m_computeVelocity = false;
     /// If true, will use current and previous rotations to produce angular velocity, if off, will ask device for angular velocity
