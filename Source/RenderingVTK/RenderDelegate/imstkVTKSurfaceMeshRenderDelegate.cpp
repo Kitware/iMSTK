@@ -48,7 +48,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
-    m_geometry->computeVertexNeighborTriangles();
+    m_geometry->computeVertexToCellMap();
 
     // Get our own handles to these in case the geometry changes them
     m_vertices = m_isDynamicMesh ? m_geometry->getVertexPositions() : m_geometry->getInitialVertexPositions();

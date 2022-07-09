@@ -43,7 +43,7 @@ SurfaceMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
 
     if (computeDerivedData)
     {
-        this->computeVertexNeighborTriangles();
+        this->computeVertexToCellMap();
         //this->computeUVSeamVertexGroups();
 
         this->computeVertexNormals();
@@ -63,7 +63,7 @@ SurfaceMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
 
     if (computeDerivedData)
     {
-        this->computeVertexNeighborTriangles();
+        this->computeVertexToCellMap();
         this->computeUVSeamVertexGroups();
         this->computeVertexNormals();
         this->computeVertexTangents();
@@ -78,8 +78,8 @@ SurfaceMesh::clear()
     {
         m_triangleIndices->clear();
     }
-    m_vertexNeighborTriangles.clear();
-    m_vertexNeighborVertices.clear();
+    m_vertexToCells.clear();
+    m_vertexToNeighborVertex.clear();
     for (auto i : m_cellAttributes)
     {
         i.second->clear();
@@ -116,46 +116,43 @@ SurfaceMesh::getVolume()
 }
 
 void
-SurfaceMesh::computeVertexNeighborTriangles()
+SurfaceMesh::computeVertexToCellMap()
 {
-    m_vertexNeighborTriangles.clear();
-    m_vertexNeighborTriangles.resize(m_vertexPositions->size());
+    m_vertexToCells.clear();
+    m_vertexToCells.resize(m_vertexPositions->size());
 
-    size_t triangleId = 0;
-
-    for (const auto& t : *m_triangleIndices)
+    int cellId = 0;
+    for (const auto& cell : *m_triangleIndices)
     {
-        m_vertexNeighborTriangles.at(t[0]).insert(triangleId);
-        m_vertexNeighborTriangles.at(t[1]).insert(triangleId);
-        m_vertexNeighborTriangles.at(t[2]).insert(triangleId);
-        triangleId++;
+        m_vertexToCells.at(cell[0]).insert(cellId);
+        m_vertexToCells.at(cell[1]).insert(cellId);
+        m_vertexToCells.at(cell[2]).insert(cellId);
+        cellId++;
     }
 }
 
 void
-SurfaceMesh::computeVertexNeighborVertices()
+SurfaceMesh::computeVertexNeighbors()
 {
-    m_vertexNeighborVertices.clear();
-    m_vertexNeighborVertices.resize(m_vertexPositions->size());
-
-    if (static_cast<int>(m_vertexNeighborTriangles.size()) != m_vertexPositions->size())
-    {
-        this->computeVertexNeighborTriangles();
-    }
+    m_vertexToNeighborVertex.clear();
+    m_vertexToNeighborVertex.resize(m_vertexPositions->size());
+    this->computeVertexToCellMap();
 
     // For every vertex
     const VecDataArray<int, 3>& indices = *m_triangleIndices;
-    for (size_t vertexId = 0; vertexId < m_vertexNeighborVertices.size(); ++vertexId)
+    for (int vertexId = 0; vertexId < m_vertexToNeighborVertex.size(); vertexId++)
     {
-        // For every other vertex
-        for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
+        // For every cell it is connected too
+        for (const int cellId : m_vertexToCells.at(vertexId))
         {
+            // For every vertex of that cell
             for (int i = 0; i < 3; i++)
             {
-                const size_t& vertexId2 = indices[triangleId][i];
+                // So long as its not the source vertex (not a neighbor of itself)
+                const int vertexId2 = indices[cellId][i];
                 if (vertexId2 != vertexId)
                 {
-                    m_vertexNeighborVertices.at(vertexId).insert(vertexId2);
+                    m_vertexToNeighborVertex.at(vertexId).insert(vertexId2);
                 }
             }
         }
@@ -269,7 +266,7 @@ SurfaceMesh::computeVertexNormals()
     // First we must compute per triangle normals
     this->computeTrianglesNormals();
 
-    this->computeVertexNeighborTriangles();
+    this->computeVertexToCellMap();
 
     // Sum them all into temp_normals
     VecDataArray<double, 3>                  temp_normals(vertexNormals.size());
@@ -278,7 +275,7 @@ SurfaceMesh::computeVertexNormals()
     for (int vertexId = 0; vertexId < vertexNormals.size(); ++vertexId)
     {
         temp_normals[vertexId] = Vec3d(0.0, 0.0, 0.0);
-        for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
+        for (const int triangleId : m_vertexToCells.at(vertexId))
         {
             temp_normals[vertexId] += triangleNormals[triangleId];
         }
@@ -344,7 +341,7 @@ SurfaceMesh::computeVertexTangents()
         for (int vertexId = 0; vertexId < vertexTangents.size(); ++vertexId)
         {
             temp_vertex_tangents[vertexId] = Vec3d(0.0, 0.0, 0.0);
-            for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
+            for (const int triangleId : m_vertexToCells.at(vertexId))
             {
                 temp_vertex_tangents[vertexId] += triangleTangents[triangleId];
             }
@@ -628,8 +625,8 @@ SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
     // \todo: Add deep copies to all geometry classes
     // SurfaceMesh members
     this->m_triangleIndices = std::make_shared<VecDataArray<int, 3>>(*srcMesh->m_triangleIndices);
-    this->m_vertexNeighborTriangles = srcMesh->m_vertexNeighborTriangles;
-    this->m_vertexNeighborVertices  = srcMesh->m_vertexNeighborVertices;
+    this->m_vertexToCells   = srcMesh->m_vertexToCells;
+    this->m_vertexToNeighborVertex = srcMesh->m_vertexToNeighborVertex;
     for (auto i : srcMesh->m_UVSeamVertexGroups)
     {
         this->m_UVSeamVertexGroups[i.first] = std::make_shared<std::vector<size_t>>(*i.second);

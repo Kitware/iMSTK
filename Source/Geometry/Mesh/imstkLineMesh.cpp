@@ -63,6 +63,49 @@ LineMesh::print() const
     }
 }
 
+void
+LineMesh::computeVertexToCellMap()
+{
+    m_vertexToCells.clear();
+    m_vertexToCells.resize(m_vertexPositions->size());
+
+    int cellId = 0;
+    for (const auto& cell : *m_segmentIndices)
+    {
+        m_vertexToCells.at(cell[0]).insert(cellId);
+        m_vertexToCells.at(cell[1]).insert(cellId);
+        cellId++;
+    }
+}
+
+void
+LineMesh::computeNeighborVertices()
+{
+    m_vertexToNeighborVertex.clear();
+    m_vertexToNeighborVertex.resize(m_vertexPositions->size());
+    this->computeVertexToCellMap();
+
+    // For every vertex
+    const VecDataArray<int, 2>& indices = *m_segmentIndices;
+    for (int vertexId = 0; vertexId < m_vertexToNeighborVertex.size(); vertexId++)
+    {
+        // For every cell it is connected too
+        for (const int cellId : m_vertexToCells.at(vertexId))
+        {
+            // For every vertex of that cell
+            for (int i = 0; i < 2; i++)
+            {
+                // So long as its not the source vertex (not a neighbor of itself)
+                const int vertexId2 = indices[cellId][i];
+                if (vertexId2 != vertexId)
+                {
+                    m_vertexToNeighborVertex.at(vertexId).insert(vertexId2);
+                }
+            }
+        }
+    }
+}
+
 int
 LineMesh::getNumLines() const
 {

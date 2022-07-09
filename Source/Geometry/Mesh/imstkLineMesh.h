@@ -26,6 +26,7 @@
 #include "imstkVecDataArray.h"
 
 #include <array>
+#include <unordered_set>
 
 namespace imstk
 {
@@ -65,11 +66,33 @@ public:
     ///
     bool isMesh() const override { return true; }
 
+    ///
+    /// \brief Computes neighboring cells for all vertices
+    ///
+    void computeVertexToCellMap();
+
+    ///
+    /// \brief Computes neighboring vertices for all vertices
+    ///
+    void computeNeighborVertices();
+
 // Accessors
     ///
     /// \brief Get the number of segments/cells
     ///
     int getNumLines() const;
+
+    ///
+    /// \brief Returns the indices of the faces neighboring a vertex
+    /// ComputeVertexToCellMap can be called to produce these
+    ///
+    const std::vector<std::unordered_set<int>>& getVertexToCellMap() { return m_vertexToCells; }
+
+    ///
+    /// \brief Returns the indices of the vertices neighboring a vertex
+    /// ComputeVertexNeighborVertices can be called to produce these
+    ///
+    const std::vector<std::unordered_set<int>>& getVertexNeighbors() { return m_vertexToNeighborVertex; }
 
     ///
     /// \brief Set the connectivity of the segments
@@ -132,7 +155,9 @@ protected:
     void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
                                 const int expectedNumComponents, const ScalarTypeId expectedScalarType);
 
-    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;   ///< line connectivity
+    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;         ///< line connectivity
+    std::vector<std::unordered_set<int>>  m_vertexToCells;          ///< Reverse linkage, gives vertex ids -> N cell ids
+    std::vector<std::unordered_set<int>>  m_vertexToNeighborVertex; ///< Gives map of vertex ids to neighboring vertex ids
 
     std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> m_cellAttributes;
     std::string m_activeCellScalars = "";
