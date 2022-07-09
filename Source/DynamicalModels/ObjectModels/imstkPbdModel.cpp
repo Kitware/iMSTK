@@ -224,7 +224,7 @@ PbdModel::initialize()
         }
     }
 
-    // Setup the default pbd solver if none exists
+    // Setup the default pbd solver if none was provided
     if (m_pbdSolver == nullptr)
     {
         m_pbdSolver = std::make_shared<PbdSolver>();

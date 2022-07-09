@@ -390,6 +390,7 @@ PbdObjectStitching::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
 {
     std::shared_ptr<PbdModel> pbdModel = m_objectToStitch->getPbdModel();
 
+    // Ensure a complete graph
     m_taskGraph->addEdge(source, m_objectToStitch->getTaskGraph()->getSource());
     m_taskGraph->addEdge(m_objectToStitch->getTaskGraph()->getSink(), sink);
 

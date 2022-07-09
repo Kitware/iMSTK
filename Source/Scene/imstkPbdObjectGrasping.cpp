@@ -447,6 +447,7 @@ PbdObjectGrasping::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_
 {
     std::shared_ptr<PbdModel> pbdModel = m_objectToGrasp->getPbdModel();
 
+    // Ensure a complete graph
     m_taskGraph->addEdge(source, m_objectToGrasp->getTaskGraph()->getSource());
     m_taskGraph->addEdge(m_objectToGrasp->getTaskGraph()->getSink(), sink);
 
