@@ -108,12 +108,6 @@ public:
     ///
     int getNumVertices() const;
 
-    ///
-    /// \brief Get cells as abstract array. Overridden by derived classes to return
-    ///     cells as point indices.
-    ///
-    virtual const AbstractDataArray* getCellIndices() const { return nullptr; }
-
 // Attributes
     ///
     /// \brief Set a data array holding some per vertex data

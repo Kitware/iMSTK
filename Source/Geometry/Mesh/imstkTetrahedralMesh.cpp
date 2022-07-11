@@ -27,47 +27,12 @@
 
 namespace imstk
 {
-TetrahedralMesh::TetrahedralMesh() : VolumetricMesh(),
-    m_tetrahedraIndices(std::make_shared<VecDataArray<int, 4>>())
-{
-}
-
-void
-TetrahedralMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
-                            std::shared_ptr<VecDataArray<int, 4>> tetrahedra)
-{
-    PointSet::initialize(vertices);
-    this->setTetrahedraIndices(tetrahedra);
-
-    m_removedMeshElems.resize(tetrahedra->size(), false);
-}
-
-void
-TetrahedralMesh::clear()
-{
-    PointSet::clear();
-    m_tetrahedraIndices->clear();
-}
-
-void
-TetrahedralMesh::print() const
-{
-    PointSet::print();
-
-    LOG(INFO) << "Number of tetrahedra: " << this->getNumTetrahedra();
-    LOG(INFO) << "Tetrahedra:";
-    for (auto& tet : *m_tetrahedraIndices)
-    {
-        LOG(INFO) << tet[0] << ", " << tet[1] << ", " << tet[2] << ", " << tet[3];
-    }
-}
-
 double
 TetrahedralMesh::getVolume()
 {
     double                         volume   = 0.0;
     const VecDataArray<double, 3>& vertices = *m_vertexPositions;
-    for (const Vec4i& tet : *m_tetrahedraIndices)
+    for (const Vec4i& tet : *m_indices)
     {
         const double tetVol = tetVolume(vertices[tet[0]], vertices[tet[1]], vertices[tet[2]], vertices[tet[3]]);
         if (tetVol < 0.0)
@@ -89,7 +54,7 @@ TetrahedralMesh::extractSurfaceMesh()
     const std::array<int, 4>   unusedVert = { 3, 2, 1, 0 };
 
     // Find and store the tetrahedral faces that are unique
-    const VecDataArray<int, 4>&              tetraIndices   = *this->getTetrahedraIndices();
+    const VecDataArray<int, 4>&              tetraIndices   = *m_indices;
     std::shared_ptr<VecDataArray<double, 3>> tetVerticesPtr = getVertexPositions();
     const VecDataArray<double, 3>&           tetVertices    = *tetVerticesPtr;
     std::shared_ptr<VecDataArray<int, 3>>    triIndicesPtr  = std::make_shared<VecDataArray<int, 3>>();
@@ -237,10 +202,10 @@ TetrahedralMesh::extractSurfaceMesh()
 }
 
 Vec4d
-TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos) const
+TetrahedralMesh::computeBarycentricWeights(const int tetId, const Vec3d& pos) const
 {
     const VecDataArray<double, 3>& vertices     = *m_vertexPositions;
-    const VecDataArray<int, 4>&    tetraIndices = *m_tetrahedraIndices;
+    const VecDataArray<int, 4>&    tetraIndices = *m_indices;
     return baryCentric(pos,
         vertices[tetraIndices[tetId][0]],
         vertices[tetraIndices[tetId][1]],
@@ -252,7 +217,7 @@ void
 TetrahedralMesh::computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const
 {
     const VecDataArray<double, 3>& vertices     = *m_vertexPositions;
-    const VecDataArray<int, 4>&    tetraIndices = *m_tetrahedraIndices;
+    const VecDataArray<int, 4>&    tetraIndices = *m_indices;
     auto                           v1 = vertices[tetraIndices[tetId][0]];
     auto                           v2 = vertices[tetraIndices[tetId][1]];
     auto                           v3 = vertices[tetraIndices[tetId][2]];
@@ -269,23 +234,5 @@ TetrahedralMesh::computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, 
     max[0] = *std::max_element(arrayx.begin(), arrayx.end());
     max[1] = *std::max_element(arrayy.begin(), arrayy.end());
     max[2] = *std::max_element(arrayz.begin(), arrayz.end());
-}
-
-const Vec4i&
-TetrahedralMesh::getTetrahedronIndices(const size_t tetId) const
-{
-    return (*m_tetrahedraIndices)[tetId];
-}
-
-Vec4i&
-TetrahedralMesh::getTetrahedronIndices(const size_t tetId)
-{
-    return (*m_tetrahedraIndices)[tetId];
-}
-
-int
-TetrahedralMesh::getNumTetrahedra() const
-{
-    return m_tetrahedraIndices->size();
 }
 } // namespace imstk

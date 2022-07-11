@@ -26,40 +26,16 @@
 
 namespace imstk
 {
-HexahedralMesh::HexahedralMesh() : VolumetricMesh(),
-    m_hexahedraIndices(std::make_shared<VecDataArray<int, 8>>())
-{
-}
-
-void
-HexahedralMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
-                           std::shared_ptr<VecDataArray<int, 8>> hexahedra)
-{
-    PointSet::initialize(vertices);
-    this->setHexahedraIndices(hexahedra);
-}
-
 void
 HexahedralMesh::clear()
 {
-    PointSet::clear();
-    m_hexahedraIndices->clear();
+    VolumetricMesh::clear();
 }
 
 void
 HexahedralMesh::print() const
 {
-    Geometry::print();
-
-    LOG(INFO) << "Number of Hexahedra: " << this->getNumHexahedra();
-    LOG(INFO) << "Hexahedra:";
-    for (auto& hex : *m_hexahedraIndices)
-    {
-        LOG(INFO) << hex[0] << ", " << hex[1] << ", "
-                  << hex[2] << ", " << hex[3] << ", "
-                  << hex[4] << ", " << hex[5] << ", "
-                  << hex[6] << ", " << hex[7];
-    }
+    VolumetricMesh::print();
 }
 
 double
@@ -114,17 +90,5 @@ HexahedralMesh::extractSurfaceMesh()
 {
     LOG(WARNING) << "error: not implemented.";
     return nullptr;
-}
-
-const Vec8i&
-HexahedralMesh::getHexahedronIndices(const int hexaNum) const
-{
-    return (*m_hexahedraIndices)[hexaNum];
-}
-
-int
-HexahedralMesh::getNumHexahedra() const
-{
-    return m_hexahedraIndices->size();
 }
 } // namespace imstk

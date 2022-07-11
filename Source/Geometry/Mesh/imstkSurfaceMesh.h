@@ -21,9 +21,8 @@
 
 #pragma once
 
+#include "imstkCellMesh.h"
 #include "imstkMacros.h"
-#include "imstkPointSet.h"
-#include "imstkVecDataArray.h"
 
 #include <array>
 #include <unordered_set>
@@ -137,10 +136,10 @@ namespace imstk
 /// \brief Represents a set of triangles & vertices via an array of
 /// Vec3d double vertices & Vec3i integer indices
 ///
-class SurfaceMesh : public PointSet
+class SurfaceMesh : public CellMesh<3>
 {
 public:
-    SurfaceMesh();
+    SurfaceMesh() = default;
     ~SurfaceMesh() override = default;
 
     IMSTK_TYPE_NAME(SurfaceMesh)
@@ -161,26 +160,6 @@ public:
                     std::shared_ptr<VecDataArray<int, 3>> triangleIndices,
                     std::shared_ptr<VecDataArray<double, 3>> normals,
                     const bool computeDerivedData = false);
-
-    ///
-    /// \brief Clear all the mesh data
-    ///
-    void clear() override;
-
-    ///
-    /// \brief Print the surface mesh
-    ///
-    void print() const override;
-
-    ///
-    /// \brief Computes neighboring triangles for all vertices
-    ///
-    void computeVertexToCellMap();
-
-    ///
-    /// \brief Computes neighboring vertices for all vertices
-    ///
-    void computeVertexNeighbors();
 
     ///
     /// \brief Compute the normals of all the triangles
@@ -226,125 +205,15 @@ public:
     void computeUVSeamVertexGroups();
 
     ///
-    /// \brief Copy the contents of one SurfaceMesh to the other (no pointers to shared data between this and srcMesh)
-    /// \todo: generalize base classes and implement for every geometry
-    ///
-    void deepCopy(std::shared_ptr<SurfaceMesh> srcMesh);
-
-    ///
-    /// \brief Returns true if the geometry is a mesh, else returns false
-    ///
-    bool isMesh() const override { return true; }
-
-// Accessors
-    ///
-    /// \brief Get/Set triangle connectivity
-    ///@{
-    void setTriangleIndices(std::shared_ptr<VecDataArray<int, 3>> indices) { m_triangleIndices = indices; }
-    std::shared_ptr<VecDataArray<int, 3>> getTriangleIndices() const { return m_triangleIndices; }
-    ///@}
-
-    ///
-    /// \brief Return connectivity of a triangle
-    ///@{
-    const Vec3i& getTriangleIndices(const int triangleNum) const;
-    Vec3i& getTriangleIndices(const int triangleNum);
-    ///@}
-
-    ///
-    /// \brief Returns the number of triangles
-    ///
-    int getNumTriangles() const;
-
-    ///
     /// \brief Get the volume enclosed by the surface mesh
     ///
     double getVolume() override;
 
-    ///
-    /// \brief Returns the indices of the faces neighboring a vertex
-    /// ComputeVertexToCellMap can be called to produce these
-    ///
-    const std::vector<std::unordered_set<int>>& getVertexToCellMap() { return m_vertexToCells; }
-
-    ///
-    /// \brief Returns the indices of the vertices neighboring a vertex
-    /// ComputeVertexNeighborVertices can be called to produce these
-    ///
-    const std::vector<std::unordered_set<int>>& getVertexNeighbors() { return m_vertexToNeighborVertex; }
-
-    ///
-    /// \brief Get cells as abstract array.
-    ///
-    const AbstractDataArray* getCellIndices() const override { return m_triangleIndices.get(); }
-
-// Attributes
-    ///
-    /// \brief Set a data array holding some per cell data
-    ///
-    void setCellAttribute(const std::string& arrayName, std::shared_ptr<AbstractDataArray> arr);
-
-    ///
-    /// \brief Get a specific data array. If the array name cannot be found, nullptr is returned.
-    ///
-    std::shared_ptr<AbstractDataArray> getCellAttribute(const std::string& arrayName) const;
-
-    ///
-    /// \brief Get the cell attributes map
-    ///
-    const std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& getCellAttributes() const { return m_cellAttributes; }
-
-    ///
-    /// \brief Check if a specific data array exists.
-    ///
-    bool hasCellAttribute(const std::string& arrayName) const;
-
-    ///
-    /// \brief Set the cell attributes map
-    ///
-    void setCellAttributes(std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> attributes) { m_cellAttributes = attributes; }
-
-    ///
-    /// \brief Get/Set the active scalars
-    ///@{
-    void setCellScalars(const std::string& arrayName, std::shared_ptr<AbstractDataArray> scalars);
-    void setCellScalars(const std::string& arrayName);
-    std::string getActiveCellScalars() const { return m_activeCellScalars; }
-    std::shared_ptr<AbstractDataArray> getCellScalars() const;
-    ///@}
-
-    ///
-    /// \brief Get/Set the active normals
-    ///@{
-    void setCellNormals(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> normals);
-    void setCellNormals(const std::string& arrayName);
-    std::string getActiveCellNormals() const { return m_activeCellNormals; }
-    std::shared_ptr<VecDataArray<double, 3>> getCellNormals() const;
-    ///@}
-
-    ///
-    /// \brief Get/Set the active tangents
-    ///@{
-    void setCellTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> tangents);
-    void setCellTangents(const std::string& arrayName);
-    std::string getActiveCellTangents() const { return m_activeCellTangents; }
-    std::shared_ptr<VecDataArray<double, 3>> getCellTangents() const;
-///@}
+    int getNumTriangles() const { return getNumCells(); }
+    void setTriangleIndices(std::shared_ptr<VecDataArray<int, 3>> indices) { setCells(indices); }
+    std::shared_ptr<VecDataArray<int, 3>> getTriangleIndices() const { return getCells(); }
 
 protected:
-    void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
-                                const int expectedNumComponents, const ScalarTypeId expectedScalarType);
-
-    std::shared_ptr<VecDataArray<int, 3>> m_triangleIndices;
-
-    std::vector<std::unordered_set<int>> m_vertexToCells;          ///< Neighbor triangles to vertices
-    std::vector<std::unordered_set<int>> m_vertexToNeighborVertex; ///< Neighbor vertices to vertices
-
     std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
-
-    std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> m_cellAttributes;
-    std::string m_activeCellNormals  = "";
-    std::string m_activeCellTangents = "";
-    std::string m_activeCellScalars  = "";
 };
 } // namespace imstk
