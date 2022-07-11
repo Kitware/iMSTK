@@ -93,7 +93,8 @@ struct MeshSide
                 pointSet->setVertexAttribute("Velocities", velocitiesPtr);
             }
 
-            return MeshSide(verticesPtr.get(), velocitiesPtr.get(), invMassesPtr.get(), mapPtr, pointSet->getCellIndices());
+            return MeshSide(verticesPtr.get(), velocitiesPtr.get(), invMassesPtr.get(), mapPtr,
+                dynamic_cast<AbstractCellMesh*>(pointSet)->getIndices().get());
         }
         return MeshSide();
     }

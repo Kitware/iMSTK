@@ -41,7 +41,7 @@ VTKSurfaceNormalRenderDelegate::VTKSurfaceNormalRenderDelegate(std::shared_ptr<V
 {
     auto surfMesh = std::static_pointer_cast<SurfaceMesh>(visualModel->getGeometry());
     m_surfMeshVertices = surfMesh->getVertexPositions();
-    m_surfMeshIndices  = surfMesh->getTriangleIndices();
+    m_surfMeshIndices  = surfMesh->getCells();
 
     // Compute the centers of the triangle
     m_triangleCenterVertices = computeTriangleCenters(m_surfMeshVertices, m_surfMeshIndices);

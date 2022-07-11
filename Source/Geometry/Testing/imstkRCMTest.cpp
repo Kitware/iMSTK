@@ -251,7 +251,7 @@ TEST(imstkRCMTest, TestRCM)
         auto         tetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
         const size_t numVerts = tetMesh->getNumVertices();
         //std::cout << "Number of vertices = " << numVerts << std::endl;
-        testRCM(*tetMesh->getTetrahedraIndices(), numVerts);
+        testRCM(*tetMesh->getCells(), numVerts);
     }
 
     // a surface mesh cover
@@ -260,6 +260,6 @@ TEST(imstkRCMTest, TestRCM)
         auto tetMesh  = GeometryUtils::createTetrahedralMeshCover(surfMesh, 80, 40, 60);
         auto numVerts = tetMesh->getNumVertices();
         //std::cout << "Number of vertices = " << numVerts << std::endl;
-        testRCM(*tetMesh->getTetrahedraIndices(), numVerts);
+        testRCM(*tetMesh->getCells(), numVerts);
     }
 }

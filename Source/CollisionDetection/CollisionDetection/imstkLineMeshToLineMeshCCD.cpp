@@ -135,18 +135,22 @@ LineMeshToLineMeshCCD::internalComputeCollision(
     const VecDataArray<double, 3>& verticesA = *verticesPtrA;
     const VecDataArray<double, 3>& verticesB = *verticesPtrB;
 
-    for (size_t i = 0; i < static_cast<size_t>(meshA->getNumLines()); ++i)
+    std::shared_ptr<VecDataArray<int, 2>> linesAPtr = meshA->getCells();
+    const VecDataArray<int, 2>&           linesA    = *linesAPtr;
+    std::shared_ptr<VecDataArray<int, 2>> linesBPtr = meshB->getCells();
+    const VecDataArray<int, 2>&           linesB    = *linesBPtr;
+    for (size_t i = 0; i < static_cast<size_t>(meshA->getNumCells()); ++i)
     {
-        const imstk::Vec2i& cellA = meshA->getLineIndices(i);
+        const imstk::Vec2i& cellA = linesA[i];
         size_t              j     = selfCollision ? i + 2 : 0;
-        for (; j < static_cast<size_t>(meshB->getNumLines()); ++j)
+        for (; j < static_cast<size_t>(meshB->getNumCells()); ++j)
         {
             // If performing self-collision, do not process self or immediate neighboring cells (lines).
             if (selfCollision && (std::max(i, j) - std::min(i, j) <= 1))
             {
                 continue;
             }
-            const imstk::Vec2i& cellB = meshB->getLineIndices(j);
+            const imstk::Vec2i& cellB = linesB[j];
 
             EdgeEdgeCCDState currState(verticesA[cellA(0)], verticesA[cellA(1)], verticesB[cellB(0)], verticesB[cellB(1)]);
             EdgeEdgeCCDState prevState(prevA[cellA(0)], prevA[cellA(1)], prevB[cellB(0)], prevB[cellB(1)]);

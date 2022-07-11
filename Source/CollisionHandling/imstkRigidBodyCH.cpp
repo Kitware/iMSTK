@@ -226,7 +226,7 @@ RigidBodyCH::handleRbdStaticOneWay(
             Vec3i tri = Vec3i::Zero();
             if (elemB.idCount == 1)
             {
-                tri = (*dynamic_cast<SurfaceMesh*>(geomB.get())->getTriangleIndices().get())[elemB.ids[0]];
+                tri = (*dynamic_cast<SurfaceMesh*>(geomB.get())->getCells().get())[elemB.ids[0]];
             }
             else if (elemB.idCount == 3)
             {
@@ -256,7 +256,7 @@ RigidBodyCH::handleRbdStaticOneWay(
             Vec2i edgeA = Vec2i::Zero();
             if (elemA.idCount == 1)
             {
-                edgeA = (*dynamic_cast<LineMesh*>(geomA.get())->getLinesIndices().get())[elemA.ids[0]];
+                edgeA = (*dynamic_cast<LineMesh*>(geomA.get())->getCells().get())[elemA.ids[0]];
             }
             else if (elemA.idCount == 2)
             {
@@ -265,7 +265,7 @@ RigidBodyCH::handleRbdStaticOneWay(
             Vec2i edgeB = Vec2i::Zero();
             if (elemB.idCount == 1)
             {
-                edgeB = (*dynamic_cast<LineMesh*>(geomB.get())->getLinesIndices().get())[elemB.ids[0]];
+                edgeB = (*dynamic_cast<LineMesh*>(geomB.get())->getCells().get())[elemB.ids[0]];
             }
             else if (elemB.idCount == 2)
             {
@@ -295,7 +295,7 @@ RigidBodyCH::handleRbdStaticOneWay(
             Vec2i edge = Vec2i::Zero();
             if (elemA.idCount == 1)
             {
-                edge = (*dynamic_cast<LineMesh*>(geomA.get())->getLinesIndices().get())[elemA.ids[0]];
+                edge = (*dynamic_cast<LineMesh*>(geomA.get())->getCells().get())[elemA.ids[0]];
             }
             else if (elemA.idCount == 2)
             {
@@ -331,7 +331,7 @@ RigidBodyCH::handleRbdStaticOneWay(
             Vec2i edge = Vec2i::Zero();
             if (elemB.idCount == 1)
             {
-                edge = (*dynamic_cast<LineMesh*>(geomB.get())->getLinesIndices().get())[elemB.ids[0]];
+                edge = (*dynamic_cast<LineMesh*>(geomB.get())->getCells().get())[elemB.ids[0]];
             }
             else if (elemB.idCount == 2)
             {

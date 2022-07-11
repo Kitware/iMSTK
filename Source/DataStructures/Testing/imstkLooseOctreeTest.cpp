@@ -121,14 +121,14 @@ randomizePositions(const std::shared_ptr<PointSet>& pointset)
 void
 randomizePositions(const std::shared_ptr<SurfaceMesh>& mesh)
 {
-    for (int i = 0; i < mesh->getNumTriangles(); ++i)
+    for (int i = 0; i < mesh->getNumCells(); ++i)
     {
         const auto translation = Vec3d(
             (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND,
             (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND,
             (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND
             );
-        const Vec3i& face = (*mesh->getTriangleIndices())[i];
+        const Vec3i& face = (*mesh->getCells())[i];
         for (unsigned int j = 0; j < 3; ++j)
         {
             mesh->setVertexPosition(face[j], mesh->getVertexPosition(face[j]) + translation);
@@ -162,7 +162,7 @@ public:
         m_Mesh = generateMesh();
         m_Octree->addTriangleMesh(m_Mesh);
         EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Point].size(), m_PointSet->getNumVertices());
-        EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Triangle].size(), m_Mesh->getNumTriangles());
+        EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Triangle].size(), m_Mesh->getNumCells());
         EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Analytical].size(), 0);
 
         m_Octree->build();

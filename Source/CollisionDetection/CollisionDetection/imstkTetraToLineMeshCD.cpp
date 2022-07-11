@@ -44,12 +44,12 @@ TetraToLineMeshCD::computeCollisionDataAB(
     std::shared_ptr<TetrahedralMesh> tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(geomA);
     std::shared_ptr<LineMesh>        lineMesh = std::dynamic_pointer_cast<LineMesh>(geomB);
 
-    std::shared_ptr<VecDataArray<int, 4>>    tetsPtr = tetMesh->getTetrahedraIndices();
+    std::shared_ptr<VecDataArray<int, 4>>    tetsPtr = tetMesh->getCells();
     std::shared_ptr<VecDataArray<double, 3>> tetVerticesPtr = tetMesh->getVertexPositions();
     const VecDataArray<int, 4>&              tets     = *tetsPtr;
     const VecDataArray<double, 3>&           tetVerts = *tetVerticesPtr;
 
-    std::shared_ptr<VecDataArray<int, 2>>    linesPtr    = lineMesh->getLinesIndices();
+    std::shared_ptr<VecDataArray<int, 2>>    linesPtr    = lineMesh->getCells();
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = lineMesh->getVertexPositions();
     const VecDataArray<int, 2>&              lines       = *linesPtr;
     const VecDataArray<double, 3>&           lineVerts   = *verticesPtr;

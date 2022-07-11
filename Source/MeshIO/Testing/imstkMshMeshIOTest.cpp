@@ -42,13 +42,13 @@ TEST(imstkMshMeshIOTest, ReadMsh_Ascii_LineMesh)
 
     // Check the sizes
     ASSERT_EQ(2, lineMesh->getVertexPositions()->size());
-    ASSERT_EQ(1, lineMesh->getLinesIndices()->size());
+    ASSERT_EQ(1, lineMesh->getCells()->size());
 
     // Check contents
     const VecDataArray<double, 3>& vertices = *lineMesh->getVertexPositions();
     ASSERT_EQ(Vec3d(-0.5, 0.0, 0.0), vertices[0]);
     ASSERT_EQ(Vec3d(0.5, 0.0, 0.0), vertices[1]);
-    const VecDataArray<int, 2>& indices = *lineMesh->getLinesIndices();
+    const VecDataArray<int, 2>& indices = *lineMesh->getCells();
     ASSERT_EQ(0, indices[0][0]);
     ASSERT_EQ(1, indices[0][1]);
 }
@@ -64,13 +64,13 @@ TEST(imstkMshMeshIOTest, ReadMsh_Binary_LineMesh)
 
     // Check the sizes
     ASSERT_EQ(2, lineMesh->getVertexPositions()->size());
-    ASSERT_EQ(1, lineMesh->getLinesIndices()->size());
+    ASSERT_EQ(1, lineMesh->getCells()->size());
 
     // Check contents
     const VecDataArray<double, 3>& vertices = *lineMesh->getVertexPositions();
     ASSERT_EQ(Vec3d(-0.5, 0.0, 0.0), vertices[0]);
     ASSERT_EQ(Vec3d(0.5, 0.0, 0.0), vertices[1]);
-    const VecDataArray<int, 2>& indices = *lineMesh->getLinesIndices();
+    const VecDataArray<int, 2>& indices = *lineMesh->getCells();
     ASSERT_EQ(0, indices[0][0]);
     ASSERT_EQ(1, indices[0][1]);
 }
@@ -87,14 +87,14 @@ TEST(imstkMshMeshIOTest, ReadMsh_Ascii_SurfaceMesh)
 
     // Check the sizes
     ASSERT_EQ(3, surfMesh->getVertexPositions()->size());
-    ASSERT_EQ(1, surfMesh->getTriangleIndices()->size());
+    ASSERT_EQ(1, surfMesh->getCells()->size());
 
     // Check contents
     const VecDataArray<double, 3>& vertices = *surfMesh->getVertexPositions();
     ASSERT_EQ(Vec3d(-0.5, 0.0, 0.0), vertices[0]);
     ASSERT_EQ(Vec3d(0.5, 0.0, 0.0), vertices[1]);
     ASSERT_EQ(Vec3d(0.0, 0.5, 0.0), vertices[2]);
-    const VecDataArray<int, 3>& indices = *surfMesh->getTriangleIndices();
+    const VecDataArray<int, 3>& indices = *surfMesh->getCells();
     ASSERT_EQ(0, indices[0][0]);
     ASSERT_EQ(1, indices[0][1]);
     ASSERT_EQ(2, indices[0][2]);
@@ -111,14 +111,14 @@ TEST(imstkMshMeshIOTest, ReadMsh_Binary_SurfaceMesh)
 
     // Check the sizes
     ASSERT_EQ(3, surfMesh->getVertexPositions()->size());
-    ASSERT_EQ(1, surfMesh->getTriangleIndices()->size());
+    ASSERT_EQ(1, surfMesh->getCells()->size());
 
     // Check contents
     const VecDataArray<double, 3>& vertices = *surfMesh->getVertexPositions();
     ASSERT_EQ(Vec3d(-0.5, 0.0, 0.0), vertices[0]);
     ASSERT_EQ(Vec3d(0.5, 0.0, 0.0), vertices[1]);
     ASSERT_EQ(Vec3d(0.0, 0.5, 0.0), vertices[2]);
-    const VecDataArray<int, 3>& indices = *surfMesh->getTriangleIndices();
+    const VecDataArray<int, 3>& indices = *surfMesh->getCells();
     ASSERT_EQ(0, indices[0][0]);
     ASSERT_EQ(1, indices[0][1]);
     ASSERT_EQ(2, indices[0][2]);
@@ -136,7 +136,7 @@ TEST(imstkMshMeshIOTest, ReadMsh_Ascii_TetrahedralMesh)
 
     // Check the sizes
     ASSERT_EQ(4, tetMesh->getVertexPositions()->size());
-    ASSERT_EQ(1, tetMesh->getTetrahedraIndices()->size());
+    ASSERT_EQ(1, tetMesh->getCells()->size());
 
     // Check contents
     const VecDataArray<double, 3>& vertices = *tetMesh->getVertexPositions();
@@ -144,7 +144,7 @@ TEST(imstkMshMeshIOTest, ReadMsh_Ascii_TetrahedralMesh)
     ASSERT_EQ(Vec3d(1.0, -0.707107, 0.0), vertices[1]);
     ASSERT_EQ(Vec3d(-1.0, -0.707107, 0.0), vertices[2]);
     ASSERT_EQ(Vec3d(0.0, 0.707107, -1.0), vertices[3]);
-    const VecDataArray<int, 4>& indices = *tetMesh->getTetrahedraIndices();
+    const VecDataArray<int, 4>& indices = *tetMesh->getCells();
     ASSERT_EQ(0, indices[0][0]);
     ASSERT_EQ(1, indices[0][1]);
     ASSERT_EQ(2, indices[0][2]);
@@ -162,14 +162,14 @@ TEST(imstkMshMeshIOTest, ReadMsh_Binary_TetrahedralMesh)
 
     // Check the sizes
     ASSERT_EQ(tetMesh->getVertexPositions()->size(), 4);
-    ASSERT_EQ(tetMesh->getTetrahedraIndices()->size(), 1);
+    ASSERT_EQ(tetMesh->getCells()->size(), 1);
     // Check contents
     const VecDataArray<double, 3>& vertices = *tetMesh->getVertexPositions();
     ASSERT_EQ(Vec3d(0.0, 0.707107, 1.0), vertices[0]);
     ASSERT_EQ(Vec3d(1.0, -0.707107, 0.0), vertices[1]);
     ASSERT_EQ(Vec3d(-1.0, -0.707107, 0.0), vertices[2]);
     ASSERT_EQ(Vec3d(0.0, 0.707107, -1.0), vertices[3]);
-    const VecDataArray<int, 4>& indices = *tetMesh->getTetrahedraIndices();
+    const VecDataArray<int, 4>& indices = *tetMesh->getCells();
     ASSERT_EQ(0, indices[0][0]);
     ASSERT_EQ(1, indices[0][1]);
     ASSERT_EQ(2, indices[0][2]);
@@ -188,7 +188,7 @@ TEST(imstkMshMeshIOTest, ReadMsh_Ascii_HexahedralMesh)
 
     // Check the sizes
     ASSERT_EQ(8, hexMesh->getVertexPositions()->size());
-    ASSERT_EQ(1, hexMesh->getHexahedraIndices()->size());
+    ASSERT_EQ(1, hexMesh->getCells()->size());
 
     // Check contents
     const VecDataArray<double, 3>& vertices = *hexMesh->getVertexPositions();
@@ -200,7 +200,7 @@ TEST(imstkMshMeshIOTest, ReadMsh_Ascii_HexahedralMesh)
     ASSERT_EQ(Vec3d(0.5, 0.5, 0.5), vertices[5]);
     ASSERT_EQ(Vec3d(0.5, 0.5, -0.5), vertices[6]);
     ASSERT_EQ(Vec3d(-0.5, 0.5, -0.5), vertices[7]);
-    const VecDataArray<int, 8>& indices = *hexMesh->getHexahedraIndices();
+    const VecDataArray<int, 8>& indices = *hexMesh->getCells();
     ASSERT_EQ(0, indices[0][0]);
     ASSERT_EQ(1, indices[0][1]);
     ASSERT_EQ(2, indices[0][2]);
@@ -230,7 +230,7 @@ TEST(imstkMshMeshIOTest, ReadMsh_Binary_HexahedralMesh)
     ASSERT_EQ(Vec3d(0.5, 0.5, 0.5), vertices[5]);
     ASSERT_EQ(Vec3d(0.5, 0.5, -0.5), vertices[6]);
     ASSERT_EQ(Vec3d(-0.5, 0.5, -0.5), vertices[7]);
-    const VecDataArray<int, 8>& indices = *hexMesh->getHexahedraIndices();
+    const VecDataArray<int, 8>& indices = *hexMesh->getCells();
     ASSERT_EQ(0, indices[0][0]);
     ASSERT_EQ(1, indices[0][1]);
     ASSERT_EQ(2, indices[0][2]);
@@ -253,5 +253,5 @@ TEST(imstkMshMeshIOTest, ReadMsh_Human)
 
     // Check the sizes
     ASSERT_EQ(tetMesh->getVertexPositions()->size(), 394);
-    ASSERT_EQ(tetMesh->getTetrahedraIndices()->size(), 1184);
+    ASSERT_EQ(tetMesh->getCells()->size(), 1184);
 }

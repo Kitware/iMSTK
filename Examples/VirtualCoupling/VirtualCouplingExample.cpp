@@ -121,7 +121,7 @@ main()
     imstkNew<SurfaceMesh> toolGhostMesh;
     toolGhostMesh->initialize(
         std::make_shared<VecDataArray<double, 3>>(*toolMesh->getVertexPositions()),
-        std::make_shared<VecDataArray<int, 3>>(*toolMesh->getTriangleIndices()));
+        std::make_shared<VecDataArray<int, 3>>(*toolMesh->getCells()));
     ghostToolObj->setVisualGeometry(toolGhostMesh);
     auto ghostMaterial = std::make_shared<RenderMaterial>();
     ghostMaterial->setColor(Color::Orange);

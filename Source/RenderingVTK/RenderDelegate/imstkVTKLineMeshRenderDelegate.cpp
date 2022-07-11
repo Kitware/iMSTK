@@ -44,7 +44,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel
 
     // Get our own handles to these in case the geometry changes them
     m_vertices = m_geometry->getVertexPositions();
-    m_indices  = m_geometry->getLinesIndices();
+    m_indices  = m_geometry->getCells();
 
     // Map vertices to VTK point data
     if (m_vertices != nullptr)
@@ -91,7 +91,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel
     queueConnect<Event>(m_geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKLineMeshRenderDelegate::vertexDataModified);
 
     // When index buffer internals are modified
-    queueConnect<Event>(m_geometry->getLinesIndices(), &VecDataArray<int, 2>::modified, this, &VTKLineMeshRenderDelegate::indexDataModified);
+    queueConnect<Event>(m_geometry->getCells(), &VecDataArray<int, 2>::modified, this, &VTKLineMeshRenderDelegate::indexDataModified);
 
     // Setup mapper
     {
@@ -117,7 +117,7 @@ VTKLineMeshRenderDelegate::processEvents()
 {
     // Custom handling of events
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr      = m_geometry->getVertexPositions();
-    std::shared_ptr<VecDataArray<int, 2>>    indicesPtr       = m_geometry->getLinesIndices();
+    std::shared_ptr<VecDataArray<int, 2>>    indicesPtr       = m_geometry->getCells();
     std::shared_ptr<AbstractDataArray>       cellScalarsPtr   = m_geometry->getCellScalars();
     std::shared_ptr<AbstractDataArray>       vertexScalarsPtr = m_geometry->getVertexScalars();
 
@@ -182,7 +182,7 @@ VTKLineMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
 void
 VTKLineMeshRenderDelegate::indexDataModified(Event* imstkNotUsed(e))
 {
-    setIndexBuffer(m_geometry->getLinesIndices());
+    setIndexBuffer(m_geometry->getCells());
 }
 
 void
@@ -210,9 +210,9 @@ VTKLineMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
     m_mappedVertexArray->Modified();
 
     // Only update index buffer when reallocated
-    if (m_indices != m_geometry->getLinesIndices())
+    if (m_indices != m_geometry->getCells())
     {
-        setIndexBuffer(m_geometry->getLinesIndices());
+        setIndexBuffer(m_geometry->getCells());
     }
     if (m_vertexScalars != m_geometry->getVertexScalars())
     {

@@ -72,7 +72,7 @@ PbdObjectCutting::apply()
     // update pbd mesh
     pbdMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newPbdMesh->getInitialVertexPositions()));
     pbdMesh->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newPbdMesh->getVertexPositions()));
-    pbdMesh->setTriangleIndices(std::make_shared<VecDataArray<int, 3>>(*newPbdMesh->getTriangleIndices()));
+    pbdMesh->setTriangleIndices(std::make_shared<VecDataArray<int, 3>>(*newPbdMesh->getCells()));
     pbdMesh->postModified();
 
     // update pbd states, constraints and solver
@@ -140,7 +140,7 @@ void
 PbdObjectCutting::addTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
                                std::shared_ptr<VecDataArray<int, 3>> newTriangles)
 {
-    auto triangles     = pbdMesh->getTriangleIndices();
+    auto triangles     = pbdMesh->getCells();
     auto nTriangles    = triangles->size();
     auto nNewTriangles = newTriangles->size();
 
@@ -160,7 +160,7 @@ PbdObjectCutting::modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
                                   std::shared_ptr<std::vector<size_t>> modifiedTriangleIndices,
                                   std::shared_ptr<VecDataArray<int, 3>> modifiedTriangles)
 {
-    auto triangles = pbdMesh->getTriangleIndices();
+    auto triangles = pbdMesh->getCells();
     auto nModifiedTriangles = static_cast<size_t>(modifiedTriangles->size());
     if (nModifiedTriangles != modifiedTriangleIndices->size())
     {

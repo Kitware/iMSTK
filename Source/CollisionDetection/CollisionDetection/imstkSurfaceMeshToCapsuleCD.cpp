@@ -50,7 +50,7 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
     const Vec3d& capsulePosA        = capsulePos - 0.5 * capsuleLength * capsuleOrientation.toRotationMatrix().col(1);
     const Vec3d& capsulePosB        = capsulePos + (capsulePos - capsulePosA);
 
-    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = surfMesh->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = surfMesh->getCells();
     const VecDataArray<int, 3>&              indices     = *indicesPtr;
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
     const VecDataArray<double, 3>&           vertices    = *verticesPtr;
@@ -136,6 +136,8 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                 }
                 else if (caseType == 2) // Triangle vs point on sphere
                 {
+                                        // \todo: Doesn't handle case of triangle completely embedded in the cylinder
+
                                         // Face contact
                     CellIndexElement elemA;
                     elemA.ids[0]   = cell[0];

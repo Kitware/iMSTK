@@ -147,7 +147,7 @@ SurfaceMeshTextureProject::requestUpdate()
 
     std::shared_ptr<VecDataArray<double, 3>> srcVerticesPtr = inputSrcMesh->getVertexPositions();
     const VecDataArray<double, 3>&           srcVertices    = *srcVerticesPtr;
-    std::shared_ptr<VecDataArray<int, 3>>    srcCellsPtr    = inputSrcMesh->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>>    srcCellsPtr    = inputSrcMesh->getCells();
     const VecDataArray<int, 3>&              srcCells       = *srcCellsPtr;
     std::shared_ptr<VecDataArray<float, 2>>  srcTCoordsPtr  = inputSrcMesh->getVertexTCoords();
     if (srcTCoordsPtr == nullptr)

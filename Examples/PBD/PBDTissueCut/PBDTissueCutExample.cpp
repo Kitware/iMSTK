@@ -70,7 +70,7 @@ addDummyVertex(std::shared_ptr<SurfaceMesh> surfMesh)
     addDummyVertexPointSet(surfMesh);
 
     // Then shift all indices by 1
-    std::shared_ptr<VecDataArray<int, 3>> indicesPtr = surfMesh->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>> indicesPtr = surfMesh->getCells();
     VecDataArray<int, 3>&                 indices    = *indicesPtr;
     for (int i = 0; i < indices.size(); i++)
     {

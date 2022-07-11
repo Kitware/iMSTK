@@ -183,17 +183,9 @@ PbdObjectStitching::addStitchConstraints()
     CHECK(invMassesPtr != nullptr) << "Trying to vertex pick with geometry that has no InvMass";
 
     std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
-    if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(pointSetToPick))
+    if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(pointSetToPick))
     {
-        indicesPtr = lineMesh->getLinesIndices();
-    }
-    if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(pointSetToPick))
-    {
-        indicesPtr = surfMesh->getTriangleIndices();
-    }
-    else if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick))
-    {
-        indicesPtr = tetMesh->getTetrahedraIndices();
+        indicesPtr = cellMesh->getIndices();
     }
 
     // If the user tries to pick

@@ -191,7 +191,7 @@ FemDeformableBodyModel::initialize()
         setSolver(nlSolver);
     }
 
-    auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
+    auto physicsMesh = std::dynamic_pointer_cast<PointSet>(this->getModelGeometry());
     m_vegaPhysicsMesh = VegaMeshIO::convertVolumetricMeshToVegaMesh(physicsMesh);
     //m_vegaPhysicsMesh = physicsMesh->getAttachedVegaMesh();
     if (!this->initializeForceModel()
@@ -725,7 +725,7 @@ FemDeformableBodyModel::updateMassMatrix()
 void
 FemDeformableBodyModel::updatePhysicsGeometry()
 {
-    auto                                     volMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
+    auto                                     volMesh = std::dynamic_pointer_cast<PointSet>(m_geometry);
     auto&                                    u       = m_currentState->getQ();
     std::shared_ptr<VecDataArray<double, 3>> displacementsPtr =
         std::dynamic_pointer_cast<VecDataArray<double, 3>>(volMesh->getVertexAttribute("displacements"));

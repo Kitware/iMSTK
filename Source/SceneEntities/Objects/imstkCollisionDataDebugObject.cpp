@@ -48,7 +48,7 @@ CollisionDataDebugObject::addCollisionElement(std::shared_ptr<PointSet> pointSet
             Vec2i cell;
             if (idCount == 1)
             {
-                auto indices = std::dynamic_pointer_cast<LineMesh>(pointSet)->getLinesIndices();
+                auto indices = std::dynamic_pointer_cast<LineMesh>(pointSet)->getCells();
                 cell = (*indices)[elem.m_element.m_CellIndexElement.ids[0]];
             }
             else
@@ -64,7 +64,7 @@ CollisionDataDebugObject::addCollisionElement(std::shared_ptr<PointSet> pointSet
             Vec3i cell;
             if (idCount == 1)
             {
-                auto indices = std::dynamic_pointer_cast<SurfaceMesh>(pointSet)->getTriangleIndices();
+                auto indices = std::dynamic_pointer_cast<SurfaceMesh>(pointSet)->getCells();
                 cell = (*indices)[elem.m_element.m_CellIndexElement.ids[0]];
             }
             else

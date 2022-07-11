@@ -35,11 +35,11 @@ DebugGeometryObject::DebugGeometryObject(const std::string& name) : SceneObject(
     m_debugPointSet(std::make_shared<PointSet>()),
     m_debugSurfMesh(std::make_shared<SurfaceMesh>()),
     m_triVerticesPtr(m_debugSurfMesh->getVertexPositions()),
-    m_triIndicesPtr(m_debugSurfMesh->getTriangleIndices()),
+    m_triIndicesPtr(m_debugSurfMesh->getCells()),
     m_triColorsPtr(std::make_shared<VecDataArray<unsigned char, 3>>()),
     m_trianglesChanged(false),
     m_lineVerticesPtr(m_debugLineMesh->getVertexPositions()),
-    m_lineIndicesPtr(m_debugLineMesh->getLinesIndices()),
+    m_lineIndicesPtr(m_debugLineMesh->getCells()),
     m_lineColorsPtr(std::make_shared<VecDataArray<unsigned char, 3>>()),
     m_linesChanged(false),
     m_pointVerticesPtr(m_debugPointSet->getVertexPositions()),
@@ -302,12 +302,12 @@ DebugGeometryObject::getNumPoints() const
 int
 DebugGeometryObject::getNumLines() const
 {
-    return m_debugLineMesh->getNumLines();
+    return m_debugLineMesh->getNumCells();
 }
 
 int
 DebugGeometryObject::getNumTriangles() const
 {
-    return m_debugSurfMesh->getNumTriangles();
+    return m_debugSurfMesh->getNumCells();
 }
 } // namespace imstk

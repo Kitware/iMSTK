@@ -134,9 +134,9 @@ BoneDrillingCH::handle(
         }
 
         // Pre-compute the nodal cardinality set
-        for (size_t tetId = 0; tetId < boneMesh->getNumTetrahedra(); ++tetId)
+        for (size_t tetId = 0; tetId < boneMesh->getNumCells(); ++tetId)
         {
-            const Vec4i& indices = boneMesh->getTetrahedronIndices(tetId);
+            const Vec4i& indices = (*boneMesh->getCells())[tetId];
             for (int i = 0; i < 4; i++)
             {
                 m_nodalCardinalSet[indices[i]].push_back(tetId);

@@ -130,7 +130,7 @@ PointSetData::PointSetData(std::shared_ptr<PointSet> pointSet) :
 
 SurfMeshData::SurfMeshData(std::shared_ptr<SurfaceMesh> surfMesh) :
     m_surfMesh(surfMesh),
-    cells(*surfMesh->getTriangleIndices()),
+    cells(*surfMesh->getCells()),
     vertices(*surfMesh->getVertexPositions()),
     vertexFaces(surfMesh->getVertexToCellMap()),
     faceNormals(*surfMesh->getCellNormals())
@@ -448,7 +448,7 @@ ClosedSurfaceMeshToMeshCD::lineMeshEdgeToTriangleTest(
     std::shared_ptr<LineMesh>                lineMesh = std::dynamic_pointer_cast<LineMesh>(geomA);
     std::shared_ptr<VecDataArray<double, 3>> meshAVerticesPtr = lineMesh->getVertexPositions();
     const VecDataArray<double, 3>&           meshAVertices    = *meshAVerticesPtr;
-    std::shared_ptr<VecDataArray<int, 2>>    meshACellsPtr    = lineMesh->getLinesIndices();
+    std::shared_ptr<VecDataArray<int, 2>>    meshACellsPtr    = lineMesh->getCells();
     VecDataArray<int, 2>&                    meshACells       = *meshACellsPtr;
 
     const int triEdgePattern[3][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 } };
@@ -537,7 +537,7 @@ ClosedSurfaceMeshToMeshCD::surfMeshEdgeToTriangleTest(
     std::shared_ptr<SurfaceMesh>             surfMeshA = std::dynamic_pointer_cast<SurfaceMesh>(geomA);
     std::shared_ptr<VecDataArray<double, 3>> meshAVerticesPtr = surfMeshA->getVertexPositions();
     const VecDataArray<double, 3>&           meshAVertices    = *meshAVerticesPtr;
-    std::shared_ptr<VecDataArray<int, 3>>    meshACellsPtr    = surfMeshA->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>>    meshACellsPtr    = surfMeshA->getCells();
     VecDataArray<int, 3>&                    meshACells       = *meshACellsPtr;
 
     std::unordered_set<EdgePair> hashedEdges;

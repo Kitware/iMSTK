@@ -30,7 +30,6 @@ class ImageData;
 class LineMesh;
 class SurfaceMesh;
 class TetrahedralMesh;
-class VolumetricMesh;
 
 ///
 /// \class VTKMeshIO
@@ -103,7 +102,7 @@ protected:
     /// \brief Reads vtk unstructured grid
     ///
     template<typename ReaderType>
-    static std::shared_ptr<VolumetricMesh> readVtkUnstructuredGrid(const std::string& filePath);
+    static std::shared_ptr<PointSet> readVtkUnstructuredGrid(const std::string& filePath);
 
     ///
     /// \brief Reads vtk image data

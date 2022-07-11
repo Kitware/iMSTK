@@ -140,7 +140,7 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
             }
             else if (auto triMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_geom))
             {
-                std::shared_ptr<VecDataArray<int, 3>> elementsPtr = triMesh->getTriangleIndices();
+                std::shared_ptr<VecDataArray<int, 3>> elementsPtr = triMesh->getCells();
                 const VecDataArray<int, 3>&           elements    = *elementsPtr;
                 const auto                            nV = triMesh->getNumVertices();
                 std::vector<std::vector<bool>>        E(nV, std::vector<bool>(nV, 1)); // To test for duplicates
@@ -181,7 +181,7 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
 
             auto                                     triMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
             std::shared_ptr<VecDataArray<double, 3>> initVerticesPtr = m_geom->getInitialVertexPositions();
-            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr     = triMesh->getTriangleIndices();
+            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr     = triMesh->getCells();
 
             const VecDataArray<double, 3>& initVertices = *initVerticesPtr;
             const VecDataArray<int, 3>&    elements     = *elementsPtr;
@@ -356,7 +356,7 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
             auto                                     triMesh     = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
             std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
             const VecDataArray<double, 3>&           vertices    = *verticesPtr;
-            std::shared_ptr<VecDataArray<int, 3>>    elemenstPtr = triMesh->getTriangleIndices();
+            std::shared_ptr<VecDataArray<int, 3>>    elemenstPtr = triMesh->getCells();
             const VecDataArray<int, 3>&              elements    = *elemenstPtr;
 
             ParallelUtils::parallelFor(elements.size(),
@@ -378,7 +378,7 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
 
             auto                                     triMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
             std::shared_ptr<VecDataArray<double, 3>> initVerticesPtr = m_geom->getInitialVertexPositions();
-            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr     = triMesh->getTriangleIndices();
+            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr     = triMesh->getCells();
 
             const VecDataArray<double, 3>& initVertices = *initVerticesPtr;
             const VecDataArray<int, 3>&    elements     = *elementsPtr;
@@ -545,7 +545,7 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
             auto                                     triMesh     = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
             std::shared_ptr<VecDataArray<double, 3>> verticesPtr = triMesh->getVertexPositions();
             const VecDataArray<double, 3>&           vertices    = *verticesPtr;
-            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr = triMesh->getTriangleIndices();
+            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr = triMesh->getCells();
             const VecDataArray<int, 3>&              elements    = *elementsPtr;
             const int                                nV = triMesh->getNumVertices();
             std::vector<std::vector<int>>            vertIdsToTriangleIds(nV);
@@ -633,7 +633,7 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
 
             auto                                     triMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
             std::shared_ptr<VecDataArray<double, 3>> initVerticesPtr = m_geom->getInitialVertexPositions();
-            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr     = triMesh->getTriangleIndices();
+            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr     = triMesh->getCells();
 
             const VecDataArray<double, 3>& initVertices = *initVerticesPtr;
             const VecDataArray<int, 3>&    elements     = *elementsPtr;

@@ -56,7 +56,6 @@ class LineMesh;
 class PointSet;
 class SurfaceMesh;
 class TetrahedralMesh;
-class VolumetricMesh;
 
 class OrientedBox;
 class Sphere;
@@ -138,7 +137,7 @@ std::shared_ptr<LineMesh> copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
 ///
 /// \brief Get imstk volumetric mesh given vtkUnstructuredGrid as input
 ///
-std::shared_ptr<VolumetricMesh> copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh);
+std::shared_ptr<PointSet> copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh);
 
 ///
 /// \brief Converts imstk point set into a vtk polydata
