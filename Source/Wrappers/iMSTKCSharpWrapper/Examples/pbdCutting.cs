@@ -34,7 +34,9 @@ public class PbdCutting
         HapticDeviceManager server = new HapticDeviceManager();
         HapticDeviceClient client = server.makeDeviceClient();
 
-        SceneObjectController controller = new SceneObjectController(cutObj, client);
+        SceneObjectController controller = new SceneObjectController();
+        controller.setControlledObject(cutObj);
+        controller.setDevice(client);
         scene.addController(controller);
 
         // Adjust camera
@@ -67,11 +69,13 @@ public class PbdCutting
 
             // Add mouse and keyboard controls to the viewer
             {
-                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
+                MouseSceneControl mouseControl = new MouseSceneControl();
+                mouseControl.setDevice(viewer.getMouseDevice());
                 mouseControl.setSceneManager(sceneManager);
                 scene.addControl(mouseControl);
 
-                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
+                KeyboardSceneControl keyControl = new KeyboardSceneControl();
+                keyControl.setDevice(viewer.getKeyboardDevice());
                 keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
                 keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
                 scene.addControl(keyControl);
@@ -131,6 +135,11 @@ public class PbdCutting
         clothObj.setPhysicsGeometry(clothMesh);
         clothObj.setCollidingGeometry(clothMesh);
         clothObj.setDynamicalModel(pbdModel);
+
+        clothObj.getPbdBody().fixedNodeIds = new VectorInt(2);
+        clothObj.getPbdBody().fixedNodeIds.Add(0);
+        clothObj.getPbdBody().fixedNodeIds.Add(colCount - 1);
+        clothObj.getPbdBody().uniformMassValue = width * height / (rowCount * colCount);
 
         return clothObj;
     }

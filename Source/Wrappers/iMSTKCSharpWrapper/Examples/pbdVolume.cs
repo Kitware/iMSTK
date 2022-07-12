@@ -40,11 +40,13 @@ public class PbdVolume
 
             // Add mouse and keyboard controls to the viewer
             {
-                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
+                MouseSceneControl mouseControl = new MouseSceneControl();
+                mouseControl.setDevice(viewer.getMouseDevice());
                 mouseControl.setSceneManager(sceneManager);
                 scene.addControl(mouseControl);
 
-                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
+                KeyboardSceneControl keyControl = new KeyboardSceneControl();
+                keyControl.setDevice(viewer.getKeyboardDevice());
                 keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
                 keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
                 scene.addControl(keyControl);
@@ -113,6 +115,23 @@ public class PbdVolume
         deformableObj.addVisualModel(visualModel);
         deformableObj.setPhysicsGeometry(tetMesh);
         deformableObj.setPhysicsToVisualMap(new PointwiseMap(tetMesh, surfMesh));
+
+        VectorInt fixedNodeIds = new VectorInt(13);
+        fixedNodeIds.Add(75);
+        fixedNodeIds.Add(82);
+        fixedNodeIds.Add(84);
+        fixedNodeIds.Add(94);
+        fixedNodeIds.Add(95);
+        fixedNodeIds.Add(105);
+        fixedNodeIds.Add(110);
+        fixedNodeIds.Add(124);
+        fixedNodeIds.Add(139);
+        fixedNodeIds.Add(150);
+        fixedNodeIds.Add(161);
+        fixedNodeIds.Add(171);
+        fixedNodeIds.Add(350);
+        deformableObj.getPbdBody().fixedNodeIds = fixedNodeIds;
+        deformableObj.getPbdBody().uniformMassValue = 1.0;
 
         return deformableObj;
     }

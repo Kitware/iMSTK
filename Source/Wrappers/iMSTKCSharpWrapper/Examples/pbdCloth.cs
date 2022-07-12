@@ -38,11 +38,13 @@ public class PbdCloth
 
             // Add mouse and keyboard controls to the viewer
             {
-                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
+                MouseSceneControl mouseControl = new MouseSceneControl();
+                mouseControl.setDevice(viewer.getMouseDevice());
                 mouseControl.setSceneManager(sceneManager);
                 scene.addControl(mouseControl);
 
-                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
+                KeyboardSceneControl keyControl = new KeyboardSceneControl();
+                keyControl.setDevice(viewer.getKeyboardDevice());
                 keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
                 keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
                 scene.addControl(keyControl);
@@ -93,10 +95,6 @@ public class PbdCloth
         PbdModelConfig pbdParams = new PbdModelConfig();
         pbdParams.enableConstraint(PbdModelConfig.ConstraintGenType.Distance, 1.0e2);
         pbdParams.enableConstraint(PbdModelConfig.ConstraintGenType.Dihedral, 1.0e1);
-        pbdParams.m_fixedNodeIds = new VectorSizet(2);
-        pbdParams.m_fixedNodeIds.Add(0);
-        pbdParams.m_fixedNodeIds.Add((uint)colCount - 1);
-        pbdParams.m_uniformMassValue = width * height / (rowCount * colCount);
         pbdParams.m_gravity    = new Vec3d(0.0, -9.8, 0.0);
         pbdParams.m_dt  = 0.005;
         pbdParams.m_iterations = 5;
@@ -123,6 +121,11 @@ public class PbdCloth
         clothObj.addVisualModel(visualModel);
         clothObj.setPhysicsGeometry(clothMesh);
         clothObj.setDynamicalModel(pbdModel);
+
+        clothObj.getPbdBody().fixedNodeIds = new VectorInt(2);
+        clothObj.getPbdBody().fixedNodeIds.Add(0);
+        clothObj.getPbdBody().fixedNodeIds.Add(colCount - 1);
+        clothObj.getPbdBody().uniformMassValue = width * height / (rowCount * colCount);
 
         return clothObj;
     }

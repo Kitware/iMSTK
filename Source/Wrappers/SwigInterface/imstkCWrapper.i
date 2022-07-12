@@ -35,8 +35,9 @@
  */
 #include "imstkGeometry.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkAbstractCellMesh.h"
 #include "imstkPointSet.h"
+#include "imstkAbstractCellMesh.h"
+#include "imstkCellMesh.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"
 #include "imstkImageData.h"
@@ -208,6 +209,7 @@
  */
 #include "imstkDeviceClient.h"
 #include "imstkKeyboardDeviceClient.h"
+#include "imstkMouseDeviceClient.h"
 
 #ifdef iMSTK_USE_OpenHaptics
 #include "imstkHapticDeviceManager.h"
@@ -272,12 +274,19 @@ namespace std
  * Geometry
  */
 %include "../../Geometry/imstkGeometry.h";
-%include "../../Geometry/Mesh/imstkAbstractCellMesh.h"
 %include "../../Geometry/Mesh/imstkPointSet.h"
-%include "../../Geometry/Mesh/imstkSurfaceMesh.h"
-%include "../../Geometry/Mesh/imstkLineMesh.h"
 %include "../../Geometry/Mesh/imstkImageData.h"
+%include "../../Geometry/Mesh/imstkAbstractCellMesh.h"
+%include "../../Geometry/Mesh/imstkCellMesh.h"
+%template(CellMesh2) imstk::CellMesh<2>;
+%template(CellMesh3) imstk::CellMesh<3>;
+%template(CellMesh4) imstk::CellMesh<4>;
+%template(CellMesh8) imstk::CellMesh<8>;
+%include "../../Geometry/Mesh/imstkLineMesh.h"
+%include "../../Geometry/Mesh/imstkSurfaceMesh.h"
 %include "../../Geometry/Mesh/imstkVolumetricMesh.h"
+%template(VolumetricMesh4) imstk::VolumetricMesh<4>;
+%template(VolumetricMesh8) imstk::VolumetricMesh<8>;
 %include "../../Geometry/Mesh/imstkTetrahedralMesh.h"
 %include "../../Geometry/Mesh/imstkHexahedralMesh.h"
 %include "../../Geometry/Implicit/imstkImplicitGeometry.h"
@@ -457,6 +466,7 @@ namespace std
  */
 %include "../../Devices/imstkDeviceClient.h"
 %include "../../Devices/imstkKeyboardDeviceClient.h"
+%include "../../Devices/imstkMouseDeviceClient.h"
 
 #ifdef iMSTK_USE_OpenHaptics
 	#define HDCALLBACK

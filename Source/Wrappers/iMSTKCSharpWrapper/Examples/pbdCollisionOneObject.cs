@@ -53,7 +53,6 @@ public class PbdCollisionOneObject
                 pbdParams.m_femParams.m_YoungModulus = youngModulus;
                 pbdParams.m_femParams.m_PoissonRatio = poissonRatio;
                 pbdParams.enableFemConstraint(PbdFemConstraint.MaterialType.Corotation);
-                pbdParams.m_uniformMassValue = 1.0;
                 pbdParams.m_gravity = new Vec3d(0, -10.0, 0);
                 pbdParams.m_dt = timeStep;
                 pbdParams.m_iterations = maxIter;
@@ -64,6 +63,7 @@ public class PbdCollisionOneObject
                 deformableObj.setPhysicsGeometry(coarseTetMesh);
                 deformableObj.setPhysicsToVisualMap(new PointToTetMap(coarseTetMesh, highResSurfMesh));
                 deformableObj.setDynamicalModel(pbdModel);
+                deformableObj.getPbdBody().uniformMassValue = 1.0;
             }
             scene.addSceneObject(deformableObj);
 
@@ -105,11 +105,13 @@ public class PbdCollisionOneObject
 
             // Add mouse and keyboard controls to the viewer
             {
-                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
+                MouseSceneControl mouseControl = new MouseSceneControl();
+                mouseControl.setDevice(viewer.getMouseDevice());
                 mouseControl.setSceneManager(sceneManager);
                 scene.addControl(mouseControl);
 
-                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
+                KeyboardSceneControl keyControl = new KeyboardSceneControl();
+                keyControl.setDevice(viewer.getKeyboardDevice());
                 keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
                 keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
                 scene.addControl(keyControl);

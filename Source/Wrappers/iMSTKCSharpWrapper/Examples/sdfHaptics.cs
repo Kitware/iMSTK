@@ -89,11 +89,13 @@ public class SdfHaptics
 
             // Add mouse and keyboard controls to the viewer
             {
-                MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
+                MouseSceneControl mouseControl = new MouseSceneControl();
+                mouseControl.setDevice(viewer.getMouseDevice());
                 mouseControl.setSceneManager(sceneManager);
                 scene.addControl(mouseControl);
 
-                KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
+                KeyboardSceneControl keyControl = new KeyboardSceneControl();
+                keyControl.setDevice(viewer.getKeyboardDevice());
                 keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
                 keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
                 scene.addControl(keyControl);
