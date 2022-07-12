@@ -6,6 +6,8 @@
 
 #include "imstkPbdObjectCutting.h"
 #include "imstkAnalyticalGeometry.h"
+#include "imstkLineMesh.h"
+#include "imstkLineMeshCut.h"
 #include "imstkPbdConstraintContainer.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"

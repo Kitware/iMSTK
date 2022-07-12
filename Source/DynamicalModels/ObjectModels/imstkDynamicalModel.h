@@ -20,7 +20,13 @@ template<class StateType>
 class DynamicalModel : public AbstractDynamicalModel
 {
 public:
-    DynamicalModel(DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalModel(type) {}
+    DynamicalModel(DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalModel(type),
+        m_initialState(std::make_shared<StateType>()),
+        m_currentState(std::make_shared<StateType>()),
+        m_previousState(std::make_shared<StateType>())
+    {
+    }
+
     ~DynamicalModel() override = default;
 
     ///
@@ -41,7 +47,7 @@ public:
     ///
     /// \brief Reset the current state to the initial state
     ///
-    virtual void resetToInitialState() override
+    void resetToInitialState() override
     {
         m_currentState->setState(m_initialState);
         m_previousState->setState(m_initialState);

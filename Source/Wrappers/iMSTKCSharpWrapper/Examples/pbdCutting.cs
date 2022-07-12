@@ -37,7 +37,7 @@ public class PbdCutting
         SceneObjectController controller = new SceneObjectController();
         controller.setControlledObject(cutObj);
         controller.setDevice(client);
-        scene.addController(controller);
+        scene.addControl(controller);
 
         // Adjust camera
         scene.getActiveCamera().setPosition(100.0, 100.0, 100.0);
@@ -108,10 +108,6 @@ public class PbdCutting
         PbdModelConfig pbdParams = new PbdModelConfig();
         pbdParams.enableConstraint(PbdModelConfig.ConstraintGenType.Distance, 1.0e3);
         pbdParams.enableConstraint(PbdModelConfig.ConstraintGenType.Dihedral, 1.0e3);
-        pbdParams.m_fixedNodeIds = new VectorSizet(2);
-        pbdParams.m_fixedNodeIds.Add(0);
-        pbdParams.m_fixedNodeIds.Add((uint)colCount - 1);
-        pbdParams.m_uniformMassValue = width * height / (rowCount * colCount);
         pbdParams.m_gravity    = new Vec3d(0.0, -9.8, 0.0);
         pbdParams.m_dt  = 0.005;
         pbdParams.m_iterations = 5;

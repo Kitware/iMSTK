@@ -15,6 +15,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCutting.h"
 #include "imstkRenderMaterial.h"

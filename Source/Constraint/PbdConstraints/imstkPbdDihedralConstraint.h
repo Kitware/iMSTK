@@ -18,11 +18,7 @@ namespace imstk
 class PbdDihedralConstraint : public PbdConstraint
 {
 public:
-    PbdDihedralConstraint() : PbdConstraint()
-    {
-        m_vertexIds.resize(4);
-        m_dcdx.resize(4);
-    }
+    PbdDihedralConstraint() : PbdConstraint(4) { }
 
     /**
       \brief initConstraint
@@ -41,9 +37,9 @@ public:
       \param k stiffness
     */
     void initConstraint(
-        const VecDataArray<double, 3>& initVertexPositions,
-        const size_t& pIdx0, const size_t& pIdx1,
-        const size_t& pIdx2, const size_t& pIdx3,
+        const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
+        const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
+        const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
         const double k);
 
     ///
@@ -52,10 +48,8 @@ public:
     /// \param[in] currVertexPositions vector of current positions
     /// \param[inout] c constraint value
     ///
-    bool computeValueAndGradient(
-        const VecDataArray<double, 3>& currVertexPositions,
-        double& c,
-        std::vector<Vec3d>& dcdx) const override;
+    bool computeValueAndGradient(PbdState& bodies,
+                                 double& c, std::vector<Vec3d>& dcdx) override;
 
 public:
     double m_restAngle = 0.0; ///< Rest angle

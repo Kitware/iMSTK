@@ -75,4 +75,14 @@ getCDType(const CollidingObject& obj1, const CollidingObject& obj2)
     std::string cdType = CDObjectFactory::getCDType(*obj1.getCollidingGeometry(), *obj2.getCollidingGeometry());
     return cdType;
 }
+
+void
+CollidingObject::postModifiedAll()
+{
+    if (m_collidingGeometry != nullptr)
+    {
+        m_collidingGeometry->postModified();
+    }
+    SceneObject::postModifiedAll();
+}
 } // namespace imstk

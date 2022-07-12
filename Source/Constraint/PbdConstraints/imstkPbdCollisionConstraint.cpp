@@ -8,20 +8,26 @@
 
 namespace imstk
 {
-PbdCollisionConstraint::PbdCollisionConstraint(const unsigned int n1, const unsigned int n2)
+PbdCollisionConstraint::PbdCollisionConstraint(const int numParticlesA, const int numParticlesB) :
+    PbdConstraint(numParticlesA + numParticlesB)
 {
-    m_bodiesFirst.resize(n1);
-    m_dcdxA.resize(n1);
-
-    m_bodiesSecond.resize(n2);
-    m_dcdxB.resize(n2);
+    m_bodiesSides.resize(numParticlesA + numParticlesB);
+    for (int i = 0; i < m_bodiesSides.size(); i++)
+    {
+        m_bodiesSides[i] = (i >= numParticlesA); // false/0 for A, true/1 for B
+    }
 }
 
 void
-PbdCollisionConstraint::solvePosition()
+PbdCollisionConstraint::projectConstraint(PbdState& bodies, const double dt, const SolverType&)
 {
-    double     c;
-    const bool update = this->computeValueAndGradient(c, m_dcdxA, m_dcdxB);
+    if (dt == 0.0)
+    {
+        return;
+    }
+
+    double c      = 0.0;
+    bool   update = this->computeValueAndGradient(bodies, c, m_dcdx);
     if (!update)
     {
         return;
@@ -30,14 +36,10 @@ PbdCollisionConstraint::solvePosition()
     double lambda = 0.0;
 
     // Sum the mass (so we can weight displacements)
-    for (size_t i = 0; i < m_bodiesFirst.size(); i++)
+    for (size_t i = 0; i < m_particles.size(); i++)
     {
-        lambda += m_bodiesFirst[i].invMass * m_dcdxA[i].squaredNorm();
-    }
-
-    for (size_t i = 0; i < m_bodiesSecond.size(); i++)
-    {
-        lambda += m_bodiesSecond[i].invMass * m_dcdxB[i].squaredNorm();
+        const double invMass = bodies.getInvMass(m_particles[i]);
+        lambda += invMass * m_dcdx[i].squaredNorm();
     }
 
     if (lambda == 0.0)
@@ -47,53 +49,14 @@ PbdCollisionConstraint::solvePosition()
 
     lambda = c / lambda;
 
-    for (size_t i = 0; i < m_bodiesFirst.size(); i++)
+    for (size_t i = 0; i < m_particles.size(); i++)
     {
-        (*m_bodiesFirst[i].vertex) +=
-            m_bodiesFirst[i].invMass * lambda * m_dcdxA[i] * m_stiffnessA;
-    }
-
-    for (size_t i = 0; i < m_bodiesSecond.size(); i++)
-    {
-        (*m_bodiesSecond[i].vertex) +=
-            m_bodiesSecond[i].invMass * lambda * m_dcdxB[i] * m_stiffnessB;
-    }
-}
-
-void
-PbdCollisionConstraint::correctVelocity(const double friction, const double restitution)
-{
-    const double fricFrac = 1.0 - friction;
-
-    for (size_t i = 0; i < m_bodiesFirst.size(); i++)
-    {
-        if (m_bodiesFirst[i].invMass > 0.0)
+        const double invMass = bodies.getInvMass(m_particles[i]);
+        if (invMass > 0.0)
         {
-            const Vec3d n = m_dcdxA[i].normalized();
-            Vec3d&      v = *m_bodiesFirst[i].velocity;
-
-            // Separate velocity into normal and tangent components
-            const Vec3d vN = n.dot(v) * n;
-            const Vec3d vT = v - vN;
-
-            // Put back together fractionally based on defined restitution and frictional coefficients
-            v = vN * restitution + vT * fricFrac;
-        }
-    }
-
-    for (size_t i = 0; i < m_bodiesSecond.size(); i++)
-    {
-        if (m_bodiesSecond[i].invMass > 0.0)
-        {
-            const Vec3d n = m_dcdxB[i].normalized();
-            Vec3d&      v = *m_bodiesSecond[i].velocity;
-
-            // Separate velocity into normal and tangent components
-            const Vec3d vN = n.dot(v) * n;
-            const Vec3d vT = v - vN;
-
-            // Put back together fractionally based on defined restitution and frictional coefficients
-            v = vN * restitution + vT * fricFrac;
+            const Vec3d dx = invMass * lambda *
+                             m_dcdx[i] * m_stiffness[m_bodiesSides[i]];
+            bodies.getPosition(m_particles[i]) += dx;
         }
     }
 }

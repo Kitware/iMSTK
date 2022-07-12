@@ -59,6 +59,9 @@ DynamicObject::initialize()
 {
     if (CollidingObject::initialize())
     {
+        CHECK(m_physicsGeometry != nullptr) << "DynamicObject \"" << m_name
+                                            << "\" expects a physics geometry at start, none was provided";
+
         if (m_physicsToCollidingGeomMap)
         {
             m_physicsToCollidingGeomMap->compute();
@@ -69,7 +72,7 @@ DynamicObject::initialize()
             m_physicsToVisualGeomMap->compute();
         }
 
-        return m_dynamicalModel->initialize();
+        return true;
     }
     else
     {
@@ -98,6 +101,17 @@ void
 DynamicObject::reset()
 {
     m_dynamicalModel->resetToInitialState();
-    this->updateGeometries();
-};
+    updateGeometries();
+    postModifiedAll();
+}
+
+void
+DynamicObject::postModifiedAll()
+{
+    if (m_physicsGeometry != nullptr)
+    {
+        m_physicsGeometry->postModified();
+    }
+    CollidingObject::postModifiedAll();
+}
 } // namespace imstk

@@ -9,20 +9,16 @@
 namespace imstk
 {
 bool
-PbdFemTetConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                                    const size_t& pIdx0, const size_t& pIdx1,
-                                    const size_t& pIdx2, const size_t& pIdx3,
-                                    std::shared_ptr<PbdFemConstraintConfig> config)
+PbdFemTetConstraint::initConstraint(
+    const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
+    const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
+    const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
+    std::shared_ptr<PbdFemConstraintConfig> config)
 {
-    m_vertexIds[0] = pIdx0;
-    m_vertexIds[1] = pIdx1;
-    m_vertexIds[2] = pIdx2;
-    m_vertexIds[3] = pIdx3;
-
-    const Vec3d& p0 = initVertexPositions[pIdx0];
-    const Vec3d& p1 = initVertexPositions[pIdx1];
-    const Vec3d& p2 = initVertexPositions[pIdx2];
-    const Vec3d& p3 = initVertexPositions[pIdx3];
+    m_particles[0] = pIdx0;
+    m_particles[1] = pIdx1;
+    m_particles[2] = pIdx2;
+    m_particles[3] = pIdx3;
 
     m_initialElementVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
     m_config     = config;
@@ -34,7 +30,7 @@ PbdFemTetConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPos
     m.col(2) = p2 - p3;
 
     const double det = m.determinant();
-    if (fabs(det) > m_epsilon)
+    if (fabs(det) > 1.0e-16)
     {
         m_invRestMat = m.inverse();
         return true;
@@ -44,20 +40,13 @@ PbdFemTetConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPos
 }
 
 bool
-PbdFemTetConstraint::computeValueAndGradient(
-    const VecDataArray<double, 3>& currVertexPositions,
-    double& cval,
-    std::vector<Vec3d>& dcdx) const
+PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
+                                             double& c, std::vector<Vec3d>& dcdx)
 {
-    const auto i0 = m_vertexIds[0];
-    const auto i1 = m_vertexIds[1];
-    const auto i2 = m_vertexIds[2];
-    const auto i3 = m_vertexIds[3];
-
-    const Vec3d& p0 = currVertexPositions[i0];
-    const Vec3d& p1 = currVertexPositions[i1];
-    const Vec3d& p2 = currVertexPositions[i2];
-    const Vec3d& p3 = currVertexPositions[i3];
+    const Vec3d& p0 = bodies.getPosition(m_particles[0]);
+    const Vec3d& p1 = bodies.getPosition(m_particles[1]);
+    const Vec3d& p2 = bodies.getPosition(m_particles[2]);
+    const Vec3d& p3 = bodies.getPosition(m_particles[3]);
 
     Mat3d m;
     m.col(0) = p0 - p3;
@@ -148,8 +137,32 @@ PbdFemTetConstraint::computeValueAndGradient(
     // P(F) = mu*(F - mu*F^-T) + lambda*log(J)F^-T;
     case MaterialType::NeoHookean:
     {
+        // This is a modified NeoHookean to deal with inversions
+        // - for which log produces nans
+        // - log also gets drastically large as we near 0, so an epsilon is used
+
+        // Modified NeoHookean with flip
         Mat3d  invFT = F.inverse().transpose();
-        double logJ  = log(F.determinant());
+        double det   = F.determinant();
+        double logJ  = log(std::abs(det)) * static_cast<double>(!std::signbit(det));
+
+        // Modified NeoHookean with epsilon
+        /*Mat3d  invFT = F.inverse().transpose();
+        double det = F.determinant();
+        double logJ = 0.0;
+        if (det < 0.00001)
+        {
+            logJ = log(0.00001);
+        }
+        else
+        {
+            logJ = log(det);
+        }*/
+
+        // Original NeoHookean
+        /* Mat3d  invFT = F.inverse().transpose();
+         double logJ  = log(F.determinant());*/
+
         P = mu * (F - invFT) + lambda * logJ * invFT;
 
         C = F(0, 0) * F(0, 0) + F(0, 1) * F(0, 1) + F(0, 2) * F(0, 2)
@@ -173,8 +186,8 @@ PbdFemTetConstraint::computeValueAndGradient(
     P = U * P * VT;
 
     Mat3d gradC = m_initialElementVolume * P * m_invRestMat.transpose();
-    cval    = C;
-    cval   *=  m_initialElementVolume;
+    c       = C;
+    c      *= m_initialElementVolume;
     dcdx[0] = gradC.col(0);
     dcdx[1] = gradC.col(1);
     dcdx[2] = gradC.col(2);
@@ -292,23 +305,23 @@ PbdFemTetConstraint::handleInversions(
 
     if (detU < 0.0)
     {
-        int    position  = 0;
+        int    positionu = 0;
         double minLambda = IMSTK_DOUBLE_MAX;
         for (int i = 0; i < 3; i++)
         {
             if (Fhat(i, i) < minLambda)
             {
-                position  = i;
+                positionu = i;
                 minLambda = Fhat(i, i);
             }
         }
 
         // Invert values of smallest singular value and associated column of U
         // This "pushes" the node nearest the uninverted state towards the uninverted state
-        Fhat(position, position) *= -1.0;
+        Fhat(positionu, positionu) *= -1.0;
         for (int i = 0; i < 3; i++)
         {
-            U(i, position) *= -1.0;
+            U(i, positionu) *= -1.0;
         }
     }
 

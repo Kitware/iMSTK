@@ -9,29 +9,28 @@
 namespace imstk
 {
 void
-PbdPointTriangleConstraint::initConstraint(VertexMassPair ptA,
-                                           VertexMassPair ptB1, VertexMassPair ptB2, VertexMassPair ptB3,
+PbdPointTriangleConstraint::initConstraint(const PbdParticleId& ptA,
+                                           const PbdParticleId& ptB1, const PbdParticleId& ptB2, const PbdParticleId& ptB3,
                                            double stiffnessA, double stiffnessB)
 {
-    m_bodiesFirst[0] = ptA;
+    m_particles[0] = ptA;
+    m_particles[1] = ptB1;
+    m_particles[2] = ptB2;
+    m_particles[3] = ptB3;
 
-    m_bodiesSecond[0] = ptB1;
-    m_bodiesSecond[1] = ptB2;
-    m_bodiesSecond[2] = ptB3;
-
-    m_stiffnessA = stiffnessA;
-    m_stiffnessB = stiffnessB;
+    m_stiffness[0] = stiffnessA;
+    m_stiffness[1] = stiffnessB;
 }
 
 bool
-PbdPointTriangleConstraint::computeValueAndGradient(double&             c,
-                                                    std::vector<Vec3d>& dcdxA,
-                                                    std::vector<Vec3d>& dcdxB) const
+PbdPointTriangleConstraint::computeValueAndGradient(
+    PbdState& bodies,
+    double& c, std::vector<Vec3d>& dcdx)
 {
-    const Vec3d& x0 = *m_bodiesFirst[0].vertex;
-    const Vec3d& x1 = *m_bodiesSecond[0].vertex;
-    const Vec3d& x2 = *m_bodiesSecond[1].vertex;
-    const Vec3d& x3 = *m_bodiesSecond[2].vertex;
+    const Vec3d& x0 = bodies.getPosition(m_particles[0]);
+    const Vec3d& x1 = bodies.getPosition(m_particles[1]);
+    const Vec3d& x2 = bodies.getPosition(m_particles[2]);
+    const Vec3d& x3 = bodies.getPosition(m_particles[3]);
 
     // Compute barycentric coordinates u,v,w
     const Vec3d  v0    = x2 - x1;
@@ -59,16 +58,16 @@ PbdPointTriangleConstraint::computeValueAndGradient(double&             c,
         return false;
     }
 
-    Vec3d barycenteric = { u, v, w };
-    int   maxId = 0;
-
-    barycenteric.maxCoeff(&maxId);
-
     // If contacting point near a boundary ignore constraint
-    if (!m_enableBoundaryCollisions && m_bodiesSecond[maxId].invMass == 0.0)
+    if (!m_enableBoundaryCollisions)
     {
-        c = 0.0;
-        return false;
+        int maxId = 0;
+        Vec3d(u, v, w).maxCoeff(&maxId);
+        if (bodies.getInvMass(m_particles[maxId + 1]) == 0.0)
+        {
+            c = 0.0;
+            return false;
+        }
     }
 
     // Triangle normal (pointing up on standard counter clockwise triangle)
@@ -76,10 +75,12 @@ PbdPointTriangleConstraint::computeValueAndGradient(double&             c,
     // Point could be on either side of triangle, we want to resolve to the triangles plane
     const double l = v2.dot(n);
 
-    dcdxA[0] = -n;
-    dcdxB[0] = u * n;
-    dcdxB[1] = v * n;
-    dcdxB[2] = w * n;
+    // A
+    dcdx[0] = -n;
+    // B
+    dcdx[1] = u * n;
+    dcdx[2] = v * n;
+    dcdx[3] = w * n;
 
     c = l;
 

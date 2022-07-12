@@ -10,6 +10,9 @@
 %ignore imstk::PbdModel::getUpdateCollisionGeometryNode();
 %ignore imstk::PbdModel::getSolveNode();
 %ignore imstk::PbdModel::getUpdateVelocityNode();
+%ignore imstk::PbdModelConfig::addPbdConstraintFunctor(std::shared_ptr<PbdConstraintFunctor>);
+%ignore imstk::PbdModelConfig::addPbdConstraintFunctor(std::function<void(PbdConstraintContainer&)>);
+%ignore imstk::PbdModelConfig::getFunctors();
 
 %ignore imstk::AbstractDataArray::clone();
 %ignore imstk::DataArray::iterator; /* fix the multiple-definition problem. */
@@ -50,6 +53,7 @@
 
 %ignore imstk::RbdConstraint;
 %ignore imstk::PbdConstraintContainer;
+%ignore imstk::PbdConstraintFunctor;
 %ignore imstk::CollisionHandling::getTaskNode();
 
 %ignore imstk::VTKTextStatusManager::getTextActor();

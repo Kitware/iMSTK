@@ -14,6 +14,7 @@
 #include "imstkNew.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdSolver.h"

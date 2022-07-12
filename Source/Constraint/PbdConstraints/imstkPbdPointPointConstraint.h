@@ -23,21 +23,19 @@ public:
 
 public:
     ///
-    /// \brief initialize constraint
+    /// \brief Initialize constraint
     ///
     void initConstraint(
-        VertexMassPair ptA, VertexMassPair ptB,
+        const PbdParticleId& ptA, const PbdParticleId& ptB,
         double stiffnessA, double stiffnessB);
 
     ///
-    /// \brief compute value and gradient of constraint function
-    ///
+    /// \brief Compute value and gradient of constraint function
+    /// \param[inout] set of bodies involved in system
     /// \param[inout] c constraint value
-    /// \param[inout] dcdxA constraint gradient for A
-    /// \param[inout] dcdxB constraint gradient for B
+    /// \param[inout] dcdx constraint gradient
     ///
-    bool computeValueAndGradient(double&             c,
-                                 std::vector<Vec3d>& dcdxA,
-                                 std::vector<Vec3d>& dcdxB) const override;
+    bool computeValueAndGradient(PbdState& bodies,
+                                 double& c, std::vector<Vec3d>& dcdx) override;
 };
 } // imstk

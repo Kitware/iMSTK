@@ -32,11 +32,41 @@ public:
 
     IMSTK_TYPE_NAME(PbdObjectCollision)
 
+    ///
+    /// \brief Get/Set the restitution, which gives how much velocity is
+    /// removed along the contact normals during contact
+    /// @{
     void setRestitution(const double restitution);
-    const double getRestitution() const;
+    double getRestitution() const;
+    /// @}
 
+    ///
+    /// \brief Get/Set the friction, which gives how much velocity is
+    /// removed along the tangents during contact
+    /// @{
     void setFriction(const double friction);
-    const double getFriction() const;
+    double getFriction() const;
+    /// @}
+
+    ///
+    /// \brief Get/Set compliance of rigid body contacts. Defaults to 0
+    /// compliance/infinitely stiff. This is what is needed most of the time
+    /// but sometimes making a contact a bit softer can be helpful.
+    /// @{
+    void setRigidBodyCompliance(const double compliance);
+    double getRigidBodyCompliance() const;
+    /// @}
+
+    ///
+    /// \brief Get/Set stiffness of deformable contacts. Defaults to 1.0.
+    /// This is what is needed most of the time but sometimes making a
+    /// contact a bit softer can be helpful.
+    /// @{
+    void setDeformableStiffnessA(const double stiffness);
+    double getDeformableStiffnessA() const;
+    void setDeformableStiffnessB(const double stiffness);
+    double getDeformableStiffnessB() const;
+    /// @}
 
     ///
     /// \brief Setup connectivity of task graph
@@ -44,8 +74,6 @@ public:
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
-    // Steps introduced in interaction
-    std::shared_ptr<TaskNode> m_collisionSolveNode    = nullptr;
-    std::shared_ptr<TaskNode> m_correctVelocitiesNode = nullptr;
+    std::shared_ptr<TaskNode> m_updatePrevGeometryCCDNode = nullptr;
 };
 } // namespace imstk

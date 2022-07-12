@@ -12,6 +12,7 @@
 #include "imstkPbdInflatableDistanceConstraint.h"
 #include "imstkPbdInflatableVolumeConstraint.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"

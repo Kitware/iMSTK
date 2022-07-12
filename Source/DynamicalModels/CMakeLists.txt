@@ -31,11 +31,11 @@ set(H_FILES
   ObjectModels/imstkLevelSetModel.h
   ObjectModels/imstkPbdConstraintFunctor.h
   ObjectModels/imstkPbdModel.h
+  ObjectModels/imstkPbdModelConfig.h
   ObjectModels/imstkRigidBodyModel2.h
   ObjectModels/imstkSphBoundaryConditions.h
   ObjectModels/imstkSPHKernels.h
   ObjectModels/imstkSphModel.h
-  ObjectStates/imstkPbdState.h
   ObjectStates/imstkRigidBodyState2.h
   ObjectStates/imstkSphState.h
   ObjectStates/imstkVectorizedState.h
@@ -54,10 +54,10 @@ set(SRC_FILES
   ObjectModels/imstkFemDeformableBodyModel.cpp
   ObjectModels/imstkLevelSetModel.cpp
   ObjectModels/imstkPbdModel.cpp
+  ObjectModels/imstkPbdModelConfig.cpp
   ObjectModels/imstkRigidBodyModel2.cpp
   ObjectModels/imstkSphBoundaryConditions.cpp
   ObjectModels/imstkSphModel.cpp
-  ObjectStates/imstkPbdState.cpp
   ObjectStates/imstkSphState.cpp
   ObjectStates/imstkVectorizedState.cpp
   TimeIntegrators/imstkBackwardEuler.cpp

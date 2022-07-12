@@ -20,23 +20,25 @@ class PbdFemTetConstraint : public PbdFemConstraint
 {
 public:
     PbdFemTetConstraint(MaterialType mType = MaterialType::StVK) :
-        PbdFemConstraint(4, mType) {}
+        PbdFemConstraint(4, mType) { }
 
     ///
-    /// \brief Initialize the tetrahedral FEM constraint
+    /// \brief Initialize the constraint
     ///
-    bool initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                        const size_t& pIdx1, const size_t& pIdx2,
-                        const size_t& pIdx3, const size_t& pIdx4,
-                        std::shared_ptr<PbdFemConstraintConfig> config);
+    bool initConstraint(
+        const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
+        const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
+        const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
+        std::shared_ptr<PbdFemConstraintConfig> config);
 
     ///
-    /// \brief Compute the value and gradient of constraint
+    /// \brief Compute value and gradient of constraint function
+    /// \param[inout] set of bodies involved in system
+    /// \param[inout] c constraint value
+    /// \param[inout] dcdx constraint gradient
     ///
-    bool computeValueAndGradient(
-        const VecDataArray<double, 3>& currVertexPosition,
-        double& c,
-        std::vector<Vec3d>& dcdx) const override;
+    bool computeValueAndGradient(PbdState& bodies,
+                                 double& c, std::vector<Vec3d>& dcdx) override;
 
     ///
     /// \brief Handle inverted tets with the method described by Irving et. al. in

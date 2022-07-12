@@ -12,7 +12,6 @@
 
 namespace imstk
 {
-class Geometry;
 class GeometryMap;
 
 ///
@@ -51,6 +50,9 @@ public:
     /// \brief Initialize the scene object
     ///
     bool initialize() override;
+
+protected:
+    void postModifiedAll() override;
 
 protected:
     std::shared_ptr<Geometry>    m_collidingGeometry    = nullptr; ///< Geometry for collisions

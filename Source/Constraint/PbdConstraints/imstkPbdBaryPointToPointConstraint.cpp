@@ -9,57 +9,75 @@
 namespace imstk
 {
 Vec3d
-PbdBaryPointToPointConstraint::computePtA() const
+PbdBaryPointToPointConstraint::computeInterpolantDifference(PbdState& bodies) const
 {
     Vec3d p1 = Vec3d::Zero();
-    for (size_t i = 0; i < m_bodiesFirst.size(); i++)
+    Vec3d p2 = Vec3d::Zero();
+    for (size_t i = 0; i < m_particles.size(); i++)
     {
-        p1 += *m_bodiesFirst[i].vertex * m_weightsA[i];
+        if (m_bodiesSides[i])
+        {
+            p2 += bodies.getPosition(m_particles[i]) * m_weights[i];
+        }
+        else
+        {
+            p1 += bodies.getPosition(m_particles[i]) * m_weights[i];
+        }
     }
-    return p1;
+    return p2 - p1;
 }
 
-Vec3d
-PbdBaryPointToPointConstraint::computePtB() const
+void
+PbdBaryPointToPointConstraint::initConstraintToRest(
+    PbdState& bodies,
+    const std::vector<PbdParticleId>& ptIdsA,
+    const std::vector<double>& weightsA,
+    const std::vector<PbdParticleId>& ptIdsB,
+    const std::vector<double>& weightsB,
+    const double stiffnessA, const double stiffnessB)
 {
-    Vec3d p2 = Vec3d::Zero();
-    for (size_t i = 0; i < m_bodiesSecond.size(); i++)
-    {
-        p2 += *m_bodiesSecond[i].vertex * m_weightsB[i];
-    }
-    return p2;
+    initConstraint(ptIdsA, weightsA, ptIdsB, weightsB, stiffnessA, stiffnessB, 0.0);
+    setRestLength(computeInterpolantDifference(bodies).norm());
 }
 
 void
 PbdBaryPointToPointConstraint::initConstraint(
-    const std::vector<VertexMassPair>& ptsA,
+    const std::vector<PbdParticleId>& ptIdsA,
     const std::vector<double>& weightsA,
-    const std::vector<VertexMassPair>& ptsB,
+    const std::vector<PbdParticleId>& ptIdsB,
     const std::vector<double>& weightsB,
     const double stiffnessA, const double stiffnessB,
     const double restLength)
 {
-    m_dcdxA.resize(ptsA.size());
-    m_bodiesFirst = ptsA;
-    m_weightsA    = weightsA;
+    m_particles.resize(ptIdsA.size() + ptIdsB.size());
+    m_dcdx.resize(m_particles.size());
+    m_weights.resize(m_dcdx.size());
+    m_bodiesSides.resize(m_dcdx.size());
 
-    m_dcdxB.resize(ptsB.size());
-    m_bodiesSecond = ptsB;
-    m_weightsB     = weightsB;
+    for (size_t i = 0; i < ptIdsA.size(); i++)
+    {
+        m_particles[i]   = ptIdsA[i];
+        m_weights[i]     = weightsA[i];
+        m_bodiesSides[i] = false;
+    }
+    for (size_t i = 0, j = ptIdsA.size(); i < ptIdsB.size(); i++, j++)
+    {
+        m_particles[j]   = ptIdsB[i];
+        m_weights[j]     = weightsB[i];
+        m_bodiesSides[j] = true;
+    }
 
-    m_stiffnessA = stiffnessA;
-    m_stiffnessB = stiffnessB;
-
-    m_restLength = restLength;
+    m_restLength   = restLength;
+    m_stiffness[0] = stiffnessA;
+    m_stiffness[1] = stiffnessB;
 }
 
 bool
-PbdBaryPointToPointConstraint::computeValueAndGradient(double&             c,
-                                                       std::vector<Vec3d>& dcdxA,
-                                                       std::vector<Vec3d>& dcdxB) const
+PbdBaryPointToPointConstraint::computeValueAndGradient(PbdState& bodies,
+                                                       double& c, std::vector<Vec3d>& dcdx)
 {
     // Compute the difference between the interpolant points (points in the two cells)
-    Vec3d diff = computeInterpolantDifference();
+    Vec3d diff = computeInterpolantDifference(bodies);
 
     c = diff.norm() - m_restLength;
 
@@ -70,13 +88,16 @@ PbdBaryPointToPointConstraint::computeValueAndGradient(double&             c,
     }
     diff /= c;
 
-    for (size_t i = 0; i < dcdxA.size(); i++)
+    for (size_t i = 0; i < dcdx.size(); i++)
     {
-        dcdxA[i] = diff * m_weightsA[i];
-    }
-    for (size_t i = 0; i < dcdxB.size(); i++)
-    {
-        dcdxB[i] = -diff * m_weightsB[i];
+        if (m_bodiesSides[i])
+        {
+            dcdx[i] = -diff * m_weights[i];
+        }
+        else
+        {
+            dcdx[i] = diff * m_weights[i];
+        }
     }
 
     return true;

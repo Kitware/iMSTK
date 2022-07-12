@@ -4,67 +4,62 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "gtest/gtest.h"
-
-#include "imstkPbdConstraint.h"
+#include "imstkPbdConstraintTest.h"
 #include "imstkPbdFemTetConstraint.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 
 ///
 /// \brief Test that tet will right itself if inverted using the StVK model
 ///
-TEST(imstkPbdFemConstraintTest, TestTetInversionStVK)
+TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionStVK)
 {
-    // Set up constraint
-    PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::StVK);
+    setNumParticles(4);
 
-    DataArray<double> invMasses(4);
-    invMasses[0] = 400.0;
-    invMasses[1] = 400.0;
-    invMasses[2] = 400.0;
-    invMasses[3] = 400.0;
-
-    // Ref position matrix
-    Mat3d m;
-
-    // Setup the Geometry
-    auto                     vertices = std::make_shared<VecDataArray<double, 3>>();
-    VecDataArray<double, 3>& verts    = *vertices;
-
-    *vertices = {
+    m_vertices = {
         { 0.5, 0.0, -1.0 / 3.0 },
         { -0.5, 0.0, -1.0 / 3.0 },
         { 0.0, 0.0, 2.0 / 3.0 },
         { 0.0, 1.0, 0.0 },
     };
 
-    m.col(0) = verts[0] - verts[3];
-    m.col(1) = verts[1] - verts[3];
-    m.col(2) = verts[2] - verts[3];
+    m_invMasses[0] = 400.0;
+    m_invMasses[1] = 400.0;
+    m_invMasses[2] = 400.0;
+    m_invMasses[3] = 400.0;
 
-    VecDataArray<int, 4> indices(1);
-    indices[0] = Vec4i(0, 1, 2, 3);
+    // Ref position matrix
+    Mat3d m;
+    m.col(0) = m_vertices[0] - m_vertices[3];
+    m.col(1) = m_vertices[1] - m_vertices[3];
+    m.col(2) = m_vertices[2] - m_vertices[3];
 
     // PbdFemConstraintConfig(mu, lambda, youngModulus, poissonRatio)
     auto femConfig = std::make_shared<PbdFemConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
 
-    constraint.initConstraint(*vertices, 0, 1, 2, 3, femConfig);
+    // Set up constraint
+    PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::StVK);
+    m_constraint = &constraint;
+    constraint.initConstraint(
+        m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
+        { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, femConfig);
 
     Mat3d refPositionInverse = m.inverse();
 
     // Invert the tet
-    verts[3] += Vec3d(0.1, -2.6, -0.1);
+    m_vertices[3] += Vec3d(0.1, -2.6, -0.1);
 
     for (int step = 0; step < 600; step++)
     {
-        constraint.projectConstraint(invMasses, 0.01, PbdConstraint::SolverType::xPBD, *vertices);
+        solve(0.01, PbdConstraint::SolverType::xPBD);
     }
 
     // Check sign of determinant of deformation gradient
-    m.col(0) = verts[0] - verts[3];
-    m.col(1) = verts[1] - verts[3];
-    m.col(2) = verts[2] - verts[3];
+    m.col(0) = m_vertices[0] - m_vertices[3];
+    m.col(1) = m_vertices[1] - m_vertices[3];
+    m.col(2) = m_vertices[2] - m_vertices[3];
 
     Mat3d F    = m * refPositionInverse;
     auto  detF = F.determinant();
@@ -75,34 +70,27 @@ TEST(imstkPbdFemConstraintTest, TestTetInversionStVK)
 ///
 /// \brief Test that tet will right itself if inverted using the NeoHookean model
 ///
-TEST(imstkPbdFemConstraintTest, TestTetInversionNeoHookean)
+TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionNeoHookean)
 {
-    // Set up constraint
-    PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::NeoHookean);
+    setNumParticles(4);
 
-    DataArray<double> invMasses(4);
-    invMasses[0] = 400.0;
-    invMasses[1] = 400.0;
-    invMasses[2] = 400.0;
-    invMasses[3] = 400.0;
-
-    // Ref position matrix
-    Mat3d m;
-
-    // Setup the Geometry
-    auto                     vertices = std::make_shared<VecDataArray<double, 3>>();
-    VecDataArray<double, 3>& verts    = *vertices;
-
-    *vertices = {
+    m_vertices = {
         { 0.5, 0.0, -1.0 / 3.0 },
         { -0.5, 0.0, -1.0 / 3.0 },
         { 0.0, 0.0, 2.0 / 3.0 },
         { 0.0, 1.0, 0.0 },
     };
 
-    m.col(0) = verts[0] - verts[3];
-    m.col(1) = verts[1] - verts[3];
-    m.col(2) = verts[2] - verts[3];
+    m_invMasses[0] = 400.0;
+    m_invMasses[1] = 400.0;
+    m_invMasses[2] = 400.0;
+    m_invMasses[3] = 400.0;
+
+    // Ref position matrix
+    Mat3d m;
+    m.col(0) = m_vertices[0] - m_vertices[3];
+    m.col(1) = m_vertices[1] - m_vertices[3];
+    m.col(2) = m_vertices[2] - m_vertices[3];
 
     VecDataArray<int, 4> indices(1);
     indices[0] = Vec4i(0, 1, 2, 3);
@@ -110,22 +98,27 @@ TEST(imstkPbdFemConstraintTest, TestTetInversionNeoHookean)
     // PbdFemConstraintConfig(mu, lambda, youngModulus, poissonRatio)
     auto femConfig = std::make_shared<PbdFemConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
 
-    constraint.initConstraint(*vertices, 0, 1, 2, 3, femConfig);
+    // Set up constraint
+    PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::NeoHookean);
+    m_constraint = &constraint;
+    constraint.initConstraint(
+        m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
+        { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, femConfig);
 
     Mat3d refPositionInverse = m.inverse();
 
     // Invert the tet
-    verts[3] += Vec3d(0.1, -2.6, -0.1);
+    m_vertices[3] += Vec3d(0.1, -2.6, -0.1);
 
     for (int step = 0; step < 600; step++)
     {
-        constraint.projectConstraint(invMasses, 0.01, PbdConstraint::SolverType::xPBD, *vertices);
+        solve(0.01, PbdConstraint::SolverType::xPBD);
     }
 
     // Check sign of determinant of deformation gradient
-    m.col(0) = verts[0] - verts[3];
-    m.col(1) = verts[1] - verts[3];
-    m.col(2) = verts[2] - verts[3];
+    m.col(0) = m_vertices[0] - m_vertices[3];
+    m.col(1) = m_vertices[1] - m_vertices[3];
+    m.col(2) = m_vertices[2] - m_vertices[3];
 
     Mat3d F    = m * refPositionInverse;
     auto  detF = F.determinant();
@@ -136,34 +129,27 @@ TEST(imstkPbdFemConstraintTest, TestTetInversionNeoHookean)
 ///
 /// \brief Test that tet will right itself if inverted using the Corotational model
 ///
-TEST(imstkPbdFemConstraintTest, TestTetInversionCorotational)
+TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionCorotational)
 {
-    // Set up constraint
-    PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::Corotation);
+    setNumParticles(4);
 
-    DataArray<double> invMasses(4);
-    invMasses[0] = 400.0;
-    invMasses[1] = 400.0;
-    invMasses[2] = 400.0;
-    invMasses[3] = 400.0;
-
-    // Ref position matrix
-    Mat3d m;
-
-    // Setup the Geometry
-    auto                     vertices = std::make_shared<VecDataArray<double, 3>>();
-    VecDataArray<double, 3>& verts    = *vertices;
-
-    *vertices = {
+    m_vertices = {
         { 0.5, 0.0, -1.0 / 3.0 },
         { -0.5, 0.0, -1.0 / 3.0 },
         { 0.0, 0.0, 2.0 / 3.0 },
         { 0.0, 1.0, 0.0 },
     };
 
-    m.col(0) = verts[0] - verts[3];
-    m.col(1) = verts[1] - verts[3];
-    m.col(2) = verts[2] - verts[3];
+    m_invMasses[0] = 400.0;
+    m_invMasses[1] = 400.0;
+    m_invMasses[2] = 400.0;
+    m_invMasses[3] = 400.0;
+
+    // Ref position matrix
+    Mat3d m;
+    m.col(0) = m_vertices[0] - m_vertices[3];
+    m.col(1) = m_vertices[1] - m_vertices[3];
+    m.col(2) = m_vertices[2] - m_vertices[3];
 
     VecDataArray<int, 4> indices(1);
     indices[0] = Vec4i(0, 1, 2, 3);
@@ -171,22 +157,27 @@ TEST(imstkPbdFemConstraintTest, TestTetInversionCorotational)
     // PbdFemConstraintConfig(mu, lambda, youngModulus, poissonRatio)
     auto femConfig = std::make_shared<PbdFemConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
 
-    constraint.initConstraint(*vertices, 0, 1, 2, 3, femConfig);
+    // Set up constraint
+    PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::Corotation);
+    m_constraint = &constraint;
+    constraint.initConstraint(
+        m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
+        { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, femConfig);
 
     Mat3d refPositionInverse = m.inverse();
 
     // Invert the tet
-    verts[3] += Vec3d(0.1, -2.6, -0.1);
+    m_vertices[3] += Vec3d(0.1, -2.6, -0.1);
 
     for (int step = 0; step < 600; step++)
     {
-        constraint.projectConstraint(invMasses, 0.01, PbdConstraint::SolverType::xPBD, *vertices);
+        solve(0.01, PbdConstraint::SolverType::xPBD);
     }
 
     // Check sign of determinant of deformation gradient
-    m.col(0) = verts[0] - verts[3];
-    m.col(1) = verts[1] - verts[3];
-    m.col(2) = verts[2] - verts[3];
+    m.col(0) = m_vertices[0] - m_vertices[3];
+    m.col(1) = m_vertices[1] - m_vertices[3];
+    m.col(2) = m_vertices[2] - m_vertices[3];
 
     Mat3d F    = m * refPositionInverse;
     auto  detF = F.determinant();

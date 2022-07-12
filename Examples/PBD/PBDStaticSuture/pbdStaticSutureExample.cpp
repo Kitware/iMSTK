@@ -15,6 +15,7 @@
 #include "imstkNew.h"
 #include "imstkOrientedBox.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkRenderMaterial.h"

@@ -7,51 +7,234 @@
 #pragma once
 
 #include "imstkCollisionHandling.h"
-#include "imstkPbdCollisionConstraint.h"
+#include "imstkPbdConstraint.h"
+
+#include <unordered_map>
+#include <iostream>
 
 namespace imstk
 {
-class LineMeshToLineMeshCCD;
-class PbdCollisionSolver;
-class PbdEdgeEdgeConstraint;
-class PbdEdgeEdgeCCDConstraint;
-class PbdObject;
-class PbdPointEdgeConstraint;
-class PbdPointPointConstraint;
-class PbdPointTriangleConstraint;
+enum PbdContactCase
+{
+    None,
+    Vertex,   // Mesh vertex either from Pbd or CollidingObject
+    Edge,     // Mesh edge either from Pbd or CollidingObject
+    Triangle, // Mesh triangle either from Pbd or CollidingObject
+    Body,     // Body, usually a PD contact
+    Primitive // Not a mesh, could be V,E,T, or PD additionally
+};
+static std::string
+getContactCaseStr(PbdContactCase contactCase)
+{
+    switch (contactCase)
+    {
+    case PbdContactCase::Body:
+        return "Body";
+    case PbdContactCase::Edge:
+        return "Edge";
+    case PbdContactCase::Primitive:
+        return "Primitive";
+    case PbdContactCase::Triangle:
+        return "Triangle";
+    case PbdContactCase::Vertex:
+        return "Vertex";
+    default:
+        return "None";
+    }
+    ;
+}
 
-struct MeshSide;
+///
+/// \struct PbdCHTableKey
+///
+/// \brief Used as a key in a function table to decide how to handle
+/// resulting collision.
+///
+struct PbdCHTableKey
+{
+    PbdContactCase elemAType;
+    PbdContactCase elemBType;
+    bool ccd;
+
+    friend std::ostream& operator<<(std::ostream& os, const PbdCHTableKey& dt);
+
+    bool operator==(const PbdCHTableKey& other) const
+    {
+        return
+            (elemAType == other.elemAType)
+            && (elemBType == other.elemBType)
+            && (ccd == other.ccd);
+    }
+};
+} // namespace imstk
+
+namespace std
+{
+///
+/// \struct hash<imstk::PbdCHTableKey>
+///
+/// \brief Gives hashing function for PbdCHFuncTableKey
+/// complete unique/garunteed no collisions
+///
+template<>
+struct hash<imstk::PbdCHTableKey>
+{
+    std::size_t operator()(const imstk::PbdCHTableKey& k) const
+    {
+        using std::size_t;
+        using std::hash;
+
+        // Base on the bit width of each value
+        std::size_t v0 = static_cast<std::size_t>(k.elemAType); // first 2 bits
+        std::size_t v1 = static_cast<std::size_t>(k.elemBType); // Next 2 bits
+        std::size_t v2 = static_cast<std::size_t>(k.ccd);       // Next bit
+        return v0 ^ (v1 << 3) ^ (v2 << 5);
+    }
+};
+} // namespace std
+
+namespace imstk
+{
+class PbdObject;
+class PbdModel;
+class PointSet;
+class PointwiseMap;
+
 ///
 /// \class PbdCollisionHandling
 ///
-/// \brief Implements PBD based collision handling
+/// \brief Implements PBD based collision handling. Given an input PbdObject
+/// and CollisionData it creates & adds constraints in the PbdModel to be solved
+/// in order to resolve the collision. This solve is ultimately implemented
+/// in PbdModel, shared among all the collisions.
+///
+/// This supports PointDirection (PD) collision data as well as contacting feature
+/// collision data (ie: EE, VT, VV, VE). The VV and VE are often redundant but
+/// handled anyways for robustness. The PD is often reported for point contacts,
+/// most common on primitive vs mesh collisions.
 ///
 class PbdCollisionHandling : public CollisionHandling
 {
 public:
+    enum class ObjType
+    {
+        PbdDeformable,
+        PbdRigid,
+        Colliding
+    };
+    struct CollisionSideData
+    {
+        CollisionSideData() = default;
+
+        // Objects
+        PbdObject* pbdObj       = nullptr;
+        CollidingObject* colObj = nullptr;
+        ObjType objType = ObjType::Colliding;
+
+        PbdModel* model    = nullptr;
+        double compliance  = 0.0;
+        double stiffness   = 0.0;
+        Geometry* geometry = nullptr;
+        PointSet* pointSet = nullptr;
+        VecDataArray<double, 3>* vertices = nullptr;
+        PointwiseMap* mapPtr = nullptr;
+        AbstractDataArray* indicesPtr = nullptr;
+        int bodyId = 0;
+
+        Geometry* prevGeometry = nullptr;
+    };
+    ///
+    /// \brief Packs the collision element together with the
+    /// data it will need to process it (for swapping)
+    ///
+    struct ColElemSide
+    {
+        const CollisionElement* elem  = nullptr;
+        const CollisionSideData* data = nullptr;
+    };
+
     PbdCollisionHandling();
-    virtual ~PbdCollisionHandling() override;
+    ~PbdCollisionHandling() override;
 
     IMSTK_TYPE_NAME(PbdCollisionHandling)
 
-public:
     ///
-    /// \brief Return the solver of the collision constraints
-    ///
-    std::shared_ptr<PbdCollisionSolver> getCollisionSolver() const { return m_pbdCollisionSolver; }
-
-    ///
-    /// \brief Corrects for velocity (restitution and friction) after PBD is complete
-    ///
-    void correctVelocities();
-
+    /// \brief Get/Set the restitution, which gives how much velocity is
+    /// removed along the contact normals during contact
+    /// @{
+    double getRestitution() const { return m_restitution; }
     void setRestitution(const double restitution) { m_restitution = restitution; }
-    const double getRestitution() const { return m_restitution; }
+    /// @}
 
+    ///
+    /// \brief Get/Set the friction, which gives how much velocity is
+    /// removed along the tangents during contact
+    /// @{
+    double getFriction() const { return m_friction; }
     void setFriction(const double friction) { m_friction = friction; }
-    const double getFriction() const { return m_friction; }
+    /// @}
+
+    ///
+    /// \brief Get enableBoundaryCollision
+    ///@{
+    void setEnableBoundaryCollisions(const double enableBoundaryCollisions) { m_enableBoundaryCollisions = enableBoundaryCollisions; }
+    const double getEnableBoundaryCollisions() const { return m_enableBoundaryCollisions; }
+    ///@}
+
+    ///
+    /// \brief Get/Set compliance of rigid body contacts. Defaults to 0
+    /// compliance/infinitely stiff. This is what is needed most of the time
+    /// but sometimes making a contact a bit softer can be helpful.
+    /// @{
+    void setRigidBodyCompliance(const double compliance) { m_compliance = compliance; }
+    double getRigidBodyCompliance() const { return m_compliance; }
+    /// @}
+
+    ///
+    /// \brief Get/Set stiffness of deformable contacts. Defaults to 1.0.
+    /// This is what is needed most of the time but sometimes making a
+    /// contact a bit softer can be helpful.
+    /// @{
+    void setDeformableStiffnessA(const double stiffness) { m_stiffness[0] = stiffness; }
+    double getDeformableStiffnessA() const { return m_stiffness[0]; }
+    void setDeformableStiffnessB(const double stiffness) { m_stiffness[1] = stiffness; }
+    double getDeformableStiffnessB() const { return m_stiffness[1]; }
+    /// @}
+
+    std::pair<PbdParticleId, Vec3d> getBodyAndContactPoint(
+        const CollisionElement&  elem,
+        const CollisionSideData& data);
 
 protected:
+    std::array<PbdParticleId, 2> getEdge(
+        const CollisionElement&  elem,
+        const CollisionSideData& side);
+    std::array<Vec3d*, 2> getPrevEdge(
+        const std::array<PbdParticleId, 2>& ids,
+        const CollisionSideData& side);
+    std::array<PbdParticleId, 3> getTriangle(
+        const CollisionElement&  elem,
+        const CollisionSideData& side);
+    ///
+    /// \brief getVertex takes slightly differing paths than the others, as the
+    /// cell vertex directly refers to the vertex buffer, not an index buffer
+    ///
+    std::array<PbdParticleId, 1> getVertex(
+        const CollisionElement&  elem,
+        const CollisionSideData& side);
+
+    ///
+    /// \brief Creates a CollisionSideData struct from the provided object, this
+    /// gives all the info needed to response to collision
+    ///
+    CollisionSideData getDataFromObject(std::shared_ptr<CollidingObject> obj);
+
+    ///
+    /// \brief Get the contact case from the collision element and data as
+    /// additional context
+    ///
+    PbdContactCase getCaseFromElement(const ColElemSide& elem);
+
     ///
     /// \brief Add collision constraints based off contact data
     ///
@@ -60,78 +243,56 @@ protected:
         const std::vector<CollisionElement>& elementsB) override;
 
     ///
-    /// \brief Generates constraints in the pools between a mesh and non mesh
+    /// \brief Handle a single element
     ///
-    void generateMeshNonMeshConstraints(
-        const std::vector<CollisionElement>& elementsA,
-        const std::vector<CollisionElement>& elementsB);
+    void handleElementPair(ColElemSide sideA, ColElemSide sideB);
 
-    ///
-    /// \brief Generates constraints in the pools between two meshes
-    ///
-    void generateMeshMeshConstraints(
-        const std::vector<CollisionElement>& elementsA,
-        const std::vector<CollisionElement>& elementsB);
+    // -----------------One-Way Rigid on X Cases-----------------
+    virtual void Body_V(
+        const ColElemSide& sideA,
+        const ColElemSide& sideB);
+    virtual void Body_E(
+        const ColElemSide& sideA,
+        const ColElemSide& sideB);
+    virtual void Body_T(
+        const ColElemSide& sideA,
+        const ColElemSide& sideB);
+    // ---------------Two-Way Rigid on Rigid Cases---------------
+    /*virtual void Body_Body(
+        const ColElemSide& sideA,
+        const ColElemSide& sideB);*/
 
-protected:
-    ///
-    /// \brief Add a vertex-triangle constraint
-    ///
-    virtual void addVTConstraint(
-        VertexMassPair ptA,
-        VertexMassPair ptB1, VertexMassPair ptB2, VertexMassPair ptB3,
-        double stiffnessA, double stiffnessB);
-
-    ///
-    /// \brief Add an edge-edge constraint
-    ///
-    virtual void addEEConstraint(
-        VertexMassPair ptA1, VertexMassPair ptA2,
-        VertexMassPair ptB1, VertexMassPair ptB2,
-        double stiffnessA, double stiffnessB);
-
-    ///
-    /// \brief Add an edge-edge CCD constraint
-    ///
-    virtual void addEECCDConstraint(
-        VertexMassPair prev_ptA1, VertexMassPair prev_ptA2,
-        VertexMassPair prev_ptB1, VertexMassPair prev_ptB2,
-        VertexMassPair ptA1, VertexMassPair ptA2,
-        VertexMassPair ptB1, VertexMassPair ptB2,
-        double stiffnessA, double stiffnessB);
-
-    ///
-    /// \brief Add a point-edge constraint
-    ///
-    virtual void addPEConstraint(
-        VertexMassPair ptA1,
-        VertexMassPair ptB1, VertexMassPair ptB2,
-        double stiffnessA, double stiffnessB);
-
-    ///
-    /// \brief Add a point-point constraint
-    ///
-    virtual void addPPConstraint(
-        VertexMassPair ptA, VertexMassPair ptB,
-        double stiffnessA, double stiffnessB);
+    // ----------DeformableMesh on DeformableMesh Cases----------
+    virtual void V_T(
+        const ColElemSide& sideA,
+        const ColElemSide& sideB);
+    virtual void E_E(
+        const ColElemSide& sideA,
+        const ColElemSide& sideB);
+    virtual void E_E_CCD(
+        const ColElemSide& sideA,
+        const ColElemSide& sideB);
+    virtual void V_E(
+        const ColElemSide& sideA,
+        const ColElemSide& sideB);
+    virtual void V_V(
+        const ColElemSide& sideA,
+        const ColElemSide& sideB);
 
 private:
-    std::shared_ptr<PbdCollisionSolver> m_pbdCollisionSolver = nullptr;
+    double m_restitution = 0.0;  ///< Coefficient of restitution (1.0 = perfect elastic, 0.0 = inelastic)
+    double m_friction    = 0.0;  ///< Coefficient of friction (1.0 = full frictional force, 0.0 = none)
 
-    std::vector<PbdCollisionConstraint*> m_PBDConstraints; ///< List of PBD constraints
+    /// Enables collisions on fixed pbd elements. Collision on these elements can cause instabilities
+    /// as the collisions near the fixed vertices.
+    bool   m_enableBoundaryCollisions = false;
+    double m_compliance = 0.0;
+    std::array<double, 2> m_stiffness = { 1.0, 1.0 };
 
-    // Lists important here as the memory locations should not change upon push_back
-    // and the amount is not known a priori
-    std::list<Vec3d> m_fixedPoints;
-    std::list<Vec3d> m_fixedPointVelocities;
+protected:
+    std::vector<PbdConstraint*> m_constraints; ///< Constraints users can add too
 
-    std::vector<PbdEdgeEdgeConstraint*>      m_EEConstraintPool;
-    std::vector<PbdEdgeEdgeCCDConstraint*>   m_EECCDConstraintPool;
-    std::vector<PbdPointTriangleConstraint*> m_VTConstraintPool;
-    std::vector<PbdPointEdgeConstraint*>     m_PEConstraintPool;
-    std::vector<PbdPointPointConstraint*>    m_PPConstraintPool;
-
-    double m_restitution = 0.0; ///< Coefficient of restitution (1.0 = perfect elastic, 0.0 = inelastic)
-    double m_friction    = 0.0; ///< Coefficient of friction (1.0 = full frictional force, 0.0 = none)
+    std::unordered_map<PbdCHTableKey, std::function<void(
+                                                        const ColElemSide& elemA, const ColElemSide& elemB)>> m_funcTable;
 };
 } // namespace imstk

@@ -41,7 +41,8 @@ public:
     ///
     /// \brief Removes all constraints associated with vertex ids
     ///
-    virtual void removeConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices);
+    virtual void removeConstraints(
+        std::shared_ptr<std::unordered_set<size_t>> vertices, const int bodyId);
 
     ///
     /// \brief Removes a constraint from the system by iterator, thread safe

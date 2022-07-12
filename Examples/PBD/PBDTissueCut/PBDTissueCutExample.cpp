@@ -17,6 +17,7 @@
 #include "imstkNew.h"
 #include "imstkPbdConstraintContainer.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPlane.h"
 #include "imstkRbdConstraint.h"

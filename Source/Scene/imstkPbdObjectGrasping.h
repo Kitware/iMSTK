@@ -107,9 +107,9 @@ public:
     /// pt position = weightA_0 * ptsA_0 + weightA_1 * ptsA_1 + ...
     ///
     virtual void addConstraint(
-        const std::vector<VertexMassPair>& ptsA,
+        const std::vector<PbdParticleId>& ptsA,
         const std::vector<double>& weightsA,
-        const std::vector<VertexMassPair>& ptsB,
+        const std::vector<PbdParticleId>& ptsB,
         const std::vector<double>& weightsB,
         const double stiffnessA, const double stiffnessB);
 
@@ -166,7 +166,10 @@ protected:
     /// when stiffness < 1 it will slowly converge on the grasp point
     double m_stiffness = 0.4;
 
-    std::list<std::tuple<Vec3d, Vec3d, Vec3d>> m_constraintPts;         ///< Position, Relative position, Velocity
-    std::vector<std::shared_ptr<PbdCollisionConstraint>> m_constraints; ///< List of PBD constraints
+    std::vector<std::tuple<PbdParticleId, Vec3d, Vec3d>> m_constraintPts;
+    std::vector<std::shared_ptr<PbdConstraint>> m_constraints; ///< List of PBD constraints
+
+private:
+    std::vector<PbdConstraint*> m_collisionConstraints;
 };
 } // namespace imstk

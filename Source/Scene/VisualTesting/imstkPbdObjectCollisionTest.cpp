@@ -14,6 +14,7 @@
 #include "imstkLineMesh.h"
 #include "imstkOrientedBox.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPlane.h"
@@ -58,12 +59,11 @@ makeTetTissueObj(const std::string& name,
     pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
     /* pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 0.01);
      pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.4);*/
-    pbdParams->m_doPartitioning   = false;
-    pbdParams->m_uniformMassValue = 0.01;
+    pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.025;
+    pbdParams->m_linearDampingCoeff = 0.025;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
@@ -93,6 +93,7 @@ makeTetTissueObj(const std::string& name,
     }
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
     return tissueObj;
 }
@@ -115,11 +116,10 @@ makeTriTissueObj(const std::string& name,
     auto pbdParams = std::make_shared<PbdModelConfig>();
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6);
-    pbdParams->m_uniformMassValue = 0.00001;
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.025;
+    pbdParams->m_linearDampingCoeff = 0.025;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
@@ -139,6 +139,7 @@ makeTriTissueObj(const std::string& name,
     tissueObj->setPhysicsGeometry(triMesh);
     tissueObj->setCollidingGeometry(triMesh);
     tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
     return tissueObj;
 }
@@ -162,11 +163,10 @@ makeLineThreadObj(const std::string& name,
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1);
     //pbdParams->enableBendConstraint(100000.0, 1);
     //pbdParams->enableBendConstraint(100000.0, 2);
-    pbdParams->m_uniformMassValue = 0.00001;
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.025;
+    pbdParams->m_linearDampingCoeff = 0.025;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
@@ -187,6 +187,7 @@ makeLineThreadObj(const std::string& name,
     tissueObj->setPhysicsGeometry(lineMesh);
     tissueObj->setCollidingGeometry(lineMesh);
     tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
     return tissueObj;
 }
@@ -203,7 +204,8 @@ public:
         m_scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
         ASSERT_NE(m_pbdObj, nullptr) << "Missing a pbdObj for PbdObjectCollisionTest";
-        m_pbdObj->getPbdModel()->getConfig()->m_doPartitioning = false;
+        m_pbdObj->getPbdModel()->getConfig()->m_doPartitioning      = false;
+        m_pbdObj->getPbdModel()->getConfig()->m_collisionIterations = 5;
         auto pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObj->getPhysicsGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;

@@ -18,27 +18,25 @@ namespace imstk
 class PbdVolumeConstraint : public PbdConstraint
 {
 public:
-    PbdVolumeConstraint()
-    {
-        m_vertexIds.resize(4);
-        m_dcdx.resize(4);
-    }
+    PbdVolumeConstraint() : PbdConstraint(4) { }
 
     ///
     /// \brief Initializes the volume constraint
     ///
-    void initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                        const size_t& pIdx1, const size_t& pIdx2,
-                        const size_t& pIdx3, const size_t& pIdx4,
-                        const double k = 2.0);
+    void initConstraint(
+        const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
+        const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
+        const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
+        const double k = 2.0);
 
     ///
-    /// \brief Compute the value and gradient of constraint
+    /// \brief Compute value and gradient of constraint function
+    /// \param[inout] set of bodies involved in system
+    /// \param[inout] c constraint value
+    /// \param[inout] dcdx constraint gradient
     ///
-    bool computeValueAndGradient(
-        const VecDataArray<double, 3>& currVertexPosition,
-        double& c,
-        std::vector<Vec3d>& dcdx) const override;
+    bool computeValueAndGradient(PbdState& bodies,
+                                 double& c, std::vector<Vec3d>& dcdx) override;
 
 protected:
     double m_restVolume = 0.0; ///< Rest volume

@@ -8,10 +8,12 @@
 
 #include "imstkDynamicObject.h"
 #include "imstkMacros.h"
+#include "imstkPbdConstraint.h"
 
 namespace imstk
 {
 class PbdModel;
+class PointSet;
 
 ///
 /// \class PbdObject
@@ -33,11 +35,51 @@ public:
     std::shared_ptr<PbdModel> getPbdModel();
 
     ///
+    /// \brief Returns body in the model.
+    ///
+    std::shared_ptr<PbdBody> getPbdBody()
+    {
+        if (m_pbdBody == nullptr)
+        {
+            LOG(FATAL) << "Set the PbdModel on the PbdObject before trying to acquire the body";
+        }
+        return m_pbdBody;
+    }
+
+    ///
+    /// \brief Sets the model, and creates the body within the model
+    ///
+    void setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaModel) override;
+
+    ///
+    /// \brief Update physics geometry, overrided to set transform should the
+    /// PbdObject be a rigid body
+    ///
+    void updatePhysicsGeometry() override;
+
+    ///
+    /// \brief Sets the PbdBody representing this object given its geometry
+    ///
+    void setBodyFromGeometry();
+
+    ///
     /// \brief Initialize the Pbd scene object
     ///
     bool initialize() override;
 
 protected:
+    ///
+    /// \brief Creates a deformable PbdBody from Geometry
+    ///
+    void setDeformBodyFromGeometry(PbdBody& body, std::shared_ptr<PointSet> geom);
+
+    ///
+    /// \brief Creates a rigid PbdBody from values
+    ///
+    void setRigidBody(PbdBody& body);
+
+protected:
     std::shared_ptr<PbdModel> m_pbdModel = nullptr; ///< Pbd mathematical model
+    std::shared_ptr<PbdBody>  m_pbdBody  = nullptr; ///< Handle to this object in the model/system
 };
 } // namespace imstk

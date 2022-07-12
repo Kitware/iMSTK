@@ -16,28 +16,28 @@ class TaskNode;
 
 class PbdRigidObjectGrasping : public PbdObjectGrasping
 {
-protected:
-    std::shared_ptr<RigidObject2> m_rbdObj = nullptr;
-    std::shared_ptr<PbdObject>    m_pbdObj = nullptr;
-
 public:
     PbdRigidObjectGrasping(
         std::shared_ptr<PbdObject>    obj1,
         std::shared_ptr<RigidObject2> obj2);
 
     ~PbdRigidObjectGrasping() override = default;
+
     IMSTK_TYPE_NAME(PbdRigidObjectGrasping)
 
     void updatePicking();
 
     void addConstraint(
-        const std::vector<VertexMassPair>& ptsA,
+        const std::vector<PbdParticleId>& ptsA,
         const std::vector<double>& weightsA,
-        const std::vector<VertexMassPair>& ptsB,
+        const std::vector<PbdParticleId>& ptsB,
         const std::vector<double>& weightsB,
-        double stiffnessA, double stiffnessB)
-    override;
+        double stiffnessA, double stiffnessB) override;
 
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+
+protected:
+    std::shared_ptr<RigidObject2> m_rbdObj = nullptr;
+    std::shared_ptr<PbdObject>    m_pbdObj = nullptr;
 };
 } // namespace imstk

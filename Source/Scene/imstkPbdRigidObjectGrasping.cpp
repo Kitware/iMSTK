@@ -37,19 +37,17 @@ PbdRigidObjectGrasping::updatePicking()
 
 void
 PbdRigidObjectGrasping::addConstraint(
-    const std::vector<VertexMassPair>& ptsA,
+    const std::vector<PbdParticleId>& ptsA,
     const std::vector<double>& weightsA,
-    const std::vector<VertexMassPair>& ptsB,
+    const std::vector<PbdParticleId>& ptsB,
     const std::vector<double>& weightsB,
     double stiffnessA, double stiffnessB)
 {
     // Create constraint
     auto constraint = std::make_shared<PbdRigidBaryPointToPointConstraint>(m_rbdObj->getRigidBody());
     constraint->initConstraint(
-        ptsA,
-        weightsA,
-        ptsB,
-        weightsB,
+        ptsA, weightsA,
+        ptsB, weightsB,
         stiffnessA,
         stiffnessB);
     // Add to constraints

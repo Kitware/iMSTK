@@ -85,24 +85,10 @@ public class PbdVolume
         // FEM constraint
         pbdParams.m_femParams.m_YoungModulus = 500.0;
         pbdParams.m_femParams.m_PoissonRatio = 0.3;
-        pbdParams.m_fixedNodeIds = new VectorSizet(13);
-        pbdParams.m_fixedNodeIds.Add(75);
-        pbdParams.m_fixedNodeIds.Add(82);
-        pbdParams.m_fixedNodeIds.Add(84);
-        pbdParams.m_fixedNodeIds.Add(94);
-        pbdParams.m_fixedNodeIds.Add(95);
-        pbdParams.m_fixedNodeIds.Add(105);
-        pbdParams.m_fixedNodeIds.Add(110);
-        pbdParams.m_fixedNodeIds.Add(124);
-        pbdParams.m_fixedNodeIds.Add(139);
-        pbdParams.m_fixedNodeIds.Add(150);
-        pbdParams.m_fixedNodeIds.Add(161);
-        pbdParams.m_fixedNodeIds.Add(171);
-        pbdParams.m_fixedNodeIds.Add(350);
+       
         pbdParams.enableFemConstraint(PbdFemConstraint.MaterialType.StVK);
 
         // Other parameters
-        pbdParams.m_uniformMassValue = 1.0;
         pbdParams.m_gravity    = new Vec3d(0, -9.8, 0);
         pbdParams.m_iterations = 6;
         pbdParams.m_dt = 0.02;

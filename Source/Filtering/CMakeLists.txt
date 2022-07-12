@@ -14,7 +14,9 @@ imstk_add_library( Filtering
     imstkImageResample.h
     imstkImageReslice.h
     imstkImplicitGeometryToImageData.h
+    imstkLineMeshCut.h
     imstkLocalMarchingCubes.h
+    imstkMeshCut.h
     imstkQuadricDecimate.h
     imstkSelectEnclosedPoints.h
     imstkSurfaceMeshCut.h
@@ -34,7 +36,9 @@ imstk_add_library( Filtering
     imstkImageResample.cpp
     imstkImageReslice.cpp
     imstkImplicitGeometryToImageData.cpp
+    imstkLineMeshCut.cpp
     imstkLocalMarchingCubes.cpp
+    imstkMeshCut.cpp
     imstkQuadricDecimate.cpp
     imstkSelectEnclosedPoints.cpp
     imstkSurfaceMeshCut.cpp

@@ -83,6 +83,8 @@ protected:
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
+    void postModifiedAll() override;
+
     DynamicObject(const std::string& name) : CollidingObject(name) { }
 
     std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel = nullptr; ///< Dynamical model

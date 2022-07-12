@@ -170,7 +170,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_CapsuleToCapsuleCD)
     m_assertionBoundsMax = Vec3d(20.0, 20.0, 20.0);
 
     connect<KeyEvent>(m_viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
-        [this](KeyEvent* e)
+        [this](KeyEvent*)
         {
             m_rbdObj->getCollidingGeometry()->print();
             m_collidingGeometry->print();

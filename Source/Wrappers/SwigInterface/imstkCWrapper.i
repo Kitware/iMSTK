@@ -84,9 +84,9 @@
  * DynamicalModel 
  */
 #include "imstkVectorizedState.h"
-#include "imstkPbdState.h"
 #include "imstkAbstractDynamicalModel.h"
 #include "imstkDynamicalModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkBackwardEuler.h"
@@ -109,6 +109,7 @@
 /*
  * Constraints
  */
+#include "imstkPbdBody.h"
 #include "imstkPbdConstraint.h"
 #include "imstkRbdConstraint.h"
 
@@ -236,6 +237,7 @@ namespace std
   %template(VectorSizet) vector<std::size_t>;
   %template(VectorDouble) vector<double>;
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
+  %template(VectorPbdBody) vector<imstk::PbdBody>;
 }
 
 %include <std_except.i>
@@ -336,6 +338,7 @@ namespace std
 /*
  * Constraint
  */
+%include "../../Constraint/PbdConstraints/imstkPbdBody.h"
 %include "../../Constraint/PbdConstraints/imstkPbdConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdFemConstraint.h"
@@ -345,11 +348,9 @@ namespace std
  * DynamicalModel
  */
 %include "../../DynamicalModels/ObjectStates/imstkVectorizedState.h"
-%include "../../DynamicalModels/ObjectStates/imstkPbdState.h"
 %include "../../DynamicalModels/ObjectModels/imstkAbstractDynamicalModel.h"
 %include "../../DynamicalModels/ObjectModels/imstkDynamicalModel.h"
-/* Instantiation of base class should be put before the derived class */
-%template(DynamicalModelPbdState) imstk::DynamicalModel<imstk::PbdState>;
+%include "../../DynamicalModels/ObjectModels/imstkPbdModelConfig.h"
 %include "../../DynamicalModels/ObjectModels/imstkPbdModel.h"
 %template(DynamicalModelFeDeformBodyState) imstk::DynamicalModel<imstk::FeDeformBodyState>;
 %include "../../DynamicalModels/InternalForceModel/imstkInternalForceModelTypes.h"
