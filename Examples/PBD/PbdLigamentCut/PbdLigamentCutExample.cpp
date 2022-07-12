@@ -20,30 +20,27 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdConstraintFunctor.h"
+#include "imstkPbdBaryPointToPointConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
-#include "imstkGeometryUtilities.h"
-#include "imstkPbdObjectCollision.h"
+#include "imstkPbdObjectCutting.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkVertexLabelVisualModel.h"
-#include "imstkVisualModel.h"
-#include "imstkVTKViewer.h"
 #include "imstkSurfaceMeshDistanceTransform.h"
-#include "imstkCollisionUtils.h"
-#include "imstkPbdObjectCutting.h"
 #include "imstkTriangleToTetMap.h"
-#include "imstkPbdBaryPointToPointConstraint.h"
+#include "imstkVertexLabelVisualModel.h"
+#include "imstkVTKViewer.h"
 
 #ifdef iMSTK_USE_OPENHAPTICS
 #include "imstkHapticDeviceClient.h"
@@ -55,6 +52,13 @@
 
 using namespace imstk;
 
+///
+/// \class PbdAttachmentConstraintFunctor
+///
+/// \brief This constraint generation functor takes an input TetrahedralMesh simulated
+/// pbd object and a set of ligament points. It then finds the nearest points on the
+/// TetrahedralMesh and generates constraints to attach the ligaments to the organ
+///
 class PbdAttachmentConstraintFunctor : public PbdBodyConstraintFunctor
 {
 public:
@@ -146,8 +150,9 @@ public:
         std::shared_ptr<std::unordered_set<size_t>> vertices) override
     {
         // Instead of regenerating we save the initial ones
-        for (const int vertId : *vertices)
+        for (const size_t vertIdu : *vertices)
         {
+            const int vertId = static_cast<int>(vertIdu);
             if (m_constraintMap.count(vertId) > 0)
             {
                 constraints.addConstraint(m_constraintMap.at(vertId));
@@ -168,7 +173,7 @@ static std::shared_ptr<PbdObject>
 makeGallBlader(const std::string& name, std::shared_ptr<PbdModel> model)
 {
     // Setup the Geometry
-    auto        tissueMesh = MeshIO::read<TetrahedralMesh>("C:/Users/Andx_/Downloads/gallblader1_.msh");
+    auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Gallblader/gallblader.msh");
     const Vec3d center     = tissueMesh->getCenter();
     tissueMesh->translate(-center, Geometry::TransformType::ApplyToData);
     tissueMesh->rotate(Vec3d(0.0, 0.0, 1.0), 30.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
@@ -177,7 +182,6 @@ makeGallBlader(const std::string& name, std::shared_ptr<PbdModel> model)
     model->getConfig()->m_femParams->m_YoungModulus = 420000.0;
     model->getConfig()->m_femParams->m_PoissonRatio = 0.48;
     model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
-    model->setModelGeometry(tissueMesh);
 
     // Setup the material
     auto material = std::make_shared<RenderMaterial>();
@@ -220,7 +224,7 @@ makeToolObj(const std::string& name, std::shared_ptr<PbdModel> model)
     cutGeom->setTranslation(Vec3d(-10, -20, 0));
     cutGeom->updatePostTransformData();
 
-    auto cutObj = std::make_shared<PbdObject>("CuttingObject");
+    auto cutObj = std::make_shared<PbdObject>(name);
     cutObj->setVisualGeometry(cutGeom);
     cutObj->setPhysicsGeometry(cutGeom);
     cutObj->setCollidingGeometry(cutGeom);
@@ -228,10 +232,7 @@ makeToolObj(const std::string& name, std::shared_ptr<PbdModel> model)
     cutObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     cutObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
 
-    cutObj->getPbdBody()->bodyType = PbdBody::Type::RIGID;
-    cutObj->getPbdBody()->uniformMassValue = 1.0;
-    cutObj->getPbdBody()->initInertiaTest  = Mat3d::Identity();
-    cutObj->getPbdBody()->initPosTest      = Vec3d(0.0, 0.0, 0.0);
+    cutObj->getPbdBody()->setRigid(Vec3d(0.0, 0.0, 0.0), 1.0);
 
     return cutObj;
 }
@@ -240,7 +241,7 @@ static std::shared_ptr<PbdObject>
 makeLigamentObj(const std::string& name, std::shared_ptr<PbdObject> gallbladerObj,
                 std::shared_ptr<PbdModel> model)
 {
-    auto ligamentOriginMesh = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Downloads/ligamentOrigins3.stl");
+    auto ligamentOriginMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Organs/Gallblader/ligamentOrigins.stl");
 
     auto                         gallbladerTetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(gallbladerObj->getPhysicsGeometry());
     std::shared_ptr<SurfaceMesh> gallbladerSurfMesh = gallbladerTetMesh->extractSurfaceMesh();
@@ -394,7 +395,7 @@ main()
         // Damping doesn't work well here. The force is applied at the start of pbd
         // Because velocities are ulimately computed after the fact from positions
         controller->setUseCritDamping(true);
-        scene->addController(controller);
+        scene->addControl(controller);
 
         // Queue haptic button press to be called after scene thread
         queueConnect<ButtonEvent>(hapticDeviceClient, &HapticDeviceClient::buttonStateChanged, sceneManager,
@@ -413,13 +414,13 @@ main()
             auto mouseControl = std::make_shared<MouseSceneControl>();
             mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
+            scene->addControl(mouseControl);
 
             auto keyControl = std::make_shared<KeyboardSceneControl>();
             keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
+            scene->addControl(keyControl);
         }
 
         driver->start();

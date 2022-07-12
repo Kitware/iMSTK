@@ -6,13 +6,14 @@
 
 #include "NeedleInteraction.h"
 #include "imstkLineMesh.h"
+#include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkTaskGraph.h"
+#include "imstkTetrahedralMesh.h"
 #include "imstkTetraToLineMeshCD.h"
 #include "NeedleEmbeddedCH.h"
 #include "NeedlePbdCH.h"
 #include "NeedleRigidBodyCH.h"
-#include "imstkTetrahedralMesh.h"
 
 using namespace imstk;
 
@@ -43,7 +44,6 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
     needlePbdCH->setInputObjectA(tissueObj);
     needlePbdCH->setInputObjectB(needleObj);
     needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
-    //needlePbdCH->getCollisionSolver()->setCollisionIterations(1);
     setCollisionHandlingA(needlePbdCH);
 
     // Then add a separate scheme for when the needle is embedded
@@ -55,7 +55,6 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
 
     embeddedCH = std::make_shared<NeedleEmbeddedCH>();
     embeddedCH->setInputCollisionData(tetMeshCD->getCollisionData());
-    embeddedCH->setCollisionSolver(needlePbdCH->getCollisionSolver());
     embeddedCH->setInputObjectA(tissueObj);
     embeddedCH->setInputObjectB(needleObj);
 
@@ -86,7 +85,7 @@ NeedleInteraction::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_
         m_taskGraph->addEdge(m_collisionHandleANode, embeddingCDNode);
         m_taskGraph->addEdge(m_collisionHandleBNode, embeddingCDNode);
         m_taskGraph->addEdge(embeddingCDNode, embeddingCHNode);
-        m_taskGraph->addEdge(embeddingCHNode, m_pbdCollisionSolveNode);
+        m_taskGraph->addEdge(embeddingCHNode, pbdObj->getPbdModel()->getCollisionSolveNode());
         m_taskGraph->addEdge(embeddingCHNode, rbdObj->getRigidBodyModel2()->getSolveNode());
     }
 }

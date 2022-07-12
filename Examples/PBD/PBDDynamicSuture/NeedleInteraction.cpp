@@ -19,14 +19,15 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
     : PbdObjectCollision(tissueObj, needleObj)
 {
     // Check inputs
-
+    CHECK(tissueObj != nullptr) << "NeedleInteraction requires a PbdObject tissue";
     CHECK(std::dynamic_pointer_cast<SurfaceMesh>(tissueObj->getCollidingGeometry()) != nullptr) <<
         "NeedleInteraction only works with SufraceMesh collision geometry on the tissue object";
 
+    CHECK(threadObj != nullptr) << "NeedleInteraction requires a PbdObject thread";
     CHECK(std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry()) != nullptr) <<
         "NeedleInteraction only works with LineMesh collision geometry on NeedleObject";
 
-    CHECK(threadObj != nullptr) << "NeedleInteraction requires a PbdObject thread";
+    CHECK(threadObj->getPbdModel() == tissueObj->getPbdModel()) << "Tissue and thread must share a PbdModel";
 
     // Add collision handler for the PBD reaction
     auto needlePbdCH = std::make_shared<NeedlePbdCH>();

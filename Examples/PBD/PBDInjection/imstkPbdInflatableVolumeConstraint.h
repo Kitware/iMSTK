@@ -22,12 +22,12 @@ public:
     ///
     /// \brief Initializes the inflatable volume constraint
     ///
-    void initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                        const size_t& pIdx0, const size_t& pIdx1,
-                        const size_t& pIdx2, const size_t& pIdx3,
+    void initConstraint(const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
+                        const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
+                        const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
                         const double k = 2.0)
     {
-        PbdVolumeConstraint::initConstraint(initVertexPositions, pIdx0, pIdx1, pIdx2, pIdx3, k);
+        PbdVolumeConstraint::initConstraint(p0, p1, p2, p3, pIdx0, pIdx1, pIdx2, pIdx3, k);
         m_initialRestVolume = m_restVolume;
     }
 
@@ -69,16 +69,19 @@ struct PbdInflatableVolumeConstraintFunctor : public PbdVolumeConstraintFunctor
         auto                                     tetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
         const VecDataArray<double, 3>&           vertices    = *verticesPtr;
-        std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getTetrahedraIndices();
+        std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getCells();
         const VecDataArray<int, 4>&              elements    = *elementsPtr;
 
         ParallelUtils::parallelFor(elements.size(),
-            [&](const size_t k)
+            [&](const int k)
             {
                 auto& tet = elements[k];
                 auto c    = std::make_shared<PbdInflatableVolumeConstraint>();
-                c->initConstraint(vertices,
-                    tet[0], tet[1], tet[2], tet[3], m_stiffness);
+                c->initConstraint(
+                    vertices[tet[0]], vertices[tet[1]], vertices[tet[2]], vertices[tet[3]],
+                    { m_bodyIndex, tet[0] }, { m_bodyIndex, tet[1] },
+                    { m_bodyIndex, tet[2] }, { m_bodyIndex, tet[3] },
+                    m_stiffness);
                 constraints.addConstraint(c);
             });
     }

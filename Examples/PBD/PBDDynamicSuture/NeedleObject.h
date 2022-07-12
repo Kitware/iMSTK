@@ -36,7 +36,7 @@ public:
     };
 
     NeedleObject();
-    virtual ~NeedleObject() = default;
+    ~NeedleObject() override = default;
 
     IMSTK_TYPE_NAME(NeedleObject)
 

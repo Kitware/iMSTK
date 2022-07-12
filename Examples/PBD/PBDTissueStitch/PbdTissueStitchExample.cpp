@@ -70,31 +70,15 @@ makeTetTissueObj(const std::string& name,
     pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
     /* pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 0.01);
      pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.4);*/
-    pbdParams->m_doPartitioning   = false;
-    pbdParams->m_uniformMassValue = 0.00001;
+    pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.05;
-
-    // Fix the borders
-    for (int z = 0; z < dim[2]; z++)
-    {
-        for (int y = 0; y < dim[1]; y++)
-        {
-            for (int x = 0; x < dim[0]; x++)
-            {
-                if (x == 0)
-                {
-                    pbdParams->m_fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
-                }
-            }
-        }
-    }
+    pbdParams->m_linearDampingCoeff  = 0.05;
+    pbdParams->m_collisionIterations = 4;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(tissueMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the material
@@ -111,6 +95,21 @@ makeTetTissueObj(const std::string& name,
     tissueObj->setCollidingGeometry(surfMesh);
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->getPbdBody()->uniformMassValue = 0.00001;
+    // Fix the borders
+    for (int z = 0; z < dim[2]; z++)
+    {
+        for (int y = 0; y < dim[1]; y++)
+        {
+            for (int x = 0; x < dim[0]; x++)
+            {
+                if (x == 0)
+                {
+                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                }
+            }
+        }
+    }
 
     return tissueObj;
 }
@@ -133,27 +132,13 @@ makeTriTissueObj(const std::string& name,
     auto pbdParams = std::make_shared<PbdModelConfig>();
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6);
-    pbdParams->m_uniformMassValue = 0.00001;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.025;
-
-    // Fix the borders
-    for (int y = 0; y < dim[1]; y++)
-    {
-        for (int x = 0; x < dim[0]; x++)
-        {
-            if (x == 0)
-            {
-                pbdParams->m_fixedNodeIds.push_back(x + dim[0] * y);
-            }
-        }
-    }
+    pbdParams->m_linearDampingCoeff = 0.025;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(triMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
@@ -169,6 +154,18 @@ makeTriTissueObj(const std::string& name,
     tissueObj->setPhysicsGeometry(triMesh);
     tissueObj->setCollidingGeometry(triMesh);
     tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->getPbdBody()->uniformMassValue = 0.00001;
+    // Fix the borders
+    for (int y = 0; y < dim[1]; y++)
+    {
+        for (int x = 0; x < dim[0]; x++)
+        {
+            if (x == 0)
+            {
+                tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * y);
+            }
+        }
+    }
 
     return tissueObj;
 }
@@ -255,6 +252,7 @@ main()
     // Setup CD with a cylinder CD object
     auto collisionInteraction = std::make_shared<PbdObjectCollision>(tissueObj, cdObj, "SurfaceMeshToCapsuleCD");
     collisionInteraction->setFriction(0.0);
+    collisionInteraction->setDeformableStiffnessA(0.3);
     scene->addInteraction(collisionInteraction);
 
     auto stitching = std::make_shared<PbdObjectStitching>(tissueObj);
@@ -367,7 +365,7 @@ main()
             std::dynamic_pointer_cast<PointSet>(tissueObj->getPhysicsGeometry());
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointMesh->getVertexPositions();
         VecDataArray<double, 3>&                 vertices    = *verticesPtr;
-        const std::vector<size_t>                fixedNodes  = tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds;
+        const std::vector<int>                   fixedNodes  = tissueObj->getPbdBody()->fixedNodeIds;
         for (size_t i = 0; i < fixedNodes.size(); i++)
         {
             initPositions.push_back(vertices[fixedNodes[i]]);
@@ -397,8 +395,8 @@ main()
                     {
                         // Clear and reinit all constraints (new resting lengths)
                         stopped = true;
-                        tissueObj->getPbdModel()->getConfig()->m_fixedNodeIds.clear();
-                        tissueObj->initialize();
+                        tissueObj->getPbdBody()->fixedNodeIds.clear();
+                        tissueObj->getPbdModel()->initialize();
                     }
                 }
             });

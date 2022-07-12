@@ -48,15 +48,12 @@ makePbdString(
     imstkNew<PbdModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e7);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Bend, bendStiffness);
-    pbdParams->m_fixedNodeIds     = { 0 };
-    pbdParams->m_uniformMassValue = 5.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_dt         = 0.0005;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(stringMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
@@ -74,6 +71,8 @@ makePbdString(
     stringObj->addVisualModel(visualModel);
     stringObj->setPhysicsGeometry(stringMesh);
     stringObj->setDynamicalModel(pbdModel);
+    stringObj->getPbdBody()->fixedNodeIds     = { 0 };
+    stringObj->getPbdBody()->uniformMassValue = 5.0;
 
     return stringObj;
 }
@@ -156,7 +155,7 @@ main()
                 {
                     std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
                     model->getConfig()->m_dt = dt;
-                    std::shared_ptr<VecDataArray<double, 3>> positions = model->getCurrentState()->getPositions();
+                    std::shared_ptr<VecDataArray<double, 3>> positions = pbdStringObjs[i]->getPbdBody()->vertices;
                     (*positions)[0] += Vec3d(
                         -std::sin(t) * radius * dt,
                         0.0,

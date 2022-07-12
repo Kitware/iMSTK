@@ -60,7 +60,7 @@ const std::vector<Vec3d> selfCCDStringMesh = {
     { 0.05, 0, 0.01 },
     { 0.05, 0, 0.02 },
     { 0.05, 0, 0.03 },
-    { 0.05, 0, 0.04 },
+    { 0.05, 0, 0.04 }
 };
 
 ///
@@ -112,32 +112,14 @@ makePbdString(const std::string& name, const std::string& filename)
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
-    if (name == "granny_knot")
-    {
-        pbdParams->m_fixedNodeIds = { 0, 1, size_t(stringMesh->getNumVertices() - 2), size_t(stringMesh->getNumVertices() - 1) };
-        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
-        pbdParams->enableBendConstraint(0.01, 1);
-        //pbdParams->enableBendConstraint(.5, 2);
-    }
-    else
-    {
-        pbdParams->m_fixedNodeIds = { 9, 10, selfCCDStringMesh.size() - 2, selfCCDStringMesh.size() - 1 };
-        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
-        pbdParams->enableBendConstraint(0.01, 1);
-        //pbdParams->enableBendConstraint(.5, 2);
-    }
-
-    pbdParams->m_uniformMassValue = 0.0001 / numVerts; // grams
-    pbdParams->m_gravity = Vec3d(0.0, -9.8, 0.0);
-    pbdParams->m_dt      = 0.0005;
-    // Very important parameter for stability of solver, keep lower than 1.0:
-    pbdParams->m_contactStiffness    = 0.05;
-    pbdParams->m_iterations          = 1;
-    pbdParams->m_viscousDampingCoeff = 0.03;
+    pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
+    pbdParams->m_dt         = 0.0005;
+    pbdParams->m_iterations = 1;
+    pbdParams->m_linearDampingCoeff  = 0.03;
+    pbdParams->m_collisionIterations = 25;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(stringMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
@@ -159,6 +141,24 @@ makePbdString(const std::string& name, const std::string& filename)
     stringObj->setCollidingGeometry(stringMesh);
     stringObj->setDynamicalModel(pbdModel);
 
+    if (name == "granny_knot")
+    {
+        stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // grams
+        stringObj->getPbdBody()->fixedNodeIds     = { 0, 1, stringMesh->getNumVertices() - 2, stringMesh->getNumVertices() - 1 };
+        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
+        pbdParams->enableBendConstraint(0.01, 1);
+        //pbdParams->enableBendConstraint(.5, 2);
+    }
+    else
+    {
+        stringObj->getPbdBody()->fixedNodeIds = { 9, 10,
+                                                  static_cast<int>(selfCCDStringMesh.size() - 2),
+                                                  static_cast<int>(selfCCDStringMesh.size() - 1) };
+        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
+        pbdParams->enableBendConstraint(0.01, 1);
+        //pbdParams->enableBendConstraint(.5, 2);
+    }
+
     return stringObj;
 }
 
@@ -179,17 +179,15 @@ main()
 
     imstkNew<Scene> scene("PbdSutureSelfCCD");
 
-    std::shared_ptr<PbdObject> movingLine =
+    std::shared_ptr<PbdObject> threadObj =
         // makePbdString("selfCCDLine", "");
         makePbdString("granny_knot", iMSTK_DATA_ROOT "/LineMesh/granny_knot.obj");
+    scene->addSceneObject(threadObj);
 
-    scene->addSceneObject(movingLine);
-
-    auto interaction = std::make_shared<PbdObjectCollision>(movingLine, movingLine, "LineMeshToLineMeshCCD");
-    interaction->setFriction(0.0);
-    interaction->setRestitution(0.0);
-    auto colHandler = std::dynamic_pointer_cast<PbdCollisionHandling>(interaction->getCollisionHandlingAB());
-    colHandler->getCollisionSolver()->setCollisionIterations(25);
+    auto interaction = std::make_shared<PbdObjectCollision>(threadObj, threadObj, "LineMeshToLineMeshCCD");
+    // Important parameter for stability, take multiple smaller steps to resolve multiple contacts
+    interaction->setDeformableStiffnessA(0.05);
+    interaction->setDeformableStiffnessB(0.05);
     scene->addInteraction(interaction);
 
     // Create the arc needle
@@ -242,8 +240,6 @@ main()
             });
 #endif
 
-#define USE_NEEDLE
-#ifdef USE_NEEDLE
         imstkNew<RigidObjectController> controller;
         controller->setControlledObject(needleObj);
         controller->setDevice(deviceClient);
@@ -254,24 +250,15 @@ main()
         controller->setUseCritDamping(true);
         controller->setForceScaling(0.0);
         scene->addControl(controller);
-#else
-        imstkNew<SceneObjectController> controller(movingLine, deviceClient);
-        controller->setTranslationOffset(offset);
-        controller->setTranslationScaling(translationScaling);
-        scene->addControl(controller);
-#endif
 
-        std::shared_ptr<LineMesh> movingLineMesh[2] = { nullptr, nullptr };
-        // Update the timesteps for real time
+        // Update the thread fixed points to the controlled needle
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
             {
-#ifdef USE_NEEDLE
-                auto movingLineMesh = std::dynamic_pointer_cast<LineMesh>(movingLine->getPhysicsGeometry());
+                auto threadLineMesh = std::dynamic_pointer_cast<LineMesh>(threadObj->getPhysicsGeometry());
                 auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getPhysicsGeometry());
-                (*movingLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
-                (*movingLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
-#endif // USE_NEEDLE
+                (*threadLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
+                (*threadLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
             });
 
         // Add mouse and keyboard controls to the viewer

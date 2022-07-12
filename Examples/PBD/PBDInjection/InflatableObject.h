@@ -8,14 +8,11 @@
 
 #include "imstkMacros.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdConstraintContainer.h"
 
 namespace imstk
 {
-class ImageData;
 class SurfaceMesh;
 class TetrahedralMesh;
-class Texture;
 }; // namespace imstk
 
 using namespace imstk;
@@ -39,8 +36,6 @@ public:
 
 public:
     IMSTK_TYPE_NAME(InflatableObject)
-
-    bool initialize() override;
 
     ///
     /// \brief Perform injection on the tissue given tool tip position
@@ -82,8 +77,7 @@ protected:
     std::shared_ptr<TetrahedralMesh> m_objectTetMesh;
     std::shared_ptr<SurfaceMesh>     m_objectSurfMesh;
 
-    std::shared_ptr<PbdConstraintContainer> m_constraintContainer;
-    std::vector<std::pair<int, double>>     m_constraintIDandWeight;
+    std::vector<std::pair<int, double>> m_constraintIDandWeight;
 
     bool m_affectedAreaUpdated = false;
 

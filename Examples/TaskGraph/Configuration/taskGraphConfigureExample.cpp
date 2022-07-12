@@ -39,15 +39,12 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     imstkNew<PbdModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e2);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e1);
-    pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
-    pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_dt         = 0.007;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(clothMesh);
     pbdModel->configure(pbdParams);
 
     // Setup visual models
@@ -68,6 +65,8 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     clothObj->addVisualModel(clothSurfaceNormals);
     clothObj->setPhysicsGeometry(clothMesh);
     clothObj->setDynamicalModel(pbdModel);
+    clothObj->getPbdBody()->fixedNodeIds     = { 0, nCols - 1 };
+    clothObj->getPbdBody()->uniformMassValue = width * height / (nRows * nCols);
     return clothObj;
 }
 

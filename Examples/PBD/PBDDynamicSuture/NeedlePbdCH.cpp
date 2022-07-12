@@ -105,10 +105,12 @@ NeedlePbdCH::handle(
         LOG(FATAL) << "Surface Mesh has changed size";
     }
 
-    // Do it the normal way if not inserted or touching
-    if (needleObj->getCollisionState() == NeedleObject::CollisionState::REMOVED || needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
+    // Handle collision normally if removed or touching
+    if (needleObj->getCollisionState() == NeedleObject::CollisionState::REMOVED
+        || needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
     {
         PbdCollisionHandling::handle(elementsA, elementsB);     // (PBD Object, Needle Object)
+        return;
     }
 
     std::shared_ptr<VecDataArray<int, 2>> needleIndicesPtr = needleMesh->getCells();
@@ -119,6 +121,7 @@ NeedlePbdCH::handle(
     const VecDataArray<int, 2>&           threadIndices     = *threadIndcicesPtr;
 
     // If inserted, find intersections and constrain to insertion points
+    m_constraints.clear();
     if (needleObj->getCollisionState() == NeedleObject::CollisionState::INSERTED)
     {
         // Scope for needle
@@ -236,33 +239,17 @@ NeedlePbdCH::handle(
                 // Now that we have the closest point on the needle to this penetration point, we can
                 // generate and solve the constraint
 
-                auto pointTriangleConstraint = std::make_shared<SurfaceInsertionConstraint>();
-
-                VertexMassPair ptB1;
-                VertexMassPair ptB2;
-                VertexMassPair ptB3;
-
-                ptB1.vertex = &meshVertices[m_needlePData[pPointId].triVertIds[0]];
-                ptB2.vertex = &meshVertices[m_needlePData[pPointId].triVertIds[1]];
-                ptB3.vertex = &meshVertices[m_needlePData[pPointId].triVertIds[2]];
-
-                ptB1.invMass = triangleInvMasses[m_needlePData[pPointId].triVertIds[0]];
-                ptB2.invMass = triangleInvMasses[m_needlePData[pPointId].triVertIds[1]];
-                ptB3.invMass = triangleInvMasses[m_needlePData[pPointId].triVertIds[2]];
-
-                ptB1.velocity = &meshVelocity[m_needlePData[pPointId].triVertIds[0]];
-                ptB2.velocity = &meshVelocity[m_needlePData[pPointId].triVertIds[1]];
-                ptB3.velocity = &meshVelocity[m_needlePData[pPointId].triVertIds[2]];
-
-                pointTriangleConstraint->initConstraint(
-                        puncturePt,
-                        ptB1, ptB2, ptB3,
-                        closestPoint,
-                        baryPoint,
-                        0.0, 0.9 // stiffness parameters
+                const int bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
+                auto      pointTriangleConstraint = std::make_shared<SurfaceInsertionConstraint>();
+                pointTriangleConstraint->initConstraint(puncturePt,
+                    { bodyId, m_needlePData[pPointId].triVertIds[0] },
+                    { bodyId, m_needlePData[pPointId].triVertIds[1] },
+                    { bodyId, m_needlePData[pPointId].triVertIds[2] },
+                    closestPoint,
+                    baryPoint,
+                    0.0, 0.01 // stiffness parameters
                     );
-
-                pointTriangleConstraint->solvePosition();
+                m_constraints.push_back(pointTriangleConstraint);
             } // end loop over penetration points
         }     // end scope for needle
 
@@ -406,43 +393,23 @@ NeedlePbdCH::handle(
                 const Vec3d& p = threadVertices[nearestSegNodeIds[0]];
                 const Vec3d& q = threadVertices[nearestSegNodeIds[1]];
 
-                VertexMassPair ptA1;
-                ptA1.vertex   = &threadVertices[nearestSegNodeIds[0]];
-                ptA1.invMass  = 1.0;   // threadInvMasses[nearestSegNodeIds[0]];
-                ptA1.velocity = &threadVelocity[nearestSegNodeIds[0]];
-
-                VertexMassPair ptA2;
-                ptA2.vertex   = &threadVertices[nearestSegNodeIds[1]];
-                ptA2.invMass  = 1.0;   // threadInvMasses[nearestSegNodeIds[1]];
-                ptA2.velocity = &threadVelocity[nearestSegNodeIds[1]];
-
                 // Thread barycentric intersection point
                 const Vec2d segBary = baryCentric(closestPoint, p, q);
 
-                // Set of VM pairs for triangle
-                VertexMassPair ptB1;
-                VertexMassPair ptB2;
-                VertexMassPair ptB3;
-
-                ptB1.vertex = &meshVertices[m_threadPData[pPointId].triVertIds[0]];
-                ptB2.vertex = &meshVertices[m_threadPData[pPointId].triVertIds[1]];
-                ptB3.vertex = &meshVertices[m_threadPData[pPointId].triVertIds[2]];
-
-                ptB1.invMass = triangleInvMasses[m_threadPData[pPointId].triVertIds[0]];
-                ptB2.invMass = triangleInvMasses[m_threadPData[pPointId].triVertIds[1]];
-                ptB3.invMass = triangleInvMasses[m_threadPData[pPointId].triVertIds[2]];
-
-                ptB1.velocity = &meshVelocity[m_threadPData[pPointId].triVertIds[0]];
-                ptB2.velocity = &meshVelocity[m_threadPData[pPointId].triVertIds[1]];
-                ptB3.velocity = &meshVelocity[m_threadPData[pPointId].triVertIds[2]];
-
+                const int tissueBodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
+                const int threadBodyId = m_threadObj->getPbdBody()->bodyHandle;
                 threadTriangleConstraint->initConstraint(
-                        ptA1, ptA2, segBary,
-                        ptB1, ptB2, ptB3, m_threadPData[pPointId].triBaryPuncturePoint,
-                        0.2, 0.0);
-
-                threadTriangleConstraint->solvePosition();
-            }     // end loop over penetration points for thread
+                    m_pbdTissueObj->getPbdModel()->getBodies(),
+                    { threadBodyId, nearestSegNodeIds[0] },
+                    { threadBodyId, nearestSegNodeIds[1] },
+                    segBary,
+                    { tissueBodyId, m_threadPData[pPointId].triVertIds[0] },
+                    { tissueBodyId, m_threadPData[pPointId].triVertIds[1] },
+                    { tissueBodyId, m_threadPData[pPointId].triVertIds[2] },
+                    m_threadPData[pPointId].triBaryPuncturePoint,
+                    0.01, 0.0); // Tissue is not currently moved
+                m_constraints.push_back(threadTriangleConstraint);
+            }                   // end loop over penetration points for thread
         } // end scope for thread
 
         // Solve stitching constraint
@@ -450,7 +417,7 @@ NeedlePbdCH::handle(
         {
             for (size_t i = 0; i < m_stitchConstraints.size(); i++)
             {
-                m_stitchConstraints[i]->solvePosition();
+                m_constraints.push_back(m_stitchConstraints[i]);
             }
         }
     }     // end needle state puncture check
@@ -460,6 +427,13 @@ NeedlePbdCH::handle(
     {
         needleObj->setCollisionState(NeedleObject::CollisionState::REMOVED);
     }
+
+    m_solverConstraints.resize(m_constraints.size());
+    for (int i = 0; i < m_constraints.size(); i++)
+    {
+        m_solverConstraints[i] = m_constraints[i].get();
+    }
+    m_pbdTissueObj->getPbdModel()->getCollisionSolver()->addConstraints(&m_solverConstraints);
 }
 
 // Create stitching constraints
@@ -499,43 +473,21 @@ NeedlePbdCH::stitch()
         // Create constraints to pull the puncture points to the center location
         for (int pPointId = 0; pPointId < m_threadPData.size(); pPointId++)
         {
-            VertexMassPair ptA1;
-            VertexMassPair ptA2;
-            VertexMassPair ptA3;
-
-            ptA1.vertex = m_threadPData[pPointId].triVerts[0];
-            ptA2.vertex = m_threadPData[pPointId].triVerts[1];
-            ptA3.vertex = m_threadPData[pPointId].triVerts[2];
-
-            ptA1.invMass = 1.0;              //  triangleInvMasses[m_threadPData[pPointId].triertIds[0]];
-            ptA2.invMass = 1.0;              //  triangleInvMasses[m_threadPData[pPointId].triVertIds[0]];
-            ptA3.invMass = 1.0;              // triangleInvMasses[m_threadPData[pPointId].triVertIds[0]];
-
-            ptA1.velocity = &m_fakeVelocity; //  &meshVelocity[m_threadPData[pPointId].triVertIds[0]];
-            ptA2.velocity = &m_fakeVelocity; //  &meshVelocity[m_threadPData[pPointId].triVertIds[1]];
-            ptA3.velocity = &m_fakeVelocity; //  &meshVelocity[m_threadPData[pPointId].triVertIds[2]];
-
-            std::vector<VertexMassPair> ptsA = { ptA1, ptA2, ptA3 };
-
-            std::vector<double> weightsA = { m_threadPData[pPointId].triBaryPuncturePoint[0],
-                                             m_threadPData[pPointId].triBaryPuncturePoint[1],
-                                             m_threadPData[pPointId].triBaryPuncturePoint[2] };
-
             // Now create values for the central point
-            VertexMassPair centerPt;
+            const PbdParticleId& stitchCenterPt = m_pbdTissueObj->getPbdModel()->addVirtualParticle(m_stitchCenter, 0.0);
 
-            centerPt.vertex  = &m_stitchCenter;
-            centerPt.invMass = 0.0;
-
-            centerPt.velocity = &m_fakeVelocity;
-
-            std::vector<VertexMassPair> ptsB     = { centerPt };
-            std::vector<double>         weightsB = { 1.0 };
+            const int           bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
+            const PbdParticleId p0     = { bodyId, m_threadPData[pPointId].triVertIds[0] };
+            const PbdParticleId p1     = { bodyId, m_threadPData[pPointId].triVertIds[1] };
+            const PbdParticleId p2     = { bodyId, m_threadPData[pPointId].triVertIds[2] };
 
             auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
             constraint->initConstraint(
-                    ptsA, weightsA,
-                    ptsB, weightsB,
+                { p0, p1, p2 },
+                { m_threadPData[pPointId].triBaryPuncturePoint[0],
+                  m_threadPData[pPointId].triBaryPuncturePoint[1],
+                  m_threadPData[pPointId].triBaryPuncturePoint[2] },
+                { stitchCenterPt }, { 1.0 },
                     0.2, 0.0);
 
             // Add to list of constraints to be solved together in the handler
@@ -548,10 +500,9 @@ NeedlePbdCH::stitch()
 /// \brief Add a vertex-triangle constraint
 ///
 void
-NeedlePbdCH::addVTConstraint(
-    VertexMassPair ptA,
-    VertexMassPair ptB1, VertexMassPair ptB2, VertexMassPair ptB3,
-    double stiffnessA, double stiffnessB)
+NeedlePbdCH::V_T(
+    const ColElemSide& sideA,
+    const ColElemSide& sideB)
 {
     auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
 
@@ -566,23 +517,23 @@ NeedlePbdCH::addVTConstraint(
     // use dot product to project onto the needle stabing direction, if close to 1 assume its inserted
     // Possibly add contact time or pseudo force calculation to know if penetration occurs
 
-    Vec3d surfNormal = Vec3d::Zero();
-
     // Note: assumes closed mesh
 
-    // Assuming traingle has points a,b,c
-    Vec3d ab = *ptB2.vertex - *ptB1.vertex;
-    Vec3d ac = *ptB3.vertex - *ptB1.vertex;
+    // Assuming triangle has points a,b,c
+    std::array<PbdParticleId, 3> ptsB   = PbdCollisionHandling::getTriangle(*sideB.elem, *sideB.data);
+    const PbdState&              bodies = m_pbdTissueObj->getPbdModel()->getBodies();
+    const Vec3d                  ab     = bodies.getPosition(ptsB[1]) - bodies.getPosition(ptsB[0]);
+    const Vec3d                  ac     = bodies.getPosition(ptsB[2]) - bodies.getPosition(ptsB[0]);
 
     // Calculate surface normal
-    surfNormal = (ac.cross(ab)).normalized();
+    const Vec3d surfNormal = ac.cross(ab).normalized();
 
     // Get vector pointing in direction of needle
     // Use absolute value to ignore direction issues
-    double dotProduct = fabs(m_needleDirection.dot(surfNormal));
+    const double dotProduct = std::fabs(m_needleDirection.dot(surfNormal));
 
     // Arbitrary threshold
-    double threshold = 0.9;
+    const double threshold = 0.9;
 
     if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
     {
@@ -597,7 +548,7 @@ NeedlePbdCH::addVTConstraint(
 
     if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
     {
-        PbdCollisionHandling::addVTConstraint(ptA, ptB1, ptB2, ptB3, stiffnessA, stiffnessB);
+        PbdCollisionHandling::V_T(sideA, sideB);
     }
 }
 } // namespace imstk

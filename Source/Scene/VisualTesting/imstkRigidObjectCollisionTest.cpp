@@ -139,10 +139,10 @@ TEST_F(RigidObjectCollisionTest, RbdObj_CapsuleToCapsuleCD)
 
         // Setup the Model
         auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.001;
+        rbdModel->getConfig()->m_dt      = 0.01;
         rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.98;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.98;
+        rbdModel->getConfig()->m_velocityDamping = 1.0;
+        rbdModel->getConfig()->m_angularVelocityDamping = 1.0;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
@@ -177,7 +177,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_CapsuleToCapsuleCD)
         });
 
     createScene();
-    runFor(2.0);
+    runFor(4.0);
 }
 
 ///
@@ -407,10 +407,10 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToCapsuleCD)
 
         // Setup the Model
         auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.001;
+        rbdModel->getConfig()->m_dt      = 0.01;
         rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.99;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.99;
+        rbdModel->getConfig()->m_velocityDamping = 0.999;
+        rbdModel->getConfig()->m_angularVelocityDamping = 0.999;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
@@ -468,10 +468,10 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToSphereCD)
 
         // Setup the Model
         auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.001;
+        rbdModel->getConfig()->m_dt      = 0.01;
         rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.99;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.99;
+        rbdModel->getConfig()->m_velocityDamping = 0.999;
+        rbdModel->getConfig()->m_angularVelocityDamping = 0.999;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();

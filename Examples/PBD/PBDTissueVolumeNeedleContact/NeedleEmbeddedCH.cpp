@@ -8,8 +8,10 @@
 #include "EmbeddingConstraint.h"
 #include "imstkCollisionUtils.h"
 #include "imstkLineMesh.h"
+#include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
+#include "imstkRbdConstraint.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkTetrahedralMesh.h"
 #include "NeedleObject.h"
@@ -18,31 +20,11 @@
 
 using namespace imstk;
 
-NeedleEmbeddedCH::NeedleEmbeddedCH() :
-    m_solver(std::make_shared<PbdCollisionSolver>())
-{
-}
-
 std::shared_ptr<Geometry>
 NeedleEmbeddedCH::getHandlingGeometryA()
 {
     auto tissueObj = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
     return (tissueObj == nullptr) ? nullptr : tissueObj->getPhysicsGeometry();
-}
-
-void
-NeedleEmbeddedCH::correctVelocities()
-{
-    for (size_t i = 0; i < m_solverConstraints.size(); i++)
-    {
-        m_solverConstraints[i]->correctVelocity(m_friction, 1.0);
-    }
-}
-
-void
-NeedleEmbeddedCH::solve()
-{
-    m_solver->solve();
 }
 
 void
@@ -91,24 +73,20 @@ NeedleEmbeddedCH::handle(
     needleGeom->updatePostTransformData();
 
     std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = tissueGeom->getVertexPositions();
-    std::shared_ptr<VecDataArray<int, 4>>    tissueIndicesPtr  = tissueGeom->getTetrahedraIndices();
-
-    auto tissueVelocitiesPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(tissueGeom->getVertexAttribute("Velocities"));
-    auto tissueInvMassesPtr  = std::dynamic_pointer_cast<DataArray<double>>(tissueGeom->getVertexAttribute("InvMass"));
-
-    VecDataArray<double, 3>&    tissueVertices   = *tissueVerticesPtr;
-    const VecDataArray<int, 4>& tissueIndices    = *tissueIndicesPtr;
-    VecDataArray<double, 3>&    tissueVelocities = *tissueVelocitiesPtr;
-    const DataArray<double>&    tissueInvMasses  = *tissueInvMassesPtr;
+    std::shared_ptr<VecDataArray<int, 4>>    tissueIndicesPtr  = tissueGeom->getCells();
+    VecDataArray<double, 3>&                 tissueVertices    = *tissueVerticesPtr;
+    const VecDataArray<int, 4>&              tissueIndices     = *tissueIndicesPtr;
 
     std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleGeom->getVertexPositions();
-    std::shared_ptr<VecDataArray<int, 2>>    needleIndicesPtr  = needleGeom->getLinesIndices();
+    std::shared_ptr<VecDataArray<int, 2>>    needleIndicesPtr  = needleGeom->getCells();
     VecDataArray<double, 3>&                 needleVertices    = *needleVerticesPtr;
     const VecDataArray<int, 2>&              needleIndices     = *needleIndicesPtr;
 
     // Keep track of the constraints that are added *this iteration* vs those already present
     // in m_faceConstraints so we can find the set that are no longer present
     std::unordered_set<std::shared_ptr<EmbeddingConstraint>> m_constraintEnabled;
+
+    const int bodyId = tissueObj->getPbdBody()->bodyHandle;
 
     // Constrain the triangle to the intersection point
     // If constraint for triangle already exists, update existing intersection point
@@ -129,10 +107,11 @@ NeedleEmbeddedCH::handle(
                 auto constraint = std::make_shared<EmbeddingConstraint>(needleObj->getRigidBody());
 
                 constraint->initConstraint(
-                    { &tissueVertices[v1], tissueInvMasses[v1], &tissueVelocities[v1] },
-                    { &tissueVertices[v2], tissueInvMasses[v2], &tissueVelocities[v2] },
-                    { &tissueVertices[v3], tissueInvMasses[v3], &tissueVelocities[v3] },
-                &needleVertices[0], &needleVertices[1]);
+                    tissueObj->getPbdModel()->getBodies(),
+                    { bodyId, v1 }, { bodyId, v2 }, { bodyId, v3 },
+                    &needleVertices[0], &needleVertices[1]);
+                constraint->setFriction(m_friction);
+                constraint->setRestitution(1.0);
 
                 // Add the constraint to a map of face->constraint
                 m_faceConstraints[triCell] = constraint;
@@ -231,5 +210,5 @@ NeedleEmbeddedCH::handle(
             i = m_faceConstraints.erase(i);
         }
     }
-    m_solver->addCollisionConstraints(&m_solverConstraints);
+    tissueObj->getPbdModel()->getCollisionSolver()->addConstraints(&m_solverConstraints);
 }

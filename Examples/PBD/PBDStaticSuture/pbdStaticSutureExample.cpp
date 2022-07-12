@@ -59,19 +59,16 @@ makePbdString(
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100.0);
     pbdParams->enableBendConstraint(100000.0, 1);
     pbdParams->enableBendConstraint(100000.0, 2);
-    pbdParams->m_fixedNodeIds     = { 0, 1, 19, 20 };
-    pbdParams->m_uniformMassValue = 0.002 / numVerts; // grams
     pbdParams->m_gravity = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt      = 0.0005;                    // Overwritten for real time
 
     // Requires large amounts of iterations the longer, a different
     // solver would help
     pbdParams->m_iterations = 100;
-    pbdParams->m_viscousDampingCoeff = 0.01;
+    pbdParams->m_linearDampingCoeff = 0.01;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(stringMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
@@ -91,6 +88,8 @@ makePbdString(
     stringObj->setPhysicsGeometry(stringMesh);
     stringObj->setCollidingGeometry(stringMesh);
     stringObj->setDynamicalModel(pbdModel);
+    stringObj->getPbdBody()->fixedNodeIds     = { 0, 1, 19, 20 };
+    stringObj->getPbdBody()->uniformMassValue = 0.002 / numVerts; // grams
 
     return stringObj;
 }

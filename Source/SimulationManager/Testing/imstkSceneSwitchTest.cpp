@@ -38,7 +38,6 @@ createSoftBodyScene(std::string sceneName)
 
     auto pbdObj   = std::make_shared<PbdObject>("PbdObj");
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(tetMesh);
 
     // Configure model
     auto pbdConfig = std::make_shared<PbdModelConfig>();
@@ -86,7 +85,6 @@ createClothScene(std::string sceneName)
 
         // Setup the Model
         auto pbdModel = std::make_shared<PbdModel>();
-        pbdModel->setModelGeometry(clothMesh);
         pbdModel->configure(pbdConfig);
 
         // Setup the Object

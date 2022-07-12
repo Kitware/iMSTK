@@ -31,10 +31,11 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
+#include "imstkSphere.h"
 
 // If two-way coupling is used haptic forces can be felt when the tool
 // hits the tissue
-#define TWOWAY_COUPLING
+//#define TWOWAY_COUPLING
 
 // Whether to use FEM or volume+distance constraints
 #define USE_FEM
@@ -93,8 +94,6 @@ static std::shared_ptr<PbdObject>
 makeTissueObj(const std::string& name,
               const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
-    imstkNew<PbdObject> clothObj(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tissueMesh = GeometryUtils::toTetGrid(center, size, dim);
     std::shared_ptr<SurfaceMesh>     surfMesh   = tissueMesh->extractSurfaceMesh();
@@ -106,37 +105,20 @@ makeTissueObj(const std::string& name,
     // Use FEMTet constraints
     pbdParams->m_femParams->m_YoungModulus = 5.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.4;
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
 #else
     // Use volume+distance constraints, worse results. More performant (can use larger mesh)
     pbdParams->enableConstraint(PbdConstraint::Type::Volume, 0.9);
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.95);
 #endif
-    pbdParams->m_doPartitioning   = true;
-    pbdParams->m_uniformMassValue = 0.05;
+    pbdParams->m_doPartitioning = true;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.05;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.1;
-
-    // Fix the borders
-    for (int z = 0; z < dim[2]; z++)
-    {
-        for (int y = 0; y < dim[1]; y++)
-        {
-            for (int x = 0; x < dim[0]; x++)
-            {
-                if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
-                {
-                    pbdParams->m_fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
-                }
-            }
-        }
-    }
+    pbdParams->m_linearDampingCoeff = 0.1;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(tissueMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the material
@@ -153,22 +135,38 @@ makeTissueObj(const std::string& name,
     imstkNew<VisualModel> visualModel;
     visualModel->setGeometry(surfMesh);
     visualModel->setRenderMaterial(material);
-    clothObj->addVisualModel(visualModel);
 
     // Add a visual model to render the normals of the surface
     imstkNew<VisualModel> normalsVisualModel;
     normalsVisualModel->setGeometry(surfMesh);
     normalsVisualModel->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::SurfaceNormals);
     normalsVisualModel->getRenderMaterial()->setPointSize(0.5);
-    clothObj->addVisualModel(normalsVisualModel);
 
     // Setup the Object
-    clothObj->setPhysicsGeometry(tissueMesh);
-    clothObj->setCollidingGeometry(surfMesh);
-    clothObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
-    clothObj->setDynamicalModel(pbdModel);
+    imstkNew<PbdObject> tissueObj(name);
+    tissueObj->addVisualModel(visualModel);
+    tissueObj->addVisualModel(normalsVisualModel);
+    tissueObj->setPhysicsGeometry(tissueMesh);
+    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
+    tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->getPbdBody()->uniformMassValue = 0.05;
+    // Fix the borders
+    for (int z = 0; z < dim[2]; z++)
+    {
+        for (int y = 0; y < dim[1]; y++)
+        {
+            for (int x = 0; x < dim[0]; x++)
+            {
+                if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
+                {
+                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                }
+            }
+        }
+    }
 
-    return clothObj;
+    return tissueObj;
 }
 
 static std::shared_ptr<RigidObject2>
@@ -232,7 +230,7 @@ main()
 
     // Setup a tissue
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
-        Vec3d(8.0, 3.0, 8.0), Vec3i(8, 3, 8), Vec3d(0.0, -1.0, 0.0));
+        Vec3d(8.0, 2.0, 8.0), Vec3i(6, 5, 6), Vec3d(0.0, -1.0, 0.0));
     scene->addSceneObject(tissueObj);
 
     std::shared_ptr<RigidObject2> toolObj = makeToolObj();

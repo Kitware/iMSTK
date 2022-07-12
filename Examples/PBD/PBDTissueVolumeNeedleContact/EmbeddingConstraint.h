@@ -29,7 +29,7 @@ class EmbeddingConstraint : public PbdCollisionConstraint, public RbdConstraint
 {
 public:
     EmbeddingConstraint(std::shared_ptr<RigidBody> obj1) :
-        PbdCollisionConstraint(1, 3), RbdConstraint(obj1, nullptr, RbdConstraint::Side::A)
+        PbdCollisionConstraint(3, 0), RbdConstraint(obj1, nullptr, RbdConstraint::Side::A)
     {
     }
 
@@ -38,27 +38,32 @@ public:
 public:
     ///
     /// \brief Initializes both PBD and RBD constraint
+    /// \param bodies
+    /// \param rigid body particle
+    /// \param triangle particle b1
+    /// \param triangle particle b2
+    /// \param triangle particle b3
+    /// \param p/start of line
+    /// \param q/end of line
     ///
     void initConstraint(
-        VertexMassPair ptB1, VertexMassPair ptB2, VertexMassPair ptB3,
+        PbdState& bodies,
+        const PbdParticleId& ptB1, const PbdParticleId& ptB2, const PbdParticleId& ptB3,
         Vec3d* p, Vec3d* q);
 
-public:
     ///
     /// \brief Given two interpolants on the two elements, compute the difference
     /// between them and use for resolution
     ///
-    Vec3d computeInterpolantDifference() const;
+    Vec3d computeInterpolantDifference(const PbdState& bodies) const;
 
-public:
     ///
     /// \brief Update the pbd constraint
     ///
-    bool computeValueAndGradient(double&             c,
-                                 std::vector<Vec3d>& dcdxA,
-                                 std::vector<Vec3d>& dcdxB) const override;
+    bool computeValueAndGradient(PbdState&           bodies,
+                                 double&             c,
+                                 std::vector<Vec3d>& dcdx) override;
 
-public:
     ///
     /// \brief Update the rbd constraint
     ///
@@ -74,8 +79,6 @@ protected:
     Vec3d* m_p = nullptr;
     Vec3d* m_q = nullptr;
 
-// The triangle is stored in PBD base class
-
 protected:
     // Step for rbd constraint
     double m_beta = 0.05;
@@ -88,15 +91,13 @@ protected:
     //
     // If 0.0, rbd tool is completely resolved and PBD tissue does not move
     // If 1.0, pbd tissue completely moves and rbd tool feels no resistance
-    double m_compliance = 0.5;
-
-    //// Ratio between the two models. This gives how much the rbd tool is moved vs how much pbd tissue is
-    //// in the normal direction
-    //double m_normalCompliance = 0.5;
+    double m_compliance0 = 0.5;
 
     // If 0.0, completely removes pbd reaction in line axes direction, the pbd triangle will completely let
     // the tool slide in that direction
     // If 1.0, completely resist normal movement
     double m_normalFriction = 0.0;
+
+    PbdState* m_state = nullptr; ///< Temporary to handle issue of multi body constraints with bodies
 };
 } // namespace imstk

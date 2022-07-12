@@ -17,38 +17,25 @@ using namespace imstk;
 ///
 class SurfaceInsertionConstraint : public PbdCollisionConstraint
 {
-private:
+public:
+    SurfaceInsertionConstraint() :  PbdCollisionConstraint(0, 3) { }
+    ~SurfaceInsertionConstraint() override = default;
 
+    void initConstraint(
+        const Vec3d&         insertionPoint,
+        const PbdParticleId& ptB1,
+        const PbdParticleId& ptB2,
+        const PbdParticleId& ptB3,
+        const Vec3d&         contactPt,
+        const Vec3d&         barycentricPt,
+        double               stiffnessA,
+        double               stiffnessB);
+
+    bool computeValueAndGradient(PbdState& bodies,
+                                 double& c, std::vector<Vec3d>& dcdx) override;
+
+private:
     Vec3d m_insertionPoint;
     Vec3d m_barycentricPt;
     Vec3d m_contactPt;
-
-public:
-
-    ///
-    /// \param the Rigid body needle
-    /// \param
-    ///
-    SurfaceInsertionConstraint() :  PbdCollisionConstraint(1, 3)
-    {
-    }
-
-    ~SurfaceInsertionConstraint() override = default;
-
-public:
-
-    void initConstraint(
-        Vec3d          insertionPoint,
-        VertexMassPair ptB1,
-        VertexMassPair ptB2,
-        VertexMassPair ptB3,
-        Vec3d          contactPt,
-        Vec3d          barycentricPt,
-        double         stiffnessA,
-        double         stiffnessB);
-
-    bool computeValueAndGradient(
-        double&             c,
-        std::vector<Vec3d>& dcdxA,
-        std::vector<Vec3d>& dcdxB) const override;
 };

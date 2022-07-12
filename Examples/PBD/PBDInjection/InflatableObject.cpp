@@ -6,9 +6,11 @@
 
 #include "InflatableObject.h"
 #include "imstkCollisionUtils.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
 #include "imstkMeshIO.h"
 #include "imstkNew.h"
+#include "imstkPbdConstraintContainer.h"
 #include "imstkPbdInflatableDistanceConstraint.h"
 #include "imstkPbdInflatableVolumeConstraint.h"
 #include "imstkPbdModel.h"
@@ -16,9 +18,9 @@
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
-#include "imstkGeometryUtilities.h"
 
-InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueSize, const Vec3i& tissueDim, const Vec3d& tissueCenter) : PbdObject(name)
+InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueSize,
+                                   const Vec3i& tissueDim, const Vec3d& tissueCenter) : PbdObject(name)
 {
     // Setup the Geometry
     m_objectTetMesh  = GeometryUtils::toTetGrid(tissueCenter, tissueSize, tissueDim);
@@ -27,12 +29,11 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
 
     // Setup the Parameters
     imstkNew<PbdModelConfig> pbdParams;
-    pbdParams->m_doPartitioning   = false;
-    pbdParams->m_uniformMassValue = 0.1;
+    pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.05;
     pbdParams->m_iterations = 2;
-    pbdParams->m_viscousDampingCoeff = 0.05;
+    pbdParams->m_linearDampingCoeff = 0.05;
 
     // Add custom constraint generation functors
     auto distanceFunctor = std::make_shared<PbdInflatableDistanceConstraintFunctor>();
@@ -43,24 +44,8 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
     pbdParams->addPbdConstraintFunctor(distanceFunctor);
     pbdParams->addPbdConstraintFunctor(volumeFunctor);
 
-    // Fix the borders
-    for (int z = 0; z < tissueDim[2]; z++)
-    {
-        for (int y = 0; y < tissueDim[1]; y++)
-        {
-            for (int x = 0; x < tissueDim[0]; x++)
-            {
-                if (x == 0 || z == 0 || x == tissueDim[0] - 1 || z == tissueDim[2] - 1 || y == 0)
-                {
-                    pbdParams->m_fixedNodeIds.push_back(x + tissueDim[0] * (y + tissueDim[1] * z));
-                }
-            }
-        }
-    }
-
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(m_objectTetMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the material
@@ -84,16 +69,25 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
     setCollidingGeometry(m_objectSurfMesh);
     setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(m_objectTetMesh, m_objectSurfMesh));
     setDynamicalModel(pbdModel);
-}
 
-bool
-InflatableObject::initialize()
-{
-    PbdObject::initialize();
+    distanceFunctor->setBodyIndex(getPbdBody()->bodyHandle);
+    volumeFunctor->setBodyIndex(getPbdBody()->bodyHandle);
 
-    m_constraintContainer = m_pbdModel->getConstraints();
-
-    return true;
+    // Fix the borders
+    getPbdBody()->uniformMassValue = 0.1;
+    for (int z = 0; z < tissueDim[2]; z++)
+    {
+        for (int y = 0; y < tissueDim[1]; y++)
+        {
+            for (int x = 0; x < tissueDim[0]; x++)
+            {
+                if (x == 0 || z == 0 || x == tissueDim[0] - 1 || z == tissueDim[2] - 1 || y == 0)
+                {
+                    getPbdBody()->fixedNodeIds.push_back(x + tissueDim[0] * (y + tissueDim[1] * z));
+                }
+            }
+        }
+    }
 }
 
 void
@@ -139,14 +133,14 @@ InflatableObject::findAffectedConstraint(const Vec3d& toolTip, const double radi
     std::vector<double> weights;
     int                 counter     = 0;
     double              minDistance = LONG_MAX;
-    for (auto& c : m_constraintContainer->getConstraints())
+    for (auto& c : m_pbdModel->getConstraints()->getConstraints())
     {
-        auto& ids = c->getVertexIds();
+        const std::vector<PbdParticleId>& ids = c->getParticles();
 
         Vec3d center(0.0, 0.0, 0.0);
         for (auto i : ids)
         {
-            center += (*vertices)[i];
+            center += (*vertices)[i.second];
         }
 
         double distance = (center / ids.size() - toolTip).norm();
@@ -202,7 +196,7 @@ InflatableObject::inject(const Vec3d& toolTip, const double radius, double dx)
     {
         const double dv = id.second * de;
 
-        auto& c = (m_constraintContainer->getConstraints())[id.first];
+        auto& c = (m_pbdModel->getConstraints()->getConstraints())[id.first];
         if (auto volConstraint = std::dynamic_pointer_cast<PbdInflatableVolumeConstraint>(c))
         {
             volConstraint->setRestVolume(dv + volConstraint->getRestVolume());
@@ -245,7 +239,7 @@ InflatableObject::reset()
 
     m_inflationRatio = 1.0;
 
-    for (auto& c : m_constraintContainer->getConstraints())
+    for (auto& c : m_pbdModel->getConstraints()->getConstraints())
     {
         if (auto volConstraint = std::dynamic_pointer_cast<PbdInflatableVolumeConstraint>(c))
         {

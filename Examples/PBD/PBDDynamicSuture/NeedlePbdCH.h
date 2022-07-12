@@ -31,6 +31,35 @@ class TetrahedralMesh;
 ///
 class NeedlePbdCH : public PbdCollisionHandling
 {
+public:
+    NeedlePbdCH() = default;
+    ~NeedlePbdCH() override = default;
+
+    IMSTK_TYPE_NAME(NeedlePbdCH)
+
+    ///
+    /// \brief Initialize interaction data
+    ///
+    void init(std::shared_ptr<PbdObject> threadObj);
+
+    ///
+    /// \brief Create stitching constraints on button press for four or more puncture points
+    ///
+    void stitch();
+
+    ///
+    /// \brief Handles puncture constraints for both the needle and the thread
+    ///
+    void handle(
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
+
+    ///
+    /// \brief Add a vertex-triangle constraint
+    ///
+    void V_T(const ColElemSide& sideA,
+             const ColElemSide& sideB) override;
+
 protected:
     // Stores data for penetration points, both for the needle and the thread
     struct SuturePenetrationData
@@ -58,6 +87,10 @@ protected:
     // Vector of thread-triangle constraints (one sided, force thread to follow triangle)
     std::vector<std::shared_ptr<PbdBaryPointToPointConstraint>> m_stitchConstraints;
 
+    // All constraints
+    std::vector<std::shared_ptr<PbdConstraint>> m_constraints;
+    std::vector<PbdConstraint*> m_solverConstraints;
+
     // Center of puncture points for stitching constraint
     Vec3d m_stitchCenter = Vec3d::Zero();
 
@@ -80,36 +113,5 @@ protected:
 
     // Fake velocity for stitch constraint
     Vec3d m_fakeVelocity = Vec3d::Zero();
-
-public:
-    NeedlePbdCH() = default;
-    ~NeedlePbdCH() override = default;
-
-    IMSTK_TYPE_NAME(NeedlePbdCH)
-
-    ///
-    /// \brief Initialize interaction data
-    ///
-    void init(std::shared_ptr<PbdObject> threadObj);
-
-    ///
-    /// \brief Create stitching constraints on button press for four or more puncture points
-    ///
-    void stitch();
-
-    ///
-    /// \brief Handles puncture constraints for both the needle and the thread
-    ///
-    void handle(
-        const std::vector<CollisionElement>& elementsA,
-        const std::vector<CollisionElement>& elementsB) override;
-
-    ///
-    /// \brief Add a vertex-triangle constraint
-    ///
-    void addVTConstraint(
-        VertexMassPair ptA,
-        VertexMassPair ptB1, VertexMassPair ptB2, VertexMassPair ptB3,
-        double stiffnessA, double stiffnessB) override;
 };
 } // end iMSTK namespace
