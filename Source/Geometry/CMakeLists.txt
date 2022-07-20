@@ -15,6 +15,7 @@ imstk_add_library( Geometry
     Implicit/imstkImplicitFunctionFiniteDifferenceFunctor.h
     Implicit/imstkImplicitGeometry.h
     Implicit/imstkSignedDistanceField.h
+    Mesh/imstkAbstractCellMesh.h
     Mesh/imstkCellMesh.h
     Mesh/imstkHexahedralMesh.h
     Mesh/imstkImageData.h
@@ -35,7 +36,7 @@ imstk_add_library( Geometry
     Analytic/imstkSphere.cpp
     Implicit/imstkCompositeImplicitGeometry.cpp
     Implicit/imstkSignedDistanceField.cpp
-    Mesh/imstkCellMesh.cpp
+    Mesh/imstkAbstractCellMesh.cpp
     Mesh/imstkHexahedralMesh.cpp
     Mesh/imstkImageData.cpp
     Mesh/imstkPointSet.cpp

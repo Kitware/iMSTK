@@ -13,7 +13,7 @@
    limitations under the License.
 =========================================================================*/
 
-#include "imstkCellMesh.h"
+#include "imstkAbstractCellMesh.h"
 
 namespace imstk
 {
