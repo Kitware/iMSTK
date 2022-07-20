@@ -70,9 +70,9 @@ be run through command line or double clicking.
 Options at Configure Time
 -------------------------
 
-**Phantom Omni Support (haptics)**
+**3DSystems Touch Support (haptics)**
 
-To support the Geomagic Touch (formerly Sensable Phantom Omni) haptic
+To support the 3DSystems Touch (formerly Sensable Phantom Omni, formerly Geomagic) haptic
 device, follow the steps below:
 
 1. Install the `OpenHaptics

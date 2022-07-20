@@ -52,5 +52,26 @@ public:
         const VecDataArray<double, 3>& currVertexPosition,
         double& c,
         std::vector<Vec3d>& dcdx) const override;
+
+    ///
+    /// \brief Handle inverted tets with the method described by Irving et. al. in
+    /// "Invertible Finite Elements For Robust Simulation of Large Deformation"
+    ///
+    void handleInversions(
+        Mat3d& F,
+        Mat3d& U,
+        Mat3d& Fhat,
+        Mat3d& VT
+        ) const;
+
+    ///
+    /// \brief Set/Get Inversion Handling
+    ///@{
+    void setInverstionHandling(const bool handleInversions) { m_handleInversions = handleInversions; }
+    bool getInverstionHandling() const { return m_handleInversions; }
+///@}
+
+private:
+    bool m_handleInversions = true;
 };
 } // namespace imstk

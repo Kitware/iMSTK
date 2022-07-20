@@ -39,7 +39,7 @@ PbdFemTetConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPos
     const Vec3d& p2 = initVertexPositions[pIdx2];
     const Vec3d& p3 = initVertexPositions[pIdx3];
 
-    m_elementVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
+    m_initialElementVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
     m_config     = config;
     m_compliance = 1.0 / (config->m_lambda + 2 * config->m_mu);
 
@@ -79,8 +79,23 @@ PbdFemTetConstraint::computeValueAndGradient(
     m.col(1) = p1 - p3;
     m.col(2) = p2 - p3;
 
-    // deformation gradient
-    const Mat3d F = m * m_invRestMat;
+    // deformation gradient (F)
+    Mat3d defgrad = m * m_invRestMat;
+
+    // SVD matrices
+    Mat3d U    = Mat3d::Identity();
+    Mat3d Fhat = Mat3d::Identity();
+    Mat3d VT   = Mat3d::Identity();
+
+    Mat3d F = defgrad;
+
+    // If inverted, handle if flag set to true
+    if (m_handleInversions && defgrad.determinant() <= 1E-8)
+    {
+        handleInversions(defgrad, U, Fhat, VT);
+        F = Fhat; // diagonalized deformation gradient
+    }
+
     // First Piola-Kirchhoff tensor
     Mat3d P;
     // energy constraint
@@ -169,9 +184,12 @@ PbdFemTetConstraint::computeValueAndGradient(
         break;
     }
 
-    Mat3d gradC = m_elementVolume * P * m_invRestMat.transpose();
+    // Rotate P back here. P = U\hat{P}V^{T}
+    P = U * P * VT;
+
+    Mat3d gradC = m_initialElementVolume * P * m_invRestMat.transpose();
     cval    = C;
-    cval   *=  m_elementVolume;
+    cval   *=  m_initialElementVolume;
     dcdx[0] = gradC.col(0);
     dcdx[1] = gradC.col(1);
     dcdx[2] = gradC.col(2);
@@ -179,4 +197,144 @@ PbdFemTetConstraint::computeValueAndGradient(
 
     return true;
 }
-} // namespace imstk
+
+void
+PbdFemTetConstraint::handleInversions(
+    Mat3d& F,
+    Mat3d& U,
+    Mat3d& Fhat,
+    Mat3d& VT) const
+{
+    // Compute SVD of F and return U and VT. Modify to handle inversions. F = U\hat{F} V^{T}
+    Eigen::JacobiSVD<Mat3d> svd(F, Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+    // Save \hat{F}
+    Vec3d sigma(svd.singularValues());
+
+    // Store as matrix
+    for (int i = 0; i < 3; i++)
+    {
+        Fhat(i, i) = sigma(i);
+    }
+
+    // Save U and V
+    U = svd.matrixU();
+    Mat3d V = svd.matrixV();
+
+    // Verify that V is a pure rotations
+    const double detV = V.determinant();
+
+    // If detV is negative, then V includes a reflection.
+    // Switch to reflection by multiplying one column by -1
+    if (detV < 0.0)
+    {
+        double minLambda = IMSTK_DOUBLE_MAX;
+        int    column    = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            if (Fhat(i, i) < minLambda)
+            {
+                column    = i;
+                minLambda = Fhat(i, i);
+            }
+        }
+
+        V.col(column) *= -1.0;
+    }
+
+    VT = V.transpose();
+
+    // Check for small singular values
+    int count    = 0; // number of small singlar values
+    int position = 0; // position of small singular values
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (fabs(Fhat(i, i)) < 1E-4)
+        {
+            position = i;
+            count++;
+        }
+    }
+
+    if (count > 0)
+    {
+        // If more than one singular value is small the element has collapsed
+        // to a line or point. To fix set U to identity.
+        if (count > 1)
+        {
+            U.setIdentity();
+        }
+        else
+        {
+            U = F * V;
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (i != position)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        U(j, i) *= 1.0 / Fhat(i, i);
+                    }
+                }
+            }
+
+            // Replace column of U associated with small singular value with
+            // new basis orthogonal to other columns of U
+            Eigen::Matrix<double, 3, 1, 2> v[2];
+            int                            index = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                if (i != position)
+                {
+                    v[index++] = Eigen::Matrix<double, 3, 1, 2>(U(0, i), U(1, i), U(2, i));
+                }
+            }
+
+            Vec3d vec = v[0].cross(v[1]).normalized();
+            U.col(position) = vec;
+        }
+    }
+    else // No modificaitons required: U = FV\hat{F}^{-1}
+    {
+        Mat3d FhatInv(Fhat.inverse());
+        U = F * V * FhatInv;
+    }
+
+    // If detU is negative, then U includes a reflection.
+    double detU = U.determinant();
+
+    if (detU < 0.0)
+    {
+        int    position  = 0;
+        double minLambda = IMSTK_DOUBLE_MAX;
+        for (int i = 0; i < 3; i++)
+        {
+            if (Fhat(i, i) < minLambda)
+            {
+                position  = i;
+                minLambda = Fhat(i, i);
+            }
+        }
+
+        // Invert values of smallest singular value and associated column of U
+        // This "pushes" the node nearest the uninverted state towards the uninverted state
+        Fhat(position, position) *= -1.0;
+        for (int i = 0; i < 3; i++)
+        {
+            U(i, position) *= -1.0;
+        }
+    }
+
+    // Clamp small singular values of Fhat
+    double clamp = 0.577;
+    for (int i = 0; i < 3; i++)
+    {
+        if (Fhat(i, i) < clamp)
+        {
+            Fhat(i, i) = clamp;
+        }
+    }
+} // end handle tet inversion
+}; // namespace imstk
