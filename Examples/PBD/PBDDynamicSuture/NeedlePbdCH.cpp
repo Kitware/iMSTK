@@ -206,19 +206,19 @@ NeedlePbdCH::handle(
                 const Vec3d& b = meshVertices[m_needlePData[pPointId].triVertIds[1]];
                 const Vec3d& c = meshVertices[m_needlePData[pPointId].triVertIds[2]];
 
-                Vec3d baryPoint  = m_needlePData[pPointId].triBaryPuncturePoint;
-                auto  puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
+                const Vec3d& baryPoint  = m_needlePData[pPointId].triBaryPuncturePoint;
+                const Vec3d  puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
 
                 for (int segmentId = 0; segmentId < needleMesh->getNumCells(); segmentId++)
                 {
-                    Vec2i       needleSegNodeIds = needleIndices[segmentId];
-                    const Vec3d x1 = needleVertices[needleSegNodeIds[0]];
-                    const Vec3d x2 = needleVertices[needleSegNodeIds[1]];
+                    const Vec2i& needleSegNodeIds = needleIndices[segmentId];
+                    const Vec3d& x1 = needleVertices[needleSegNodeIds[0]];
+                    const Vec3d& x2 = needleVertices[needleSegNodeIds[1]];
 
                     int caseType = -1;
 
                     // Find the closest point on this segment
-                    Vec3d segClosestPoint = CollisionUtils::closestPointOnSegment(puncturePt, x1, x2, caseType);
+                    const Vec3d segClosestPoint = CollisionUtils::closestPointOnSegment(puncturePt, x1, x2, caseType);
 
                     double newDist = (segClosestPoint - puncturePt).squaredNorm();
                     if (newDist < closestDist)
@@ -290,8 +290,8 @@ NeedlePbdCH::handle(
 
             // First, find new penetration points
             const Vec2i& nodeIds    = threadIndices[0];
-            const Vec3d  threadTip1 = threadVertices[nodeIds[0]];
-            const Vec3d  threadTip2 = threadVertices[nodeIds[1]];
+            const Vec3d& threadTip1 = threadVertices[nodeIds[0]];
+            const Vec3d& threadTip2 = threadVertices[nodeIds[1]];
 
             // Loop over all triangles in the surface mesh
             for (int triangleId = 0; triangleId < m_tissueSurfMesh->getNumCells(); triangleId++)
@@ -359,12 +359,11 @@ NeedlePbdCH::handle(
             for (int pPointId = 0; pPointId < m_threadPData.size(); pPointId++)
             {
                 // Start with arbitrary large value
-                constexpr double maxVal       = IMSTK_DOUBLE_MAX;
-                Vec3d            closestPoint = { maxVal, maxVal, maxVal };
+                Vec3d closestPoint = { IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX };
 
-                Vec3d a = meshVertices[m_threadPData[pPointId].triVertIds[0]];
-                Vec3d b = meshVertices[m_threadPData[pPointId].triVertIds[1]];
-                Vec3d c = meshVertices[m_threadPData[pPointId].triVertIds[2]];
+                const Vec3d& a = meshVertices[m_threadPData[pPointId].triVertIds[0]];
+                const Vec3d& b = meshVertices[m_threadPData[pPointId].triVertIds[1]];
+                const Vec3d& c = meshVertices[m_threadPData[pPointId].triVertIds[2]];
 
                 Vec3d baryPoint = m_threadPData[pPointId].triBaryPuncturePoint;
 
@@ -376,15 +375,15 @@ NeedlePbdCH::handle(
                 for (int segmentId = 0; segmentId < m_threadMesh->getNumCells() - 1; segmentId++)
                 {
                     const Vec2i& threadSegNodeIds = threadIndices[segmentId];
-                    const Vec3d  x1 = threadVertices[threadSegNodeIds[0]];
-                    const Vec3d  x2 = threadVertices[threadSegNodeIds[1]];
+                    const Vec3d& x1 = threadVertices[threadSegNodeIds[0]];
+                    const Vec3d& x2 = threadVertices[threadSegNodeIds[1]];
 
                     int caseType = -1;
 
-                    Vec3d segClosestPoint = CollisionUtils::closestPointOnSegment(puncturePt, x1, x2, caseType);
+                    const Vec3d segClosestPoint = CollisionUtils::closestPointOnSegment(puncturePt, x1, x2, caseType);
 
-                    Vec3d newDist = segClosestPoint - puncturePt;
-                    Vec3d oldDist = closestPoint - puncturePt;
+                    const Vec3d newDist = segClosestPoint - puncturePt;
+                    const Vec3d oldDist = closestPoint - puncturePt;
 
                     if (newDist.norm() <= oldDist.norm())
                     {
@@ -394,8 +393,8 @@ NeedlePbdCH::handle(
                 }     // end loop over thread segments
 
                 // Check and see if the closest point is at the tips of the thread
-                Vec3d diffTip  = closestPoint - threadVertices[0];
-                Vec3d diffTail = closestPoint - threadVertices[m_threadMesh->getNumVertices() - 1];
+                const Vec3d diffTip  = closestPoint - threadVertices[0];
+                const Vec3d diffTail = closestPoint - threadVertices[m_threadMesh->getNumVertices() - 1];
 
                 // NOTE: Commented out to force thread to stay inserted once inserted
                 // If uncommented, the thread would be able to slide through the mesh and unpuncture.
@@ -419,8 +418,8 @@ NeedlePbdCH::handle(
 
                 // Set of VM pairs for thread
                 const Vec2i& nearestSegNodeIds = threadIndices[closestSegmentId];
-                const Vec3d  p = threadVertices[nearestSegNodeIds[0]];
-                const Vec3d  q = threadVertices[nearestSegNodeIds[1]];
+                const Vec3d& p = threadVertices[nearestSegNodeIds[0]];
+                const Vec3d& q = threadVertices[nearestSegNodeIds[1]];
 
                 VertexMassPair ptA1;
                 ptA1.vertex   = &threadVertices[nearestSegNodeIds[0]];
