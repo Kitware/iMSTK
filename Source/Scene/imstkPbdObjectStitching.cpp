@@ -185,7 +185,7 @@ PbdObjectStitching::addStitchConstraints()
     std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
     if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(pointSetToPick))
     {
-        indicesPtr = cellMesh->getIndices();
+        indicesPtr = cellMesh->getAbstractCells();
     }
 
     // If the user tries to pick

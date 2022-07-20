@@ -94,7 +94,7 @@ struct MeshSide
             }
 
             return MeshSide(verticesPtr.get(), velocitiesPtr.get(), invMassesPtr.get(), mapPtr,
-                dynamic_cast<AbstractCellMesh*>(pointSet)->getIndices().get());
+                dynamic_cast<AbstractCellMesh*>(pointSet)->getAbstractCells().get());
         }
         return MeshSide();
     }
