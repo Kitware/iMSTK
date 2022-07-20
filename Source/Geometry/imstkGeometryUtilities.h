@@ -48,6 +48,7 @@ class vtkDataSetAttributes;
 
 namespace imstk
 {
+class AbstractCellMesh;
 class AbstractDataArray;
 class AnalyticalGeometry;
 class ImageData;
@@ -56,7 +57,6 @@ class LineMesh;
 class PointSet;
 class SurfaceMesh;
 class TetrahedralMesh;
-class VolumetricMesh;
 
 class OrientedBox;
 class Sphere;
@@ -136,9 +136,10 @@ std::shared_ptr<SurfaceMesh> copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkM
 std::shared_ptr<LineMesh> copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
 
 ///
-/// \brief Get imstk volumetric mesh given vtkUnstructuredGrid as input
+/// \brief Get imstk cell mesh given vtkUnstructuredGrid as input
+/// iMSTK only supports homogenous cells, not unstructured. Uses the last cell type in array. Drops others.
 ///
-std::shared_ptr<VolumetricMesh> copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh);
+std::shared_ptr<AbstractCellMesh> copyToCellMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh);
 
 ///
 /// \brief Converts imstk point set into a vtk polydata

@@ -33,7 +33,7 @@ TEST(imstkLineMeshTest, VertexNeighborVertices)
         std::make_shared<VecDataArray<double, 3>>(vertices),
         std::make_shared<VecDataArray<int, 2>>(indices));
 
-    lineMesh->computeNeighborVertices();
+    lineMesh->computeVertexNeighbors();
 
     const std::vector<std::unordered_set<int>>& map = lineMesh->getVertexNeighbors();
 

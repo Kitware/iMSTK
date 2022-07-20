@@ -70,7 +70,7 @@ TEST(imstkTetrahedralMeshTest, ExtractSurfaceMesh)
     // Extract the surface
     std::shared_ptr<SurfaceMesh>             surfMesh = tetMesh.extractSurfaceMesh();
     std::shared_ptr<VecDataArray<double, 3>> surfVerticesPtr = surfMesh->getVertexPositions();
-    std::shared_ptr<VecDataArray<int, 3>>    surfIndicesPtr  = surfMesh->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>>    surfIndicesPtr  = surfMesh->getCells();
     VecDataArray<double, 3>&                 surfVertices    = *surfVerticesPtr;
     VecDataArray<int, 3>&                    surfIndices     = *surfIndicesPtr;
 

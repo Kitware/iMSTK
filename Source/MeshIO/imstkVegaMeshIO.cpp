@@ -36,7 +36,7 @@ DISABLE_WARNING_POP
 
 namespace imstk
 {
-std::shared_ptr<VolumetricMesh>
+std::shared_ptr<PointSet>
 VegaMeshIO::read(const std::string& filePath, MeshFileType meshType)
 {
     CHECK(meshType == MeshFileType::VEG) << "@VegaMeshIO::read error: input file type is not veg for input " << filePath;
@@ -49,12 +49,12 @@ VegaMeshIO::read(const std::string& filePath, MeshFileType meshType)
 }
 
 bool
-VegaMeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath, const MeshFileType meshType)
+VegaMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& filePath, const MeshFileType meshType)
 {
     CHECK(meshType == MeshFileType::VEG) << "@VegaMeshIO::write error: file type is not veg for input " << filePath;
 
-    // extract volumetric mesh
-    const auto imstkVolMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(imstkMesh);
+    // Extract volumetric mesh
+    auto imstkVolMesh = std::dynamic_pointer_cast<PointSet>(imstkMesh);
 
     CHECK(imstkVolMesh != nullptr) << "@VegaMeshIO::write error: imstk::PointSet object supplied is not a imstk::VolumetricMesh type for input" << filePath;
 
@@ -86,7 +86,7 @@ VegaMeshIO::readVegaMesh(const std::string& filePath)
     return vegaMesh;
 }
 
-std::shared_ptr<imstk::VolumetricMesh>
+std::shared_ptr<PointSet>
 VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh> vegaMesh)
 {
     // Copy vertices
@@ -94,8 +94,8 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
     VegaMeshIO::copyVertices(vegaMesh, *vertices);
 
     // Copy cells
-    auto                                   cellType = vegaMesh->getElementType();
-    std::shared_ptr<imstk::VolumetricMesh> mesh;
+    auto                      cellType = vegaMesh->getElementType();
+    std::shared_ptr<PointSet> mesh;
     if (cellType == vega::VolumetricMesh::TET)
     {
         std::shared_ptr<VecDataArray<int, 4>> cellsPtr = std::make_shared<VecDataArray<int, 4>>();
@@ -153,7 +153,7 @@ VegaMeshIO::copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
 }
 
 std::shared_ptr<vega::VolumetricMesh>
-VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::VolumetricMesh> imstkVolMesh)
+VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<PointSet> imstkVolMesh)
 {
     // as of now, only works for TET elements
     if (imstkVolMesh->getTypeName() == TetrahedralMesh::getStaticTypeName())
@@ -169,7 +169,7 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
             vertices.emplace_back(node(2));
         }
 
-        VecDataArray<int, 4>& tetArray = *imstkVolTetMesh->getTetrahedraIndices();
+        VecDataArray<int, 4>& tetArray = *imstkVolTetMesh->getCells();
         std::vector<int>      elements;
         for (const Vec4i& tet : tetArray)
         {
@@ -182,7 +182,7 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
         // Using default material properties to append to the .veg file
         auto vegaMesh = std::make_shared<vega::TetMesh>(int(imstkVolTetMesh->getNumVertices()),
             &vertices[0],
-            int(imstkVolTetMesh->getNumTetrahedra()),
+            int(imstkVolTetMesh->getNumCells()),
             &elements[0],
             1E7, /* Young's modulus */
             0.4, /* Poisson's ratio */

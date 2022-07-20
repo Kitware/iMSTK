@@ -147,7 +147,7 @@ ObjectIO::importSceneObject(
                 copyMesh = std::make_shared<LineMesh>();
                 std::dynamic_pointer_cast<LineMesh>(copyMesh)->initialize(
                     std::make_shared<VecDataArray<double, 3>>(*lineMesh->getVertexPositions()),
-                    std::make_shared<VecDataArray<int, 2>>(*lineMesh->getLinesIndices()));
+                    std::make_shared<VecDataArray<int, 2>>(*lineMesh->getCells()));
             }
             else
             {

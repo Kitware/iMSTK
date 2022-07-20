@@ -28,6 +28,7 @@
  * Geometry 
  */
 %shared_ptr(imstk::Geometry)
+%shared_ptr(imstk::AbstractCellMesh)
 %shared_ptr(imstk::PointSet)
 %shared_ptr(imstk::ImageData)
 %shared_ptr(imstk::LineMesh)

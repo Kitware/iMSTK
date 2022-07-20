@@ -181,7 +181,7 @@ main()
                     // Another issue here is that initial geometry is not remapped so reset will not reset to undeformed config
                     clothMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newClothMesh->getVertexPositions()));
                     clothMesh->setVertexPositions(newClothMesh->getVertexPositions());
-                    clothMesh->setTriangleIndices(newClothMesh->getTriangleIndices());
+                    clothMesh->setCells(newClothMesh->getCells());
                     clothMesh->setVertexAttribute("Velocities", newClothMesh->getVertexAttribute("Velocities"));
                     clothMesh->postModified();
 

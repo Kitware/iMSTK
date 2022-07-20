@@ -47,7 +47,7 @@ SurfaceMeshToSphereCD::computeCollisionDataAB(
     const Vec3d& spherePos    = sphere->getPosition();
     const double sphereRadius = sphere->getRadius();
 
-    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = surfMesh->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = surfMesh->getCells();
     const VecDataArray<int, 3>&              indices     = *indicesPtr;
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
     const VecDataArray<double, 3>&           vertices    = *verticesPtr;

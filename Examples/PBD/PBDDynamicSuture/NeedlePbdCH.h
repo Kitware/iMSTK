@@ -47,7 +47,6 @@ class TetrahedralMesh;
 class NeedlePbdCH : public PbdCollisionHandling
 {
 protected:
-
     // Stores data for penetration points, both for the needle and the thread
     struct SuturePenetrationData
     {
@@ -91,7 +90,7 @@ protected:
 
     // PBD Tissue Mesh Data
     std::shared_ptr<PbdObject>   m_pbdTissueObj;
-    std::shared_ptr<SurfaceMesh> m_surfMesh;
+    std::shared_ptr<SurfaceMesh> m_tissueSurfMesh;
     std::shared_ptr<VecDataArray<double, 3>> m_meshVerticesPtr;
 
     // Fake velocity for stitch constraint

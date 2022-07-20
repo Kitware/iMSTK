@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkPointSet.h"
+#include "imstkCellMesh.h"
 
 namespace imstk
 {
@@ -32,7 +32,8 @@ class SurfaceMesh;
 ///
 /// \brief Base class for all volume mesh types
 ///
-class VolumetricMesh : public PointSet
+template<int N>
+class VolumetricMesh : public CellMesh<N>
 {
 public:
     ~VolumetricMesh() override = default;

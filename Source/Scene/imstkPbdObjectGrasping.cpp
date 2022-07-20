@@ -204,17 +204,9 @@ PbdObjectGrasping::addPickConstraints()
     const DataArray<double>& invMasses = *invMassesPtr;
 
     std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
-    if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(pointSetToPick))
+    if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(pointSetToPick))
     {
-        indicesPtr = lineMesh->getLinesIndices();
-    }
-    if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(pointSetToPick))
-    {
-        indicesPtr = surfMesh->getTriangleIndices();
-    }
-    else if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(pointSetToPick))
-    {
-        indicesPtr = tetMesh->getTetrahedraIndices();
+        indicesPtr = cellMesh->getAbstractCells();
     }
 
     // If the user tries to pick

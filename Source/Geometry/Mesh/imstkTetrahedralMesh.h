@@ -29,38 +29,19 @@
 
 namespace imstk
 {
-class SurfaceMesh;
-
 ///
 /// \class TetrahedralMesh
 ///
 /// \brief Represents a set of tetrahedrons & vertices via an array of
 /// Vec3d double vertices & Vec4i integer indices
 ///
-class TetrahedralMesh : public VolumetricMesh
+class TetrahedralMesh : public VolumetricMesh<4>
 {
 public:
-    TetrahedralMesh();
+    TetrahedralMesh() = default;
     ~TetrahedralMesh() override = default;
 
     IMSTK_TYPE_NAME(TetrahedralMesh)
-
-    ///
-    /// \brief Initializes the rest of the data structures given vertex positions and
-    ///  tetrahedra connectivity
-    ///
-    void initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
-                    std::shared_ptr<VecDataArray<int, 4>> tetrahedra);
-
-    ///
-    /// \brief Clear all the mesh data
-    ///
-    void clear() override;
-
-    ///
-    /// \brief Print the tetrahedral mesh
-    ///
-    void print() const override;
 
     ///
     /// \brief This method extracts the conforming triangular mesh from the tetrahedral mesh
@@ -70,41 +51,14 @@ public:
     ///
     /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra
     ///
-    Vec4d computeBarycentricWeights(const size_t& tetId, const Vec3d& pos) const;
+    Vec4d computeBarycentricWeights(const int tetId, const Vec3d& pos) const override;
 
     ///
     /// \brief Compute the bounding box of a given tetrahedron
     ///
     void computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const;
 
-    ///
-    /// \brief Returns true if the geometry is a mesh, else returns false
-    ///
-    bool isMesh() const override { return true; }
-
 // Accessors
-    ///
-    /// \brief set the vector of array of IDs for the mesh
-    ///
-    void setTetrahedraIndices(std::shared_ptr<VecDataArray<int, 4>> indices) { m_tetrahedraIndices = indices; }
-
-    ///
-    /// \brief Return the vector of array of IDs for all the tetrahedra
-    ///
-    std::shared_ptr<VecDataArray<int, 4>> getTetrahedraIndices() const { return m_tetrahedraIndices; }
-
-    ///
-    /// \brief Return the array of IDs for a given tetrahedron
-    ///@{
-    const Vec4i& getTetrahedronIndices(const size_t tetId) const;
-    Vec4i& getTetrahedronIndices(const size_t tetId);
-    ///@}
-
-    ///
-    /// \brief Returns the number of tetrahedra
-    ///
-    int getNumTetrahedra() const;
-
     ///
     /// \brief Get/set method for removed elements from the mesh
     ///@{
@@ -117,14 +71,11 @@ public:
     ///
     double getVolume() override;
 
-    ///
-    /// \brief Get cells as abstract array.
-    ///
-    const AbstractDataArray* getCellIndices() const override { return m_tetrahedraIndices.get(); }
+    int getNumTetrahedra() const { return getNumCells(); }
+    void setTetrahedraIndices(std::shared_ptr<VecDataArray<int, 4>> indices) { setCells(indices); }
+    std::shared_ptr<VecDataArray<int, 4>> getTetrahedraIndices() const { return getCells(); }
 
 protected:
-    std::shared_ptr<VecDataArray<int, 4>> m_tetrahedraIndices;
-
     std::vector<bool> m_removedMeshElems;
 };
 } // namespace imstk

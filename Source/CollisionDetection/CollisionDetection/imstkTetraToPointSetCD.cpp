@@ -53,7 +53,7 @@ TetraToPointSetCD::computeCollisionDataAB(
 
     // For every tet in meshA, test if any points lie in it
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(tetMesh->getNumTetrahedra(),
+    ParallelUtils::parallelFor(tetMesh->getNumCells(),
         [&](const int tetIdA)
         {
             // Compute the bounding box of the tet

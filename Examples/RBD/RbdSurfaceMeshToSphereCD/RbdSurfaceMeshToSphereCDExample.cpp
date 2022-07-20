@@ -50,7 +50,7 @@ createBowlMesh()
 
     std::shared_ptr<SurfaceMesh> sphereMesh = GeometryUtils::toUVSphereSurfaceMesh(sphere, 10, 10);
     auto                         sphereVerticesPtr = sphereMesh->getVertexPositions();
-    auto                         sphereIndicesPtr  = sphereMesh->getTriangleIndices();
+    auto                         sphereIndicesPtr  = sphereMesh->getCells();
 
     // Cut off the upper half of the sphere
     auto bowlVerticesPtr = std::make_shared<VecDataArray<double, 3>>();

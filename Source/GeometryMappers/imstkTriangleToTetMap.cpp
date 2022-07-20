@@ -58,10 +58,10 @@ TriangleToTetMap::computeTriToTetMap(std::unordered_map<int, int>& triToTetMap)
     auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(getChildGeometry());
 
-    std::shared_ptr<VecDataArray<int, 4>> tetIndicesPtr = tetMesh->getTetrahedraIndices();
+    std::shared_ptr<VecDataArray<int, 4>> tetIndicesPtr = tetMesh->getCells();
     const VecDataArray<int, 4>&           tetIndices    = *tetIndicesPtr;
 
-    std::shared_ptr<VecDataArray<int, 3>> surfIndicesPtr = surfMesh->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>> surfIndicesPtr = surfMesh->getCells();
     const VecDataArray<int, 3>&           surfIndices    = *surfIndicesPtr;
 
     // Hash all the triangles from the surface

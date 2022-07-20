@@ -131,72 +131,43 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         switch (meshType)
         {
         case MeshFileType::NII:
-        {
             return VTKMeshIO::writeVtkImageDataNIFTI(imgMesh, filePath);
-        }
         case MeshFileType::MHD:
-        {
             return VTKMeshIO::writeMetaImageData(imgMesh, filePath);
-        }
         case MeshFileType::PNG:
-        {
             return VTKMeshIO::writeVtkImageData<vtkPNGWriter>(imgMesh, filePath);
-        }
         case MeshFileType::JPG:
-        {
             return VTKMeshIO::writeVtkImageData<vtkJPEGWriter>(imgMesh, filePath);
-        }
         case MeshFileType::BMP:
-        {
             return VTKMeshIO::writeVtkImageData<vtkBMPWriter>(imgMesh, filePath);
-        }
         default:
-            LOG(WARNING) << "Error: file type not supported for volumetric mesh. Target path supplied:" << filePath;
+            LOG(WARNING) << "Error: file type not supported for ImageData. Target path supplied:" << filePath;
             return false;
         }
     }
-    else if (auto vMesh = std::dynamic_pointer_cast<VolumetricMesh>(imstkMesh))
+    else if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(imstkMesh))
     {
         switch (meshType)
         {
         case MeshFileType::VTU:
-            if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(vMesh))
-            {
-                return VTKMeshIO::writeVtkUnstructuredGrid<vtkXMLUnstructuredGridWriter>(tetMesh, filePath);
-            }
-            else if (auto hexMesh = std::dynamic_pointer_cast<HexahedralMesh>(vMesh))
-            {
-                return VTKMeshIO::writeVtkUnstructuredGrid<vtkXMLUnstructuredGridWriter>(hexMesh, filePath);
-            }
-            else
-            {
-                return false;
-            }
-
+            return VTKMeshIO::writeVtkUnstructuredGrid<vtkXMLUnstructuredGridWriter>(tetMesh, filePath);
         case MeshFileType::VTK:
-            if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(vMesh))
-            {
-                return VTKMeshIO::writeVtkPolyData<vtkGenericDataObjectWriter>(lineMesh, filePath);
-            }
-            else if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(vMesh))
-            {
-                return VTKMeshIO::writeVtkPolyData<vtkGenericDataObjectWriter>(surfMesh, filePath);
-            }
-            else if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(vMesh))
-            {
-                return VTKMeshIO::writeVtkUnstructuredGrid<vtkGenericDataObjectWriter>(tetMesh, filePath);
-            }
-            else if (auto hexMesh = std::dynamic_pointer_cast<HexahedralMesh>(vMesh))
-            {
-                return VTKMeshIO::writeVtkUnstructuredGrid<vtkGenericDataObjectWriter>(hexMesh, filePath);
-            }
-            else
-            {
-                return false;
-            }
-
+            return VTKMeshIO::writeVtkUnstructuredGrid<vtkGenericDataObjectWriter>(tetMesh, filePath);
         default:
-            LOG(WARNING) << "Error: file type not supported for volumetric mesh. Target path supplied:" << filePath;
+            LOG(WARNING) << "Error: file type not supported for TetrahedralMesh. Target path supplied:" << filePath;
+            return false;
+        }
+    }
+    else if (auto hexMesh = std::dynamic_pointer_cast<HexahedralMesh>(imstkMesh))
+    {
+        switch (meshType)
+        {
+        case MeshFileType::VTU:
+            return VTKMeshIO::writeVtkUnstructuredGrid<vtkXMLUnstructuredGridWriter>(hexMesh, filePath);
+        case MeshFileType::VTK:
+            return VTKMeshIO::writeVtkUnstructuredGrid<vtkGenericDataObjectWriter>(hexMesh, filePath);
+        default:
+            LOG(WARNING) << "Error: file type not supported for HexahedralMesh. Target path supplied:" << filePath;
             return false;
         }
     }
@@ -213,7 +184,7 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::VTK:
             return VTKMeshIO::writeVtkPolyData<vtkPolyDataWriter>(sMesh, filePath);
         default:
-            LOG(WARNING) << "Error: file type not supported for surface mesh. Target path supplied:" << filePath;
+            LOG(WARNING) << "Error: file type not supported for SurfaceMesh. Target path supplied:" << filePath;
             return false;
         }
     }
@@ -226,7 +197,7 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::VTP:
             return VTKMeshIO::writeVtkPolyData<vtkXMLPolyDataWriter>(lMesh, filePath);
         default:
-            LOG(WARNING) << "Error: file type not supported for line mesh. Target path supplied:" << filePath;
+            LOG(WARNING) << "Error: file type not supported for LineMesh. Target path supplied:" << filePath;
             return false;
         }
     }
@@ -237,7 +208,7 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::VTK:
             return VTKMeshIO::writeVtkPointSet<vtkGenericDataObjectWriter>(ptMesh, filePath);
         default:
-            LOG(WARNING) << "Error: file type not supported for point mesh. Target path supplied:" << filePath;
+            LOG(WARNING) << "Error: file type not supported for PointSet. Target path supplied:" << filePath;
             return false;
         }
     }
@@ -260,12 +231,12 @@ VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
     {
         // Try to convert to surface mesh, if no elements exist try reading as a line mesh
         std::shared_ptr<SurfaceMesh> surfMesh = GeometryUtils::copyToSurfaceMesh(vtkMesh);
-        if (surfMesh->getNumTriangles() > 0)
+        if (surfMesh->getNumCells() > 0)
         {
             return surfMesh;
         }
         std::shared_ptr<LineMesh> lineMesh = GeometryUtils::copyToLineMesh(vtkMesh);
-        if (lineMesh->getNumLines() > 0)
+        if (lineMesh->getNumCells() > 0)
         {
             return lineMesh;
         }
@@ -274,7 +245,7 @@ VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
 
     if (vtkUnstructuredGrid* vtkMesh = reader->GetUnstructuredGridOutput())
     {
-        return GeometryUtils::copyToVolumetricMesh(vtkMesh);
+        return GeometryUtils::copyToCellMesh(vtkMesh);
     }
 
     LOG(FATAL) << "Error: could not read with VTK reader for input " << filePath;
@@ -378,7 +349,7 @@ VTKMeshIO::writeVtkPointSet(const std::shared_ptr<PointSet> imstkMesh, const std
 }
 
 template<typename ReaderType>
-std::shared_ptr<VolumetricMesh>
+std::shared_ptr<AbstractCellMesh>
 VTKMeshIO::readVtkUnstructuredGrid(const std::string& filePath)
 {
     auto reader = vtkSmartPointer<ReaderType>::New();
@@ -386,7 +357,7 @@ VTKMeshIO::readVtkUnstructuredGrid(const std::string& filePath)
     reader->Update();
 
     vtkSmartPointer<vtkUnstructuredGrid> vtkMesh = reader->GetOutput();
-    return GeometryUtils::copyToVolumetricMesh(vtkMesh);
+    return GeometryUtils::copyToCellMesh(vtkMesh);
 }
 
 std::shared_ptr<ImageData>

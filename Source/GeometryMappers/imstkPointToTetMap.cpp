@@ -112,18 +112,24 @@ PointToTetMap::requestUpdate()
     auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     auto pointSet = std::dynamic_pointer_cast<PointSet>(getChildGeometry());
 
-    VecDataArray<double, 3>& vertices = *m_childVerts;
+    std::shared_ptr<VecDataArray<int, 4>>    parentIndicesPtr = tetMesh->getCells();
+    const VecDataArray<int, 4>&              parentIndices    = *parentIndicesPtr;
+    std::shared_ptr<VecDataArray<double, 3>> parentVertsPtr   = tetMesh->getVertexPositions();
+    const VecDataArray<double, 3>&           parentVerts      = *parentVertsPtr;
+
+    VecDataArray<double, 3>& childVerts = *m_childVerts;
+
     ParallelUtils::parallelFor(pointSet->getNumVertices(),
         [&](const int vertexId)
         {
-            const Vec4i& tetVerts =
-                tetMesh->getTetrahedronIndices(m_verticesEnclosingTetraId[vertexId]);
+            const Vec4i& tet =
+                parentIndices[m_verticesEnclosingTetraId[vertexId]];
             const Vec4d& weights = m_verticesWeights[vertexId];
 
-            vertices[vertexId] = tetMesh->getVertexPosition(tetVerts[0]) * weights[0] +
-                                 tetMesh->getVertexPosition(tetVerts[1]) * weights[1] +
-                                 tetMesh->getVertexPosition(tetVerts[2]) * weights[2] +
-                                 tetMesh->getVertexPosition(tetVerts[3]) * weights[3];
+            childVerts[vertexId] = parentVerts[tet[0]] * weights[0] +
+                                   parentVerts[tet[1]] * weights[1] +
+                                   parentVerts[tet[2]] * weights[2] +
+                                   parentVerts[tet[3]] * weights[3];
         });
 
     pointSet->postModified();
@@ -139,10 +145,10 @@ PointToTetMap::findClosestTetrahedron(const Vec3d& pos) const
     int    closestTetrahedron = IMSTK_INT_MAX;
     Vec3d  center(0.0, 0.0, 0.0);
 
-    for (int tetId = 0; tetId < tetMesh->getNumTetrahedra(); tetId++)
+    for (int tetId = 0; tetId < tetMesh->getNumCells(); tetId++)
     {
         center = Vec3d::Zero();
-        const Vec4i& vert = tetMesh->getTetrahedronIndices(tetId);
+        const Vec4i& vert = (*tetMesh->getCells())[tetId];
         for (int i = 0; i < 4; i++)
         {
             center += tetMesh->getInitialVertexPosition(vert[i]);
@@ -166,7 +172,7 @@ PointToTetMap::findEnclosingTetrahedron(const Vec3d& pos) const
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
     int  enclosingTetrahedron = IMSTK_INT_MAX;
 
-    for (int idx = 0; idx < tetMesh->getNumTetrahedra(); idx++)
+    for (int idx = 0; idx < tetMesh->getNumCells(); idx++)
     {
         const bool inBox = (pos[0] >= m_bBoxMin[idx][0] && pos[0] <= m_bBoxMax[idx][0])
                            && (pos[1] >= m_bBoxMin[idx][1] && pos[1] <= m_bBoxMax[idx][1])
@@ -194,10 +200,10 @@ void
 PointToTetMap::updateBoundingBox()
 {
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getParentGeometry());
-    m_bBoxMin.resize(tetMesh->getNumTetrahedra());
-    m_bBoxMax.resize(tetMesh->getNumTetrahedra());
+    m_bBoxMin.resize(tetMesh->getNumCells());
+    m_bBoxMax.resize(tetMesh->getNumCells());
 
-    ParallelUtils::parallelFor(tetMesh->getNumTetrahedra(),
+    ParallelUtils::parallelFor(tetMesh->getNumCells(),
         [&](const int tid)
         {
             tetMesh->computeTetrahedronBoundingBox(tid, m_bBoxMin[tid], m_bBoxMax[tid]);

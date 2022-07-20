@@ -50,7 +50,7 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
 
     setVertexBuffer(geometry->getVertexPositions());
 
-    setIndexBuffer(geometry->getTetrahedraIndices());
+    setIndexBuffer(geometry->getCells());
     m_mesh->SetCells(VTK_TETRA, m_cellArray);
 
     // Map vertex scalars if it has them
@@ -84,7 +84,7 @@ VTKTetrahedralMeshRenderDelegate::processEvents()
     // Custom handling of events
     std::shared_ptr<TetrahedralMesh>         geom     = std::dynamic_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
-    std::shared_ptr<VecDataArray<int, 4>>    indices  = geom->getTetrahedraIndices();
+    std::shared_ptr<VecDataArray<int, 4>>    indices  = geom->getCells();
 
     // Only use the most recent event from respective sender
     std::array<Command, 5> cmds;
@@ -136,7 +136,7 @@ void
 VTKTetrahedralMeshRenderDelegate::indexDataModified(Event* imstkNotUsed(e))
 {
     auto geometry = std::static_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
-    setIndexBuffer(geometry->getTetrahedraIndices());
+    setIndexBuffer(geometry->getCells());
 }
 
 void
@@ -154,9 +154,9 @@ VTKTetrahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
     m_mappedVertexArray->Modified();
 
     // Only update index buffer when reallocated
-    if (m_indices != geometry->getTetrahedraIndices())
+    if (m_indices != geometry->getCells())
     {
-        setIndexBuffer(geometry->getTetrahedraIndices());
+        setIndexBuffer(geometry->getCells());
     }
 }
 

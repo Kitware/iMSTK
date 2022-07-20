@@ -26,20 +26,12 @@
 
 namespace imstk
 {
-SurfaceMesh::SurfaceMesh() : PointSet(),
-    m_triangleIndices(std::make_shared<VecDataArray<int, 3>>())
-{
-}
-
 void
 SurfaceMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
                         std::shared_ptr<VecDataArray<int, 3>> triangleIndices,
                         const bool computeDerivedData)
 {
-    this->clear();
-
-    PointSet::initialize(vertices);
-    this->setTriangleIndices(triangleIndices);
+    CellMesh::initialize(vertices, triangleIndices);
 
     if (computeDerivedData)
     {
@@ -70,35 +62,6 @@ SurfaceMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
     }
 }
 
-void
-SurfaceMesh::clear()
-{
-    PointSet::clear();
-    if (m_triangleIndices != nullptr)
-    {
-        m_triangleIndices->clear();
-    }
-    m_vertexToCells.clear();
-    m_vertexToNeighborVertex.clear();
-    for (auto i : m_cellAttributes)
-    {
-        i.second->clear();
-    }
-}
-
-void
-SurfaceMesh::print() const
-{
-    PointSet::print();
-
-    LOG(INFO) << "Number of triangles: " << this->getNumTriangles();
-    LOG(INFO) << "Triangles:";
-    for (auto& tri : *m_triangleIndices)
-    {
-        LOG(INFO) << tri[0] << ", " << tri[1] << ", " << tri[2];
-    }
-}
-
 double
 SurfaceMesh::getVolume()
 {
@@ -116,69 +79,25 @@ SurfaceMesh::getVolume()
 }
 
 void
-SurfaceMesh::computeVertexToCellMap()
-{
-    m_vertexToCells.clear();
-    m_vertexToCells.resize(m_vertexPositions->size());
-
-    int cellId = 0;
-    for (const auto& cell : *m_triangleIndices)
-    {
-        m_vertexToCells.at(cell[0]).insert(cellId);
-        m_vertexToCells.at(cell[1]).insert(cellId);
-        m_vertexToCells.at(cell[2]).insert(cellId);
-        cellId++;
-    }
-}
-
-void
-SurfaceMesh::computeVertexNeighbors()
-{
-    m_vertexToNeighborVertex.clear();
-    m_vertexToNeighborVertex.resize(m_vertexPositions->size());
-    this->computeVertexToCellMap();
-
-    // For every vertex
-    const VecDataArray<int, 3>& indices = *m_triangleIndices;
-    for (int vertexId = 0; vertexId < m_vertexToNeighborVertex.size(); vertexId++)
-    {
-        // For every cell it is connected too
-        for (const int cellId : m_vertexToCells.at(vertexId))
-        {
-            // For every vertex of that cell
-            for (int i = 0; i < 3; i++)
-            {
-                // So long as its not the source vertex (not a neighbor of itself)
-                const int vertexId2 = indices[cellId][i];
-                if (vertexId2 != vertexId)
-                {
-                    m_vertexToNeighborVertex.at(vertexId).insert(vertexId2);
-                }
-            }
-        }
-    }
-}
-
-void
 SurfaceMesh::computeTrianglesNormals()
 {
     // Avoid reallocating if same size
     std::shared_ptr<VecDataArray<double, 3>> triangleNormalsPtr = getCellNormals();
     if (triangleNormalsPtr == nullptr)
     {
-        triangleNormalsPtr = std::make_shared<VecDataArray<double, 3>>(m_triangleIndices->size());
+        triangleNormalsPtr = std::make_shared<VecDataArray<double, 3>>(m_indices->size());
     }
     else
     {
-        if (m_triangleIndices->size() != triangleNormalsPtr->size())
+        if (m_indices->size() != triangleNormalsPtr->size())
         {
-            triangleNormalsPtr->resize(m_triangleIndices->size());
+            triangleNormalsPtr->resize(m_indices->size());
         }
     }
     VecDataArray<double, 3>& triangleNormals = *triangleNormalsPtr;
 
     const VecDataArray<double, 3>& vertices = *m_vertexPositions;
-    const VecDataArray<int, 3>&    indices  = *m_triangleIndices;
+    const VecDataArray<int, 3>&    indices  = *m_indices;
     for (int triangleId = 0; triangleId < triangleNormals.size(); ++triangleId)
     {
         const auto& t  = indices[triangleId];
@@ -201,13 +120,13 @@ SurfaceMesh::computeTriangleTangents()
         std::shared_ptr<VecDataArray<double, 3>> triangleTangentsPtr = getCellTangents();
         if (triangleTangentsPtr == nullptr)
         {
-            triangleTangentsPtr = std::make_shared<VecDataArray<double, 3>>(m_triangleIndices->size());
+            triangleTangentsPtr = std::make_shared<VecDataArray<double, 3>>(m_indices->size());
         }
         else
         {
-            if (m_triangleIndices->size() != triangleTangentsPtr->size())
+            if (m_indices->size() != triangleTangentsPtr->size())
             {
-                triangleTangentsPtr->resize(m_triangleIndices->size());
+                triangleTangentsPtr->resize(m_indices->size());
             }
         }
         VecDataArray<double, 3>& triangleTangents = *triangleTangentsPtr;
@@ -222,7 +141,7 @@ SurfaceMesh::computeTriangleTangents()
         const VecDataArray<double, 3>& triangleNormals = *triangleNormalsPtr;
         const VecDataArray<float, 2>&  uvs      = *uvsPtr;
         const VecDataArray<double, 3>& vertices = *m_vertexPositions;
-        const VecDataArray<int, 3>&    indices  = *m_triangleIndices;
+        const VecDataArray<int, 3>&    indices  = *m_indices;
         for (int triangleId = 0; triangleId < triangleNormals.size(); ++triangleId)
         {
             const Vec3i& t   = indices[triangleId];
@@ -368,13 +287,13 @@ void
 SurfaceMesh::optimizeForDataLocality()
 {
     const size_t numVertices  = this->getNumVertices();
-    const size_t numTriangles = this->getNumTriangles();
+    const size_t numTriangles = this->getNumCells();
 
     // First find the list of triangles a given vertex is part of
     std::vector<std::vector<int>> vertexNeighbors;
     vertexNeighbors.resize(this->getNumVertices());
     int                   triangleId      = 0;
-    VecDataArray<int, 3>& triangleIndices = *m_triangleIndices;
+    VecDataArray<int, 3>& triangleIndices = *m_indices;
     for (const auto& tri : triangleIndices)
     {
         vertexNeighbors[tri[0]].push_back(triangleId);
@@ -472,16 +391,10 @@ SurfaceMesh::optimizeForDataLocality()
     this->initialize(optimallyOrderedNodalPos, optConnectivityRenumbered);
 }
 
-int
-SurfaceMesh::getNumTriangles() const
-{
-    return m_triangleIndices->size();
-}
-
 void
 SurfaceMesh::flipNormals()
 {
-    for (auto& tri : *m_triangleIndices)
+    for (auto& tri : *m_indices)
     {
         std::swap(tri[0], tri[1]);
     }
@@ -491,7 +404,7 @@ void
 SurfaceMesh::correctWindingOrder()
 {
     // Enforce consistency in winding of a particular triangle with its neighbor (parent)
-    VecDataArray<int, 3>& indices = *m_triangleIndices;
+    VecDataArray<int, 3>& indices = *m_indices;
     auto                  enforceWindingConsistency =
         [&](const size_t masterTriId, const size_t neighTriId)
         {
@@ -560,7 +473,7 @@ SurfaceMesh::correctWindingOrder()
     // Keep track of those neighbor triangles whose order is enforced but its neighbors not
     // necessarily enforced (trianglesCorrected). Continue this until there is no
     // triangle left in the list
-    std::vector<bool>   trianglesCorrected(this->getNumTriangles(), false);
+    std::vector<bool>   trianglesCorrected(this->getNumCells(), false);
     std::vector<size_t> correctedTriangles;
 
     size_t currentTriangle = 0;  // Start with triangle 0
@@ -617,195 +530,5 @@ SurfaceMesh::computeUVSeamVertexGroups()
         }
         m_UVSeamVertexGroups[group]->push_back(i);
     }
-}
-
-void
-SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
-{
-    // \todo: Add deep copies to all geometry classes
-    // SurfaceMesh members
-    this->m_triangleIndices = std::make_shared<VecDataArray<int, 3>>(*srcMesh->m_triangleIndices);
-    this->m_vertexToCells   = srcMesh->m_vertexToCells;
-    this->m_vertexToNeighborVertex = srcMesh->m_vertexToNeighborVertex;
-    for (auto i : srcMesh->m_UVSeamVertexGroups)
-    {
-        this->m_UVSeamVertexGroups[i.first] = std::make_shared<std::vector<size_t>>(*i.second);
-    }
-    // \todo: abstract DataArray's can't be copied currently
-    for (auto i : srcMesh->m_cellAttributes)
-    {
-        this->m_cellAttributes[i.first] = i.second;
-    }
-    this->m_activeCellNormals  = srcMesh->m_activeCellNormals;
-    this->m_activeCellScalars  = srcMesh->m_activeCellScalars;
-    this->m_activeCellTangents = srcMesh->m_activeCellTangents;
-
-    // PointSet members
-    this->m_initialVertexPositions = std::make_shared<VecDataArray<double, 3>>(*srcMesh->m_initialVertexPositions);
-    this->m_vertexPositions = std::make_shared<VecDataArray<double, 3>>(*srcMesh->m_vertexPositions);
-    // \todo: abstract DataArray's can't be copied currently
-    for (auto i : srcMesh->m_vertexAttributes)
-    {
-        this->m_vertexAttributes[i.first] = i.second;
-    }
-    this->m_activeVertexNormals  = srcMesh->m_activeVertexNormals;
-    this->m_activeVertexScalars  = srcMesh->m_activeVertexScalars;
-    this->m_activeVertexTangents = srcMesh->m_activeVertexTangents;
-    this->m_activeVertexTCoords  = srcMesh->m_activeVertexTCoords;
-
-    // Geometry members
-    this->m_transformApplied = srcMesh->m_transformApplied;
-    this->m_transform = srcMesh->m_transform;
-}
-
-const Vec3i&
-SurfaceMesh::getTriangleIndices(const int triangleNum) const
-{
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (triangleNum >= m_triangleIndices->size())) << "Invalid index";
-#endif
-    return (*m_triangleIndices)[triangleNum];
-}
-
-Vec3i&
-SurfaceMesh::getTriangleIndices(const int triangleNum)
-{
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (triangleNum >= m_triangleIndices->size())) << "Invalid index";
-#endif
-    return (*m_triangleIndices)[triangleNum];
-}
-
-void
-SurfaceMesh::setCellAttribute(const std::string& arrayName, std::shared_ptr<AbstractDataArray> arr)
-{
-    m_cellAttributes[arrayName] = arr;
-}
-
-std::shared_ptr<AbstractDataArray>
-SurfaceMesh::getCellAttribute(const std::string& arrayName) const
-{
-    auto it = m_cellAttributes.find(arrayName);
-    if (it == m_cellAttributes.end())
-    {
-        LOG(WARNING) << "No array with such name holds any cell data.";
-        return nullptr;
-    }
-    return it->second;
-}
-
-bool
-SurfaceMesh::hasCellAttribute(const std::string& arrayName) const
-{
-    return (m_cellAttributes.find(arrayName) != m_cellAttributes.end());
-}
-
-void
-SurfaceMesh::setCellScalars(const std::string& arrayName, std::shared_ptr<AbstractDataArray> scalars)
-{
-    m_activeCellScalars = arrayName;
-    m_cellAttributes[arrayName] = scalars;
-}
-
-void
-SurfaceMesh::setCellScalars(const std::string& arrayName)
-{
-    if (hasCellAttribute(arrayName))
-    {
-        m_activeCellScalars = arrayName;
-    }
-}
-
-std::shared_ptr<AbstractDataArray>
-SurfaceMesh::getCellScalars() const
-{
-    if (hasCellAttribute(m_activeCellScalars))
-    {
-        return m_cellAttributes.at(m_activeCellScalars);
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-
-void
-SurfaceMesh::setCellNormals(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> normals)
-{
-    m_activeCellNormals = arrayName;
-    m_cellAttributes[arrayName] = normals;
-}
-
-void
-SurfaceMesh::setCellNormals(const std::string& arrayName)
-{
-    if (hasCellAttribute(arrayName))
-    {
-        setCellActiveAttribute(m_activeCellNormals, arrayName, 3, IMSTK_DOUBLE);
-    }
-}
-
-std::shared_ptr<VecDataArray<double, 3>>
-SurfaceMesh::getCellNormals() const
-{
-    if (hasCellAttribute(m_activeCellNormals))
-    {
-        return std::dynamic_pointer_cast<VecDataArray<double, 3>>(m_cellAttributes.at(m_activeCellNormals));
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-
-void
-SurfaceMesh::setCellTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> tangents)
-{
-    m_activeCellTangents = arrayName;
-    m_cellAttributes[arrayName] = tangents;
-}
-
-void
-SurfaceMesh::setCellTangents(const std::string& arrayName)
-{
-    if (hasCellAttribute(arrayName))
-    {
-        setCellActiveAttribute(m_activeCellTangents, arrayName, 3, IMSTK_DOUBLE);
-    }
-}
-
-std::shared_ptr<VecDataArray<double, 3>>
-SurfaceMesh::getCellTangents() const
-{
-    if (hasCellAttribute(m_activeCellTangents))
-    {
-        return std::dynamic_pointer_cast<VecDataArray<double, 3>>(m_cellAttributes.at(m_activeCellTangents));
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-
-void
-SurfaceMesh::setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
-                                    const int expectedNumComponents, const ScalarTypeId expectedScalarType)
-{
-    std::shared_ptr<AbstractDataArray> attribute = m_cellAttributes[attributeName];
-    if (attribute->getNumberOfComponents() != expectedNumComponents)
-    {
-        LOG(WARNING) << "Failed to set cell attribute on SurfaceMesh " + getName() + " with "
-                     << attribute->getNumberOfComponents() << " components. Expected " <<
-            expectedNumComponents << " components.";
-        return;
-    }
-    else if (attribute->getScalarType() != expectedScalarType)
-    {
-        LOG(INFO) << "Tried to set cell attribute on SurfaceMesh " + getName() + " with scalar type "
-                  << static_cast<int>(attribute->getScalarType()) << ". Casting to "
-                  << static_cast<int>(expectedScalarType) << " scalar type";
-        m_cellAttributes[attributeName] = attribute->cast(expectedScalarType);
-    }
-    activeAttributeName = attributeName;
 }
 } // namespace imstk

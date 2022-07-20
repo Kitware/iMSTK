@@ -32,7 +32,6 @@ class VolumetricMesh;
 
 namespace imstk
 {
-class VolumetricMesh;
 template<typename T, int N> class VecDataArray;
 
 ///
@@ -50,7 +49,7 @@ public:
     ///
     /// \brief Read and generate volumetric mesh given a external vega mesh file
     ///
-    static std::shared_ptr<VolumetricMesh> read(const std::string& filePath, MeshFileType meshType);
+    static std::shared_ptr<PointSet> read(const std::string& filePath, MeshFileType meshType);
 
     ///
     /// \brief Read vega volume mesh from a file
@@ -65,12 +64,12 @@ public:
     ///
     /// \brief Generate volumetric mesh given a vega volume mesh
     ///
-    static std::shared_ptr<VolumetricMesh> convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh> vegaVolumeMesh);
+    static std::shared_ptr<PointSet> convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh> vegaVolumeMesh);
 
     ///
     /// \brief Generate a vega volume mesh given volumetric mesh
     ///
-    static std::shared_ptr<vega::VolumetricMesh> convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::VolumetricMesh> volumeMesh);
+    static std::shared_ptr<vega::VolumetricMesh> convertVolumetricMeshToVegaMesh(const std::shared_ptr<PointSet> volumeMesh);
 
 protected:
     ///

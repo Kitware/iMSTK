@@ -111,13 +111,13 @@ SurfaceMeshToSurfaceMeshCD::computeCollisionDataAB(
     std::shared_ptr<SurfaceMesh>             surfMeshA    = std::dynamic_pointer_cast<SurfaceMesh>(geomA);
     std::shared_ptr<VecDataArray<double, 3>> verticesAPtr = surfMeshA->getVertexPositions();
     VecDataArray<double, 3>&                 verticesA    = *verticesAPtr;
-    std::shared_ptr<VecDataArray<int, 3>>    indicesAPtr  = surfMeshA->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>>    indicesAPtr  = surfMeshA->getCells();
     const VecDataArray<int, 3>&              indicesA     = *indicesAPtr;
 
     std::shared_ptr<SurfaceMesh>             surfMeshB    = std::dynamic_pointer_cast<SurfaceMesh>(geomB);
     std::shared_ptr<VecDataArray<double, 3>> verticesBPtr = surfMeshB->getVertexPositions();
     VecDataArray<double, 3>&                 verticesB    = *verticesBPtr;
-    std::shared_ptr<VecDataArray<int, 3>>    indicesBPtr  = surfMeshB->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>>    indicesBPtr  = surfMeshB->getCells();
     const VecDataArray<int, 3>&              indicesB     = *indicesBPtr;
 
     std::unordered_set<EdgePair> edges;

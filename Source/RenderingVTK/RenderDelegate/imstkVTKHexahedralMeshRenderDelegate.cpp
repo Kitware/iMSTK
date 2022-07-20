@@ -40,7 +40,7 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
 {
     auto geometry = std::static_pointer_cast<HexahedralMesh>(m_visualModel->getGeometry());
     m_vertices = geometry->getVertexPositions();
-    m_indices  = geometry->getHexahedraIndices();
+    m_indices  = geometry->getCells();
 
     // Map vertices
     {
@@ -154,10 +154,10 @@ VTKHexahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
     m_mappedVertexArray->Modified();
 
     // Test if the index buffer changed
-    if (m_indices != geometry->getHexahedraIndices())
+    if (m_indices != geometry->getCells())
     {
         //printf("Index data swapped\n");
-        m_indices = geometry->getHexahedraIndices();
+        m_indices = geometry->getCells();
         {
             // Copy cells
             m_cellArray->Reset();

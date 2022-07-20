@@ -53,7 +53,7 @@ PointPicker::requestUpdate()
     {
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMeshToPick->getVertexPositions();
         const VecDataArray<double, 3>&           vertices    = *verticesPtr;
-        std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = surfMeshToPick->getTriangleIndices();
+        std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = surfMeshToPick->getCells();
         const VecDataArray<int, 3>&              indices     = *indicesPtr;
 
         // Brute force
@@ -83,7 +83,7 @@ PointPicker::requestUpdate()
 
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr = tetMeshToPick->getVertexPositions();
         const VecDataArray<double, 3>&           vertices    = *verticesPtr;
-        std::shared_ptr<VecDataArray<int, 4>>    indicesPtr  = tetMeshToPick->getTetrahedraIndices();
+        std::shared_ptr<VecDataArray<int, 4>>    indicesPtr  = tetMeshToPick->getCells();
         const VecDataArray<int, 4>&              indices     = *indicesPtr;
 
         // For every tet

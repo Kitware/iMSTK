@@ -108,7 +108,7 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
     // map between one exsiting edge to the new vert generated from the cutting
     std::map<std::pair<int, int>, int> edgeVertMap;
 
-    auto triangles = outputSurf->getTriangleIndices();
+    auto triangles = outputSurf->getCells();
     auto vertices  = outputSurf->getVertexPositions();
     auto initVerts = outputSurf->getInitialVertexPositions();
     triangles->reserve(triangles->size() * 2);
@@ -268,7 +268,7 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
 void
 SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int, bool>& cutVerts, std::shared_ptr<Geometry> geometry)
 {
-    auto triangles = outputSurf->getTriangleIndices();
+    auto triangles = outputSurf->getCells();
     auto vertices  = outputSurf->getVertexPositions();
     auto initVerts = outputSurf->getInitialVertexPositions();
 
@@ -281,7 +281,7 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
     {
         // assuming triangles in cutSurf are co-planar
         auto cutSurf      = std::static_pointer_cast<SurfaceMesh>(geometry);
-        auto cutTriangles = cutSurf->getTriangleIndices();
+        auto cutTriangles = cutSurf->getCells();
         auto cutVertices  = cutSurf->getVertexPositions();
 
         // compute cutting plane (assuming all triangles in cutSurf are co-planar)
@@ -408,7 +408,7 @@ SurfaceMeshCut::vertexOnBoundary(std::shared_ptr<VecDataArray<int, 3>> triangleI
 void
 SurfaceMeshCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> geometry, std::shared_ptr<SurfaceMesh> outputSurf)
 {
-    auto triangles = outputSurf->getTriangleIndices();
+    auto triangles = outputSurf->getCells();
     auto vertices  = outputSurf->getVertexPositions();
     auto initVerts = outputSurf->getInitialVertexPositions();
 
@@ -543,9 +543,9 @@ SurfaceMeshCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> ge
 void
 SurfaceMeshCut::generateSurfaceMeshCutData(std::shared_ptr<SurfaceMesh> cutSurf, std::shared_ptr<SurfaceMesh> outputSurf)
 {
-    auto cutTriangles = cutSurf->getTriangleIndices();
+    auto cutTriangles = cutSurf->getCells();
     auto cutVertices  = cutSurf->getVertexPositions();
-    auto triangles    = outputSurf->getTriangleIndices();
+    auto triangles    = outputSurf->getCells();
     auto vertices     = outputSurf->getVertexPositions();
 
     // compute cutting plane (assuming all triangles in cutSurf are co-planar)
@@ -644,7 +644,7 @@ SurfaceMeshCut::generateSurfaceMeshCutData(std::shared_ptr<SurfaceMesh> cutSurf,
 bool
 SurfaceMeshCut::pointProjectionInSurface(const Vec3d& pt, std::shared_ptr<SurfaceMesh> cutSurf)
 {
-    auto cutTriangles = cutSurf->getTriangleIndices();
+    auto cutTriangles = cutSurf->getCells();
     auto cutVertices  = cutSurf->getVertexPositions();
     bool inSurface    = false;
 

@@ -52,7 +52,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
 
     // Get our own handles to these in case the geometry changes them
     m_vertices = m_isDynamicMesh ? m_geometry->getVertexPositions() : m_geometry->getInitialVertexPositions();
-    m_indices  = m_geometry->getTriangleIndices();
+    m_indices  = m_geometry->getCells();
 
     // Map vertices to VTK point data
     if (m_vertices != nullptr)
@@ -163,7 +163,7 @@ VTKSurfaceMeshRenderDelegate::processEvents()
     // Custom handling of events
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr =
         m_isDynamicMesh ? m_geometry->getVertexPositions() : m_geometry->getInitialVertexPositions();
-    std::shared_ptr<VecDataArray<int, 3>> indicesPtr            = m_geometry->getTriangleIndices();
+    std::shared_ptr<VecDataArray<int, 3>> indicesPtr            = m_geometry->getCells();
     std::shared_ptr<AbstractDataArray>    cellScalarsPtr        = m_geometry->getCellScalars();
     std::shared_ptr<AbstractDataArray>    vertexScalarsPtr      = m_geometry->getVertexScalars();
     std::shared_ptr<AbstractDataArray>    textureCoordinatesPtr = m_geometry->getVertexTCoords();
@@ -246,7 +246,7 @@ VTKSurfaceMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
 void
 VTKSurfaceMeshRenderDelegate::indexDataModified(Event* imstkNotUsed(e))
 {
-    setIndexBuffer(m_geometry->getTriangleIndices());
+    setIndexBuffer(m_geometry->getCells());
 }
 
 void
@@ -290,9 +290,9 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
         m_mappedVertexArray->Modified();
 
         // Only update index buffer when reallocated
-        if (m_indices != m_geometry->getTriangleIndices())
+        if (m_indices != m_geometry->getCells())
         {
-            setIndexBuffer(m_geometry->getTriangleIndices());
+            setIndexBuffer(m_geometry->getCells());
         }
 
         if (m_normals != m_geometry->getVertexNormals())
@@ -319,9 +319,9 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
         }
 
         // Only update index buffer when reallocated
-        if (m_indices != m_geometry->getTriangleIndices())
+        if (m_indices != m_geometry->getCells())
         {
-            setIndexBuffer(m_geometry->getTriangleIndices());
+            setIndexBuffer(m_geometry->getCells());
             normalsOutdated = true;
         }
 

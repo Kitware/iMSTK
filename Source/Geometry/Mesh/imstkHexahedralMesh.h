@@ -31,20 +31,13 @@ namespace imstk
 ///
 /// \brief Hexahedral mesh class
 ///
-class HexahedralMesh : public VolumetricMesh
+class HexahedralMesh : public VolumetricMesh<8>
 {
 public:
-    HexahedralMesh();
+    HexahedralMesh() = default;
     ~HexahedralMesh() override = default;
 
     IMSTK_TYPE_NAME(HexahedralMesh)
-
-    ///
-    /// \brief Initializes the rest of the data structures given vertex positions and
-    ///  hexahedra connectivity
-    ///
-    void initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
-                    std::shared_ptr<VecDataArray<int, 8>> hexahedra);
 
     ///
     /// \brief Clear all the mesh data
@@ -60,35 +53,15 @@ public:
     /// \brief Extract surface Mesh
     std::shared_ptr<SurfaceMesh> extractSurfaceMesh() override;
 
-    ///
-    /// \brief Returns true if the geometry is a mesh, else returns false
-    ///
-    bool isMesh() const override { return true; }
-
 // Accessors
-    ///
-    /// \brief Get/Set the hexahedral connectivity
-    ///@{
-    void setHexahedraIndices(std::shared_ptr<VecDataArray<int, 8>> hexahedra) { m_hexahedraIndices = hexahedra; }
-    std::shared_ptr<VecDataArray<int, 8>> getHexahedraIndices() const { return m_hexahedraIndices; }
-    ///@}
-
-    ///
-    /// \brief Returns the connectivity of a hexahedron given its index
-    ///
-    const Vec8i& getHexahedronIndices(const int hexaNum) const;
-
     ///
     /// \brief Returns the number of hexahedra
     ///
-    int getNumHexahedra() const;
+    int getNumHexahedra() const { return getNumCells(); }
 
     ///
     /// \brief Compute and return the volume of the hexahedral mesh
     ///
     double getVolume() override;
-
-protected:
-    std::shared_ptr<VecDataArray<int, 8>> m_hexahedraIndices;   ///< indices of the hexahedra
 };
 } // namespace imstk
