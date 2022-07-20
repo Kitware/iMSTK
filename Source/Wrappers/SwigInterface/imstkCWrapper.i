@@ -29,6 +29,7 @@
  */
 #include "imstkGeometry.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkAbstractCellMesh.h"
 #include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"
@@ -265,6 +266,7 @@ namespace std
  * Geometry
  */
 %include "../../Geometry/imstkGeometry.h";
+%include "../../Geometry/Mesh/imstkAbstractCellMesh.h"
 %include "../../Geometry/Mesh/imstkPointSet.h"
 %include "../../Geometry/Mesh/imstkSurfaceMesh.h"
 %include "../../Geometry/Mesh/imstkLineMesh.h"
