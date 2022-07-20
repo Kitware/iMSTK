@@ -63,8 +63,5 @@ public:
     /// \brief Compute and return the volume of the hexahedral mesh
     ///
     double getVolume() override;
-
-protected:
-    std::shared_ptr<VecDataArray<int, 8>> m_hexahedraIndices; ///< indices of the hexahedra
 };
 } // namespace imstk

@@ -46,7 +46,7 @@ HexahedralMesh::getVolume()
     Vec3d                          a, b, c;
     double                         volume   = 0.0;
     const VecDataArray<double, 3>& vertices = *m_vertexPositions;
-    for (const Vec8i& hexArray : *m_hexahedraIndices)
+    for (const Vec8i& hexArray : *m_indices)
     {
         for (int i = 0; i < 8; ++i)
         {
@@ -88,7 +88,7 @@ HexahedralMesh::getVolume()
 std::shared_ptr<SurfaceMesh>
 HexahedralMesh::extractSurfaceMesh()
 {
-    LOG(WARNING) << "error: not implemented.";
+    LOG(FATAL) << "error: not implemented.";
     return nullptr;
 }
 } // namespace imstk
