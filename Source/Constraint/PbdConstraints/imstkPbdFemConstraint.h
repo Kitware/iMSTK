@@ -66,8 +66,8 @@ public:
     PbdFemConstraint(const unsigned int cardinality, MaterialType mtype = MaterialType::StVK);
 
 public:
-    double       m_elementVolume = 0.0; ///< Volume of the element
-    MaterialType m_material;            ///< Material type
+    double       m_initialElementVolume = 0.0; ///< Volume of the element
+    MaterialType m_material;                   ///< Material type
     Mat3d m_invRestMat;
 
     std::shared_ptr<PbdFemConstraintConfig> m_config = nullptr;

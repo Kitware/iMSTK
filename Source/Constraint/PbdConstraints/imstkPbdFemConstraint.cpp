@@ -26,7 +26,7 @@ namespace imstk
 PbdFemConstraint::PbdFemConstraint(const unsigned int cardinality,
                                    MaterialType       mType /*= MaterialType::StVK*/) :
     PbdConstraint(),
-    m_elementVolume(0),
+    m_initialElementVolume(0),
     m_material(mType),
     m_invRestMat(Mat3d::Identity())
 {
