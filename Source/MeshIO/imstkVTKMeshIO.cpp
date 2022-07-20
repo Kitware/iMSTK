@@ -245,7 +245,7 @@ VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
 
     if (vtkUnstructuredGrid* vtkMesh = reader->GetUnstructuredGridOutput())
     {
-        return GeometryUtils::copyToVolumetricMesh(vtkMesh);
+        return GeometryUtils::copyToCellMesh(vtkMesh);
     }
 
     LOG(FATAL) << "Error: could not read with VTK reader for input " << filePath;
@@ -349,7 +349,7 @@ VTKMeshIO::writeVtkPointSet(const std::shared_ptr<PointSet> imstkMesh, const std
 }
 
 template<typename ReaderType>
-std::shared_ptr<PointSet>
+std::shared_ptr<AbstractCellMesh>
 VTKMeshIO::readVtkUnstructuredGrid(const std::string& filePath)
 {
     auto reader = vtkSmartPointer<ReaderType>::New();
@@ -357,7 +357,7 @@ VTKMeshIO::readVtkUnstructuredGrid(const std::string& filePath)
     reader->Update();
 
     vtkSmartPointer<vtkUnstructuredGrid> vtkMesh = reader->GetOutput();
-    return GeometryUtils::copyToVolumetricMesh(vtkMesh);
+    return GeometryUtils::copyToCellMesh(vtkMesh);
 }
 
 std::shared_ptr<ImageData>

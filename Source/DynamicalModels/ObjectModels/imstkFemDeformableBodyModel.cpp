@@ -191,7 +191,7 @@ FemDeformableBodyModel::initialize()
         setSolver(nlSolver);
     }
 
-    auto physicsMesh = std::dynamic_pointer_cast<PointSet>(this->getModelGeometry());
+    auto physicsMesh = std::dynamic_pointer_cast<AbstractCellMesh>(this->getModelGeometry());
     m_vegaPhysicsMesh = VegaMeshIO::convertVolumetricMeshToVegaMesh(physicsMesh);
     //m_vegaPhysicsMesh = physicsMesh->getAttachedVegaMesh();
     if (!this->initializeForceModel()

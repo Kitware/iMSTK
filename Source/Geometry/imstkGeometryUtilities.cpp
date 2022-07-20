@@ -595,15 +595,15 @@ GeometryUtils::copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
     return mesh;
 }
 
-std::shared_ptr<PointSet>
-GeometryUtils::copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh)
+std::shared_ptr<AbstractCellMesh>
+GeometryUtils::copyToCellMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh)
 {
     CHECK(vtkMesh != nullptr) << "vtkUnstructuredGrid provided is not valid!";
 
     std::shared_ptr<VecDataArray<double, 3>> vertices = copyToVecDataArray(vtkMesh->GetPoints());
 
-    const int                 cellType = vtkMesh->GetCellType(vtkMesh->GetNumberOfCells() - 1);
-    std::shared_ptr<PointSet> vMesh    = nullptr;
+    const int                         cellType = vtkMesh->GetCellType(vtkMesh->GetNumberOfCells() - 1);
+    std::shared_ptr<AbstractCellMesh> vMesh    = nullptr;
     if (cellType == VTK_TETRA)
     {
         std::shared_ptr<VecDataArray<int, 4>> cells = copyToVecDataArray<4>(vtkMesh->GetCells());

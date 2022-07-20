@@ -25,6 +25,7 @@
 
 namespace imstk
 {
+class AbstractCellMesh;
 class HexahedralMesh;
 class ImageData;
 class LineMesh;
@@ -34,7 +35,7 @@ class TetrahedralMesh;
 ///
 /// \class VTKMeshIO
 ///
-/// \brief
+/// \brief Implements VTK read and write functions
 ///
 class VTKMeshIO
 {
@@ -99,10 +100,11 @@ protected:
     static bool writeVtkUnstructuredGrid(const std::shared_ptr<HexahedralMesh> hMesh, const std::string& filePath);
 
     ///
-    /// \brief Reads vtk unstructured grid
+    /// \brief Reads vtk unstructured grid. Drops cells that aren't of the last cell type.
+    /// \return Returns TetrahedralMesh or HexahedralMesh
     ///
     template<typename ReaderType>
-    static std::shared_ptr<PointSet> readVtkUnstructuredGrid(const std::string& filePath);
+    static std::shared_ptr<AbstractCellMesh> readVtkUnstructuredGrid(const std::string& filePath);
 
     ///
     /// \brief Reads vtk image data
