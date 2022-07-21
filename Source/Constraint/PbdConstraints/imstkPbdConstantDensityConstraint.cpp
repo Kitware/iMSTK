@@ -24,8 +24,16 @@ limitations under the License.
 
 namespace imstk
 {
+PbdConstantDensityConstraint::PbdConstantDensityConstraint() : PbdConstraint()
+{
+    m_particleRadiusSqr = m_particleRadius * m_particleRadius;
+    m_wPoly6Coeff       = 315.0 / (64.0 * PI * pow(m_particleRadius, 9));
+    m_wSpikyCoeff       = 15.0 / (PI * pow(m_particleRadius, 6)) * -3.0;
+}
+
 void
-PbdConstantDensityConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions, const double)
+PbdConstantDensityConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
+                                             const double particleRadius, const double density)
 {
     const size_t numParticles = initVertexPositions.size();
     m_lambdas.resize(numParticles);
@@ -33,8 +41,14 @@ PbdConstantDensityConstraint::initConstraint(const VecDataArray<double, 3>& init
     m_deltaPositions.resize(numParticles);
     m_neighborList.resize(numParticles);
 
+    m_restDensity       = density;
+    m_particleRadius    = particleRadius;
+    m_particleRadiusSqr = m_particleRadius * m_particleRadius;
+    m_wPoly6Coeff       = 315.0 / (64.0 * PI * pow(m_particleRadius, 9));
+    m_wSpikyCoeff       = 15.0 / (PI * pow(m_particleRadius, 6)) * -3.0;
+
     // Initialize neighbor searcher
-    m_NeighborSearcher = std::make_shared<NeighborSearch>(m_NeighborSearchMethod, m_maxDist);
+    m_NeighborSearcher = std::make_shared<NeighborSearch>(m_NeighborSearchMethod, m_particleRadius);
 }
 
 void
@@ -111,18 +125,5 @@ PbdConstantDensityConstraint::updatePositions(const Vec3d& pi,
 
     m_deltaPositions[index] = gradientLambdaSum / m_restDensity;
     positions[index] += m_deltaPositions[index];
-}
-
-void
-PbdConstantDensityConstraint::setMaxNeighborDistance(const double dist)
-{
-    m_maxDist     = dist;
-    m_maxDistSqr  = dist * dist;
-    m_wPoly6Coeff = 315.0 / (64.0 * PI * pow(m_maxDist, 9));
-    m_wSpikyCoeff = 15.0 / (PI * pow(m_maxDist, 6)) * -3.0;
-    if (m_NeighborSearcher)
-    {
-        m_NeighborSearcher->setSearchRadius(m_maxDist);
-    }
 }
 } // namespace imstk

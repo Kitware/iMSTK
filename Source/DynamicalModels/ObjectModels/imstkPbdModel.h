@@ -81,6 +81,14 @@ struct PbdModelConfig
         void enableBendConstraint(const double stiffness, const int stride, const bool restLength0 = true);
 
         ///
+        /// \brief Enables constant density constraint given the stiffness and particleSize
+        /// \param Stiffness, how much density is enforced
+        /// \param ParticleRadius, radius of particle
+        ///
+        void enableConstantDensityConstraint(const double stiffness,
+                                             const double particleRadius, const double restDensity = 6378.0);
+
+        ///
         /// \brief Enable a Fem constraint with the material provided
         ///
         void enableFemConstraint(PbdFemConstraint::MaterialType material);

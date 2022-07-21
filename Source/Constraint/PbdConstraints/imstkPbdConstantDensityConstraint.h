@@ -36,15 +36,13 @@ namespace imstk
 class PbdConstantDensityConstraint : public PbdConstraint
 {
 public:
-    PbdConstantDensityConstraint() : PbdConstraint()
-    {
-        setMaxNeighborDistance(m_maxDist);
-    }
+    PbdConstantDensityConstraint();
 
     ///
     /// \brief Constant Density Constraint Initialization
     ///
-    void initConstraint(const VecDataArray<double, 3>& initVertexPositions, const double k);
+    void initConstraint(const VecDataArray<double, 3>& initVertexPositions,
+                        const double particleRadius, const double density = 6378.0);
 
     ///
     /// \brief Solves the constant density constraint
@@ -62,6 +60,13 @@ public:
         return true;
     }
 
+    ///
+    /// \brief Set/Get rest density
+    ///@{
+    void setDensity(const double density) { m_restDensity = density; }
+    double getDensity() const { return m_restDensity; }
+///@}
+
 private:
     ///
     /// \brief Smoothing kernel WPoly6 for density estimation
@@ -69,13 +74,13 @@ private:
     inline double wPoly6(const Vec3d& pi, const Vec3d& pj) const
     {
         const double rLengthSqr = (Vec3d(pi - pj)).squaredNorm();
-        if (rLengthSqr > m_maxDistSqr || rLengthSqr < 1e-20)
+        if (rLengthSqr > m_particleRadiusSqr || rLengthSqr == 0.0)
         {
             return 0.0;
         }
         else
         {
-            const double maxDiff = m_maxDistSqr - rLengthSqr;
+            const double maxDiff = m_particleRadiusSqr - rLengthSqr;
             return m_wPoly6Coeff * maxDiff * maxDiff * maxDiff;
         }
     }
@@ -88,13 +93,13 @@ private:
         const Vec3d  r = pi - pj;
         const double rLengthSqr = r.squaredNorm();
 
-        if (rLengthSqr > m_maxDistSqr || rLengthSqr < 1e-20)
+        if (rLengthSqr > m_particleRadiusSqr || rLengthSqr < 1e-20)
         {
             return Vec3d::Zero();
         }
 
         const double rLength = std::sqrt(rLengthSqr);
-        return r * (m_wSpikyCoeff * (m_maxDist - rLength) * (m_maxDist - rLength));
+        return r * (m_wSpikyCoeff * (m_particleRadius - rLength) * (m_particleRadius - rLength));
     }
 
     ///
@@ -113,29 +118,17 @@ private:
     void updatePositions(const Vec3d& pi, const size_t index, VecDataArray<double, 3>& positions);
 
     ///
-    /// \brief Set/Get rest density
-    ///
-    void setDensity(const double density) { m_restDensity = density; }
-    double getDensity() const { return m_restDensity; }
-
-    ///
-    /// \brief Set/Get max. neighbor distance
-    ///
-    void setMaxNeighborDistance(const double dist);
-    double getMaxNeighborDistance() const { return m_maxDist; }
-
-    ///
     /// \brief Set/Get neighbor search method
     ///
     void setNeighborSearchMethod(NeighborSearch::Method method) { m_NeighborSearchMethod = method; }
     NeighborSearch::Method getNeighborSearchMethod() const { return m_NeighborSearchMethod; }
 
 private:
-    double m_wPoly6Coeff;
-    double m_wSpikyCoeff;
+    double m_wPoly6Coeff = 0.0;
+    double m_wSpikyCoeff = 0.0;
 
-    double m_maxDist    = 0.2;                       ///< Max. neighbor distance
-    double m_maxDistSqr = 0.04;                      ///< Max. neighbor squared distance
+    double m_particleRadius      = 0.2;              ///< Max. neighbor distance
+    double m_particleRadiusSqr   = 0.04;             ///< Max. neighbor squared distance
     double m_relaxationParameter = 600.0;            ///< Relaxation parameter
     double m_restDensity = 6378.0;                   ///< Fluid density
 

@@ -744,7 +744,7 @@ struct PbdConstantDensityConstraintFunctor : public PbdConstraintFunctor
                 << "PbdConstantDensityConstraint can only be generated with a PointSet";
 
             auto c = std::make_shared<PbdConstantDensityConstraint>();
-            c->initConstraint(*m_geom->getVertexPositions(), m_stiffness);
+            c->initConstraint(*m_geom->getVertexPositions(), m_particleRadius, m_restDensity);
             constraints.addConstraint(c);
         }
 
@@ -753,9 +753,25 @@ struct PbdConstantDensityConstraintFunctor : public PbdConstraintFunctor
         ///@{
         void setStiffness(const double stiffness) { m_stiffness = stiffness; }
         double getStiffness() const { return m_stiffness; }
+        ///@}
+
+        ///
+        /// \brief Get/Set the stiffness, how hard the constraint is
+        ///@{
+        void setParticleRadius(const double particleRadius) { m_particleRadius = particleRadius; }
+        double getParticleRadius() const { return m_particleRadius; }
+        ///@}
+
+        ///
+        /// \brief Get/Set the resting density, default rest density of water for m
+        ///@{
+        void setRestDensity(const double restDensity) { m_restDensity = restDensity; }
+        double getRestDensity() const { return m_restDensity; }
     ///@}
 
     protected:
-        double m_stiffness = 0.0;
+        double m_stiffness      = 0.0;
+        double m_particleRadius = 0.2;
+        double m_restDensity    = 6378.0;
 };
 } // namespace imstk
