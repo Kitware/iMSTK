@@ -24,6 +24,7 @@ set(H_FILES
   Objects/imstkSphObject.h
   Objects/imstkVisualModel.h
   Objects/imstkVertexLabelVisualModel.h
+  Objects/imstkTextVisualModel.h
   imstkSceneEntity.h
   )
 

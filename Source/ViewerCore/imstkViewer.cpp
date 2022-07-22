@@ -21,7 +21,6 @@
 
 #include "imstkViewer.h"
 #include "imstkCamera.h"
-#include "imstkDeviceControl.h"
 #include "imstkLogger.h"
 
 namespace imstk
@@ -56,10 +55,6 @@ void
 Viewer::updateModule()
 {
     this->postEvent(Event(Module::preUpdate()));
-    for (auto control : m_controls)
-    {
-        control->update(m_dt);
-    }
     this->postEvent(Event(Module::postUpdate()));
 }
 } // namespace imstk

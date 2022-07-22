@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-class DeviceControl;
 class Camera;
 class InteractorStyle;
 class Scene;
@@ -132,30 +131,11 @@ public:
     ///
     virtual void setBackgroundColors(const Color color1, const Color color2 = Color(0.0, 0.0, 0.0), const bool gradientBackground = false) = 0;
 
-    ///
-    /// \brief Add a control whose events should be handled
-    ///
-    void addControl(std::shared_ptr<DeviceControl> control) { m_controls.push_back(control); }
-
-    ///
-    /// \brief Remove an existing control if it exists
-    ///
-    void removeControl(std::shared_ptr<DeviceControl> control)
-    {
-        std::vector<std::shared_ptr<DeviceControl>>::iterator i =
-            std::find(m_controls.begin(), m_controls.end(), control);
-        if (i != m_controls.end())
-        {
-            m_controls.erase(i);
-        }
-    }
-
     virtual void processEvents() = 0;
 
 protected:
     void updateModule() override;
 
-    std::vector<std::shared_ptr<DeviceControl>> m_controls; ///< Set of controls updated on the viewer thread
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 
     std::shared_ptr<Scene>  m_activeScene;

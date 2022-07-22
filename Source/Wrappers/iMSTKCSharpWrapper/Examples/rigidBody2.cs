@@ -128,12 +128,12 @@ public class RigidBody2
             {
                 MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
                 mouseControl.setSceneManager(sceneManager);
-                viewer.addControl(mouseControl);
+                scene.addControl(mouseControl);
 
                 KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
                 keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
                 keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
-                viewer.addControl(keyControl);
+                scene.addControl(keyControl);
             }
 
             // LOG(INFO) << "Cube Controls:";

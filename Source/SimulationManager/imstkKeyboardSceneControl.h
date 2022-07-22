@@ -1,21 +1,20 @@
 /*=========================================================================
 
-   Library: iMSTK
+    Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+    Copyright (c) Kitware
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+    http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 
 =========================================================================*/
 
@@ -27,6 +26,7 @@ namespace imstk
 {
 class ModuleDriver;
 class SceneManager;
+class TextVisualModel;
 
 ///
 /// \class KeyboardSceneControl
@@ -40,8 +40,11 @@ class SceneManager;
 class KeyboardSceneControl : public KeyboardControl
 {
 public:
-    KeyboardSceneControl(const std::string& name = "KeyboardSceneControl") : KeyboardControl(name) { }
+
+    KeyboardSceneControl(const std::string& name = "KeyboardSceneControl");
     ~KeyboardSceneControl() override = default;
+
+    bool initialize() override;
 
     ///
     /// \brief The driver is used to stop the simulation
@@ -60,7 +63,8 @@ public:
     void OnKeyRelease(const char key) override;
 
 protected:
-    std::weak_ptr<ModuleDriver> m_driver;
-    std::weak_ptr<SceneManager> m_sceneManager;
+    std::weak_ptr<ModuleDriver>      m_driver;
+    std::weak_ptr<SceneManager>      m_sceneManager;
+    std::shared_ptr<TextVisualModel> m_textVisualModel;
 };
 } // namespace imstk

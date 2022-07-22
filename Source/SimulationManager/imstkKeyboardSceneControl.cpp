@@ -1,21 +1,20 @@
 /*=========================================================================
 
-   Library: iMSTK
+    Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+    Copyright (c) Kitware
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+    http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 
 =========================================================================*/
 
@@ -28,9 +27,31 @@
 #include "imstkSceneManager.h"
 #include "imstkViewer.h"
 #include "imstkVisualModel.h"
+#include "imstkTextVisualModel.h"
 
 namespace imstk
 {
+KeyboardSceneControl::KeyboardSceneControl(const std::string& name) : KeyboardControl(name)
+{
+    // Create visual model
+    m_textVisualModel = std::make_shared<TextVisualModel>();
+    m_textVisualModel->setFontSize(40);
+    m_textVisualModel->setVisability(true);
+    m_textVisualModel->setText(
+        "Simulation Paused\nPress Space to Continue\nPress R to Reset\nPress C to clear pause screen");
+
+    m_textVisualModel->setPosition(TextVisualModel::DisplayPosition::CenterCenter);
+
+    addVisualModel(m_textVisualModel);
+}
+
+bool
+KeyboardSceneControl::initialize()
+{
+    m_textVisualModel->setVisability(m_sceneManager.lock()->getPaused());
+    return true;
+}
+
 void
 KeyboardSceneControl::printControls()
 {
@@ -68,6 +89,9 @@ KeyboardSceneControl::OnKeyPress(const char key)
         // To ensure consistency toggle/invert based of m_sceneManager
         const bool paused = sceneManager->getPaused();
 
+        // Switch pause screen visibility
+        m_textVisualModel->setVisability(!paused);
+
         // Resume or pause all modules, expect viewers
         for (auto module : driver->getModules())
         {
@@ -76,7 +100,6 @@ KeyboardSceneControl::OnKeyPress(const char key)
                 module->setPaused(!paused);
             }
         }
-
         // In case the SceneManager is not apart of the driver
         paused ? sceneManager->resume() : sceneManager->pause();
     }
@@ -139,6 +162,20 @@ KeyboardSceneControl::OnKeyPress(const char key)
     else if (key == 'n' || key == 'N')
     {
         sceneManager->getActiveScene()->getActiveCamera()->print();
+    }
+    //// Toggle text on pause screen
+    else if (key == 'c' || key == 'C')
+    {
+        const bool paused = sceneManager->getPaused();
+
+        if (paused && m_textVisualModel->getVisability())
+        {
+            m_textVisualModel->setVisability(false);
+        }
+        else if (paused)
+        {
+            m_textVisualModel->setVisability(true);
+        }
     }
 }
 

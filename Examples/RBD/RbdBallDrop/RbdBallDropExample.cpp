@@ -159,13 +159,13 @@ main()
     auto mouseControl = std::make_shared<MouseSceneControl>();
     mouseControl->setDevice(viewer->getMouseDevice());
     mouseControl->setSceneManager(sceneManager);
-    viewer->addControl(mouseControl);
+    scene->addControl(mouseControl);
 
     auto keyControl = std::make_shared<KeyboardSceneControl>();
     keyControl->setDevice(viewer->getKeyboardDevice());
     keyControl->setSceneManager(sceneManager);
     keyControl->setModuleDriver(simulationManager);
-    viewer->addControl(keyControl);
+    scene->addControl(keyControl);
 
     // iMSTK utilizes an event system this is one of many ways to connect to this system
     // postUpdateFunction will be called every time the SceneManager posts a

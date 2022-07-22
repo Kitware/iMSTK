@@ -141,7 +141,7 @@ main()
         rbdControllers[i]->setTranslationScaling(1.0);
         //controller->setTranslationScaling(0.02);
         rbdControllers[i]->setForceScaling(0.001);
-        scene->addController(rbdControllers[i]);
+        scene->addControl(rbdControllers[i]);
     }
 
     // Graph the springs with this object
@@ -251,13 +251,13 @@ main()
             auto mouseControl = std::make_shared<MouseSceneControl>();
             mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
+            scene->addControl(mouseControl);
 
             auto keyControl = std::make_shared<KeyboardSceneControl>();
             keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
+            scene->addControl(keyControl);
         }
 
         driver->start();

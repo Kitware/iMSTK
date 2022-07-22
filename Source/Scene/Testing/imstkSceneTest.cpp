@@ -37,7 +37,6 @@ TEST(imstkSceneTest, empty_scene_emptiness_checks)
     // Do some basic checks for empty scene
     EXPECT_EQ(scene.getName(), "test scene");
     EXPECT_EQ(scene.getSceneObjects().size(), 0);
-    EXPECT_EQ(scene.getControllers().size(), 0);
     EXPECT_EQ(scene.getLights().size(), 0);
     EXPECT_EQ(scene.getFPS(), 0.0);
     EXPECT_EQ(scene.getGlobalIBLProbe(), nullptr);

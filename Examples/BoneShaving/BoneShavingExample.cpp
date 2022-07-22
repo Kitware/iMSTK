@@ -95,7 +95,7 @@ main()
     controller->setLinearKd(10.0);
     controller->setAngularKs(0.0);
     controller->setAngularKd(0.0);
-    scene->addController(controller);
+    scene->addControl(controller);
 
     // Add interaction
     scene->addInteraction(std::make_shared<RigidObjectCollision>(drill, bone, "PointSetToSphereCD"));
@@ -129,13 +129,13 @@ main()
             auto mouseControl = std::make_shared<MouseSceneControl>();
             mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
+            scene->addControl(mouseControl);
 
             auto keyControl = std::make_shared<KeyboardSceneControl>();
             keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
+            scene->addControl(keyControl);
         }
 
         driver->start();

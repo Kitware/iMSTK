@@ -242,7 +242,7 @@ main()
     controller->setDevice(client);
     controller->setJawAngleChange(1.0);
     controller->setTranslationScaling(0.001);
-    scene->addController(controller);
+    scene->addControl(controller);
 
     // Add collision for both jaws of the tool
     auto upperJawCollision = std::make_shared<PbdObjectCollision>(tissueObj, objUpperJaw, "SurfaceMeshToCapsuleCD");
@@ -286,13 +286,13 @@ main()
             auto mouseControl = std::make_shared<MouseSceneControl>();
             mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
+            scene->addControl(mouseControl);
 
             auto keyControl = std::make_shared<KeyboardSceneControl>();
             keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
+            scene->addControl(keyControl);
         }
 
         connect<Event>(sceneManager, &SceneManager::postUpdate,

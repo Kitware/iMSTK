@@ -131,13 +131,13 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
         auto mouseControl = std::make_shared<MouseSceneControl>();
         mouseControl->setDevice(m_viewer->getMouseDevice());
         mouseControl->setSceneManager(m_sceneManager);
-        m_viewer->addControl(mouseControl);
+        m_scene->addControl(mouseControl);
 
         auto keyControl = std::make_shared<KeyboardSceneControl>();
         keyControl->setDevice(m_viewer->getKeyboardDevice());
         keyControl->setSceneManager(m_sceneManager);
         keyControl->setModuleDriver(m_driver);
-        m_viewer->addControl(keyControl);
+        m_scene->addControl(keyControl);
     }
 
     m_dt = fixedTimestep;
