@@ -141,7 +141,7 @@ main()
     controller->setForceScaling(0.001);
     controller->setUseCritDamping(true);
     //controller->setInversionFlags(RigidObjectController::InvertFlag::rotY);
-    scene->addController(controller);
+    scene->addControl(controller);
 
     // Add interaction between the rigid object sphere and static plane
     scene->addInteraction(
@@ -196,13 +196,13 @@ main()
         auto mouseControl = std::make_shared<MouseSceneControl>();
         mouseControl->setDevice(viewer->getMouseDevice());
         mouseControl->setSceneManager(sceneManager);
-        viewer->addControl(mouseControl);
+        scene->addControl(mouseControl);
 
         auto keyControl = std::make_shared<KeyboardSceneControl>();
         keyControl->setDevice(viewer->getKeyboardDevice());
         keyControl->setSceneManager(sceneManager);
         keyControl->setModuleDriver(driver);
-        viewer->addControl(keyControl);
+        scene->addControl(keyControl);
 #endif
 
         driver->start();

@@ -333,7 +333,7 @@ main()
         controller->setForceScaling(0.0045);
         controller->setSmoothingKernelSize(15);
         controller->setUseForceSmoothening(true);
-        scene->addController(controller);
+        scene->addControl(controller);
 
 #ifdef iMSTK_USE_OPENHAPTICS
         connect<ButtonEvent>(deviceClient, &HapticDeviceClient::buttonStateChanged,
@@ -422,13 +422,13 @@ main()
             auto mouseControl = std::make_shared<MouseSceneControl>();
             mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
+            scene->addControl(mouseControl);
 
             auto keyControl = std::make_shared<KeyboardSceneControl>();
             keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
+            scene->addControl(keyControl);
         }
 
         driver->start();

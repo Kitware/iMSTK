@@ -35,6 +35,7 @@ namespace imstk
 {
 class Camera;
 class CameraController;
+class DeviceControl;
 class IblProbe;
 class Light;
 class SceneObject;
@@ -138,11 +139,6 @@ public:
     /// \brief Return the SceneObjects of the scene
     ///
     const std::unordered_set<std::shared_ptr<SceneObject>>& getSceneObjects() const { return m_sceneObjects; }
-
-    ///
-    /// \brief Get the scene object controllers
-    ///
-    const std::vector<std::shared_ptr<TrackingDeviceControl>> getControllers() const { return m_trackingControllers; }
 
     ///
     /// \brief Get SceneObject by name, returns nullptr if doesn't exist
@@ -253,9 +249,9 @@ public:
     void removeCamera(const std::string name);
 
     ///
-    /// \brief Add objects controller
+    /// \brief Add a device control
     ///
-    void addController(std::shared_ptr<TrackingDeviceControl> controller);
+    void addControl(std::shared_ptr<DeviceControl> control);
 
     ///
     /// \brief Set/Get the frames per second (FPS)
@@ -291,8 +287,6 @@ protected:
 
     std::unordered_map<std::string, std::shared_ptr<Camera>> m_cameras;
     std::shared_ptr<Camera> m_activeCamera;
-
-    std::vector<std::shared_ptr<TrackingDeviceControl>> m_trackingControllers; ///< List of object controllers
 
     std::shared_ptr<TaskGraph> m_taskGraph;                                    ///< Computational graph
     std::shared_ptr<TaskGraphController> m_taskGraphController   = nullptr;    ///< Controller for the computational graph

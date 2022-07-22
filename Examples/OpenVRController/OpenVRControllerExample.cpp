@@ -145,12 +145,12 @@ main()
         imstkNew<SceneObjectController> controller1;
         controller1->setControlledObject(scalpelHandle);
         controller1->setDevice(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
-        scene->addController(controller1);
+        scene->addControl(controller1);
         // Add a VR controller for the scalpel blade
         imstkNew<SceneObjectController> controller2;
         controller2->setControlledObject(scalpelBlade10);
         controller2->setDevice(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
-        scene->addController(controller2);
+        scene->addControl(controller2);
 
         imstkNew<CameraOpenVRControl> camControl;
         camControl->setRotateDevice(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
@@ -158,7 +158,7 @@ main()
         camControl->setTranslateSpeedScale(1.0);
         camControl->setRotateSpeedScale(1.0);
         camControl->setCamera(scene->getActiveCamera());
-        viewer->addControl(camControl); // Only needs to update every render
+        scene->addControl(camControl); // Only needs to update every render
 
         // This button event is emitted from the viewer's thread, thus it is queued to the scene so that we do not
         // run it while the scene is updating

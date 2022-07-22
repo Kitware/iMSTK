@@ -1,21 +1,20 @@
 /*=========================================================================
 
-   Library: iMSTK
+    Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+    Copyright (c) Kitware
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+    http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 
 =========================================================================*/
 
@@ -41,6 +40,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
 #ifdef iMSTK_USE_OPENHAPTICS
@@ -54,20 +54,21 @@
 using namespace imstk;
 
 static std::shared_ptr<PbdObject>
-makePbdObjSurface(const std::string& name,
-                  const Vec3d&       size,
-                  const Vec3i&       dim,
-                  const Vec3d&       center,
-                  const int          numIter)
+makePbdObjSurface(
+    const std::string& name,
+    const Vec3d&       size,
+    const Vec3i&       dim,
+    const Vec3d&       center,
+    const int          numIter)
 {
-    imstkNew<PbdObject> prismObj(name);
+    auto prismObj = std::make_shared<PbdObject>(name);
 
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> prismMesh = GeometryUtils::toTetGrid(center, size, dim);
     std::shared_ptr<SurfaceMesh>     surfMesh  = prismMesh->extractSurfaceMesh();
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
+    auto pbdParams = std::make_shared<PbdModelConfig>();
 
     // Use volume+distance constraints, worse results. More performant (can use larger mesh)
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0);
@@ -92,16 +93,16 @@ makePbdObjSurface(const std::string& name,
     }
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
+    auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(surfMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the material
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
     // Add a visual model to render the surface of the tet mesh
-    imstkNew<VisualModel> visualModel;
+    auto visualModel = std::make_shared<VisualModel>();
     visualModel->setGeometry(surfMesh);
     visualModel->setRenderMaterial(material);
     prismObj->addVisualModel(visualModel);
@@ -140,16 +141,16 @@ makeCapsuleToolObj()
     toolObj->setDynamicalModel(rbdModel);
     toolObj->getRigidBody()->m_mass = 1.0;
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 1.0;
-    toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 1.0, 2.0);
+    toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 5.0, 2.0);
 
-    toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.5);
+    toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.9);
 
     return toolObj;
 }
 
 ///
-/// \brief This example demonstrates collision interaction with a 3d pbd
-/// simulated tissue (tetrahedral)
+/// \brief This example demonstrates grasping interaction with a 3d pbd
+/// simulated tissue
 ///
 int
 main()
@@ -158,7 +159,7 @@ main()
     Logger::startLogger();
 
     // Setup the scene
-    imstkNew<Scene> scene("PBDGrasping");
+    imstkNew<Scene> scene("PBDHapticGrasping");
     scene->getActiveCamera()->setPosition(0.12, 4.51, 16.51);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
@@ -202,8 +203,6 @@ main()
     light->setIntensity(1);
     scene->addLight("Light", light);
 
-    // scene->getConfig()->writeTaskGraph = true;
-
     // Run the simulation
     {
         // Setup a viewer to render
@@ -238,7 +237,7 @@ main()
         controller->setForceScaling(0.001);
         controller->setSmoothingKernelSize(10);
         controller->setUseForceSmoothening(true);
-        scene->addController(controller);
+        scene->addControl(controller);
 
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
@@ -307,20 +306,20 @@ main()
         auto mouseControl = std::make_shared<MouseSceneControl>();
         mouseControl->setDevice(viewer->getMouseDevice());
         mouseControl->setSceneManager(sceneManager);
-        viewer->addControl(mouseControl);
+        scene->addControl(mouseControl);
 
         auto keyControl = std::make_shared<KeyboardSceneControl>();
         keyControl->setDevice(viewer->getKeyboardDevice());
         keyControl->setSceneManager(sceneManager);
         keyControl->setModuleDriver(driver);
-        viewer->addControl(keyControl);
+        scene->addControl(keyControl);
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
                 // Simulate the cube in real time
                 PbdObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
                 toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-             });
+            });
 
         driver->start();
     }

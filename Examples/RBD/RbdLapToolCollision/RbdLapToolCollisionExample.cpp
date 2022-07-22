@@ -152,7 +152,7 @@ main()
         rightController->setSmoothingKernelSize(15);
         rightController->setUseForceSmoothening(true);
     }
-    scene->addController(rightController);
+    scene->addControl(rightController);
 
     auto       dummyClient = std::make_shared<DummyClient>();
     const Rotd rotX = Rotd(1.3, Vec3d(0.0, 0.0, 1.0));
@@ -168,7 +168,7 @@ main()
         leftController->setSmoothingKernelSize(15);
         leftController->setUseForceSmoothening(true);
     }
-    scene->addController(leftController);
+    scene->addControl(leftController);
 
     // Run the simulation
     {
@@ -192,13 +192,13 @@ main()
             auto mouseControl = std::make_shared<MouseSceneControl>();
             mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
+            scene->addControl(mouseControl);
 
             auto keyControl = std::make_shared<KeyboardSceneControl>();
             keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
+            scene->addControl(keyControl);
         }
 
         // Process Mouse tool movement & presses

@@ -151,12 +151,6 @@ VTKOpenVRViewer::processEvents()
     auto iren = vtkOpenVRRenderWindowInteractorImstk::SafeDownCast(m_vtkRenderWindow->GetInteractor());
     auto ren  = std::dynamic_pointer_cast<imstk::VTKRenderer>(getActiveRenderer());
     iren->DoOneEvent(vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow), ren->getVtkRenderer(), false);
-
-    // Update all controls
-    for (auto control : m_controls)
-    {
-        control->update(m_dt);
-    }
 }
 
 bool

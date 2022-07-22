@@ -42,12 +42,12 @@ public class PbdVolume
             {
                 MouseSceneControl mouseControl = new MouseSceneControl(viewer.getMouseDevice());
                 mouseControl.setSceneManager(sceneManager);
-                viewer.addControl(mouseControl);
+                scene.addControl(mouseControl);
 
                 KeyboardSceneControl keyControl = new KeyboardSceneControl(viewer.getKeyboardDevice());
                 keyControl.setSceneManager(new SceneManagerWeakPtr(sceneManager));
                 keyControl.setModuleDriver(new ModuleDriverWeakPtr(driver));
-                viewer.addControl(keyControl);
+                scene.addControl(keyControl);
             }
 
             driver.start();

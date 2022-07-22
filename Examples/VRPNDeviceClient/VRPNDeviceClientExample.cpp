@@ -81,7 +81,7 @@ main()
     controller->setControlledObject(object);
     controller->setDevice(client);
     controller->setTranslationScaling(0.1);
-    scene->addController(controller);
+    scene->addControl(controller);
 
     // Update Camera position
     std::shared_ptr<Camera> cam = scene->getActiveCamera();
@@ -115,13 +115,13 @@ main()
             auto mouseControl = std::make_shared<MouseSceneControl>();
             mouseControl->setDevice(viewer->getMouseDevice());
             mouseControl->setSceneManager(sceneManager);
-            viewer->addControl(mouseControl);
+            scene->addControl(mouseControl);
 
             auto keyControl = std::make_shared<KeyboardSceneControl>();
             keyControl->setDevice(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
             keyControl->setModuleDriver(driver);
-            viewer->addControl(keyControl);
+            scene->addControl(keyControl);
         }
 
         driver->start();

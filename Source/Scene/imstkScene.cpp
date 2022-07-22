@@ -66,6 +66,12 @@ Scene::initialize()
     for (const auto& obj : m_sceneObjects)
     {
         CHECK(obj->initialize()) << "Error initializing scene object: " << obj->getName();
+
+        // Print any controls
+        if (auto deviceObj = std::dynamic_pointer_cast<DeviceControl>(obj))
+        {
+            deviceObj->printControls();
+        }
     }
 
     // Build the compute graph
@@ -421,9 +427,9 @@ Scene::removeCamera(const std::string name)
 }
 
 void
-Scene::addController(std::shared_ptr<TrackingDeviceControl> controller)
+Scene::addControl(std::shared_ptr<DeviceControl> control)
 {
-    m_trackingControllers.push_back(controller);
+    addSceneObject(control);
     this->postEvent(Event(modified()));
 }
 
@@ -469,10 +475,14 @@ Scene::advance(const double dt)
         }
     }
 
-    // Update objects controlled by the device controllers
-    for (auto controller : this->getControllers())
+    // Process all inputs (haptics, keyboard, mouse, VR control)
+    // before updating the scene
+    for (auto obj : this->getSceneObjects())
     {
-        controller->update(dt);
+        if (auto controlObj = std::dynamic_pointer_cast<DeviceControl>(obj))
+        {
+            controlObj->update(dt);
+        }
     }
 
     // Execute the computational graph
