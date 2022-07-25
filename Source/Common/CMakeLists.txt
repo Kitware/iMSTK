@@ -36,7 +36,6 @@ imstk_add_library( Common
     Utils/imstkTimer.h
   CPP_FILES
     imstkColor.cpp
-    imstkLogger.cpp
     imstkLoggerG3.cpp
     imstkLoggerSynchronous.cpp
     imstkModule.cpp

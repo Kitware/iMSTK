@@ -1,3 +1,9 @@
+/*
+** This file is part of the Interactive Medical Simulation Toolkit (iMSTK)
+** iMSTK is distributed under the Apache License, Version 2.0.
+** See accompanying NOTICE for details. 
+*/
+
 %module(directors="1") Utils
 #pragma SWIG nowarn=302,314,317,401,476,501,503,505,516,844,
 %{
