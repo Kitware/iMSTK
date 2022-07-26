@@ -35,6 +35,9 @@
 #include "imstkVTKRenderer.h"
 #endif
 
+#include "imstkHaplyDeviceClient.h"
+#include "imstkHaplyDeviceManager.h"
+
 using namespace imstk;
 
 ///
@@ -48,8 +51,9 @@ main()
     Logger::startLogger();
 
     // Setup haptics manager
-    imstkNew<HapticDeviceManager>       hapticsManager;
-    std::shared_ptr<HapticDeviceClient> client = hapticsManager->makeDeviceClient();
+    imstkNew<HaplyDeviceManager> hapticsManager;
+    //hapticsManager->setSleepDelay(1.0);
+    std::shared_ptr<HaplyDeviceClient> client = hapticsManager->makeDeviceClient();
 
     // Scene
     imstkNew<Scene> scene("VirtualCoupling");
@@ -120,10 +124,13 @@ main()
     imstkNew<RigidObjectController> controller;
     controller->setControlledObject(rbdObj);
     controller->setDevice(client);
-    controller->setLinearKs(30000.0);
+    controller->setTranslationOffset(Vec3d(0.0, -3.0, 0.0));
+    controller->setLinearKs(3000.0);
     controller->setAngularKs(10000000000.0);
-    controller->setTranslationScaling(0.02);
-    controller->setForceScaling(0.001);
+    controller->setTranslationScaling(10.0);
+    controller->setForceScaling(0.01);
+    controller->setSmoothingKernelSize(5);
+    controller->setUseForceSmoothening(true);
     controller->setUseCritDamping(true);
     //controller->setInversionFlags(RigidObjectController::InvertFlag::rotY);
     scene->addControl(controller);
@@ -167,7 +174,8 @@ main()
                 // Run the rbd model in real time
                 rbdObj->getRigidBodyModel2()->getConfig()->m_dt = driver->getDt();
 
-                ghostMaterial->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+                //ghostMaterial->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+                ghostMaterial->setOpacity(1.0);
 
                 // Also apply controller transform to ghost geometry
                 toolGhostMesh->setTranslation(controller->getPosition());

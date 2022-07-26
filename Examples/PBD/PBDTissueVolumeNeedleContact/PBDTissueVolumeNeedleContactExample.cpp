@@ -39,6 +39,9 @@
 #ifdef iMSTK_USE_OPENHAPTICS
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
+#include "imstkHaplyDeviceManager.h"
+#include "imstkHaplyDeviceClient.h"
+#include "imstkRigidObjectController.h"
 #else
 #include "imstkMouseDeviceClient.h"
 #include "imstkDummyClient.h"
@@ -271,12 +274,23 @@ main()
 
         auto controller = std::make_shared<PbdObjectController>();
 #ifdef iMSTK_USE_OPENHAPTICS
-        auto hapticManager = std::make_shared<HapticDeviceManager>();
+        imstkNew<HaplyDeviceManager> hapticManager;
         //hapticManager->setSleepDelay(0.01);
-        std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
+        std::shared_ptr<HaplyDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        controller->setTranslationScaling(0.001);
+        imstkNew<RigidObjectController> controller;
+        controller->setControlledObject(toolObj);
+        controller->setDevice(hapticDeviceClient);
+        controller->setTranslationScaling(0.2);
+        controller->setTranslationOffset(Vec3d(0.05, 0.0, 0.0));
+        controller->setLinearKs(5000.0);
+        controller->setAngularKs(5000000.0);
+        controller->setUseCritDamping(true);
+        controller->setForceScaling(0.1);
+        controller->setSmoothingKernelSize(15);
+        controller->setUseForceSmoothening(true);
+        scene->addController(controller);
 
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)

@@ -29,8 +29,8 @@
 #include "imstkVTKViewer.h"
 
 #ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
+#include "imstkHaplyDeviceClient.h"
+#include "imstkHaplyDeviceManager.h"
 #include "imstkRigidObjectController.h"
 #else
 #include "imstkMouseDeviceClient.h"
@@ -46,6 +46,7 @@ makeRigidObj(const std::string& name)
     rbdModel->getConfig()->m_velocityDamping        = 1.0;
     rbdModel->getConfig()->m_angularVelocityDamping = 1.0;
     rbdModel->getConfig()->m_maxNumConstraints      = 40;
+    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
 
     // Create the first rbd, plane floor
     imstkNew<RigidObject2> rigidObj(name);
@@ -145,19 +146,19 @@ main()
         driver->setDesiredDt(0.001); // Exactly 1000ups
 
 #ifdef iMSTK_USE_OPENHAPTICS
-        imstkNew<HapticDeviceManager> hapticManager;
-        hapticManager->setSleepDelay(0.5); // Delay for 1/2ms (haptics thread is limited to max 2000hz)
+        imstkNew<HaplyDeviceManager> hapticManager;
+        hapticManager->setSleepDelay(0.25); // Delay for 1/2ms (haptics thread is limited to max 2000hz)
         driver->addModule(hapticManager);
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
+        std::shared_ptr<HaplyDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
 
         imstkNew<RigidObjectController> controller;
         {
             controller->setControlledObject(rbdObj);
             controller->setDevice(hapticDeviceClient);
-            controller->setLinearKs(300000.0);
+            controller->setLinearKs(50000.0);
             controller->setAngularKs(300000000.0);
             controller->setUseCritDamping(true);
-            controller->setForceScaling(0.001);
+            controller->setForceScaling(0.005);
 
             // The particular device we are using doesn't produce this quantity
             // with this flag its computed
@@ -165,8 +166,8 @@ main()
             controller->setComputeVelocity(true);
             controller->setComputeAngularVelocity(true);
 
-            controller->setTranslationScaling(0.0015);
-            controller->setTranslationOffset(Vec3d(0.1, 0.9, 1.6));
+            controller->setTranslationScaling(1.0);
+            controller->setTranslationOffset(Vec3d(0.4, 0.7, 1.6));
             controller->setSmoothingKernelSize(30);
         }
         scene->addControl(controller);

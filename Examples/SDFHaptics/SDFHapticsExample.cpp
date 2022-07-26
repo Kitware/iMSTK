@@ -7,8 +7,8 @@
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkDirectionalLight.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
+#include "imstkHaplyDeviceClient.h"
+#include "imstkHaplyDeviceManager.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -72,8 +72,8 @@ main()
         }
     }
 
-    imstkNew<HapticDeviceManager>       hapticManager;
-    std::shared_ptr<HapticDeviceClient> client = hapticManager->makeDeviceClient();
+    imstkNew<HaplyDeviceManager>       hapticManager;
+    std::shared_ptr<HaplyDeviceClient> client = hapticManager->makeDeviceClient();
 
     // Run the simulation
     {
@@ -83,6 +83,7 @@ main()
 
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager;
+        //sceneManager->setSleepDelay(1.0);
         sceneManager->setActiveScene(scene);
 
         imstkNew<SimulationManager> driver;
