@@ -212,6 +212,11 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkMouseDeviceClient.h"
 
+#ifdef iMSTK_USE_HAPLY
+#include "imstkHaplyDeviceManager.h"
+#include "imstkHaplyDeviceClient.h"
+#endif
+
 #ifdef iMSTK_USE_OpenHaptics
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
@@ -468,6 +473,12 @@ namespace std
 %include "../../Devices/imstkDeviceClient.h"
 %include "../../Devices/imstkKeyboardDeviceClient.h"
 %include "../../Devices/imstkMouseDeviceClient.h"
+
+#ifdef iMSTK_USE_HAPLY
+	#define HDCALLBACK
+	%include "../../Devices/imstkHaplyDeviceManager.h"
+	%include "../../Devices/imstkHaplyDeviceClient.h"
+#endif
 
 #ifdef iMSTK_USE_OpenHaptics
 	#define HDCALLBACK

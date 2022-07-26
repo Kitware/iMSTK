@@ -33,6 +33,19 @@ if(iMSTK_USE_OpenHaptics)
     )
 endif()
 
+if (iMSTK_USE_HAPLY)
+  list(APPEND Dependencies Haply::Haply)
+
+  list(APPEND H_FILES
+    imstkHaplyDeviceClient.h
+    imstkHaplyDeviceManager.h
+    )
+  list(APPEND SRC_FILES
+    imstkHaplyDeviceClient.cpp
+    imstkHaplyDeviceManager.cpp
+    )
+endif()
+
 if(iMSTK_USE_VRPN)
   list(APPEND Dependencies VRPN::VRPN)
 

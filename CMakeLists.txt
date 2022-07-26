@@ -179,6 +179,9 @@ endif()
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_VRPN:BOOL)
 
+option(${PROJECT_NAME}_USE_HAPLY "Build with Haply support" OFF)
+mark_as_superbuild(${PROJECT_NAME}_USE_HAPLY:BOOL)
+
 cmake_dependent_option(${PROJECT_NAME}_USE_RENDERING_VTK "Build with/out VTK rendering support" ON "NOT ${PROJECT_NAME}_BUILD_FOR_UNITY" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_RENDERING_VTK:BOOL)
 
@@ -249,6 +252,9 @@ if(${PROJECT_NAME}_SUPERBUILD)
       imstk_define_dependency(Libusb) #for VRPN
     endif()
     imstk_define_dependency(VRPN)
+  endif()
+  if (${PROJECT_NAME}_USE_HAPLY)
+    imstk_define_dependency(Haply)
   endif()
 
   if(WIN32 AND ${PROJECT_NAME}_AUDIO_ENABLED)
@@ -346,6 +352,13 @@ if (${PROJECT_NAME}_USE_VRPN)
   add_definitions( -DiMSTK_USE_VRPN )
 else()
   remove_definitions( -DiMSTK_USE_VRPN )
+endif()
+
+if (${PROJECT_NAME}_USE_HAPLY)
+  find_package( Haply REQUIRED )
+  add_definitions( -DiMSTK_USE_HAPLY )
+else()
+  remove_definitions( -DiMSTK_USE_HAPLY )
 endif()
 
 # OpenHaptics

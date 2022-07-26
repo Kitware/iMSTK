@@ -84,6 +84,11 @@ if (iMSTK_USE_VRPN)
   find_dependency( VRPN )
 endif()
 
+# VRPN
+if (iMSTK_USE_HAPLY)
+  find_dependency( Haply )
+endif()
+
 # OpenHaptics
 if(iMSTK_USE_OpenHaptics)
   find_dependency( OpenHapticsSDK )
