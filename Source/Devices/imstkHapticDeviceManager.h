@@ -15,7 +15,8 @@ namespace imstk
 class HapticDeviceClient;
 
 ///
-/// \class HDAPIDeviceServer
+/// \class HapticDeviceManager
+///
 /// \brief Devices manager using HDAPI
 /// \todo add the frame rate option for the servo loop
 ///
@@ -32,7 +33,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~HapticDeviceManager() override = default;
+    ~HapticDeviceManager() override = default;
 
     ///
     /// \brief Create a haptic device client and add it to the internal list
