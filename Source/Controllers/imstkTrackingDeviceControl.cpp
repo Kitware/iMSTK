@@ -42,8 +42,6 @@ TrackingDeviceControl::updateTrackingData(const double dt)
         return false;
     }
 
-    m_deviceClient->update();
-
     // Retrieve device info
     const Vec3d prevPos = m_currentPos;
     const Quatd prevOrientation = m_currentOrientation;
