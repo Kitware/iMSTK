@@ -356,6 +356,6 @@ TEST(imstkDataArrayTest, Cloning)
 
     DataArray<int>* cloned = dynamic_cast<DataArray<int>*>(d.get());
 
-    EXPECT_NE(cloned, nullptr);
+    ASSERT_NE(cloned, nullptr);
     EXPECT_TRUE(isEqualTo(a, *cloned));
 }

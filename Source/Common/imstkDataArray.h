@@ -323,7 +323,7 @@ public:
     inline T& operator[](const size_t pos)
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+        if (pos >= m_size) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_data[pos];
     }
@@ -331,23 +331,31 @@ public:
     inline const T& operator[](const size_t pos) const
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+        if (pos >= m_size) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_data[pos];
     }
 
+    ///
+    /// \return the item at the given position
+    /// \note as opposed to the std::vector bounds checking is only done when IMSTK_CHECK_ARRAY_RANGE is set
+    ///
     inline T& at(const size_t pos)
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+        if (pos >= m_size) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_data[pos];
     }
 
+    ///
+    /// \return the item at the given position
+    /// \note as opposed to the std::vector bounds checking is only done when IMSTK_CHECK_ARRAY_RANGE is set
+    ///
     inline const T& at(const size_t pos) const
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+        if (pos >= m_size) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_data[pos];
     }

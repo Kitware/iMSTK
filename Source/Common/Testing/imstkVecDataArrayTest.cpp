@@ -406,6 +406,6 @@ TEST(imstkVecDataArrayTest, Cloning)
 
     VecDataArray<int, 2>* cloned = dynamic_cast<VecDataArray<int, 2>*>(d.get());
 
-    EXPECT_NE(cloned, nullptr);
+    ASSERT_NE(cloned, nullptr);
     EXPECT_TRUE(isEqualTo(a, *cloned));
 }
