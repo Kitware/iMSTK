@@ -1,17 +1,9 @@
-/*=========================================================================
+/*
+** This file is part of the Interactive Medical Simulation Toolkit (iMSTK)
+** iMSTK is distributed under the Apache License, Version 2.0.
+** See accompanying NOTICE for details.
+*/
 
-  Program:   Visualization Toolkit
-  Module:    vtkOpenVRRenderWindowInteractor2.cxx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 #include <cassert>
 #include <cmath>
 #include <cstdio>
