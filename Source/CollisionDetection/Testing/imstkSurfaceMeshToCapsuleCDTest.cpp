@@ -273,17 +273,18 @@ TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_FaceInteriorEnd)
 /// midpiece/cylinder of the capsule
 /// \todo: Edge case not currently implemented in SurfaceMeshToCapsuleCD
 ///
-TEST(imstkSurfaceMeshToCapsuleCDTest, DISABLED_IntersectionTestAB_FaceInteriorMidpiece)
+TEST(imstkSurfaceMeshToCapsuleCDTest, IntersectionTestAB_FaceInteriorMidpiece)
 {
     // Vertex-to-capsule edge face case
-    auto capsule = std::make_shared<Capsule>(Vec3d::Zero(), 0.5, 1.0);
+    auto capsule = std::make_shared<Capsule>(Vec3d(0.0, 0.1, 0.0), 0.1, 0.5);
 
     // Create surafce mesh (single triangle)
     auto                    surfMesh = std::make_shared<SurfaceMesh>();
     VecDataArray<double, 3> triangleVertices(3);
-    triangleVertices[0] = Vec3d(-1.33, 0.24, -1.0);
-    triangleVertices[1] = Vec3d(1.33, 0.24, -1.0);
-    triangleVertices[2] = Vec3d(0.0, 0.24, 1.0);
+    triangleVertices[0] = Vec3d(0.5, 0.0, -1.0 / 3.0);
+    triangleVertices[1] = Vec3d(-0.5, 0.1, -1.0 / 3.0);
+    triangleVertices[2] = Vec3d(0.0, 0.0, 2.0 / 3.0);
+
     VecDataArray<int, 3> triangleIndices(1);
     triangleIndices[0] = Vec3i(0, 1, 2);
     surfMesh->initialize(
