@@ -24,7 +24,7 @@ template<typename T, int N> class VecDataArray;
 class RigidObjectCollision : public CollisionInteraction
 {
 public:
-    RigidObjectCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType);
+    RigidObjectCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType = "");
     ~RigidObjectCollision() override = default;
 
     IMSTK_TYPE_NAME(RigidObjectCollision)

@@ -23,7 +23,7 @@
 namespace imstk
 {
 RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2) :
-    CollisionInteraction("RigidObjectLevelSetCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2),
+    CollisionInteraction("RigidObjectLevelSetCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, std::string("ImplicitGeometryToPointSetCCD")),
     m_prevVertices(std::make_shared<VecDataArray<double, 3>>())
 {
     std::shared_ptr<RigidBodyModel2> rbdModel    = obj1->getRigidBodyModel2();
@@ -48,17 +48,11 @@ RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<Rigid
     m_taskGraph->addNode(rbdModel->getSolveNode());
     m_taskGraph->addNode(lvlSetModel->getGenerateVelocitiesEndNode());
 
-    // Setup the CD
-    auto cd = std::make_shared<ImplicitGeometryToPointSetCCD>();
-    cd->setInputGeometryA(obj1->getCollidingGeometry());
-    cd->setInputGeometryB(obj2->getCollidingGeometry());
-    setCollisionDetection(cd);
-
     // Setup the rigid body handler to move the rigid body according to collision data
     auto rbdCH = std::make_shared<RigidBodyCH>();
     rbdCH->setInputRigidObjectA(obj1);
     rbdCH->setInputCollidingObjectB(obj2);
-    rbdCH->setInputCollisionData(cd->getCollisionData());
+    rbdCH->setInputCollisionData(m_colDetect->getCollisionData());
     rbdCH->setFriction(0.0);
     setCollisionHandlingA(rbdCH);
 
@@ -66,7 +60,7 @@ RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<Rigid
     auto lvlSetCH = std::make_shared<LevelSetCH>();
     lvlSetCH->setInputLvlSetObj(obj2);
     lvlSetCH->setInputRigidObj(obj1);
-    lvlSetCH->setInputCollisionData(cd->getCollisionData());
+    lvlSetCH->setInputCollisionData(m_colDetect->getCollisionData());
     setCollisionHandlingB(lvlSetCH);
 
     m_copyVertToPrevNode = std::make_shared<TaskNode>([ = ]()

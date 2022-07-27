@@ -4,6 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkCDObjectFactory.h"
 #include "imstkCollisionInteraction.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionDetectionAlgorithm.h"
@@ -15,7 +16,8 @@ namespace imstk
 CollisionInteraction::CollisionInteraction(
     std::string                      objName,
     std::shared_ptr<CollidingObject> objA,
-    std::shared_ptr<CollidingObject> objB) : SceneObject(objName),
+    std::shared_ptr<CollidingObject> objB,
+    std::string                      cdType = "") : SceneObject(objName),
     m_objA(objA), m_objB(objB)
 {
     m_collisionDetectionNode = std::make_shared<TaskNode>(std::bind(&CollisionInteraction::updateCD, this),
@@ -34,6 +36,18 @@ CollisionInteraction::CollisionInteraction(
     m_collisionGeometryUpdateNode = std::make_shared<TaskNode>(std::bind(&CollisionInteraction::updateCollisionGeometry, this),
         objA->getName() + "_vs_" + objB->getName() + "_CollisionGeometryUpdate", true);
     m_taskGraph->addNode(m_collisionGeometryUpdateNode);
+
+    // Get default cdType if one not provided
+    if (cdType.empty())
+    {
+        cdType = getCDType(*objA, *objB);
+    }
+
+    // Setup the CD
+    m_colDetect = CDObjectFactory::makeCollisionDetection(cdType);
+    m_colDetect->setInput(objA->getCollidingGeometry(), 0);
+    m_colDetect->setInput(objB->getCollidingGeometry(), 1);
+    setCollisionDetection(m_colDetect);
 }
 
 void

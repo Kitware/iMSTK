@@ -26,7 +26,6 @@ public:
     void print() const override;
 
     // Accessors
-
     ///
     /// \brief Get the local or global position (post transformed)
     ///

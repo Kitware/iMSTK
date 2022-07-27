@@ -21,27 +21,21 @@ namespace imstk
 {
 PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<RigidObject2> obj2,
                                                  std::string cdType) :
-    CollisionInteraction("PbdRigidObjectCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2)
+    CollisionInteraction("PbdRigidObjectCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, cdType)
 {
     std::shared_ptr<PbdModel> pbdModel1 = obj1->getPbdModel();
-
-    // Setup the CD
-    std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
-    cd->setInput(obj1->getCollidingGeometry(), 0);
-    cd->setInput(obj2->getCollidingGeometry(), 1);
-    setCollisionDetection(cd);
 
     // Setup the handler to resolve obj1
     auto pbdCH = std::make_shared<PbdCollisionHandling>();
     pbdCH->setInputObjectA(obj1);
     pbdCH->setInputObjectB(obj2);
-    pbdCH->setInputCollisionData(cd->getCollisionData());
+    pbdCH->setInputCollisionData(m_colDetect->getCollisionData());
     setCollisionHandlingA(pbdCH);
 
     auto rbdCH = std::make_shared<RigidBodyCH>();
     rbdCH->setInputRigidObjectA(obj2);
     rbdCH->setInputCollidingObjectB(obj1);
-    rbdCH->setInputCollisionData(cd->getCollisionData());
+    rbdCH->setInputCollisionData(m_colDetect->getCollisionData());
     rbdCH->setBaumgarteStabilization(0.1);
     setCollisionHandlingB(rbdCH);
 

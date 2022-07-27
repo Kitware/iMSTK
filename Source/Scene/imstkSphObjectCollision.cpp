@@ -18,20 +18,13 @@ namespace imstk
 // Pbd Collision will be tested before any step of pbd, then resolved after the solve steps of the two objects
 SphObjectCollision::SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<CollidingObject> obj2,
                                        std::string cdType) :
-    CollisionInteraction("SphObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2)
+    CollisionInteraction("SphObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, cdType)
 {
-    // Setup the CD
-    std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
-    cd->setInput(obj1->getCollidingGeometry(), 0);
-    cd->setInput(obj2->getCollidingGeometry(), 1);
-    cd->setGenerateCD(true, false); // CD data is only needed for the SPHObject geometry
-    setCollisionDetection(cd);
-
     // Setup the handler
     std::shared_ptr<SphCollisionHandling> ch = std::make_shared<SphCollisionHandling>();
     ch->setInputObjectA(obj1);
-    ch->setInputCollisionData(cd->getCollisionData());
-    ch->setDetection(cd);
+    ch->setInputCollisionData(m_colDetect->getCollisionData());
+    ch->setDetection(m_colDetect);
     setCollisionHandlingA(ch);
 
     // Collision should happen after positions and velocities are computed

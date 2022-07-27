@@ -5,6 +5,7 @@
 */
 
 #include "imstkCollidingObject.h"
+#include "imstkCDObjectFactory.h"
 #include "imstkGeometry.h"
 #include "imstkGeometryMap.h"
 
@@ -59,5 +60,19 @@ CollidingObject::updateGeometries()
         m_collidingToVisualMap->getChildGeometry()->postModified();
     }
     SceneObject::updateGeometries();
+}
+
+std::string
+getCDType(const CollidingObject& obj1, const CollidingObject& obj2)
+{
+    // Check for nullptr in colliding objects
+    if (&obj1 == nullptr || &obj2 == nullptr)
+    {
+        LOG(FATAL) << "Nullptr passed into getCDType";
+        return std::string("");
+    }
+
+    std::string cdType = CDObjectFactory::getCDType(*obj1.getCollidingGeometry(), *obj2.getCollidingGeometry());
+    return cdType;
 }
 } // namespace imstk

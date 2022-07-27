@@ -16,7 +16,7 @@
 namespace imstk
 {
 class CollisionDetectionAlgorithm;
-
+class Geometry;
 /// \brief Manages and generates the CollisionDetectionAlgorithms.
 ///
 /// The factory is a singleton and can be accessed anywhere.
@@ -44,6 +44,11 @@ public:
 /// \brief attempts to create a new CD algorithm
 /// \param collisionTypeName name of the class to look up
     static std::shared_ptr<CollisionDetectionAlgorithm> makeCollisionDetection(const std::string collisionTypeName);
+///
+/// \brief Get the CD type from the types of objects colliding
+    static std::string getCDType(
+        const Geometry& obj1,
+        const Geometry& obj2);
 };
 
 /// \brief Auto registration class

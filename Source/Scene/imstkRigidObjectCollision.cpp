@@ -20,19 +20,14 @@ namespace imstk
 {
 RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1, std::shared_ptr<CollidingObject> obj2,
                                            std::string cdType) :
-    CollisionInteraction("RigidObjectCollision" + rbdObj1->getName() + "_vs_" + obj2->getName(), rbdObj1, obj2)
+    CollisionInteraction("RigidObjectCollision" + rbdObj1->getName() + "_vs_" + obj2->getName(), rbdObj1, obj2, cdType)
 {
     std::shared_ptr<RigidBodyModel2> model1 = rbdObj1->getRigidBodyModel2();
-
-    std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
-    cd->setInput(rbdObj1->getCollidingGeometry(), 0);
-    cd->setInput(obj2->getCollidingGeometry(), 1);
-    setCollisionDetection(cd);
 
     // Only one handler is used, this means we only support one-way collisions or two-way
     // If you want two one-way's, use two RigidObjectCollisions
     auto ch = std::make_shared<RigidBodyCH>();
-    ch->setInputCollisionData(cd->getCollisionData());
+    ch->setInputCollisionData(m_colDetect->getCollisionData());
     ch->setInputObjectA(rbdObj1);
     ch->setInputObjectB(obj2);
 
@@ -71,7 +66,7 @@ RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1
         m_taskGraph->addNode(obj2->getUpdateNode());
 
         // Setup the handlers for only A and inform CD it only needs to generate A
-        cd->setGenerateCD(true, false);
+        m_colDetect->setGenerateCD(true, false);
         setCollisionHandlingA(ch);
     }
 
