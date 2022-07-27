@@ -34,21 +34,15 @@ namespace imstk
 {
 PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
                                        std::string cdType) :
-    CollisionInteraction("PbdObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2)
+    CollisionInteraction("PbdObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, cdType)
 {
     std::shared_ptr<PbdModel> pbdModel1 = obj1->getPbdModel();
-
-    // Setup the CD
-    std::shared_ptr<CollisionDetectionAlgorithm> cd = CDObjectFactory::makeCollisionDetection(cdType);
-    cd->setInput(obj1->getCollidingGeometry(), 0);
-    cd->setInput(obj2->getCollidingGeometry(), 1);
-    setCollisionDetection(cd);
 
     // Setup the handler
     std::shared_ptr<PbdCollisionHandling> ch = std::make_shared<PbdCollisionHandling>();
     ch->setInputObjectA(obj1);
     ch->setInputObjectB(obj2);
-    ch->setInputCollisionData(cd->getCollisionData());
+    ch->setInputCollisionData(m_colDetect->getCollisionData());
 
     setCollisionHandlingAB(ch);
 

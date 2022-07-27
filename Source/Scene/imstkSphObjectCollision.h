@@ -38,7 +38,7 @@ class SphObjectCollision : public CollisionInteraction
 {
 public:
     SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                       std::string cdType = "ImplicitGeometryToPointSetCD");
+                       std::string cdType = "");
     ~SphObjectCollision() override = default;
 
     IMSTK_TYPE_NAME(SphObjectCollision)

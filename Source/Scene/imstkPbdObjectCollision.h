@@ -41,7 +41,8 @@ public:
     /// \brief Constructor for PbdObject-PbdObject or PbdObject-CollidingObject collisions
     ///
     PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                       std::string cdType = "ClosedSurfaceMeshToMeshCD");
+                       std::string cdType = "");
+
     ~PbdObjectCollision() override = default;
 
     IMSTK_TYPE_NAME(PbdObjectCollision)

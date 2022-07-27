@@ -72,4 +72,6 @@ protected:
     std::shared_ptr<GeometryMap> m_collidingToVisualMap = nullptr; ///< Maps transformations to visual geometry
     Vec3d m_force = Vec3d::Zero();
 };
+
+std::string getCDType(const CollidingObject& obj1, const CollidingObject& obj2);
 } // namespace imstk
