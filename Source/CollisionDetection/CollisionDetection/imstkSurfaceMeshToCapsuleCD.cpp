@@ -68,13 +68,19 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
             int unusedCaseType = 0;
             const Vec3d trianglePointA = CollisionUtils::closestPointOnTriangle(capsulePosA, x1, x2, x3, unusedCaseType);
             const Vec3d trianglePointB = CollisionUtils::closestPointOnTriangle(capsulePosB, x1, x2, x3, unusedCaseType);
-            const auto segmentPointA   = CollisionUtils::closestPointOnSegment(trianglePointA, capsulePosA, capsulePosB, unusedCaseType);
-            const auto segmentPointB   = CollisionUtils::closestPointOnSegment(trianglePointB, capsulePosA, capsulePosB, unusedCaseType);
-            const auto distanceA       = (segmentPointA - trianglePointA).norm();
-            const auto distanceB       = (segmentPointB - trianglePointB).norm();
+
+            const auto segmentPointA = CollisionUtils::closestPointOnSegment(trianglePointA, capsulePosA, capsulePosB, unusedCaseType);
+            const auto segmentPointB = CollisionUtils::closestPointOnSegment(trianglePointB, capsulePosA, capsulePosB, unusedCaseType);
+
+            const auto distanceA = (segmentPointA - trianglePointA).norm();
+            const auto distanceB = (segmentPointB - trianglePointB).norm();
 
             const double sphereRadius = capsuleRadius;
             Vec3d spherePos(0, 0, 0);
+
+            Vec3d nearestTip;
+            Vec3d triTipProjection;
+
             if (distanceA < distanceB)
             {
                 spherePos = segmentPointA;
@@ -85,7 +91,7 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
             }
             else // parallel
             {
-                spherePos = (segmentPointA + segmentPointB) / 2;
+                spherePos = (segmentPointA + segmentPointB) / 2.0;        // switch to intersection point?
             }
 
             // This approach does a built in sphere sweep
@@ -105,14 +111,46 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                 Vec3d triangleContactPt;
                 Vec2i edgeContact;
                 int pointContact;
+
                 int caseType = CollisionUtils::testSphereToTriangle(
                 spherePos, sphereRadius,
                 cell, x1, x2, x3,
                 triangleContactPt,
                 edgeContact, pointContact);
-                if (caseType == 1) // Edge vs point on sphere
+
+                // Test if capsule centerline intersects with surface
+                Vec3d uvw;
+                const bool inserted = CollisionUtils::testSegmentTriangle(
+                    capsulePosA, capsulePosB,
+                    x1, x2, x3,
+                    uvw);
+
+                // If capsule segment is inside of triangle, find nearest segment tip and
+                // create constraint to move the capsule out using that position + radius
+                if (inserted)
                 {
-                                   // Edge contact
+                    caseType = 4;
+
+                    auto intersectionPt = uvw[0] * x1 + uvw[1] * x2 + uvw[2] * x3;
+
+                    auto capsuleSegTipDistA = (capsulePosA - intersectionPt).squaredNorm();
+                    auto capsuleSegTipDistB = (capsulePosB - intersectionPt).squaredNorm();
+
+                    if (capsuleSegTipDistA <= capsuleSegTipDistB)
+                    {
+                        nearestTip       = capsulePosA; // Note: this is the wrong place to do this, the distance is not the distance you think it is.
+                        triTipProjection = trianglePointA;
+                    }
+                    else
+                    {
+                        nearestTip       = capsulePosB;
+                        triTipProjection = trianglePointB;
+                    }
+                }
+
+                // Contact with triangle edge
+                if (caseType == 1)
+                {
                     CellIndexElement elemA;
                     elemA.ids[0]   = edgeContact[0];
                     elemA.ids[1]   = edgeContact[1];
@@ -134,11 +172,9 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     elementsB.push_back(elemB);
                     lock.unlock();
                 }
-                else if (caseType == 2) // Triangle vs point on sphere
+                // Contact with triangle face
+                else if (caseType == 2)
                 {
-                                        // \todo: Doesn't handle case of triangle completely embedded in the cylinder
-
-                                        // Face contact
                     CellIndexElement elemA;
                     elemA.ids[0]   = cell[0];
                     elemA.ids[1]   = cell[1];
@@ -161,6 +197,7 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     elementsB.push_back(elemB);
                     lock.unlock();
                 }
+                // Contact with trianlge vertex
                 else if (caseType == 3)
                 {
                     Vec3d contactNormal = (spherePos - triangleContactPt);
@@ -177,6 +214,33 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     PointDirectionElement elemB;
                     elemB.pt  = spherePos - sphereRadius * contactNormal; // Contact point on sphere
                     elemB.dir = contactNormal;                            // Direction to resolve point
+                    elemB.penetrationDepth = penetrationDepth;
+
+                    lock.lock();
+                    elementsA.push_back(elemA);
+                    elementsB.push_back(elemB);
+                    lock.unlock();
+                }
+                // Capsule body intersecting triangle
+                else if (caseType == 4)
+                {
+                    auto puncturePt = uvw[0] * x1 + uvw[1] * x2 + uvw[2] * x3;
+
+                    CellIndexElement elemA;
+                    elemA.ids[0]   = cell[0];
+                    elemA.ids[1]   = cell[1];
+                    elemA.ids[2]   = cell[2];
+                    elemA.idCount  = 3;
+                    elemA.cellType = IMSTK_TRIANGLE;
+
+                    Vec3d contactNormal = (triTipProjection - nearestTip);
+                    const double dist   = contactNormal.norm();
+                    const double penetrationDepth = dist + sphereRadius;// sphere radius is capsule radius
+                    contactNormal /= dist;
+
+                    PointDirectionElement elemB;
+                    elemB.dir = contactNormal;                                          // Direction to resolve capsule
+                    elemB.pt  = nearestTip - sphereRadius * contactNormal.normalized(); // Contact point on capsule
                     elemB.penetrationDepth = penetrationDepth;
 
                     lock.lock();
