@@ -25,6 +25,8 @@ public:
     HapticDeviceManager() : Module()
     {
         m_muteUpdateEvents = true;
+        // Default a 1ms sleep to avoid over consumption of the CPU
+        m_sleepDelay = 1.0;
     }
 
     ///
@@ -44,7 +46,7 @@ protected:
     ///
     bool initModule() override;
 
-    void updateModule() override { }
+    void updateModule() override;
 
     ///
     /// \brief

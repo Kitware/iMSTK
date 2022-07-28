@@ -32,6 +32,15 @@ HapticDeviceManager::initModule()
 }
 
 void
+HapticDeviceManager::updateModule()
+{
+    for (int i = 0; i < m_deviceClients.size(); i++)
+    {
+        m_deviceClients[i]->update();
+    }
+}
+
+void
 HapticDeviceManager::uninitModule()
 {
     // \todo: Other threads could be mid update call here
