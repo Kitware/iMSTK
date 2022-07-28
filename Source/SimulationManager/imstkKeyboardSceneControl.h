@@ -42,6 +42,14 @@ public:
     ///
     void setSceneManager(std::weak_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
 
+    ///
+    /// \brief If on, text status will be shown when paused.
+    /// On by default.
+    ///@{
+    void setUseTextStatus(const bool useTextStatus) { m_useTextStatus = useTextStatus; }
+    bool getUseTextStatus() const { return m_useTextStatus; }
+    ///@}
+
     void printControls() override;
 
     void OnKeyPress(const char key) override;
@@ -52,5 +60,6 @@ protected:
     std::weak_ptr<ModuleDriver>      m_driver;
     std::weak_ptr<SceneManager>      m_sceneManager;
     std::shared_ptr<TextVisualModel> m_textVisualModel;
+    bool m_useTextStatus = true;
 };
 } // namespace imstk

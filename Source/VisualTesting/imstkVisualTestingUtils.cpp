@@ -119,6 +119,7 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
         m_scene->addControl(mouseControl);
 
         auto keyControl = std::make_shared<KeyboardSceneControl>();
+        keyControl->setUseTextStatus(false);
         keyControl->setDevice(m_viewer->getKeyboardDevice());
         keyControl->setSceneManager(m_sceneManager);
         keyControl->setModuleDriver(m_driver);

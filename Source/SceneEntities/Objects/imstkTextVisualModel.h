@@ -59,8 +59,8 @@ public:
     ///
     /// \brief Text visibility
     ///@{
-    void setVisability(const bool visible) { m_visible = visible; }
-    const bool getVisability() const { return m_visible; }
+    void setVisibility(const bool visible) { m_visible = visible; }
+    const bool getVisibility() const { return m_visible; }
     ///@}
 
     ///

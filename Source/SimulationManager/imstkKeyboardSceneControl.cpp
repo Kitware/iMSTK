@@ -22,7 +22,7 @@ KeyboardSceneControl::KeyboardSceneControl(const std::string& name) : KeyboardCo
     // Create visual model
     m_textVisualModel = std::make_shared<TextVisualModel>();
     m_textVisualModel->setFontSize(40);
-    m_textVisualModel->setVisability(true);
+    m_textVisualModel->setVisibility(false);
     m_textVisualModel->setText(
         "Simulation Paused\nPress Space to Continue\nPress R to Reset\nPress C to clear pause screen");
 
@@ -34,7 +34,7 @@ KeyboardSceneControl::KeyboardSceneControl(const std::string& name) : KeyboardCo
 bool
 KeyboardSceneControl::initialize()
 {
-    m_textVisualModel->setVisability(m_sceneManager.lock()->getPaused());
+    m_textVisualModel->setVisibility(m_useTextStatus ? m_sceneManager.lock()->getPaused() : false);
     return true;
 }
 
@@ -76,7 +76,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
         const bool paused = sceneManager->getPaused();
 
         // Switch pause screen visibility
-        m_textVisualModel->setVisability(!paused);
+        m_textVisualModel->setVisibility(m_useTextStatus ? !paused : false);
 
         // Resume or pause all modules, expect viewers
         for (auto module : driver->getModules())
@@ -149,19 +149,12 @@ KeyboardSceneControl::OnKeyPress(const char key)
     {
         sceneManager->getActiveScene()->getActiveCamera()->print();
     }
-    //// Toggle text on pause screen
+    // Toggle text on pause screen
     else if (key == 'c' || key == 'C')
     {
+        m_useTextStatus = !m_useTextStatus;
         const bool paused = sceneManager->getPaused();
-
-        if (paused && m_textVisualModel->getVisability())
-        {
-            m_textVisualModel->setVisability(false);
-        }
-        else if (paused)
-        {
-            m_textVisualModel->setVisability(true);
-        }
+        m_textVisualModel->setVisibility(m_useTextStatus ? !paused : false);
     }
 }
 
