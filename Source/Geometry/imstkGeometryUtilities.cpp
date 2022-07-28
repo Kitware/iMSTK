@@ -499,7 +499,7 @@ GeometryUtils::toLineGrid(
     VecDataArray<double, 3>& vertices = *verticesPtr;
     for (int i = 0; i < dim; i++)
     {
-        double t = static_cast<double>(i) / dim;
+        double t = static_cast<double>(i) / (dim - 1);
         vertices[i] = start + dirN * t * length;
     }
 
