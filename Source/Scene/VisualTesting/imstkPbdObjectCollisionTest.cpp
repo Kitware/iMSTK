@@ -203,6 +203,7 @@ public:
         m_scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
         ASSERT_NE(m_pbdObj, nullptr) << "Missing a pbdObj for PbdObjectCollisionTest";
+        m_pbdObj->getPbdModel()->getConfig()->m_doPartitioning = false;
         auto pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObj->getPhysicsGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;
@@ -284,6 +285,35 @@ public:
     Vec3d m_assertionBoundsMin = Vec3d(-1.0, -1.0, -1.0);
     Vec3d m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
 };
+
+///
+/// \brief Test PbdObjectCollision with line on line CCD
+///
+TEST_F(PbdObjectCollisionTest, PbdTissue_LineMeshToLineMeshCCD)
+{
+    // Setup the tissue
+    m_pbdObj = makeLineThreadObj("Thread",
+        0.2, 3, Vec3d(0.0, 0.01, -0.1), Vec3d(0.0, 0.0, 1.0));
+
+    // Setup the geometry
+    auto                    lineMesh = std::make_shared<LineMesh>();
+    VecDataArray<double, 3> vertices = { Vec3d(-0.5, 0.0, 0.0), Vec3d(0.5, 0.0, 0.0) };
+    VecDataArray<int, 2>    indices  = { Vec2i(0, 1) };
+    lineMesh->initialize(std::make_shared<VecDataArray<double, 3>>(vertices),
+        std::make_shared<VecDataArray<int, 2>>(indices));
+    m_collidingGeometry = lineMesh;
+
+    m_collisionName = "LineMeshToLineMeshCCD";
+    m_friction      = 0.0;
+    m_restitution   = 0.0;
+
+    m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
+    m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
+
+    createScene();
+
+    runFor(4.0, 0.01);
+}
 
 ///
 /// \brief Test PbdObjectCollision code path with and without mapping of collision geometry
