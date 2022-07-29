@@ -90,7 +90,7 @@ VTKTextRenderDelegate::processEvents()
         m_textActor->SetInput(textVisualModel->getText().c_str());
     }
 
-    m_textActor->SetVisibility(textVisualModel->getVisability());
+    m_textActor->SetVisibility(textVisualModel->getVisibility());
 }
 
 void
