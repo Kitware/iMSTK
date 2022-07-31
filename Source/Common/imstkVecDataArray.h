@@ -330,7 +330,7 @@ public:
     inline ValueType& operator[](const size_t pos)
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_vecSize) { throw std::runtime_error("Index out of range"); }
+        if (pos >= m_vecSize) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_dataCast[pos];
     }
@@ -338,7 +338,31 @@ public:
     inline const ValueType& operator[](const size_t pos) const
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_vecSize) { throw std::runtime_error("Index out of range"); }
+        if (pos >= m_vecSize) { throw std::out_of_range("Index out of range"); }
+#endif
+        return m_dataCast[pos];
+    }
+
+    ///
+    /// \return the item at the given position
+    /// \note as opposed to the std::vector bounds checking is only done when IMSTK_CHECK_ARRAY_RANGE is set
+    ///
+    inline ValueType& at(const size_t pos)
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_vecSize) { throw std::out_of_range("Index out of range"); }
+#endif
+        return m_dataCast[pos];
+    }
+
+    ///
+    /// \return the item at the given position
+    /// \note as opposed to the std::vector bounds checking is only done when IMSTK_CHECK_ARRAY_RANGE is set
+    ///
+    inline const ValueType& at(const size_t pos) const
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_vecSize) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_dataCast[pos];
     }
@@ -458,7 +482,22 @@ public:
 
     inline int getNumberOfComponents() const override { return N; }
 
+    ///
+    /// \brief Polymorphic clone, shadows the declaration in the superclasss
+    ///        but returns own type
+    ///
+    std::unique_ptr<VecDataArray<T, N>> clone()
+    {
+        return std::unique_ptr<VecDataArray<T, N>>(cloneImplementation());
+    }
+
 private:
+
+    VecDataArray<T, N>* cloneImplementation()
+    {
+        return new VecDataArray<T, N>(*this);
+    };
+
     int m_vecSize;
     int m_vecCapacity;
     ValueType* m_dataCast;

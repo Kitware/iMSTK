@@ -14,9 +14,8 @@ using namespace imstk;
 
 template<class T>
 bool
-isEqualTo(const DataArray<T>& original, std::initializer_list<T>&& p)
+isEqualTo(const DataArray<T>& original, const DataArray<T>& other)
 {
-    DataArray<T> other(p);
     if (original.size() != other.size())
     {
         return false;
@@ -65,9 +64,15 @@ TEST(imstkDataArrayTest, Accessors)
 
     b[3] = 4;
     EXPECT_EQ(4, b[3]);
+    b.at(3) = 5;
+    EXPECT_EQ(5, b[3]);
+
+    EXPECT_EQ(b.at(3), b[3]);
+    EXPECT_EQ(b.at(0), b[0]);
 
     // Checked Arrays only
     EXPECT_ANY_THROW(b[4]);
+    EXPECT_ANY_THROW(b.at(4));
 }
 
 TEST(imstkDataArrayTest, AccessorsConst)
@@ -319,4 +324,23 @@ TEST(imstkDataArrayTest, RangedBasedFor)
             EXPECT_EQ(value, expected++);
         }
     }
+}
+
+TEST(imstkDataArrayTest, Cloning)
+{
+    using Base = DataArray<int>;
+    DataArray<int> a{ 1, 2, 3, 4 };
+
+    // Cloning known type
+    std::shared_ptr<DataArray<int>> b = a.clone();
+    EXPECT_TRUE(isEqualTo(a, *b));
+
+    // Cloning unknown type
+    std::unique_ptr<AbstractDataArray> c = std::make_unique<DataArray<int>>(a);
+    auto                               d = (c->clone());
+
+    DataArray<int>* cloned = dynamic_cast<DataArray<int>*>(d.get());
+
+    ASSERT_NE(cloned, nullptr);
+    EXPECT_TRUE(isEqualTo(a, *cloned));
 }

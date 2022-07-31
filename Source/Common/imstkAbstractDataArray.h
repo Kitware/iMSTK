@@ -32,7 +32,6 @@ public:
     SIGNAL(AbstractDataArray, modified);
     // *INDENT-ON*
 
-public:
     ///
     /// \brief Resizes the array, may reallocate
     ///
@@ -79,19 +78,30 @@ public:
     ///
     virtual std::shared_ptr<AbstractDataArray> cast(ScalarTypeId) = 0;
 
-public:
     ///
     /// \brief emits signal to all observers, informing them on the current address
     /// in memory and size of array
     ///
     inline void postModified() { this->postEvent(Event(AbstractDataArray::modified())); }
 
-protected:
-    void setType(const ScalarTypeId type) { this->m_scalarType = type; }
+    ///
+    /// \brief polymorphic clone() function, utilize this to get a copy of the array
+    ///        without casting to the expected array type
+    std::unique_ptr<AbstractDataArray> clone()
+    {
+        return std::unique_ptr<AbstractDataArray>(cloneImplementation());
+    }
 
 protected:
+
+    void setType(const ScalarTypeId type) { this->m_scalarType = type; }
+
     ScalarTypeId m_scalarType;
     int m_size;     // Number of values
     int m_capacity; // Capacity of the vector
+
+private:
+
+    virtual AbstractDataArray* cloneImplementation() = 0; ///< Private virtual to execute the cloning operation
 };
 } // namespace imstk

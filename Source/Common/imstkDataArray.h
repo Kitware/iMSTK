@@ -152,6 +152,10 @@ public:
         m_size = m_capacity = static_cast<int>(list.size());
     }
 
+    ///
+    /// \brief Copy Constructor
+    /// \note The Copy constructor *does not* copy the event subscribers of this object
+    ///
     DataArray(const DataArray& other) : AbstractDataArray(other)
     {
         // Copy the buffer instead of the pointer
@@ -304,7 +308,7 @@ public:
     inline T& operator[](const size_t pos)
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+        if (pos >= m_size) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_data[pos];
     }
@@ -312,7 +316,31 @@ public:
     inline const T& operator[](const size_t pos) const
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_size) { throw std::runtime_error("Index out of range"); }
+        if (pos >= m_size) { throw std::out_of_range("Index out of range"); }
+#endif
+        return m_data[pos];
+    }
+
+    ///
+    /// \return the item at the given position
+    /// \note as opposed to the std::vector bounds checking is only done when IMSTK_CHECK_ARRAY_RANGE is set
+    ///
+    inline T& at(const size_t pos)
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_size) { throw std::out_of_range("Index out of range"); }
+#endif
+        return m_data[pos];
+    }
+
+    ///
+    /// \return the item at the given position
+    /// \note as opposed to the std::vector bounds checking is only done when IMSTK_CHECK_ARRAY_RANGE is set
+    ///
+    inline const T& at(const size_t pos) const
+    {
+#ifdef IMSTK_CHECK_ARRAY_RANGE
+        if (pos >= m_size) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_data[pos];
     }
@@ -432,8 +460,25 @@ public:
         }
     }
 
+    ///
+    /// \brief Polymorphic clone, shadows the declaration in the superclasss
+    ///        but returns own type
+    ///
+    std::unique_ptr<DataArray<T>> clone()
+    {
+        return std::unique_ptr<DataArray<T>>(cloneImplementation());
+    }
+
 protected:
+
     bool m_mapped;
     T*   m_data;
+
+private:
+
+    DataArray<T>* cloneImplementation()
+    {
+        return new DataArray<T>(*this);
+    };
 };
 } // namespace imstk

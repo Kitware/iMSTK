@@ -17,9 +17,8 @@ namespace
 {
 template<class T, int N>
 bool
-isEqualTo(const VecDataArray<T, N>& original, std::initializer_list<Eigen::Matrix<T, N, 1>>&& p)
+isEqualTo(const VecDataArray<T, N>& original, const VecDataArray<T, N>& other)
 {
-    VecDataArray<T, N> other(p);
     if (original.size() != other.size())
     {
         return false;
@@ -75,11 +74,17 @@ TEST(imstkVecDataArrayTest, Accessors)
     EXPECT_EQ(Vec2i(3, 3), a[2]);
     EXPECT_EQ(Vec2i(1, 1), a[0]);
 
+    EXPECT_EQ(a.at(2), a[2]);
+    EXPECT_EQ(a.at(3), a[3]);
+
     a[3] = Vec2i(6, 6);
     EXPECT_EQ(Vec2i(6, 6), a[3]);
+    a.at(3) = Vec2i(7, 8);
+    EXPECT_EQ(Vec2i(7, 8), a[3]);
 
     // Checked Arrays only
     EXPECT_ANY_THROW(a[4]);
+    EXPECT_ANY_THROW(a.at(4));
 }
 
 TEST(imstkVecDataArrayTest, AccessorsConst)
@@ -370,4 +375,22 @@ TEST(imstkVecDataArrayTest, RangedBasedFor)
             expected += Vec2i(2, 2);
         }
     }
+}
+
+TEST(imstkVecDataArrayTest, Cloning)
+{
+    VecDataArray<int, 2> a{ Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6), Vec2i(7, 8) };
+
+    // Cloning known type
+    std::shared_ptr<VecDataArray<int, 2>> b = a.clone();
+    EXPECT_TRUE(isEqualTo(a, *b));
+
+    // Cloning unknown type
+    std::unique_ptr<AbstractDataArray> c = std::make_unique<VecDataArray<int, 2>>(a);
+    auto                               d = (c->clone());
+
+    VecDataArray<int, 2>* cloned = dynamic_cast<VecDataArray<int, 2>*>(d.get());
+
+    ASSERT_NE(cloned, nullptr);
+    EXPECT_TRUE(isEqualTo(a, *cloned));
 }
