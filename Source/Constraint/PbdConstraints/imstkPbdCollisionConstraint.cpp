@@ -49,20 +49,14 @@ PbdCollisionConstraint::solvePosition()
 
     for (size_t i = 0; i < m_bodiesFirst.size(); i++)
     {
-        if (m_bodiesFirst[i].invMass > 0.0)
-        {
-            (*m_bodiesFirst[i].vertex) +=
-                m_bodiesFirst[i].invMass * lambda * m_dcdxA[i] * m_stiffnessA;
-        }
+        (*m_bodiesFirst[i].vertex) +=
+            m_bodiesFirst[i].invMass * lambda * m_dcdxA[i] * m_stiffnessA;
     }
 
     for (size_t i = 0; i < m_bodiesSecond.size(); i++)
     {
-        if (m_bodiesSecond[i].invMass > 0.0)
-        {
-            (*m_bodiesSecond[i].vertex) +=
-                m_bodiesSecond[i].invMass * lambda * m_dcdxB[i] * m_stiffnessB;
-        }
+        (*m_bodiesSecond[i].vertex) +=
+            m_bodiesSecond[i].invMass * lambda * m_dcdxB[i] * m_stiffnessB;
     }
 }
 

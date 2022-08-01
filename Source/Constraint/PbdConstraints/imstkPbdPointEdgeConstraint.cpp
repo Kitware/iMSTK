@@ -52,6 +52,20 @@ PbdPointEdgeConstraint::computeValueAndGradient(double&             cc,
         cc = 0.0;
         return false;
     }
+
+    int maxId = 0;
+    if ((1.0 - p) < p)
+    {
+        maxId = 1;
+    }
+
+    // If contacting point near a boundary ignore constraint
+    if (!m_enableBoundaryCollisions && m_bodiesSecond[maxId].invMass == 0.0)
+    {
+        cc = 0.0;
+        return false;
+    }
+
     // Remove tangent component to get normal
     const Vec3d  diff1 = diff - p * dir1;
     const double l     = diff1.norm();

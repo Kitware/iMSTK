@@ -15,6 +15,7 @@
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectCollision.h"
 #include "imstkPbdRigidBaryPointToPointConstraint.h"
 #include "imstkPbdRigidObjectGrasping.h"
 #include "imstkRenderMaterial.h"
@@ -57,8 +58,8 @@ makePbdObjSurface(
     auto pbdParams = std::make_shared<PbdModelConfig>();
 
     // Use volume+distance constraints, worse results. More performant (can use larger mesh)
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 100.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100.0);
 
     pbdParams->m_doPartitioning   = true;
     pbdParams->m_uniformMassValue = 0.05;
@@ -176,8 +177,8 @@ main()
     scene->addSceneObject(rbdGhost);
 
     // Add collision
-    // auto pbdToolCollision = std::make_shared<PbdObjectCollision>(PbdObj, toolObj, "SurfaceMeshToCapsuleCD");
-    // scene->addInteraction(pbdToolCollision);
+    auto pbdToolCollision = std::make_shared<PbdObjectCollision>(PbdObj, toolObj, "SurfaceMeshToCapsuleCD");
+    scene->addInteraction(pbdToolCollision);
 
     // Create new picking with constraints
     auto toolPicking = std::make_shared<PbdRigidObjectGrasping>(PbdObj, toolObj);

@@ -59,6 +59,13 @@ public:
     ///@}
 
     ///
+    /// \brief Get enableBoundaryCollision
+    ///@{
+    void setEnableBoundaryCollisions(const double enableBoundaryCollisions) { m_enableBoundaryCollisions = enableBoundaryCollisions; }
+    const double getEnableBoundaryCollisions() const { return m_enableBoundaryCollisions; }
+    ///@}
+
+    ///
     /// \brief compute value and gradient of constraint function
     /// \param Constraint value
     /// \param Normalized constraint gradients of A (per vertex)
@@ -85,7 +92,9 @@ protected:
     double m_stiffnessA = 1.0;
     double m_stiffnessB = 1.0;
 
-    std::vector<Vec3d> m_dcdxA; ///< Normalized constraint gradients (per vertex)
-    std::vector<Vec3d> m_dcdxB; ///< Normalized constraint gradients (per vertex)
+    std::vector<Vec3d> m_dcdxA;              ///< Normalized constraint gradients (per vertex)
+    std::vector<Vec3d> m_dcdxB;              ///< Normalized constraint gradients (per vertex)
+
+    bool m_enableBoundaryCollisions = false; ///< enables boundary collisions, only use with 2 way coupling
 };
 } // namespace imstk
