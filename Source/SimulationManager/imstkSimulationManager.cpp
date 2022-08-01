@@ -115,14 +115,18 @@ SimulationManager::start()
             {
                 // Divided out and floor
                 m_numSteps = static_cast<int>(accumulator / desiredDt_ms);
-                // Set the remainder
+                // accumulator now contains remainder time
                 accumulator = accumulator - m_numSteps * desiredDt_ms;
-                // Flatten out the remainder over our desired dt
                 m_dt = desiredDt_ms;
-                if (m_numSteps != 0)
+
+                // Flatten out the remainder over our desired dt
+                if (m_useRemainderTimeDivide)
                 {
-                    m_dt += accumulator / m_numSteps;
-                    accumulator = 0.0;
+                    if (m_numSteps != 0)
+                    {
+                        m_dt += accumulator / m_numSteps;
+                        accumulator = 0.0; // Remove remainder time
+                    }
                 }
                 m_dt *= 0.001; // ms->s
             }

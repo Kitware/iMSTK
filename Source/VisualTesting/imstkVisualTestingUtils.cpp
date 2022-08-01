@@ -14,6 +14,7 @@
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkTestingUtils.h"
+#include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
@@ -57,6 +58,8 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
     m_sceneManager->setActiveScene(m_scene);
 
     m_driver->clearModules();
+    // All tests are completely deterministic, ensure completely fixed timestep
+    m_driver->setUseRemainderTimeDivide(false);
     m_driver->requestStatus(ModuleDriverRunning);
     m_driver->addModule(m_viewer);
     m_driver->addModule(m_sceneManager);
@@ -89,6 +92,13 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
                 m_sceneManager->postEvent(Event(SceneManager::preUpdate()));
                 m_scene->advance(0.001);
                 m_sceneManager->postEvent(Event(SceneManager::postUpdate()));
+            }
+            // Toggle visibility of debug axes
+            else if (e->m_key == '0')
+            {
+                auto ren = std::dynamic_pointer_cast<VTKRenderer>(m_viewer->getActiveRenderer());
+                CHECK(ren != nullptr);
+                ren->setAxesVisibility(!ren->getAxesVisibility());
             }
         });
     connect<Event>(m_sceneManager, &SceneManager::postUpdate,

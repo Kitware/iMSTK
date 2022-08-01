@@ -96,6 +96,16 @@ public:
         m_threadType = threadType;
     }
 
+    ///
+    /// \brief The number of substeps is computed as N = (accumulated time / desiredDt). This leaves
+    /// a remainder. Off gives a completely fixed timestep, on provides semi-fixed timestep.
+    /// When off, the remainder is accumulated for later iterations, causing extra iterations now and then (possible stutter).
+    /// When on, the remainder time is divided out over the N substeps.
+    /// @{
+    void setUseRemainderTimeDivide(const bool useRemainderTimeDivide) { m_useRemainderTimeDivide = useRemainderTimeDivide; }
+    bool getUseRemainderTimeDivide() const { return m_useRemainderTimeDivide; }
+/// @}
+
 protected:
     void requestStop(Event* e);
 
@@ -110,8 +120,9 @@ protected:
     std::vector<std::shared_ptr<Module>> m_adaptiveModules;  ///< Modules that update adpatively to keep up with real time
 
     ThreadingType m_threadType = ThreadingType::STL;
-    double m_desiredDt = 0.003; // Desired timestep
-    double m_dt       = 0.0;    // Actual timestep
+    double m_desiredDt = 0.003;             ///< Desired timestep
+    double m_dt       = 0.0;                ///< Actual timestep
     int    m_numSteps = 0;
+    bool   m_useRemainderTimeDivide = true; ///< Whether to divide out remainder time or not
 };
-}; // namespace imstk
+};                                          // namespace imstk
