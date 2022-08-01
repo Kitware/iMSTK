@@ -220,10 +220,10 @@ std::shared_ptr<SurfaceMesh> toTriangleGrid(
 
 ///
 /// \brief Creates a set of connected lines
-/// \param Total length of the line mesh
-/// \param divisions
 /// \param start of the line mesh
 /// \param direction to build the lines
+/// \param Total length of the line mesh
+/// \param divisions
 ///
 std::shared_ptr<LineMesh> toLineGrid(const Vec3d& start, const Vec3d& dir,
                                      const double length, const int dim);
