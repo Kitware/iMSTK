@@ -59,6 +59,18 @@ PbdPointTriangleConstraint::computeValueAndGradient(double&             c,
         return false;
     }
 
+    Vec3d barycenteric = { u, v, w };
+    int   maxId = 0;
+
+    barycenteric.maxCoeff(&maxId);
+
+    // If contacting point near a boundary ignore constraint
+    if (!m_enableBoundaryCollisions && m_bodiesSecond[maxId].invMass == 0.0)
+    {
+        c = 0.0;
+        return false;
+    }
+
     // Triangle normal (pointing up on standard counter clockwise triangle)
     const Vec3d n = v0.cross(v1).normalized();
     // Point could be on either side of triangle, we want to resolve to the triangles plane
