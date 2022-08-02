@@ -24,6 +24,7 @@ public:
     {
         setPosition(pos);
         setRadius(radius);
+        updatePostTransformData();
     }
 
     ~Sphere() override = default;

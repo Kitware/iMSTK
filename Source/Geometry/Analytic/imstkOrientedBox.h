@@ -26,6 +26,7 @@ public:
         setPosition(pos);
         setOrientation(orientation);
         setExtents(extents);
+        updatePostTransformData();
     }
 
     ~OrientedBox() override = default;
