@@ -53,7 +53,6 @@ TEST(imstkSphereTest, SphereInitializer)
     Sphere sphere2(Vec3d(0.0, 0.0, 0.0), 0.003);
     EXPECT_DOUBLE_EQ(4.0 / 3.0 * PI * 0.003 * 0.003 * 0.003, sphere2.getVolume());
     EXPECT_DOUBLE_EQ(0.003, sphere2.getRadius());
-
 }
 
 TEST(imstkSphereTest, GetFunctionValue)
