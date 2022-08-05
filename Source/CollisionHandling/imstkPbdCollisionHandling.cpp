@@ -177,6 +177,7 @@ PbdCollisionHandling::PbdCollisionHandling()
     REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Triangle, false, Body_T);
     REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Edge, false, Body_E);
     REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Vertex, false, Body_V);
+    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Primitive, false, Body_V);
 
     // If swap occurs the colliding object could be on the LHS causing issues
     REGISTER_CASE(PbdContactCase::Primitive, PbdContactCase::Triangle, false, V_T);
@@ -390,8 +391,11 @@ PbdCollisionHandling::handleElementPair(ColElemSide sideA, ColElemSide sideB)
             || (key.elemBType == PbdContactCase::Body && key.elemAType != PbdContactCase::Body)
             || (key.elemAType != PbdContactCase::Primitive && key.elemBType == PbdContactCase::Primitive))
         {
-            std::swap(key.elemAType, key.elemBType);
-            std::swap(sideA, sideB);
+            if (!(key.elemAType == PbdContactCase::Body && key.elemBType == PbdContactCase::Primitive))
+            {
+                std::swap(key.elemAType, key.elemBType);
+                std::swap(sideA, sideB);
+            }
         }
     }
 
