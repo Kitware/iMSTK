@@ -8,8 +8,6 @@
 #include "imstkCapsule.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
@@ -17,6 +15,8 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkPbdContactConstraint.h"
+#include "imstkPbdHingeJointConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -30,10 +30,11 @@
 #include "imstkSphere.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkPbdHingeJointConstraint.h"
-
-#include <thread>
-#include <chrono>
+#include "imstkCompositeImplicitGeometry.h"
+#include "imstkImplicitGeometryToImageData.h"
+#include "imstkSurfaceMeshFlyingEdges.h"
+#include "imstkSurfaceMeshSubdivide.h"
+#include "imstkOrientedBox.h"
 
 using namespace imstk;
 
@@ -41,13 +42,14 @@ using namespace imstk;
 /// \brief Creates tissue object
 ///
 static std::shared_ptr<PbdObject>
-makeTissueObj(const std::string&        name,
+makeTissueObj(const std::string& name,
               std::shared_ptr<PbdModel> model,
-              const double              width,
-              const double              height,
-              const int                 rowCount,
-              const int                 colCount,
-              const double              particleMassValue)
+              const double width,
+              const double height,
+              const int rowCount,
+              const int colCount,
+              const double particleMassValue,
+              const double distStiffness, const double bendStiffness)
 {
     // Setup the Geometry
     std::shared_ptr<SurfaceMesh> tissueMesh =
@@ -76,7 +78,7 @@ makeTissueObj(const std::string&        name,
     pbdObject->setDynamicalModel(model);
 
     pbdObject->getPbdBody()->uniformMassValue = particleMassValue;
-    for (int x = 0; x < rowCount; x++)
+    /*for (int x = 0; x < rowCount; x++)
     {
         for (int y = 0; y < colCount; y++)
         {
@@ -85,7 +87,7 @@ makeTissueObj(const std::string&        name,
                 pbdObject->getPbdBody()->fixedNodeIds.push_back(x * colCount + y);
             }
         }
-    }
+    }*/
 
     return pbdObject;
 }
@@ -146,43 +148,65 @@ sausageScene()
 
     auto pbdModel  = std::make_shared<PbdModel>();
     auto pbdConfig = std::make_shared<PbdModelConfig>();
-    pbdConfig->m_gravity    = Vec3d(0.0, -20.0, 0.0); // Slightly larger gravity to compensate viscosity
-    pbdConfig->m_dt         = 0.005;
-    pbdConfig->m_iterations = 3;
+    pbdConfig->m_gravity = Vec3d(-1.0, 0.0, 0.0);
+    //pbdConfig->m_gravity = Vec3d(0.0, -9.8, 0.0);
+    pbdConfig->m_dt = 0.005;
+    pbdConfig->m_iterations = 5;
     pbdConfig->m_linearDampingCoeff  = 0.03;
     pbdConfig->m_angularDampingCoeff = 0.03;
     pbdConfig->m_doPartitioning      = false;
     pbdModel->configure(pbdConfig);
 
     // Setup a capsule
-    auto rigidObj = std::make_shared<PbdObject>("rigidObj");
-    {
-        // Setup line geometry
-        //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.5);
-        auto rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.1, 0.0), 0.5, 2.0);
-        rigidObj->setVisualGeometry(rigidGeom);
-        rigidObj->setCollidingGeometry(rigidGeom);
-        rigidObj->setPhysicsGeometry(rigidGeom);
 
-        // Setup material
-        rigidObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.0, 0.0));
-        rigidObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-        rigidObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-        rigidObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-        rigidObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
+    auto makeCapsuleObj = [&](std::string name, Vec3d pos)
+                          {
+                              auto rigidObj = std::make_shared<PbdObject>(name);
 
-        rigidObj->setDynamicalModel(pbdModel);
+                              // Setup line geometry
+                              //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.5);
+                              auto rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.1, 0.0), 0.25, 1.0);
+                              rigidObj->setVisualGeometry(rigidGeom);
+                              rigidObj->setCollidingGeometry(rigidGeom);
+                              rigidObj->setPhysicsGeometry(rigidGeom);
 
-        // Setup body
-        //const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 0.0, 0.0).normalized());
-        rigidObj->getPbdBody()->setRigid(Vec3d(-4.0, 1.0, 0.0), 10.0,
-            Quatd::Identity(), Mat3d::Identity() * 100.0);
-    }
-    scene->addSceneObject(rigidObj);
+                              // Setup material
+                              rigidObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.0, 0.0));
+                              rigidObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
+                              rigidObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
+                              rigidObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
+                              rigidObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
-    //auto collision = std::make_shared<PbdObjectCollision>(rigidObj, tissueObj, "SurfaceMeshToCapsuleCD");
-    ////auto collision = std::make_shared<PbdObjectCollision>(tissueObj, capsuleObj, "SurfaceMeshToSphereCD");
-    //scene->addSceneObject(collision);
+                              rigidObj->setDynamicalModel(pbdModel);
+
+                              // Setup body
+                              //const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 0.0, 0.0).normalized());
+                              rigidObj->getPbdBody()->setRigid(pos, 1.0,
+            Quatd::Identity(), Mat3d::Identity() * 0.1);
+                              return rigidObj;
+                          };
+    std::shared_ptr<PbdObject> capsule0Obj = makeCapsuleObj("capsule0Obj", Vec3d(0.0, 0.0, 0.0));
+    scene->addSceneObject(capsule0Obj);
+    std::shared_ptr<PbdObject> capsule1Obj = makeCapsuleObj("capsule1Obj", Vec3d(0.0, -1.0, 0.0));
+    scene->addSceneObject(capsule1Obj);
+
+    // Add custom constraint to connect the two capsules
+    pbdModel->getConfig()->addPbdConstraintFunctor([&](PbdConstraintContainer& container)
+        {
+            auto distConstraint1 = std::make_shared<PbdBodyToBodyDistanceConstraint>();
+            distConstraint1->initConstraint(pbdModel->getBodies(),
+                { capsule0Obj->getPbdBody()->bodyHandle, 0 }, Vec3d(0.0, -0.5, 0.0),
+                { capsule1Obj->getPbdBody()->bodyHandle, 0 }, Vec3d(0.0, -0.5, 0.0), 0.001);
+            container.addConstraint(distConstraint1);
+
+            const PbdParticleId& pid = pbdModel->addVirtualParticle(Vec3d(0.0, 0.0, 0.0), 0.0, Vec3d::Zero(), true);
+
+            // Add a constraint to fix the first one positionally
+            auto distConstraint2 = std::make_shared<PbdDistanceConstraint>();
+            distConstraint2->initConstraint(0.0,
+                { capsule0Obj->getPbdBody()->bodyHandle, 0 }, pid, 1000.0);
+            container.addConstraint(distConstraint2);
+        });
 
     // Light
     auto light = std::make_shared<DirectionalLight>();
@@ -206,7 +230,7 @@ sausageScene()
         auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(0.001);
+        driver->setDesiredDt(0.005);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -282,11 +306,12 @@ planeContactScene()
         //const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 0.0, 0.0).normalized());
         //const Mat3d inertia = Mat3d::Identity() * 100.0;
         rigidPbdObj->getPbdBody()->setRigid(Vec3d(0.0, 0.2, 0.0),
-            1.0, orientation, Mat3d::Identity() * 0.01);
+            1.0, orientation, Mat3d::Identity() * 0.005);
     }
     scene->addSceneObject(rigidPbdObj);
 
-    auto collision = std::make_shared<PbdObjectCollision>(rigidPbdObj, planeObj, "PointSetToPlaneCD");
+    auto collision = std::make_shared<PbdObjectCollision>(rigidPbdObj, planeObj);
+    collision->setRigidBodyCompliance(0.000001);
     scene->addSceneObject(collision);
 
     // Light
@@ -588,7 +613,7 @@ tissueCapsuleDrop()
 
     auto pbdModel  = std::make_shared<PbdModel>();
     auto pbdConfig = std::make_shared<PbdModelConfig>();
-    pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0); // Slightly larger gravity to compensate viscosity
+    pbdConfig->m_gravity    = Vec3d(0.0, 0.0, 0.0); // Slightly larger gravity to compensate viscosity
     pbdConfig->m_dt         = 0.001;
     pbdConfig->m_iterations = 10;
     pbdConfig->m_collisionIterations = 5;
@@ -791,6 +816,8 @@ main()
     tissueCapsuleDrop();
     //planeContactScene();
     //hingeScene();
+    //sausageScene();
+    //bowlScene();
 
     return 0;
 }
