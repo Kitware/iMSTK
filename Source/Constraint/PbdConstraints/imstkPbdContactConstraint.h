@@ -63,11 +63,7 @@ public:
     ///
     /// \brief Solve the velocities given to the constraint
     ///
-<<<<<<< HEAD
     void correctVelocity(PbdState& bodies, const double dt) override;
-=======
-    void correctVelocity(PbdState& bodies) override;
->>>>>>> cbb7c8da (ENH: Correct friction for pbd rbd)
 
 protected:
     std::vector<Vec3d> m_r;
@@ -245,18 +241,18 @@ protected:
 ///
 /// \class PbdBodyToBodyDistanceConstraint
 ///
-/// \brief Constrain two points locally defined on two bodies to maintain
-/// a provided distance from each other
+/// \brief Constrain two locally defined points on each body by a given distance
 ///
-class PbdBodyToBodyDistanceConstraint : PbdConstraint
+class PbdBodyToBodyDistanceConstraint : public PbdContactConstraint
 {
 public:
-    PbdBodyToBodyDistanceConstraint() : PbdConstraint()
+    PbdBodyToBodyDistanceConstraint() : PbdContactConstraint(2, { ContactType::RIGID, ContactType::RIGID })
     {
     }
 
     ///
-    /// \brief ptOnBody are globally defined
+    /// \brief Initialize the constraint
+    /// ptOnBody is global position
     ///
     void initConstraint(
         const PbdState&      state,
@@ -265,15 +261,17 @@ public:
         const PbdParticleId& bodyId1,
         const Vec3d          ptOnBody1,
         const double         restLength,
-        const double         compliance = 0.0)
+        const double         compliance)
     {
         m_particles[0] = bodyId0;
-        // Compute local position on body
-        m_r[0] = ptOnBody0 - state.getPosition(bodyId0);
+        // Compute local position on body in rest pose
+        m_r[0]      = ptOnBody0 - state.getPosition(bodyId0);
+        m_rest_r[0] = state.getOrientation(bodyId0).inverse()._transformVector(m_r[0]);
 
         m_particles[1] = bodyId1;
         // Compute local position on body
-        m_r[1] = ptOnBody1 - state.getPosition(bodyId1);
+        m_r[1]      = ptOnBody1 - state.getPosition(bodyId1);
+        m_rest_r[1] = state.getOrientation(bodyId1).inverse()._transformVector(m_r[1]);
 
         m_restLength = restLength;
 
@@ -302,7 +300,7 @@ public:
                                  std::vector<Vec3d>& n) override;
 
 protected:
-    Vec3d  m_r[2]       = { Vec3d::Zero(), Vec3d::Zero() };
+    Vec3d  m_rest_r[2]  = { Vec3d::Zero(), Vec3d::Zero() };      // In rest pose
     double m_restLength = 0.0;
 };
 } // namespace imstk
