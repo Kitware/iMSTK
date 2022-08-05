@@ -29,6 +29,7 @@ public:
         setOrientation(orientation);
         setRadius(radius);
         setLength(length);
+        updatePostTransformData();
     }
 
     ~Capsule() override = default;

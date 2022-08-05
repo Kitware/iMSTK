@@ -44,6 +44,17 @@ TEST(imstkSphereTest, GetVolume)
     EXPECT_DOUBLE_EQ(4.0 / 3.0 * PI * r * r * r, sphere.getVolume());
 }
 
+TEST(imstkSphereTest, SphereInitializer)
+{
+    Sphere sphere1(Vec3d(0.0, 0.0, 0.0), 2);
+    EXPECT_DOUBLE_EQ(-2.0, sphere1.getFunctionValue(Vec3d(0.0, 0.0, 0.0)));
+    EXPECT_DOUBLE_EQ(2.0, sphere1.getRadius());
+
+    Sphere sphere2(Vec3d(0.0, 0.0, 0.0), 0.003);
+    EXPECT_DOUBLE_EQ(4.0 / 3.0 * PI * 0.003 * 0.003 * 0.003, sphere2.getVolume());
+    EXPECT_DOUBLE_EQ(0.003, sphere2.getRadius());
+}
+
 TEST(imstkSphereTest, GetFunctionValue)
 {
     Sphere sphere;
