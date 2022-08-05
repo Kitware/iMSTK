@@ -32,6 +32,7 @@ PbdContactConstraint::projectConstraint(PbdState& bodies,
         return;
     }
 
+    // dcdx is normalized
     double c      = 0.0;
     bool   update = this->computeValueAndGradient(bodies, c,
         m_dcdx);
@@ -72,6 +73,7 @@ PbdContactConstraint::projectConstraint(PbdState& bodies,
         const double invMass = bodies.getInvMass(m_particles[i]);
         if (invMass > 0.0)
         {
+            // Positional impulse
             const Vec3d p  = dlambda * m_dcdx[i];
             const Vec3d dx = p * invMass;
             bodies.getPosition(m_particles[i]) += dx;
@@ -87,6 +89,8 @@ PbdContactConstraint::projectConstraint(PbdState& bodies,
                 rot = invInteria * rot;
                 rot = q._transformVector(rot);
 
+                // Apply a max rotation limit, quaternions can only represent
+                // rotations up to 180deg
                 double       scale = 1.0;
                 const double phi   = rot.norm();
                 if (phi > 0.5) // Max rot
@@ -278,9 +282,9 @@ PbdVertexToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
 
     const Vec3d normal = diff / c;
 
-    // A
+    // A (direction to move body)
     n[0] = -normal;
-    // B
+    // B (direction to move vertex)
     n[1] = normal;
 
     return true;

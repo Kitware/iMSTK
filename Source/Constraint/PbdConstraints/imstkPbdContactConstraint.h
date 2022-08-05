@@ -63,7 +63,11 @@ public:
     ///
     /// \brief Solve the velocities given to the constraint
     ///
+<<<<<<< HEAD
     void correctVelocity(PbdState& bodies, const double dt) override;
+=======
+    void correctVelocity(PbdState& bodies) override;
+>>>>>>> cbb7c8da (ENH: Correct friction for pbd rbd)
 
 protected:
     std::vector<Vec3d> m_r;
