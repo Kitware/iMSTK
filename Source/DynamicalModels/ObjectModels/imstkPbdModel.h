@@ -64,14 +64,24 @@ public:
 
     PbdState& getBodies() { return m_state; }
 
+    ///
+    /// \brief Add a particle to a virtual pool/buffer of particles for quick removal/insertion
+    /// The persist flag indicates if it should be cleared at the end of the frame or not
+    ///
     PbdParticleId addVirtualParticle(
         const Vec3d& pos, const Quatd& orientation,
         const double mass, const Mat3d inertia,
-        const Vec3d& velocity = Vec3d::Zero(), const Vec3d& angularVelocity = Vec3d::Zero());
+        const Vec3d& velocity = Vec3d::Zero(), const Vec3d& angularVelocity = Vec3d::Zero(),
+        const bool persist    = false);
 
+    ///
+    /// \brief Add a particle to a virtual pool/buffer of particles for quick removal/insertion
+    /// The persist flag indicates if it should be cleared at the end of the frame or not
+    ///
     PbdParticleId addVirtualParticle(
         const Vec3d& pos, const double mass,
-        const Vec3d& velocity = Vec3d::Zero());
+        const Vec3d& velocity = Vec3d::Zero(),
+        const bool persist    = false);
 
     ///
     /// \brief Resize 0 the virtual particles
@@ -103,14 +113,14 @@ public:
     /// \brief Time integrate the position
     ///@{
     void integratePosition();
-    void integratePosition(const PbdBody& body);
+    void integratePosition(PbdBody& body);
     ///@}
 
     ///
     /// \brief Time integrate the velocity
     ///@{
     void updateVelocity();
-    void updateVelocity(const PbdBody& body);
+    void updateVelocity(PbdBody& body);
     ///@}
 
     ///

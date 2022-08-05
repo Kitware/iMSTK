@@ -61,7 +61,7 @@ public:
     /// If constraint of that type already exists, sets the stiffness on it
     /// Defaults to bodyId=1, the first body, where 0 is the dummy body
     ///
-    void enableConstraint(ConstraintGenType type, const double stiffness, const int bodyId = 1);
+    void enableConstraint(ConstraintGenType type, const double stiffness, const int bodyId = 2);
 
     ///
     /// \brief Enables a bend constraint with given stiffness, stride, and flag for 0 rest length
@@ -71,22 +71,23 @@ public:
     /// \param Stride, distance between vertex connections
     /// \param When true rest length (and angle) are constrained to 0, useful when mesh initial/resting state
     /// is not 0 angled
+    /// \param Body to add the constraint throughout
     ///
-    void enableBendConstraint(const double stiffness, const int stride, const bool restLength0 = true, const int bodyId = 1);
+    void enableBendConstraint(const double stiffness, const int stride, const bool restLength0 = true, const int bodyId = 2);
 
     ///
     /// \brief Enables constant density constraint given the stiffness and particleSize
     /// \param Stiffness, how much density is enforced
     /// \param ParticleRadius, radius of particle
+    /// \param Body to add the constraint throughout
     ///
     void enableConstantDensityConstraint(const double stiffness,
-                                         const double particleRadius, const double restDensity = 6378.0, const int bodyId = 1);
+                                         const double particleRadius, const double restDensity = 6378.0, const int bodyId = 2);
 
     ///
     /// \brief Enable a Fem constraint with the material provided
-    /// Defaults to bodyId=1, the first body, where 0 is the dummy body
     ///
-    void enableFemConstraint(PbdFemConstraint::MaterialType material, const int bodyId = 1);
+    void enableFemConstraint(PbdFemConstraint::MaterialType material, const int bodyId = 2);
 
     ///
     /// \brief If lame parameters (mu+lambda) are given in femParams, then youngs modulus and poissons ratio are computed

@@ -19,7 +19,9 @@ namespace imstk
 PbdModel::PbdModel() : AbstractDynamicalModel(DynamicalModelType::PositionBasedDynamics),
     m_config(std::make_shared<PbdModelConfig>())
 {
-    // Add a dummy pbdy body for virtual particle addition
+    // Add a virtual particle buffer, cleared every frame
+    addBody();
+    // Add a virtual particle buffer, persistant
     addBody();
 
     m_validGeometryTypes = {
@@ -45,6 +47,24 @@ void
 PbdModel::resetToInitialState()
 {
     m_state.deepCopy(m_initialState);
+
+    // Set previous particle positions, orientations to current to avoid a jump
+    for (auto bodyIter = std::next(std::next(m_state.m_bodies.begin()));
+         bodyIter != m_state.m_bodies.end(); bodyIter++)
+    {
+        PbdBody& body = **bodyIter;
+        for (int i = 0; i < body.prevVertices->size(); i++)
+        {
+            (*body.prevVertices)[i] = (*body.vertices)[i];
+        }
+        if (body.getOriented())
+        {
+            for (int i = 0; i < body.prevOrientations->size(); i++)
+            {
+                (*body.prevOrientations)[i] = (*body.orientations)[i];
+            }
+        }
+    }
 }
 
 void
@@ -75,32 +95,36 @@ PbdParticleId
 PbdModel::addVirtualParticle(
     const Vec3d& pos, const Quatd& orientation,
     const double mass, const Mat3d inertia,
-    const Vec3d& velocity, const Vec3d& angularVelocity)
+    const Vec3d& velocity, const Vec3d& angularVelocity,
+    const bool persist)
 {
-    m_state.m_bodies[0]->vertices->push_back(pos);
-    m_state.m_bodies[0]->orientations->push_back(orientation);
-    m_state.m_bodies[0]->velocities->push_back(velocity);
-    m_state.m_bodies[0]->angularVelocities->push_back(angularVelocity);
-    m_state.m_bodies[0]->masses->push_back(mass);
-    m_state.m_bodies[0]->invMasses->push_back((mass == 0.0) ? 0.0 : 1.0 / mass);
-    m_state.m_bodies[0]->inertias->push_back(inertia);
+    const int virtualBufferId = static_cast<int>(persist);
+
+    m_state.m_bodies[virtualBufferId]->vertices->push_back(pos);
+    m_state.m_bodies[virtualBufferId]->orientations->push_back(orientation);
+    m_state.m_bodies[virtualBufferId]->velocities->push_back(velocity);
+    m_state.m_bodies[virtualBufferId]->angularVelocities->push_back(angularVelocity);
+    m_state.m_bodies[virtualBufferId]->masses->push_back(mass);
+    m_state.m_bodies[virtualBufferId]->invMasses->push_back((mass == 0.0) ? 0.0 : 1.0 / mass);
+    m_state.m_bodies[virtualBufferId]->inertias->push_back(inertia);
     Mat3d invInertia = Mat3d::Zero();
     if (inertia.determinant() != 0.0)
     {
         invInertia = inertia.inverse();
     }
-    m_state.m_bodies[0]->invInertias->push_back(invInertia);
-    return { 0, m_state.m_bodies[0]->vertices->size() - 1 };
+    m_state.m_bodies[virtualBufferId]->invInertias->push_back(invInertia);
+    return { virtualBufferId, m_state.m_bodies[virtualBufferId]->vertices->size() - 1 };
 }
 
 PbdParticleId
 PbdModel::addVirtualParticle(
     const Vec3d& pos, const double mass,
-    const Vec3d& velocity)
+    const Vec3d& velocity,
+    const bool persist)
 {
     return addVirtualParticle(pos, Quatd::Identity(),
         mass, Mat3d::Identity(),
-        velocity, Vec3d::Zero());
+        velocity, Vec3d::Zero(), persist);
 }
 
 void
@@ -120,7 +144,8 @@ PbdModel::getConfig() const
 bool
 PbdModel::initialize()
 {
-    // Clear the dummy body for virtual particles, init with space for 10 particles
+    // Create a virtual particles buffer for particles that need to be quickly added/removed
+    // such as during collision
     m_state.m_bodies[0] = std::make_shared<PbdBody>(0);
     m_state.m_bodies[0]->bodyType          = PbdBody::Type::DEFORMABLE_ORIENTED;
     m_state.m_bodies[0]->prevVertices      = std::make_shared<VecDataArray<double, 3>>();
@@ -133,6 +158,20 @@ PbdModel::initialize()
     m_state.m_bodies[0]->invMasses   = std::make_shared<DataArray<double>>();
     m_state.m_bodies[0]->inertias    = std::make_shared<StdVectorOfMat3d>();
     m_state.m_bodies[0]->invInertias = std::make_shared<StdVectorOfMat3d>();
+
+    // The second virtual particle buffer is for persistant virtual particles
+    m_state.m_bodies[1] = std::make_shared<PbdBody>(1);
+    m_state.m_bodies[1]->bodyType          = PbdBody::Type::DEFORMABLE_ORIENTED;
+    m_state.m_bodies[1]->prevVertices      = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[1]->vertices          = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[1]->prevOrientations  = std::make_shared<StdVectorOfQuatd>();
+    m_state.m_bodies[1]->orientations      = std::make_shared<StdVectorOfQuatd>();
+    m_state.m_bodies[1]->velocities        = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[1]->angularVelocities = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[1]->masses      = std::make_shared<DataArray<double>>();
+    m_state.m_bodies[1]->invMasses   = std::make_shared<DataArray<double>>();
+    m_state.m_bodies[1]->inertias    = std::make_shared<StdVectorOfMat3d>();
+    m_state.m_bodies[1]->invInertias = std::make_shared<StdVectorOfMat3d>();
 
     // Store a copy of the initial state
     m_initialState.deepCopy(m_state);
@@ -223,8 +262,8 @@ PbdModel::integratePosition()
     // resize 0 virtual particles (avoids reallocation)
     clearVirtualParticles();
 
-    //for (const auto& body : m_state.m_bodies)
-    for (auto bodyIter = std::next(m_state.m_bodies.begin());
+    // There are two virtual particles buffer, skip the first two
+    for (auto bodyIter = std::next(std::next(m_state.m_bodies.begin()));
          bodyIter != m_state.m_bodies.end(); bodyIter++)
     {
         integratePosition(**bodyIter);
@@ -232,14 +271,12 @@ PbdModel::integratePosition()
 }
 
 void
-PbdModel::integratePosition(const PbdBody& body)
+PbdModel::integratePosition(PbdBody& body)
 {
     VecDataArray<double, 3>& pos       = *body.vertices;
     VecDataArray<double, 3>& prevPos   = *body.prevVertices;
     VecDataArray<double, 3>& vel       = *body.velocities;
     const DataArray<double>& invMasses = *body.invMasses;
-    const Vec3d              bodyExternalForce  = body.externalForce;
-    const Vec3d              bodyExternalTorque = body.externalTorque;
 
     // Check all the arrays are the same
     const int numParticles = pos.size();
@@ -254,12 +291,15 @@ PbdModel::integratePosition(const PbdBody& body)
         {
             if (std::abs(invMasses[i]) > 0.0)
             {
-                const Vec3d accel = m_config->m_gravity + bodyExternalForce * invMasses[i];
+                const Vec3d accel = m_config->m_gravity + body.externalForce * invMasses[i];
                 vel[i]    += accel * dt;
+                vel[i]    *= linearVelocityDamp;
                 prevPos[i] = pos[i];
-                pos[i]    += linearVelocityDamp * vel[i] * dt;
+                pos[i]    += vel[i] * dt;
             }
         }, numParticles > 50); // Only run parallel when more than 50 pts
+
+    body.externalForce = Vec3d::Zero();
 
     // If using oriented particles update those too
     if (body.getOriented())
@@ -284,23 +324,35 @@ PbdModel::integratePosition(const PbdBody& body)
                 {
                     Vec3d& w = angularVelocities[i];
                     const Vec3d accel = invInertias[i] *
-                                        (bodyExternalTorque - (w.cross(inertias[i] * w)));
+                                        (body.externalTorque - (w.cross(inertias[i] * w)));
                     w += dt * accel;
+                    w *= angularVelocityDamp;
                     prevOrientations[i] = orientations[i];
 
-                    const Vec3d w1 = angularVelocities[i] * angularVelocityDamp * 0.5;
-                    const Quatd dq = Quatd(0.0, w1[0], w1[1], w1[2]) * orientations[i];
-                    orientations[i].coeffs() += dq.coeffs() * dt;
+                    // Limit on rotation
+                    double scale     = dt;
+                    const double phi = w.norm();
+                    if (phi * scale > 0.5)
+                    {
+                        scale = 0.5 / phi;
+                    }
+                    const Quatd dq = Quatd(0.0,
+                        w[0] * scale,
+                        w[1] * scale,
+                        w[2] * scale) * orientations[i];
+                    orientations[i].coeffs() += dq.coeffs() * 0.5;
                     orientations[i].normalize();
                 }
             }, numParticles > 50); // Only run parallel when more than 50 pts
+
+        body.externalTorque = Vec3d::Zero();
     }
 }
 
 void
 PbdModel::updateVelocity()
 {
-    for (auto bodyIter = std::next(m_state.m_bodies.begin());
+    for (auto bodyIter = std::next(std::next(m_state.m_bodies.begin()));
          bodyIter != m_state.m_bodies.end(); bodyIter++)
     {
         updateVelocity(**bodyIter);
@@ -319,7 +371,7 @@ PbdModel::updateVelocity()
 }
 
 void
-PbdModel::updateVelocity(const PbdBody& body)
+PbdModel::updateVelocity(PbdBody& body)
 {
     if (m_config->m_dt > 0.0)
     {
