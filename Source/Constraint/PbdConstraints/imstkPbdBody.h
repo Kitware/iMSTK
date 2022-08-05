@@ -91,6 +91,9 @@ struct PbdBody
 
             fixedNodeIds     = src.fixedNodeIds;
             uniformMassValue = src.uniformMassValue;
+
+            externalForce  = src.externalForce;
+            externalTorque = src.externalTorque;
         }
 
         ///
