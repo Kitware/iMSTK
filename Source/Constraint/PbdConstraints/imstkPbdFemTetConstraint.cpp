@@ -326,13 +326,6 @@ PbdFemTetConstraint::handleInversions(
     }
 
     // Clamp small singular values of Fhat
-    double clamp = 0.577;
-    for (int i = 0; i < 3; i++)
-    {
-        if (Fhat(i, i) < clamp)
-        {
-            Fhat(i, i) = clamp;
-        }
-    }
+    Fhat.cwiseMax(0.577);
 } // end handle tet inversion
 }; // namespace imstk
