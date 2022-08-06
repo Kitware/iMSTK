@@ -110,7 +110,6 @@ PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
 
         break;
     }
-
     // P(F) = (2*mu*(F-R) + lambda*(J-1)*J*F^-T
     case MaterialType::Corotation:
     {
@@ -137,32 +136,8 @@ PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
     // P(F) = mu*(F - mu*F^-T) + lambda*log(J)F^-T;
     case MaterialType::NeoHookean:
     {
-        // This is a modified NeoHookean to deal with inversions
-        // - for which log produces nans
-        // - log also gets drastically large as we near 0, so an epsilon is used
-
-        // Modified NeoHookean with flip
         Mat3d  invFT = F.inverse().transpose();
-        double det   = F.determinant();
-        double logJ  = log(std::abs(det)) * static_cast<double>(!std::signbit(det));
-
-        // Modified NeoHookean with epsilon
-        /*Mat3d  invFT = F.inverse().transpose();
-        double det = F.determinant();
-        double logJ = 0.0;
-        if (det < 0.00001)
-        {
-            logJ = log(0.00001);
-        }
-        else
-        {
-            logJ = log(det);
-        }*/
-
-        // Original NeoHookean
-        /* Mat3d  invFT = F.inverse().transpose();
-         double logJ  = log(F.determinant());*/
-
+        double logJ  = log(F.determinant());
         P = mu * (F - invFT) + lambda * logJ * invFT;
 
         C = F(0, 0) * F(0, 0) + F(0, 1) * F(0, 1) + F(0, 2) * F(0, 2)
@@ -173,7 +148,6 @@ PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
 
         break;
     }
-
     case MaterialType::Linear:
     {
         break;
