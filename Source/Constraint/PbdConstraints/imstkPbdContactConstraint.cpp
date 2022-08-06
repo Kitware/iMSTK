@@ -383,7 +383,7 @@ PbdBodyToBodyDistanceConstraint::computeValueAndGradient(PbdState&           bod
     // Move according to the difference
     Vec3d        diff   = p1 - p0;
     const double length = diff.norm();
-    if (std::abs(length) < IMSTK_DOUBLE_EPS)
+    if (length == 0.0)
     {
         return false;
     }

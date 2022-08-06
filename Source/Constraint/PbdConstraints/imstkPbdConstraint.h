@@ -10,6 +10,10 @@
 
 namespace imstk
 {
+///
+/// \brief Index pair that refers to a particle in a PbdState.
+/// Index 0 is the body id, Index 1 is the particle id
+///
 using PbdParticleId = std::pair<int, int>;
 
 ///

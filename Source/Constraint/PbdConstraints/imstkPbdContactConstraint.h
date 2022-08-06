@@ -39,7 +39,7 @@ class PbdContactConstraint : public PbdConstraint
 public:
     enum class ContactType
     {
-        DEFORM,
+        DEFORMABLE,
         RIGID
     };
 
@@ -78,7 +78,7 @@ class PbdTriangleToBodyConstraint : public PbdContactConstraint
 {
 public:
     PbdTriangleToBodyConstraint() : PbdContactConstraint(4,
-                                                         { ContactType::RIGID, ContactType::DEFORM, ContactType::DEFORM, ContactType::DEFORM })
+                                                         { ContactType::RIGID, ContactType::DEFORMABLE, ContactType::DEFORMABLE, ContactType::DEFORMABLE })
     {
     }
 
@@ -122,7 +122,7 @@ class PbdVertexToBodyConstraint : public PbdContactConstraint
 {
 public:
     PbdVertexToBodyConstraint() : PbdContactConstraint(2,
-                                                       { ContactType::RIGID, ContactType::DEFORM })
+                                                       { ContactType::RIGID, ContactType::DEFORMABLE })
     {
     }
 
@@ -163,7 +163,7 @@ class PbdEdgeToBodyConstraint : public PbdContactConstraint
 {
 public:
     PbdEdgeToBodyConstraint() : PbdContactConstraint(3,
-                                                     { ContactType::RIGID, ContactType::DEFORM, ContactType::DEFORM })
+                                                     { ContactType::RIGID, ContactType::DEFORMABLE, ContactType::DEFORMABLE })
     {
     }
 
@@ -300,7 +300,7 @@ public:
                                  std::vector<Vec3d>& n) override;
 
 protected:
-    Vec3d  m_rest_r[2]  = { Vec3d::Zero(), Vec3d::Zero() };      // In rest pose
+    std::array<Vec3d, 2> m_rest_r = { Vec3d::Zero(), Vec3d::Zero() }; // In rest pose
     double m_restLength = 0.0;
 };
 } // namespace imstk
