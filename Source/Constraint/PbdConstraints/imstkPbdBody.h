@@ -48,8 +48,18 @@ namespace imstk
 ///
 /// \struct PbdBody
 ///
-/// \brief Represents a pbd body in the model. This is a data
-/// only object. It does no function.
+/// \brief Represents a pbd body in the model. This is a data only object.
+/// It does no function.
+/// PbdBody can be of different types. The types effect what properties it
+/// has.
+///
+/// A deformable PbdBody only uses vertices, velocities, & masses.
+/// A deformable oriented body uses all properties, adding orientations, angular velocities, and inertias.
+/// A rigid uses all properties but contains only one particle to represent the rigid body.
+///
+/// These may all be used together in constraints allowing things like distance constraints to
+/// not only function on an edge in a deformable mesh but also between two rigid bodies or even
+/// between two totally separate deformable meshes.
 ///
 struct PbdBody
 {
@@ -154,7 +164,6 @@ struct PbdBody
         int bodyHandle; ///< Id in the system
         Type bodyType = Type::DEFORMABLE;
 
-        // Some of these particle properties are unused depending on bodyType
         std::shared_ptr<VecDataArray<double, 3>> prevVertices;
         std::shared_ptr<VecDataArray<double, 3>> vertices;
 
@@ -171,15 +180,15 @@ struct PbdBody
         std::shared_ptr<StdVectorOfMat3d> inertias;
         std::shared_ptr<StdVectorOfMat3d> invInertias;
 
-        ///< Nodal/vertex IDs of the nodes that are fixed
+        /// Nodal/vertex IDs of the nodes that are fixed
         std::vector<int> fixedNodeIds;
-        ///< Mass properties, not used if per vertex masses are given in geometry attributes
+        /// Mass properties, not used if per vertex masses are given in geometry attributes
         double uniformMassValue = 1.0;
 
         Vec3d externalForce  = Vec3d::Zero();
         Vec3d externalTorque = Vec3d::Zero();
 
-        ///< Map for archiving fixed nodes' mass.
+        /// Map for archiving fixed nodes' mass.
         std::unordered_map<int, double> fixedNodeInvMass;
 };
 
