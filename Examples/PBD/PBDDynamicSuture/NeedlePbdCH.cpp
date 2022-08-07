@@ -500,7 +500,7 @@ NeedlePbdCH::stitch()
 /// \brief Add a vertex-triangle constraint
 ///
 void
-NeedlePbdCH::V_T(
+NeedlePbdCH::addConstraint_V_T(
     const ColElemSide& sideA,
     const ColElemSide& sideB)
 {
@@ -548,7 +548,7 @@ NeedlePbdCH::V_T(
 
     if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
     {
-        PbdCollisionHandling::V_T(sideA, sideB);
+        PbdCollisionHandling::addConstraint_V_T(sideA, sideB);
     }
 }
 } // namespace imstk

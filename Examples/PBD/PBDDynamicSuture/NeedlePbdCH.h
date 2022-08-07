@@ -57,8 +57,8 @@ public:
     ///
     /// \brief Add a vertex-triangle constraint
     ///
-    void V_T(const ColElemSide& sideA,
-             const ColElemSide& sideB) override;
+    void addConstraint_V_T(const ColElemSide& sideA,
+                           const ColElemSide& sideB) override;
 
 protected:
     // Stores data for penetration points, both for the needle and the thread

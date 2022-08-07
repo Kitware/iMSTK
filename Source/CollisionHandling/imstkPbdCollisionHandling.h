@@ -10,7 +10,6 @@
 #include "imstkPbdConstraint.h"
 
 #include <unordered_map>
-#include <iostream>
 
 namespace imstk
 {
@@ -20,8 +19,8 @@ enum PbdContactCase
     Vertex,   // Mesh vertex either from Pbd or CollidingObject
     Edge,     // Mesh edge either from Pbd or CollidingObject
     Triangle, // Mesh triangle either from Pbd or CollidingObject
-    Body,     // Body, usually a PD contact
-    Primitive // Not a mesh, could be V,E,T, or PD additionally
+    Body,     // Body
+    Primitive // Not a mesh at all still could be any CD data type
 };
 static std::string
 getContactCaseStr(PbdContactCase contactCase)
@@ -105,13 +104,15 @@ class PointwiseMap;
 ///
 /// \brief Implements PBD based collision handling. Given an input PbdObject
 /// and CollisionData it creates & adds constraints in the PbdModel to be solved
-/// in order to resolve the collision. This solve is ultimately implemented
-/// in PbdModel, shared among all the collisions.
+/// in order to resolve the collision.
 ///
-/// This supports PointDirection (PD) collision data as well as contacting feature
-/// collision data (ie: EE, VT, VV, VE). The VV and VE are often redundant but
-/// handled anyways for robustness. The PD is often reported for point contacts,
-/// most common on primitive vs mesh collisions.
+/// This solve happens later together with all other collision constraints in the
+/// PbdModels collision solve step.
+///
+/// This supports PD (PointDirection) collision data as well as contacting feature
+/// collision data (ie: EE (Edge, Edge), VT (Vertex-Triangle), VV (Vertex-Vertex), VE (Vertex-Edge)).
+/// The VV and VE are often redundant but handled anyways for robustness to different inputs.
+/// The PD is often reported for point contacts, most commonly on primitive vs mesh collisions.
 ///
 class PbdCollisionHandling : public CollisionHandling
 {
@@ -248,34 +249,34 @@ protected:
     void handleElementPair(ColElemSide sideA, ColElemSide sideB);
 
     // -----------------One-Way Rigid on X Cases-----------------
-    virtual void Body_V(
+    virtual void addConstraint_Body_V(
         const ColElemSide& sideA,
         const ColElemSide& sideB);
-    virtual void Body_E(
+    virtual void addConstraint_Body_E(
         const ColElemSide& sideA,
         const ColElemSide& sideB);
-    virtual void Body_T(
+    virtual void addConstraint_Body_T(
         const ColElemSide& sideA,
         const ColElemSide& sideB);
     // ---------------Two-Way Rigid on Rigid Cases---------------
-    /*virtual void Body_Body(
+    /*virtual void addConstraint_Body_Body(
         const ColElemSide& sideA,
         const ColElemSide& sideB);*/
 
     // ----------DeformableMesh on DeformableMesh Cases----------
-    virtual void V_T(
+    virtual void addConstraint_V_T(
         const ColElemSide& sideA,
         const ColElemSide& sideB);
-    virtual void E_E(
+    virtual void addConstraint_E_E(
         const ColElemSide& sideA,
         const ColElemSide& sideB);
-    virtual void E_E_CCD(
+    virtual void addConstraint_E_E_CCD(
         const ColElemSide& sideA,
         const ColElemSide& sideB);
-    virtual void V_E(
+    virtual void addConstraint_V_E(
         const ColElemSide& sideA,
         const ColElemSide& sideB);
-    virtual void V_V(
+    virtual void addConstraint_V_V(
         const ColElemSide& sideA,
         const ColElemSide& sideB);
 

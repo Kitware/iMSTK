@@ -169,27 +169,27 @@ operator<<(std::ostream& os, const PbdCHTableKey& key)
 
 PbdCollisionHandling::PbdCollisionHandling()
 {
-    REGISTER_CASE(PbdContactCase::Vertex, PbdContactCase::Vertex, false, V_V);
-    REGISTER_CASE(PbdContactCase::Vertex, PbdContactCase::Edge, false, V_E);
-    REGISTER_CASE(PbdContactCase::Edge, PbdContactCase::Edge, false, E_E);
-    REGISTER_CASE(PbdContactCase::Vertex, PbdContactCase::Triangle, false, V_T);
+    REGISTER_CASE(PbdContactCase::Vertex, PbdContactCase::Vertex, false, addConstraint_V_V);
+    REGISTER_CASE(PbdContactCase::Vertex, PbdContactCase::Edge, false, addConstraint_V_E);
+    REGISTER_CASE(PbdContactCase::Edge, PbdContactCase::Edge, false, addConstraint_E_E);
+    REGISTER_CASE(PbdContactCase::Vertex, PbdContactCase::Triangle, false, addConstraint_V_T);
 
-    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Triangle, false, Body_T);
-    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Edge, false, Body_E);
-    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Vertex, false, Body_V);
-    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Primitive, false, Body_V);
+    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Triangle, false, addConstraint_Body_T);
+    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Edge, false, addConstraint_Body_E);
+    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Vertex, false, addConstraint_Body_V);
+    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Primitive, false, addConstraint_Body_V);
 
     // If swap occurs the colliding object could be on the LHS causing issues
-    REGISTER_CASE(PbdContactCase::Primitive, PbdContactCase::Triangle, false, V_T);
-    REGISTER_CASE(PbdContactCase::Primitive, PbdContactCase::Edge, false, V_E);
-    REGISTER_CASE(PbdContactCase::Primitive, PbdContactCase::Vertex, false, V_V);
+    REGISTER_CASE(PbdContactCase::Primitive, PbdContactCase::Triangle, false, addConstraint_V_T);
+    REGISTER_CASE(PbdContactCase::Primitive, PbdContactCase::Edge, false, addConstraint_V_E);
+    REGISTER_CASE(PbdContactCase::Primitive, PbdContactCase::Vertex, false, addConstraint_V_V);
 
     // One way point direction resolution
-    REGISTER_CASE(PbdContactCase::Vertex, PbdContactCase::None, false, V_V);
-    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::None, false, Body_V);
+    REGISTER_CASE(PbdContactCase::Vertex, PbdContactCase::None, false, addConstraint_V_V);
+    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::None, false, addConstraint_Body_V);
 
     // CCD cases
-    REGISTER_CASE(PbdContactCase::Edge, PbdContactCase::Edge, true, E_E_CCD);
+    REGISTER_CASE(PbdContactCase::Edge, PbdContactCase::Edge, true, addConstraint_E_E_CCD);
 }
 
 PbdCollisionHandling::~PbdCollisionHandling()
@@ -412,7 +412,7 @@ PbdCollisionHandling::handleElementPair(ColElemSide sideA, ColElemSide sideB)
 }
 
 void
-PbdCollisionHandling::Body_V(const ColElemSide& sideA, const ColElemSide& sideB)
+PbdCollisionHandling::addConstraint_Body_V(const ColElemSide& sideA, const ColElemSide& sideB)
 {
     const std::pair<PbdParticleId, Vec3d>& ptAAndContact = getBodyAndContactPoint(*sideA.elem, *sideA.data);
     PbdParticleId                          ptB;
@@ -460,7 +460,7 @@ PbdCollisionHandling::Body_V(const ColElemSide& sideA, const ColElemSide& sideB)
 }
 
 void
-PbdCollisionHandling::Body_E(const ColElemSide& sideA, const ColElemSide& sideB)
+PbdCollisionHandling::addConstraint_Body_E(const ColElemSide& sideA, const ColElemSide& sideB)
 {
     const std::pair<PbdParticleId, Vec3d>& ptAAndContact = getBodyAndContactPoint(*sideA.elem, *sideA.data);
     std::array<PbdParticleId, 2>           ptsB = getEdge(*sideB.elem, *sideB.data);
@@ -477,7 +477,7 @@ PbdCollisionHandling::Body_E(const ColElemSide& sideA, const ColElemSide& sideB)
 }
 
 void
-PbdCollisionHandling::Body_T(const ColElemSide& sideA, const ColElemSide& sideB)
+PbdCollisionHandling::addConstraint_Body_T(const ColElemSide& sideA, const ColElemSide& sideB)
 {
     const std::pair<PbdParticleId, Vec3d>& ptAAndContact = getBodyAndContactPoint(*sideA.elem, *sideA.data);
     std::array<PbdParticleId, 3>           ptsB = getTriangle(*sideB.elem, *sideB.data);
@@ -494,12 +494,12 @@ PbdCollisionHandling::Body_T(const ColElemSide& sideA, const ColElemSide& sideB)
 }
 
 //void
-//PbdCollisionHandling::Body_Body(const ColElemSide& sideA, const ColElemSide& sideB)
+//PbdCollisionHandling::addConstraint_Body_Body(const ColElemSide& sideA, const ColElemSide& sideB)
 //{
 //}
 
 void
-PbdCollisionHandling::V_T(const ColElemSide& sideA, const ColElemSide& sideB)
+PbdCollisionHandling::addConstraint_V_T(const ColElemSide& sideA, const ColElemSide& sideB)
 {
     const PbdParticleId&         ptA  = getVertex(*sideA.elem, *sideA.data)[0];
     std::array<PbdParticleId, 3> ptsB = getTriangle(*sideB.elem, *sideB.data);
@@ -514,7 +514,7 @@ PbdCollisionHandling::V_T(const ColElemSide& sideA, const ColElemSide& sideB)
 }
 
 void
-PbdCollisionHandling::E_E(const ColElemSide& sideA, const ColElemSide& sideB)
+PbdCollisionHandling::addConstraint_E_E(const ColElemSide& sideA, const ColElemSide& sideB)
 {
     std::array<PbdParticleId, 2> ptsA = getEdge(*sideA.elem, *sideA.data);
     std::array<PbdParticleId, 2> ptsB = getEdge(*sideB.elem, *sideB.data);
@@ -529,7 +529,7 @@ PbdCollisionHandling::E_E(const ColElemSide& sideA, const ColElemSide& sideB)
 }
 
 void
-PbdCollisionHandling::E_E_CCD(
+PbdCollisionHandling::addConstraint_E_E_CCD(
     const ColElemSide& sideA,
     const ColElemSide& sideB)
 {
@@ -551,7 +551,7 @@ PbdCollisionHandling::E_E_CCD(
 }
 
 void
-PbdCollisionHandling::V_E(const ColElemSide& sideA, const ColElemSide& sideB)
+PbdCollisionHandling::addConstraint_V_E(const ColElemSide& sideA, const ColElemSide& sideB)
 {
     const PbdParticleId&         ptA  = getVertex(*sideA.elem, *sideA.data)[0];
     std::array<PbdParticleId, 2> ptsB = getEdge(*sideB.elem, *sideB.data);
@@ -566,7 +566,7 @@ PbdCollisionHandling::V_E(const ColElemSide& sideA, const ColElemSide& sideB)
 }
 
 void
-PbdCollisionHandling::V_V(const ColElemSide& sideA, const ColElemSide& sideB)
+PbdCollisionHandling::addConstraint_V_V(const ColElemSide& sideA, const ColElemSide& sideB)
 {
     // One special case with one-way
     const PbdParticleId& ptA = getVertex(*sideA.elem, *sideA.data)[0];
