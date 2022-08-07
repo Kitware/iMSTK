@@ -15,12 +15,12 @@ namespace imstk
 {
 enum PbdContactCase
 {
-    None,
-    Vertex,   // Mesh vertex either from Pbd or CollidingObject
-    Edge,     // Mesh edge either from Pbd or CollidingObject
-    Triangle, // Mesh triangle either from Pbd or CollidingObject
-    Body,     // Body
-    Primitive // Not a mesh at all still could be any CD data type
+    Vertex,    // Mesh vertex either from Pbd or CollidingObject
+    Edge,      // Mesh edge either from Pbd or CollidingObject
+    Triangle,  // Mesh triangle either from Pbd or CollidingObject
+    Body,      // Body
+    Primitive, // Not a mesh at all still could be any CD data type
+    None
 };
 static std::string
 getContactCaseStr(PbdContactCase contactCase)
@@ -202,6 +202,10 @@ public:
     double getDeformableStiffnessB() const { return m_stiffness[1]; }
     /// @}
 
+    ///
+    /// \brief Get the body particle id from the collision side
+    /// as well as the contact point on the body (in global space)
+    ///
     std::pair<PbdParticleId, Vec3d> getBodyAndContactPoint(
         const CollisionElement&  elem,
         const CollisionSideData& data);

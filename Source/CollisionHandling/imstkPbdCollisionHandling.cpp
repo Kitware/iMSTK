@@ -47,7 +47,7 @@ template<typename ArrType, int cellType>
 static std::array<PbdParticleId, ArrType::NumComponents>
 getElementVertIds(const CollisionElement& elem, const PbdCollisionHandling::CollisionSideData& side)
 {
-    // Note: The unrolling of this functions loops could be important too performance
+    // Note: The unrolling of this functions loops could be important to performance
     typename ArrType::ValueType cell;
     if (elem.m_type == CollisionElementType::CellIndex && elem.m_element.m_CellIndexElement.cellType == cellType)
     {
@@ -205,10 +205,12 @@ PbdCollisionHandling::getDataFromObject(std::shared_ptr<CollidingObject> obj)
 {
     // Pack info into struct, gives some contextual hints as well
     CollisionSideData side;
-    side.pbdObj   = std::dynamic_pointer_cast<PbdObject>(obj).get();  // Garunteed
-    side.colObj   = obj.get();
-    side.objType  = ObjType::Colliding;
-    side.geometry = side.colObj->getCollidingGeometry().get();
+    auto              pbdObj = std::dynamic_pointer_cast<PbdObject>(obj);
+    side.pbdObj  = pbdObj.get();   // Garunteed
+    side.colObj  = obj.get();
+    side.objType = ObjType::Colliding;
+    std::shared_ptr<Geometry> collidingGeometry = side.colObj->getCollidingGeometry();
+    side.geometry = collidingGeometry.get();
 
     if (side.pbdObj != nullptr)
     {
@@ -220,12 +222,14 @@ PbdCollisionHandling::getDataFromObject(std::shared_ptr<CollidingObject> obj)
         {
             side.objType = ObjType::PbdDeformable;
         }
-        side.model = side.pbdObj->getPbdModel().get();
+        std::shared_ptr<PbdModel> model = side.pbdObj->getPbdModel();
+        side.model = model.get();
         // If a physics geometry is provided always use that because
         // Either:
         //  A.) Physics geometry == Collision Geometry
         //  B.) A PointwiseMap is used and map should refer us back to physics geometry
-        side.geometry = side.pbdObj->getPhysicsGeometry().get();
+        std::shared_ptr<Geometry> physicsGeometry = side.pbdObj->getPhysicsGeometry();
+        side.geometry = physicsGeometry.get();
         side.bodyId   = side.pbdObj->getPbdBody()->bodyHandle;
 
         auto map = std::dynamic_pointer_cast<PointwiseMap>(side.pbdObj->getPhysicsToCollidingMap());
@@ -237,14 +241,16 @@ PbdCollisionHandling::getDataFromObject(std::shared_ptr<CollidingObject> obj)
     {
         if (auto pointSet = std::dynamic_pointer_cast<PointSet>(side.colObj->getCollidingGeometry()))
         {
-            side.vertices = pointSet->getVertexPositions().get();
+            std::shared_ptr<VecDataArray<double, 3>> vertices = pointSet->getVertexPositions();
+            side.vertices = vertices.get();
         }
         //side.vertices = side.colObj->getCollidingGeometry()
     }
     side.indicesPtr = nullptr;
     if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(side.colObj->getCollidingGeometry()))
     {
-        side.indicesPtr = cellMesh->getAbstractCells().get();
+        std::shared_ptr<AbstractDataArray> indicesPtr = cellMesh->getAbstractCells();
+        side.indicesPtr = indicesPtr.get();
     }
 
     return side;
@@ -267,7 +273,7 @@ PbdCollisionHandling::getCaseFromElement(const ColElemSide& elem)
         {
             // 0 - vertex, 1 - edge, 2 - triangle
             return static_cast<PbdContactCase>(
-                elem.elem->m_element.m_CellIndexElement.cellType + 1);
+                elem.elem->m_element.m_CellIndexElement.cellType);
         }
         else if (elem.elem->m_type == CollisionElementType::CellVertex)
         {

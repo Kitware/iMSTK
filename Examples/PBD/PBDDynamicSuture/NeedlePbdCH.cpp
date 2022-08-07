@@ -75,8 +75,6 @@ NeedlePbdCH::handle(
 
     // Get thread velocities
     std::shared_ptr<PointSet> pointSetA = std::dynamic_pointer_cast<PointSet>(m_threadObj->getPhysicsGeometry());
-    auto                      threadVelocitiesPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSetA->getVertexAttribute("Velocities"));
-    VecDataArray<double, 3>&  threadVelocity      = *threadVelocitiesPtr;
 
     // Unpack tissue data
 
@@ -84,13 +82,7 @@ NeedlePbdCH::handle(
     VecDataArray<double, 3>& meshVertices = *m_meshVerticesPtr;
 
     // For something to be a PbdObject it must have a pointset, it must also have invMasses defined
-    std::shared_ptr<PointSet>                pointSetB = std::dynamic_pointer_cast<PointSet>(m_pbdTissueObj->getPhysicsGeometry());
-    const std::shared_ptr<DataArray<double>> triangleInvMassesAPtr = std::dynamic_pointer_cast<DataArray<double>>(pointSetB->getVertexAttribute("InvMass"));
-    const DataArray<double>&                 triangleInvMasses     = *triangleInvMassesAPtr;
-
-    // Get velocities
-    std::shared_ptr<VecDataArray<double, 3>> velocitiesAPtr = std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSetB->getVertexAttribute("Velocities"));
-    VecDataArray<double, 3>&                 meshVelocity   = *velocitiesAPtr;
+    std::shared_ptr<PointSet> pointSetB = std::dynamic_pointer_cast<PointSet>(m_pbdTissueObj->getPhysicsGeometry());
 
     // Save the direction of the tip of the needle. NOTE: Needle indices are backwards
     m_needleDirection = (needleVertices[35] - needleVertices[34]).normalized();
