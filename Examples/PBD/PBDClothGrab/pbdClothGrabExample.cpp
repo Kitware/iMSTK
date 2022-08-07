@@ -45,10 +45,10 @@ makeThinTissueObj(const std::string& name,
                   const Vec2i        dim,
                   const Vec3d        pos)
 {
-    imstkNew<PbdObject> clothObj(name);
+    imstkNew<PbdObject> tissueObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh =
+    std::shared_ptr<SurfaceMesh> tissueMesh =
         GeometryUtils::toTriangleGrid(pos, size, dim,
             Quatd::Identity(), 2.0);
 
@@ -79,17 +79,17 @@ makeThinTissueObj(const std::string& name,
 
     // Setup the VisualModel to render the mesh
     imstkNew<VisualModel> visualModel;
-    visualModel->setGeometry(clothMesh);
+    visualModel->setGeometry(tissueMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
-    clothObj->addVisualModel(visualModel);
-    clothObj->setPhysicsGeometry(clothMesh);
-    clothObj->setCollidingGeometry(clothMesh);
-    clothObj->setDynamicalModel(pbdModel);
-    clothObj->getPbdBody()->uniformMassValue = size[0] * size[1] / (dim[0] * dim[1]) * 0.01;
+    tissueObj->addVisualModel(visualModel);
+    tissueObj->setPhysicsGeometry(tissueMesh);
+    tissueObj->setCollidingGeometry(tissueMesh);
+    tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->getPbdBody()->uniformMassValue = size[0] * size[1] / (dim[0] * dim[1]) * 0.01;
 
-    return clothObj;
+    return tissueObj;
 }
 
 ///
@@ -103,10 +103,10 @@ main()
     Logger::startLogger();
 
     // Setup a scene
-    imstkNew<Scene>            scene("PBDCloth");
-    std::shared_ptr<PbdObject> clothObj =
-        makeThinTissueObj("Cloth", Vec2d(5.0, 5.0), Vec2i(4, 4), Vec3d(0.0, 6.0, 0.0));
-    scene->addSceneObject(clothObj);
+    imstkNew<Scene>            scene("PbdClothGrab");
+    std::shared_ptr<PbdObject> tissueObj =
+        makeThinTissueObj("Tissue", Vec2d(5.0, 5.0), Vec2i(4, 4), Vec3d(0.0, 6.0, 0.0));
+    scene->addSceneObject(tissueObj);
 
     auto            planeObj =  std::make_shared<CollidingObject>("Plane");
     imstkNew<Plane> plane(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 1.0, 0.0));
@@ -120,11 +120,11 @@ main()
     scene->getActiveCamera()->setFocalPoint(-0.116722, 1.70485, 0.625839);
     scene->getActiveCamera()->setPosition(2.25549, 8.07292, 14.8692);
 
-    auto clothCollision = std::make_shared<PbdObjectCollision>(clothObj, planeObj, "PointSetToPlaneCD");
+    auto clothCollision = std::make_shared<PbdObjectCollision>(tissueObj, planeObj);
     clothCollision->setDeformableStiffnessA(0.3);
     scene->addInteraction(clothCollision);
 
-    auto pbdGrasping = std::make_shared<PbdObjectGrasping>(clothObj);
+    auto pbdGrasping = std::make_shared<PbdObjectGrasping>(tissueObj);
     pbdGrasping->setStiffness(0.3);
     scene->addInteraction(pbdGrasping);
 
@@ -211,7 +211,7 @@ main()
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
                 // Run the model in real time
-                clothObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+                tissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
             });
 
         driver->start();
