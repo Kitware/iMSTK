@@ -78,7 +78,7 @@ makeTissueObj(const std::string& name,
     pbdObject->setDynamicalModel(model);
 
     pbdObject->getPbdBody()->uniformMassValue = particleMassValue;
-    /*for (int x = 0; x < rowCount; x++)
+    for (int x = 0; x < rowCount; x++)
     {
         for (int y = 0; y < colCount; y++)
         {
@@ -87,7 +87,7 @@ makeTissueObj(const std::string& name,
                 pbdObject->getPbdBody()->fixedNodeIds.push_back(x * colCount + y);
             }
         }
-    }*/
+    }
 
     return pbdObject;
 }
@@ -613,9 +613,9 @@ tissueCapsuleDrop()
 
     auto pbdModel  = std::make_shared<PbdModel>();
     auto pbdConfig = std::make_shared<PbdModelConfig>();
-    pbdConfig->m_gravity    = Vec3d(0.0, 0.0, 0.0); // Slightly larger gravity to compensate viscosity
+    pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0); // Slightly larger gravity to compensate viscosity
     pbdConfig->m_dt         = 0.001;
-    pbdConfig->m_iterations = 10;
+    pbdConfig->m_iterations = 5;
     pbdConfig->m_collisionIterations = 5;
     pbdConfig->m_linearDampingCoeff  = 0.0;
     pbdConfig->m_angularDampingCoeff = 0.0;
