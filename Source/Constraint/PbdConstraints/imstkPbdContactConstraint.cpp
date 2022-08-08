@@ -144,17 +144,11 @@ PbdContactConstraint::correctVelocity(PbdState& bodies, const double dt)
     {
         return;
     }
-    // Correction for friction
-    Vec3d dV = (vT / vTMag) * std::min(m_friction * getForce(dt) * dt, vTMag);
-
-    double restitution = m_restitution;
-    // To avoid jitter
-    if (std::abs(vNMag) < 1.0e-10)
-    {
-        restitution = 0.0;
-    }
-    // Correction for restitution
-    dV += n * (-vNMag + std::min(-m_restitution * vNMag, 0.0));
+    // To avoid jitter threshold restitution by normal velocity
+    const double restitution = (std::abs(vNMag) < 1.0e-10) ? 0.0 : m_restitution;
+    // Correction for friction & restitution
+    Vec3d dV = (vT / vTMag) * std::min(m_friction * getForce(dt) * dt, vTMag) +
+               n * (-vNMag + std::min(-m_restitution * vNMag, 0.0));
 
     // Compute generalized inverse mass sum
     double w = 0.0;
