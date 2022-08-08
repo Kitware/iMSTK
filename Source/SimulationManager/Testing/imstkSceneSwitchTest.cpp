@@ -55,7 +55,6 @@ createSoftBodyScene(std::string sceneName)
     pbdObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     pbdObj->setPhysicsGeometry(tetMesh);
     pbdObj->setPhysicsToVisualMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
-    pbdObj->setDynamicalModel(pbdModel);
     pbdObj->getPbdBody()->uniformMassValue = 1.0;
     pbdObj->getPbdBody()->fixedNodeIds     = { 51, 127, 178 };
 
