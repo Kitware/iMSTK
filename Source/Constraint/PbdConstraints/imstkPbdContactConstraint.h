@@ -13,27 +13,18 @@ namespace imstk
 ///
 /// \class PbdContactConstraint
 ///
-/// \brief A constraint on a rigid body that defines dtheta through dx applied
-/// at a local position r on the body.
+/// \brief A constraint on a rigid body that defines rotationl correction through
+/// dx applied at a local position r on the body.
 ///
 /// It is primarily useful for rigid vs rigid and rigid vs deformable collision
 /// but can be used for other purposes such as joints.
 ///
 class PbdContactConstraint : public PbdConstraint
 {
-public:
-    enum class ContactType
-    {
-        DEFORMABLE,
-        RIGID
-    };
-
 protected:
-    PbdContactConstraint(const int numParticles, std::vector<ContactType> contactTypes) :
-        PbdConstraint(numParticles)
+    PbdContactConstraint(const int numParticles) :
+        PbdConstraint(numParticles), m_r(numParticles)
     {
-        CHECK(numParticles == contactTypes.size());
-        m_r.resize(numParticles);
     }
 
 public:
@@ -62,10 +53,7 @@ protected:
 class PbdTriangleToBodyConstraint : public PbdContactConstraint
 {
 public:
-    PbdTriangleToBodyConstraint() : PbdContactConstraint(4,
-                                                         { ContactType::RIGID, ContactType::DEFORMABLE, ContactType::DEFORMABLE, ContactType::DEFORMABLE })
-    {
-    }
+    PbdTriangleToBodyConstraint() : PbdContactConstraint(4) { }
 
     ///
     /// \brief Initialize the constraint
@@ -106,10 +94,7 @@ public:
 class PbdVertexToBodyConstraint : public PbdContactConstraint
 {
 public:
-    PbdVertexToBodyConstraint() : PbdContactConstraint(2,
-                                                       { ContactType::RIGID, ContactType::DEFORMABLE })
-    {
-    }
+    PbdVertexToBodyConstraint() : PbdContactConstraint(2) { }
 
     ///
     /// \brief Initialize the constraint
@@ -147,10 +132,7 @@ public:
 class PbdEdgeToBodyConstraint : public PbdContactConstraint
 {
 public:
-    PbdEdgeToBodyConstraint() : PbdContactConstraint(3,
-                                                     { ContactType::RIGID, ContactType::DEFORMABLE, ContactType::DEFORMABLE })
-    {
-    }
+    PbdEdgeToBodyConstraint() : PbdContactConstraint(3) { }
 
     ///
     /// \brief Initialize the constraint
@@ -190,10 +172,7 @@ public:
 class PbdBodyToBodyConstraint : public PbdContactConstraint
 {
 public:
-    PbdBodyToBodyConstraint() : PbdContactConstraint(2,
-                                                     { ContactType::RIGID, ContactType::RIGID })
-    {
-    }
+    PbdBodyToBodyConstraint() : PbdContactConstraint(2) { }
 
     void initConstraint(
         const PbdState&      state,
@@ -231,9 +210,7 @@ protected:
 class PbdBodyToBodyDistanceConstraint : public PbdContactConstraint
 {
 public:
-    PbdBodyToBodyDistanceConstraint() : PbdContactConstraint(2, { ContactType::RIGID, ContactType::RIGID })
-    {
-    }
+    PbdBodyToBodyDistanceConstraint() : PbdContactConstraint(2) { }
 
     ///
     /// \brief Initialize the constraint

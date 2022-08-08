@@ -30,7 +30,6 @@ PbdContactConstraint::projectConstraint(PbdState& bodies,
     double w = 0.0;
     for (size_t i = 0; i < m_particles.size(); i++)
     {
-        //w += computeGeneralizedInvMass(bodies, i, m_r[i]);
         w += computeGeneralizedInvMass(bodies, i, m_r[i]) * m_dcdx[i].squaredNorm();
     }
     if (w == 0.0)
