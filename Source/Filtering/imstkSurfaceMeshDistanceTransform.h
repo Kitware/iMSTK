@@ -97,6 +97,6 @@ private:
     bool m_NarrowBanded = false;
     int  m_DilateSize   = 4; ///< Only for narrow banded
 
-    vtkSmartPointer<vtkImplicitPolyDataDistance> m_distFunc = nullptr;
+    vtkSmartPointer<vtkImplicitPolyDataDistance> m_distFunc;
 };
 } // namespace imstk

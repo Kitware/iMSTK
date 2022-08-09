@@ -214,9 +214,6 @@ protected:
     std::array<PbdParticleId, 2> getEdge(
         const CollisionElement&  elem,
         const CollisionSideData& side);
-    std::array<Vec3d*, 2> getPrevEdge(
-        const std::array<PbdParticleId, 2>& ids,
-        const CollisionSideData& side);
     std::array<PbdParticleId, 3> getTriangle(
         const CollisionElement&  elem,
         const CollisionSideData& side);

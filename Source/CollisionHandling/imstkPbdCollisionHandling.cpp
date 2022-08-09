@@ -152,13 +152,6 @@ getElementVertIdsPrev(const std::array<PbdParticleId, N>& ids,
     return results;
 }
 
-std::array<Vec3d*, 2>
-PbdCollisionHandling::getPrevEdge(const std::array<PbdParticleId, 2>& ids,
-                                  const CollisionSideData& side)
-{
-    return getElementVertIdsPrev(ids, side);
-}
-
 std::ostream&
 operator<<(std::ostream& os, const PbdCHTableKey& key)
 {
@@ -544,8 +537,8 @@ PbdCollisionHandling::addConstraint_E_E_CCD(
 
     // We want to refer to the same vertices but from a different geometry
     // We want to ensure the vertex is added as virtual
-    std::array<Vec3d*, 2> prevPtsA = getPrevEdge(ptsA, *sideA.data);
-    std::array<Vec3d*, 2> prevPtsB = getPrevEdge(ptsB, *sideB.data);
+    std::array<Vec3d*, 2> prevPtsA = getElementVertIdsPrev<2>(ptsA, *sideA.data);
+    std::array<Vec3d*, 2> prevPtsB = getElementVertIdsPrev<2>(ptsB, *sideB.data);
 
     PbdEdgeEdgeCCDConstraint* constraint = new PbdEdgeEdgeCCDConstraint();
     constraint->initConstraint(
