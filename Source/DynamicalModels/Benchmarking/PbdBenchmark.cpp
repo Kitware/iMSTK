@@ -10,16 +10,17 @@
 #include "imstkMath.h"
 #include "imstkMeshIO.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPointSetToCapsuleCD.h"
 #include "imstkPointwiseMap.h"
-#include "imstkSphere.h"
+#include "imstkRbdConstraint.h"
 #include "imstkScene.h"
+#include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshToCapsuleCD.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkRbdConstraint.h"
 
 #include <benchmark/benchmark.h>
 
@@ -151,12 +152,10 @@ BM_DistanceVolume(benchmark::State& state)
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = dt;
     pbdParams->m_iterations = state.range(1);
-    pbdParams->m_viscousDampingCoeff = 0.03;
+    pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-
-    pbdModel->setModelGeometry(prismMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the Object
@@ -228,12 +227,10 @@ BM_DistanceDihedral(benchmark::State& state)
     pbdParams->m_gravity    = Vec3d(0.0, -8.0, 0.0);
     pbdParams->m_dt         = dt;
     pbdParams->m_iterations = state.range(1);
-    pbdParams->m_viscousDampingCoeff = 0.03;
+    pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-
-    pbdModel->setModelGeometry(surfMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the Object
@@ -301,11 +298,10 @@ BM_PbdFem(benchmark::State& state)
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = dt;
     pbdParams->m_iterations = state.range(1);
-    pbdParams->m_viscousDampingCoeff = 0.03;
+    pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(prismMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the Object
@@ -387,11 +383,10 @@ BM_PbdContactDistanceVol(benchmark::State& state)
     pbdParams->m_gravity    = Vec3d(0.0, -1.0 / (double)state.range(0), 0.0);
     pbdParams->m_dt         = 0.05;
     pbdParams->m_iterations = state.range(1);
-    pbdParams->m_viscousDampingCoeff = 0.03;
+    pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(prismMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the Object
@@ -487,12 +482,10 @@ BM_PbdContactDistanceDihedral(benchmark::State& state)
     pbdParams->m_gravity    = Vec3d(0.0, -2.0 / (double)state.range(0), 0.0);
     pbdParams->m_dt         = dt;
     pbdParams->m_iterations = state.range(1);
-    pbdParams->m_viscousDampingCoeff = 0.03;
+    pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-
-    pbdModel->setModelGeometry(surfMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the Object
@@ -594,11 +587,10 @@ BM_PbdFemContact(benchmark::State& state)
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = dt;
     pbdParams->m_iterations = state.range(1);
-    pbdParams->m_viscousDampingCoeff = 0.03;
+    pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(prismMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the Object
