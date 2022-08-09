@@ -30,6 +30,7 @@ PbdConstraint::projectConstraint(PbdState& bodies,
     {
         // Multiplication with dcdx here is important for non normalized
         // constraint gradients
+        //w += bodies.getInvMass(m_particles[i]) * m_dcdx[i].squaredNorm();
         w += computeGeneralizedInvMass(bodies, i) * m_dcdx[i].squaredNorm();
     }
     if (w == 0.0)
@@ -83,29 +84,5 @@ PbdConstraint::correctVelocity(PbdState& bodies, const double)
             v = vN * m_restitution + vT * fricFrac;
         }
     }
-}
-
-double
-PbdConstraint::computeGeneralizedInvMass(PbdState& bodies,
-                                         const size_t particleIndex, const Vec3d& r) const
-{
-    const PbdParticleId& pid = m_particles[particleIndex];
-
-    // Compute generalized inverse mass sum
-    double       w       = 0.0;
-    const double invMass = bodies.getInvMass(pid);
-    if (bodies.m_bodies[pid.first]->getOriented())
-    {
-        const Quatd  invOrientation = bodies.getOrientation(pid).inverse();
-        const Mat3d& invInteria     = bodies.getInvInertia(pid);
-        Vec3d        l = r.cross(m_dcdx[particleIndex]);
-        l = invOrientation._transformVector(l);
-        // Assumes inertia is diagonal, always in unrotated state
-        w += l[0] * l[0] * invInteria(0, 0) +
-             l[1] * l[1] * invInteria(1, 1) +
-             l[2] * l[2] * invInteria(2, 2);
-    }
-    w += invMass;
-    return w;
 }
 } // namespace imstk

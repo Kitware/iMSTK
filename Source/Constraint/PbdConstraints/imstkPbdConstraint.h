@@ -118,14 +118,38 @@ public:
     virtual void correctVelocity(PbdState& bodies, const double dt);
 
     ///
+    /// \brief Compute generalized inverse mass of the particle. Note perf sensitive function. It
+    /// has been intentionally inlined
+    /// \param bodies of the system
+    /// \param particleIndex Index of the particle in the constraint to compute from
+    ///
+    inline double computeGeneralizedInvMass(const PbdState& bodies, const size_t particleIndex) const
+    {
+        return bodies.getInvMass(m_particles[particleIndex]);
+    }
+
+    ///
     /// \brief Compute generalized inverse mass of the particle
     /// \param bodies of the system
     /// \param particleIndex Index of the particle in the constraint to compute from
     /// \param r Optional local support point for which to cross when particle
     /// is oriented
     ///
-    double computeGeneralizedInvMass(PbdState& bodies,
-                                     const size_t particleIndex, const Vec3d& r = Vec3d::Zero()) const;
+    inline double computeGeneralizedInvMass(const PbdState& bodies,
+                                            const size_t particleIndex, const Vec3d& r) const
+    {
+        const PbdParticleId& pid = m_particles[particleIndex];
+
+        // Compute generalized inverse mass sum
+        const double invMass = bodies.getInvMass(pid);
+        const Quatd  invOrientation = bodies.getOrientation(pid).inverse();
+        const Mat3d& invInteria     = bodies.getInvInertia(pid);
+        const Vec3d  l = invOrientation._transformVector(r.cross(m_dcdx[particleIndex]));
+        // Assumes inertia is diagonal, always in unrotated state
+        return l[0] * l[0] * invInteria(0, 0) +
+               l[1] * l[1] * invInteria(1, 1) +
+               l[2] * l[2] * invInteria(2, 2) + invMass;
+    }
 
 protected:
     PbdConstraint(const size_t numParticles)
