@@ -51,7 +51,7 @@ PbdDihedralConstraint::computeValueAndGradient(PbdState& bodies,
     n2 /= A2;
 
     const double l = e.norm();
-    if (l == 0.0)
+    if (l < 1.0e-16)
     {
         return false;
     }

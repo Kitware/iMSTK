@@ -37,7 +37,7 @@ PbdAreaConstraint::computeValueAndGradient(PbdState& bodies,
     Vec3d n = e0.cross(e1);
     c = 0.5 * n.norm();
 
-    if (c == 0.0)
+    if (c < 1.0e-16)
     {
         return false;
     }

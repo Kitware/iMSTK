@@ -30,7 +30,7 @@ PbdDistanceConstraint::computeValueAndGradient(PbdState& bodies,
 
     dcdx[0] = p0 - p1;
     const double len = dcdx[0].norm();
-    if (len == 0.0)
+    if (len < 1.0e-16)
     {
         return false;
     }

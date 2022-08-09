@@ -49,7 +49,7 @@ PbdBendConstraint::computeValueAndGradient(PbdState& bodies,
     const Vec3d& diff   = p1 - center;
     const double dist   = diff.norm();
 
-    if (dist == 0.0)
+    if (dist < 1.0e-16)
     {
         return false;
     }
