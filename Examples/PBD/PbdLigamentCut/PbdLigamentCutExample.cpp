@@ -181,7 +181,6 @@ makeGallBlader(const std::string& name, std::shared_ptr<PbdModel> model)
 
     model->getConfig()->m_femParams->m_YoungModulus = 420000.0;
     model->getConfig()->m_femParams->m_PoissonRatio = 0.48;
-    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
 
     // Setup the material
     auto material = std::make_shared<RenderMaterial>();
@@ -206,6 +205,8 @@ makeGallBlader(const std::string& name, std::shared_ptr<PbdModel> model)
     // Gallblader is about 60g
     tissueObj->getPbdBody()->uniformMassValue = 60.0 / tissueMesh->getNumVertices();
     tissueObj->getPbdBody()->fixedNodeIds     = { 72, 57, 131, 132 };
+    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK,
+        tissueObj->getPbdBody()->bodyHandle);
     LOG(INFO) << "Per particle mass: " << tissueObj->getPbdBody()->uniformMassValue;
 
     return tissueObj;

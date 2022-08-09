@@ -46,7 +46,9 @@ public:
     /// \brief Enables a constraint of type defined by ConstraintGenType with
     /// given stiffness. If constraint of that type already exists, sets the
     /// stiffness on it.
-    /// Defaults to bodyId=1, the first body, where 0 is the dummy body
+    /// \param type Generation scheme type
+    /// \param stiffness How much constraint is enforced
+    /// \param bodyId Body to add the constraint throughout, -1 applies to all bodies
     ///
     void enableConstraint(ConstraintGenType type, const double stiffness, const int bodyId = 2);
 
@@ -54,25 +56,27 @@ public:
     /// \brief Enables a bend constraint with given stiffness, stride, and flag for 0 rest length
     /// You may enable multiple with differing strides
     /// If constraint with same stride already exists, updates the stiffness and restLength0 on it
-    /// \param Stiffness, how much bend is enforced
-    /// \param Stride, distance between vertex connections
-    /// \param When true rest length (and angle) are constrained to 0, useful when mesh initial/resting state
+    /// \param stiffness How much constraint is enforced
+    /// \param stride Distance between vertex connections
+    /// \param restLength0 When true rest length (and angle) are constrained to 0, useful when mesh initial/resting state
     /// is not 0 angled
-    /// \param Body to add the constraint throughout
+    /// \param bodyId Body to add the constraint throughout, -1 applies to all bodies
     ///
     void enableBendConstraint(const double stiffness, const int stride, const bool restLength0 = true, const int bodyId = 2);
 
     ///
     /// \brief Enables constant density constraint given the stiffness and particleSize
-    /// \param Stiffness, how much density is enforced
-    /// \param ParticleRadius, radius of particle
-    /// \param Body to add the constraint throughout
+    /// \param stiffness how much constraint is enforced
+    /// \param particleRadius, radius of particle
+    /// \param bodyId Body to add the constraint throughout, -1 applies to all bodies
     ///
     void enableConstantDensityConstraint(const double stiffness,
                                          const double particleRadius, const double restDensity = 6378.0, const int bodyId = 2);
 
     ///
     /// \brief Enable a Fem constraint with the material provided
+    /// \param material FEM model type
+    /// \param bodyId Body to add the constraint throughout, -1 applies to all bodies
     ///
     void enableFemConstraint(PbdFemConstraint::MaterialType material, const int bodyId = 2);
 
@@ -102,6 +106,9 @@ public:
     ///
     /// \brief Set damping for a specific body
     /// 1.0 is fully damped/all velocity removed, 0.0 is no damping
+    /// \param bodyId Body to damp
+    /// \param How much to damp linear velocity
+    /// \param How much to damp angular velocity
     ///
     void setBodyDamping(const int bodyId,
                         const double linearDampCoeff, const double angularDampCoeff = 0.01);
@@ -110,6 +117,7 @@ public:
     /// \brief Returns global and per body damping multiplied together
     /// for a body
     /// 1.0 is fully damped/all velocity removed, 0.0 is no damping
+    /// \param bodyId Body that is damped
     ///@{
     double getLinearDamping(const int bodyId);
     double getAngularDamping(const int bodyId);
