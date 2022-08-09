@@ -82,7 +82,7 @@ public:
     void clearConstraintLists() { m_constraintLists->clear(); }
 
 private:
-    size_t m_iterations = 20;                                        ///< Number of NL Gauss-Seidel iterations for regular constraints
+    size_t m_iterations = 20;                                        ///< Number of NL Gauss-Seidel iterations for constraints
     double m_dt = 0.0;                                               ///< time step
 
     std::shared_ptr<PbdConstraintContainer> m_constraints = nullptr; ///< Vector of constraints

@@ -43,8 +43,9 @@ public:
 
 public:
     ///
-    /// \brief Enables a regular constraint (not FEM constraint) with given stiffness
-    /// If constraint of that type already exists, sets the stiffness on it
+    /// \brief Enables a constraint of type defined by ConstraintGenType with
+    /// given stiffness. If constraint of that type already exists, sets the
+    /// stiffness on it.
     /// Defaults to bodyId=1, the first body, where 0 is the dummy body
     ///
     void enableConstraint(ConstraintGenType type, const double stiffness, const int bodyId = 2);
