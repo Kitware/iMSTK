@@ -29,17 +29,21 @@ public:
     double getRestLength() const { return m_restLength; }
     void setRestLength(const double length) { m_restLength = length; }
 
+    ///
+    /// \param bodies of the simulation (contains state data)
+    ///
     Vec3d computeInterpolantDifference(PbdState& bodies) const;
 
     ///
     /// \brief initialize constraint with current distance between
     /// the points as the resting length
-    /// \param points of cell a
-    /// \param barycentric weights for the point in cell a
-    /// \param points of cell b
-    /// \param barycentric weights for the point in cell b
-    /// \param Stiffness which to resolve a
-    /// \param stiffness which to resolve b
+    /// \param bodies Bodies of the simulation
+    /// \param ptIdsA points of cell a
+    /// \param weightsA barycentric weights for the point in cell a
+    /// \param ptIdsB points of cell b
+    /// \param weightsB barycentric weights for the point in cell b
+    /// \param stiffnessB Stiffness which to resolve a
+    /// \param stiffnessA stiffness which to resolve b
     ///
     void initConstraintToRest(
         PbdState& bodies,
@@ -62,7 +66,7 @@ public:
 
     ///
     /// \brief Compute value and gradient of constraint function
-    /// \param[inout] set of bodies involved in system
+    /// \param[inout] bodies set of bodies involved in system
     /// \param[inout] c constraint value
     /// \param[inout] dcdx constraint gradient
     ///

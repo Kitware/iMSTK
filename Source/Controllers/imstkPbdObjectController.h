@@ -18,9 +18,10 @@ class PbdObject;
 /// \brief This class uses the provided device to control the provided rigid object via
 /// virtual coupling. That is, it applies forces+torques to the rigid body that will
 /// help move it to desired position/orientation.
-/// It has linear and angular spring scales has well as dampening
+/// It has linear and angular spring scales as well as damping
 /// You may also use force smoothening for the force applied back on the device
-/// \todo: Force smoothening currently incurs loss
+///
+/// The PbdObjectController is not perfectly smooth yet
 ///
 class PbdObjectController : public SceneObjectController
 {

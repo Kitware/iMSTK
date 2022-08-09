@@ -33,7 +33,7 @@ public:
     void compute(double dt) override;
 
 private:
-    double m_beta = 0.0001;
+    double m_beta = 0.0001; ///< Bauhmgarte stabilization term
     mutable Vec3d m_diff = Vec3d::Zero();
 };
 } // namespace imstk

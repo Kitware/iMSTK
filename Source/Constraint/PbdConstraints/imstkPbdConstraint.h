@@ -38,9 +38,9 @@ public:
 
     ///
     /// \brief Compute value and gradient of the constraint
-    /// \param PbdState provides all the bodies
-    /// \param Constraint value
-    /// \param Normalized constraint gradients (per vertex)
+    /// \param bodies PbdState provides all the bodies
+    /// \param c Constraint value
+    /// \param dcdx Normalized constraint gradients (per vertex)
     ///
     virtual bool computeValueAndGradient(PbdState& bodies,
                                          double& c, std::vector<Vec3d>& dcdx) = 0;
@@ -51,7 +51,7 @@ public:
     std::vector<PbdParticleId>& getParticles() { return m_particles; }
 
     ///
-    /// \brief Get/Set resitution
+    /// \brief Get/Set restitution
     ///@{
     double getRestitution() const { return m_restitution; }
     void setRestitution(const double restitution) { m_restitution = restitution; }
@@ -120,8 +120,8 @@ public:
     ///
     /// \brief Compute generalized inverse mass of the particle
     /// \param bodies of the system
-    /// \param Index of the particle in the constraint to compute from
-    /// \param Optional local support point for which to cross when particle
+    /// \param particleIndex Index of the particle in the constraint to compute from
+    /// \param r Optional local support point for which to cross when particle
     /// is oriented
     ///
     double computeGeneralizedInvMass(PbdState& bodies,

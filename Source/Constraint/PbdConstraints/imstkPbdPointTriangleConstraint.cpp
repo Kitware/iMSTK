@@ -63,6 +63,7 @@ PbdPointTriangleConstraint::computeValueAndGradient(
     {
         int maxId = 0;
         Vec3d(u, v, w).maxCoeff(&maxId);
+        // +1 as first particle is from other body (vertex)
         if (bodies.getInvMass(m_particles[maxId + 1]) == 0.0)
         {
             c = 0.0;

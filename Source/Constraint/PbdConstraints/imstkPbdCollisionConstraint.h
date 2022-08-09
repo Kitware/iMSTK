@@ -22,7 +22,7 @@ namespace imstk
 /// stiffness is modifiable. Given enough iterations in the solve, it will
 /// converge to perfectly rigid.
 ///
-/// The collision constraint also provides a correctVelocity function.
+/// Collision constraint also provides a correctVelocity function.
 /// This may be overriden but by default it will correct velocity along
 /// the gradient tangents and normal according to frictional and restitution
 /// coefficients.
