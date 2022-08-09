@@ -270,37 +270,36 @@ PbdFemTetConstraint::handleInversions(
     }
     else // No modificaitons required: U = FV\hat{F}^{-1}
     {
-        Mat3d FhatInv(Fhat.inverse());
-        U = F * V * FhatInv;
+        U = F * V * Fhat.inverse();
     }
 
     // If detU is negative, then U includes a reflection.
-    double detU = U.determinant();
+    const double detU = U.determinant();
 
     if (detU < 0.0)
     {
-        int    positionu = 0;
+        int    positionU = 0;
         double minLambda = IMSTK_DOUBLE_MAX;
         for (int i = 0; i < 3; i++)
         {
             if (Fhat(i, i) < minLambda)
             {
-                positionu = i;
+                positionU = i;
                 minLambda = Fhat(i, i);
             }
         }
 
         // Invert values of smallest singular value and associated column of U
         // This "pushes" the node nearest the uninverted state towards the uninverted state
-        Fhat(positionu, positionu) *= -1.0;
+        Fhat(positionU, positionU) *= -1.0;
         for (int i = 0; i < 3; i++)
         {
-            U(i, positionu) *= -1.0;
+            U(i, positionU) *= -1.0;
         }
     }
 
     // Clamp small singular values of Fhat
-    double clamp = 0.577;
+    const double clamp = 0.577;
     for (int i = 0; i < 3; i++)
     {
         if (Fhat(i, i) < clamp)

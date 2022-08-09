@@ -28,9 +28,12 @@
 
 namespace
 {
+///
+/// \brief Copies src to dest, allocates dest if it does not exist
+///
 template<typename T>
 void
-copyOrAllocate(const std::shared_ptr<T>& src, std::shared_ptr<T>& dest)
+copyAndAllocate(const std::shared_ptr<T>& src, std::shared_ptr<T>& dest)
 {
     if (src != nullptr)
     {
@@ -83,20 +86,20 @@ struct PbdBody
             fixedNodeInvMass = src.fixedNodeInvMass;
             bodyHandle       = src.bodyHandle;
 
-            copyOrAllocate(src.prevVertices, prevVertices);
-            copyOrAllocate(src.vertices, vertices);
-            copyOrAllocate(src.velocities, velocities);
-            copyOrAllocate(src.masses, masses);
-            copyOrAllocate(src.invMasses, invMasses);
+            copyAndAllocate(src.prevVertices, prevVertices);
+            copyAndAllocate(src.vertices, vertices);
+            copyAndAllocate(src.velocities, velocities);
+            copyAndAllocate(src.masses, masses);
+            copyAndAllocate(src.invMasses, invMasses);
 
             bodyType = src.bodyType;
             if (getOriented())
             {
-                copyOrAllocate(src.prevOrientations, prevOrientations);
-                copyOrAllocate(src.orientations, orientations);
-                copyOrAllocate(src.angularVelocities, angularVelocities);
-                copyOrAllocate(src.inertias, inertias);
-                copyOrAllocate(src.invInertias, invInertias);
+                copyAndAllocate(src.prevOrientations, prevOrientations);
+                copyAndAllocate(src.orientations, orientations);
+                copyAndAllocate(src.angularVelocities, angularVelocities);
+                copyAndAllocate(src.inertias, inertias);
+                copyAndAllocate(src.invInertias, invInertias);
             }
 
             fixedNodeIds     = src.fixedNodeIds;

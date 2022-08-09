@@ -41,23 +41,23 @@ void
 PbdConstantDensityConstraint::projectConstraint(PbdState& state,
                                                 const double imstkNotUsed(dt), const SolverType& imstkNotUsed(type))
 {
-    const size_t             numParticles = state.m_bodies[m_bodyHandle]->vertices->size();
-    VecDataArray<double, 3>& vertices     = *state.m_bodies[m_bodyHandle]->vertices;
+    const size_t             numVertices = state.m_bodies[m_bodyHandle]->vertices->size();
+    VecDataArray<double, 3>& vertices    = *state.m_bodies[m_bodyHandle]->vertices;
 
     // Search neighbor for each particle
     m_NeighborSearcher->getNeighbors(m_neighborList, vertices);
 
-    ParallelUtils::parallelFor(numParticles,
+    ParallelUtils::parallelFor(numVertices,
         [&](const size_t idx) {
             computeDensity(vertices[idx], idx, vertices);
     });
 
-    ParallelUtils::parallelFor(numParticles,
+    ParallelUtils::parallelFor(numVertices,
         [&](const size_t idx) {
             computeLambdaScalingFactor(vertices[idx], idx, vertices);
     });
 
-    ParallelUtils::parallelFor(numParticles,
+    ParallelUtils::parallelFor(numVertices,
         [&](const size_t idx) {
             updatePositions(vertices[idx], idx, vertices);
     });
