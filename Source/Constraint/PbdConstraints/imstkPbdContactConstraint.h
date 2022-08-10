@@ -23,7 +23,7 @@ class PbdContactConstraint : public PbdConstraint
 {
 protected:
     PbdContactConstraint(const int numParticles) :
-        PbdConstraint(numParticles), m_r(numParticles)
+        PbdConstraint(numParticles), m_r(numParticles), m_weights(numParticles)
     {
     }
 
@@ -36,13 +36,31 @@ public:
     void projectConstraint(PbdState& bodies,
                            const double dt, const SolverType& type) override;
 
+    virtual Vec3d computeRelativeVelocity(PbdState& bodies) { return Vec3d::Zero(); }
+
     ///
     /// \brief Solve the velocities given to the constraint
     ///
     void correctVelocity(PbdState& bodies, const double dt) override;
 
+    ///
+    /// \brief Returns the velocity at the given point on body
+    /// Either body in collision could be rigid body
+    ///
+    Vec3d getVelocityOnRigidBody(PbdState& bodies, const int bodyId, const Vec3d& pt)
+    {
+        const PbdParticleId pid     = { bodyId, 0 };
+        const Vec3d&        bodyPos = bodies.getPosition(pid);
+        const Vec3d         r       = pt - bodyPos;
+
+        const Vec3d& v = bodies.getVelocity(pid);
+        const Vec3d& w = bodies.getAngularVelocity(pid);
+        return v + w.cross(r);
+    }
+
 protected:
-    std::vector<Vec3d> m_r;
+    std::vector<Vec3d>  m_r;
+    std::vector<double> m_weights;
 };
 
 ///
@@ -69,21 +87,16 @@ public:
         const PbdParticleId& bodyId,
         const Vec3d contactPtOnBody,
         const PbdParticleId& x0, const PbdParticleId& x1, const PbdParticleId& x2,
-        const double compliance = 0.0)
-    {
-        m_particles[0] = bodyId;
-        // Compute local position on body
-        m_r[0] = contactPtOnBody - state.getPosition(bodyId);
-        m_particles[1] = x0;
-        m_particles[2] = x1;
-        m_particles[3] = x2;
+        const double compliance = 0.0);
 
-        setCompliance(compliance);
-    }
+    bool computeInterpolantsAndContact(const PbdState& bodies,
+                                       std::vector<double>& weights, Vec3d& contactNormal, double& depth) const;
 
     bool computeValueAndGradient(PbdState&           bodies,
                                  double&             c,
                                  std::vector<Vec3d>& n) override;
+
+    Vec3d computeRelativeVelocity(PbdState& bodies) override;
 };
 
 ///
@@ -108,20 +121,13 @@ public:
         const PbdParticleId& bodyId,
         const Vec3d          contactPtOnBody,
         const PbdParticleId& x0,
-        const double         compliance = 0.0)
-    {
-        m_particles[0] = bodyId;
-        // Compute local position on body
-        m_r[0] = contactPtOnBody - state.getPosition(bodyId);
-        m_particles[1] = x0;
-
-        // Infinite stiffness/completely rigid
-        setCompliance(compliance);
-    }
+        const double         compliance = 0.0);
 
     bool computeValueAndGradient(PbdState&           bodies,
                                  double&             c,
                                  std::vector<Vec3d>& n) override;
+
+    Vec3d computeRelativeVelocity(PbdState& bodies) override;
 };
 
 ///
@@ -147,59 +153,16 @@ public:
         const PbdParticleId& bodyId,
         const Vec3d contactPtOnBody,
         const PbdParticleId& x0, const PbdParticleId& x1,
-        const double compliance = 0.0)
-    {
-        m_particles[0] = bodyId;
-        // Compute local position on body
-        m_r[0] = contactPtOnBody - state.getPosition(bodyId);
-        m_particles[1] = x0;
-        m_particles[2] = x1;
+        const double compliance = 0.0);
 
-        setCompliance(compliance);
-    }
-
-    bool computeValueAndGradient(PbdState&           bodies,
-                                 double&             c,
-                                 std::vector<Vec3d>& n) override;
-};
-
-///
-/// \class PbdBodyToBodyConstraint
-///
-/// \brief Resolves contact with contact plane reprojection between two bodies
-/// Resolves distance between two points on two bodies by given direction
-///
-class PbdBodyToBodyConstraint : public PbdContactConstraint
-{
-public:
-    PbdBodyToBodyConstraint() : PbdContactConstraint(2) { }
-
-    void initConstraint(
-        const PbdState&      state,
-        const PbdParticleId& bodyId0,
-        const Vec3d&         contactPtOnBody0,
-        const Vec3d&         contactNormal,
-        const PbdParticleId& bodyId1,
-        const Vec3d          contactPtOnBody1,
-        const double         compliance = 0.0)
-    {
-        m_particles[0] = bodyId0;
-        // Compute local position on body
-        m_r[0] = contactPtOnBody0 - state.getPosition(bodyId0);
-        m_particles[1] = bodyId1;
-        m_r[1] = contactPtOnBody1 - state.getPosition(bodyId1);
-
-        m_contactNormal = contactNormal.normalized();
-
-        setCompliance(compliance);
-    }
+    bool computeInterpolantsAndContact(const PbdState& bodies,
+                                       std::vector<double>& weights, Vec3d& contactNormal, double& depth) const;
 
     bool computeValueAndGradient(PbdState&           bodies,
                                  double&             c,
                                  std::vector<Vec3d>& n) override;
 
-protected:
-    Vec3d m_contactNormal = Vec3d::Zero();
+    Vec3d computeRelativeVelocity(PbdState& bodies) override;
 };
 
 ///

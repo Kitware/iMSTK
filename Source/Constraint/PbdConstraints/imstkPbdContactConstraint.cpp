@@ -96,31 +96,13 @@ PbdContactConstraint::projectConstraint(PbdState& bodies,
 void
 PbdContactConstraint::correctVelocity(PbdState& bodies, const double dt)
 {
-    // Either both could be rigid, or ones rigid and the others deformable
-    Vec3d contactVel1  = Vec3d::Zero();
-    bool  leftIsRigid  = bodies.getBodyType(m_particles[0]) == PbdBody::Type::RIGID;
-    Vec3d contactVel2  = Vec3d::Zero();
-    bool  rightIsRigid = bodies.getBodyType(m_particles.back()) == PbdBody::Type::RIGID;
-
-    if (leftIsRigid)
-    {
-        const Vec3d& v = bodies.getVelocity(m_particles[0]);
-        const Vec3d& w = bodies.getAngularVelocity(m_particles[0]);
-        contactVel1 = v + w.cross(m_r[0]);
-    }
-    if (rightIsRigid)
-    {
-        const int    lastIndex = m_particles.size() - 1;
-        const Vec3d& v = bodies.getVelocity(m_particles[lastIndex]);
-        const Vec3d& w = bodies.getAngularVelocity(m_particles[lastIndex]);
-        contactVel1 = v + w.cross(m_r[lastIndex]);
-    }
+    // Assumed equal and opposite normals/constraint gradients
+    const Vec3d contactNormal = m_dcdx[0].normalized();
 
     // We can also assume equal and opposite normals/constraint gradients
-    const Vec3d  n = m_dcdx[0].normalized();
-    const Vec3d  relativeVelocity = contactVel1 - contactVel2;
-    const double vNMag = n.dot(relativeVelocity);
-    const Vec3d  vN    = vNMag * n;
+    const Vec3d  relativeVelocity = computeRelativeVelocity(bodies);
+    const double vNMag = contactNormal.dot(relativeVelocity);
+    const Vec3d  vN    = vNMag * contactNormal;
     const Vec3d  vT    = relativeVelocity - vN;
     const double vTMag = vT.norm();
 
@@ -128,27 +110,23 @@ PbdContactConstraint::correctVelocity(PbdState& bodies, const double dt)
     {
         return;
     }
-    // To avoid jitter threshold restitution by normal velocity
+    // Avoid jitter with threshold here
     const double restitution = (std::abs(vNMag) < 1.0e-10) ? 0.0 : m_restitution;
-    // Correction for friction & restitution
-    Vec3d dV = (vT / vTMag) * std::min(m_friction * getForce(dt) * dt, vTMag) +
-               n * (-vNMag + std::min(-m_restitution * vNMag, 0.0));
+
+    // Velocity correction for friction & restitution
+    const Vec3d dV = (vT / vTMag) * std::min(m_friction * getForce(dt) * dt, vTMag) +
+                     contactNormal * (-vNMag + std::min(-m_restitution * vNMag, 0.0));
 
     // Compute generalized inverse mass sum
     double w = 0.0;
     for (size_t i = 0; i < m_particles.size(); i++)
     {
-        w += computeGeneralizedInvMass(bodies, i, m_r[i]);
+        w += computeGeneralizedInvMass(bodies, i, m_r[i]) /** m_dcdx[i].squaredNorm()*/;
     }
     if (w == 0.0)
     {
         return;
     }
-
-    // How to apply dV to deformable particles
-    // Do I compute relative velocity per particle?
-    // Do I compute relative velocity between contact point? (seems right)
-    //  if I do this how do I apply the correction back to the deformable
 
     const Vec3d p = dV / w;
     for (size_t i = 0; i < m_particles.size(); i++)
@@ -156,14 +134,7 @@ PbdContactConstraint::correctVelocity(PbdState& bodies, const double dt)
         const double invMass = bodies.getInvMass(m_particles[i]);
         if (invMass > 0.0)
         {
-            Vec3d p1 = p;
-            /*if (bodies.getBodyType(m_particles[i]) != PbdBody::Type::RIGID)
-            {
-                p1 *= -1.0;
-            }*/
-
-            // \todo: Need to apply negative/opposite to other "side"
-            bodies.getVelocity(m_particles[i]) += p1 * invMass;
+            bodies.getVelocity(m_particles[i]) += p * invMass * m_weights[i];
 
             if (bodies.getBodyType(m_particles[i]) == PbdBody::Type::RIGID)
             {
@@ -181,10 +152,27 @@ PbdContactConstraint::correctVelocity(PbdState& bodies, const double dt)
     }
 }
 
+void
+PbdTriangleToBodyConstraint::initConstraint(
+    const PbdState& state,
+    const PbdParticleId& bodyId,
+    const Vec3d contactPtOnBody,
+    const PbdParticleId& x0, const PbdParticleId& x1, const PbdParticleId& x2,
+    const double compliance)
+{
+    m_particles[0] = bodyId;
+    // Compute local position on body
+    m_r[0] = contactPtOnBody - state.getPosition(bodyId);
+    m_particles[1] = x0;
+    m_particles[2] = x1;
+    m_particles[3] = x2;
+
+    setCompliance(compliance);
+}
+
 bool
-PbdTriangleToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
-                                                     double&             c,
-                                                     std::vector<Vec3d>& n)
+PbdTriangleToBodyConstraint::computeInterpolantsAndContact(const PbdState& bodies,
+                                                           std::vector<double>& weights, Vec3d& contactNormal, double& depth) const
 {
     const Vec3d& bodyPos = bodies.getPosition(m_particles[0]);
     const Vec3d& x1      = bodies.getPosition(m_particles[1]);
@@ -206,35 +194,101 @@ PbdTriangleToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
     const double denom = d00 * d11 - d01 * d01;
     if (fabs(denom) < 1e-12)
     {
-        c = 0.0;
         return false;
     }
-    const double v = (d11 * d20 - d01 * d21) / denom;
-    const double w = (d00 * d21 - d01 * d20) / denom;
-    const double u = 1.0 - v - w;
+    // Point
+    weights[0] = 1.0;
+    // Triangle
+    weights[3] = (d11 * d20 - d01 * d21) / denom;
+    weights[2] = (d00 * d21 - d01 * d20) / denom;
+    weights[1] = 1.0 - weights[2] - weights[3];
 
     // This constraint becomes invalid if moved out of the triangle
-    if (u < 0.0 || v < 0.0 || w < 0.0)
+    if (weights[1] < 0.0 || weights[2] < 0.0 || weights[3] < 0.0)
+    {
+        return false;
+    }
+
+    // Triangle normal (pointing up on standard counter clockwise triangle)
+    contactNormal = v0.cross(v1).normalized();
+    // Point could be on either side of triangle, we want to resolve to the triangles plane
+    depth = v2.dot(contactNormal);
+
+    return true;
+}
+
+bool
+PbdTriangleToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
+                                                     double&             c,
+                                                     std::vector<Vec3d>& n)
+{
+    Vec3d  uvw    = Vec3d::Zero();
+    Vec3d  normal = Vec3d::Zero();
+    double depth  = 0.0;
+    if (!computeInterpolantsAndContact(bodies, m_weights, normal, depth))
     {
         c = 0.0;
         return false;
     }
 
-    // Triangle normal (pointing up on standard counter clockwise triangle)
-    const Vec3d normal = v0.cross(v1).normalized();
-    // Point could be on either side of triangle, we want to resolve to the triangles plane
-    const double l = v2.dot(normal);
-
     // A
     n[0] = normal;
     // B
-    n[1] = -u * normal;
-    n[2] = -v * normal;
-    n[3] = -w * normal;
+    n[1] = -m_weights[1] * normal;
+    n[2] = -m_weights[2] * normal;
+    n[3] = -m_weights[3] * normal;
 
-    c = l;
+    c = depth;
 
     return true;
+}
+
+Vec3d
+PbdTriangleToBodyConstraint::computeRelativeVelocity(PbdState& bodies)
+{
+    Vec3d  normal = Vec3d::Zero();
+    double depth  = 0.0;
+    if (!computeInterpolantsAndContact(bodies, m_weights, normal, depth))
+    {
+        return Vec3d::Zero();
+    }
+    m_weights[0] = -m_weights[0];
+
+    const Vec3d& bodyPos = bodies.getPosition(m_particles[0]);
+    // Global position
+    const Vec3d contactPt = bodyPos + m_r[0];
+    const Vec3d v0 = getVelocityOnRigidBody(bodies, m_particles[0].first, contactPt);
+
+    //const Vec3d& x1 = bodies.getPosition(m_particles[1]);
+    const Vec3d& v1 = bodies.getPosition(m_particles[1]);
+    //const Vec3d& x2 = bodies.getPosition(m_particles[2]);
+    const Vec3d& v2 = bodies.getPosition(m_particles[2]);
+    //const Vec3d& x3 = bodies.getPosition(m_particles[3]);
+    const Vec3d& v3   = bodies.getPosition(m_particles[3]);
+    const Vec3d  v123 = v1 * m_weights[1] + v2 * m_weights[2] + v3 * m_weights[3];
+
+    // Assumed equal and opposite normals/constraint gradients
+    const Vec3d contactNormal = m_dcdx[0].normalized();
+
+    // We can also assume equal and opposite normals/constraint gradients
+    return v0 - v123;
+}
+
+void
+PbdVertexToBodyConstraint::initConstraint(
+    const PbdState&      state,
+    const PbdParticleId& bodyId,
+    const Vec3d          contactPtOnBody,
+    const PbdParticleId& x0,
+    const double         compliance)
+{
+    m_particles[0] = bodyId;
+    // Compute local position on body
+    m_r[0] = contactPtOnBody - state.getPosition(bodyId);
+    m_particles[1] = x0;
+
+    // Infinite stiffness/completely rigid
+    setCompliance(compliance);
 }
 
 bool
@@ -268,10 +322,42 @@ PbdVertexToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
     return true;
 }
 
+Vec3d
+PbdVertexToBodyConstraint::computeRelativeVelocity(PbdState& bodies)
+{
+    const Vec3d& bodyPos = bodies.getPosition(m_particles[0]);
+    // Global position
+    const Vec3d contactPt = bodyPos + m_r[0];
+    const Vec3d v0 = getVelocityOnRigidBody(bodies, m_particles[0].first, contactPt);
+
+    m_weights[0] = 1.0;
+    m_weights[1] = -1.0;
+
+    //const Vec3d& x1 = bodies.getPosition(m_particles[1]);
+    const Vec3d& v1 = bodies.getVelocity(m_particles[1]);
+    return v0 - v1;
+}
+
+void
+PbdEdgeToBodyConstraint::initConstraint(
+    const PbdState& state,
+    const PbdParticleId& bodyId,
+    const Vec3d contactPtOnBody,
+    const PbdParticleId& x0, const PbdParticleId& x1,
+    const double compliance)
+{
+    m_particles[0] = bodyId;
+    // Compute local position on body
+    m_r[0] = contactPtOnBody - state.getPosition(bodyId);
+    m_particles[1] = x0;
+    m_particles[2] = x1;
+
+    setCompliance(compliance);
+}
+
 bool
-PbdEdgeToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
-                                                 double&             c,
-                                                 std::vector<Vec3d>& n)
+PbdEdgeToBodyConstraint::computeInterpolantsAndContact(const PbdState& bodies,
+                                                       std::vector<double>& weights, Vec3d& normal, double& depth) const
 {
     const Vec3d& bodyPos = bodies.getPosition(m_particles[0]);
 
@@ -286,8 +372,6 @@ PbdEdgeToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
     const double length = ab.norm();
     if (length == 0.0)
     {
-        // There is no distance between the edge, can't do anything
-        c = 0.0;
         return false;
     }
     const Vec3d dir1 = ab / length;
@@ -297,7 +381,6 @@ PbdEdgeToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
     const double p1   = dir1.dot(diff);
     if (p1 < 0.0 || p1 > length)
     {
-        c = 0.0;
         return false;
     }
     // Remove tangent component to get normal
@@ -305,45 +388,69 @@ PbdEdgeToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
     const double l     = diff1.norm();
     if (l == 0.0)
     {
-        // The point is on the line
-        c = 0.0;
         return false;
     }
-    const Vec3d  normal = diff1 / l;
-    const double u      = p1 / length;
+    normal = diff1 / l;
+    const double u = p1 / length;
 
-    // A
-    n[0] = normal;
-    // B
-    n[1] = -(1.0 - u) * normal;
-    n[2] = -u * normal;
+    // Point
+    weights[0] = 1.0;
+    // Edge
+    weights[1] = (1.0 - u);
+    weights[2] = u;
 
-    c = l;
-
+    depth = l;
     return true;
 }
 
 bool
-PbdBodyToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
+PbdEdgeToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
                                                  double&             c,
                                                  std::vector<Vec3d>& n)
 {
-    const Vec3d& bodyPos0 = bodies.getPosition(m_particles[0]);
-    const Vec3d  p0       = bodyPos0 + m_r[0];
-
-    const Vec3d& bodyPos1 = bodies.getPosition(m_particles[1]);
-    const Vec3d  p1       = bodyPos1 + m_r[1];
-
-    const Vec3d diff = p1 - p0;
-
-    c = diff.dot(m_contactNormal);
+    Vec3d  uvw    = Vec3d::Zero();
+    Vec3d  normal = Vec3d::Zero();
+    double depth  = 0.0;
+    if (!computeInterpolantsAndContact(bodies, m_weights, normal, depth))
+    {
+        c = 0.0;
+        return false;
+    }
 
     // A
-    n[0] = -m_contactNormal;
+    n[0] = normal;
     // B
-    n[1] = m_contactNormal;
+    n[1] = -m_weights[1] * normal;
+    n[2] = -m_weights[2] * normal;
+
+    c = depth;
 
     return true;
+}
+
+Vec3d
+PbdEdgeToBodyConstraint::computeRelativeVelocity(PbdState& bodies)
+{
+    Vec2d  uv     = Vec2d::Zero();
+    Vec3d  normal = Vec3d::Zero();
+    double depth  = 0.0;
+    if (!computeInterpolantsAndContact(bodies, m_weights, normal, depth))
+    {
+        return Vec3d::Zero();
+    }
+    m_weights[0] = -m_weights[0];
+
+    const Vec3d& bodyPos = bodies.getPosition(m_particles[0]);
+    // Global position
+    const Vec3d contactPt = bodyPos + m_r[0];
+    const Vec3d v0 = getVelocityOnRigidBody(bodies, m_particles[0].first, contactPt);
+
+    //const Vec3d& x1 = bodies.getPosition(m_particles[1]);
+    const Vec3d& v1 = bodies.getPosition(m_particles[1]);
+    //const Vec3d& x2 = bodies.getPosition(m_particles[2]);
+    const Vec3d& v2  = bodies.getPosition(m_particles[2]);
+    const Vec3d  v12 = v1 * m_weights[1] + v2 * m_weights[2];
+    return v0 - v12;
 }
 
 bool

@@ -6,35 +6,30 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCompositeImplicitGeometry.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkImplicitGeometryToImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLineMesh.h"
-#include "imstkLogger.h"
-#include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdContactConstraint.h"
+#include "imstkOrientedBox.h"
 #include "imstkPbdHingeJointConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
-#include "imstkPbdObjectController.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSphere.h"
-#include "imstkVisualModel.h"
-#include "imstkVTKViewer.h"
-#include "imstkCompositeImplicitGeometry.h"
-#include "imstkImplicitGeometryToImageData.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
 #include "imstkSurfaceMeshSubdivide.h"
-#include "imstkOrientedBox.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -92,164 +87,6 @@ makeTissueObj(const std::string& name,
     return pbdObject;
 }
 
-///
-/// \brief Creates tissue object
-///
-static std::shared_ptr<PbdObject>
-makeTriTissueObj(const std::string& name,
-                 std::shared_ptr<PbdModel> model,
-                 const double particleMassValue,
-                 const double distStiffness, const double bendStiffness)
-{
-    // Setup the Geometry
-    auto                    tissueMesh = std::make_shared<SurfaceMesh>();
-    VecDataArray<double, 3> vertices   = { Vec3d(-0.1, 0.0, -0.1), Vec3d(0.0, 0.0, 0.1), Vec3d(0.1, 0.0, -0.1) };
-    VecDataArray<int, 3>    indices    = { Vec3i(0, 1, 2) };
-    tissueMesh->initialize(std::make_shared<VecDataArray<double, 3>>(vertices),
-        std::make_shared<VecDataArray<int, 3>>(indices));
-
-    // Setup the Parameters
-    //model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, distStiffness);
-    //model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, bendStiffness);
-
-    // Setup the VisualModel
-    auto material = std::make_shared<RenderMaterial>();
-    material->setBackFaceCulling(false);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
-
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(tissueMesh);
-    visualModel->setRenderMaterial(material);
-
-    // Setup the Object
-    auto pbdObject = std::make_shared<PbdObject>(name);
-    pbdObject->addVisualModel(visualModel);
-    pbdObject->setPhysicsGeometry(tissueMesh);
-    pbdObject->setCollidingGeometry(tissueMesh);
-    pbdObject->setDynamicalModel(model);
-
-    pbdObject->getPbdBody()->uniformMassValue = particleMassValue;
-
-    return pbdObject;
-}
-
-static void
-sausageScene()
-{
-    // Write log to stdout and file
-    Logger::startLogger();
-
-    // Setup a scene
-    auto scene = std::make_shared<Scene>("PbdRigidBody");
-    scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
-    scene->getActiveCamera()->setPosition(-0.0237419, 0.0368787, 0.338374);
-    scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
-
-    auto pbdModel  = std::make_shared<PbdModel>();
-    auto pbdConfig = std::make_shared<PbdModelConfig>();
-    pbdConfig->m_gravity = Vec3d(-1.0, 0.0, 0.0);
-    //pbdConfig->m_gravity = Vec3d(0.0, -9.8, 0.0);
-    pbdConfig->m_dt = 0.005;
-    pbdConfig->m_iterations = 5;
-    pbdConfig->m_linearDampingCoeff  = 0.03;
-    pbdConfig->m_angularDampingCoeff = 0.03;
-    pbdConfig->m_doPartitioning      = false;
-    pbdModel->configure(pbdConfig);
-
-    // Setup a capsule
-
-    auto makeCapsuleObj = [&](std::string name, Vec3d pos)
-                          {
-                              auto rigidObj = std::make_shared<PbdObject>(name);
-
-                              // Setup line geometry
-                              //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.5);
-                              auto rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.1, 0.0), 0.25, 1.0);
-                              rigidObj->setVisualGeometry(rigidGeom);
-                              rigidObj->setCollidingGeometry(rigidGeom);
-                              rigidObj->setPhysicsGeometry(rigidGeom);
-
-                              // Setup material
-                              rigidObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.0, 0.0));
-                              rigidObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-                              rigidObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-                              rigidObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-                              rigidObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
-
-                              rigidObj->setDynamicalModel(pbdModel);
-
-                              // Setup body
-                              //const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 0.0, 0.0).normalized());
-                              rigidObj->getPbdBody()->setRigid(pos, 1.0,
-            Quatd::Identity(), Mat3d::Identity() * 0.1);
-                              return rigidObj;
-                          };
-    std::shared_ptr<PbdObject> capsule0Obj = makeCapsuleObj("capsule0Obj", Vec3d(0.0, 0.0, 0.0));
-    scene->addSceneObject(capsule0Obj);
-    std::shared_ptr<PbdObject> capsule1Obj = makeCapsuleObj("capsule1Obj", Vec3d(0.0, -1.0, 0.0));
-    scene->addSceneObject(capsule1Obj);
-
-    // Add custom constraint to connect the two capsules
-    pbdModel->getConfig()->addPbdConstraintFunctor([&](PbdConstraintContainer& container)
-        {
-            auto distConstraint1 = std::make_shared<PbdBodyToBodyDistanceConstraint>();
-            distConstraint1->initConstraint(pbdModel->getBodies(),
-                { capsule0Obj->getPbdBody()->bodyHandle, 0 }, Vec3d(0.0, -0.5, 0.0),
-                { capsule1Obj->getPbdBody()->bodyHandle, 0 }, Vec3d(0.0, -0.5, 0.0), 0.001);
-            container.addConstraint(distConstraint1);
-
-            const PbdParticleId& pid = pbdModel->addVirtualParticle(Vec3d(0.0, 0.0, 0.0), 0.0, Vec3d::Zero(), true);
-
-            // Add a constraint to fix the first one positionally
-            auto distConstraint2 = std::make_shared<PbdDistanceConstraint>();
-            distConstraint2->initConstraint(0.0,
-                { capsule0Obj->getPbdBody()->bodyHandle, 0 }, pid, 1000.0);
-            container.addConstraint(distConstraint2);
-        });
-
-    // Light
-    auto light = std::make_shared<DirectionalLight>();
-    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-    light->setIntensity(1.0);
-    scene->addLight("Light", light);
-
-    // Run the simulation
-    {
-        // Setup a viewer to render
-        auto viewer = std::make_shared<VTKViewer>();
-        viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
-        viewer->setActiveScene(scene);
-        viewer->setDebugAxesLength(0.01, 0.01, 0.01);
-
-        // Setup a scene manager to advance the scene
-        auto sceneManager = std::make_shared<SceneManager>();
-        sceneManager->setActiveScene(scene);
-        sceneManager->pause(); // Start simulation paused
-
-        auto driver = std::make_shared<SimulationManager>();
-        driver->addModule(viewer);
-        driver->addModule(sceneManager);
-        driver->setDesiredDt(0.005);
-
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
-
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
-
-        driver->start();
-    }
-}
-
 static void
 planeContactScene()
 {
@@ -295,6 +132,7 @@ planeContactScene()
         // Setup material
         rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.0, 0.0));
         rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
         rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
         rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
         rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
@@ -303,10 +141,8 @@ planeContactScene()
 
         // Setup body
         const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 1.0, 1.0).normalized());
-        //const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 0.0, 0.0).normalized());
-        //const Mat3d inertia = Mat3d::Identity() * 100.0;
         rigidPbdObj->getPbdBody()->setRigid(Vec3d(0.0, 0.2, 0.0),
-            1.0, orientation, Mat3d::Identity() * 0.005);
+            1.0, orientation, Mat3d::Identity() * 0.01);
     }
     scene->addSceneObject(rigidPbdObj);
 
@@ -813,10 +649,9 @@ hingeScene()
 int
 main()
 {
-    tissueCapsuleDrop();
-    //planeContactScene();
+    //tissueCapsuleDrop();
+    planeContactScene();
     //hingeScene();
-    //sausageScene();
     //bowlScene();
 
     return 0;

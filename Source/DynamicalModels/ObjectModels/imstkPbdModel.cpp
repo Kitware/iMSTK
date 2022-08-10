@@ -100,7 +100,9 @@ PbdModel::addVirtualParticle(
 {
     const int virtualBufferId = static_cast<int>(persist);
 
+    m_state.m_bodies[virtualBufferId]->prevVertices->push_back(pos);
     m_state.m_bodies[virtualBufferId]->vertices->push_back(pos);
+    m_state.m_bodies[virtualBufferId]->prevOrientations->push_back(orientation);
     m_state.m_bodies[virtualBufferId]->orientations->push_back(orientation);
     m_state.m_bodies[virtualBufferId]->velocities->push_back(velocity);
     m_state.m_bodies[virtualBufferId]->angularVelocities->push_back(angularVelocity);
@@ -108,10 +110,12 @@ PbdModel::addVirtualParticle(
     m_state.m_bodies[virtualBufferId]->invMasses->push_back((mass == 0.0) ? 0.0 : 1.0 / mass);
     m_state.m_bodies[virtualBufferId]->inertias->push_back(inertia);
     Mat3d invInertia = Mat3d::Zero();
-    if (inertia.determinant() != 0.0)
+    if (inertia.determinant() == 0.0)
     {
-        invInertia = inertia.inverse();
+        LOG(FATAL) << "Tried to add virtual particle with non-invertible inertia";
+        return { -1, -1 };
     }
+    invInertia = inertia.inverse();
     m_state.m_bodies[virtualBufferId]->invInertias->push_back(invInertia);
     return { virtualBufferId, m_state.m_bodies[virtualBufferId]->vertices->size() - 1 };
 }
