@@ -19,6 +19,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectGrasping.h"
@@ -52,25 +53,13 @@ makeTissueObj(const std::string& name,
     imstkNew<PbdModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 10000.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.1);
-    for (int x = 0; x < rowCount; x++)
-    {
-        for (int y = 0; y < colCount; y++)
-        {
-            if (x == 0 || y == 0 || x == rowCount - 1 || y == colCount - 1)
-            {
-                pbdParams->m_fixedNodeIds.push_back(x * colCount + y);
-            }
-        }
-    }
-    pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0.0, -0.01, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 4;
-    pbdParams->m_viscousDampingCoeff = 0.01;
+    pbdParams->m_linearDampingCoeff = 0.01;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(mesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
@@ -92,6 +81,17 @@ makeTissueObj(const std::string& name,
     tissueObj->setPhysicsGeometry(mesh);
     tissueObj->setCollidingGeometry(mesh);
     tissueObj->setDynamicalModel(pbdModel);
+    for (int x = 0; x < rowCount; x++)
+    {
+        for (int y = 0; y < colCount; y++)
+        {
+            if (x == 0 || y == 0 || x == rowCount - 1 || y == colCount - 1)
+            {
+                tissueObj->getPbdBody()->fixedNodeIds.push_back(x * colCount + y);
+            }
+        }
+    }
+    tissueObj->getPbdBody()->uniformMassValue = 1.0;
 
     return tissueObj;
 }

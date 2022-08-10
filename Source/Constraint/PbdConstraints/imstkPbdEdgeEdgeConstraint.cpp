@@ -10,29 +10,27 @@ namespace imstk
 {
 void
 PbdEdgeEdgeConstraint::initConstraint(
-    VertexMassPair ptA1, VertexMassPair ptA2,
-    VertexMassPair ptB1, VertexMassPair ptB2,
+    const PbdParticleId& ptA1, const PbdParticleId& ptA2,
+    const PbdParticleId& ptB1, const PbdParticleId& ptB2,
     double stiffnessA, double stiffnessB)
 {
-    m_stiffnessA = stiffnessA;
-    m_stiffnessB = stiffnessB;
+    m_particles[0] = ptA1;
+    m_particles[1] = ptA2;
+    m_particles[2] = ptB1;
+    m_particles[3] = ptB2;
 
-    m_bodiesFirst[0] = ptA1;
-    m_bodiesFirst[1] = ptA2;
-
-    m_bodiesSecond[0] = ptB1;
-    m_bodiesSecond[1] = ptB2;
+    m_stiffness[0] = stiffnessA;
+    m_stiffness[1] = stiffnessB;
 }
 
 bool
-PbdEdgeEdgeConstraint::computeValueAndGradient(double&             c,
-                                               std::vector<Vec3d>& dcdxA,
-                                               std::vector<Vec3d>& dcdxB) const
+PbdEdgeEdgeConstraint::computeValueAndGradient(PbdState& bodies,
+                                               double& c, std::vector<Vec3d>& dcdx)
 {
-    const Vec3d& x0 = *m_bodiesFirst[0].vertex;
-    const Vec3d& x1 = *m_bodiesFirst[1].vertex;
-    const Vec3d& x2 = *m_bodiesSecond[0].vertex;
-    const Vec3d& x3 = *m_bodiesSecond[1].vertex;
+    const Vec3d& x0 = bodies.getPosition(m_particles[0]);
+    const Vec3d& x1 = bodies.getPosition(m_particles[1]);
+    const Vec3d& x2 = bodies.getPosition(m_particles[2]);
+    const Vec3d& x3 = bodies.getPosition(m_particles[3]);
 
     const double a  = (x3 - x2).dot(x1 - x0);
     const double b  = (x1 - x0).dot(x1 - x0);
@@ -70,10 +68,12 @@ PbdEdgeEdgeConstraint::computeValueAndGradient(double&             c,
         return false;
     }
 
-    dcdxA[0] = (1 - t) * n;
-    dcdxA[1] = t * n;
-    dcdxB[0] = -(1 - s) * n;
-    dcdxB[1] = -s * n;
+    // A
+    dcdx[0] = (1 - t) * n;
+    dcdx[1] = t * n;
+    // B
+    dcdx[2] = -(1 - s) * n;
+    dcdx[3] = -s * n;
 
     c = l;
 

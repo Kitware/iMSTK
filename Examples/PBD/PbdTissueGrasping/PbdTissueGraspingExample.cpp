@@ -18,6 +18,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectGrasping.h"
@@ -91,15 +92,14 @@ makeTissueObj(const std::string& name,
         //    gives complete bulk where its rigid
         //  - Youngs modulus then gives the scaling of the above in pressure
         //    (pascals).
-        pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+        pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
     }
     else
     {
         pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100000.0);
         pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100000.0);
     }
-    pbdParams->m_doPartitioning   = false;
-    pbdParams->m_uniformMassValue = 100.0;
+    pbdParams->m_doPartitioning = false;
     pbdParams->m_dt = 0.001; // realtime used in update calls later in main
     pbdParams->m_iterations = 5;
 
@@ -110,26 +110,10 @@ makeTissueObj(const std::string& name,
     // Ultimately this is a result of not modelling everything around the tissue.
     // and poor/hard to model boundary conditions.
     pbdParams->m_gravity = Vec3d::Zero();
-    pbdParams->m_viscousDampingCoeff = 0.03; // Removed from velocity
-
-    // Fix the borders
-    for (int z = 0; z < dim[2]; z++)
-    {
-        for (int y = 0; y < dim[1]; y++)
-        {
-            for (int x = 0; x < dim[0]; x++)
-            {
-                if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
-                {
-                    pbdParams->m_fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
-                }
-            }
-        }
-    }
+    pbdParams->m_linearDampingCoeff = 0.03; // Removed from velocity
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(tissueMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the material
@@ -156,6 +140,21 @@ makeTissueObj(const std::string& name,
     tissueObj->setCollidingGeometry(surfMesh);
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->getPbdBody()->uniformMassValue = 100.0;
+    // Fix the borders
+    for (int z = 0; z < dim[2]; z++)
+    {
+        for (int y = 0; y < dim[1]; y++)
+        {
+            for (int x = 0; x < dim[0]; x++)
+            {
+                if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
+                {
+                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                }
+            }
+        }
+    }
 
     return tissueObj;
 }

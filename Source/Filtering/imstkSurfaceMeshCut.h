@@ -6,24 +6,14 @@
 
 #pragma once
 
-#include "imstkGeometryAlgorithm.h"
-#include "imstkMath.h"
-
-#include <map>
-#include <unordered_set>
-#include <set>
+#include "imstkMeshCut.h"
 
 namespace imstk
 {
-class AnalyticalGeometry;
-class Geometry;
-class SurfaceMesh;
-template<typename T, int N> class VecDataArray;
-
 // vertex on the plane (0), positive side (+1), negative side (-1)
 // pt0 and pt1 follows the triangle's indexing order when tri is presented
 // c0 and c1 are cutting coordinates stored in cutData
-enum class CutType
+enum class TriCutType
 {
     NONE = 0,
     /* triangle is not cut through
@@ -68,74 +58,39 @@ enum class CutType
     VERT_VERT
 };
 
-struct CutData
-{
-    public:
-        Vec3d cutCoords[2];
-        Vec3d initCoords[2];
-        int triId       = -1;
-        int ptIds[2]    = { -1, -1 };
-        CutType cutType = CutType::NONE;
-};
-
 ///
 /// \class SurfaceMeshCut
 ///
 /// \brief This filter cuts the triangles of a SurfaceMesh into smaller
-/// triangles using input cutData
-/// \todo: test
+/// triangles using input cutting geometry
 ///
-class SurfaceMeshCut : public GeometryAlgorithm
+class SurfaceMeshCut : public MeshCut
 {
 public:
     SurfaceMeshCut();
     ~SurfaceMeshCut() override = default;
 
-public:
     std::shared_ptr<SurfaceMesh> getOutputMesh();
     void setInputMesh(std::shared_ptr<SurfaceMesh> inputSurf);
-    std::shared_ptr<std::map<int, int>> getCutVertMap() { return m_CutVertMap; }
-
-    imstkGetMacro(CutData, std::shared_ptr<std::vector<CutData>>);
-    imstkSetMacro(CutData, std::shared_ptr<std::vector<CutData>>);
-    imstkGetMacro(CutGeometry, std::shared_ptr<Geometry>);
-    imstkSetMacro(CutGeometry, std::shared_ptr<Geometry>);
-    imstkGetMacro(Epsilon, double);
-    imstkSetMacro(Epsilon, double);
-    imstkGetMacro(RemoveConstraintVertices, std::shared_ptr<std::unordered_set<size_t>>);
-    imstkGetMacro(AddConstraintVertices, std::shared_ptr<std::unordered_set<size_t>>);
 
 protected:
-    void requestUpdate() override;
+    void refinement(std::shared_ptr<AbstractCellMesh> outputGeom,
+                    std::map<int, bool>& cutVerts) override;
 
-    void refinement(std::shared_ptr<SurfaceMesh> outputSurf,
-                    std::map<int, bool>& cutVerts);
-
-    void splitVerts(std::shared_ptr<SurfaceMesh> outputSurf,
+    void splitVerts(std::shared_ptr<AbstractCellMesh> outputGeom,
                     std::map<int, bool>& cutVerts,
-                    std::shared_ptr<Geometry> geometry);
+                    std::shared_ptr<Geometry> cuttingGeom) override;
 
-    int pointOnGeometrySide(Vec3d pt, std::shared_ptr<Geometry> geometry);
+    std::shared_ptr<std::vector<CutData>> generateCutData(
+        std::shared_ptr<Geometry>         cuttingGeom,
+        std::shared_ptr<AbstractCellMesh> geomToCut) override;
 
-    int pointOnAnalyticalSide(Vec3d pt, std::shared_ptr<AnalyticalGeometry> geometry);
+    std::shared_ptr<std::vector<CutData>> generateImplicitCutData(
+        std::shared_ptr<AnalyticalGeometry> cuttingGeom,
+        std::shared_ptr<SurfaceMesh>        geomToCut);
 
-    bool vertexOnBoundary(std::shared_ptr<VecDataArray<int, 3>> triangleIndices,
-                          std::set<int>& triSet);
-
-    bool pointProjectionInSurface(const Vec3d& pt, std::shared_ptr<SurfaceMesh> cutSurf);
-
-    void generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> geometry,
-                                   std::shared_ptr<SurfaceMesh>        outputSurf);
-
-    void generateSurfaceMeshCutData(std::shared_ptr<SurfaceMesh> cutSurf,
-                                    std::shared_ptr<SurfaceMesh> outputSurf);
-
-private:
-    std::shared_ptr<std::vector<CutData>> m_CutData    = std::make_shared<std::vector<CutData>>();
-    std::shared_ptr<std::map<int, int>>   m_CutVertMap = std::make_shared<std::map<int, int>>();
-    std::shared_ptr<Geometry> m_CutGeometry = nullptr;
-    std::shared_ptr<std::unordered_set<size_t>> m_RemoveConstraintVertices = nullptr;
-    std::shared_ptr<std::unordered_set<size_t>> m_AddConstraintVertices    = nullptr;
-    double m_Epsilon = 1;
+    std::shared_ptr<std::vector<CutData>> generateSurfaceMeshCutData(
+        std::shared_ptr<SurfaceMesh> cuttingGeom,
+        std::shared_ptr<SurfaceMesh> geomToCut);
 };
 } // namespace imstk

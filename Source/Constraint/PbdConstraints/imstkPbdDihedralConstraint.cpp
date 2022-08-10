@@ -9,25 +9,18 @@
 namespace  imstk
 {
 void
-PbdDihedralConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                                      const size_t& pIdx0,
-                                      const size_t& pIdx1,
-                                      const size_t& pIdx2,
-                                      const size_t& pIdx3,
-                                      const double k)
+PbdDihedralConstraint::initConstraint(
+    const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
+    const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
+    const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
+    const double k)
 {
-    m_vertexIds[0] = pIdx0;
-    m_vertexIds[1] = pIdx1;
-    m_vertexIds[2] = pIdx2;
-    m_vertexIds[3] = pIdx3;
+    m_particles[0] = pIdx0;
+    m_particles[1] = pIdx1;
+    m_particles[2] = pIdx2;
+    m_particles[3] = pIdx3;
 
-    m_stiffness  = k;
-    m_compliance = 1.0 / k;
-
-    const Vec3d& p0 = initVertexPositions[pIdx0];
-    const Vec3d& p1 = initVertexPositions[pIdx1];
-    const Vec3d& p2 = initVertexPositions[pIdx2];
-    const Vec3d& p3 = initVertexPositions[pIdx3];
+    setStiffness(k);
 
     const Vec3d n1 = (p2 - p0).cross(p3 - p0).normalized();
     const Vec3d n2 = (p3 - p1).cross(p2 - p1).normalized();
@@ -36,36 +29,29 @@ PbdDihedralConstraint::initConstraint(const VecDataArray<double, 3>& initVertexP
 }
 
 bool
-PbdDihedralConstraint::computeValueAndGradient(
-    const VecDataArray<double, 3>& currVertexPositions,
-    double& c,
-    std::vector<Vec3d>& dcdx) const
+PbdDihedralConstraint::computeValueAndGradient(PbdState& bodies,
+                                               double& c, std::vector<Vec3d>& dcdx)
 {
-    const auto i0 = m_vertexIds[0];
-    const auto i1 = m_vertexIds[1];
-    const auto i2 = m_vertexIds[2];
-    const auto i3 = m_vertexIds[3];
+    const Vec3d& p0 = bodies.getPosition(m_particles[0]);
+    const Vec3d& p1 = bodies.getPosition(m_particles[1]);
+    const Vec3d& p2 = bodies.getPosition(m_particles[2]);
+    const Vec3d& p3 = bodies.getPosition(m_particles[3]);
 
-    const Vec3d& p0 = currVertexPositions[i0];
-    const Vec3d& p1 = currVertexPositions[i1];
-    const Vec3d& p2 = currVertexPositions[i2];
-    const Vec3d& p3 = currVertexPositions[i3];
-
-    const auto e  = p3 - p2;
-    const auto e1 = p3 - p0;
-    const auto e2 = p0 - p2;
-    const auto e3 = p3 - p1;
-    const auto e4 = p1 - p2;
+    const Vec3d e  = p3 - p2;
+    const Vec3d e1 = p3 - p0;
+    const Vec3d e2 = p0 - p2;
+    const Vec3d e3 = p3 - p1;
+    const Vec3d e4 = p1 - p2;
     // To accelerate, all normal (area) vectors and edge length should be precomputed in parallel
-    auto       n1 = e1.cross(e);
-    auto       n2 = e.cross(e3);
-    const auto A1 = n1.norm();
-    const auto A2 = n2.norm();
+    Vec3d        n1 = e1.cross(e);
+    Vec3d        n2 = e.cross(e3);
+    const double A1 = n1.norm();
+    const double A2 = n2.norm();
     n1 /= A1;
     n2 /= A2;
 
     const double l = e.norm();
-    if (l < m_epsilon)
+    if (l < 1.0e-16)
     {
         return false;
     }

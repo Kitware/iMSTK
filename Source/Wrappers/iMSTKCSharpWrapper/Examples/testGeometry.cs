@@ -52,17 +52,15 @@ public class PbdCloth
 
         Console.WriteLine("vol = {0}", tetMesh.getVolume());
         Console.WriteLine("numberOfTets = {0}", tetMesh.getNumTetrahedra());
-        Vec4i conn_tet = tetMesh.getTetrahedronIndices(0);
+        Vec4i conn_tet = tetMesh.getCells()[0];
         Console.WriteLine("conn[0] = [{0}, {1}, {2}, {3}]", conn_tet[0], conn_tet[1], conn_tet[2], conn_tet[3]);
 
         {
             VecDataArray4i conn2 = tetMesh.getTetrahedraIndices();
             conn2[0] = new Vec4i(1, 2, 3, 0);
-            Vec4i new_conn_tet = tetMesh.getTetrahedronIndices(0);
+            Vec4i new_conn_tet = tetMesh.getCells()[0];
             Console.WriteLine("conn[0] = [{0}, {1}, {2}, {3}]", new_conn_tet[0], new_conn_tet[1], new_conn_tet[2], new_conn_tet[3]);
         }
-
-        tetMesh.print();
 
         PointSet asianDragonMesh = MeshIO.read("/home/jianfeng/Documents/imstk/build_csharp_shared/install/data/asianDragon/asianDragon.veg");
         // asianDragonMesh.print();

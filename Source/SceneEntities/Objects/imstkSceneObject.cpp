@@ -6,10 +6,9 @@
 
 #include "imstkSceneObject.h"
 #include "imstkGeometry.h"
+#include "imstkLogger.h"
 #include "imstkTaskGraph.h"
 #include "imstkVisualModel.h"
-
-#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -60,5 +59,15 @@ SceneObject::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Ta
     m_taskGraph->addEdge(source, m_updateNode);
     m_taskGraph->addEdge(m_updateNode, m_updateGeometryNode);
     m_taskGraph->addEdge(m_updateGeometryNode, sink);
+}
+
+void
+SceneObject::postModifiedAll()
+{
+    // Assume geometry may be changed upon reset
+    for (auto visualModel : m_visualModels)
+    {
+        visualModel->getGeometry()->postModified();
+    }
 }
 } // namespace imstk

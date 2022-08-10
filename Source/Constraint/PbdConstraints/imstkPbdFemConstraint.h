@@ -48,7 +48,13 @@ public:
         NeoHookean
     };
 
-    PbdFemConstraint(const unsigned int cardinality, MaterialType mtype = MaterialType::StVK);
+    PbdFemConstraint(const unsigned int cardinality,
+                     MaterialType       mType = MaterialType::StVK) : PbdConstraint(cardinality),
+        m_initialElementVolume(0.0),
+        m_material(mType),
+        m_invRestMat(Mat3d::Identity())
+    {
+    }
 
 public:
     double       m_initialElementVolume = 0.0; ///< Volume of the element

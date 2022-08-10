@@ -42,7 +42,7 @@ struct PbdConstraintFunctor
         virtual ~PbdConstraintFunctor() = default;
 
         ///
-        /// \brief Appends a set of constraint to the container given a geometry
+        /// \brief Appends a set of constraint to the container given a geometry & body
         ///
         virtual void operator()(PbdConstraintContainer& constraints) = 0;
 
@@ -51,11 +51,47 @@ struct PbdConstraintFunctor
         /// and a set of newly inserted vertices
         /// This is for dealing with topology diffs during runtime
         ///
-        virtual void addConstraints(PbdConstraintContainer&                     imstkNotUsed(constraints),
-                                    std::shared_ptr<std::unordered_set<size_t>> imstkNotUsed(vertices)) { }
+        virtual void addConstraints(
+            PbdConstraintContainer&                     imstkNotUsed(constraints),
+            std::shared_ptr<std::unordered_set<size_t>> imstkNotUsed(vertices)) { }
+};
 
-        void setGeometry(std::shared_ptr<PointSet> geom) { m_geom = geom; }
+///
+/// \class PbdConstraintFunctorLambda
+///
+/// \brief PbdConstraintFunctor that can be forwarded out to a function pointer
+///
+struct PbdConstraintFunctorLambda : public PbdConstraintFunctor
+{
+    public:
+        PbdConstraintFunctorLambda() = default;
+        PbdConstraintFunctorLambda(std::function<void(PbdConstraintContainer&)> f) :
+            m_func(f) { }
 
+        void operator()(PbdConstraintContainer& constraints) override
+        {
+            m_func(constraints);
+        }
+
+        std::function<void(PbdConstraintContainer&)> m_func = nullptr;
+};
+
+///
+/// \class PbdBodyConstraintFunctor
+///
+/// \brief Abstract PbdConstraintFunctor that assumes usage of a singular body & geometry
+///
+struct PbdBodyConstraintFunctor : public PbdConstraintFunctor
+{
+    public:
+        void setGeometry(std::shared_ptr<PointSet> geom)
+        {
+            m_geom = geom;
+        }
+
+        void setBodyIndex(const int bodyIndex) { m_bodyIndex = bodyIndex; }
+
+        int m_bodyIndex = 1;
         std::shared_ptr<PointSet> m_geom = nullptr;
 };
 
@@ -65,7 +101,7 @@ struct PbdConstraintFunctor
 /// \brief PbdDistanceConstraintFunctor generates constraints between the edges of the input
 /// TetrahedralMesh, SurfaceMesh, or LineMesh
 ///
-struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
+struct PbdDistanceConstraintFunctor : public PbdBodyConstraintFunctor
 {
     public:
         PbdDistanceConstraintFunctor() = default;
@@ -76,10 +112,11 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
         ///
         virtual std::shared_ptr<PbdDistanceConstraint> makeDistConstraint(
             const VecDataArray<double, 3>& vertices,
-            size_t i1, size_t i2)
+            int i1, int i2)
         {
             auto constraint = std::make_shared<PbdDistanceConstraint>();
-            constraint->initConstraint(vertices, i1, i2, m_stiffness);
+            constraint->initConstraint(vertices[i1], vertices[i2],
+                { m_bodyIndex, i1 }, { m_bodyIndex, i2 }, m_stiffness);
             return constraint;
         }
 
@@ -89,7 +126,7 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
             const VecDataArray<double, 3>&           vertices    = *verticesPtr;
 
             auto addDistConstraint = [&](
-                std::vector<std::vector<bool>>& E, size_t i1, size_t i2)
+                std::vector<std::vector<bool>>& E, int i1, int i2)
                                      {
                                          // Make sure i1 is always smaller than i2 for duplicate testing
                                          if (i1 > i2)
@@ -107,7 +144,7 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
 
             if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom))
             {
-                std::shared_ptr<VecDataArray<int, 4>> elementsPtr = tetMesh->getTetrahedraIndices();
+                std::shared_ptr<VecDataArray<int, 4>> elementsPtr = tetMesh->getCells();
                 const VecDataArray<int, 4>&           elements    = *elementsPtr;
                 const auto                            nV = tetMesh->getNumVertices();
                 std::vector<std::vector<bool>>        E(nV, std::vector<bool>(nV, 1)); // To test for duplicates
@@ -140,7 +177,7 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
             }
             else if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_geom))
             {
-                std::shared_ptr<VecDataArray<int, 2>> elementsPtr = lineMesh->getLinesIndices();
+                std::shared_ptr<VecDataArray<int, 2>> elementsPtr = lineMesh->getCells();
                 const VecDataArray<int, 2>&           elements    = *elementsPtr;
                 const auto&                           nV = lineMesh->getNumVertices();
                 std::vector<std::vector<bool>>        E(nV, std::vector<bool>(nV, 1)); // To test for duplicates
@@ -157,56 +194,91 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
             }
         }
 
+        ///
+        /// \brief Called when topology changed
+        ///
         void addConstraints(PbdConstraintContainer&                     constraints,
                             std::shared_ptr<std::unordered_set<size_t>> vertices) override
         {
-            // Check for correct mesh type
-            CHECK(std::dynamic_pointer_cast<SurfaceMesh>(m_geom) != nullptr)
-                << "Add element constraints does not support current mesh type.";
-
-            auto                                     triMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_geom);
             std::shared_ptr<VecDataArray<double, 3>> initVerticesPtr = m_geom->getInitialVertexPositions();
-            std::shared_ptr<VecDataArray<int, 3>>    elementsPtr     = triMesh->getCells();
+            const VecDataArray<double, 3>&           initVertices    = *initVerticesPtr;
 
-            const VecDataArray<double, 3>& initVertices = *initVerticesPtr;
-            const VecDataArray<int, 3>&    elements     = *elementsPtr;
+            std::set<std::pair<int, int>> distanceSet;
+            if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_geom))
+            {
+                std::shared_ptr<VecDataArray<int, 3>> elementsPtr = surfMesh->getCells();
+                const VecDataArray<int, 3>&           elements    = *elementsPtr;
 
-            // Build vertex to tri map
-            std::vector<std::vector<size_t>> vertexToTriMap(triMesh->getNumVertices());
-            for (int k = 0; k < elements.size(); k++)
-            {
-                const Vec3i& tri = elements[k];
-                vertexToTriMap[tri[0]].push_back(k);
-                vertexToTriMap[tri[1]].push_back(k);
-                vertexToTriMap[tri[2]].push_back(k);
-            }
-            for (std::vector<size_t>& faceIds : vertexToTriMap)
-            {
-                std::sort(faceIds.begin(), faceIds.end());
-            }
-
-            std::set<std::pair<size_t, size_t>> distanceSet;
-            for (const size_t& vertIdx : *vertices)
-            {
-                for (const size_t& triIdx : vertexToTriMap[vertIdx])
+                // Build vertex to tri map
+                std::vector<std::vector<int>> vertexToCellMap(surfMesh->getNumVertices());
+                for (int i = 0; i < elements.size(); i++)
                 {
-                    const Vec3i& tri = elements[triIdx];
-                    size_t       i1  = 0;
-                    size_t       i2  = 0;
-                    for (size_t i = 0; i < 3; i++)
-                    {
-                        if (tri[i] == vertIdx)
-                        {
-                            i1 = tri[(i + 1) % 3];
-                            i2 = tri[(i + 2) % 3];
-                            break;
-                        }
-                    }
-                    auto pair1 = std::make_pair(std::min(vertIdx, i1), std::max(vertIdx, i1));
-                    auto pair2 = std::make_pair(std::min(vertIdx, i2), std::max(vertIdx, i2));
-                    distanceSet.insert(pair1);
-                    distanceSet.insert(pair2);
+                    const Vec3i& cell = elements[i];
+                    vertexToCellMap[cell[0]].push_back(i);
+                    vertexToCellMap[cell[1]].push_back(i);
+                    vertexToCellMap[cell[2]].push_back(i);
                 }
+                for (std::vector<int>& faceIds : vertexToCellMap)
+                {
+                    std::sort(faceIds.begin(), faceIds.end());
+                }
+
+                for (const size_t vertIdx : *vertices)
+                {
+                    const int vid = static_cast<int>(vertIdx);
+                    for (const int cellId : vertexToCellMap[vertIdx])
+                    {
+                        const Vec3i& cell = elements[cellId];
+                        int          i1   = 0;
+                        int          i2   = 0;
+                        for (int i = 0; i < 3; i++)
+                        {
+                            if (cell[i] == static_cast<int>(vertIdx))
+                            {
+                                i1 = cell[(i + 1) % 3];
+                                i2 = cell[(i + 2) % 3];
+                                break;
+                            }
+                        }
+                        auto pair1 = std::make_pair(std::min(vid, i1), std::max(vid, i1));
+                        auto pair2 = std::make_pair(std::min(vid, i2), std::max(vid, i2));
+                        distanceSet.insert(pair1);
+                        distanceSet.insert(pair2);
+                    }
+                }
+            }
+            else if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_geom))
+            {
+                std::shared_ptr<VecDataArray<int, 2>> elementsPtr = lineMesh->getCells();
+                const VecDataArray<int, 2>&           elements    = *elementsPtr;
+
+                // Build vertex to cell map
+                std::vector<std::vector<int>> vertexToCellMap(lineMesh->getNumVertices());
+                for (int k = 0; k < elements.size(); k++)
+                {
+                    const Vec2i& cell = elements[k];
+                    vertexToCellMap[cell[0]].push_back(k);
+                    vertexToCellMap[cell[1]].push_back(k);
+                }
+                for (std::vector<int>& faceIds : vertexToCellMap)
+                {
+                    std::sort(faceIds.begin(), faceIds.end());
+                }
+
+                for (const size_t vertIdx : *vertices)
+                {
+                    for (const int triIdx : vertexToCellMap[vertIdx])
+                    {
+                        const Vec2i& cell = elements[triIdx];
+
+                        auto pair1 = std::make_pair(std::min(cell[0], cell[1]), std::max(cell[0], cell[1]));
+                        distanceSet.insert(pair1);
+                    }
+                }
+            }
+            else
+            {
+                LOG(FATAL) << "Add element constraints does not support current mesh type";
             }
 
             constraints.reserve(constraints.getConstraints().size() + distanceSet.size());
@@ -233,7 +305,7 @@ struct PbdDistanceConstraintFunctor : public PbdConstraintFunctor
 ///
 /// \brief PbdFemTetConstraintFunctor generates constraints per cell of a TetrahedralMesh
 ///
-struct PbdFemTetConstraintFunctor : public PbdConstraintFunctor
+struct PbdFemTetConstraintFunctor : public PbdBodyConstraintFunctor
 {
     public:
         PbdFemTetConstraintFunctor() = default;
@@ -249,7 +321,7 @@ struct PbdFemTetConstraintFunctor : public PbdConstraintFunctor
             auto                                     tetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
             std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
             const VecDataArray<double, 3>&           vertices    = *verticesPtr;
-            std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getTetrahedraIndices();
+            std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getCells();
             const VecDataArray<int, 4>&              elements    = *elementsPtr;
 
             ParallelUtils::parallelFor(elements.size(),
@@ -257,8 +329,11 @@ struct PbdFemTetConstraintFunctor : public PbdConstraintFunctor
                 {
                     const Vec4i& tet = elements[k];
                     auto c = std::make_shared<PbdFemTetConstraint>(m_matType);
-                    c->initConstraint(vertices,
-                    tet[0], tet[1], tet[2], tet[3], m_femConfig);
+                    c->initConstraint(
+                        vertices[tet[0]], vertices[tet[1]], vertices[tet[2]], vertices[tet[3]],
+                        { m_bodyIndex, tet[0] }, { m_bodyIndex, tet[1] },
+                        { m_bodyIndex, tet[2] }, { m_bodyIndex, tet[3] },
+                        m_femConfig);
                     constraints.addConstraint(c);
             }, elements.size() > 100);
         }
@@ -279,7 +354,7 @@ struct PbdFemTetConstraintFunctor : public PbdConstraintFunctor
 ///
 /// \brief PbdVolumeConstraintFunctor generates constraints per cell of a TetrahedralMesh
 ///
-struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
+struct PbdVolumeConstraintFunctor : public PbdBodyConstraintFunctor
 {
     public:
         PbdVolumeConstraintFunctor() = default;
@@ -295,7 +370,7 @@ struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
             auto                                     tetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
             std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
             const VecDataArray<double, 3>&           vertices    = *verticesPtr;
-            std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getTetrahedraIndices();
+            std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getCells();
             const VecDataArray<int, 4>&              elements    = *elementsPtr;
 
             ParallelUtils::parallelFor(elements.size(),
@@ -303,8 +378,11 @@ struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
                 {
                     auto& tet = elements[k];
                     auto c    = std::make_shared<PbdVolumeConstraint>();
-                    c->initConstraint(vertices,
-                    tet[0], tet[1], tet[2], tet[3], m_stiffness);
+                    c->initConstraint(
+                        vertices[tet[0]], vertices[tet[1]], vertices[tet[2]], vertices[tet[3]],
+                        { m_bodyIndex, tet[0] }, { m_bodyIndex, tet[1] },
+                        { m_bodyIndex, tet[2] }, { m_bodyIndex, tet[3] },
+                        m_stiffness);
                     constraints.addConstraint(c);
             });
         }
@@ -325,7 +403,7 @@ struct PbdVolumeConstraintFunctor : public PbdConstraintFunctor
 ///
 /// \brief PbdAreaConstraintFunctor generates constraints per cell of a SurfaceMesh
 ///
-struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
+struct PbdAreaConstraintFunctor : public PbdBodyConstraintFunctor
 {
     public:
         PbdAreaConstraintFunctor() = default;
@@ -349,7 +427,9 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
                 {
                     auto& tri = elements[k];
                     auto c    = std::make_shared<PbdAreaConstraint>();
-                    c->initConstraint(vertices, tri[0], tri[1], tri[2], m_stiffness);
+                    c->initConstraint(vertices[tri[0]], vertices[tri[1]], vertices[tri[2]],
+                        { m_bodyIndex, tri[0] }, { m_bodyIndex, tri[1] }, { m_bodyIndex, tri[2] },
+                        m_stiffness);
                     constraints.addConstraint(c);
             });
         }
@@ -396,7 +476,9 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
                 {
                     const Vec3i& tri = elements[k];
                     auto         c   = std::make_shared<PbdAreaConstraint>();
-                    c->initConstraint(initVertices, tri[0], tri[1], tri[2], stiffness);
+                    c->initConstraint(initVertices[tri[0]], initVertices[tri[1]], initVertices[tri[2]],
+                        { m_bodyIndex, tri[0] }, { m_bodyIndex, tri[1] }, { m_bodyIndex, tri[2] },
+                        stiffness);
                     constraints.addConstraint(c);
                 };
 
@@ -423,7 +505,7 @@ struct PbdAreaConstraintFunctor : public PbdConstraintFunctor
 ///
 /// \brief PbdBendConstraintFunctor generates constraints per cell of a LineMesh
 ///
-struct PbdBendConstraintFunctor : public PbdConstraintFunctor
+struct PbdBendConstraintFunctor : public PbdBodyConstraintFunctor
 {
     public:
         PbdBendConstraintFunctor() = default;
@@ -438,11 +520,11 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
             auto                                     lineMesh    = std::dynamic_pointer_cast<LineMesh>(m_geom);
             std::shared_ptr<VecDataArray<double, 3>> verticesPtr = m_geom->getVertexPositions();
             const VecDataArray<double, 3>&           vertices    = *verticesPtr;
-            /*std::shared_ptr< VecDataArray<int, 2>> indicesPtr = lineMesh->getLinesIndices();
+            /*std::shared_ptr< VecDataArray<int, 2>> indicesPtr = lineMesh->getCells();
             const VecDataArray<int, 2>& indices = *indicesPtr*/
 
             auto addBendConstraint =
-                [&](const double k, size_t i1, size_t i2, size_t i3)
+                [&](const double k, int i1, int i2, int i3)
                 {
                     // i1 should always come first
                     if (i2 < i1)
@@ -458,11 +540,13 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
                     auto c = std::make_shared<PbdBendConstraint>();
                     if (m_restLengthOverride >= 0.0)
                     {
-                        c->initConstraint(i1, i2, i3, m_restLengthOverride, k);
+                        c->initConstraint({ m_bodyIndex, i1 }, { m_bodyIndex, i2 }, { m_bodyIndex, i3 },
+                            m_restLengthOverride, k);
                     }
                     else
                     {
-                        c->initConstraint(vertices, i1, i2, i3, k);
+                        c->initConstraint(vertices[i1], vertices[i2], vertices[i3],
+                            { m_bodyIndex, i1 }, { m_bodyIndex, i2 }, { m_bodyIndex, i3 }, k);
                     }
                     constraints.addConstraint(c);
                 };
@@ -514,7 +598,7 @@ struct PbdBendConstraintFunctor : public PbdConstraintFunctor
 /// \brief PbdDihedralConstraintFunctor generates constraints per pair of triangle neighbors in a
 /// SurfaceMesh
 ///
-struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
+struct PbdDihedralConstraintFunctor : public PbdBodyConstraintFunctor
 {
     public:
         PbdDihedralConstraintFunctor() = default;
@@ -564,12 +648,12 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
                         rs.resize(static_cast<size_t>(it - rs.begin()));
                         if (rs.size() > 1)
                         {
-                            size_t      idx  = (rs[0] == k) ? 1 : 0;
-                            const auto& tri0 = elements[k];
-                            const auto& tri1 = elements[rs[idx]];
-                            size_t      idx0 = 0;
-                            size_t      idx1 = 0;
-                            for (size_t i = 0; i < 3; ++i)
+                            int          idx  = (rs[0] == k) ? 1 : 0;
+                            const Vec3i& tri0 = elements[k];
+                            const Vec3i& tri1 = elements[rs[idx]];
+                            int          idx0 = 0;
+                            int          idx1 = 0;
+                            for (int i = 0; i < 3; i++)
                             {
                                 if (tri0[i] != i1 && tri0[i] != i2)
                                 {
@@ -581,7 +665,9 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
                                 }
                             }
                             auto c = std::make_shared<PbdDihedralConstraint>();
-                            c->initConstraint(vertices, idx0, idx1, i1, i2, m_stiffness);
+                            c->initConstraint(vertices[idx0], vertices[idx1], vertices[i1], vertices[i2],
+                                { m_bodyIndex, idx0 }, { m_bodyIndex, idx1 },
+                                { m_bodyIndex, i1 }, { m_bodyIndex, i2 }, m_stiffness);
                             constraints.addConstraint(c);
                         }
                     }
@@ -670,22 +756,23 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
                 {
                     const Vec3i& tri0 = elements[t0];
                     const Vec3i& tri1 = elements[t1];
-                    size_t       idx0 = 0;
-                    size_t       idx1 = 0;
-                    for (int i = 0; i < 3; ++i)
+                    int          idx0 = 0;
+                    int          idx1 = 0;
+                    for (int i = 0; i < 3; i++)
                     {
                         if (tri0[i] != i1 && tri0[i] != i2)
                         {
-                            idx0 = static_cast<size_t>(tri0[i]);
+                            idx0 = tri0[i];
                         }
                         if (tri1[i] != i1 && tri1[i] != i2)
                         {
-                            idx1 = static_cast<size_t>(tri1[i]);
+                            idx1 = tri1[i];
                         }
                     }
                     auto c = std::make_shared<PbdDihedralConstraint>();
-                    c->initConstraint(initVertices,
-                        idx0, idx1, static_cast<size_t>(i1), static_cast<size_t>(i2),
+                    c->initConstraint(initVertices[idx0], initVertices[idx1], initVertices[i1], initVertices[i2],
+                        { m_bodyIndex, idx0 }, { m_bodyIndex, idx1 },
+                        { m_bodyIndex, i1 }, { m_bodyIndex, i2 },
                         stiffness);
                     constraints.addConstraint(c);
                 };
@@ -693,8 +780,9 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
             constraints.reserve(constraints.getConstraints().size() + dihedralSet.size());
             for (auto& c : dihedralSet)
             {
-                addDihedralConstraint(c.second.first, c.second.second,
-                    c.first.first, c.first.second,
+                addDihedralConstraint(
+                    static_cast<int>(c.second.first), static_cast<int>(c.second.second),
+                    static_cast<int>(c.first.first), static_cast<int>(c.first.second),
                     m_stiffness);
             }
         }
@@ -716,7 +804,7 @@ struct PbdDihedralConstraintFunctor : public PbdConstraintFunctor
 /// \brief PbdConstantDensityConstraintFunctor generates a global constant density constraint
 /// for an entire PointSet
 ///
-struct PbdConstantDensityConstraintFunctor : public PbdConstraintFunctor
+struct PbdConstantDensityConstraintFunctor : public PbdBodyConstraintFunctor
 {
     public:
         PbdConstantDensityConstraintFunctor() = default;
@@ -729,7 +817,7 @@ struct PbdConstantDensityConstraintFunctor : public PbdConstraintFunctor
                 << "PbdConstantDensityConstraint can only be generated with a PointSet";
 
             auto c = std::make_shared<PbdConstantDensityConstraint>();
-            c->initConstraint(*m_geom->getVertexPositions(), m_particleRadius, m_restDensity);
+            c->initConstraint(m_geom->getNumVertices(), m_bodyIndex, m_particleRadius, m_restDensity);
             constraints.addConstraint(c);
         }
 

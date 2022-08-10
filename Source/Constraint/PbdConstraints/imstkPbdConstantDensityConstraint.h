@@ -25,22 +25,25 @@ public:
 
     ///
     /// \brief Constant Density Constraint Initialization
+    /// \param Bodies containing all the particles
+    /// \param the body index to simulate as a fluid
+    /// \param stiffness
     ///
-    void initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                        const double particleRadius, const double density = 6378.0);
+    void initConstraint(const int    numParticles,
+                        const int    bodyHandle,
+                        const double particleRadius,
+                        const double density);
 
     ///
     /// \brief Solves the constant density constraint
     ///
-    void projectConstraint(const DataArray<double>& currInvMasses,
-                           const double dt,
-                           const PbdConstraint::SolverType& type,
-                           VecDataArray<double, 3>& currVertexPositions) override;
+    void projectConstraint(PbdState& bodies, const double dt,
+                           const SolverType& type) override;
 
     bool computeValueAndGradient(
-        const VecDataArray<double, 3>& imstkNotUsed(currVertexPositions),
-        double& imstkNotUsed(c),
-        std::vector<Vec3d>& imstkNotUsed(dcdx)) const override
+        PbdState&           imstkNotUsed(bodies),
+        double&             imstkNotUsed(c),
+        std::vector<Vec3d>& imstkNotUsed(dcdx)) override
     {
         return true;
     }
@@ -109,6 +112,7 @@ private:
     NeighborSearch::Method getNeighborSearchMethod() const { return m_NeighborSearchMethod; }
 
 private:
+    int    m_bodyHandle  = -1;
     double m_wPoly6Coeff = 0.0;
     double m_wSpikyCoeff = 0.0;
 

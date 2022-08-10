@@ -39,7 +39,9 @@ public:
         needlePbdCH->setInputObjectA(tissueObj);
         needlePbdCH->setInputObjectB(needleObj);
         needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
-        needlePbdCH->getCollisionSolver()->setCollisionIterations(1);
+        // These two can control compliance
+        needlePbdCH->setDeformableStiffnessA(1.0);
+        needlePbdCH->setDeformableStiffnessB(0.01);
         setCollisionHandlingA(needlePbdCH);
     }
 

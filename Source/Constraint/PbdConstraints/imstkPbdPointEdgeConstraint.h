@@ -13,7 +13,7 @@ namespace imstk
 ///
 /// \class PbdEdgeEdgeConstraint
 ///
-/// \brief Pushes an edge "outside" the other point
+/// \brief Resolves an edge to coincide with a point & point to edge
 ///
 class PbdPointEdgeConstraint : public PbdCollisionConstraint
 {
@@ -23,24 +23,20 @@ public:
 
 public:
     ///
-    /// \brief initialize constraint
-    /// \return  true if succeeded
+    /// \brief Initialize the constraint
     ///
     void initConstraint(
-        VertexMassPair ptA1,
-        VertexMassPair ptB1, VertexMassPair ptB2,
+        const PbdParticleId& ptA1,
+        const PbdParticleId& ptB1, const PbdParticleId& ptB2,
         double stiffnessA, double stiffnessB);
 
     ///
-    /// \brief compute value and gradient of constraint function
-    ///
-    /// \param[in] currVertexPositionsA current positions from object A
-    /// \param[in] currVertexPositionsA current positions from object B
+    /// \brief Compute value and gradient of constraint function
+    /// \param[inout] set of bodies involved in system
     /// \param[inout] c constraint value
     /// \param[inout] dcdx constraint gradient
     ///
-    bool computeValueAndGradient(double&             c,
-                                 std::vector<Vec3d>& dcdxA,
-                                 std::vector<Vec3d>& dcdxB) const override;
+    bool computeValueAndGradient(PbdState& bodies,
+                                 double& c, std::vector<Vec3d>& dcdx) override;
 };
 } // namespace imstk

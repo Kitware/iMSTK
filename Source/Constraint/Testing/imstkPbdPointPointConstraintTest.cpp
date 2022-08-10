@@ -4,30 +4,34 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "gtest/gtest.h"
-
+#include "imstkPbdConstraintTest.h"
 #include "imstkPbdPointPointConstraint.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 
 ///
 /// \brief Test that two points meet
 ///
-TEST(imstkPbdPointPointConstraintTest, TestConvergence1)
+TEST_F(PbdConstraintTest, PointPointConstraint_TestConvergence1)
 {
+    setNumParticles(2);
+
+    m_invMasses.fill(1.0);
+
+    m_vertices[0] = Vec3d(0.0, 0.0, 0.0);
+    m_vertices[1] = Vec3d(0.0, -1.0, 0.0);
+
     PbdPointPointConstraint constraint;
-
-    Vec3d a = Vec3d(0.0, 0.0, 0.0);
-    Vec3d b = Vec3d(0.0, -1.0, 0.0);
-
+    m_constraint = &constraint;
     constraint.initConstraint(
-        { &a, 1.0, nullptr },
-        { &b, 1.0, nullptr },
+        { 0, 0 }, { 0, 1 },
         1.0, 1.0);
     for (int i = 0; i < 3; i++)
     {
-        constraint.solvePosition();
+        solve(0.01, PbdConstraint::SolverType::PBD);
     }
 
-    ASSERT_EQ(a[1], b[1]);
+    ASSERT_EQ(m_vertices[0][1], m_vertices[1][1]);
 }

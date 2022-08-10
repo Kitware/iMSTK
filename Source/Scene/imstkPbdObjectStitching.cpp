@@ -10,6 +10,7 @@
 #include "imstkPbdBaryPointToPointConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdSolver.h"
 #include "imstkPointPicker.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
@@ -25,24 +26,23 @@ namespace imstk
 ///
 struct MeshSide
 {
-    MeshSide(VecDataArray<double, 3>& verticest, VecDataArray<double, 3>& velocitiest, DataArray<double>& invMassest,
-             AbstractDataArray* indicesPtrt, PointwiseMap* mapt) : vertices(verticest), velocities(velocitiest),
-        invMasses(invMassest), indicesPtr(indicesPtrt), map(mapt)
+    MeshSide(VecDataArray<double, 3>& verticest, AbstractDataArray* indicesPtrt,
+             PointwiseMap* mapt, int bodyIdt) : vertices(verticest),
+        indicesPtr(indicesPtrt), map(mapt), bodyId(bodyIdt)
     {
     }
 
     VecDataArray<double, 3>& vertices;
-    VecDataArray<double, 3>& velocities;
-    DataArray<double>& invMasses;
     AbstractDataArray* indicesPtr = nullptr;
     PointwiseMap* map = nullptr;
+    int bodyId = -1;
 };
 
 template<int N>
-static std::vector<std::pair<int, VertexMassPair>>
+static std::vector<PbdParticleId>
 getElement(const PickData& pickData, const MeshSide& side)
 {
-    std::vector<std::pair<int, VertexMassPair>> results(N);
+    std::vector<PbdParticleId> results(N);
     if (pickData.idCount == 1 && pickData.cellType != IMSTK_VERTEX) // If given cell index
     {
         const Eigen::Matrix<int, N, 1>& cell = (*dynamic_cast<VecDataArray<int, N>*>(side.indicesPtr))[pickData.ids[0]];
@@ -51,9 +51,9 @@ getElement(const PickData& pickData, const MeshSide& side)
             int vertexId = cell[i];
             if (side.map != nullptr)
             {
-                vertexId = static_cast<int>(side.map->getParentVertexId(vertexId));
+                vertexId = side.map->getParentVertexId(vertexId);
             }
-            results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
+            results[i] = { side.bodyId, vertexId };
         }
     }
     else // If given vertex indices
@@ -63,53 +63,56 @@ getElement(const PickData& pickData, const MeshSide& side)
             int vertexId = pickData.ids[i];
             if (side.map != nullptr)
             {
-                vertexId = static_cast<int>(side.map->getParentVertexId(vertexId));
+                vertexId = side.map->getParentVertexId(vertexId);
             }
-            results[i] = { vertexId, { &side.vertices[vertexId], side.invMasses[vertexId], &side.velocities[vertexId] } };
+            results[i] = { side.bodyId, vertexId };
         }
     }
     return results;
 }
 
 static std::vector<double>
-getWeights(const std::vector<VertexMassPair>& cellVerts, const Vec3d& pt)
+getWeights(const PbdState& bodies, const std::vector<PbdParticleId>& particles, const Vec3d& pt)
 {
-    std::vector<double> weights(cellVerts.size());
-    if (cellVerts.size() == 4)
+    std::vector<double> weights(particles.size());
+    if (particles.size() == 4)
     {
         const Vec4d baryCoord = baryCentric(pt,
-            *cellVerts[0].vertex,
-            *cellVerts[1].vertex,
-            *cellVerts[2].vertex,
-            *cellVerts[3].vertex);
+            bodies.getPosition(particles[0]),
+            bodies.getPosition(particles[1]),
+            bodies.getPosition(particles[2]),
+            bodies.getPosition(particles[3]));
         weights[0] = baryCoord[0];
         weights[1] = baryCoord[1];
         weights[2] = baryCoord[2];
         weights[3] = baryCoord[3];
     }
-    else if (cellVerts.size() == 3)
+    else if (particles.size() == 3)
     {
         const Vec3d baryCoord = baryCentric(pt,
-            *cellVerts[0].vertex, *cellVerts[1].vertex, *cellVerts[2].vertex);
+            bodies.getPosition(particles[0]),
+            bodies.getPosition(particles[1]),
+            bodies.getPosition(particles[2]));
         weights[0] = baryCoord[0];
         weights[1] = baryCoord[1];
         weights[2] = baryCoord[2];
     }
-    else if (cellVerts.size() == 2)
+    else if (particles.size() == 2)
     {
-        const Vec2d baryCoord = baryCentric(pt, *cellVerts[0].vertex, *cellVerts[1].vertex);
+        const Vec2d baryCoord = baryCentric(pt,
+            bodies.getPosition(particles[0]),
+            bodies.getPosition(particles[1]));
         weights[0] = baryCoord[0];
         weights[1] = baryCoord[1];
     }
-    else if (cellVerts.size() == 1)
+    else if (particles.size() == 1)
     {
         weights[0] = 1.0;
     }
     return weights;
-};
+}
 
 PbdObjectStitching::PbdObjectStitching(std::shared_ptr<PbdObject> obj) :
-    SceneObject("PbdObjectStitching_" + obj->getName()),
     m_objectToStitch(obj), m_pickMethod(std::make_shared<CellPicker>())
 {
     m_stitchingNode = std::make_shared<TaskNode>(std::bind(&PbdObjectStitching::updateStitching, this),
@@ -117,7 +120,7 @@ PbdObjectStitching::PbdObjectStitching(std::shared_ptr<PbdObject> obj) :
     m_taskGraph->addNode(m_stitchingNode);
 
     m_taskGraph->addNode(m_objectToStitch->getPbdModel()->getSolveNode());
-    m_taskGraph->addNode(m_objectToStitch->getPbdModel()->getUpdateVelocityNode());
+    m_taskGraph->addNode(m_objectToStitch->getPbdModel()->getCollisionSolveNode());
 
     m_taskGraph->addNode(m_objectToStitch->getTaskGraph()->getSource());
     m_taskGraph->addNode(m_objectToStitch->getTaskGraph()->getSink());
@@ -138,11 +141,14 @@ void
 PbdObjectStitching::removeStitchConstraints()
 {
     m_constraints.clear();
+    m_collisionConstraints.clear();
 }
 
 void
 PbdObjectStitching::addStitchConstraints()
 {
+    std::shared_ptr<PbdModel> model = m_objectToStitch->getPbdModel();
+
     // PbdModel geometry can only be PointSet
     std::shared_ptr<PointSet> pbdPhysicsGeom =
         std::dynamic_pointer_cast<PointSet>(m_objectToStitch->getPhysicsGeometry());
@@ -157,15 +163,6 @@ PbdObjectStitching::addStitchConstraints()
     }
 
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pbdPhysicsGeom->getVertexPositions();
-
-    // Get the attributes from the physics geometry
-    auto velocitiesPtr =
-        std::dynamic_pointer_cast<VecDataArray<double, 3>>(pbdPhysicsGeom->getVertexAttribute("Velocities"));
-    CHECK(velocitiesPtr != nullptr) << "Trying to vertex pick with geometry that has no Velocities";
-
-    auto invMassesPtr =
-        std::dynamic_pointer_cast<DataArray<double>>(pbdPhysicsGeom->getVertexAttribute("InvMass"));
-    CHECK(invMassesPtr != nullptr) << "Trying to vertex pick with geometry that has no InvMass";
 
     std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
     if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(pointSetToPick))
@@ -184,17 +181,16 @@ PbdObjectStitching::addStitchConstraints()
     // or dereferencing
     MeshSide meshStruct(
         *verticesPtr,
-        *velocitiesPtr,
-        *invMassesPtr,
         indicesPtr.get(),
-        map);
+        map,
+        m_objectToStitch->getPbdBody()->bodyHandle);
 
     auto getCellVerts =
         [&](const PickData& data)
         {
             const CellTypeId pickedCellType = data.cellType;
 
-            std::vector<std::pair<int, VertexMassPair>> cellIdVerts;
+            std::vector<PbdParticleId> cellIdVerts;
             if (pickedCellType == IMSTK_TETRAHEDRON)
             {
                 cellIdVerts = getElement<4>(data, meshStruct);
@@ -207,12 +203,7 @@ PbdObjectStitching::addStitchConstraints()
             {
                 cellIdVerts = getElement<2>(data, meshStruct);
             }
-            std::vector<VertexMassPair> cellVerts(cellIdVerts.size());
-            for (size_t j = 0; j < cellIdVerts.size(); j++)
-            {
-                cellVerts[j] = cellIdVerts[j].second;
-            }
-            return cellVerts;
+            return cellIdVerts;
         };
 
     auto pointPicker = std::dynamic_pointer_cast<PointPicker>(m_pickMethod);
@@ -307,10 +298,10 @@ PbdObjectStitching::addStitchConstraints()
 
         if (m_maxStitchDist == -1.0 || (pickData2.pickPoint - pickData1.pickPoint).norm() < m_maxStitchDist)
         {
-            std::vector<VertexMassPair> cellVerts1 = getCellVerts(pickData1);
-            std::vector<double>         weights1   = getWeights(cellVerts1, pickData1.pickPoint);
-            std::vector<VertexMassPair> cellVerts2 = getCellVerts(pickData2);
-            std::vector<double>         weights2   = getWeights(cellVerts2, pickData2.pickPoint);
+            std::vector<PbdParticleId> cellVerts1 = getCellVerts(pickData1);
+            std::vector<double>        weights1   = getWeights(model->getBodies(), cellVerts1, pickData1.pickPoint);
+            std::vector<PbdParticleId> cellVerts2 = getCellVerts(pickData2);
+            std::vector<double>        weights2   = getWeights(model->getBodies(), cellVerts2, pickData2.pickPoint);
 
             // Cell to single point constraint
             addConstraint(
@@ -319,13 +310,19 @@ PbdObjectStitching::addStitchConstraints()
                 m_stiffness, m_stiffness);
         }
     }
+
+    m_collisionConstraints.reserve(m_constraints.size());
+    for (int i = 0; i < m_constraints.size(); i++)
+    {
+        m_collisionConstraints.push_back(m_constraints[i].get());
+    }
 }
 
 void
 PbdObjectStitching::addConstraint(
-    const std::vector<VertexMassPair>& ptsA,
+    const std::vector<PbdParticleId>& ptsA,
     const std::vector<double>& weightsA,
-    const std::vector<VertexMassPair>& ptsB,
+    const std::vector<PbdParticleId>& ptsB,
     const std::vector<double>& weightsB,
     const double stiffnessA, const double stiffnessB)
 {
@@ -349,16 +346,9 @@ PbdObjectStitching::updateStitching()
         m_performStitch = false;
     }
 
-    updateConstraints();
-}
-
-void
-PbdObjectStitching::updateConstraints()
-{
-    // Directly solve here
-    for (const auto& constraint : m_constraints)
+    if (m_collisionConstraints.size() > 0)
     {
-        constraint->solvePosition();
+        m_objectToStitch->getPbdModel()->getCollisionSolver()->addConstraints(&m_collisionConstraints);
     }
 }
 
@@ -367,12 +357,11 @@ PbdObjectStitching::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
 {
     std::shared_ptr<PbdModel> pbdModel = m_objectToStitch->getPbdModel();
 
-    // Ensure a complete graph
     m_taskGraph->addEdge(source, m_objectToStitch->getTaskGraph()->getSource());
     m_taskGraph->addEdge(m_objectToStitch->getTaskGraph()->getSink(), sink);
 
-    // The ideal location is after the internal positional solve
+    // The ideal location is after the internal positional solve, before the collision solve
     m_taskGraph->addEdge(pbdModel->getSolveNode(), m_stitchingNode);
-    m_taskGraph->addEdge(m_stitchingNode, pbdModel->getUpdateVelocityNode());
+    m_taskGraph->addEdge(m_stitchingNode, pbdModel->getCollisionSolveNode());
 }
 } // namespace imstk

@@ -18,36 +18,28 @@ using namespace imstk;
 ///
 class ThreadInsertionConstraint : public PbdCollisionConstraint
 {
-private:
+public:
+    ThreadInsertionConstraint() :  PbdCollisionConstraint(2, 3) { }
+    ~ThreadInsertionConstraint() override = default;
 
+    void initConstraint(
+        const PbdState&      bodies,
+        const PbdParticleId& ptA1,
+        const PbdParticleId& ptA2,
+        const Vec2d&         threadBaryPoint,
+        const PbdParticleId& ptB1,
+        const PbdParticleId& ptB2,
+        const PbdParticleId& ptB3,
+        const Vec3d&         triBaryPoint,
+        double               stiffnessA,
+        double               stiffnessB);
+
+    bool computeValueAndGradient(PbdState& bodies,
+                                 double& c, std::vector<Vec3d>& dcdx) override;
+
+protected:
     Vec2d m_threadBaryPt;
     Vec3d m_triangleBaryPt;
     Vec3d m_triInsertionPoint;
     Vec3d m_threadInsertionPoint;
-
-public:
-
-    ThreadInsertionConstraint() :  PbdCollisionConstraint(2, 3) // (num thread verts, num triangle verts)
-    {
-    }
-
-    ~ThreadInsertionConstraint() override = default;
-
-public:
-
-    void initConstraint(
-        VertexMassPair ptA1,
-        VertexMassPair ptA2,
-        Vec2d          threadBaryPoint,
-        VertexMassPair ptB1,
-        VertexMassPair ptB2,
-        VertexMassPair ptB3,
-        Vec3d          triBaryPoint,
-        double         stiffnessA,
-        double         stiffnessB);
-
-    bool computeValueAndGradient(
-        double&             c,
-        std::vector<Vec3d>& dcdxA,
-        std::vector<Vec3d>& dcdxB) const override;
 };

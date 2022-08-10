@@ -4,40 +4,44 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "gtest/gtest.h"
-
 #include "imstkPbdBendConstraint.h"
+#include "imstkPbdConstraintTest.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 
 ///
 /// \brief Test that two connecting line segments unfold
 ///
-TEST(imstkPbdBendConstraintTest, TestConvergence1)
+TEST_F(PbdConstraintTest, BendConstraint_TestConvergence1)
 {
-    PbdBendConstraint constraint;
+    setNumParticles(3);
 
     // Straight line upon initialization
-    VecDataArray<double, 3> vertices(3);
-    vertices[0] = Vec3d(0.0, 0.0, 0.0);
-    vertices[1] = Vec3d(0.5, 0.0, 0.0);
-    vertices[2] = Vec3d(1.0, 0.0, 0.0);
-    DataArray<double> invMasses(3);
-    invMasses[0] = 1.0;
-    invMasses[1] = 0.0; // Center doesn't move
-    invMasses[2] = 1.0;
+    m_vertices[0] = Vec3d(0.0, 0.0, 0.0);
+    m_vertices[1] = Vec3d(0.5, 0.0, 0.0);
+    m_vertices[2] = Vec3d(1.0, 0.0, 0.0);
 
-    constraint.initConstraint(vertices, 0, 1, 2, 1e20);
+    m_invMasses[0] = 1.0;
+    m_invMasses[1] = 0.0; // Center doesn't move
+    m_invMasses[2] = 1.0;
+
+    PbdBendConstraint constraint;
+    m_constraint = &constraint;
+    constraint.initConstraint(
+        m_vertices[0], m_vertices[1], m_vertices[2],
+        { 0, 0 }, { 0, 1 }, { 0, 2 }, 1e20);
 
     // Modify it so the line segments look like \/
-    vertices[0][1] = 0.1;
-    vertices[2][1] = 0.1;
+    m_vertices[0][1] = 0.1;
+    m_vertices[2][1] = 0.1;
     for (int i = 0; i < 500; i++)
     {
-        constraint.projectConstraint(invMasses, 0.01, PbdConstraint::SolverType::xPBD, vertices);
+        solve(0.01, PbdConstraint::SolverType::xPBD);
     }
 
     // Should resolve back to a flat line
-    EXPECT_NEAR(vertices[0][1], 0.0, IMSTK_DOUBLE_EPS);
-    EXPECT_NEAR(vertices[2][1], 0.0, IMSTK_DOUBLE_EPS);
+    EXPECT_NEAR(m_vertices[0][1], 0.0, IMSTK_DOUBLE_EPS);
+    EXPECT_NEAR(m_vertices[2][1], 0.0, IMSTK_DOUBLE_EPS);
 }

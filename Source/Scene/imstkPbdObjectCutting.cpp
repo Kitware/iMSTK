@@ -6,24 +6,24 @@
 
 #include "imstkPbdObjectCutting.h"
 #include "imstkAnalyticalGeometry.h"
+#include "imstkLineMesh.h"
+#include "imstkLineMeshCut.h"
 #include "imstkPbdConstraintContainer.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshCut.h"
+#include "imstkLineMeshCut.h"
 
 namespace imstk
 {
 PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj) :
     m_objA(pbdObj), m_objB(cutObj)
 {
-    // check whether pbd object is a surfacemesh
-    if (std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getPhysicsGeometry()) == nullptr)
-    {
-        LOG(WARNING) << "PbdObj is not a SurfaceMesh, could not create cutting pair";
-        return;
-    }
+    CHECK(std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getPhysicsGeometry()) != nullptr
+        || std::dynamic_pointer_cast<LineMesh>(pbdObj->getPhysicsGeometry())) <<
+        "PbdObj is not a SurfaceMesh, could not create cutting pair";
 
     // check whether cut object is valid
     if (std::dynamic_pointer_cast<SurfaceMesh>(cutObj->getCollidingGeometry()) == nullptr
@@ -37,36 +37,56 @@ PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::share
 void
 PbdObjectCutting::apply()
 {
-    auto pbdModel = m_objA->getPbdModel();
-    auto pbdMesh  = std::static_pointer_cast<SurfaceMesh>(pbdModel->getModelGeometry());
+    std::shared_ptr<PbdModel> pbdModel = m_objA->getPbdModel();
 
     m_addConstraintVertices->clear();
     m_removeConstraintVertices->clear();
 
     // Perform cutting
-    SurfaceMeshCut surfCut;
-    surfCut.setInputMesh(pbdMesh);
-    surfCut.setCutGeometry(m_objB->getCollidingGeometry());
-    surfCut.update();
-    std::shared_ptr<SurfaceMesh> newPbdMesh = surfCut.getOutputMesh();
+    if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_objA->getPhysicsGeometry()))
+    {
+        SurfaceMeshCut cutter;
+        cutter.setInputMesh(surfMesh);
+        cutter.setCutGeometry(m_objB->getCollidingGeometry());
+        cutter.update();
 
-    // Only remove and add constraints related to the topological changes
-    m_removeConstraintVertices = surfCut.getRemoveConstraintVertices();
-    m_addConstraintVertices    = surfCut.getAddConstraintVertices();
+        std::shared_ptr<SurfaceMesh> newMesh = cutter.getOutputMesh();
 
-    // update pbd mesh
-    pbdMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newPbdMesh->getInitialVertexPositions()));
-    pbdMesh->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newPbdMesh->getVertexPositions()));
-    pbdMesh->setTriangleIndices(std::make_shared<VecDataArray<int, 3>>(*newPbdMesh->getCells()));
-    pbdMesh->postModified();
+        // Only remove and add constraints related to the topological changes
+        m_removeConstraintVertices = cutter.getRemoveConstraintVertices();
+        m_addConstraintVertices    = cutter.getAddConstraintVertices();
+
+        // update pbd mesh
+        surfMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newMesh->getInitialVertexPositions()));
+        surfMesh->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newMesh->getVertexPositions()));
+        surfMesh->setCells(std::make_shared<VecDataArray<int, 3>>(*newMesh->getCells()));
+    }
+    else if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_objA->getPhysicsGeometry()))
+    {
+        LineMeshCut cutter;
+        cutter.setInputMesh(lineMesh);
+        cutter.setCutGeometry(m_objB->getCollidingGeometry());
+        cutter.update();
+
+        std::shared_ptr<LineMesh> newMesh = cutter.getOutputMesh();
+
+        // Only remove and add constraints related to the topological changes
+        m_removeConstraintVertices = cutter.getRemoveConstraintVertices();
+        m_addConstraintVertices    = cutter.getAddConstraintVertices();
+
+        // update pbd mesh
+        lineMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newMesh->getInitialVertexPositions()));
+        lineMesh->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newMesh->getVertexPositions()));
+        lineMesh->setCells(std::make_shared<VecDataArray<int, 2>>(*newMesh->getCells()));
+    }
 
     // update pbd states, constraints and solver
-    pbdModel->initState();
-    pbdModel->getConstraints()->removeConstraints(m_removeConstraintVertices);
-    // pbdModel->getConstraints()->addConstraintVertices(m_addConstraintVertices);
-    pbdModel->addConstraints(m_addConstraintVertices);
-    pbdModel->getSolver()->setInvMasses(pbdModel->getInvMasses());
-    pbdModel->getSolver()->setPositions(pbdModel->getCurrentState()->getPositions());
+    m_objA->setBodyFromGeometry();
+    pbdModel->getConstraints()->removeConstraints(m_removeConstraintVertices,
+        m_objA->getPbdBody()->bodyHandle);
+    pbdModel->addConstraints(m_addConstraintVertices, m_objA->getPbdBody()->bodyHandle);
+
+    m_objA->getPhysicsGeometry()->postModified();
 }
 
 void
@@ -118,25 +138,6 @@ PbdObjectCutting::modifyVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
         (*initialVertices)[vertexIdx] = (*modifiedInitialVertices)[i];
         m_removeConstraintVertices->insert(vertexIdx);
         m_addConstraintVertices->insert(vertexIdx);
-    }
-}
-
-void
-PbdObjectCutting::addTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
-                               std::shared_ptr<VecDataArray<int, 3>> newTriangles)
-{
-    auto triangles     = pbdMesh->getCells();
-    auto nTriangles    = triangles->size();
-    auto nNewTriangles = newTriangles->size();
-
-    triangles->reserve(nTriangles + nNewTriangles);
-    for (int i = 0; i < nNewTriangles; ++i)
-    {
-        auto& tri = (*newTriangles)[i];
-        triangles->push_back(tri);
-        m_addConstraintVertices->insert(tri[0]);
-        m_addConstraintVertices->insert(tri[1]);
-        m_addConstraintVertices->insert(tri[2]);
     }
 }
 

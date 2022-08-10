@@ -39,35 +39,20 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
     rbdCH->setBaumgarteStabilization(0.1);
     setCollisionHandlingB(rbdCH);
 
-    // Setup compute node for collision solver (true/critical node)
-    m_pbdCollisionSolveNode = std::make_shared<TaskNode>([&]()
-        {
-            std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->getCollisionSolver()->solve();
-        },
-        obj1->getName() + "_vs_" + obj2->getName() + "_PBDCollisionSolver", true);
-    m_taskGraph->addNode(m_pbdCollisionSolveNode);
-
-    m_correctVelocitiesNode = std::make_shared<TaskNode>([&]()
-        {
-            std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA())->correctVelocities();
-        },
-        obj1->getName() + "_vs_" + obj2->getName() + "_PBDVelocityCorrect", true);
-    m_taskGraph->addNode(m_correctVelocitiesNode);
-
     // Nodes from objectA
     auto pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objA);
-    m_taskGraph->addNode(pbdObj->getPbdModel()->getTaskGraph()->getSource());
+    m_taskGraph->addNode(pbdObj->getTaskGraph()->getSource());
     m_taskGraph->addNode(pbdObj->getPbdModel()->getSolveNode());
-    m_taskGraph->addNode(pbdObj->getPbdModel()->getUpdateVelocityNode());
-    m_taskGraph->addNode(pbdObj->getPbdModel()->getTaskGraph()->getSink());
+    m_taskGraph->addNode(pbdObj->getPbdModel()->getCollisionSolveNode());
+    m_taskGraph->addNode(pbdObj->getTaskGraph()->getSink());
 
     // Nodes from objectB
     auto rbdObj = std::dynamic_pointer_cast<RigidObject2>(m_objB);
-    m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getTaskGraph()->getSource());
+    m_taskGraph->addNode(rbdObj->getTaskGraph()->getSource());
     m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getComputeTentativeVelocitiesNode());
     m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getSolveNode());
     m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getIntegrateNode());
-    m_taskGraph->addNode(rbdObj->getRigidBodyModel2()->getTaskGraph()->getSink());
+    m_taskGraph->addNode(rbdObj->getTaskGraph()->getSink());
 }
 
 void
@@ -110,10 +95,11 @@ PbdRigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::s
     auto pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objA);
     auto rbdObj = std::dynamic_pointer_cast<RigidObject2>(m_objB);
 
-    m_taskGraph->addEdge(source, pbdObj->getPbdModel()->getTaskGraph()->getSource());
-    m_taskGraph->addEdge(source, rbdObj->getRigidBodyModel2()->getTaskGraph()->getSource());
-    m_taskGraph->addEdge(pbdObj->getPbdModel()->getTaskGraph()->getSink(), sink);
-    m_taskGraph->addEdge(rbdObj->getRigidBodyModel2()->getTaskGraph()->getSink(), sink);
+    // Ensure a complete graph
+    m_taskGraph->addEdge(source, pbdObj->getTaskGraph()->getSource());
+    m_taskGraph->addEdge(source, rbdObj->getTaskGraph()->getSource());
+    m_taskGraph->addEdge(pbdObj->getTaskGraph()->getSink(), sink);
+    m_taskGraph->addEdge(rbdObj->getTaskGraph()->getSink(), sink);
 
     std::shared_ptr<CollisionHandling> pbdCH = m_colHandlingA;
     {
@@ -123,10 +109,7 @@ PbdRigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::s
         m_taskGraph->addEdge(pbdObj->getPbdModel()->getSolveNode(), m_collisionGeometryUpdateNode);
         m_taskGraph->addEdge(m_collisionGeometryUpdateNode, m_collisionDetectionNode);
         m_taskGraph->addEdge(m_collisionDetectionNode, pbdHandlerNode);
-        m_taskGraph->addEdge(pbdHandlerNode, m_pbdCollisionSolveNode);
-        m_taskGraph->addEdge(m_pbdCollisionSolveNode, pbdObj->getPbdModel()->getUpdateVelocityNode());
-        m_taskGraph->addEdge(pbdObj->getPbdModel()->getUpdateVelocityNode(), m_correctVelocitiesNode);
-        m_taskGraph->addEdge(m_correctVelocitiesNode, pbdObj->getPbdModel()->getTaskGraph()->getSink());
+        m_taskGraph->addEdge(pbdHandlerNode, pbdObj->getPbdModel()->getCollisionSolveNode());
     }
 
     std::shared_ptr<CollisionHandling> rbdCH = m_colHandlingB;
@@ -139,8 +122,8 @@ PbdRigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::s
         m_taskGraph->addEdge(m_collisionDetectionNode, pbdHandlerNode);
         m_taskGraph->addEdge(pbdHandlerNode, rbdObj->getRigidBodyModel2()->getSolveNode()); // Ensure we aren't handling PBD whilst solving RBD
         m_taskGraph->addEdge(rbdHandlerNode, rbdObj->getRigidBodyModel2()->getSolveNode());
-        m_taskGraph->addEdge(rbdObj->getRigidBodyModel2()->getSolveNode(), m_pbdCollisionSolveNode);
-        m_taskGraph->addEdge(m_pbdCollisionSolveNode, rbdObj->getRigidBodyModel2()->getIntegrateNode());
+        m_taskGraph->addEdge(rbdObj->getRigidBodyModel2()->getSolveNode(), pbdObj->getPbdModel()->getCollisionSolveNode());
+        m_taskGraph->addEdge(pbdObj->getPbdModel()->getCollisionSolveNode(), rbdObj->getRigidBodyModel2()->getIntegrateNode());
     }
 }
 } // namespace imstk

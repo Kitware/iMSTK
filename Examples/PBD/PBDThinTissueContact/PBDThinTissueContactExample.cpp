@@ -16,6 +16,7 @@
 #include "imstkNew.h"
 #include "imstkPbdConstraintFunctor.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkRenderMaterial.h"
@@ -53,25 +54,13 @@ makeTissueObj(const std::string& name,
     imstkNew<PbdModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5000.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 5000.0);
-    for (int x = 0; x < rowCount; x++)
-    {
-        for (int y = 0; y < colCount; y++)
-        {
-            if (x == 0 || y == 0 || x == rowCount - 1 || y == colCount - 1)
-            {
-                pbdParams->m_fixedNodeIds.push_back(x * colCount + y);
-            }
-        }
-    }
-    pbdParams->m_uniformMassValue = width * height / (rowCount * colCount);
     pbdParams->m_gravity    = Vec3d(0.0, -20.0, 0.0); // Slightly larger gravity to compensate viscosity
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 2;
-    pbdParams->m_viscousDampingCoeff = 0.0;
+    pbdParams->m_linearDampingCoeff = 0.0;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(clothMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
@@ -96,6 +85,17 @@ makeTissueObj(const std::string& name,
     pbdObject->setPhysicsGeometry(clothMesh);
     pbdObject->setCollidingGeometry(clothMesh);
     pbdObject->setDynamicalModel(pbdModel);
+    pbdObject->getPbdBody()->uniformMassValue = width * height / (rowCount * colCount);
+    for (int x = 0; x < rowCount; x++)
+    {
+        for (int y = 0; y < colCount; y++)
+        {
+            if (x == 0 || y == 0 || x == rowCount - 1 || y == colCount - 1)
+            {
+                pbdObject->getPbdBody()->fixedNodeIds.push_back(x * colCount + y);
+            }
+        }
+    }
 
     return pbdObject;
 }
@@ -142,7 +142,7 @@ main()
     scene->addSceneObject(toolObj);
 
     // Add a collision interaction between the tools
-    scene->addInteraction(std::make_shared<PbdObjectCollision>(tissueObj, toolObj.get(), "ClosedSurfaceMeshToMeshCD"));
+    scene->addInteraction(std::make_shared<PbdObjectCollision>(tissueObj, toolObj, "ClosedSurfaceMeshToMeshCD"));
 
     // Light
     imstkNew<DirectionalLight> light;
@@ -183,7 +183,7 @@ main()
                 toolGeometry->setRotation(deviceOrientation);
                 toolGeometry->setTranslation(devicePosition);
                 toolGeometry->postModified();
-        });
+            });
 #else
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {

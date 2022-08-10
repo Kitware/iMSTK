@@ -9,6 +9,10 @@
 #include "imstkGeometryAlgorithm.h"
 #include "imstkMath.h"
 
+#include <vtkSmartPointer.h>
+
+class vtkImplicitPolyDataDistance;
+
 namespace imstk
 {
 class ImageData;
@@ -36,6 +40,13 @@ public:
     void setInputMesh(std::shared_ptr<SurfaceMesh> surfMesh);
 
     std::shared_ptr<ImageData> getOutputImage();
+
+    void setupDistFunc();
+
+    ///
+    /// \brief Get the nearest point
+    ///
+    Vec3d getNearestPoint(const Vec3d& pos);
 
     ///
     /// \brief Dimensions of distance transform to fill
@@ -85,5 +96,7 @@ private:
 
     bool m_NarrowBanded = false;
     int  m_DilateSize   = 4; ///< Only for narrow banded
+
+    vtkSmartPointer<vtkImplicitPolyDataDistance> m_distFunc;
 };
 } // namespace imstk

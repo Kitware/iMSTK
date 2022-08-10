@@ -14,18 +14,8 @@ namespace imstk
 bool
 RigidObject2::initialize()
 {
-    m_rigidBodyModel2 = std::dynamic_pointer_cast<RigidBodyModel2>(m_dynamicalModel);
-    if (m_rigidBodyModel2 == nullptr)
-    {
-        LOG(FATAL) << "Dynamics pointer cast failure in RigidObject2::initialize()";
-        return false;
-    }
-
     DynamicObject::initialize();
-    m_rigidBodyModel2->initialize();
-
     updateGeometries();
-
     return true;
 }
 

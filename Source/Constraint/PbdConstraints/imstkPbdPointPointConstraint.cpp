@@ -10,26 +10,25 @@ namespace imstk
 {
 void
 PbdPointPointConstraint::initConstraint(
-    VertexMassPair ptA, VertexMassPair ptB,
+    const PbdParticleId& ptA, const PbdParticleId& ptB,
     double stiffnessA, double stiffnessB)
 {
-    m_bodiesFirst[0]  = ptA;
-    m_bodiesSecond[0] = ptB;
+    m_particles[0] = ptA;
+    m_particles[1] = ptB;
 
-    m_stiffnessA = stiffnessA;
-    m_stiffnessB = stiffnessB;
+    m_stiffness[0] = stiffnessA;
+    m_stiffness[1] = stiffnessB;
 }
 
 bool
-PbdPointPointConstraint::computeValueAndGradient(double&             c,
-                                                 std::vector<Vec3d>& dcdxA,
-                                                 std::vector<Vec3d>& dcdxB) const
+PbdPointPointConstraint::computeValueAndGradient(PbdState& bodies,
+                                                 double& c, std::vector<Vec3d>& dcdx)
 {
     // Current position during solve
-    const Vec3d& x_a = *m_bodiesFirst[0].vertex;
-    const Vec3d& x_b = *m_bodiesSecond[0].vertex;
+    const Vec3d& x0 = bodies.getPosition(m_particles[0]);
+    const Vec3d& x1 = bodies.getPosition(m_particles[1]);
 
-    const Vec3d diff = x_b - x_a;
+    const Vec3d diff = x1 - x0;
     c = diff.norm();
 
     if (c == 0.0)
@@ -39,8 +38,10 @@ PbdPointPointConstraint::computeValueAndGradient(double&             c,
 
     const Vec3d n = diff / c;
 
-    dcdxA[0] = n;
-    dcdxB[0] = -n;
+    // A
+    dcdx[0] = n;
+    // B
+    dcdx[1] = -n;
 
     return true;
 }

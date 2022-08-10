@@ -125,7 +125,7 @@ CollisionInteraction::setEnabled(const bool enabled)
     {
         // Clear the data (since CD clear is only run before CD is performed)
         m_colDetect->getCollisionData()->elementsA.resize(0);
-        m_colDetect->getCollisionData()->elementsA.resize(0);
+        m_colDetect->getCollisionData()->elementsB.resize(0);
     }
     else
     {

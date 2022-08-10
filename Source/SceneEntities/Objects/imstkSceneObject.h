@@ -131,6 +131,11 @@ protected:
     ///
     virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
 
+    ///
+    /// \brief Posts modified for all geometries
+    ///
+    virtual void postModifiedAll();
+
     std::string m_name;                                       ///< Custom name of the scene object
     std::vector<std::shared_ptr<VisualModel>> m_visualModels; ///< Visual objects for rendering
     std::shared_ptr<TaskGraph> m_taskGraph = nullptr;         ///< Computational Graph

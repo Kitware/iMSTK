@@ -10,60 +10,55 @@ namespace imstk
 {
 void
 PbdPointEdgeConstraint::initConstraint(
-    VertexMassPair ptA1,
-    VertexMassPair ptB1, VertexMassPair ptB2,
+    const PbdParticleId& ptA1,
+    const PbdParticleId& ptB1, const PbdParticleId& ptB2,
     double stiffnessA, double stiffnessB)
 {
-    m_stiffnessA = stiffnessA;
-    m_stiffnessB = stiffnessB;
+    m_particles[0] = ptA1;
+    m_particles[1] = ptB1;
+    m_particles[2] = ptB2;
 
-    m_bodiesFirst[0] = ptA1;
-
-    m_bodiesSecond[0] = ptB1;
-    m_bodiesSecond[1] = ptB2;
+    m_stiffness[0] = stiffnessA;
+    m_stiffness[1] = stiffnessB;
 }
 
 bool
-PbdPointEdgeConstraint::computeValueAndGradient(double&             cc,
-                                                std::vector<Vec3d>& dcdxA,
-                                                std::vector<Vec3d>& dcdxB) const
+PbdPointEdgeConstraint::computeValueAndGradient(PbdState& bodies,
+                                                double& c, std::vector<Vec3d>& dcdx)
 {
     // Just project x0 onto x3-x2. Get the normal component for distance to line
-    const Vec3d& x0 = *m_bodiesFirst[0].vertex;
+    const Vec3d& x0 = bodies.getPosition(m_particles[0]);
+    const Vec3d& x1 = bodies.getPosition(m_particles[1]);
+    const Vec3d& x2 = bodies.getPosition(m_particles[2]);
 
-    const Vec3d& x2 = *m_bodiesSecond[0].vertex;
-    const Vec3d& x3 = *m_bodiesSecond[1].vertex;
-
-    const Vec3d  ab     = x3 - x2;
+    const Vec3d  ab     = x2 - x1;
     const double length = ab.norm();
     if (length == 0.0)
     {
         // There is no distance between the edge, can't do anything
-        cc = 0.0;
+        c = 0.0;
         return false;
     }
     const Vec3d dir1 = ab / length;
 
     // Project onto the line
-    const Vec3d  diff = x0 - x2;
+    const Vec3d  diff = x0 - x1;
     const double p    = dir1.dot(diff);
     if (p < 0.0 || p > length)
     {
-        cc = 0.0;
+        c = 0.0;
         return false;
-    }
-
-    int maxId = 0;
-    if ((1.0 - p) < p)
-    {
-        maxId = 1;
     }
 
     // If contacting point near a boundary ignore constraint
-    if (!m_enableBoundaryCollisions && m_bodiesSecond[maxId].invMass == 0.0)
+    if (!m_enableBoundaryCollisions)
     {
-        cc = 0.0;
-        return false;
+        const int maxId = ((1.0 - p) < p) ? 2 : 1;
+        if (bodies.getInvMass(m_particles[maxId]) == 0.0)
+        {
+            c = 0.0;
+            return false;
+        }
     }
 
     // Remove tangent component to get normal
@@ -72,17 +67,17 @@ PbdPointEdgeConstraint::computeValueAndGradient(double&             cc,
     if (l == 0.0)
     {
         // The point is on the line
-        cc = 0.0;
+        c = 0.0;
         return false;
     }
     const Vec3d  n = diff1 / l;
     const double u = p / length;
 
-    dcdxA[0] = -n;
-    dcdxB[0] = (1.0 - u) * n;
-    dcdxB[1] = u * n;
+    dcdx[0] = -n;
+    dcdx[1] = (1.0 - u) * n;
+    dcdx[2] = u * n;
 
-    cc = l;
+    c = l;
 
     return true;
 }

@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include "imstkCollisionInteraction.h"
+#include "imstkSceneObject.h"
+#include "imstkCellMesh.h"
 #include "imstkMacros.h"
 
 #include <unordered_set>
@@ -20,11 +21,11 @@ class PbdObject;
 class SurfaceMesh;
 
 ///
-/// \class PbdObjectCuttingPair
+/// \class PbdObjectCutting
 ///
-/// \brief This class defines a cutting interaction between a PbdObject and a CollidingObject
-/// call apply to perform the cut given the current states of both objects. A discrete cut is
-/// performed, not for calling continuously.
+/// \brief This class defines a cutting interaction between a PbdObject and
+/// a CollidingObject. PbdObjectCutting::apply can be used to perform a discrete
+/// cut given the current states of both objects.
 ///
 class PbdObjectCutting : public SceneObject
 {
@@ -58,8 +59,25 @@ protected:
     ///
     /// \brief Add new elements to pbdObj
     ///
-    void addTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
-                      std::shared_ptr<VecDataArray<int, 3>> elements);
+    template<int N>
+    void addCells(std::shared_ptr<CellMesh<N>> pbdMesh,
+                  std::shared_ptr<VecDataArray<int, N>> newCells)
+    {
+        std::shared_ptr<VecDataArray<int, N>> cells     = pbdMesh->getCells();
+        const int                             nCells    = cells->size();
+        const int                             nNewCells = newCells->size();
+
+        cells->reserve(nCells + nNewCells);
+        for (int i = 0; i < nNewCells; i++)
+        {
+            const Vec3i& cell = (*newCells)[i];
+            cells->push_back(cell);
+            for (int j = 0; j < N; j++)
+            {
+                m_addConstraintVertices->insert(cell[j]);
+            }
+        }
+    }
 
     ///
     /// \brief Modify existing elements of pbdObj

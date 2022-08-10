@@ -8,6 +8,7 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkMeshIO.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
@@ -37,15 +38,12 @@ createSoftBodyScene(std::string sceneName)
 
     auto pbdObj   = std::make_shared<PbdObject>("PbdObj");
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(tetMesh);
 
     // Configure model
     auto pbdConfig = std::make_shared<PbdModelConfig>();
     pbdConfig->m_femParams->m_YoungModulus = 1000000.0;
     pbdConfig->m_femParams->m_PoissonRatio = 0.3;
-    pbdConfig->m_fixedNodeIds = { 51, 127, 178 };
     pbdConfig->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
-    pbdConfig->m_uniformMassValue = 1.0;
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_iterations = 5;
     pbdConfig->m_dt = 0.03;
@@ -57,7 +55,8 @@ createSoftBodyScene(std::string sceneName)
     pbdObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     pbdObj->setPhysicsGeometry(tetMesh);
     pbdObj->setPhysicsToVisualMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
-    pbdObj->setDynamicalModel(pbdModel);
+    pbdObj->getPbdBody()->uniformMassValue = 1.0;
+    pbdObj->getPbdBody()->fixedNodeIds     = { 51, 127, 178 };
 
     scene->addSceneObject(pbdObj);
 
@@ -79,15 +78,12 @@ createClothScene(std::string sceneName)
         auto pbdConfig = std::make_shared<PbdModelConfig>();
         pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e2);
         pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e1);
-        pbdConfig->m_fixedNodeIds     = { 0, static_cast<size_t>(dim[0]) - 1 };
-        pbdConfig->m_uniformMassValue = size[0] * size[1] / static_cast<double>(dim[0] * dim[1]);
         pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
         pbdConfig->m_dt         = 0.03;
         pbdConfig->m_iterations = 5;
 
         // Setup the Model
         auto pbdModel = std::make_shared<PbdModel>();
-        pbdModel->setModelGeometry(clothMesh);
         pbdModel->configure(pbdConfig);
 
         // Setup the Object
@@ -96,6 +92,8 @@ createClothScene(std::string sceneName)
         clothObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
         clothObj->setPhysicsGeometry(clothMesh);
         clothObj->setDynamicalModel(pbdModel);
+        clothObj->getPbdBody()->fixedNodeIds     = { 0, dim[0] - 1 };
+        clothObj->getPbdBody()->uniformMassValue = size[0] * size[1] / static_cast<double>(dim[0] * dim[1]);
     }
 
     auto scene = std::make_shared<Scene>("PBDCloth");

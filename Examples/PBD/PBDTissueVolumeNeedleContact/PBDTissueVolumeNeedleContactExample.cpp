@@ -17,6 +17,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRbdConstraint.h"
@@ -78,42 +79,37 @@ setSphereTexCoords(std::shared_ptr<SurfaceMesh> surfMesh, const double uvScale)
 ///
 static std::shared_ptr<PbdObject>
 makeTissueObj(const std::string& name,
+              std::shared_ptr<PbdModel> model,
               const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
-    imstkNew<PbdObject> clothObj(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tissueMesh = GeometryUtils::toTetGrid(center, size, dim);
     std::shared_ptr<SurfaceMesh>     surfMesh   = tissueMesh->extractSurfaceMesh();
     setSphereTexCoords(surfMesh, 6.0);
 
-    // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
-    // Actual skin young's modulus, 0.42MPa to 0.85Mpa, as reported in papers
-    // Actual skin possion ratio, 0.48, as reported in papers
-    pbdParams->m_femParams->m_YoungModulus = 420000.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.48;
-    // FYI:
-    //  - Poisson ratio gives shear to bulk, with 0.5 being complete shear
-    //    where everything is like a fluid and can slide past each other. 0.0
-    //    gives complete bulk where its rigid
-    //  - Youngs modulus then gives the scaling of the above in pressure
-    //    (pascals).
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
-    pbdParams->m_doPartitioning   = false;
-    pbdParams->m_uniformMassValue = 100.0;
-    pbdParams->m_dt = 0.001; // realtime used in update calls later in main
-    pbdParams->m_iterations = 5;
+    model->getConfig()->m_femParams->m_YoungModulus = 420000.0;
+    model->getConfig()->m_femParams->m_PoissonRatio = 0.48;
+    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
 
-    // Due to poor boundary conditions turning off gravity is useful. But then makes
-    // your tissue look like it's in space (springy and no resistance). So viscous
-    // damping is introduced to approximate these conditions.
-    //
-    // Ultimately this is a result of not modelling everything around the tissue.
-    // and poor/hard to model boundary conditions.
-    pbdParams->m_gravity = Vec3d::Zero();
-    pbdParams->m_viscousDampingCoeff = 0.03; // Removed from velocity
+    // Setup the material
+    imstkNew<RenderMaterial> material;
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setBackFaceCulling(false);
+    material->setOpacity(0.5);
 
+    // Add a visual model to render the surface of the tet mesh
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(surfMesh);
+    visualModel->setRenderMaterial(material);
+
+    // Setup the Object
+    imstkNew<PbdObject> tissueObj(name);
+    tissueObj->addVisualModel(visualModel);
+    tissueObj->setPhysicsGeometry(tissueMesh);
+    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
+    tissueObj->setDynamicalModel(model);
+    tissueObj->getPbdBody()->uniformMassValue = 100.0;
     // Fix the borders
     for (int z = 0; z < dim[2]; z++)
     {
@@ -123,36 +119,11 @@ makeTissueObj(const std::string& name,
             {
                 if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
                 {
-                    pbdParams->m_fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
                 }
             }
         }
     }
-
-    // Setup the Model
-    imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(tissueMesh);
-    pbdModel->configure(pbdParams);
-
-    // Setup the material
-    imstkNew<RenderMaterial> material;
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setBackFaceCulling(false);
-    /* material->setShadingModel(RenderMaterial::ShadingModel::PBR);
-     auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
-     material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
-     auto normalTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshNormal.jpg");
-     material->addTexture(std::make_shared<Texture>(normalTex, Texture::Type::Normal));
-     auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshORM.jpg");
-     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
-     material->setNormalStrength(0.3);*/
-    material->setOpacity(0.5);
-
-    // Add a visual model to render the surface of the tet mesh
-    imstkNew<VisualModel> visualModel;
-    visualModel->setGeometry(surfMesh);
-    visualModel->setRenderMaterial(material);
-    clothObj->addVisualModel(visualModel);
 
     // Add a visual model to render the normals of the surface
     /*imstkNew<VisualModel> normalsVisualModel(surfMesh);
@@ -160,13 +131,7 @@ makeTissueObj(const std::string& name,
     normalsVisualModel->getRenderMaterial()->setPointSize(0.5);
     clothObj->addVisualModel(normalsVisualModel);*/
 
-    // Setup the Object
-    clothObj->setPhysicsGeometry(tissueMesh);
-    clothObj->setCollidingGeometry(surfMesh);
-    clothObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
-    clothObj->setDynamicalModel(pbdModel);
-
-    return clothObj;
+    return tissueObj;
 }
 
 static std::shared_ptr<NeedleObject>
@@ -225,9 +190,24 @@ main()
     scene->getActiveCamera()->setFocalPoint(0.00262407, -0.026582, -0.00463737);
     scene->getActiveCamera()->setViewUp(-0.00218222, 0.901896, -0.431947);
 
+    // Setup the Parameters
+    imstkNew<PbdModelConfig> pbdParams;
+    pbdParams->m_doPartitioning = false;
+    pbdParams->m_dt = 0.001; // realtime used in update calls later in main
+    pbdParams->m_iterations = 5;
+    pbdParams->m_collisionIterations = 1;
+    pbdParams->m_gravity = Vec3d::Zero();
+    pbdParams->m_linearDampingCoeff  = 0.08; // Removed from velocity
+    pbdParams->m_angularDampingCoeff = 0.08;
+
+    // Setup the Model
+    auto pbdModel = std::make_shared<PbdModel>();
+    //pbdModel->setModelGeometry(toolObj->getCollidingGeometry());
+    pbdModel->configure(pbdParams);
+
     // Setup a tissue with surface collision geometry
     // 0.1m tissue patch 6x3x6 tet grid
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("PBDTissue",
+    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("PBDTissue", pbdModel,
         Vec3d(0.1, 0.025, 0.1), Vec3i(6, 3, 6), Vec3d(0.0, -0.03, 0.0));
     scene->addSceneObject(tissueObj);
 

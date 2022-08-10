@@ -37,10 +37,14 @@
 %shared_ptr(imstk::AbstractCellMesh)
 %shared_ptr(imstk::PointSet)
 %shared_ptr(imstk::ImageData)
+%shared_ptr(imstk::CellMesh<2>)
+%shared_ptr(imstk::CellMesh<3>)
+%shared_ptr(imstk::CellMesh<4>)
+%shared_ptr(imstk::CellMesh<8>)
 %shared_ptr(imstk::LineMesh)
-%shared_ptr(imstk::PointSet)
 %shared_ptr(imstk::SurfaceMesh)
-%shared_ptr(imstk::VolumetricMesh)
+%shared_ptr(imstk::VolumetricMesh<4>)
+%shared_ptr(imstk::VolumetricMesh<8>)
 %shared_ptr(imstk::TetrahedralMesh)
 %shared_ptr(imstk::HexahedralMesh)
 %shared_ptr(imstk::ImplicitGeometry)
@@ -88,7 +92,6 @@
 %shared_ptr(imstk::FemModelConfig)
 %shared_ptr(imstk::FemDeformableBodyModel)
 %shared_ptr(imstk::AbstractDynamicalModel)
-%shared_ptr(imstk::DynamicalModel<imstk::PbdState>)
 %shared_ptr(imstk::DynamicalModel<imstk::FeDeformBodyState>)
 %shared_ptr(imstk::DynamicalModel<imstk::SphState>)
 %shared_ptr(imstk::SphState)
@@ -111,6 +114,8 @@
 /*
  * Constraint
  */
+%shared_ptr(imstk::PbdBody)
+%shared_ptr(imstk::PbdState)
 %shared_ptr(imstk::RigidBody)
 
 /* 
@@ -209,6 +214,8 @@
  */
 %shared_ptr(imstk::DeviceClient)
 %shared_ptr(imstk::KeyboardDeviceClient)
+%shared_ptr(imstk::MouseDeviceClient)
+%shared_ptr(imstk::MouseEvent)
 %shared_ptr(imstk::HapticDeviceClient)
 %shared_ptr(imstk::HapticDeviceManager)
 %shared_ptr(imstk::VRPNDeviceClient)

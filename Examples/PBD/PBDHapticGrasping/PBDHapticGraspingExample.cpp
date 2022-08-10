@@ -14,6 +14,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdRigidBaryPointToPointConstraint.h"
@@ -24,10 +25,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
 #ifdef iMSTK_USE_OPENHAPTICS
@@ -61,27 +59,15 @@ makePbdObjSurface(
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 100.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100.0);
 
-    pbdParams->m_doPartitioning   = true;
-    pbdParams->m_uniformMassValue = 0.05;
+    pbdParams->m_doPartitioning = true;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = numIter;
-    pbdParams->m_viscousDampingCoeff = 0.003;
-
-    // Fix the borders
-    for (int vert_id = 0; vert_id < surfMesh->getNumVertices(); vert_id++)
-    {
-        auto position = surfMesh->getVertexPosition(vert_id);
-
-        if (position(1) == -2.0)
-        {
-            pbdParams->m_fixedNodeIds.push_back(vert_id);
-        }
-    }
+    pbdParams->m_linearDampingCoeff  = 0.003;
+    pbdParams->m_collisionIterations = 5;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(surfMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the material
@@ -98,6 +84,17 @@ makePbdObjSurface(
     prismObj->setPhysicsGeometry(surfMesh);
     prismObj->setCollidingGeometry(surfMesh);
     prismObj->setDynamicalModel(pbdModel);
+    prismObj->getPbdBody()->uniformMassValue = 0.05;
+    // Fix the borders
+    for (int vert_id = 0; vert_id < surfMesh->getNumVertices(); vert_id++)
+    {
+        auto position = surfMesh->getVertexPosition(vert_id);
+
+        if (position(1) == -2.0)
+        {
+            prismObj->getPbdBody()->fixedNodeIds.push_back(vert_id);
+        }
+    }
 
     return prismObj;
 }
@@ -177,11 +174,12 @@ main()
     scene->addSceneObject(rbdGhost);
 
     // Add collision
-    auto pbdToolCollision = std::make_shared<PbdObjectCollision>(PbdObj, toolObj, "SurfaceMeshToCapsuleCD");
-    scene->addInteraction(pbdToolCollision);
+    /*auto pbdToolCollision = std::make_shared<PbdObjectCollision>(PbdObj, toolObj, "SurfaceMeshToCapsuleCD");
+    scene->addInteraction(pbdToolCollision);*/
 
     // Create new picking with constraints
     auto toolPicking = std::make_shared<PbdRigidObjectGrasping>(PbdObj, toolObj);
+    toolPicking->setStiffness(0.3);
     scene->addInteraction(toolPicking);
 
     // Light
@@ -222,7 +220,7 @@ main()
         //controller->setAngularKs(0.0);
         controller->setUseCritDamping(true);
         controller->setForceScaling(0.001);
-        controller->setSmoothingKernelSize(10);
+        controller->setSmoothingKernelSize(15);
         controller->setUseForceSmoothening(true);
         scene->addControl(controller);
 
@@ -245,6 +243,7 @@ main()
                     if (e->m_button == 1)
                     {
                         toolPicking->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
+                        //pbdToolCollision->setEnabled(false);
                     }
                 }
                 else if (e->m_buttonState == BUTTON_RELEASED)
@@ -252,6 +251,7 @@ main()
                     if (e->m_button == 1)
                     {
                         toolPicking->endGrasp();
+                        //pbdToolCollision->setEnabled(true);
                     }
                 }
             });
@@ -278,7 +278,8 @@ main()
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
             [&](Event*)
             {
-                toolPicking->beginVertexGrasp(std::dynamic_pointer_cast<AnalyticalGeometry>(toolObj->getCollidingGeometry()));
+                toolPicking->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
+                //pbdToolCollision->setEnabled(false);
             });
 
         // Add click event and side effects
@@ -286,6 +287,7 @@ main()
             [&](Event*)
             {
                 toolPicking->endGrasp();
+                //pbdToolCollision->setEnabled(true);
             });
 #endif
 

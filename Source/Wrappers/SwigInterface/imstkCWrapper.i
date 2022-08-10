@@ -35,8 +35,9 @@
  */
 #include "imstkGeometry.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkAbstractCellMesh.h"
 #include "imstkPointSet.h"
+#include "imstkAbstractCellMesh.h"
+#include "imstkCellMesh.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"
 #include "imstkImageData.h"
@@ -83,9 +84,9 @@
  * DynamicalModel 
  */
 #include "imstkVectorizedState.h"
-#include "imstkPbdState.h"
 #include "imstkAbstractDynamicalModel.h"
 #include "imstkDynamicalModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkBackwardEuler.h"
@@ -108,6 +109,7 @@
 /*
  * Constraints
  */
+#include "imstkPbdBody.h"
 #include "imstkPbdConstraint.h"
 #include "imstkRbdConstraint.h"
 
@@ -208,6 +210,7 @@
  */
 #include "imstkDeviceClient.h"
 #include "imstkKeyboardDeviceClient.h"
+#include "imstkMouseDeviceClient.h"
 
 #ifdef iMSTK_USE_OpenHaptics
 #include "imstkHapticDeviceManager.h"
@@ -234,6 +237,7 @@ namespace std
   %template(VectorSizet) vector<std::size_t>;
   %template(VectorDouble) vector<double>;
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
+  %template(VectorPbdBody) vector<imstk::PbdBody>;
 }
 
 %include <std_except.i>
@@ -272,12 +276,19 @@ namespace std
  * Geometry
  */
 %include "../../Geometry/imstkGeometry.h";
-%include "../../Geometry/Mesh/imstkAbstractCellMesh.h"
 %include "../../Geometry/Mesh/imstkPointSet.h"
-%include "../../Geometry/Mesh/imstkSurfaceMesh.h"
-%include "../../Geometry/Mesh/imstkLineMesh.h"
 %include "../../Geometry/Mesh/imstkImageData.h"
+%include "../../Geometry/Mesh/imstkAbstractCellMesh.h"
+%include "../../Geometry/Mesh/imstkCellMesh.h"
+%template(CellMesh2) imstk::CellMesh<2>;
+%template(CellMesh3) imstk::CellMesh<3>;
+%template(CellMesh4) imstk::CellMesh<4>;
+%template(CellMesh8) imstk::CellMesh<8>;
+%include "../../Geometry/Mesh/imstkLineMesh.h"
+%include "../../Geometry/Mesh/imstkSurfaceMesh.h"
 %include "../../Geometry/Mesh/imstkVolumetricMesh.h"
+%template(VolumetricMesh4) imstk::VolumetricMesh<4>;
+%template(VolumetricMesh8) imstk::VolumetricMesh<8>;
 %include "../../Geometry/Mesh/imstkTetrahedralMesh.h"
 %include "../../Geometry/Mesh/imstkHexahedralMesh.h"
 %include "../../Geometry/Implicit/imstkImplicitGeometry.h"
@@ -327,6 +338,7 @@ namespace std
 /*
  * Constraint
  */
+%include "../../Constraint/PbdConstraints/imstkPbdBody.h"
 %include "../../Constraint/PbdConstraints/imstkPbdConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdFemConstraint.h"
@@ -336,11 +348,9 @@ namespace std
  * DynamicalModel
  */
 %include "../../DynamicalModels/ObjectStates/imstkVectorizedState.h"
-%include "../../DynamicalModels/ObjectStates/imstkPbdState.h"
 %include "../../DynamicalModels/ObjectModels/imstkAbstractDynamicalModel.h"
 %include "../../DynamicalModels/ObjectModels/imstkDynamicalModel.h"
-/* Instantiation of base class should be put before the derived class */
-%template(DynamicalModelPbdState) imstk::DynamicalModel<imstk::PbdState>;
+%include "../../DynamicalModels/ObjectModels/imstkPbdModelConfig.h"
 %include "../../DynamicalModels/ObjectModels/imstkPbdModel.h"
 %template(DynamicalModelFeDeformBodyState) imstk::DynamicalModel<imstk::FeDeformBodyState>;
 %include "../../DynamicalModels/InternalForceModel/imstkInternalForceModelTypes.h"
@@ -457,6 +467,7 @@ namespace std
  */
 %include "../../Devices/imstkDeviceClient.h"
 %include "../../Devices/imstkKeyboardDeviceClient.h"
+%include "../../Devices/imstkMouseDeviceClient.h"
 
 #ifdef iMSTK_USE_OpenHaptics
 	#define HDCALLBACK

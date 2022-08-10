@@ -18,24 +18,29 @@ namespace imstk
 class PbdDistanceConstraint : public PbdConstraint
 {
 public:
-    PbdDistanceConstraint() : PbdConstraint()
+    PbdDistanceConstraint() : PbdConstraint(2) { }
+
+    ///
+    /// \brief Initialize the constraint with resting length
+    /// as the length between the two points
+    ///
+    void initConstraint(
+        const Vec3d& p0, const Vec3d& p1,
+        const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
+        const double k = 1e5)
     {
-        m_vertexIds.resize(2);
-        m_dcdx.resize(2);
+        initConstraint((p0 - p1).norm(), pIdx0, pIdx1, k);
     }
 
     ///
-    /// \brief Initializes the distance constraint
+    /// \brief Initialize the constraint with provided resting length
     ///
-    void initConstraint(const VecDataArray<double, 3>& initVertexPositions,
-                        const size_t& pIdx0,
-                        const size_t& pIdx1,
+    void initConstraint(const double restLength,
+                        const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
                         const double k = 1e5);
 
-    bool computeValueAndGradient(
-        const VecDataArray<double, 3>& currVertexPositions,
-        double& c,
-        std::vector<Vec3d>& dcdx) const override;
+    bool computeValueAndGradient(PbdState& bodies,
+                                 double& c, std::vector<Vec3d>& dcdx) override;
 
 public:
     double m_restLength = 0.0; ///< Rest length between the nodes

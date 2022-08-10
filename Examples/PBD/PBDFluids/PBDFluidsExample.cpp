@@ -12,6 +12,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkRenderMaterial.h"
@@ -54,19 +55,18 @@ createPbdFluid(const std::string& tetMeshName)
     deformableObj->setPhysicsGeometry(fluidMesh);
 
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(fluidMesh);
 
     // Configure model
     auto         pbdParams      = std::make_shared<PbdModelConfig>();
     const double particleRadius = 0.5;
     pbdParams->enableConstantDensityConstraint(1.0, particleRadius);
-    pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 2;
     pbdModel->configure(pbdParams);
 
     deformableObj->setDynamicalModel(pbdModel);
+    deformableObj->getPbdBody()->uniformMassValue = 1.0;
 
     return deformableObj;
 }

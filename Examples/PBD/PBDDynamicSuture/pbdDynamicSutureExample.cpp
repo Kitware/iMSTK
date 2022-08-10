@@ -19,6 +19,7 @@
 #include "imstkNew.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkPointLight.h"
@@ -40,29 +41,21 @@ using namespace imstk;
 
 // Create tissue object to stitch
 std::shared_ptr<PbdObject>
-createTissueHole(std::shared_ptr<TetrahedralMesh> tetMesh)
+createTissue(std::shared_ptr<PbdModel> model)
 {
+    // Load a tetrahedral mesh
+    std::shared_ptr<TetrahedralMesh> tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "Tissues/tissue_hole.vtk");
+    CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
+
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
-    auto pbdObject = std::make_shared<PbdObject>("meshHole");
-    auto pbdParams = std::make_shared<PbdModelConfig>();
-
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100.0);
-    pbdParams->m_doPartitioning   = false;
-    pbdParams->m_uniformMassValue = 0.01;
-    pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
-    pbdParams->m_dt         = 0.01;
-    pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.3;
-
-    // Fix the borders
-    for (int vert_id = 0; vert_id < surfMesh->getNumVertices(); vert_id++)
+    std::vector<int> fixedNodes;
+    for (int i = 0; i < tetMesh->getNumVertices(); i++)
     {
-        auto position = tetMesh->getVertexPosition(vert_id);
-        if (std::fabs(1.40984 - std::fabs(position(1))) <= 1E-4)
+        const Vec3d& position = tetMesh->getVertexPosition(i);
+        if (std::fabs(1.40984 - std::fabs(position[1])) <= 1E-4)
         {
-            pbdParams->m_fixedNodeIds.push_back(vert_id);
+            fixedNodes.push_back(i);
         }
     }
 
@@ -78,26 +71,18 @@ createTissueHole(std::shared_ptr<TetrahedralMesh> tetMesh)
     surfMesh->computeVertexNormals();
     surfMesh->computeTrianglesNormals();
 
-    // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(tetMesh);
-    pbdModel->configure(pbdParams);
-
-    // Setup the material
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-
-    // Add a visual model to render the surface of the tet mesh
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(surfMesh);
-    visualModel->setRenderMaterial(material);
-    pbdObject->addVisualModel(visualModel);
-
     // Setup the Object
+    auto pbdObject = std::make_shared<PbdObject>("meshHole");
+    pbdObject->setVisualGeometry(surfMesh);
+    pbdObject->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);;
     pbdObject->setPhysicsGeometry(tetMesh);
     pbdObject->setCollidingGeometry(surfMesh);
     pbdObject->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
-    pbdObject->setDynamicalModel(pbdModel);
+    pbdObject->setDynamicalModel(model);
+    pbdObject->getPbdBody()->uniformMassValue = 0.01;
+    // Fix the borders
+    pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
+    model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.3);
 
     return pbdObject;
 }
@@ -129,35 +114,12 @@ static std::shared_ptr<PbdObject>
 makePbdString(
     const std::string& name,
     const Vec3d& pos, const Vec3d& dir, const int numVerts,
-    const double stringLength)
+    const double stringLength,
+    std::shared_ptr<PbdModel> model)
 {
-    imstkNew<PbdObject> stringObj(name);
-
     // Setup the Geometry
     std::shared_ptr<LineMesh> stringMesh =
         GeometryUtils::toLineGrid(pos, dir, stringLength, numVerts);
-
-    // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50.0);
-    pbdParams->enableBendConstraint(0.2, 1);
-    pbdParams->m_fixedNodeIds     = { 0, 1 };
-    pbdParams->m_uniformMassValue = 0.0001 / numVerts; // 0.002 / numVerts; // grams
-    pbdParams->m_gravity = Vec3d(0.0, 0.01, 0.0);
-    pbdParams->m_dt      = 0.001;                      // Overwritten for real time
-
-    // Very important parameter for stability of solver, keep lower than 1.0:
-    pbdParams->m_contactStiffness = 0.01;
-
-    // Requires large amounts of iterations the longer, a different
-    // solver would help
-    pbdParams->m_iterations = 30;
-    pbdParams->m_viscousDampingCoeff = 0.03;
-
-    // Setup the Model
-    imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(stringMesh);
-    pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
@@ -172,10 +134,16 @@ makePbdString(
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
+    imstkNew<PbdObject> stringObj(name);
     stringObj->addVisualModel(visualModel);
     stringObj->setPhysicsGeometry(stringMesh);
     stringObj->setCollidingGeometry(stringMesh);
-    stringObj->setDynamicalModel(pbdModel);
+    stringObj->setDynamicalModel(model);
+    stringObj->getPbdBody()->fixedNodeIds     = { 0, 1 };
+    stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // 0.002 / numVerts; // grams
+    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50.0, stringObj->getPbdBody()->bodyHandle);
+    model->getConfig()->enableBendConstraint(0.2, 1, true, stringObj->getPbdBody()->bodyHandle);
+    model->getConfig()->setBodyDamping(stringObj->getPbdBody()->bodyHandle, 0.03);
 
     return stringObj;
 }
@@ -201,12 +169,20 @@ main()
     light->setIntensity(1.0);
     scene->addLight("Light", light);
 
-    // Load a tetrahedral mesh
-    std::shared_ptr<TetrahedralMesh> tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "Tissues/tissue_hole.vtk");
-    CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
+    // Setup the Model
+    auto pbdModel  = std::make_shared<PbdModel>();
+    auto pbdParams = std::make_shared<PbdModelConfig>();
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100.0);
+    pbdParams->m_doPartitioning = false;
+    pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
+    pbdParams->m_dt         = 0.01;
+    pbdParams->m_iterations = 5;
+    pbdParams->m_collisionIterations = 50;
+    pbdModel->configure(pbdParams);
 
     // Mesh with hole for suturing
-    std::shared_ptr<PbdObject> tissueHole = createTissueHole(tetMesh);
+    std::shared_ptr<PbdObject> tissueHole = createTissue(pbdModel);
     scene->addSceneObject(tissueHole);
 
     // Create arced needle
@@ -219,7 +195,7 @@ main()
     const int                  stringVertexCount = 70;
     std::shared_ptr<PbdObject> sutureThreadObj   =
         makePbdString("SutureThread", Vec3d(0.0, 0.0, 0.018), Vec3d(0.0, 0.0, 1.0),
-            stringVertexCount, stringLength);
+            stringVertexCount, stringLength, pbdModel);
     scene->addSceneObject(sutureThreadObj);
 
     // Add needle constraining behaviour between the tissue & arc needle/thread
@@ -228,11 +204,9 @@ main()
 
     // Add thread CCD
     auto interactionCCDThread = std::make_shared<PbdObjectCollision>(sutureThreadObj, sutureThreadObj, "LineMeshToLineMeshCCD");
-    interactionCCDThread->setFriction(0.0);
-    auto colSolver = std::dynamic_pointer_cast<PbdCollisionHandling>(interactionCCDThread->getCollisionHandlingAB())->getCollisionSolver();
-
-    // Set the number of iterations for the CCD solver.
-    colSolver->setCollisionIterations(100);
+    // Very important parameter for stability of solver, keep lower than 1.0:
+    interactionCCDThread->setDeformableStiffnessA(0.01);
+    interactionCCDThread->setDeformableStiffnessB(0.01);
     scene->addInteraction(interactionCCDThread);
 
     {

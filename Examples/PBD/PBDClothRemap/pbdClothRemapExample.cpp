@@ -13,6 +13,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
@@ -52,15 +53,12 @@ makeClothObj(const std::string& name,
     imstkNew<PbdModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e2);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e1);
-    pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
-    pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.01;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
     imstkNew<PbdModel> pbdModel;
-    pbdModel->setModelGeometry(clothMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
@@ -76,6 +74,8 @@ makeClothObj(const std::string& name,
     clothObj->addVisualModel(visualModel);
     clothObj->setPhysicsGeometry(clothMesh);
     clothObj->setDynamicalModel(pbdModel);
+    clothObj->getPbdBody()->fixedNodeIds     = { 0, nCols - 1 };
+    clothObj->getPbdBody()->uniformMassValue = width * height / (nRows * nCols);
 
     return clothObj;
 }
@@ -172,6 +172,7 @@ main()
 
                     // Re-setup the constraints on the object
                     clothObj->initialize();
+                    clothObj->getPbdModel()->initialize();
                 }
         });
 
