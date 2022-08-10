@@ -752,3 +752,59 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_Friction)
     createScene();
     runFor(2.0);
 }
+
+///
+/// \brief Test LineMeshToCapsuleCD with PbdObjectCollision
+///
+TEST_F(PbdObjectCollisionTest, PbdThread_LineMeshToCapsuleCD)
+{
+    // Setup the thread
+    m_pbdObj = makeLineThreadObj("Thread",
+        0.4, 20, Vec3d(-0.2, 0.0, 0.0),
+        Vec3d(1.0, 0.0, 0.0));
+
+    // Setup the geometry
+    auto implicitGeom = std::make_shared<Capsule>();
+    implicitGeom->setPosition(0.0, -0.2, 0.0);
+    implicitGeom->setRadius(0.1);
+    implicitGeom->setLength(1.0);
+    implicitGeom->setOrientation(Quatd(0.0, 0.0, 0.707, 0.707));
+    m_collidingGeometry = implicitGeom;
+
+    m_collisionName = "LineMeshToCapsuleCD";
+    m_friction      = 0.0;
+    m_restitution   = 0.0;
+
+    m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
+    m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
+
+    createScene();
+    runFor(2.0);
+}
+
+///
+/// \brief Test LineMeshToSphereCD with PbdObjectCollision
+///
+TEST_F(PbdObjectCollisionTest, PbdThread_LineMeshToSphereCD)
+{
+    // Setup the thread
+    m_pbdObj = makeLineThreadObj("Thread",
+        0.4, 20, Vec3d(-0.2, 0.0, 0.0),
+        Vec3d(1.0, 0.0, 0.0));
+
+    // Setup the geometry
+    auto implicitGeom = std::make_shared<Sphere>();
+    implicitGeom->setPosition(0.0, -0.2, 0.0);
+    implicitGeom->setRadius(0.1);
+    m_collidingGeometry = implicitGeom;
+
+    m_collisionName = "LineMeshToSphereCD";
+    m_friction      = 0.0;
+    m_restitution   = 0.0;
+
+    m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
+    m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
+
+    createScene();
+    runFor(2.0);
+}

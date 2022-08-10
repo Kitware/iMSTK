@@ -12,6 +12,8 @@
 #include "imstkImplicitGeometryToPointSetCCD.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
 #include "imstkLineMeshToLineMeshCCD.h"
+#include "imstkLineMeshToSphereCD.h"
+#include "imstkLineMeshToCapsuleCD.h"
 #include "imstkPointSetToCapsuleCD.h"
 #include "imstkPointSetToCylinderCD.h"
 #include "imstkPointSetToOrientedBoxCD.h"
@@ -35,6 +37,8 @@ IMSTK_REGISTER_COLLISION_DETECTION(ClosedSurfaceMeshToMeshCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCCD);
 IMSTK_REGISTER_COLLISION_DETECTION(LineMeshToLineMeshCCD);
+IMSTK_REGISTER_COLLISION_DETECTION(LineMeshToSphereCD);
+IMSTK_REGISTER_COLLISION_DETECTION(LineMeshToCapsuleCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToCapsuleCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToCylinderCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToPlaneCD);
@@ -115,14 +119,14 @@ CDObjectFactory::getCDType(
         IMSTK_MAP_TYPES(Plane, LineMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Plane, TetrahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Plane, HexahedralMesh, ImplicitGeometryToPointSetCD),
-        IMSTK_MAP_TYPES(Capsule, LineMesh, ImplicitGeometryToPointSetCD),
+        IMSTK_MAP_TYPES(Capsule, LineMesh, LineMeshToCapsuleCD),
         IMSTK_MAP_TYPES(Capsule, TetrahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Capsule, HexahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Cylinder, LineMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Cylinder, SurfaceMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Cylinder, TetrahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Cylinder, HexahedralMesh, ImplicitGeometryToPointSetCD),
-        IMSTK_MAP_TYPES(Sphere, LineMesh, ImplicitGeometryToPointSetCD),
+        IMSTK_MAP_TYPES(Sphere, LineMesh, LineMeshToSphereCD),
         IMSTK_MAP_TYPES(Sphere, TetrahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Sphere, HexahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(OrientedBox, LineMesh, ImplicitGeometryToPointSetCD),
