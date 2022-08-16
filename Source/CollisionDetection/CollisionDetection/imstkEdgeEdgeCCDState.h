@@ -10,19 +10,38 @@
 
 namespace imstk
 {
+/// Implements CCD based method described in:
+/// Qi, Di, et al. "Virtual interactive suturing for the Fundamentals of Laparoscopic Surgery (FLS)."
+/// Journal of biomedical informatics 75 (2017) : 48 - 62.
+/// https://doi.org/10.1016/j.jbi.2017.09.010
 class EdgeEdgeCCDState
 {
 public:
+
+    /*
+                _o (xi1)
+            _-*
+        _-*
+(xi) o*  (segment i)
+     ^
+     |
+ (w0)|
+     |
+ (xj)o----------o (xj1)
+        (segment j)
+    */
+
     /// Points that belong to the two input line-segments.
     /// const references are maintained to avoid unnecessary copy operations.
     const Vec3d& xi, & xi1, & xj, & xj1;
 
     /// Vectors that represent the edges / line-segments
-    const Vec3d ei, ej;
+    const Vec3d ei;  ///< vector defining segment i (xi1 - xi)
+    const Vec3d ej;  ///< vector defining segment j (xj1 - xj)
 
-    const Vec3d w0;
+    const Vec3d w0;  ///< vector from first point on segement i to first point on segment j (xj - xi)
 
-    /// Shortest distance vector between the infinite lines.
+    /// Shortest distance vector between the infinite lines defined by the two segments
     const Vec3d w;
 
     EdgeEdgeCCDState(const Vec3d& i0, const Vec3d& i1, const Vec3d& j0, const Vec3d& j1);
@@ -51,8 +70,12 @@ public:
         return m_pj;
     }
 
+    /// Computes shortest distance between the two segments assuming that the nearest point between the two
+    /// lines defined by the segments is not within the boundaries of the segments at time t
     Vec3d computeWBar();
 
+    /// Computes shortest distance between the two segments assuming that the nearest point between the two
+    /// lines defined by the segments is not within the boundaries of the segments at time t+1
     Vec3d computeWBar2() const;
 
     /// Pi and Pj are closest points on segments xi--xi1 and xj--xj1 respectively.
@@ -92,49 +115,61 @@ public:
     static int testCollision(const EdgeEdgeCCDState& prev, EdgeEdgeCCDState& curr, double& relativeTimeOfImpact);
 
 private:
-    double m_si, m_sj;
-    Vec3d  m_pi, m_pj;
+
+    double m_si; ///< magnitude of distance along ei that is nearest to line segment j
+    double m_sj; ///< magnitude of distance along ej that is nearest to line segment i
+
+    Vec3d m_pi;  ///< position of point on segment i closest to segment j
+    Vec3d m_pj;  ///< position of point on segment j closest to segment i
 
     double m_epsilon = 1e-10;
 
     // Thickness of colliding LineMeshes.
     double m_thickness = 0.0016; // 0.0016
 
+    /// Squared magnitude of vector ei
     double a() const
     {
         return ei.dot(ei);
     }
 
+    /// Projection of ei onto ej
     double b() const
     {
         return ei.dot(ej);
     }
 
+    /// Squared magnitude of vector ej
     double c() const
     {
         return ej.dot(ej);
     }
 
+    /// Projection of ei onto w0
     double d() const
     {
         return ei.dot(w0);
     }
 
+    /// Projection of ej onto w0
     double e() const
     {
         return ej.dot(w0);
     }
 
+    /// Calculate check for parallel segments ac-b^{2} < \epsilon
     double denom() const
     {
         return a() * c() - b() * b();
     }
 
+    /// Calculate magnitude of distance along ei that is nearest to line segment j
     double computeSi() const;
 
+    /// Calculate magnitude of distance along ej that is nearest to line segment i
     double computeSj() const;
 
-    /// Shortest distance vector between the infinite lines.
+    /// Shortest distance vector between the infinite lines defined by the two input segments
     Vec3d shortestDistanceVector() const;
 };
 } // namespace imstk
