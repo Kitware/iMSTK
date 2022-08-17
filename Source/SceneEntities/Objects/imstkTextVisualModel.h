@@ -74,7 +74,7 @@ protected:
     std::string m_text      = "";
     Color       m_textColor = Color::White;
     double      m_fontSize  = 20.0;
-    bool m_visible = false;
+    bool m_visible = true;
 
     DisplayPosition m_position = DisplayPosition::CenterCenter;
 };
