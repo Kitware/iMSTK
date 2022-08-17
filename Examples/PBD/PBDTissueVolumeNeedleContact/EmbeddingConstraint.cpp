@@ -12,11 +12,11 @@ namespace imstk
 void
 EmbeddingConstraint::initConstraint(
     PbdState& bodies,
+    const PbdParticleId& ptA1,
     const PbdParticleId& ptB1, const PbdParticleId& ptB2, const PbdParticleId& ptB3,
-    Vec3d* p, Vec3d* q)
+    Vec3d* p, Vec3d* q,
+    const double compliance)
 {
-    m_state = &bodies;
-
     // Set the triangle
     m_particles[0] = ptB1;
     m_particles[1] = ptB2;
@@ -27,11 +27,10 @@ EmbeddingConstraint::initConstraint(
 
     // Compute intersection point & interpolant on triangle
     CollisionUtils::testSegmentTriangle(*p, *q, x1, x2, x3, m_uvw);
-    m_iPt    = x1 * m_uvw[0] + x2 * m_uvw[1] + x3 * m_uvw[2];
-    m_iPtVel = Vec3d::Zero();
+    m_iPt = x1 * m_uvw[0] + x2 * m_uvw[1] + x3 * m_uvw[2];
 
-    // Completely rigid for PBD
-    m_stiffness[0] = m_stiffness[1] = 1.0;
+    m_particles[3] = ptA1;
+    m_r[3] = bodies.getOrientation(ptA1).inverse()._transformVector(m_iPt - bodies.getPosition(ptA1));
 
     // Compute the interpolant on the line
     {
@@ -41,12 +40,13 @@ EmbeddingConstraint::initConstraint(
         const Vec3d d  = m_iPt - *q;
         m_t = pq.dot(d);
     }
+
+    setCompliance(compliance);
 }
 
 Vec3d
 EmbeddingConstraint::computeInterpolantDifference(const PbdState& bodies) const
 {
-    //const Vec3d& x0 = *m_bodiesFirst[0].vertex;
     const Vec3d& x1 = bodies.getPosition(m_particles[0]);
     const Vec3d& x2 = bodies.getPosition(m_particles[1]);
     const Vec3d& x3 = bodies.getPosition(m_particles[2]);
@@ -65,14 +65,16 @@ EmbeddingConstraint::computeInterpolantDifference(const PbdState& bodies) const
 }
 
 bool
-EmbeddingConstraint::computeValueAndGradient(PbdState&           bodies,
-                                             double&             c,
+EmbeddingConstraint::computeValueAndGradient(PbdState& bodies, double& c,
                                              std::vector<Vec3d>& dcdx)
 {
     // Triangle
-    /*const Vec3d& x0 = bodies.getPosition(m_particles[0]);
+    const Vec3d& x0 = bodies.getPosition(m_particles[0]);
     const Vec3d& x1 = bodies.getPosition(m_particles[1]);
-    const Vec3d& x2 = bodies.getPosition(m_particles[2]);*/
+    const Vec3d& x2 = bodies.getPosition(m_particles[2]);
+    // Body center of mass
+    const Vec3d& x3 = bodies.getPosition(m_particles[3]);
+    //const Quatd& q3 = bodies.getOrientation(m_particles[3]);
 
     // Compute the normal/axes of the line
     const Vec3d pq   = *m_p - *m_q;
@@ -84,42 +86,19 @@ EmbeddingConstraint::computeValueAndGradient(PbdState&           bodies,
     // Remove any normal movement (remove only fraction for sort of friction)
     // Frees normal movement
     diff = diff - diff.dot(pq_n) * pq_n * (1.0 - m_normalFriction);
-    const Vec3d n = diff.normalized();
+    const Vec3d ortho = diff.normalized(); // Constrain only orthogonal movement
 
-    dcdx[0] = n;
-    dcdx[1] = n;
-    dcdx[2] = n;
+    // Puncture point
+    const Vec3d triPos = x0 * m_uvw[0] + x1 * m_uvw[1] + x2 * m_uvw[2];
 
-    c = -diff.norm() * (1.0 - m_compliance0);
+    dcdx[0] = -ortho;
+    dcdx[1] = -ortho;
+    dcdx[2] = -ortho;
+    dcdx[3] = ortho;
+    //m_r[3] = triPos - x3;
+
+    c = -diff.norm();
 
     return true;
-}
-
-void
-EmbeddingConstraint::compute(double dt)
-{
-    // Jacobian of contact (defines linear and angular constraint axes)
-    J = Eigen::Matrix<double, 3, 4>::Zero();
-    if (!m_obj1->m_isStatic)
-    {
-        // Compute the normal/axes of the line
-        const Vec3d pq   = *m_p - *m_q;
-        const Vec3d pq_n = pq.normalized();
-
-        // Compute the difference between the two interpolated points on the elements
-        Vec3d diff = computeInterpolantDifference(*m_state);
-
-        // Remove any normal movement (remove only fraction for sort of friction)
-        // Frees normal movement
-        diff = diff - diff.dot(pq_n) * pq_n * (1.0 - m_normalFriction);
-        const Vec3d n = -diff.normalized();
-
-        vu = diff.norm() * m_beta / dt * m_compliance0;
-
-        // Displacement from center of mass
-        J(0, 0) = -n[0]; J(0, 1) = 0.0;
-        J(1, 0) = -n[1]; J(1, 1) = 0.0;
-        J(2, 0) = -n[2]; J(2, 1) = 0.0;
-    }
 }
 } // namespace imstk
