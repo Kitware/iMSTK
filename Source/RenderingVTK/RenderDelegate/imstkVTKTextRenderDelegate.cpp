@@ -85,9 +85,10 @@ VTKTextRenderDelegate::processEvents()
     // Update text if changed
     auto textVisualModel = std::dynamic_pointer_cast<TextVisualModel>(m_visualModel);
 
-    if (textVisualModel->getText() != std::string(m_textActor->GetInput()))
+    if (textVisualModel->getText() != std::string(m_textMapper->GetInput()))
     {
-        m_textActor->SetInput(textVisualModel->getText().c_str());
+        m_textMapper->SetInput(textVisualModel->getText().c_str());
+        m_textMapper->Update();
     }
 
     m_textActor->SetVisibility(textVisualModel->getVisibility());
