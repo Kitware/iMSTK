@@ -181,6 +181,9 @@ mark_as_superbuild(${PROJECT_NAME}_USE_VRPN:BOOL)
 
 option(${PROJECT_NAME}_USE_HAPLY "Build with Haply support" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_HAPLY:BOOL)
+if (${PROJECT_NAME}_USE_HAPLY)
+  message(WARNING "iMSTK_USE_HAPLY set to true, this code is based of an early version of the Haply API")
+endif()
 
 cmake_dependent_option(${PROJECT_NAME}_USE_RENDERING_VTK "Build with/out VTK rendering support" ON "NOT ${PROJECT_NAME}_BUILD_FOR_UNITY" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_RENDERING_VTK:BOOL)
