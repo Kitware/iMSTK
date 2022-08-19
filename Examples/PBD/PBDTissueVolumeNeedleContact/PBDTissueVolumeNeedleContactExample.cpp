@@ -15,60 +15,36 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
+#include "imstkPbdCollisionHandling.h"
+#include "imstkPbdContactConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectController.h"
 #include "imstkPointwiseMap.h"
-#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkTextVisualModel.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleEmbeddedCH.h"
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
 
+#include <sstream>
+
 #ifdef iMSTK_USE_OPENHAPTICS
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
-#include "imstkRigidObjectController.h"
 #else
 #include "imstkMouseDeviceClient.h"
+#include "imstkDummyClient.h"
 #endif
 
 using namespace imstk;
-
-///
-/// \brief Spherically project the texture coordinates
-///
-static void
-setSphereTexCoords(std::shared_ptr<SurfaceMesh> surfMesh, const double uvScale)
-{
-    Vec3d min, max;
-    surfMesh->computeBoundingBox(min, max);
-    const Vec3d size   = max - min;
-    const Vec3d center = (max + min) * 0.5;
-
-    const double radius = (size * 0.5).norm();
-
-    imstkNew<VecDataArray<float, 2>> uvCoordsPtr(surfMesh->getNumVertices());
-    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
-    for (int i = 0; i < surfMesh->getNumVertices(); i++)
-    {
-        Vec3d vertex = surfMesh->getVertexPosition(i) - center;
-
-        // Compute phi and theta on the sphere
-        const double theta = asin(vertex[0] / radius);
-        const double phi   = atan2(vertex[1], vertex[2]);
-        uvCoords[i] = Vec2f(phi / (PI * 2.0) + 0.5, theta / (PI * 2.0) + 0.5) * uvScale;
-    }
-    surfMesh->setVertexTCoords("tcoords", uvCoordsPtr);
-}
 
 ///
 /// \brief Creates tissue object
@@ -85,31 +61,26 @@ makeTissueObj(const std::string& name,
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tissueMesh = GeometryUtils::toTetGrid(center, size, dim);
     std::shared_ptr<SurfaceMesh>     surfMesh   = tissueMesh->extractSurfaceMesh();
-    setSphereTexCoords(surfMesh, 6.0);
 
-    model->getConfig()->m_femParams->m_YoungModulus = 420000.0;
+    model->getConfig()->m_femParams->m_YoungModulus = 50000.0;
     model->getConfig()->m_femParams->m_PoissonRatio = 0.48;
     model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
 
     // Setup the material
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setBackFaceCulling(false);
     material->setOpacity(0.5);
 
-    // Add a visual model to render the surface of the tet mesh
-    imstkNew<VisualModel> visualModel;
-    visualModel->setGeometry(surfMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    imstkNew<PbdObject> tissueObj(name);
-    tissueObj->addVisualModel(visualModel);
+    auto tissueObj = std::make_shared<PbdObject>(name);
+    tissueObj->setVisualGeometry(surfMesh);
+    tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(tissueMesh);
     tissueObj->setCollidingGeometry(surfMesh);
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     tissueObj->setDynamicalModel(model);
-    tissueObj->getPbdBody()->uniformMassValue = 100.0;
+    tissueObj->getPbdBody()->uniformMassValue = 0.04;
     // Fix the borders
     for (int z = 0; z < dim[2]; z++)
     {
@@ -125,58 +96,91 @@ makeTissueObj(const std::string& name,
         }
     }
 
-    // Add a visual model to render the normals of the surface
-    /*imstkNew<VisualModel> normalsVisualModel(surfMesh);
-    normalsVisualModel->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::SurfaceNormals);
-    normalsVisualModel->getRenderMaterial()->setPointSize(0.5);
-    clothObj->addVisualModel(normalsVisualModel);*/
-
     return tissueObj;
 }
 
-static std::shared_ptr<NeedleObject>
-makeToolObj()
+///
+/// \brief Creates a text object with text in the top right
+///
+static std::shared_ptr<SceneObject>
+makeTextObj()
 {
-    imstkNew<LineMesh>                toolGeometry;
-    imstkNew<VecDataArray<double, 3>> verticesPtr(2);
-    (*verticesPtr)[0] = Vec3d(0.0, -0.05, 0.0);
-    (*verticesPtr)[1] = Vec3d(0.0, 0.05, 0.0);
-    imstkNew<VecDataArray<int, 2>> indicesPtr(1);
-    (*indicesPtr)[0] = Vec2i(0, 1);
-    toolGeometry->initialize(verticesPtr, indicesPtr);
+    auto txtVisualModel = std::make_shared<TextVisualModel>();
+    txtVisualModel->setText(
+        "Device Force: 0N\n"
+        "Device Torque: 0Nm\n"
+        "Contact Force: 0N\n"
+        "Contact Torque: 0Nm");
+    txtVisualModel->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
+    auto obj = std::make_shared<SceneObject>();
+    obj->addVisualModel(txtVisualModel);
+    return obj;
+}
 
-    auto syringeMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Syringes/Disposable_Syringe.stl");
-    syringeMesh->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2, Geometry::TransformType::ApplyToData);
-    syringeMesh->translate(Vec3d(0.0, 4.4, 0.0), Geometry::TransformType::ApplyToData);
-    syringeMesh->scale(0.0055, Geometry::TransformType::ApplyToData);
-    syringeMesh->translate(Vec3d(0.0, 0.1, 0.0));
+static void
+updateTxtObj(std::shared_ptr<SceneObject>         txtObj,
+             std::shared_ptr<NeedleInteraction>   interaction,
+             std::shared_ptr<PbdObjectController> controller)
+{
+    // Display the contact and device force
+    double                             contactForceMag  = 0.0;
+    double                             contactTorqueMag = 0.0;
+    auto                               pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(interaction->getCollisionHandlingAB());
+    const std::vector<PbdConstraint*>& collisionConstraints = pbdCH->getConstraints();
+    if (collisionConstraints.size() > 0)
+    {
+        auto         pbdObj = std::dynamic_pointer_cast<PbdObject>(controller->getControlledObject());
+        const double dt     = pbdObj->getPbdModel()->getConfig()->m_dt;
 
-    imstkNew<NeedleObject> toolObj("NeedleRbdTool");
-    toolObj->setVisualGeometry(syringeMesh);
-    toolObj->setCollidingGeometry(toolGeometry);
-    toolObj->setPhysicsGeometry(toolGeometry);
-    toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeometry, syringeMesh));
-    toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
-    toolObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
+        auto contactConstraint = dynamic_cast<PbdContactConstraint*>(collisionConstraints[0]);
 
-    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
-    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-    rbdModel->getConfig()->m_maxNumIterations = 5;
-    toolObj->setDynamicalModel(rbdModel);
+        // Multiply with gradient for direction
+        contactForceMag   = std::abs(contactConstraint->getForce(dt));
+        contactForceMag  *= controller->getForceScaling(); // Scale to bring in device space
+        contactTorqueMag  = std::abs(contactConstraint->getTorque(dt, 0));
+        contactTorqueMag *= controller->getForceScaling();
+    }
 
-    toolObj->getRigidBody()->m_mass = 1.0;
-    toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
-    toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.1, 0.0);
+    // Get a desired precision
+    std::ostringstream strStream;
+    strStream.precision(2);
+    strStream <<
+        "Device Force: " << controller->getDeviceForce().norm() << "N\n"
+        "Device Torque: " << controller->getDeviceTorque().norm() << "Nm\n"
+        "Contact Force (scaled): " << contactForceMag << "N\n"
+        "Contact Torque (scaled): " << contactTorqueMag << "Nm";
 
-    return toolObj;
+    std::dynamic_pointer_cast<TextVisualModel>(txtObj->getVisualModel(0))->setText(strStream.str());
+}
+
+static void
+updateDebugGeom(std::shared_ptr<NeedleInteraction>   interaction,
+                std::shared_ptr<DebugGeometryObject> debugGeomObj)
+{
+    auto                      needleEmbeddedCH   = std::dynamic_pointer_cast<NeedleEmbeddedCH>(interaction->getEmbeddingCH());
+    const std::vector<Vec3d>& debugEmbeddingPts  = needleEmbeddedCH->m_debugEmbeddingPoints;
+    const std::vector<Vec3i>& debugEmbeddingTris = needleEmbeddedCH->m_debugEmbeddedTriangles;
+    debugGeomObj->clear();
+    for (size_t i = 0; i < debugEmbeddingPts.size(); i++)
+    {
+        debugGeomObj->addPoint(debugEmbeddingPts[i]);
+    }
+    auto                     tissueObj   = std::dynamic_pointer_cast<PbdObject>(interaction->getEmbeddingCH()->getInputObjectA());
+    auto                     verticesPtr = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry())->getVertexPositions();
+    VecDataArray<double, 3>& vertices    = *verticesPtr;
+    for (size_t i = 0; i < debugEmbeddingTris.size(); i++)
+    {
+        debugGeomObj->addTriangle(
+            vertices[debugEmbeddingTris[i][0]],
+            vertices[debugEmbeddingTris[i][1]],
+            vertices[debugEmbeddingTris[i][2]]);
+    }
 }
 
 ///
-/// \brief This example demonstrates two-way tissue needle contact with a tetrahedral mesh.
-/// Constraints are used at the tetrahedrons faces of intersection
+/// \brief This example demonstrates two-way linear tissue needle contact
+/// with a tetrahedral mesh. No torques rendered. Constraints are used at
+/// the tetrahedrons faces of intersection.
 ///
 int
 main()
@@ -185,42 +189,37 @@ main()
     Logger::startLogger();
 
     // Setup the scene
-    imstkNew<Scene> scene("PBDTissueVolumeNeedleContact");
+    auto scene = std::make_shared<Scene>("PbdTissueVolumeNeedleContact");
     scene->getActiveCamera()->setPosition(-0.00149496, 0.0562587, 0.168353);
     scene->getActiveCamera()->setFocalPoint(0.00262407, -0.026582, -0.00463737);
     scene->getActiveCamera()->setViewUp(-0.00218222, 0.901896, -0.431947);
 
-    // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
-    pbdParams->m_doPartitioning = false;
-    pbdParams->m_dt = 0.001; // realtime used in update calls later in main
-    pbdParams->m_iterations = 5;
-    pbdParams->m_collisionIterations = 1;
-    pbdParams->m_gravity = Vec3d::Zero();
-    pbdParams->m_linearDampingCoeff  = 0.08; // Removed from velocity
-    pbdParams->m_angularDampingCoeff = 0.08;
-
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-    //pbdModel->setModelGeometry(toolObj->getCollidingGeometry());
-    pbdModel->configure(pbdParams);
+    pbdModel->getConfig()->m_doPartitioning = false;
+    pbdModel->getConfig()->m_dt = 0.001; // realtime used in update calls later in main
+    pbdModel->getConfig()->m_iterations = 5;
+    pbdModel->getConfig()->m_gravity    = Vec3d::Zero();
+    pbdModel->getConfig()->m_collisionIterations = 5;
 
     // Setup a tissue with surface collision geometry
     // 0.1m tissue patch 6x3x6 tet grid
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("PBDTissue", pbdModel,
+    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("PbdTissue", pbdModel,
         Vec3d(0.1, 0.025, 0.1), Vec3i(6, 3, 6), Vec3d(0.0, -0.03, 0.0));
     scene->addSceneObject(tissueObj);
 
     // Setup a tool for the user to move
-    std::shared_ptr<NeedleObject> toolObj = makeToolObj();
-    toolObj->setForceThreshold(15.0);
+    auto toolObj = std::make_shared<NeedleObject>("PbdNeedle");
+    toolObj->setDynamicalModel(pbdModel);
+    toolObj->getPbdBody()->setRigid(Vec3d(0.0, 1.0, 0.0), 1.0,
+        Quatd::Identity(), Mat3d::Identity() * 10000.0);
     scene->addSceneObject(toolObj);
 
     // Setup a debug ghost tool for virtual coupling
     auto ghostToolObj = std::make_shared<SceneObject>("ghostTool");
     {
-        auto                  toolMesh = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getVisualGeometry());
-        imstkNew<SurfaceMesh> toolGhostMesh;
+        auto toolMesh      = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getVisualGeometry());
+        auto toolGhostMesh = std::make_shared<SurfaceMesh>();
         toolGhostMesh->initialize(
             std::make_shared<VecDataArray<double, 3>>(*toolMesh->getVertexPositions(Geometry::DataType::PreTransform)),
             std::make_shared<VecDataArray<int, 3>>(*toolMesh->getCells()));
@@ -232,17 +231,22 @@ main()
     }
     scene->addSceneObject(ghostToolObj);
 
+    // Setup a text to display forces
+    std::shared_ptr<SceneObject> txtObj = makeTextObj();
+    scene->addSceneObject(txtObj);
+
     // Setup a debug polygon soup for debug contact points
-    imstkNew<DebugGeometryObject> debugGeomObj;
+    auto debugGeomObj = std::make_shared<DebugGeometryObject>();
     debugGeomObj->setLineWidth(0.1);
     scene->addSceneObject(debugGeomObj);
 
     // This adds both contact and puncture functionality
     auto interaction = std::make_shared<NeedleInteraction>(tissueObj, toolObj);
+    interaction->setPunctureForceThreshold(25.0);
     scene->addInteraction(interaction);
 
     // Light
-    imstkNew<DirectionalLight> light;
+    auto light = std::make_shared<DirectionalLight>();
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
     scene->addLight("Light", light);
@@ -250,40 +254,32 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
         viewer->setDebugAxesLength(0.1, 0.1, 0.1);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001); // 1ms, 1000hz
 
+        auto controller = std::make_shared<PbdObjectController>();
 #ifdef iMSTK_USE_OPENHAPTICS
-        imstkNew<HapticDeviceManager> hapticManager;
+        auto hapticManager = std::make_shared<HapticDeviceManager>();
         //hapticManager->setSleepDelay(0.01);
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
+        std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        imstkNew<RigidObjectController> controller;
-        controller->setControlledObject(toolObj);
-        controller->setDevice(hapticDeviceClient);
         controller->setTranslationScaling(0.001);
-        controller->setLinearKs(5000.0);
-        controller->setAngularKs(5000000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.05);
-        controller->setSmoothingKernelSize(15);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
             {
                 // Update the ghost debug geometry
                 std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
@@ -292,29 +288,22 @@ main()
                 toolGhostMesh->updatePostTransformData();
                 toolGhostMesh->postModified();
 
-                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+                //ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
             });
 #else
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        controller->setTranslationScaling(1.0);
+
+        auto deviceClient = std::make_shared<DummyClient>();
+
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
             {
                 const Vec2d mousePos   = viewer->getMouseDevice()->getPos();
                 const Vec3d desiredPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.1;
                 const Quatd desiredOrientation = Quatd(Rotd(0.0, Vec3d(1.0, 0.0, 0.0)));
 
-                Vec3d virtualForce;
-                {
-                    const Vec3d fS = (desiredPos - toolObj->getRigidBody()->getPosition()) * 1000.0; // Spring force
-                    const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                // Spring damping
-
-                    const Quatd dq       = desiredOrientation * toolObj->getRigidBody()->getOrientation().inverse();
-                    const Rotd angleAxes = Rotd(dq);
-                    const Vec3d tS       = angleAxes.axis() * angleAxes.angle() * 10000000.0;
-                    const Vec3d tD       = -toolObj->getRigidBody()->getAngularVelocity() * 1000.0;
-
-                    virtualForce = fS + fD;
-                    (*toolObj->getRigidBody()->m_force)  += virtualForce;
-                    (*toolObj->getRigidBody()->m_torque) += tS + tD;
-                }
+                deviceClient->setPosition(desiredPos);
+                deviceClient->setOrientation(desiredOrientation);
 
                 // Update the ghost debug geometry
                 std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
@@ -323,32 +312,34 @@ main()
                 toolGhostMesh->updatePostTransformData();
                 toolGhostMesh->postModified();
 
-                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, virtualForce.norm() / 15.0));
-        });
+                //ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, virtualForce.norm() / 15.0));
+            });
 #endif
+        controller->setControlledObject(toolObj);
+        controller->setDevice(deviceClient);
+        controller->setLinearKs(20000.0);
+        controller->setAngularKs(8000000.0);
+        controller->setUseCritDamping(true);
+        controller->setForceScaling(0.05);
+        controller->setSmoothingKernelSize(15);
+        controller->setUseForceSmoothening(true);
+        scene->addControl(controller);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        int counter = 0;
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
             {
                 // Keep the tool moving in real time
-                toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+                toolObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
 
-                // Copy debug geometry
-                auto needleEmbeddedCH = std::dynamic_pointer_cast<NeedleEmbeddedCH>(interaction->getEmbeddingCH());
-                const std::vector<Vec3d>& debugEmbeddingPts  = needleEmbeddedCH->m_debugEmbeddingPoints;
-                const std::vector<Vec3i>& debugEmbeddingTris = needleEmbeddedCH->m_debugEmbeddedTriangles;
-                debugGeomObj->clear();
-                for (size_t i = 0; i < debugEmbeddingPts.size(); i++)
+                // Copy constraint faces and points to debug geometry for display
+                updateDebugGeom(interaction, debugGeomObj);
+
+                // Update the force text every 100 frames
+                if (counter++ % 100 == 0)
                 {
-                    debugGeomObj->addPoint(debugEmbeddingPts[i]);
-                }
-                auto verticesPtr = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry())->getVertexPositions();
-                VecDataArray<double, 3>& vertices = *verticesPtr;
-                for (size_t i = 0; i < debugEmbeddingTris.size(); i++)
-                {
-                    debugGeomObj->addTriangle(
-                        vertices[debugEmbeddingTris[i][0]],
-                        vertices[debugEmbeddingTris[i][1]],
-                        vertices[debugEmbeddingTris[i][2]]);
+                    updateTxtObj(txtObj, interaction, controller);
+                    counter = 0;
                 }
             });
 

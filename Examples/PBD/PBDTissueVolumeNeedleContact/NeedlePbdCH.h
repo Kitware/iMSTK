@@ -31,9 +31,16 @@ protected:
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override
     {
-        // Don't handle collision data when punctured
+        auto tissueObj = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
         auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
-        if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
+        if ((elementsA.size() > 0 || elementsB.size() > 0)
+            && needleObj->getCollisionState(tissueObj) == NeedleObject::CollisionState::REMOVED)
+        {
+            needleObj->setCollisionState(tissueObj, NeedleObject::CollisionState::TOUCHING);
+        }
+
+        // Don't handle collision data when punctured
+        if (needleObj->getCollisionState(tissueObj) == NeedleObject::CollisionState::TOUCHING)
         {
             PbdCollisionHandling::handle(elementsA, elementsB);
         }

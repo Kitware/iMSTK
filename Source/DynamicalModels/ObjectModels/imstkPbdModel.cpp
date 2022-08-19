@@ -303,8 +303,6 @@ PbdModel::integratePosition(PbdBody& body)
             }
         }, numParticles > 50); // Only run parallel when more than 50 pts
 
-    body.externalForce = Vec3d::Zero();
-
     // If using oriented particles update those too
     if (body.getOriented())
     {
@@ -348,8 +346,6 @@ PbdModel::integratePosition(PbdBody& body)
                     orientations[i].normalize();
                 }
             }, numParticles > 50); // Only run parallel when more than 50 pts
-
-        body.externalTorque = Vec3d::Zero();
     }
 }
 
@@ -426,6 +422,9 @@ PbdModel::updateVelocity(PbdBody& body)
                 }, numParticles > 50);
         }
     }
+
+    body.externalForce  = Vec3d::Zero();
+    body.externalTorque = Vec3d::Zero();
 }
 
 void

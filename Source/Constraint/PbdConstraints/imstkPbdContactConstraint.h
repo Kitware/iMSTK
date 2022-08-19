@@ -58,6 +58,15 @@ public:
         return v + w.cross(r);
     }
 
+    ///
+    /// \brief Get torque magnitude after solve
+    ///
+    double getTorque(const double dt, const int i)
+    {
+        const Vec3d force = getForce(dt) * m_dcdx[i];
+        return force.cross(m_r[i]).norm();
+    }
+
 protected:
     std::vector<Vec3d>  m_r;
     std::vector<double> m_weights;

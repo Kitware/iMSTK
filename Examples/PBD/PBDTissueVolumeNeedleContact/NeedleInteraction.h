@@ -7,7 +7,7 @@
 #pragma once
 
 #include "imstkMacros.h"
-#include "imstkPbdRigidObjectCollision.h"
+#include "imstkPbdObjectCollision.h"
 
 using namespace imstk;
 
@@ -25,7 +25,7 @@ class TetraToLineMeshCD;
 ///
 /// \brief Defines interaction between NeedleObject and PbdObject
 ///
-class NeedleInteraction : public PbdRigidObjectCollision
+class NeedleInteraction : public PbdObjectCollision
 {
 public:
     NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
@@ -34,8 +34,20 @@ public:
 
     IMSTK_TYPE_NAME(NeedleInteraction)
 
-    std::shared_ptr<TetraToLineMeshCD> getEmbeddingCD() const { return tetMeshCD; }
-    std::shared_ptr<NeedleEmbeddedCH> getEmbeddingCH() const { return embeddedCH; }
+    std::shared_ptr<TetraToLineMeshCD> getEmbeddingCD() const { return m_tetMeshCD; }
+    std::shared_ptr<NeedleEmbeddedCH> getEmbeddingCH() const { return m_embeddedCH; }
+
+    void setFriction(const double friction);
+    double getFriction() const;
+
+    void setCompliance(const double compliance);
+    double getCompliance() const;
+
+    void setStaticFrictionForceThreshold(const double force);
+    const double getStaticFrictionForceThreshold() const;
+
+    void setPunctureForceThreshold(const double forceThreshold);
+    const double getPunctureForceThreshold() const;
 
     ///
     /// \brief Setup connectivity of task graph
@@ -43,9 +55,9 @@ public:
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
-    std::shared_ptr<TetraToLineMeshCD> tetMeshCD;
-    std::shared_ptr<NeedleEmbeddedCH>  embeddedCH;
+    std::shared_ptr<TetraToLineMeshCD> m_tetMeshCD;
+    std::shared_ptr<NeedleEmbeddedCH>  m_embeddedCH;
 
-    std::shared_ptr<TaskNode> embeddingCDNode = nullptr;
-    std::shared_ptr<TaskNode> embeddingCHNode = nullptr;
+    std::shared_ptr<TaskNode> m_embeddingCDNode = nullptr;
+    std::shared_ptr<TaskNode> m_embeddingCHNode = nullptr;
 };
