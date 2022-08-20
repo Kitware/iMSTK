@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include "imstkModule.h"
+#include "imstkDeviceManager.h"
+#include "imstkMacros.h"
 
 #include <vector>
 
@@ -20,22 +21,19 @@ class HaplyDeviceClient;
 /// \brief Devices manager using Haply, only supports Inverse3 right now
 /// Warning: This code is based off an early version of the Haply Hardware API.
 ///
-class HaplyDeviceManager : public Module
+class HaplyDeviceManager : public DeviceManager
 {
 public:
-    HaplyDeviceManager() : Module()
-    {
-        m_muteUpdateEvents = true;
-        m_executionType    = ExecutionType::PARALLEL;
-    }
-
+    HaplyDeviceManager() = default;
     ~HaplyDeviceManager() override = default;
+
+    IMSTK_TYPE_NAME(HaplyDeviceManager)
 
     ///
     /// \brief Create a haptic device client and add it to the internal list
     /// \param COM port name
     ///
-    std::shared_ptr<HaplyDeviceClient> makeDeviceClient(std::string portName = "");
+    std::shared_ptr<DeviceClient> makeDeviceClient(std::string portName = "") override;
 
     ///
     /// \brief Autodetect and get all Inverse3 device port names

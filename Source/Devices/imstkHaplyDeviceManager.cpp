@@ -35,7 +35,7 @@ HaplyDeviceManager::getPortNames() const
     return results;
 }
 
-std::shared_ptr<HaplyDeviceClient>
+std::shared_ptr<DeviceClient>
 HaplyDeviceManager::makeDeviceClient(std::string portName)
 {
     // Autodetect the first device found

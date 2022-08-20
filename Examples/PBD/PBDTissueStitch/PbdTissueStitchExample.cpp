@@ -36,12 +36,11 @@ using namespace imstk;
 
 // #define USE_THIN_TISSUE
 
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
+#ifdef iMSTK_USE_HAPTICS
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #else
 #include "imstkDummyClient.h"
-#include "imstkMouseDeviceClient.h"
 #endif
 
 ///
@@ -250,7 +249,7 @@ main()
     scene->addSceneObject(toolObj);
 
     // Setup CD with a cylinder CD object
-    auto collisionInteraction = std::make_shared<PbdObjectCollision>(tissueObj, cdObj, "SurfaceMeshToCapsuleCD");
+    auto collisionInteraction = std::make_shared<PbdObjectCollision>(tissueObj, cdObj);
     collisionInteraction->setFriction(0.0);
     collisionInteraction->setDeformableStiffnessA(0.3);
     scene->addInteraction(collisionInteraction);
@@ -286,10 +285,10 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-#ifdef iMSTK_USE_OPENHAPTICS
-        auto hapticManager = std::make_shared<HapticDeviceManager>();
-        hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
-        std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
+#ifdef iMSTK_USE_HAPTICS
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 #else
         auto deviceClient = std::make_shared<DummyClient>();
@@ -310,7 +309,6 @@ main()
         auto controller = std::make_shared<RigidObjectController>();
         controller->setControlledObject(toolObj);
         controller->setDevice(deviceClient);
-        controller->setTranslationScaling(0.001);
         controller->setLinearKs(1000.0);
         controller->setAngularKs(10000000.0);
         controller->setUseCritDamping(true);
@@ -319,8 +317,8 @@ main()
         controller->setUseForceSmoothening(true);
         scene->addControl(controller);
 
-#ifdef iMSTK_USE_OPENHAPTICS
-        connect<ButtonEvent>(deviceClient, &HapticDeviceClient::buttonStateChanged,
+#ifdef iMSTK_USE_HAPTICS
+        connect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged,
             [&](ButtonEvent* e)
             {
                 if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)

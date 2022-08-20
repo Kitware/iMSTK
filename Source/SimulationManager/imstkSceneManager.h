@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkModule.h"
+#include "imstkMacros.h"
 
 #include <unordered_map>
 #include <thread>
@@ -32,10 +33,12 @@ public:
     SceneManager(std::string name = "SceneManager");
     ~SceneManager() override      = default;
 
+    IMSTK_TYPE_NAME(SceneManager)
+
     ///
     /// \brief Get the scene that the scene manager is managing
     ///
-    std::shared_ptr<Scene> getActiveScene() const { return m_activeScene; };
+    std::shared_ptr<Scene> getActiveScene() const { return m_activeScene; }
 
     ///
     /// \brief Search for scene by name, returns nullptr if not found

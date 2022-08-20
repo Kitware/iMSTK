@@ -6,7 +6,6 @@
 #
 ###########################################################################
 
-
 if (iMSTK_USE_RENDERING_VTK)
   project(Example-PBDTissueContact)
 

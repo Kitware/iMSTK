@@ -8,6 +8,7 @@
 #include "imstkCapsule.h"
 #include "imstkCollidingObject.h"
 #include "imstkCylinder.h"
+#include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
@@ -16,7 +17,6 @@
 #include "imstkLogger.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkOrientedBox.h"
 #include "imstkPlane.h"
 #include "imstkScene.h"
@@ -29,8 +29,8 @@
 using namespace imstk;
 
 ///
-/// \brief This example demonstrates controlling the object
-/// using external device. NOTE: Requires GeoMagic Touch device
+/// \brief This example demonstrates controlling a object using external
+/// device.
 ///
 int
 main()
@@ -39,55 +39,54 @@ main()
     Logger::startLogger();
 
     // Create Scene
-    imstkNew<Scene> scene("ObjectController");
+    auto scene = std::make_shared<Scene>("ObjectController");
 
-    // Device Server
-    imstkNew<HapticDeviceManager>       server;
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
+    // Setup default haptics manager
+    std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+    std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
 
     std::shared_ptr<AnalyticalGeometry> geometries[] = {
-        std::make_shared<OrientedBox>(Vec3d::Zero(), Vec3d(1.0, 5.0, 1.0)),
-        std::make_shared<Plane>(Vec3d::Zero(), Vec3d(0.0, 1.0, 0.0)),
-        std::make_shared<Capsule>(Vec3d::Zero(), 0.5, 1.0),
-        std::make_shared<Cylinder>(Vec3d::Zero(), 5.0, 1.0),
-        std::make_shared<Sphere>(Vec3d::Zero(), 2.0)
+        std::make_shared<OrientedBox>(Vec3d::Zero(), Vec3d(0.01, 0.05, 0.01)),
+        std::make_shared<Plane>(Vec3d::Zero(), Vec3d(0.0, 0.01, 0.0)),
+        std::make_shared<Capsule>(Vec3d::Zero(), 0.005, 0.01),
+        std::make_shared<Cylinder>(Vec3d::Zero(), 0.05, 0.01),
+        std::make_shared<Sphere>(Vec3d::Zero(), 0.02)
     };
 
-    imstkNew<SceneObject> object("VirtualObject");
+    auto object = std::make_shared<SceneObject>("VirtualObject");
     object->setVisualGeometry(geometries[0]);
     scene->addSceneObject(object);
 
-    imstkNew<SceneObjectController> controller;
+    auto controller = std::make_shared<SceneObjectController>();
     controller->setControlledObject(object);
-    controller->setDevice(client);
-    controller->setTranslationScaling(0.1);
+    controller->setDevice(deviceClient);
     scene->addControl(controller);
 
     // Update Camera position
     std::shared_ptr<Camera> cam = scene->getActiveCamera();
-    cam->setPosition(Vec3d(0.0, 0.0, 10.0));
+    cam->setPosition(Vec3d(0.0, 0.0, 0.3));
     cam->setFocalPoint(geometries[0]->getPosition());
 
     // Light
-    imstkNew<DirectionalLight> light;
+    auto light = std::make_shared<DirectionalLight>();
     light->setDirection(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
     scene->addLight("light", light);
 
-    //Run the simulation
+    // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
 
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->addModule(server);
+        driver->addModule(hapticManager);
         driver->setDesiredDt(0.01);
 
         // Add mouse and keyboard controls to the viewer

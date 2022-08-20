@@ -5,33 +5,24 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
-#include "imstkImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
-#include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
-#include "imstkPointLight.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
@@ -122,19 +113,19 @@ makePbdString(
         GeometryUtils::toLineGrid(pos, dir, stringLength, numVerts);
 
     // Setup the VisualModel
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setColor(Color::Red);
     material->setLineWidth(2.0);
     material->setPointSize(18.0);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
-    imstkNew<VisualModel> visualModel;
+    auto visualModel = std::make_shared<VisualModel>();
     visualModel->setGeometry(stringMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
-    imstkNew<PbdObject> stringObj(name);
+    auto stringObj = std::make_shared<PbdObject>(name);
     stringObj->addVisualModel(visualModel);
     stringObj->setPhysicsGeometry(stringMesh);
     stringObj->setCollidingGeometry(stringMesh);
@@ -203,7 +194,7 @@ main()
     scene->addInteraction(sutureInteraction);
 
     // Add thread CCD
-    auto interactionCCDThread = std::make_shared<PbdObjectCollision>(sutureThreadObj, sutureThreadObj, "LineMeshToLineMeshCCD");
+    auto interactionCCDThread = std::make_shared<PbdObjectCollision>(sutureThreadObj, sutureThreadObj);
     // Very important parameter for stability of solver, keep lower than 1.0:
     interactionCCDThread->setDeformableStiffnessA(0.01);
     interactionCCDThread->setDeformableStiffnessB(0.01);
@@ -226,20 +217,19 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.01);         // 1ms, 1000hz
 
-        auto hapticManager = std::make_shared<HapticDeviceManager>();
-        hapticManager->setSleepDelay(0.01);         // Delay for 1ms (haptics thread is limited to max 1000hz)
-
-        std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
         auto hapController = std::make_shared<RigidObjectController>();
         hapController->setControlledObject(needleObj);
         hapController->setDevice(deviceClient);
-        hapController->setTranslationScaling(0.0005);
-        hapController->setLinearKs(10000.0);
+        hapController->setTranslationScaling(0.5);
+        hapController->setLinearKs(20000.0);
         hapController->setAngularKs(100000000.0);
         hapController->setUseCritDamping(true);
-        hapController->setForceScaling(0.00001);
+        hapController->setForceScaling(0.01);
         hapController->setSmoothingKernelSize(10);
         hapController->setUseForceSmoothening(true);
         scene->addControl(hapController);

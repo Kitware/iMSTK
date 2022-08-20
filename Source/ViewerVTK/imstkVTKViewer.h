@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkAbstractVTKViewer.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -27,6 +28,8 @@ class VTKViewer : public AbstractVTKViewer
 public:
     VTKViewer(std::string name = "VTKViewer");
     ~VTKViewer() override      = default;
+
+    IMSTK_TYPE_NAME(VTKViewer)
 
     ///
     /// \brief Set the rendering mode. In debug, debug actors will be shown.

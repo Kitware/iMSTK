@@ -5,11 +5,9 @@
 */
 
 #include "FemurObject.h"
-#include "imstkImageData.h"
 #include "imstkLevelSetModel.h"
 #include "imstkLocalMarchingCubes.h"
 #include "imstkMeshIO.h"
-#include "imstkNew.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
@@ -25,7 +23,7 @@ FemurObject::FemurObject() : LevelSetDeformableObject("Femur"),
     initLvlSetImage->setOrigin(Vec3d(0.0, 0.8, 1.5));
 
     // Setup the Parameters
-    imstkNew<LevelSetModelConfig> lvlSetConfig;
+    auto lvlSetConfig = std::make_shared<LevelSetModelConfig>();
     lvlSetConfig->m_sparseUpdate = true;
     lvlSetConfig->m_substeps     = 15;
 
@@ -45,10 +43,10 @@ FemurObject::FemurObject() : LevelSetDeformableObject("Femur"),
     createVisualModels();
 
     // Setup the Object
-    imstkNew<SignedDistanceField> sdf(initLvlSetImage);
+    auto sdf = std::make_shared<SignedDistanceField>(initLvlSetImage);
 
     // Setup the Model
-    imstkNew<LevelSetModel> model;
+    auto model = std::make_shared<LevelSetModel>();
     model->setModelGeometry(sdf);
     model->configure(lvlSetConfig);
 
@@ -83,9 +81,9 @@ FemurObject::createVisualModels()
         auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_isoExtract->getOutput(i));
         if (surfMesh->getNumVertices() > 0 && m_chunksGenerated.count(i) == 0)
         {
-            imstkNew<VisualModel> surfMeshModel;
+            auto surfMeshModel = std::make_shared<VisualModel>();
             surfMeshModel->setGeometry(m_isoExtract->getOutput(i));
-            imstkNew<RenderMaterial> material;
+            auto material = std::make_shared<RenderMaterial>();
             material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
             material->setLineWidth(4.0);
             if (m_useRandomChunkColors)

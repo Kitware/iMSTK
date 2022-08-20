@@ -5,28 +5,24 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
-#include "imstkIsometricMap.h"
 #include "imstkKeyboardDeviceClient.h"
-#include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkOrientedBox.h"
+#include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
+#include "imstkPbdObject.h"
+#include "imstkPbdObjectCollision.h"
+#include "imstkPbdObjectController.h"
 #include "imstkPlane.h"
-#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidObjectCollision.h"
-#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 
 #ifdef iMSTK_USE_RENDERING_VTK
@@ -35,14 +31,12 @@
 #include "imstkVTKRenderer.h"
 #endif
 
-#include "imstkHaplyDeviceClient.h"
-#include "imstkHaplyDeviceManager.h"
-
 using namespace imstk;
 
 ///
 /// \brief This example demonstrates the concept of virtual coupling
-/// for haptic interaction. NOTE: Requires GeoMagic Touch device
+/// for haptic interaction.
+/// NOTE: Requires GeoMagic Touch device or Haply Inverse 3
 ///
 int
 main()
@@ -50,13 +44,12 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
-    // Setup haptics manager
-    imstkNew<HaplyDeviceManager> hapticsManager;
-    //hapticsManager->setSleepDelay(1.0);
-    std::shared_ptr<HaplyDeviceClient> client = hapticsManager->makeDeviceClient();
+    // Setup default haptics manager
+    std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+    std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
 
     // Scene
-    imstkNew<Scene> scene("VirtualCoupling");
+    auto scene = std::make_shared<Scene>("VirtualCoupling");
 
     std::shared_ptr<CollidingObject> obstacleObjs[] =
     {
@@ -65,12 +58,14 @@ main()
     };
 
     // Create a plane and cube for collision with scissors
-    imstkNew<Plane> plane(Vec3d(0.0, -1.0, 0.0), Vec3d(0.0, 1.0, 0.0));
-    plane->setWidth(7.0);
+    auto plane = std::make_shared<Plane>();
+    plane->setWidth(0.4);
     obstacleObjs[0]->setVisualGeometry(plane);
     obstacleObjs[0]->setCollidingGeometry(plane);
 
-    imstkNew<OrientedBox> cube(Vec3d(0.0, -1.0, 0.0), Vec3d(0.5, 0.5, 0.5), Quatd(Rotd(1.0, Vec3d(0.0, 1.0, 0.0))));
+    // 0.1m size cube, slight rotation
+    auto cube = std::make_shared<OrientedBox>(Vec3d(0.0, 0.0, 0.0),
+        Vec3d(0.05, 0.05, 0.05), Quatd(Rotd(1.0, Vec3d(0.0, 1.0, 0.0))));
     obstacleObjs[1]->setVisualGeometry(cube);
     obstacleObjs[1]->setCollidingGeometry(cube);
 
@@ -81,15 +76,15 @@ main()
     }
 
     // The visual geometry is the scissor mesh read in from file
-
-    imstkNew<RigidObject2> rbdObj("rbdObj1");
+    auto rbdObj = std::make_shared<PbdObject>();
     {
-        imstkNew<RigidBodyModel2> rbdModel;
-        rbdModel->getConfig()->m_dt      = 0.001;
-        rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-        rbdObj->setDynamicalModel(rbdModel);
-        rbdObj->getRigidBody()->m_mass = 0.5;
-        rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 1000000000.0;
+        auto model = std::make_shared<PbdModel>();
+        model->getConfig()->m_dt      = 0.001;
+        model->getConfig()->m_gravity = Vec3d::Zero();
+        rbdObj->setDynamicalModel(model);
+        rbdObj->getPbdBody()->setRigid(Vec3d(0.0, 0.05, 0.0),
+            7.0, Quatd::Identity(),
+            Mat3d::Identity() * 100000000.0);
 
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
         rbdObj->setCollidingGeometry(surfMesh);
@@ -105,9 +100,9 @@ main()
     scene->addSceneObject(rbdObj);
 
     // Setup a ghost tool object to show off virtual coupling
-    imstkNew<SceneObject> ghostToolObj("GhostTool");
-    auto                  toolMesh = std::dynamic_pointer_cast<SurfaceMesh>(rbdObj->getVisualGeometry());
-    imstkNew<SurfaceMesh> toolGhostMesh;
+    auto ghostToolObj  = std::make_shared<SceneObject>("GhostTool");
+    auto toolMesh      = std::dynamic_pointer_cast<SurfaceMesh>(rbdObj->getVisualGeometry());
+    auto toolGhostMesh = std::make_shared<SurfaceMesh>();
     toolGhostMesh->initialize(
         std::make_shared<VecDataArray<double, 3>>(*toolMesh->getVertexPositions()),
         std::make_shared<VecDataArray<int, 3>>(*toolMesh->getCells()));
@@ -121,33 +116,32 @@ main()
     scene->addSceneObject(ghostToolObj);
 
     // Create a virtual coupling controller
-    imstkNew<RigidObjectController> controller;
+    // Balancing ks, device force scaling, and the mass
+    auto controller = std::make_shared<PbdObjectController>();
     controller->setControlledObject(rbdObj);
-    controller->setDevice(client);
-    controller->setTranslationOffset(Vec3d(0.0, -3.0, 0.0));
-    controller->setLinearKs(3000.0);
+    controller->setDevice(deviceClient);
+    controller->setTranslationOffset(Vec3d(0.0, 0.05, 0.0));
+    controller->setLinearKs(50000.0);
     controller->setAngularKs(10000000000.0);
-    controller->setTranslationScaling(10.0);
     controller->setForceScaling(0.01);
-    controller->setSmoothingKernelSize(5);
+    controller->setSmoothingKernelSize(15);
     controller->setUseForceSmoothening(true);
     controller->setUseCritDamping(true);
-    //controller->setInversionFlags(RigidObjectController::InvertFlag::rotY);
     scene->addControl(controller);
 
     // Add interaction between the rigid object sphere and static plane
     scene->addInteraction(
-        std::make_shared<RigidObjectCollision>(rbdObj, obstacleObjs[0], "PointSetToPlaneCD"));
+        std::make_shared<PbdObjectCollision>(rbdObj, obstacleObjs[0]));
     scene->addInteraction(
-        std::make_shared<RigidObjectCollision>(rbdObj, obstacleObjs[1], "PointSetToOrientedBoxCD"));
+        std::make_shared<PbdObjectCollision>(rbdObj, obstacleObjs[1]));
 
     // Camera
-    scene->getActiveCamera()->setPosition(Vec3d(0.0, 5.0, 10.0));
-    scene->getActiveCamera()->setFocalPoint(Vec3d(0.0, -1.0, 0.0));
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 0.2, 0.35));
+    scene->getActiveCamera()->setFocalPoint(Vec3d(0.0, 0.0, 0.0));
     scene->getActiveCamera()->setViewUp(Vec3d(0.0, 1.0, 0.0));
 
     // Light
-    imstkNew<DirectionalLight> light;
+    auto light = std::make_shared<DirectionalLight>();
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
     scene->addLight("light0", light);
@@ -155,14 +149,15 @@ main()
     // Run the simulation
     {
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
+        sceneManager->setPaused(true); // Start paused
 
-        imstkNew<SimulationManager> driver;
-        driver->addModule(hapticsManager);
+        auto driver = std::make_shared<SimulationManager>();
+        driver->addModule(hapticManager);
 #ifdef iMSTK_USE_RENDERING_VTK
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
         driver->addModule(viewer);
 #endif
@@ -172,9 +167,9 @@ main()
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
                 // Run the rbd model in real time
-                rbdObj->getRigidBodyModel2()->getConfig()->m_dt = driver->getDt();
+                rbdObj->getPbdModel()->getConfig()->m_dt = driver->getDt();
 
-                //ghostMaterial->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+                //ghostMaterial->setOpacity(std::min(1.0,controller->getDeviceForce().norm() / 15.0));
                 ghostMaterial->setOpacity(1.0);
 
                 // Also apply controller transform to ghost geometry

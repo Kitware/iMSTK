@@ -6,6 +6,8 @@ list(APPEND Dependencies Common)
 
 set(H_FILES
   imstkDeviceClient.h
+  imstkDeviceManagerFactory.h
+  imstkDeviceManager.h
   imstkDummyClient.h
   imstkKeyboardDeviceClient.h
   imstkMouseDeviceClient.h
@@ -14,6 +16,7 @@ set(H_FILES
 
 set(SRC_FILES
   imstkDeviceClient.cpp
+  imstkDeviceManagerFactory.cpp
   imstkDummyClient.cpp
   imstkKeyboardDeviceClient.cpp
   imstkMouseDeviceClient.cpp

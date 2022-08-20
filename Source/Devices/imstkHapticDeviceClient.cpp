@@ -117,7 +117,8 @@ HapticDeviceClient::hapticCallback(void* pData)
     // Might be worth locking each part separately
     const Quatd orientation = Quatd((Eigen::Affine3d(Eigen::Matrix4d(state.transform))).rotation());
     client->m_transformLock.lock();
-    client->m_position << state.pos[0], state.pos[1], state.pos[2];
+    // OpenHaptics is in mm, change to meters
+    client->m_position << state.pos[0] * 0.001, state.pos[1] * 0.001, state.pos[2] * 0.001;
     client->m_velocity << state.vel[0], state.vel[1], state.vel[2];
     client->m_angularVelocity << state.angularVel[0], state.angularVel[1], state.angularVel[2];
     client->m_orientation = orientation;

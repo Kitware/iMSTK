@@ -6,8 +6,8 @@
 #
 ###########################################################################
 
-
-if(iMSTK_USE_OpenHaptics)
+# Haptics only example
+if(iMSTK_USE_HAPTICS)
   project(Example-VirtualCoupling)
 
   #-----------------------------------------------------------------------------

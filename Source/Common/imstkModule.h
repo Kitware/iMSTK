@@ -36,6 +36,11 @@ public:
     Module() = default;
     ~Module() override = default;
 
+    ///
+    /// \brief Returns collision detection type string name
+    ///
+    virtual const std::string getTypeName() const = 0;
+
 public:
     // *INDENT-OFF*
     ///

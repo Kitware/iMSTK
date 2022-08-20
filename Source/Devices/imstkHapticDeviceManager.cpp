@@ -12,7 +12,7 @@
 
 namespace imstk
 {
-std::shared_ptr<HapticDeviceClient>
+std::shared_ptr<DeviceClient>
 HapticDeviceManager::makeDeviceClient(std::string name)
 {
     auto deviceClient = std::shared_ptr<HapticDeviceClient>(new HapticDeviceClient(name));

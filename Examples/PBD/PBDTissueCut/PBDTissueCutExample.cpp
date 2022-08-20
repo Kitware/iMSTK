@@ -6,16 +6,14 @@
 
 #include "CutHelp.h"
 #include "imstkCamera.h"
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
-#include "imstkPbdConstraintContainer.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -28,8 +26,6 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -102,12 +98,12 @@ makeTissueObj(const std::string& name,
     //addDummyVertex(surfMesh);
 
     // Add a mask of ints to denote how many elements are referencing this vertex
-    imstkNew<DataArray<int>> referenceCountPtr(tissueMesh->getNumVertices());
+    auto referenceCountPtr = std::make_shared<DataArray<int>>(tissueMesh->getNumVertices());
     referenceCountPtr->fill(0);
     tissueMesh->setVertexAttribute("ReferenceCount", referenceCountPtr);
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
+    auto pbdParams = std::make_shared<PbdModelConfig>();
     // Use FEMTet constraints
     pbdParams->m_femParams->m_YoungModulus = 50.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.4;
@@ -118,17 +114,17 @@ makeTissueObj(const std::string& name,
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
+    auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->configure(pbdParams);
 
     // Setup the material
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
 
     // Setup the Object
-    imstkNew<PbdObject> tissueObj(name);
+    auto tissueObj = std::make_shared<PbdObject>(name);
     tissueObj->setPhysicsGeometry(tissueMesh);
     tissueObj->setVisualGeometry(tissueMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
@@ -156,19 +152,19 @@ makeTissueObj(const std::string& name,
 static std::shared_ptr<RigidObject2>
 makeToolObj()
 {
-    imstkNew<Plane> toolGeometry(Vec3d(0.0, 1.0, 0.0));
-    toolGeometry->setWidth(1.0);
+    auto toolGeom = std::make_shared<Plane>(Vec3d(0.0, 1.0, 0.0));
+    toolGeom->setWidth(1.0);
 
-    imstkNew<RigidObject2> toolObj("Tool");
-    toolObj->setVisualGeometry(toolGeometry);
-    toolObj->setCollidingGeometry(toolGeometry);
-    toolObj->setPhysicsGeometry(toolGeometry);
+    auto toolObj = std::make_shared<RigidObject2>("Tool");
+    toolObj->setVisualGeometry(toolGeom);
+    toolObj->setCollidingGeometry(toolGeom);
+    toolObj->setPhysicsGeometry(toolGeom);
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Blue);
     toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     toolObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
     toolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(1.0);
 
-    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
+    auto rbdModel = std::make_shared<RigidBodyModel2>();
     rbdModel->getConfig()->m_gravity = Vec3d::Zero();
     rbdModel->getConfig()->m_maxNumIterations       = 8;
     rbdModel->getConfig()->m_velocityDamping        = 1.0;
@@ -195,7 +191,7 @@ main()
     Logger::startLogger();
 
     // Setup the scene
-    imstkNew<Scene> scene("PBDTissueCut");
+    auto scene =  std::make_shared<Scene>("PbdTissueCut");
     scene->getActiveCamera()->setPosition(0.12, 4.51, 16.51);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
@@ -212,7 +208,7 @@ main()
     scene->addInteraction(interaction);*/
 
     // Light
-    imstkNew<DirectionalLight> light;
+    auto light = std::make_shared<DirectionalLight>();
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
     scene->addLight("Light", light);
@@ -220,29 +216,29 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.01);
 
-        imstkNew<HapticDeviceManager> hapticManager;
-        hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        imstkNew<RigidObjectController> controller;
+        auto controller = std::make_shared<RigidObjectController>();
         controller->setControlledObject(toolObj);
-        controller->setDevice(hapticDeviceClient);
-        controller->setTranslationScaling(0.06);
+        controller->setDevice(deviceClient);
+        controller->setTranslationScaling(60.0);
         controller->setLinearKs(1000.0);
         controller->setLinearKd(50.0);
         controller->setAngularKs(10000000.0);
@@ -255,7 +251,7 @@ main()
                 // Keep the tool moving in real time
                 toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
 
-                if (hapticDeviceClient->getButton(0))
+                if (deviceClient->getButton(0))
                 {
                     auto tissueMesh    = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
                     auto toolPlaneGeom = std::dynamic_pointer_cast<Plane>(toolObj->getCollidingGeometry());

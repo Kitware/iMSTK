@@ -27,12 +27,11 @@
 #include "imstkTextVisualModel.h"
 #include "imstkVTKViewer.h"
 
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
+#ifdef iMSTK_USE_HAPTICS
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #else
 #include "imstkDummyClient.h"
-#include "imstkMouseDeviceClient.h"
 #endif
 
 using namespace imstk;
@@ -249,13 +248,17 @@ main()
         driver->setDesiredDt(0.001);
 
         auto controller = std::make_shared<PbdObjectController>();
-#ifdef iMSTK_USE_OPENHAPTICS
-        auto hapticManager = std::make_shared<HapticDeviceManager>();
-        hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
-        std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
+#ifdef iMSTK_USE_HAPTICS
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        controller->setTranslationScaling(0.05);
+        controller->setTranslationScaling(50.0);
+        if (hapticManager->getTypeName() == "HaplyDeviceManager")
+        {
+            controller->setTranslationOffset(Vec3d(5.0, -5.0, 0.0));
+        }
 #else
         auto deviceClient = std::make_shared<DummyClient>();
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)

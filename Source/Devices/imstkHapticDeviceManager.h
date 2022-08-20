@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include "imstkModule.h"
+#include "imstkDeviceManager.h"
+#include "imstkMacros.h"
 
 #include <vector>
 
@@ -20,26 +21,24 @@ class HapticDeviceClient;
 /// \brief Devices manager using HDAPI
 /// \todo add the frame rate option for the servo loop
 ///
-class HapticDeviceManager : public Module
+class HapticDeviceManager : public DeviceManager
 {
 public:
-    HapticDeviceManager() : Module()
+    HapticDeviceManager()
     {
-        m_muteUpdateEvents = true;
         // Default a 1ms sleep to avoid over consumption of the CPU
         m_sleepDelay = 1.0;
     }
 
-    ///
-    /// \brief Destructor
-    ///
     ~HapticDeviceManager() override = default;
+
+    IMSTK_TYPE_NAME(HapticDeviceManager)
 
     ///
     /// \brief Create a haptic device client and add it to the internal list
     /// \param Device name or use empty string for default device
     ///
-    std::shared_ptr<HapticDeviceClient> makeDeviceClient(std::string name = "");
+    std::shared_ptr<DeviceClient> makeDeviceClient(std::string name = "") override;
 
 protected:
     ///

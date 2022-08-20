@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "imstkMacros.h"
 #include "imstkRigidObject2.h"
+#include "imstkMacros.h"
 
 using namespace imstk;
 
@@ -23,7 +23,7 @@ public:
 
 public:
     NeedleObject(const std::string& name) : RigidObject2(name) { }
-    virtual ~NeedleObject() = default;
+    ~NeedleObject() override = default;
 
     IMSTK_TYPE_NAME(NeedleObject)
 

@@ -16,7 +16,8 @@
 
 namespace imstk
 {
-VRPNDeviceManager::VRPNDeviceManager(const std::string& machine /*= "localhost"*/, int port /*= vrpn_DEFAULT_LISTEN_PORT_NO*/) : Module(),
+VRPNDeviceManager::VRPNDeviceManager(const std::string& machine /*= "localhost"*/,
+                                     int                port /*= vrpn_DEFAULT_LISTEN_PORT_NO*/) :
     m_machine(machine),
     m_port(port),
     m_deviceConnections(new vrpn_MainloopContainer())

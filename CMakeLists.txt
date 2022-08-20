@@ -201,6 +201,12 @@ if(NOT WIN32 AND ${PROJECT_NAME}_USE_OpenHaptics)
   message(FATAL_ERROR "Setting ${PROJECT_NAME}_USE_OpenHaptics to ON is only supported on Windows")
 endif()
 
+# If at least one haptic API is provided
+if (${PROJECT_NAME}_USE_HAPLY OR ${PROJECT_NAME}_USE_OpenHaptics OR ${PROJECT_NAME}_USE_VRPN)
+  set(${PROJECT_NAME}_USE_HAPTICS ON)
+endif()
+mark_as_superbuild(${PROJECT_NAME}_USE_HAPTICS:BOOL)
+
 cmake_dependent_option(${PROJECT_NAME}_USE_BUILTIN_LOGGING "Uses iMSTK local logger when g3log and its error behavior is not wanted" OFF "NOT ${PROJECT_NAME}_BUILD_FOR_UNITY" ON)
 mark_as_superbuild(${PROJECT_NAME}_USE_BUILTIN_LOGGING:BOOL)
 
@@ -380,6 +386,10 @@ find_package(VTK REQUIRED CONFIG)
 if (${PROJECT_NAME}_USE_RENDERING_VTK)
   find_package(vtkRenderingOpenVR QUIET)
   find_package(vtkRenderingExternal QUIET)
+endif()
+
+if (${PROJECT_NAME}_USE_HAPTICS)
+  add_definitions( -DiMSTK_USE_HAPTICS )
 endif()
 
 list(APPEND iMSTK_VTK_DEPENDENCIES
