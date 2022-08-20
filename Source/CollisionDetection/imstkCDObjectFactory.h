@@ -8,15 +8,11 @@
 
 #include "imstkFactory.h"
 
-#include <functional>
-#include <memory>
-#include <string>
-#include <unordered_map>
-
 namespace imstk
 {
 class CollisionDetectionAlgorithm;
 class Geometry;
+
 /// \brief Manages and generates the CollisionDetectionAlgorithms.
 ///
 /// The factory is a singleton and can be accessed anywhere.
