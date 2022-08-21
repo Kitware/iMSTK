@@ -227,6 +227,9 @@
 #include "imstkVRPNDeviceClient.h"
 #endif
 
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
+
 %} /* end of module */
 
 /*
@@ -475,7 +478,6 @@ namespace std
 %include "../../Devices/imstkMouseDeviceClient.h"
 
 #ifdef iMSTK_USE_HAPLY
-	#define HDCALLBACK
 	%include "../../Devices/imstkHaplyDeviceManager.h"
 	%include "../../Devices/imstkHaplyDeviceClient.h"
 #endif
@@ -485,6 +487,9 @@ namespace std
 	%include "../../Devices/imstkHapticDeviceManager.h"
 	%include "../../Devices/imstkHapticDeviceClient.h"
 #endif
+
+%include "../../Devices/imstkDeviceManager.h"
+%include "../../Devices/imstkDeviceManagerFactory.h"
 
 #ifdef iMSTK_USE_VRPN
 	// The static calls in DeviceClient are getting ignored anyway define these
