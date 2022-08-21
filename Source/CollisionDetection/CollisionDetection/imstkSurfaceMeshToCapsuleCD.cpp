@@ -209,8 +209,6 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                 // Capsule body intersecting triangle
                 else if (caseType == 4)
                 {
-                    auto puncturePt = uvw[0] * x1 + uvw[1] * x2 + uvw[2] * x3;
-
                     CellIndexElement elemA;
                     elemA.ids[0]   = cell[0];
                     elemA.ids[1]   = cell[1];

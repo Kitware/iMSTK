@@ -134,6 +134,9 @@ public:
 
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
+    ///
+    /// \brief Returns if any grasp constraints are present
+    ///
     bool hasConstraints() const;
 
 protected:
@@ -166,8 +169,9 @@ protected:
     /// when stiffness < 1 it will slowly converge on the grasp point
     double m_stiffness = 0.4;
 
-    std::vector<std::tuple<PbdParticleId, Vec3d, Vec3d>> m_constraintPts;
-    std::vector<std::shared_ptr<PbdConstraint>> m_constraints; ///< List of PBD constraints
+    /// Vec of virtual particle grasp point ids, and local positions when grasped
+    std::vector<std::tuple<PbdParticleId, Vec3d>> m_constraintPts;
+    std::vector<std::shared_ptr<PbdConstraint>>   m_constraints; ///< List of PBD constraints
 
 private:
     std::vector<PbdConstraint*> m_collisionConstraints;
