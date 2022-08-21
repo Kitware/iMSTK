@@ -9,8 +9,6 @@
 #include "imstkModule.h"
 #include "imstkMacros.h"
 
-#include <vector>
-
 namespace imstk
 {
 class DeviceClient;
