@@ -454,7 +454,8 @@ endif()
 # Data
 #----------------------------------------------------------------------
 if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
-  add_definitions( -DiMSTK_DATA_ROOT=\"${CMAKE_INSTALL_PREFIX}/data/\")
+  # Use relative directory to bin for movement of the install directory
+  add_definitions( -DiMSTK_DATA_ROOT=\"../data/\")
   
   # Note if the target name or data name changes this has to be changed as well
   add_custom_target(CopyDataFiles ALL
