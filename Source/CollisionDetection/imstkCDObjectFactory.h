@@ -16,7 +16,7 @@ class Geometry;
 /// \brief Manages and generates the CollisionDetectionAlgorithms.
 ///
 /// The factory is a singleton and can be accessed anywhere.
-/// Given a the name of a geometry/geometry algorithm this will generate
+/// Given a name of a geometry/geometry algorithm this will generate
 /// the appropriate object that should be executed. In by default the class
 /// name is the name that is used to look up the algorithm.
 /// The generation Will fail if the name is not known to the factory

@@ -15,7 +15,7 @@ class DeviceManager;
 
 /// \brief Manages and generates the DeviceManager's.
 ///
-/// The factory is a singleton and can be accessed anywhere. Given a the
+/// The factory is a singleton and can be accessed anywhere. Given a
 /// name of a DeviceManager this will generate the appropriate object
 /// that should be executed. By default the class name is the name that is
 /// used to look up the DeviceManager.
