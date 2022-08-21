@@ -39,7 +39,10 @@ PbdCollisionConstraint::projectConstraint(PbdState& bodies, const double dt, con
     for (size_t i = 0; i < m_particles.size(); i++)
     {
         const double invMass = bodies.getInvMass(m_particles[i]);
-        lambda += invMass * m_dcdx[i].squaredNorm();
+        if (invMass > 0.0)
+        {
+            lambda += invMass * m_dcdx[i].squaredNorm();
+        }
     }
 
     if (lambda == 0.0)

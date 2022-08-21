@@ -79,14 +79,15 @@ PbdBaryPointToPointConstraint::computeValueAndGradient(PbdState& bodies,
     // Compute the difference between the interpolant points (points in the two cells)
     Vec3d diff = computeInterpolantDifference(bodies);
 
-    c = diff.norm() - m_restLength;
+    const double length = diff.norm();
+    c = length - m_restLength;
 
-    if (c < IMSTK_DOUBLE_EPS)
+    if (length < 1.0e-16)
     {
         diff = Vec3d::Zero();
         return false;
     }
-    diff /= c;
+    diff /= length;
 
     for (size_t i = 0; i < dcdx.size(); i++)
     {

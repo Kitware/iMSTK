@@ -460,10 +460,12 @@ PbdBodyToBodyDistanceConstraint::computeValueAndGradient(PbdState&           bod
 {
     // Transform local position to acquire transformed global (for constraint reprojection)
     const Vec3d& bodyPos0 = bodies.getPosition(m_particles[0]);
-    const Vec3d  p0       = bodyPos0 + bodies.getOrientation(m_particles[0])._transformVector(m_rest_r[0]);
+    m_r[0] = bodies.getOrientation(m_particles[0])._transformVector(m_rest_r[0]);
+    const Vec3d p0 = bodyPos0 + m_r[0];
 
     const Vec3d& bodyPos1 = bodies.getPosition(m_particles[1]);
-    const Vec3d  p1       = bodyPos1 + bodies.getOrientation(m_particles[1])._transformVector(m_rest_r[1]);
+    m_r[1] = bodies.getOrientation(m_particles[1])._transformVector(m_rest_r[1]);
+    const Vec3d p1 = bodyPos1 + m_r[1];
 
     // Move according to the difference
     Vec3d        diff   = p1 - p0;

@@ -260,7 +260,7 @@ PbdObjectGrasping::addPickConstraints()
 
             const Vec3d         relativePos   = pickGeomRot * (vertices[vertexId] - pickGeomPos);
             const PbdParticleId graspPointPid = model->addVirtualParticle(vertices[vertexId], 0.0);
-            m_constraintPts.push_back({ graspPointPid, relativePos, vertices[vertexId] });
+            m_constraintPts.push_back({ graspPointPid, relativePos });
 
             addConstraint(
                 { { meshStruct.bodyId, vertexId } }, { 1.0 },
@@ -301,7 +301,7 @@ PbdObjectGrasping::addPickConstraints()
 
                 const Vec3d         relativePos   = pickGeomRot * (vertices[vertexId] - pickGeomPos);
                 const PbdParticleId graspPointPid = model->addVirtualParticle(vertices[vertexId], 0.0);
-                m_constraintPts.push_back({ graspPointPid, relativePos, vertices[vertexId] });
+                m_constraintPts.push_back({ graspPointPid, relativePos });
 
                 addConstraint(
                     { particles[j] }, { 1.0 },
@@ -338,7 +338,7 @@ PbdObjectGrasping::addPickConstraints()
 
             const Vec3d         relativePos   = pickGeomRot * (pickingPt - pickGeomPos);
             const PbdParticleId graspPointPid = model->addVirtualParticle(pickingPt, 0.0);
-            m_constraintPts.push_back({ graspPointPid, relativePos, pickingPt });
+            m_constraintPts.push_back({ graspPointPid, relativePos });
 
             // Cell to single point constraint
             addConstraint(
@@ -406,10 +406,10 @@ PbdObjectGrasping::updateConstraints()
         const Mat3d  rot = m_graspGeom->getRotation();
         for (size_t i = 0; i < m_constraintPts.size(); i++)
         {
-            std::tuple<PbdParticleId, Vec3d, Vec3d>& cPt = m_constraintPts[i];
-            std::shared_ptr<PbdConstraint>           c   = m_constraints[i];
+            std::tuple<PbdParticleId, Vec3d>& cPt = m_constraintPts[i];
+            std::shared_ptr<PbdConstraint>    c   = m_constraints[i];
 
-            // Because virtual particles are cleared everytime, readd, also update the transform
+            // Because virtual particles are cleared everytime, re-add, also update the transform
             const Vec3d         relativePos = std::get<1>(cPt);
             const Vec3d         vPos = pos + rot * relativePos;
             const PbdParticleId vPid = model->addVirtualParticle(vPos, 0.0);

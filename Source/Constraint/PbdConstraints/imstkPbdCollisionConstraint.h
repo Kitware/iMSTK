@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include "imstkMath.h"
 #include "imstkPbdConstraint.h"
-#include "imstkVecDataArray.h"
 
 namespace imstk
 {

@@ -47,11 +47,11 @@ PbdConstraint::projectConstraint(PbdState& bodies,
         break;
     case (SolverType::xPBD):
     default:
-        alpha     = m_compliance / (dt * dt);
-        dlambda   = -(c + alpha * m_lambda) / (w + alpha);
-        m_lambda += dlambda;
+        alpha   = m_compliance / (dt * dt);
+        dlambda = -(c + alpha * m_lambda) / (w + alpha);
         break;
     }
+    m_lambda += dlambda;
 
     for (size_t i = 0; i < m_particles.size(); i++)
     {
@@ -71,7 +71,9 @@ PbdConstraint::correctVelocity(PbdState& bodies, const double)
     for (size_t i = 0; i < m_particles.size(); i++)
     {
         const double invMass = bodies.getInvMass(m_particles[i]);
-        if (invMass > 0.0)
+        // If immovable, don't bother.
+        // If no lambda was computed, constraint failed, or had no effect
+        if (invMass > 0.0 && m_lambda > 0.0)
         {
             const Vec3d n = m_dcdx[i].normalized();
             Vec3d&      v = bodies.getVelocity(m_particles[i]);
