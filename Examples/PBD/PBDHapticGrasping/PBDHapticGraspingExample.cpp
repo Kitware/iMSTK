@@ -12,28 +12,26 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdObjectCollision.h"
 #include "imstkPbdRigidBaryPointToPointConstraint.h"
 #include "imstkPbdRigidObjectGrasping.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
+#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkRigidObjectController.h"
+#ifdef iMSTK_USE_HAPTICS
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #else
-#include "imstkMouseDeviceClient.h"
+#include "imstkDummyClient.h"
 #endif
 
 using namespace imstk;
@@ -59,7 +57,6 @@ makePbdObjSurface(
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 100.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100.0);
 
-    pbdParams->m_doPartitioning = true;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = numIter;
@@ -143,17 +140,15 @@ main()
     Logger::startLogger();
 
     // Setup the scene
-    imstkNew<Scene> scene("PBDHapticGrasping");
+    auto scene = std::make_shared<Scene>("PbdHapticGrasping");
     scene->getActiveCamera()->setPosition(0.12, 4.51, 16.51);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
-    scene->getConfig()->writeTaskGraph = true;
-
     // Setup a tissue
-    std::shared_ptr<PbdObject> PbdObj = makePbdObjSurface("Tissue",
+    std::shared_ptr<PbdObject> pbdObj = makePbdObjSurface("Tissue",
         Vec3d(4.0, 4.0, 4.0), Vec3i(5, 5, 5), Vec3d(0.0, 0.0, 0.0), 8);
-    scene->addSceneObject(PbdObj);
+    scene->addSceneObject(pbdObj);
 
     std::shared_ptr<RigidObject2> toolObj = makeCapsuleToolObj();
     scene->addSceneObject(toolObj);
@@ -178,64 +173,40 @@ main()
     scene->addInteraction(pbdToolCollision);*/
 
     // Create new picking with constraints
-    auto toolPicking = std::make_shared<PbdRigidObjectGrasping>(PbdObj, toolObj);
+    auto toolPicking = std::make_shared<PbdRigidObjectGrasping>(pbdObj, toolObj);
     toolPicking->setStiffness(0.3);
     scene->addInteraction(toolPicking);
 
     // Light
-    imstkNew<DirectionalLight> light;
+    auto light = std::make_shared<DirectionalLight>();
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-    light->setIntensity(1);
+    light->setIntensity(1.0);
     scene->addLight("Light", light);
 
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.002);
 
-#ifdef iMSTK_USE_OPENHAPTICS
-        imstkNew<HapticDeviceManager> hapticManager;
-        hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
+#ifdef iMSTK_USE_HAPTICS
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        imstkNew<RigidObjectController> controller;
-        controller->setControlledObject(toolObj);
-        controller->setDevice(hapticDeviceClient);
-        controller->setTranslationScaling(0.05);
-        controller->setLinearKs(5000.0);
-        controller->setAngularKs(1000.0);
-        //controller->setAngularKs(0.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.001);
-        controller->setSmoothingKernelSize(15);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
-
-        connect<Event>(sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
-            {
-                ghostMat->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
-
-                // Also apply controller transform to ghost geometry
-                ghostCapsule->setTranslation(controller->getPosition());
-                ghostCapsule->setRotation(controller->getOrientation());
-                ghostCapsule->updatePostTransformData();
-                ghostCapsule->postModified();
-            });
-        connect<ButtonEvent>(hapticDeviceClient, &HapticDeviceClient::buttonStateChanged,
+        connect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged,
             [&](ButtonEvent* e)
             {
                 if (e->m_buttonState == BUTTON_PRESSED)
@@ -256,22 +227,14 @@ main()
                 }
             });
 #else
+        auto deviceClient = std::make_shared<DummyClient>();
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
             {
                 const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
+                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.1;
 
-                const Vec3d fS = (worldPos - toolObj->getRigidBody()->getPosition()) * 100000.0; // Spring force
-                const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                // Spring damping
-
-                (*toolObj->getRigidBody()->m_force) += (fS + fD);
-
-                // Also apply controller transform to ghost geometry
-                ghostCapsule->setTranslation(worldPos);
-                ghostCapsule->setRotation(Mat3d::Identity());
-                ghostCapsule->updatePostTransformData();
-                ghostCapsule->postModified();
+                deviceClient->setPosition(worldPos);
             });
 
         // Add click event and side effects
@@ -281,8 +244,6 @@ main()
                 toolPicking->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
                 //pbdToolCollision->setEnabled(false);
             });
-
-        // Add click event and side effects
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
             [&](Event*)
             {
@@ -290,6 +251,49 @@ main()
                 //pbdToolCollision->setEnabled(true);
             });
 #endif
+        // Alternative grasping by keyboard (in case device doesn't have a button)
+        connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
+            [&](KeyEvent* e)
+            {
+                if (e->m_key == 'g')
+                {
+                    toolPicking->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
+                    //pbdToolCollision->setEnabled(false);
+                }
+            });
+        connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyRelease,
+            [&](KeyEvent* e)
+            {
+                if (e->m_key == 'g')
+                {
+                    toolPicking->endGrasp();
+                    //pbdToolCollision->setEnabled(true);
+                }
+            });
+
+        auto controller = std::make_shared<RigidObjectController>();
+        controller->setControlledObject(toolObj);
+        controller->setDevice(deviceClient);
+        controller->setTranslationScaling(50.0);
+        controller->setLinearKs(5000.0);
+        controller->setAngularKs(1000.0);
+        controller->setUseCritDamping(true);
+        controller->setForceScaling(0.001);
+        controller->setSmoothingKernelSize(15);
+        controller->setUseForceSmoothening(true);
+        scene->addControl(controller);
+
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+            {
+                ghostMat->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+
+                // Also apply controller transform to ghost geometry
+                ghostCapsule->setTranslation(controller->getPosition());
+                ghostCapsule->setRotation(controller->getOrientation());
+                ghostCapsule->updatePostTransformData();
+                ghostCapsule->postModified();
+            });
 
         // Add mouse and keyboard controls to the viewer
         auto mouseControl = std::make_shared<MouseSceneControl>();
@@ -303,10 +307,10 @@ main()
         keyControl->setModuleDriver(driver);
         scene->addControl(keyControl);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
-                // Simulate the cube in real time
-                PbdObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+                // Simulate in real time
+                pbdObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
                 toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
             });
 

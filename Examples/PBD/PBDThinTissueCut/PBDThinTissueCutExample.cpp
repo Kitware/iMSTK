@@ -5,15 +5,14 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -23,7 +22,6 @@
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkVertexLabelVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -45,7 +43,7 @@ makeTissueObj(const std::string& name,
             Vec2d(width, height), Vec2i(nRows, nCols));
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
+    auto pbdParams = std::make_shared<PbdModelConfig>();
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e3);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e3);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
@@ -53,25 +51,25 @@ makeTissueObj(const std::string& name,
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
+    auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
-    imstkNew<VisualModel> visualModel;
+    auto visualModel = std::make_shared<VisualModel>();
     visualModel->setGeometry(clothMesh);
     visualModel->setRenderMaterial(material);
 
-    imstkNew<VertexLabelVisualModel> vertexLabelModel;
+    auto vertexLabelModel = std::make_shared<VertexLabelVisualModel>();
     vertexLabelModel->setGeometry(clothMesh);
     vertexLabelModel->setFontSize(20.0);
     vertexLabelModel->setTextColor(Color::Red);
 
     // Setup the Object
-    imstkNew<PbdObject> tissueObj(name);
+    auto tissueObj = std::make_shared<PbdObject>();
     tissueObj->addVisualModel(visualModel);
     tissueObj->addVisualModel(vertexLabelModel);
     tissueObj->setPhysicsGeometry(clothMesh);
@@ -94,7 +92,7 @@ main()
     Logger::startLogger();
 
     // Scene
-    imstkNew<Scene> scene("PbdThinTissueCut");
+    auto scene = std::make_shared<Scene>("PbdThinTissueCut");
 
     // Create a cutting plane object in the scene
     std::shared_ptr<SurfaceMesh> cutGeom =
@@ -102,7 +100,7 @@ main()
             Vec2d(40.0, 40.0), Vec2i(2, 2));
     cutGeom->setTranslation(Vec3d(-10, -20, 0));
     cutGeom->updatePostTransformData();
-    imstkNew<CollidingObject> cutObj("CuttingObject");
+    auto cutObj = std::make_shared<CollidingObject>("CuttingObject");
     cutObj->setVisualGeometry(cutGeom);
     cutObj->setCollidingGeometry(cutGeom);
     cutObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
@@ -114,16 +112,19 @@ main()
     scene->addSceneObject(tissueObj);
 
     // Add interaction pair for pbd cutting
-    imstkNew<PbdObjectCutting> cuttingInteraction(tissueObj, cutObj);
+    auto cutting = std::make_shared<PbdObjectCutting>(tissueObj, cutObj);
+    scene->addInteraction(cutting);
 
-    // Device Server
-    imstkNew<HapticDeviceManager>       server;
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
+    // Setup default haptics manager
+    std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+    std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
 
     // Create the virtual coupling object controller
-    imstkNew<SceneObjectController> controller;
+    auto controller = std::make_shared<SceneObjectController>();
     controller->setControlledObject(cutObj);
-    controller->setDevice(client);
+    controller->setDevice(deviceClient);
+    controller->setTranslationScaling(1000.0);
+    controller->setTranslationOffset(Vec3d(0.0, 0.0, -100.0));
     scene->addControl(controller);
 
     // Camera
@@ -131,26 +132,26 @@ main()
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, -50, 0));
 
     // Light
-    imstkNew<DirectionalLight> light;
+    auto light = std::make_shared<DirectionalLight>();
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
     scene->addLight("light", light);
 
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
-        imstkNew<SimulationManager> driver;
-        driver->addModule(server);
+        auto driver = std::make_shared<SimulationManager>();
+        driver->addModule(hapticManager);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(0.001);
+        driver->setDesiredDt(0.002);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -167,13 +168,21 @@ main()
         }
 
         // Queue haptic button press to be called after scene thread
-        queueConnect<ButtonEvent>(client, &HapticDeviceClient::buttonStateChanged, sceneManager,
+        queueConnect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged, sceneManager,
             [&](ButtonEvent* e)
             {
                 // When button 0 is pressed replace the PBD cloth with a cut one
                 if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
                 {
-                    cuttingInteraction->apply();
+                    cutting->apply();
+                }
+            });
+        connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
+            [&](KeyEvent* e)
+            {
+                if (e->m_key == 'g')
+                {
+                    cutting->apply();
                 }
             });
 

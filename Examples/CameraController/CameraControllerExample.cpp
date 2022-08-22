@@ -6,18 +6,16 @@
 
 #include "imstkCamera.h"
 #include "imstkCameraController.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkPlane.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
 #include "imstkSpotLight.h"
 #include "imstkSurfaceMesh.h"
@@ -27,8 +25,9 @@ using namespace imstk;
 
 ///
 /// \brief This example demonstrates controlling the camera using external
-/// device. Attached is a spotlight. One could use RigidBodyController with
-/// virtual coupling if they wanted damping/smoothness
+/// device. Attached is a spotlight.
+/// Alternatively use a Pbd or RbdObjectController with virtual coupling
+/// for smoothness
 ///
 int
 main()
@@ -37,80 +36,75 @@ main()
     Logger::startLogger();
 
     // Create Scene
-    imstkNew<Scene> scene("CameraController");
+    auto scene = std::make_shared<Scene>("CameraController");
 
-    // Device Server
-    imstkNew<HapticDeviceManager> server;
-    server->setSleepDelay(1.0);
-    std::shared_ptr<HapticDeviceClient> deviceClient = server->makeDeviceClient();
+    // Setup default haptics manager
+    std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+    std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
 
     // Load Mesh
-    auto                  mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
-    imstkNew<SceneObject> meshObject("meshObject");
-    meshObject->setVisualGeometry(mesh);
-    scene->addSceneObject(meshObject);
+    auto mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+    mesh->scale(0.01, Geometry::TransformType::ApplyToData);
+    auto meshObj = std::make_shared<SceneObject>("MeshObj");
+    meshObj->setVisualGeometry(mesh);
+    scene->addSceneObject(meshObj);
 
-    imstkNew<SceneObject> planeObject("Plane");
-    imstkNew<Plane>       plane(Vec3d(0.0, -2.0, 0.0));
-    plane->setWidth(1000.0);
-    planeObject->setVisualGeometry(plane);
-    scene->addSceneObject(planeObject);
+    auto planeObj = std::make_shared<SceneObject>("Plane");
+    auto plane    = std::make_shared<Plane>(Vec3d(0.0, -0.05, 0.0));
+    plane->setWidth(0.5);
+    planeObj->setVisualGeometry(plane);
+    scene->addSceneObject(planeObj);
 
     // Update Camera position
-    scene->getActiveCamera()->setPosition(Vec3d(0.0, 0.0, 10.0));
-
-    imstkNew<CameraController> camController;
-    camController->setCamera(scene->getActiveCamera());
-    camController->setDevice(deviceClient);
-    camController->setTranslationScaling(0.5);
-    scene->addControl(camController);
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 0.0, 1.0));
 
     // Light
-    imstkNew<SpotLight> light;
+    auto light = std::make_shared<SpotLight>();
     light->setFocalPoint(Vec3d(0.0, 0.0, 0.0));
     light->setPosition(Vec3d(0.0, 10.0, 0.0));
     light->setIntensity(1.0);
     light->setSpotAngle(10.0);
     //light->setAttenuationValues(0.0, 0.0, 1.0); // Constant
     //light->setAttenuationValues(0.0, 0.5, 0.0); // Linear falloff
-    light->setAttenuationValues(0.01, 0.0, 0.0); // Quadratic
+    light->setAttenuationValues(50.0, 0.0, 0.0); // Quadratic
     scene->addLight("light0", light);
 
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
 
-        // attach the camera controller to the viewer
-        scene->addControl(camController);
-
-        imstkNew<SimulationManager> driver;
-        driver->addModule(server);
+        auto driver = std::make_shared<SimulationManager>();
+        driver->addModule(hapticManager);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
+        // Attach the camera controller to the viewer
+        auto camController = std::make_shared<CameraController>();
+        camController->setCamera(scene->getActiveCamera());
+        camController->setDevice(deviceClient);
+        scene->addControl(camController);
 
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
+        // Add mouse and keyboard controls to the viewer
+        auto mouseControl = std::make_shared<MouseSceneControl>();
+        mouseControl->setDevice(viewer->getMouseDevice());
+        mouseControl->setSceneManager(sceneManager);
+        scene->addControl(mouseControl);
+
+        auto keyControl = std::make_shared<KeyboardSceneControl>();
+        keyControl->setDevice(viewer->getKeyboardDevice());
+        keyControl->setSceneManager(sceneManager);
+        keyControl->setModuleDriver(driver);
+        scene->addControl(keyControl);
 
         // Change the spot angle when haptic button is pressed
-        connect<ButtonEvent>(deviceClient, &HapticDeviceClient::buttonStateChanged,
+        connect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged,
             [&](ButtonEvent* e)
             {
                 if (e->m_buttonState == BUTTON_PRESSED)

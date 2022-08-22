@@ -5,6 +5,7 @@
 */
 
 #include "imstkModule.h"
+#include "imstkMacros.h"
 
 #include <g3log/g3log.hpp>
 #include <gtest/gtest.h>
@@ -19,6 +20,8 @@ class ModuleObjectMock : public Module
 public:
     ModuleObjectMock() { }
     ~ModuleObjectMock() override = default;
+
+    IMSTK_TYPE_NAME(ModuleObjectMock)
 
 protected:
     bool initModule() override { return true; }

@@ -6,39 +6,39 @@
 
 #pragma once
 
-#include "imstkModule.h"
+#include "imstkDeviceManager.h"
+#include "imstkMacros.h"
 
 #include <vector>
 
 namespace imstk
 {
-class HapticDeviceClient;
+class OpenHapticDeviceClient;
 
 ///
-/// \class HDAPIDeviceServer
+/// \class OpenHapticDeviceManager
+///
 /// \brief Devices manager using HDAPI
 /// \todo add the frame rate option for the servo loop
 ///
-class HapticDeviceManager : public Module
+class OpenHapticDeviceManager : public DeviceManager
 {
 public:
-    HapticDeviceManager() : Module()
+    OpenHapticDeviceManager()
     {
-        m_muteUpdateEvents = true;
         // Default a 1ms sleep to avoid over consumption of the CPU
         m_sleepDelay = 1.0;
     }
 
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~HapticDeviceManager() override = default;
+    ~OpenHapticDeviceManager() override = default;
+
+    IMSTK_TYPE_NAME(OpenHapticDeviceManager)
 
     ///
     /// \brief Create a haptic device client and add it to the internal list
     /// \param Device name or use empty string for default device
     ///
-    std::shared_ptr<HapticDeviceClient> makeDeviceClient(std::string name = "");
+    std::shared_ptr<DeviceClient> makeDeviceClient(std::string name = "") override;
 
 protected:
     ///
@@ -54,8 +54,8 @@ protected:
     void uninitModule() override;
 
 private:
-    friend HapticDeviceClient;
+    friend OpenHapticDeviceClient;
 
-    std::vector<std::shared_ptr<HapticDeviceClient>> m_deviceClients; ///< list of all the device clients
+    std::vector<std::shared_ptr<OpenHapticDeviceClient>> m_deviceClients; ///< list of all the device clients
 };
 } // namespace imstk

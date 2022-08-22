@@ -12,32 +12,27 @@
 #include "imstkIsometricMap.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
+#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
 
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkRigidObjectController.h"
+#ifdef iMSTK_USE_HAPTICS
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #else
-#include "imstkMouseDeviceClient.h"
+#include "imstkDummyClient.h"
 #endif
 
 using namespace imstk;
@@ -55,11 +50,11 @@ setSphereTexCoords(std::shared_ptr<SurfaceMesh> surfMesh, const double uvScale)
 
     const double radius = (size * 0.5).norm();
 
-    imstkNew<VecDataArray<float, 2>> uvCoordsPtr(surfMesh->getNumVertices());
-    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
+    auto                    uvCoordsPtr = std::make_shared<VecDataArray<float, 2>>(surfMesh->getNumVertices());
+    VecDataArray<float, 2>& uvCoords    = *uvCoordsPtr.get();
     for (int i = 0; i < surfMesh->getNumVertices(); i++)
     {
-        Vec3d vertex = surfMesh->getVertexPosition(i) - center;
+        const Vec3d vertex = surfMesh->getVertexPosition(i) - center;
 
         // Compute phi and theta on the sphere
         const double theta = asin(vertex[0] / radius);
@@ -86,7 +81,7 @@ makeTissueObj(const std::string& name,
     setSphereTexCoords(surfMesh, 6.0);
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
+    auto pbdParams = std::make_shared<PbdModelConfig>();
     // Use FEMTet constraints
     pbdParams->m_femParams->m_YoungModulus = 5.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.4;
@@ -99,11 +94,11 @@ makeTissueObj(const std::string& name,
     pbdParams->m_linearDampingCoeff  = 0.05;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
+    auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->configure(pbdParams);
 
     // Setup the material
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
     material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
@@ -114,7 +109,7 @@ makeTissueObj(const std::string& name,
     material->setNormalStrength(0.3);
 
     // Add a visual model to render the surface of the tet mesh
-    imstkNew<VisualModel> visualModel;
+    auto visualModel = std::make_shared<VisualModel>();
     visualModel->setGeometry(surfMesh);
     visualModel->setRenderMaterial(material);
 
@@ -125,7 +120,7 @@ makeTissueObj(const std::string& name,
     clothObj->addVisualModel(normalsVisualModel);*/
 
     // Setup the Object
-    imstkNew<PbdObject> tissueObj(name);
+    auto tissueObj = std::make_shared<PbdObject>(name);
     tissueObj->addVisualModel(visualModel);
     tissueObj->setPhysicsGeometry(tissueMesh);
     tissueObj->setCollidingGeometry(surfMesh);
@@ -153,24 +148,22 @@ makeTissueObj(const std::string& name,
 static std::shared_ptr<NeedleObject>
 makeToolObj()
 {
-    imstkNew<LineMesh>                toolGeometry;
-    imstkNew<VecDataArray<double, 3>> verticesPtr(2);
-    (*verticesPtr)[0] = Vec3d(0.0, -1.0, 0.0);
-    (*verticesPtr)[1] = Vec3d(0.0, 1.0, 0.0);
-    imstkNew<VecDataArray<int, 2>> indicesPtr(1);
-    (*indicesPtr)[0] = Vec2i(0, 1);
-    toolGeometry->initialize(verticesPtr, indicesPtr);
+    auto                    toolGeom = std::make_shared<LineMesh>();
+    VecDataArray<double, 3> vertices = { Vec3d(0.0, -1.0, 0.0), Vec3d(0.0, 1.0, 0.0) };
+    VecDataArray<int, 2>    cells    = { Vec2i(0, 1) };
+    toolGeom->initialize(std::make_shared<VecDataArray<double, 3>>(vertices),
+        std::make_shared<VecDataArray<int, 2>>(cells));
 
     auto syringeMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Syringes/Disposable_Syringe.stl");
     syringeMesh->scale(0.4, Geometry::TransformType::ApplyToData);
     syringeMesh->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2, Geometry::TransformType::ApplyToData);
     syringeMesh->translate(Vec3d(0.0, 4.4, 0.0), Geometry::TransformType::ApplyToData);
 
-    imstkNew<NeedleObject> toolObj("NeedleRbdTool");
+    auto toolObj = std::make_shared<NeedleObject>("NeedleRbdTool");
     toolObj->setVisualGeometry(syringeMesh);
-    toolObj->setCollidingGeometry(toolGeometry);
-    toolObj->setPhysicsGeometry(toolGeometry);
-    toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeometry, syringeMesh));
+    toolObj->setCollidingGeometry(toolGeom);
+    toolObj->setPhysicsGeometry(toolGeom);
+    toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, syringeMesh));
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
     toolObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
     toolObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
@@ -199,13 +192,13 @@ main()
     Logger::startLogger();
 
     // Setup the scene
-    imstkNew<Scene> scene("PBDTissueSurfaceNeedleContact");
+    auto scene = std::make_shared<Scene>("PbdTissueSurfaceNeedleContact");
     scene->getActiveCamera()->setPosition(-0.06, 7.29, 11.69);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
     // Setup a tissue
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("PBDTissue",
+    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
         Vec3d(10.0, 3.0, 10.0), Vec3i(7, 3, 6), Vec3d(0.1, -1.0, 0.0));
     scene->addSceneObject(tissueObj);
 
@@ -214,9 +207,9 @@ main()
     scene->addSceneObject(toolObj);
 
     // Setup a ghost tool object to show off virtual coupling
-    imstkNew<SceneObject> ghostToolObj("GhostTool");
-    auto                  toolMesh = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getVisualGeometry());
-    imstkNew<SurfaceMesh> toolGhostMesh;
+    auto ghostToolObj  = std::make_shared<SceneObject>("GhostTool");
+    auto toolMesh      = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getVisualGeometry());
+    auto toolGhostMesh = std::make_shared<SurfaceMesh>();
     toolGhostMesh->initialize(
         std::make_shared<VecDataArray<double, 3>>(*toolMesh->getVertexPositions()),
         std::make_shared<VecDataArray<int, 3>>(*toolMesh->getCells()));
@@ -230,7 +223,7 @@ main()
     scene->addInteraction(std::make_shared<NeedleInteraction>(tissueObj, toolObj));
 
     // Light
-    imstkNew<DirectionalLight> light;
+    auto light = std::make_shared<DirectionalLight>();
     light->setDirection(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
     scene->addLight("Light", light);
@@ -238,31 +231,42 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
         viewer->setDebugAxesLength(0.1, 0.1, 0.1);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-#ifdef iMSTK_USE_OPENHAPTICS
-        imstkNew<HapticDeviceManager> hapticManager;
-        hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
+#ifdef iMSTK_USE_HAPTICS
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
+#else
+        auto deviceClient = std::make_shared<DummyClient>();
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+            {
+                const Vec2d mousePos   = viewer->getMouseDevice()->getPos();
+                const Vec3d desiredPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.2 + Vec3d(0.0, 0.025, 0.0);
+                const Quatd desiredOrientation = Quatd(Rotd(0.0, Vec3d(1.0, 0.0, 0.0)));
 
-        imstkNew<RigidObjectController> controller;
+                deviceClient->setPosition(desiredPos);
+            });
+#endif
+
+        auto controller = std::make_shared<RigidObjectController>();
         controller->setControlledObject(toolObj);
-        controller->setDevice(hapticDeviceClient);
-        controller->setTranslationScaling(0.05);
+        controller->setDevice(deviceClient);
+        controller->setTranslationScaling(50.0);
         controller->setLinearKs(1000.0);
         controller->setAngularKs(10000000.0);
         controller->setUseCritDamping(true);
@@ -281,45 +285,14 @@ main()
                 toolGhostMesh->updatePostTransformData();
                 toolGhostMesh->postModified();
             });
-#else
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-            {
-                const Vec2d mousePos   = viewer->getMouseDevice()->getPos();
-                const Vec3d desiredPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 2.0 + Vec3d(0.0, 1.0, 0.0);
-                const Quatd desiredOrientation = Quatd(Rotd(0.0, Vec3d(1.0, 0.0, 0.0)));
 
-                Vec3d virtualForce;
-                {
-                    const Vec3d fS = (desiredPos - toolObj->getRigidBody()->getPosition()) * 1000.0; // Spring force
-                    const Vec3d fD = -toolObj->getRigidBody()->getVelocity() * 100.0;                // Spring damping
-
-                    const Quatd dq       = desiredOrientation * toolObj->getRigidBody()->getOrientation().inverse();
-                    const Rotd angleAxes = Rotd(dq);
-                    const Vec3d tS       = angleAxes.axis() * angleAxes.angle() * 10000000.0;
-                    const Vec3d tD       = -toolObj->getRigidBody()->getAngularVelocity() * 1000.0;
-
-                    virtualForce = fS + fD;
-                    (*toolObj->getRigidBody()->m_force)  += virtualForce;
-                    (*toolObj->getRigidBody()->m_torque) += tS + tD;
-                }
-
-                // Update the ghost debug geometry
-                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-                toolGhostMesh->setRotation(desiredOrientation);
-                toolGhostMesh->setTranslation(desiredPos);
-                toolGhostMesh->updatePostTransformData();
-                toolGhostMesh->postModified();
-
-                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, virtualForce.norm() / 15.0));
-            });
-#endif
-
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::preUpdate,
+            [&](Event*)
             {
                 // Keep the tool moving in real time
                 toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
                 //tissueObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
-        });
+            });
 
         // Add mouse and keyboard controls to the viewer
         {

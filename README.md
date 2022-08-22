@@ -15,6 +15,7 @@
     * [On Linux/macOS](#on-linuxmacos)
     * [On Windows](#on-windows)
     * [Phantom Omni Support](#phantom-omni-support)
+    * [Haply Inverse3 Support](#haply-support)
     * [VRPN Support](#vrpn-support)
     * [Offscreen Rendering](#offscreen-rendering)
     * [Renderless](#renderless)
@@ -114,6 +115,14 @@ We use [CMake] to configure the project on every platform. See how to run it [HE
     3. Configure your CMake project with the variable `iMSTK_USE_OpenHaptics` set to `ON`.
     4. After configuration, the CMake variable `OPENHAPTICS_ROOT_DIR` should be set to the OpenHaptics path on your system.
   
+* #### Haply Support
+  To support the [Haply Inverse3](https://www.haply.co) haptic device, follow the steps below:
+    1. Acquire the C++ Haply Hardware API from Haply.
+    2. Add the Haply Hardware API to your system path with variable name: Haply_SDK_BASE.
+    3. Configure your CMake project with the variable `iMSTK_USE_HAPLY` set to `ON`.
+
+  Please note the Haply Hardware API is in early stages of development and will be deprecated & changed in the future.
+
 * #### VRPN Support
 
   The `VRPNDeviceModule` enables access to a large number devices supported by VRPN. The `VRPNDeviceModule` expects a `vrpn_server` to be running. The iMSTK superbuild builds and

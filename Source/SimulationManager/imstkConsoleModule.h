@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkModule.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -24,6 +25,8 @@ class ConsoleModule : public Module
 public:
     ConsoleModule(std::string name = "ConsoleModule");
     ~ConsoleModule() override      = default;
+
+    IMSTK_TYPE_NAME(ConsoleModule)
 
     std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const { return m_keyboardDeviceClient; }
 

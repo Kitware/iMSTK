@@ -30,9 +30,8 @@ public class PbdCutting
         // Add interaction pair for pbd cutting
         PbdObjectCutting cuttingPair = new PbdObjectCutting(clothObj, cutObj);
 
-        // Device Sever
-        HapticDeviceManager server = new HapticDeviceManager();
-        HapticDeviceClient client = server.makeDeviceClient();
+        DeviceManager hapticManager = DeviceManagerFactory.makeDeviceManager();
+        DeviceClient client = hapticManager.makeDeviceClient();
 
         SceneObjectController controller = new SceneObjectController();
         controller.setControlledObject(cutObj);
@@ -62,7 +61,7 @@ public class PbdCutting
             sceneManager.pause(); // Start simulation paused
 
             SimulationManager driver = new SimulationManager();
-            driver.addModule(server);
+            driver.addModule(hapticManager);
             driver.addModule(viewer);
             driver.addModule(sceneManager);
             driver.setDesiredDt(0.001);

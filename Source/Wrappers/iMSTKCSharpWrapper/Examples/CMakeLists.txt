@@ -34,7 +34,7 @@ if (iMSTK_USE_RENDERING_VTK)
   add_example(SPHFluid sphFluid.cs)
   add_example(TestGeometry testGeometry.cs)
 
-  if (iMSTK_USE_OpenHaptics)
+  if (iMSTK_USE_HAPTICS)
       add_example(PBDCutting pbdCutting.cs)
       add_example(SDFHaptics sdfHaptics.cs)
   endif()

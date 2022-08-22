@@ -7,7 +7,7 @@
 ###########################################################################
 
 
-if(iMSTK_USE_OpenHaptics AND iMSTK_USE_RENDERING_VTK)
+if(iMSTK_USE_HAPTICS AND iMSTK_USE_RENDERING_VTK)
   project(Example-ObjectController)
 
   #-----------------------------------------------------------------------------

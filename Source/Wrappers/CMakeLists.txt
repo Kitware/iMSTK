@@ -59,6 +59,12 @@ endif()
 if(iMSTK_USE_OpenHaptics)
     list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_OpenHaptics")
 endif()
+if(iMSTK_USE_HAPLY)
+    list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_HAPLY")
+endif()
+if(iMSTK_USE_HAPTICS)
+    list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_HAPTICS")
+endif()
 if(iMSTK_USE_VRPN)
     list(APPEND imstk_SWIG_DEFINITIONS "iMSTK_USE_VRPN")
 endif()
@@ -150,6 +156,7 @@ if (MSVC)
             -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_PREFIX_PATH}
             -DiMSTK_SWIG_PINNED_ARRAY:BOOL=${iMSTK_SWIG_PINNED_ARRAY}
             -DiMSTK_USE_RENDERING_VTK:BOOL=${iMSTK_USE_RENDERING_VTK}
+            -DiMSTK_USE_HAPTICS:BOOL=${iMSTK_USE_HAPTICS}
             -DiMSTK_USE_OpenHaptics:BOOL=${iMSTK_USE_OpenHaptics}
             -DiMSTK_USE_VRPN:BOOL=${iMSTK_USE_VRPN}
         )

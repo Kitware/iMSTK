@@ -6,16 +6,15 @@
 
 #pragma once
 
-#include "imstkModule.h"
+#include "imstkDeviceManager.h"
+#include "imstkDeviceClient.h"
 
 #include <map>
-#include <string>
 
+//VRPN
 #include <vrpn_Connection.h>
 #include <vrpn_MainloopContainer.h>
 
-//VRPN
-#include "imstkDeviceClient.h"
 #include "quat.h"
 
 namespace imstk
@@ -39,7 +38,7 @@ const VRPNDeviceType VRPNForce   = 0x8;
 /// edited represent the projects requirements.
 /// For more information on VRPN see the wiki https://github.com/vrpn/vrpn/wiki
 ///
-class VRPNDeviceManager : public Module
+class VRPNDeviceManager : public DeviceManager
 {
 public:
 
@@ -51,7 +50,9 @@ public:
     ///
     VRPNDeviceManager(const std::string& machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO);
 
-    virtual ~VRPNDeviceManager() override = default;
+    ~VRPNDeviceManager() override = default;
+
+    IMSTK_TYPE_NAME(VRPNDeviceManager)
 
     void addDeviceClient(std::shared_ptr<VRPNDeviceClient> client);
 
@@ -64,6 +65,10 @@ public:
     ///                   will be observable
     ///
     std::shared_ptr<DeviceClient> makeDeviceClient(const std::string& deviceName, VRPNDeviceType deviceType);
+    std::shared_ptr<DeviceClient> makeDeviceClient(const std::string deviceName) override
+    {
+        return makeDeviceClient(deviceName, VRPNAnalog);
+    }
 
 protected:
     ///

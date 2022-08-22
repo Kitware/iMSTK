@@ -6,10 +6,10 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
 #include "imstkImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -17,7 +17,6 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -27,7 +26,6 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -50,7 +48,7 @@ makeTissueObj(const std::string& name,
             Quatd::Identity(), 2.0);
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
+    auto pbdParams = std::make_shared<PbdModelConfig>();
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 10000.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.1);
     pbdParams->m_gravity    = Vec3d(0.0, -0.01, 0.0);
@@ -59,11 +57,11 @@ makeTissueObj(const std::string& name,
     pbdParams->m_linearDampingCoeff = 0.01;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
+    auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
@@ -75,7 +73,7 @@ makeTissueObj(const std::string& name,
     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
 
     // Setup the Object
-    imstkNew<PbdObject> tissueObj(name);
+    auto tissueObj = std::make_shared<PbdObject>(name);
     tissueObj->setVisualGeometry(mesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(mesh);
@@ -106,43 +104,42 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
-    // Scene
-    imstkNew<Scene> scene("PbdThinTissueGraspingExample");
+    auto scene = std::make_shared<Scene>("PbdThinTissueGrasping");
     scene->getActiveCamera()->setPosition(0.001, 0.05, 0.15);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
-    imstkNew<Capsule> geomShaft;
+    auto geomShaft = std::make_shared<Capsule>();
     geomShaft->setLength(1.0);
     geomShaft->setRadius(0.005);
     geomShaft->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 0.5));
-    imstkNew<CollidingObject> objShaft("ShaftObject");
+    auto objShaft = std::make_shared<CollidingObject>("ShaftObject");
     objShaft->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/pivot.obj"));
     objShaft->setCollidingGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
-    imstkNew<Capsule> geomUpperJaw;
+    auto geomUpperJaw = std::make_shared<Capsule>();
     geomUpperJaw->setLength(0.05);
     geomUpperJaw->setTranslation(Vec3d(0.0, 0.0013, -0.016));
     geomUpperJaw->setRadius(0.004);
     geomUpperJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
-    imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
+    auto objUpperJaw = std::make_shared<CollidingObject>("UpperJawObject");
     objUpperJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/upper.obj"));
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
     scene->addSceneObject(objUpperJaw);
 
-    imstkNew<Capsule> geomLowerJaw;
+    auto geomLowerJaw = std::make_shared<Capsule>();
     geomLowerJaw->setLength(0.05);
     geomLowerJaw->setTranslation(Vec3d(0.0, -0.0013, -0.016));
     geomLowerJaw->setRadius(0.004);
     geomLowerJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
-    imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
+    auto objLowerJaw = std::make_shared<CollidingObject>("LowerJawObject");
     objLowerJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/lower.obj"));
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
-    imstkNew<Capsule> pickGeom;
+    auto pickGeom = std::make_shared<Capsule>();
     pickGeom->setLength(0.05);
     pickGeom->setTranslation(Vec3d(0.0, 0.0, -0.016));
     pickGeom->setRadius(0.006);
@@ -152,21 +149,20 @@ main()
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue", 0.1, 0.1, 16, 16);
     scene->addSceneObject(tissueObj);
 
-    imstkNew<HapticDeviceManager> deviceManager;
-    deviceManager->setSleepDelay(1.0);
-    std::shared_ptr<HapticDeviceClient> client = deviceManager->makeDeviceClient();
+    // Setup default haptics manager
+    std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+    std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
 
     // Create and add virtual coupling object controller in the scene
-    imstkNew<LaparoscopicToolController> controller;
+    auto controller = std::make_shared<LaparoscopicToolController>();
     controller->setParts(objShaft, objUpperJaw, objLowerJaw, pickGeom);
-    controller->setDevice(client);
+    controller->setDevice(deviceClient);
     controller->setJawAngleChange(1.0);
-    controller->setTranslationScaling(0.001);
     scene->addControl(controller);
 
     // Add collision for both jaws of the tool
-    auto upperJawCollision = std::make_shared<PbdObjectCollision>(tissueObj, objUpperJaw, "SurfaceMeshToCapsuleCD");
-    auto lowerJawCollision = std::make_shared<PbdObjectCollision>(tissueObj, objLowerJaw, "SurfaceMeshToCapsuleCD");
+    auto upperJawCollision = std::make_shared<PbdObjectCollision>(tissueObj, objUpperJaw);
+    auto lowerJawCollision = std::make_shared<PbdObjectCollision>(tissueObj, objLowerJaw);
     scene->addInteraction(upperJawCollision);
     scene->addInteraction(lowerJawCollision);
 
@@ -175,25 +171,25 @@ main()
     scene->addInteraction(jawPicking);
 
     // Light
-    imstkNew<DirectionalLight> light;
-    light->setFocalPoint(Vec3d(.0, -1.0, -1.0));
+    auto light = std::make_shared<DirectionalLight>();
+    light->setFocalPoint(Vec3d(0.0, -1.0, -1.0));
     light->setIntensity(1.0);
     scene->addLight("light", light);
 
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
         viewer->setDebugAxesLength(0.01, 0.01, 0.01);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
-        imstkNew<SimulationManager> driver;
-        driver->addModule(deviceManager);
+        auto driver = std::make_shared<SimulationManager>();
+        driver->addModule(hapticManager);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.005);

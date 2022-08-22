@@ -25,18 +25,18 @@ struct HDstate
 };
 
 ///
-/// \class HapticDeviceClient
+/// \class OpenHapticDeviceClient
 ///
 /// \brief Subclass of DeviceClient for phantom omni
 /// Holds and updates the data sync or on its own thread
 /// Holder of data
 ///
-class HapticDeviceClient : public DeviceClient
+class OpenHapticDeviceClient : public DeviceClient
 {
-friend class HapticDeviceManager;
+friend class OpenHapticDeviceManager;
 
 public:
-    ~HapticDeviceClient() override = default;
+    ~OpenHapticDeviceClient() override = default;
 
     ///
     /// \brief Use callback to get tracking data from phantom omni
@@ -48,7 +48,7 @@ protected:
     /// \brief Constructor/Destructor, only the DeviceManager can construct
     /// \param Device name or use empty string for default device
     ///
-    HapticDeviceClient(const std::string& name = "") : DeviceClient(name, "localhost") { }
+    OpenHapticDeviceClient(const std::string& name = "") : DeviceClient(name, "localhost") { }
 
     ///
     /// \brief Initialize the phantom omni device

@@ -1,23 +1,8 @@
-/*=========================================================================
-
-   Library: iMSTK
-
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0.txt
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-=========================================================================*/
+/*
+** This file is part of the Interactive Medical Simulation Toolkit (iMSTK)
+** iMSTK is distributed under the Apache License, Version 2.0.
+** See accompanying NOTICE for details.
+*/
 
 #include "imstkCamera.h"
 #include "imstkCollisionUtils.h"
@@ -32,6 +17,7 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectController.h"
 #include "imstkPbdObjectCutting.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
@@ -42,12 +28,11 @@
 #include "imstkVertexLabelVisualModel.h"
 #include "imstkVTKViewer.h"
 
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
-#include "imstkPbdObjectController.h"
+#ifdef iMSTK_USE_HAPTICS
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #else
-#include "imstkMouseDeviceClient.h"
+#include "imstkDummyClient.h"
 #endif
 
 using namespace imstk;
@@ -379,27 +364,14 @@ main()
         driver->setDesiredDt(0.001);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-#ifdef iMSTK_USE_OPENHAPTICS
-        auto hapticManager = std::make_shared<HapticDeviceManager>();
-        hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
+#ifdef iMSTK_USE_HAPTICS
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        auto controller = std::make_shared<PbdObjectController>();
-        controller->setDevice(hapticDeviceClient);
-        controller->setControlledObject(toolObj);
-        controller->setTranslationOffset(Vec3d(0.0, 1.1, 0.0));
-        controller->setTranslationScaling(0.001);
-        controller->setForceScaling(0.0);
-        controller->setLinearKs(200.0);
-        controller->setAngularKs(200.0);
-        // Damping doesn't work well here. The force is applied at the start of pbd
-        // Because velocities are ulimately computed after the fact from positions
-        controller->setUseCritDamping(true);
-        scene->addControl(controller);
-
         // Queue haptic button press to be called after scene thread
-        queueConnect<ButtonEvent>(hapticDeviceClient, &HapticDeviceClient::buttonStateChanged, sceneManager,
+        queueConnect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged, sceneManager,
             [&](ButtonEvent* e)
             {
                 // When button 0 is pressed replace the PBD cloth with a cut one
@@ -408,7 +380,39 @@ main()
                     pbdCutting->apply();
                 }
             });
+#else
+        auto deviceClient = std::make_shared<DummyClient>();
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+            {
+                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.1) * 0.5;
+
+                deviceClient->setPosition(worldPos);
+                deviceClient->setOrientation(Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0),
+                    Vec3d(1.0, 0.0, 0.0)));
+            });
+        connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
+            [&](MouseEvent* e)
+            {
+                if (e->m_buttonId == 0)
+                {
+                    pbdCutting->apply();
+                }
+            });
 #endif
+
+        auto controller = std::make_shared<PbdObjectController>();
+        controller->setDevice(deviceClient);
+        controller->setControlledObject(toolObj);
+        controller->setTranslationOffset(Vec3d(0.0, 1.1, 0.0));
+        controller->setTranslationScaling(1.0);
+        controller->setForceScaling(0.0);
+        controller->setLinearKs(2000.0);
+        controller->setAngularKs(500.0);
+        // Damping doesn't work well here. The force is applied at the start of pbd
+        // Because velocities are ulimately computed after the fact from positions
+        controller->setUseCritDamping(true);
+        scene->addControl(controller);
 
         // Add mouse and keyboard controls to the viewer
         {

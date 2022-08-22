@@ -4,7 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkHapticDeviceClient.h"
+#include "imstkOpenHapticDeviceClient.h"
 #include "imstkLogger.h"
 
 #include <HDU/hduError.h>
@@ -13,7 +13,7 @@
 namespace imstk
 {
 void
-HapticDeviceClient::initialize()
+OpenHapticDeviceClient::initialize()
 {
     m_buttons[0] = 0;
     m_buttons[1] = 0;
@@ -62,7 +62,7 @@ HapticDeviceClient::initialize()
 }
 
 void
-HapticDeviceClient::update()
+OpenHapticDeviceClient::update()
 {
     std::vector<std::pair<int, int>> localEvents;
     m_dataLock.lock();
@@ -71,12 +71,12 @@ HapticDeviceClient::update()
 
     for (const auto& item : localEvents)
     {
-        postEvent(ButtonEvent(HapticDeviceClient::buttonStateChanged(), item.first, item.second));
+        postEvent(ButtonEvent(OpenHapticDeviceClient::buttonStateChanged(), item.first, item.second));
     }
 }
 
 void
-HapticDeviceClient::disable()
+OpenHapticDeviceClient::disable()
 {
     // HS 2021-oct-07 There is no documentation on whether hdUnschedule is synchronous
     // or asynchronous, but as all the examples set the sequence to shutdown an HD device
@@ -87,9 +87,9 @@ HapticDeviceClient::disable()
 }
 
 HDCallbackCode HDCALLBACK
-HapticDeviceClient::hapticCallback(void* pData)
+OpenHapticDeviceClient::hapticCallback(void* pData)
 {
-    auto    client = static_cast<HapticDeviceClient*>(pData);
+    auto    client = static_cast<OpenHapticDeviceClient*>(pData);
     HHD     handle = client->m_handle;
     HDstate state  = client->m_state;
 
@@ -117,7 +117,8 @@ HapticDeviceClient::hapticCallback(void* pData)
     // Might be worth locking each part separately
     const Quatd orientation = Quatd((Eigen::Affine3d(Eigen::Matrix4d(state.transform))).rotation());
     client->m_transformLock.lock();
-    client->m_position << state.pos[0], state.pos[1], state.pos[2];
+    // OpenHaptics is in mm, change to meters
+    client->m_position << state.pos[0] * 0.001, state.pos[1] * 0.001, state.pos[2] * 0.001;
     client->m_velocity << state.vel[0], state.vel[1], state.vel[2];
     client->m_angularVelocity << state.angularVel[0], state.angularVel[1], state.angularVel[2];
     client->m_orientation = orientation;

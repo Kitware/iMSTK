@@ -44,8 +44,8 @@ public class SdfHaptics
             }
         }
 
-        HapticDeviceManager hapticManager = new HapticDeviceManager();
-        HapticDeviceClient client = hapticManager.makeDeviceClient();
+        DeviceManager hapticManager = DeviceManagerFactory.makeDeviceManager();
+        DeviceClient client = hapticManager.makeDeviceClient();
 
         // Run the simulation
         {

@@ -13,8 +13,6 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
-#include "imstkPbdConstraintFunctor.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -26,11 +24,9 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
-#else
-#include "imstkMouseDeviceClient.h"
+#ifdef iMSTK_USE_HAPTICS
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #endif
 
 using namespace imstk;
@@ -51,7 +47,7 @@ makeTissueObj(const std::string& name,
             Vec2d(width, height), Vec2i(rowCount, colCount));
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
+    auto pbdParams = std::make_shared<PbdModelConfig>();
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5000.0);
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 5000.0);
     pbdParams->m_gravity    = Vec3d(0.0, -20.0, 0.0); // Slightly larger gravity to compensate viscosity
@@ -60,11 +56,11 @@ makeTissueObj(const std::string& name,
     pbdParams->m_linearDampingCoeff = 0.0;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
+    auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
@@ -75,12 +71,12 @@ makeTissueObj(const std::string& name,
     auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshORM.jpg");
     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
 
-    imstkNew<VisualModel> visualModel;
+    auto visualModel = std::make_shared<VisualModel>();
     visualModel->setGeometry(clothMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
-    imstkNew<PbdObject> pbdObject(name);
+    auto pbdObject = std::make_shared<PbdObject>(name);
     pbdObject->addVisualModel(visualModel);
     pbdObject->setPhysicsGeometry(clothMesh);
     pbdObject->setCollidingGeometry(clothMesh);
@@ -111,7 +107,7 @@ main()
     Logger::startLogger();
 
     // Setup the scene
-    imstkNew<Scene> scene("PBDThinTissueContact");
+    auto scene = std::make_shared<Scene>("PbdThinTissueContact");
     scene->getActiveCamera()->setPosition(0.12, 4.51, 16.51);
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
@@ -121,20 +117,16 @@ main()
     scene->addSceneObject(tissueObj);
 
     // Setup the tool to press the tissue
-    imstkNew<LineMesh>                toolGeometry;
-    imstkNew<VecDataArray<double, 3>> verticesPtr(2);
-    (*verticesPtr)[0] = Vec3d(0.0, 0.0, 0.0);
-    (*verticesPtr)[1] = Vec3d(0.0, 2.0, 0.0);
-    imstkNew<VecDataArray<int, 2>> indicesPtr(1);
-    (*indicesPtr)[0] = Vec2i(0, 1);
-    toolGeometry->initialize(verticesPtr, indicesPtr);
-#ifndef iMSTK_USE_OPENHAPTICS
-    toolGeometry->translate(Vec3d(0.5, 2.0, 0.5));
-#endif
+    auto                    toolGeom = std::make_shared<LineMesh>();
+    VecDataArray<double, 3> vertices = { Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 2.0, 0.0) };
+    VecDataArray<int, 2>    cells    = { Vec2i(0, 1) };
+    toolGeom->initialize(
+        std::make_shared<VecDataArray<double, 3>>(vertices),
+        std::make_shared<VecDataArray<int, 2>>(cells));
 
-    imstkNew<CollidingObject> toolObj("Tool");
-    toolObj->setVisualGeometry(toolGeometry);
-    toolObj->setCollidingGeometry(toolGeometry);
+    auto toolObj = std::make_shared<CollidingObject>("Tool");
+    toolObj->setVisualGeometry(toolGeom);
+    toolObj->setCollidingGeometry(toolGeom);
     toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     toolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
     toolObj->getVisualModel(0)->getRenderMaterial()->setRecomputeVertexNormals(false);
@@ -142,10 +134,10 @@ main()
     scene->addSceneObject(toolObj);
 
     // Add a collision interaction between the tools
-    scene->addInteraction(std::make_shared<PbdObjectCollision>(tissueObj, toolObj, "ClosedSurfaceMeshToMeshCD"));
+    scene->addInteraction(std::make_shared<PbdObjectCollision>(tissueObj, toolObj));
 
     // Light
-    imstkNew<DirectionalLight> light;
+    auto light = std::make_shared<DirectionalLight>();
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
     scene->addLight("Light", light);
@@ -153,45 +145,43 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
+        driver->setDesiredDt(0.005);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-#ifdef iMSTK_USE_OPENHAPTICS
-        imstkNew<HapticDeviceManager> hapticManager;
-        hapticManager->setSleepDelay(1.0); // Delay for 1ms (haptics thread is limited to max 1000hz)
-        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
-        driver->addModule(hapticManager);
-#endif
-        driver->setDesiredDt(0.005);
 
-#ifdef iMSTK_USE_OPENHAPTICS
+#ifdef iMSTK_USE_HAPTICS
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
+        driver->addModule(hapticManager);
+
         Mat3d rotationalOffset = Mat3d::Identity();
         connect<Event>(sceneManager, SceneManager::preUpdate, [&](Event*)
             {
-                hapticDeviceClient->update();
-                const Quatd deviceOrientation = (Quatd(rotationalOffset) * hapticDeviceClient->getOrientation()).normalized();
-                const Vec3d devicePosition    = (rotationalOffset * hapticDeviceClient->getPosition()) * 0.05 + Vec3d(0.0, 0.0, 0.0);
-                toolGeometry->setRotation(deviceOrientation);
-                toolGeometry->setTranslation(devicePosition);
-                toolGeometry->postModified();
+                const Quatd deviceOrientation = (Quatd(rotationalOffset) * deviceClient->getOrientation()).normalized();
+                const Vec3d devicePosition    = (rotationalOffset * deviceClient->getPosition()) * 50.0 + Vec3d(0.0, 0.0, 0.0);
+                toolGeom->setRotation(deviceOrientation);
+                toolGeom->setTranslation(devicePosition);
+                toolGeom->postModified();
             });
 #else
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0;
+                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 10.0 + Vec3d(0.5, 2.0, 0.5);
 
-                toolGeometry->setTranslation(worldPos);
-                toolGeometry->postModified();
+                toolGeom->setTranslation(worldPos);
+                toolGeom->postModified();
             });
 #endif
 

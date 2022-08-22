@@ -212,15 +212,23 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkMouseDeviceClient.h"
 
+#ifdef iMSTK_USE_HAPLY
+#include "imstkHaplyDeviceManager.h"
+#include "imstkHaplyDeviceClient.h"
+#endif
+
 #ifdef iMSTK_USE_OpenHaptics
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
+#include "imstkOpenHapticDeviceManager.h"
+#include "imstkOpenHapticDeviceClient.h"
 #endif
 
 #ifdef iMSTK_USE_VRPN
 #include "imstkVRPNDeviceManager.h"
 #include "imstkVRPNDeviceClient.h"
 #endif
+
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 
 %} /* end of module */
 
@@ -469,11 +477,19 @@ namespace std
 %include "../../Devices/imstkKeyboardDeviceClient.h"
 %include "../../Devices/imstkMouseDeviceClient.h"
 
+#ifdef iMSTK_USE_HAPLY
+	%include "../../Devices/imstkHaplyDeviceManager.h"
+	%include "../../Devices/imstkHaplyDeviceClient.h"
+#endif
+
 #ifdef iMSTK_USE_OpenHaptics
 	#define HDCALLBACK
-	%include "../../Devices/imstkHapticDeviceManager.h"
-	%include "../../Devices/imstkHapticDeviceClient.h"
+	%include "../../Devices/imstkOpenHapticDeviceManager.h"
+	%include "../../Devices/imstkOpenHapticDeviceClient.h"
 #endif
+
+%include "../../Devices/imstkDeviceManager.h"
+%include "../../Devices/imstkDeviceManagerFactory.h"
 
 #ifdef iMSTK_USE_VRPN
 	// The static calls in DeviceClient are getting ignored anyway define these

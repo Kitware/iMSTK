@@ -179,6 +179,12 @@ endif()
 option(${PROJECT_NAME}_USE_VRPN "Build with VRPN support" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_VRPN:BOOL)
 
+option(${PROJECT_NAME}_USE_HAPLY "Build with Haply support" OFF)
+mark_as_superbuild(${PROJECT_NAME}_USE_HAPLY:BOOL)
+if (${PROJECT_NAME}_USE_HAPLY)
+  message(WARNING "iMSTK_USE_HAPLY set to true, this code is based of an early version of the Haply API")
+endif()
+
 cmake_dependent_option(${PROJECT_NAME}_USE_RENDERING_VTK "Build with/out VTK rendering support" ON "NOT ${PROJECT_NAME}_BUILD_FOR_UNITY" OFF)
 mark_as_superbuild(${PROJECT_NAME}_USE_RENDERING_VTK:BOOL)
 
@@ -194,6 +200,12 @@ mark_as_superbuild(${PROJECT_NAME}_USE_OpenHaptics:BOOL)
 if(NOT WIN32 AND ${PROJECT_NAME}_USE_OpenHaptics)
   message(FATAL_ERROR "Setting ${PROJECT_NAME}_USE_OpenHaptics to ON is only supported on Windows")
 endif()
+
+# If at least one haptic API is provided
+if (${PROJECT_NAME}_USE_HAPLY OR ${PROJECT_NAME}_USE_OpenHaptics OR ${PROJECT_NAME}_USE_VRPN)
+  set(${PROJECT_NAME}_USE_HAPTICS ON)
+endif()
+mark_as_superbuild(${PROJECT_NAME}_USE_HAPTICS:BOOL)
 
 cmake_dependent_option(${PROJECT_NAME}_USE_BUILTIN_LOGGING "Uses iMSTK local logger when g3log and its error behavior is not wanted" OFF "NOT ${PROJECT_NAME}_BUILD_FOR_UNITY" ON)
 mark_as_superbuild(${PROJECT_NAME}_USE_BUILTIN_LOGGING:BOOL)
@@ -249,6 +261,9 @@ if(${PROJECT_NAME}_SUPERBUILD)
       imstk_define_dependency(Libusb) #for VRPN
     endif()
     imstk_define_dependency(VRPN)
+  endif()
+  if (${PROJECT_NAME}_USE_HAPLY)
+    imstk_define_dependency(Haply)
   endif()
 
   if(WIN32 AND ${PROJECT_NAME}_AUDIO_ENABLED)
@@ -348,6 +363,13 @@ else()
   remove_definitions( -DiMSTK_USE_VRPN )
 endif()
 
+if (${PROJECT_NAME}_USE_HAPLY)
+  find_package( Haply REQUIRED )
+  add_definitions( -DiMSTK_USE_HAPLY )
+else()
+  remove_definitions( -DiMSTK_USE_HAPLY )
+endif()
+
 # OpenHaptics
 if(${PROJECT_NAME}_USE_OpenHaptics)
   find_package( OpenHapticsSDK REQUIRED )
@@ -364,6 +386,10 @@ find_package(VTK REQUIRED CONFIG)
 if (${PROJECT_NAME}_USE_RENDERING_VTK)
   find_package(vtkRenderingOpenVR QUIET)
   find_package(vtkRenderingExternal QUIET)
+endif()
+
+if (${PROJECT_NAME}_USE_HAPTICS)
+  add_definitions( -DiMSTK_USE_HAPTICS )
 endif()
 
 list(APPEND iMSTK_VTK_DEPENDENCIES
@@ -428,7 +454,8 @@ endif()
 # Data
 #----------------------------------------------------------------------
 if (${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
-  add_definitions( -DiMSTK_DATA_ROOT=\"${CMAKE_INSTALL_PREFIX}/data/\")
+  # Use relative directory to bin for movement of the install directory
+  add_definitions( -DiMSTK_DATA_ROOT=\"../data/\")
   
   # Note if the target name or data name changes this has to be changed as well
   add_custom_target(CopyDataFiles ALL

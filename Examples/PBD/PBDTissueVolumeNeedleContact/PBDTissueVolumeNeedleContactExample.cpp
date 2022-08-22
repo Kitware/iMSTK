@@ -8,39 +8,30 @@
 #include "imstkDebugGeometryObject.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkIsometricMap.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLineMesh.h"
-#include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdContactConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkTextVisualModel.h"
-#include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleEmbeddedCH.h"
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
 
-#include <sstream>
-
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
+#ifdef iMSTK_USE_HAPTICS
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #else
-#include "imstkMouseDeviceClient.h"
 #include "imstkDummyClient.h"
 #endif
 
@@ -270,29 +261,17 @@ main()
         driver->setDesiredDt(0.001); // 1ms, 1000hz
 
         auto controller = std::make_shared<PbdObjectController>();
-#ifdef iMSTK_USE_OPENHAPTICS
-        auto hapticManager = std::make_shared<HapticDeviceManager>();
-        //hapticManager->setSleepDelay(0.01);
-        std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
+#ifdef iMSTK_USE_HAPTICS
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        controller->setTranslationScaling(0.001);
-
-        connect<Event>(sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
-            {
-                // Update the ghost debug geometry
-                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-                toolGhostMesh->setRotation(controller->getOrientation());
-                toolGhostMesh->setTranslation(controller->getPosition());
-                toolGhostMesh->updatePostTransformData();
-                toolGhostMesh->postModified();
-
-                //ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
-            });
+        if (hapticManager->getTypeName() == "HaplyDeviceManager")
+        {
+            controller->setTranslationOffset(Vec3d(0.125, -0.07, 0.0));
+        }
 #else
-        controller->setTranslationScaling(1.0);
-
         auto deviceClient = std::make_shared<DummyClient>();
 
         connect<Event>(sceneManager, &SceneManager::postUpdate,
@@ -304,15 +283,6 @@ main()
 
                 deviceClient->setPosition(desiredPos);
                 deviceClient->setOrientation(desiredOrientation);
-
-                // Update the ghost debug geometry
-                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-                toolGhostMesh->setRotation(desiredOrientation);
-                toolGhostMesh->setTranslation(desiredPos);
-                toolGhostMesh->updatePostTransformData();
-                toolGhostMesh->postModified();
-
-                //ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, virtualForce.norm() / 15.0));
             });
 #endif
         controller->setControlledObject(toolObj);
@@ -329,9 +299,6 @@ main()
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
             {
-                // Keep the tool moving in real time
-                toolObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
-
                 // Copy constraint faces and points to debug geometry for display
                 updateDebugGeom(interaction, debugGeomObj);
 
@@ -341,6 +308,20 @@ main()
                     updateTxtObj(txtObj, interaction, controller);
                     counter = 0;
                 }
+
+                // Update the ghost debug geometry
+                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
+                toolGhostMesh->setRotation(controller->getOrientation());
+                toolGhostMesh->setTranslation(controller->getPosition());
+                toolGhostMesh->updatePostTransformData();
+                toolGhostMesh->postModified();
+                //ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+            });
+        connect<Event>(sceneManager, &SceneManager::preUpdate,
+            [&](Event*)
+            {
+                // Keep the tool moving in real time
+                toolObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
             });
 
         // Add mouse and keyboard controls to the viewer

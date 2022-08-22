@@ -8,11 +8,9 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLineMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkOrientedBox.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
@@ -24,15 +22,14 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
 
-#ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
+#ifdef iMSTK_USE_HAPTICS
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #else
 #include "imstkMouseDeviceClient3D.h"
 #endif
@@ -48,14 +45,14 @@ makePbdString(
     const Vec3d& pos, const Vec3d& dir, const int numVerts,
     const double stringLength)
 {
-    imstkNew<PbdObject> stringObj(name);
+    auto stringObj = std::make_shared<PbdObject>(name);
 
     // Setup the Geometry
     std::shared_ptr<LineMesh> stringMesh =
         GeometryUtils::toLineGrid(pos, dir, stringLength, numVerts);
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
+    auto pbdParams = std::make_shared<PbdModelConfig>();
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100.0);
     pbdParams->enableBendConstraint(100000.0, 1);
     pbdParams->enableBendConstraint(100000.0, 2);
@@ -68,23 +65,20 @@ makePbdString(
     pbdParams->m_linearDampingCoeff = 0.01;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
+    auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    imstkNew<RenderMaterial> material;
+    auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setColor(Color::Red);
     material->setLineWidth(2.0);
     material->setPointSize(6.0);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
-    imstkNew<VisualModel> visualModel;
-    visualModel->setGeometry(stringMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    stringObj->addVisualModel(visualModel);
+    stringObj->setVisualGeometry(stringMesh);
+    stringObj->getVisualModel(0)->setRenderMaterial(material);
     stringObj->setPhysicsGeometry(stringMesh);
     stringObj->setCollidingGeometry(stringMesh);
     stringObj->setDynamicalModel(pbdModel);
@@ -100,10 +94,10 @@ makePbdString(
 static std::shared_ptr<CollidingObject>
 makeTissueObj()
 {
-    imstkNew<CollidingObject> tissueObj("tissue");
+    auto tissueObj = std::make_shared<CollidingObject>("tissue");
 
-    imstkNew<OrientedBox> box1(Vec3d(0.0, -0.1, -0.1), Vec3d(0.1, 0.025, 0.1));
-    imstkNew<VisualModel> box1Model;
+    auto box1      = std::make_shared<OrientedBox>(Vec3d(0.0, -0.1, -0.1), Vec3d(0.1, 0.025, 0.1));
+    auto box1Model = std::make_shared<VisualModel>();
     box1Model->setGeometry(box1);
     box1Model->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::Gouraud);
     box1Model->getRenderMaterial()->setColor(Color::LightSkin);
@@ -111,8 +105,8 @@ makeTissueObj()
 
     tissueObj->setCollidingGeometry(box1);
 
-    imstkNew<OrientedBox> box2(Vec3d(0.0, -0.105, -0.1), Vec3d(0.1001, 0.025, 0.1001));
-    imstkNew<VisualModel> box2Model;
+    auto box2      = std::make_shared<OrientedBox>(Vec3d(0.0, -0.105, -0.1), Vec3d(0.1001, 0.025, 0.1001));
+    auto box2Model = std::make_shared<VisualModel>();
     box2Model->setGeometry(box2);
     box2Model->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::Gouraud);
     box2Model->getRenderMaterial()->setColor(Color::darken(Color::Yellow, 0.2));
@@ -154,10 +148,10 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
-    imstkNew<Scene> scene("PBDStaticSuture");
+    auto scene = std::make_shared<Scene>("PbdStaticSuture");
 
     // Create the arc needle
-    imstkNew<NeedleObject> needleObj;
+    auto needleObj = std::make_shared<NeedleObject>();
     needleObj->setForceThreshold(2.0);
     scene->addSceneObject(needleObj);
 
@@ -183,7 +177,7 @@ main()
     scene->addSceneObject(ghostClampsObj);
 
     // Add point based collision between the tissue & suture thread
-    auto interaction = std::make_shared<PbdObjectCollision>(sutureThreadObj, tissueObj, "ImplicitGeometryToPointSetCD");
+    auto interaction = std::make_shared<PbdObjectCollision>(sutureThreadObj, tissueObj);
     interaction->setFriction(0.0);
     scene->addInteraction(interaction);
 
@@ -199,32 +193,34 @@ main()
     // Run the simulation
     {
         // Setup a viewer to render
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
         viewer->setDebugAxesLength(0.01, 0.01, 0.01);
 
         // Setup a scene manager to advance the scene
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
         // Setup a simulation manager to manage renders & scene updates
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001); // 1ms, 1000hz
 
-#ifdef iMSTK_USE_OPENHAPTICS
-        imstkNew<HapticDeviceManager>       hapticManager;
-        std::shared_ptr<HapticDeviceClient> deviceClient = hapticManager->makeDeviceClient();
+        auto controller = std::make_shared<RigidObjectController>();
+#ifdef iMSTK_USE_HAPTICS
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
-        const double translationScaling = 0.001;
-        const Vec3d  offset = Vec3d(0.05, -0.05, 0.0);
+
+        controller->setTranslationOffset(Vec3d(0.05, -0.05, 0.0));
 #else
-        imstkNew<MouseDeviceClient3D> deviceClient(viewer->getMouseDevice());
+        auto deviceClient = std::make_shared<MouseDeviceClient3D>(viewer->getMouseDevice());
         deviceClient->setOrientation(Quatd(Rotd(1.57, Vec3d(0.0, 1.0, 0.0))));
-        const double translationScaling = 0.1;
-        const Vec3d  offset = Vec3d(-0.05, -0.1, -0.005);
+        controller->setTranslationScaling(0.13);
+        controller->setTranslationOffset(Vec3d(-0.05, -0.1, -0.005));
 
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseScroll,
             [&](MouseEvent* e)
@@ -234,11 +230,8 @@ main()
             });
 #endif
 
-        imstkNew<RigidObjectController> controller;
         controller->setControlledObject(needleObj);
         controller->setDevice(deviceClient);
-        controller->setTranslationOffset(offset);
-        controller->setTranslationScaling(translationScaling);
         controller->setLinearKs(1000.0);
         controller->setAngularKs(10000000.0);
         controller->setUseCritDamping(true);

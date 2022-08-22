@@ -6,10 +6,10 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
 #include "imstkDummyClient.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
@@ -27,7 +27,6 @@
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
-#include "imstkVisualObjectImporter.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -104,7 +103,7 @@ main()
     std::shared_ptr<RigidObject2> lapTool2 = createToolObject(rbdModel, "lapTool2");
     scene->addSceneObject(lapTool2);
 
-    auto rbdInteraction = std::make_shared<RigidObjectCollision>(lapTool1, lapTool2, "CapsuleToCapsuleCD");
+    auto rbdInteraction = std::make_shared<RigidObjectCollision>(lapTool1, lapTool2);
     rbdInteraction->setFriction(0.0); // Don't use friction
     rbdInteraction->setBaumgarteStabilization(0.01);
     scene->addInteraction(rbdInteraction);
@@ -122,15 +121,18 @@ main()
     light->setIntensity(1.0);
     scene->addLight("light", light);
 
-    auto hapticManager = std::make_shared<HapticDeviceManager>();
-    hapticManager->setSleepDelay(0.1); // Delay for 1ms (haptics thread is limited to max 1000hz)
-    std::shared_ptr<HapticDeviceClient> hapticDevice    = hapticManager->makeDeviceClient();
-    auto                                rightController = std::make_shared<RigidObjectController>();
+    // Setup default haptics manager
+    std::shared_ptr<DeviceManager> hapticManager   = DeviceManagerFactory::makeDeviceManager();
+    std::shared_ptr<DeviceClient>  deviceClient    = hapticManager->makeDeviceClient();
+    auto                           rightController = std::make_shared<RigidObjectController>();
     {
-        rightController->setDevice(hapticDevice);
+        rightController->setDevice(deviceClient);
         rightController->setControlledObject(lapTool1);
-        rightController->setTranslationScaling(0.001);
         rightController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
+        if (hapticManager->getTypeName() == "HaplyDeviceManager")
+        {
+            rightController->setTranslationOffset(Vec3d(0.2, 0.0, -1.2));
+        }
         rightController->setLinearKs(5000.0);
         rightController->setAngularKs(100000000.0);
         rightController->setForceScaling(0.1);

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkAbstractVTKViewer.h"
+#include "imstkMacros.h"
 
 #include <vtkSmartPointer.h>
 #include <list>
@@ -29,6 +30,8 @@ class VTKOpenVRViewer : public AbstractVTKViewer
 public:
     VTKOpenVRViewer(std::string name = "VTKOpenVRViewer");
     ~VTKOpenVRViewer() override      = default;
+
+    IMSTK_TYPE_NAME(VTKOpenVRViewer)
 
     ///
     /// \brief Destructor

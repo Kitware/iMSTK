@@ -6,6 +6,8 @@ list(APPEND Dependencies Common)
 
 set(H_FILES
   imstkDeviceClient.h
+  imstkDeviceManagerFactory.h
+  imstkDeviceManager.h
   imstkDummyClient.h
   imstkKeyboardDeviceClient.h
   imstkMouseDeviceClient.h
@@ -14,6 +16,7 @@ set(H_FILES
 
 set(SRC_FILES
   imstkDeviceClient.cpp
+  imstkDeviceManagerFactory.cpp
   imstkDummyClient.cpp
   imstkKeyboardDeviceClient.cpp
   imstkMouseDeviceClient.cpp
@@ -24,12 +27,25 @@ if(iMSTK_USE_OpenHaptics)
   list(APPEND Dependencies OpenHapticsSDK::OpenHapticsSDK)
 
   list(APPEND H_FILES
-    imstkHapticDeviceClient.h
-    imstkHapticDeviceManager.h
+    imstkOpenHapticDeviceClient.h
+    imstkOpenHapticDeviceManager.h
     )
   list(APPEND SRC_FILES
-    imstkHapticDeviceClient.cpp
-    imstkHapticDeviceManager.cpp
+    imstkOpenHapticDeviceClient.cpp
+    imstkOpenHapticDeviceManager.cpp
+    )
+endif()
+
+if (iMSTK_USE_HAPLY)
+  list(APPEND Dependencies Haply::Haply)
+
+  list(APPEND H_FILES
+    imstkHaplyDeviceClient.h
+    imstkHaplyDeviceManager.h
+    )
+  list(APPEND SRC_FILES
+    imstkHaplyDeviceClient.cpp
+    imstkHaplyDeviceManager.cpp
     )
 endif()
 

@@ -28,14 +28,14 @@ public:
             LOG(WARNING) << "NeedleInteraction only works with LineMesh collision geometry on NeedleObject";
         }
 
-        imstkNew<NeedleRigidBodyCH> needleRbdCH;
+        auto needleRbdCH = std::make_shared<NeedleRigidBodyCH>();
         needleRbdCH->setInputRigidObjectA(needleObj);
         needleRbdCH->setInputCollidingObjectB(tissueObj);
         needleRbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
         needleRbdCH->setBaumgarteStabilization(0.001);
         setCollisionHandlingB(needleRbdCH);
 
-        imstkNew<NeedlePbdCH> needlePbdCH;
+        auto needlePbdCH = std::make_shared<NeedlePbdCH>();
         needlePbdCH->setInputObjectA(tissueObj);
         needlePbdCH->setInputObjectB(needleObj);
         needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());

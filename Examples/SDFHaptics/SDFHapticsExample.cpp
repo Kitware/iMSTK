@@ -6,16 +6,15 @@
 
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
+#include "imstkDeviceManager.h"
+#include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkHapticDeviceManager.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -35,57 +34,56 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
-    imstkNew<Scene>               scene("SDFHaptics");
-    std::shared_ptr<SurfaceMesh>  axesMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/axesPoly.vtk");
-    std::shared_ptr<ImageData>    sdfImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/stanfordBunny/stanfordBunny_SDF.nii");
-    imstkNew<SignedDistanceField> sdf(sdfImage->cast(IMSTK_DOUBLE));
+    auto                         scene    = std::make_shared<Scene>("SDFHaptics");
+    std::shared_ptr<SurfaceMesh> axesMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/axesPoly.vtk");
+    std::shared_ptr<ImageData>   sdfImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/stanfordBunny/stanfordBunny_SDF.nii");
+    auto                         sdf      = std::make_shared<SignedDistanceField>(sdfImage->cast(IMSTK_DOUBLE));
     {
         scene->getActiveCamera()->setPosition(-2.3, 23.81, 45.65);
         scene->getActiveCamera()->setFocalPoint(9.41, 8.45, 5.76);
 
-        imstkNew<CollidingObject> bunnyObj("Bunny");
+        auto bunnyObj = std::make_shared<CollidingObject>("Bunny");
         {
             bunnyObj->setCollidingGeometry(sdf);
 
-            imstkNew<SurfaceMeshFlyingEdges> isoExtract;
-            isoExtract->setInputImage(sdfImage);
-            isoExtract->update();
+            SurfaceMeshFlyingEdges isoExtract;
+            isoExtract.setInputImage(sdfImage);
+            isoExtract.update();
 
-            isoExtract->getOutputMesh()->flipNormals();
-            bunnyObj->setVisualGeometry(isoExtract->getOutputMesh());
+            isoExtract.getOutputMesh()->flipNormals();
+            bunnyObj->setVisualGeometry(isoExtract.getOutputMesh());
 
             scene->addSceneObject(bunnyObj);
         }
 
-        imstkNew<SceneObject> axesObj("Axes");
+        auto axesObj = std::make_shared<SceneObject>("Axes");
         {
             axesObj->setVisualGeometry(axesMesh);
             scene->addSceneObject(axesObj);
         }
 
-        // Light (white)
-        imstkNew<DirectionalLight> whiteLight;
-        {
-            whiteLight->setDirection(Vec3d(0.0, -8.0, -5.0));
-            whiteLight->setIntensity(1.0);
-            scene->addLight("whitelight", whiteLight);
-        }
+        // Light
+        auto light = std::make_shared<DirectionalLight>();
+        light->setDirection(Vec3d(0.0, -8.0, -5.0));
+        light->setIntensity(1.0);
+        scene->addLight("light", light);
     }
 
-    imstkNew<HapticDeviceManager>       hapticManager;
-    std::shared_ptr<HapticDeviceClient> client = hapticManager->makeDeviceClient();
+    // Setup default haptics manager
+    std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+    std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
 
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer;
+        auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager;
+        auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
 
-        imstkNew<SimulationManager> driver;
+        auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->addModule(hapticManager);
@@ -95,18 +93,17 @@ main()
         centralGrad.setDx(sdf->getImage()->getSpacing());
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
-                const Vec3d pos = client->getPosition() * 0.1 + Vec3d(0.0, 0.1, 10.0);
+                const Vec3d pos = deviceClient->getPosition() * 100.0 + Vec3d(10.0, 0.1, 10.0);
 
-                client->update();
                 axesMesh->setTranslation(pos);
-                axesMesh->setRotation(client->getOrientation());
+                axesMesh->setRotation(deviceClient->getOrientation());
                 axesMesh->postModified();
 
                 double dx = sdf->getFunctionValue(pos);
                 if (dx < 0.0)
                 {
                     const Vec3d g = centralGrad(pos);
-                    client->setForce(-g.normalized() * dx * 4.0);
+                    deviceClient->setForce(-g.normalized() * dx * 4.0);
                 }
             });
 
