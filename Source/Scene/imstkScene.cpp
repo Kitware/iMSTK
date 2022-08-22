@@ -6,6 +6,7 @@
 
 #include "imstkScene.h"
 #include "imstkCamera.h"
+#include "imstkDeviceControl.h"
 #include "imstkCameraController.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkFeDeformableObject.h"
@@ -71,6 +72,16 @@ Scene::initialize()
             {
                 deviceObj->printControls();
             }
+        }
+    }
+
+    // Initialize all behaviours (single entity systems)
+    for (const auto& ent : m_sceneEntities)
+    {
+        auto comps = ent->getComponents();
+        for (const auto& comp : comps)
+        {
+            CHECK(comp->initialize()) << "Error initializing component";
         }
     }
 
@@ -441,7 +452,9 @@ Scene::removeCamera(const std::string name)
 void
 Scene::addControl(std::shared_ptr<DeviceControl> control)
 {
-    addSceneObject(control);
+    auto obj = std::make_shared<SceneObject>();
+    obj->addComponent(control);
+    addSceneObject(obj);
     this->postEvent(Event(modified()));
 }
 

@@ -12,15 +12,14 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkViewer.h"
-#include "imstkVisualModel.h"
-#include "imstkTextVisualModel.h"
 
 namespace imstk
 {
-KeyboardSceneControl::KeyboardSceneControl(const std::string& name) : KeyboardControl(name)
+KeyboardSceneControlObject::KeyboardSceneControlObject(const std::string& name) :
+    m_textVisualModel(std::make_shared<SceneControlText>()),
+    m_control(std::make_shared<KeyboardSceneControl>())
 {
     // Create visual model
-    m_textVisualModel = std::make_shared<TextVisualModel>();
     m_textVisualModel->setFontSize(40);
     m_textVisualModel->setVisibility(false);
     m_textVisualModel->setText(
@@ -29,12 +28,14 @@ KeyboardSceneControl::KeyboardSceneControl(const std::string& name) : KeyboardCo
     m_textVisualModel->setPosition(TextVisualModel::DisplayPosition::CenterCenter);
 
     addVisualModel(m_textVisualModel);
+
+    m_control->setSceneControlText(m_textVisualModel);
 }
 
 bool
-KeyboardSceneControl::initialize()
+SceneControlText::initialize()
 {
-    m_textVisualModel->setVisibility(m_useTextStatus ? m_sceneManager.lock()->getPaused() : false);
+    setVisibility(m_useTextStatus ? m_sceneManager.lock()->getPaused() : false);
     return true;
 }
 
@@ -76,7 +77,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
         const bool paused = sceneManager->getPaused();
 
         // Switch pause screen visibility
-        m_textVisualModel->setVisibility(m_useTextStatus ? !paused : false);
+        m_sceneControlText->setVisibility(m_sceneControlText->getUseTextStatus() ? !paused : false);
 
         // Resume or pause all modules, expect viewers
         for (auto module : driver->getModules())
@@ -152,9 +153,9 @@ KeyboardSceneControl::OnKeyPress(const char key)
     // Toggle text on pause screen
     else if (key == 'c' || key == 'C')
     {
-        m_useTextStatus = !m_useTextStatus;
+        m_sceneControlText->setUseTextStatus(!m_sceneControlText->getUseTextStatus());
         const bool paused = sceneManager->getPaused();
-        m_textVisualModel->setVisibility(m_useTextStatus ? !paused : false);
+        m_sceneControlText->setVisibility(m_sceneControlText->getUseTextStatus() ? !paused : false);
     }
 }
 

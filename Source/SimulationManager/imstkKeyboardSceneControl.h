@@ -7,12 +7,44 @@
 #pragma once
 
 #include "imstkKeyboardControl.h"
+#include "imstkSceneObject.h"
+#include "imstkTextVisualModel.h"
 
 namespace imstk
 {
 class ModuleDriver;
 class SceneManager;
-class TextVisualModel;
+
+///
+/// \class KeyboardSceneControlText
+/// 
+/// \brief This implements a text on screen that will notify the user of the current
+/// state of the simulation. ie: If paused or not. It can be toggled on and off.
+/// 
+class SceneControlText : public TextVisualModel
+{
+public:
+    SceneControlText(const std::string& name = "SceneControlText") : TextVisualModel(name) { }
+
+    bool initialize() override;
+
+    ///
+    /// \brief If on, text status will be shown when paused.
+    /// On by default.
+    ///@{
+    void setUseTextStatus(const bool useTextStatus) { m_useTextStatus = useTextStatus; }
+    bool getUseTextStatus() const { return m_useTextStatus; }
+    ///@}
+
+    ///
+    /// \brief Set the scene manager whose fps we should track
+    ///
+    void setSceneManager(std::weak_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
+
+protected:
+    std::weak_ptr<SceneManager> m_sceneManager;
+    bool m_useTextStatus = true;
+};
 
 ///
 /// \class KeyboardSceneControl
@@ -26,11 +58,8 @@ class TextVisualModel;
 class KeyboardSceneControl : public KeyboardControl
 {
 public:
-
-    KeyboardSceneControl(const std::string& name = "KeyboardSceneControl");
+    KeyboardSceneControl(const std::string& name = "KeyboardSceneControl") : KeyboardControl(name) { }
     ~KeyboardSceneControl() override = default;
-
-    bool initialize() override;
 
     ///
     /// \brief The driver is used to stop the simulation
@@ -42,13 +71,7 @@ public:
     ///
     void setSceneManager(std::weak_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
 
-    ///
-    /// \brief If on, text status will be shown when paused.
-    /// On by default.
-    ///@{
-    void setUseTextStatus(const bool useTextStatus) { m_useTextStatus = useTextStatus; }
-    bool getUseTextStatus() const { return m_useTextStatus; }
-    ///@}
+    void setSceneControlText(std::shared_ptr<SceneControlText> sceneControlText) { m_sceneControlText = sceneControlText; }
 
     void printControls() override;
 
@@ -57,9 +80,27 @@ public:
     void OnKeyRelease(const char key) override;
 
 protected:
-    std::weak_ptr<ModuleDriver>      m_driver;
-    std::weak_ptr<SceneManager>      m_sceneManager;
-    std::shared_ptr<TextVisualModel> m_textVisualModel;
-    bool m_useTextStatus = true;
+    std::weak_ptr<ModuleDriver> m_driver;
+    std::weak_ptr<SceneManager> m_sceneManager;
+    std::shared_ptr<SceneControlText> m_sceneControlText;
+};
+
+///
+/// \class KeyboardSceneControlObject
+/// 
+/// \brief Adds a common custom control scheme to pause/resume, stop, toggle debug mode,
+/// display text information, and reset the scene.
+/// \todo: Prefabs, keep hierachy flat by not extending this
+/// 
+class KeyboardSceneControlObject : public SceneObject
+{
+public:
+    KeyboardSceneControlObject(const std::string& name = "KeyboardSceneControlObject");
+
+    bool initialize() override;
+
+protected:
+    std::shared_ptr<SceneControlText> m_textVisualModel;
+    std::shared_ptr<KeyboardSceneControl> m_control;
 };
 } // namespace imstk

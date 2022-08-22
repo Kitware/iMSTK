@@ -100,9 +100,12 @@ void
 SceneObject::postModifiedAll()
 {
     // Assume geometry may be changed upon reset
-    for (auto visualModel : m_visualModels)
+    for (auto comp : m_components)
     {
-        visualModel->getGeometry()->postModified();
+        if (auto visualModel = std::dynamic_pointer_cast<VisualModel>(comp))
+        {
+            visualModel->getGeometry()->postModified();
+        }
     }
 }
 } // namespace imstk

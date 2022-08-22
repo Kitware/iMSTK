@@ -24,7 +24,7 @@ PbdObjectController::setControlledObject(std::shared_ptr<SceneObject> obj)
 }
 
 void
-PbdObjectController::update(const double dt)
+PbdObjectController::update(const double& dt)
 {
     if (!updateTrackingData(dt))
     {

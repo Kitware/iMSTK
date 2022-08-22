@@ -20,6 +20,7 @@ namespace imstk
 {
 class Camera;
 class CameraController;
+class DeviceControl;
 class Entity;
 class IblProbe;
 class Light;
@@ -233,7 +234,7 @@ public:
     void removeCamera(const std::string name);
 
     ///
-    /// \brief Add a device control
+    /// \brief Adds a device control to a newly created SceneObject
     ///
     void addControl(std::shared_ptr<DeviceControl> control);
 

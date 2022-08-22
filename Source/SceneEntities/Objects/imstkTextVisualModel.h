@@ -30,7 +30,7 @@ public:
         CenterCenter
     };
 
-    TextVisualModel()
+    TextVisualModel(const std::string& name = "TextVisualModel") : VisualModel(name)
     {
         setDelegateHint("TextRenderDelegate");
     }

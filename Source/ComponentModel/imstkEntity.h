@@ -1,22 +1,8 @@
-/*=========================================================================
-
-   Library: iMSTK
-
-   Copyright (c) Kitware
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0.txt
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-=========================================================================*/
+/*
+** This file is part of the Interactive Medical Simulation Toolkit (iMSTK)
+** iMSTK is distributed under the Apache License, Version 2.0.
+** See accompanying NOTICE for details.
+*/
 
 #pragma once
 
@@ -40,6 +26,7 @@ class Component;
 class Entity : public EventObject
 {
 public:
+    Entity(const std::string& name = "Entity");
     ~Entity() override = default;
 
     // *INDENT-OFF*
@@ -118,21 +105,54 @@ public:
         }
         return components;
     }
+    const std::vector<std::shared_ptr<Component>>& getComponents() { return m_components; }
 
     ///
     /// \brief Remove component if it exists
     ///
     void removeComponent(std::shared_ptr<Component> component);
 
+    ///
+    /// \brief Shorthand for creating object with specified entities
+    /// 
+    template<typename T, typename... Args>
+    static std::shared_ptr<Entity> createEntity()
+    {
+        auto entity = std::make_shared<Entity>();
+        createEntity(ent);
+        return entity;
+    }
+    template<typename T, typename... Args>
+    static void addComponentsToEntity(std::shared_ptr<Entity> ent)
+    {
+        
+    }
+    template<typename T>
+    static void addComponentsToEntity(std::shared_ptr<Entity> ent)
+    {
+    }
+
 protected:
     std::vector<std::shared_ptr<Component>> m_components;
-
-    Entity(const std::string& name = "Entity");
 
     // Not the best design pattern
     static std::atomic<EntityID> s_count; ///< current count of entities
 
     EntityID    m_ID;                     ///< unique ID of entity
     std::string m_name;                   ///< Not unique name
+};
+
+///
+/// \class EntityConstruct
+/// 
+/// \brief Variadic struct of component types. Can implicitly convert
+/// to a Entity with the given compnents. Unlike a static template
+/// function this allows storage of the types to be created.
+/// ie: 'auto entity = MakeEntity<Component1, Component2, ...>'
+/// \todo: Maybe not use
+/// 
+template<typename T, Args... T1>
+struct MakeEntity
+{
 };
 } // namespace imstk

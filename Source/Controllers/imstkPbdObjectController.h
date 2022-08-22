@@ -135,7 +135,7 @@ public:
     ///
     /// \brief Update controlled scene object using latest tracking information
     ///
-    void update(const double dt) override;
+    void update(const double& dt) override;
 
     ///
     /// \brief Apply forces to the haptic device
