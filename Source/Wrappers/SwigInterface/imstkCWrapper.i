@@ -218,8 +218,8 @@
 #endif
 
 #ifdef iMSTK_USE_OpenHaptics
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
+#include "imstkOpenHapticDeviceManager.h"
+#include "imstkOpenHapticDeviceClient.h"
 #endif
 
 #ifdef iMSTK_USE_VRPN
@@ -484,8 +484,8 @@ namespace std
 
 #ifdef iMSTK_USE_OpenHaptics
 	#define HDCALLBACK
-	%include "../../Devices/imstkHapticDeviceManager.h"
-	%include "../../Devices/imstkHapticDeviceClient.h"
+	%include "../../Devices/imstkOpenHapticDeviceManager.h"
+	%include "../../Devices/imstkOpenHapticDeviceClient.h"
 #endif
 
 %include "../../Devices/imstkDeviceManager.h"

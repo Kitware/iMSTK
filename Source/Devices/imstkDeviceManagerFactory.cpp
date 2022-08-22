@@ -12,7 +12,7 @@
 #endif
 
 #ifdef iMSTK_USE_OPENHAPTICS
-#include "imstkHapticDeviceManager.h"
+#include "imstkOpenHapticDeviceManager.h"
 #endif
 
 #ifdef iMSTK_USE_VRPN
@@ -26,7 +26,7 @@ IMSTK_REGISTER_DEVICE_MANAGER(HaplyDeviceManager);
 #endif
 
 #ifdef iMSTK_USE_OPENHAPTICS
-IMSTK_REGISTER_DEVICE_MANAGER(HapticDeviceManager);
+IMSTK_REGISTER_DEVICE_MANAGER(OpenHapticDeviceManager);
 #endif
 
 #ifdef iMSTK_USE_VRPN
@@ -54,7 +54,7 @@ DeviceManagerFactory::makeDeviceManager()
     return makeDeviceManager("HaplyDeviceManager");
 #endif
 #ifdef iMSTK_USE_OPENHAPTICS
-    return makeDeviceManager("HapticDeviceManager");
+    return makeDeviceManager("OpenHapticDeviceManager");
 #endif
 #ifdef iMSTK_USE_VRPN
     return makeDeviceManager("VRPNDeviceManager");

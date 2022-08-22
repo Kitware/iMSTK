@@ -4,7 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkHapticDeviceClient.h"
+#include "imstkOpenHapticDeviceClient.h"
 #include "imstkLogger.h"
 
 #include <HDU/hduError.h>
@@ -13,7 +13,7 @@
 namespace imstk
 {
 void
-HapticDeviceClient::initialize()
+OpenHapticDeviceClient::initialize()
 {
     m_buttons[0] = 0;
     m_buttons[1] = 0;
@@ -62,7 +62,7 @@ HapticDeviceClient::initialize()
 }
 
 void
-HapticDeviceClient::update()
+OpenHapticDeviceClient::update()
 {
     std::vector<std::pair<int, int>> localEvents;
     m_dataLock.lock();
@@ -71,12 +71,12 @@ HapticDeviceClient::update()
 
     for (const auto& item : localEvents)
     {
-        postEvent(ButtonEvent(HapticDeviceClient::buttonStateChanged(), item.first, item.second));
+        postEvent(ButtonEvent(OpenHapticDeviceClient::buttonStateChanged(), item.first, item.second));
     }
 }
 
 void
-HapticDeviceClient::disable()
+OpenHapticDeviceClient::disable()
 {
     // HS 2021-oct-07 There is no documentation on whether hdUnschedule is synchronous
     // or asynchronous, but as all the examples set the sequence to shutdown an HD device
@@ -87,9 +87,9 @@ HapticDeviceClient::disable()
 }
 
 HDCallbackCode HDCALLBACK
-HapticDeviceClient::hapticCallback(void* pData)
+OpenHapticDeviceClient::hapticCallback(void* pData)
 {
-    auto    client = static_cast<HapticDeviceClient*>(pData);
+    auto    client = static_cast<OpenHapticDeviceClient*>(pData);
     HHD     handle = client->m_handle;
     HDstate state  = client->m_state;
 

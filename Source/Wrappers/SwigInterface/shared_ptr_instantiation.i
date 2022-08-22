@@ -219,8 +219,8 @@
 %shared_ptr(imstk::DeviceManager)
 %shared_ptr(imstk::HaplyDeviceClient)
 %shared_ptr(imstk::HaplyDeviceManager)
-%shared_ptr(imstk::HapticDeviceClient)
-%shared_ptr(imstk::HapticDeviceManager)
+%shared_ptr(imstk::OpenHapticDeviceClient)
+%shared_ptr(imstk::OpenHapticDeviceManager)
 %shared_ptr(imstk::VRPNDeviceClient)
 %shared_ptr(imstk::VRPNDeviceManager)
 

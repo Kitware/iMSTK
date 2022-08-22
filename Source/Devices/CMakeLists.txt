@@ -27,12 +27,12 @@ if(iMSTK_USE_OpenHaptics)
   list(APPEND Dependencies OpenHapticsSDK::OpenHapticsSDK)
 
   list(APPEND H_FILES
-    imstkHapticDeviceClient.h
-    imstkHapticDeviceManager.h
+    imstkOpenHapticDeviceClient.h
+    imstkOpenHapticDeviceManager.h
     )
   list(APPEND SRC_FILES
-    imstkHapticDeviceClient.cpp
-    imstkHapticDeviceManager.cpp
+    imstkOpenHapticDeviceClient.cpp
+    imstkOpenHapticDeviceManager.cpp
     )
 endif()
 

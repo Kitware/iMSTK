@@ -4,8 +4,8 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
+#include "imstkOpenHapticDeviceManager.h"
+#include "imstkOpenHapticDeviceClient.h"
 #include "imstkLogger.h"
 
 #include <HD/hd.h>
@@ -13,15 +13,15 @@
 namespace imstk
 {
 std::shared_ptr<DeviceClient>
-HapticDeviceManager::makeDeviceClient(std::string name)
+OpenHapticDeviceManager::makeDeviceClient(std::string name)
 {
-    auto deviceClient = std::shared_ptr<HapticDeviceClient>(new HapticDeviceClient(name));
+    auto deviceClient = std::shared_ptr<OpenHapticDeviceClient>(new OpenHapticDeviceClient(name));
     m_deviceClients.push_back(deviceClient);
     return deviceClient;
 }
 
 bool
-HapticDeviceManager::initModule()
+OpenHapticDeviceManager::initModule()
 {
     for (const auto& client : m_deviceClients)
     {
@@ -32,7 +32,7 @@ HapticDeviceManager::initModule()
 }
 
 void
-HapticDeviceManager::updateModule()
+OpenHapticDeviceManager::updateModule()
 {
     for (int i = 0; i < m_deviceClients.size(); i++)
     {
@@ -41,7 +41,7 @@ HapticDeviceManager::updateModule()
 }
 
 void
-HapticDeviceManager::uninitModule()
+OpenHapticDeviceManager::uninitModule()
 {
     // \todo: Other threads could be mid update call here
     hdStopScheduler();

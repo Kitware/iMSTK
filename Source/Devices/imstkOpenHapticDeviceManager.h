@@ -13,26 +13,26 @@
 
 namespace imstk
 {
-class HapticDeviceClient;
+class OpenHapticDeviceClient;
 
 ///
-/// \class HapticDeviceManager
+/// \class OpenHapticDeviceManager
 ///
 /// \brief Devices manager using HDAPI
 /// \todo add the frame rate option for the servo loop
 ///
-class HapticDeviceManager : public DeviceManager
+class OpenHapticDeviceManager : public DeviceManager
 {
 public:
-    HapticDeviceManager()
+    OpenHapticDeviceManager()
     {
         // Default a 1ms sleep to avoid over consumption of the CPU
         m_sleepDelay = 1.0;
     }
 
-    ~HapticDeviceManager() override = default;
+    ~OpenHapticDeviceManager() override = default;
 
-    IMSTK_TYPE_NAME(HapticDeviceManager)
+    IMSTK_TYPE_NAME(OpenHapticDeviceManager)
 
     ///
     /// \brief Create a haptic device client and add it to the internal list
@@ -54,8 +54,8 @@ protected:
     void uninitModule() override;
 
 private:
-    friend HapticDeviceClient;
+    friend OpenHapticDeviceClient;
 
-    std::vector<std::shared_ptr<HapticDeviceClient>> m_deviceClients; ///< list of all the device clients
+    std::vector<std::shared_ptr<OpenHapticDeviceClient>> m_deviceClients; ///< list of all the device clients
 };
 } // namespace imstk
