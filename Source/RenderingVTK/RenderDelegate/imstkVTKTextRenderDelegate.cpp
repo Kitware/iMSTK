@@ -14,17 +14,17 @@
 namespace imstk
 {
 VTKTextRenderDelegate::VTKTextRenderDelegate(std::shared_ptr<VisualModel> visualModel)
-    : VTKRenderDelegate(visualModel)
-    , m_textActor(vtkSmartPointer<vtkTextActor>::New()), m_textMapper(vtkSmartPointer<vtkTextMapper>::New())
+    : VTKRenderDelegate(visualModel),
+    m_textActor(vtkSmartPointer<vtkActor2D>::New()),
+    m_textMapper(vtkSmartPointer<vtkTextMapper>::New())
 {
     auto textVisualModel = std::dynamic_pointer_cast<TextVisualModel>(visualModel);
-
     m_visualModel = visualModel;
 
     m_textMapper->SetInput(textVisualModel->getText().c_str());
 
     // Pull properties from textVisualModel
-    auto* txtprop = m_textMapper->GetTextProperty();
+    vtkTextProperty* txtprop = m_textMapper->GetTextProperty();
     txtprop->SetFontSize(textVisualModel->getFontSize());
     txtprop->SetFontFamilyToArial();
     txtprop->SetBackgroundColor(180, 180, 180);
@@ -36,7 +36,6 @@ VTKTextRenderDelegate::VTKTextRenderDelegate(std::shared_ptr<VisualModel> visual
     txtprop->SetVerticalJustificationToCentered();
 
     // Setup Text Actor
-    m_textActor->SetInput(textVisualModel->getText().c_str());
     m_textActor->SetMapper(m_textMapper);
     m_textActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
     m_textActor->GetPositionCoordinate()->SetValue(0.5, 0.5);
@@ -74,6 +73,7 @@ VTKTextRenderDelegate::VTKTextRenderDelegate(std::shared_ptr<VisualModel> visual
         break;
     }
 
+    m_mapper = m_textMapper;
     m_actor = m_textActor;
 
     processEvents();
@@ -88,7 +88,6 @@ VTKTextRenderDelegate::processEvents()
     if (textVisualModel->getText() != std::string(m_textMapper->GetInput()))
     {
         m_textMapper->SetInput(textVisualModel->getText().c_str());
-        m_textMapper->Update();
     }
 
     m_textActor->SetVisibility(textVisualModel->getVisibility());
