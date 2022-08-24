@@ -26,6 +26,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -261,21 +262,12 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControlEntity(driver);
+        scene->addSceneObject(mouseAndKeyControls);
 
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
-
-        connect<Event>(sceneManager, &SceneManager::postUpdate,
+        connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
             {
                 // Simulate the cloth in real time

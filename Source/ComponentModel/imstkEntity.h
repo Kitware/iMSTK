@@ -37,9 +37,9 @@ public:
     /// \brief Get ID (ALWAYS query the ID in your code, DO NOT hardcode it)
     /// \returns ID of entity
     ///
-    EntityID getID() const;
+    EntityID getID() const { return m_ID; }
 
-    virtual const std::string getTypeName() const = 0;
+    virtual const std::string getTypeName() const { return "Entity"; }
 
     ///
     /// \brief Get/Set the name of the entity
@@ -49,7 +49,27 @@ public:
     ///@}
 
     ///
-    /// \brief Create and return a component on this object
+    /// \brief Create components on this entity
+    ///
+    template<typename T, typename ... Args>
+    static void addComponents()
+    {
+        // Create and add the component
+        addComponent<T>();
+
+        // Recurse to Args
+        addComponents<Args>();
+    }
+
+    template<typename T>
+    static void addComponents()
+    {
+        // Create and add the component
+        addComponent<T>();
+    }
+
+    ///
+    /// \brief Create and return a component on this entity
     ///
     template<typename T>
     std::shared_ptr<T> addComponent()
@@ -60,6 +80,29 @@ public:
         return component;
     }
 
+    ///
+    /// \brief Add existing components to entity
+    ///
+    template<typename T, typename ... Args>
+    void addComponents(T comp, Args... otherComps)
+    {
+        // Create and add the component
+        addComponent(comp);
+
+        // Recurse to Args
+        addComponents<Args...>(otherComps ...);
+    }
+
+    template<typename T>
+    void addComponents(T comp)
+    {
+        // Create and add the component
+        addComponent(comp);
+    }
+
+    ///
+    /// \brief Add existing component to entity
+    ///
     void addComponent(std::shared_ptr<Component> component);
 
     ///
@@ -78,6 +121,27 @@ public:
             if (auto compT = std::dynamic_pointer_cast<T>(component))
             {
                 return compT;
+            }
+        }
+        return nullptr;
+    }
+
+    ///
+    /// \brief Get's the Nth component of type T
+    ///
+    template<typename T>
+    std::shared_ptr<T> getComponentN(const int index) const
+    {
+        int count = 0;
+        for (auto comp : m_components)
+        {
+            if (auto castComp = std::dynamic_pointer_cast<T>(comp))
+            {
+                if (count == index)
+                {
+                    return castComp;
+                }
+                count++;
             }
         }
         return nullptr;
@@ -105,6 +169,7 @@ public:
         }
         return components;
     }
+
     const std::vector<std::shared_ptr<Component>>& getComponents() { return m_components; }
 
     ///
@@ -113,46 +178,30 @@ public:
     void removeComponent(std::shared_ptr<Component> component);
 
     ///
-    /// \brief Shorthand for creating object with specified entities
-    /// 
-    template<typename T, typename... Args>
+    /// \brief Create entity with the given components
+    ///
+    template<typename ... Args>
     static std::shared_ptr<Entity> createEntity()
     {
         auto entity = std::make_shared<Entity>();
-        createEntity(ent);
+        entity->addComponents<Args>();
         return entity;
     }
-    template<typename T, typename... Args>
-    static void addComponentsToEntity(std::shared_ptr<Entity> ent)
+
+    template<typename ... Args>
+    static std::shared_ptr<Entity> createEntity(Args... args)
     {
-        
-    }
-    template<typename T>
-    static void addComponentsToEntity(std::shared_ptr<Entity> ent)
-    {
+        auto entity = std::make_shared<Entity>();
+        entity->addComponents(args ...);
+        return entity;
     }
 
 protected:
     std::vector<std::shared_ptr<Component>> m_components;
 
-    // Not the best design pattern
     static std::atomic<EntityID> s_count; ///< current count of entities
 
     EntityID    m_ID;                     ///< unique ID of entity
     std::string m_name;                   ///< Not unique name
-};
-
-///
-/// \class EntityConstruct
-/// 
-/// \brief Variadic struct of component types. Can implicitly convert
-/// to a Entity with the given compnents. Unlike a static template
-/// function this allows storage of the types to be created.
-/// ie: 'auto entity = MakeEntity<Component1, Component2, ...>'
-/// \todo: Maybe not use
-/// 
-template<typename T, Args... T1>
-struct MakeEntity
-{
 };
 } // namespace imstk

@@ -19,6 +19,7 @@
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkVRPNDeviceClient.h"
 #include "imstkVRPNDeviceManager.h"
 #include "imstkVTKViewer.h"
@@ -95,19 +96,10 @@ main()
         driver->addModule(server);
         driver->setDesiredDt(0.01);
 
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
-
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControlEntity(driver);
+        scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();
     }

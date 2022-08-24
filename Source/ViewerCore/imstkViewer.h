@@ -15,6 +15,8 @@ namespace imstk
 {
 class Camera;
 class InteractorStyle;
+class KeyboardDeviceClient;
+class MouseDeviceClient;
 class Scene;
 class ScreenCaptureUtility;
 
@@ -117,6 +119,16 @@ public:
     virtual void setBackgroundColors(const Color color1, const Color color2 = Color(0.0, 0.0, 0.0), const bool gradientBackground = false) = 0;
 
     virtual void processEvents() = 0;
+
+    ///
+    /// \brief Returns the device that emits key events
+    ///
+    virtual std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const;
+
+    ///
+    /// \brief Returns the device that emits mouse events
+    ///
+    virtual std::shared_ptr<MouseDeviceClient> getMouseDevice() const;
 
 protected:
     void updateModule() override;

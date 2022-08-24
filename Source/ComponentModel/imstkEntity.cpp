@@ -16,12 +16,6 @@ Entity::Entity(const std::string& name) : m_name(name)
     m_ID = s_count;
 }
 
-EntityID
-Entity::getID() const
-{
-    return m_ID;
-}
-
 void
 Entity::addComponent(std::shared_ptr<Component> component)
 {

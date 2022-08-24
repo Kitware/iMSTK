@@ -482,17 +482,17 @@ VTKRenderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
 }
 
 void
-VTKRenderer::addSceneObject(std::shared_ptr<SceneObject> sceneObject)
+VTKRenderer::addEntity(std::shared_ptr<Entity> entity)
 {
-    m_renderedObjects.insert(sceneObject);
-    m_renderedVisualModels[sceneObject] = std::unordered_set<std::shared_ptr<VisualModel>>();
-    sceneObjectModified(sceneObject);
+    m_renderedObjects.insert(entity);
+    m_renderedVisualModels[entity] = std::unordered_set<std::shared_ptr<VisualModel>>();
+    entityModified(entity);
     // Observe changes on this SceneObject
-    connect<Event>(sceneObject, &SceneObject::modified, this, &VTKRenderer::sceneObjectModified);
+    connect<Event>(entity, &Entity::modified, this, &VTKRenderer::entityModified);
 }
 
 void
-VTKRenderer::addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel)
+VTKRenderer::addVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr<VisualModel> visualModel)
 {
     // Create a delegate for the visual m odel
     auto renderDelegate = m_renderDelegates[visualModel] = VTKRenderDelegate::makeDelegate(visualModel);
@@ -517,7 +517,7 @@ VTKRenderer::addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::share
 }
 
 std::unordered_set<std::shared_ptr<VisualModel>>::iterator
-VTKRenderer::removeVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel)
+VTKRenderer::removeVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr<VisualModel> visualModel)
 {
     auto renderDelegate = m_renderDelegates[visualModel];
     auto iter = std::find(m_objectVtkActors.begin(), m_objectVtkActors.end(), renderDelegate->getVtkActor());
@@ -531,21 +531,21 @@ VTKRenderer::removeVisualModel(std::shared_ptr<SceneObject> sceneObject, std::sh
     return m_renderedVisualModels[sceneObject].erase(m_renderedVisualModels[sceneObject].find(visualModel));
 }
 
-std::unordered_set<std::shared_ptr<SceneObject>>::iterator
-VTKRenderer::removeSceneObject(std::shared_ptr<SceneObject> sceneObject)
+std::unordered_set<std::shared_ptr<Entity>>::iterator
+VTKRenderer::removeEntity(std::shared_ptr<Entity> entity)
 {
-    auto iter = m_renderedObjects.erase(m_renderedObjects.find(sceneObject));
+    auto iter = m_renderedObjects.erase(m_renderedObjects.find(entity));
 
     // Remove every delegate associated and remove its actors from the scene
-    for (auto visualModel : sceneObject->getComponents<VisualModel>())
+    for (auto visualModel : entity->getComponents<VisualModel>())
     {
-        removeVisualModel(sceneObject, visualModel);
+        removeVisualModel(entity, visualModel);
     }
 
-    m_renderedVisualModels.erase(sceneObject);
+    m_renderedVisualModels.erase(entity);
 
     // Stop observing changes on the scene object
-    disconnect(sceneObject, this, &SceneObject::modified);
+    disconnect(entity, this, &SceneObject::modified);
     return iter;
 }
 
@@ -555,12 +555,9 @@ VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
     // If the SceneObject is in the scene but not being rendered
     for (auto ent : m_scene->getSceneObjects())
     {
-        if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
+        if (m_renderedObjects.count(ent) == 0)
         {
-            if (m_renderedObjects.count(obj) == 0)
-            {
-                addSceneObject(obj);
-            }
+            addEntity(ent);
         }
     }
     // If the SceneObject is being rendered but not in the scene
@@ -569,29 +566,29 @@ VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
         auto sos = m_scene->getSceneObjects();
         if (sos.find(*i) == sos.end())
         {
-            i = removeSceneObject(*i);
+            i = removeEntity(*i);
         }
     }
 }
 
 void
-VTKRenderer::sceneObjectModified(Event* e)
+VTKRenderer::entityModified(Event* e)
 {
-    SceneObject* sceneObject = static_cast<SceneObject*>(e->m_sender);
+    Entity* sceneObject = static_cast<Entity*>(e->m_sender);
     if (sceneObject != nullptr)
     {
         // Note: All other solutions lead to some ugly variant, I went with this one
         auto iter = std::find_if(m_renderedObjects.begin(), m_renderedObjects.end(),
-            [sceneObject](const std::shared_ptr<SceneObject>& i) { return i.get() == sceneObject; });
+            [sceneObject](const std::shared_ptr<Entity>& i) { return i.get() == sceneObject; });
         if (iter != m_renderedObjects.end())
         {
-            sceneObjectModified(*iter);
+            entityModified(*iter);
         }
     }
 }
 
 void
-VTKRenderer::sceneObjectModified(std::shared_ptr<SceneObject> sceneObject)
+VTKRenderer::entityModified(std::shared_ptr<Entity> sceneObject)
 {
     // Only diff a sceneObject being rendered
     if (m_renderedObjects.count(sceneObject) == 0 || m_renderedVisualModels.count(sceneObject) == 0)

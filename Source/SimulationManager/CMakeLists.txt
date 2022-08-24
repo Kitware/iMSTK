@@ -8,6 +8,7 @@ set(H_FILES
   imstkMouseSceneControl.h
   imstkSceneManager.h
   imstkSimulationManager.h
+  imstkSimulationUtils.h
   )
 
 set(SRC_FILES
@@ -16,6 +17,7 @@ set(SRC_FILES
   imstkMouseSceneControl.cpp
   imstkSceneManager.cpp
   imstkSimulationManager.cpp
+  imstkSimulationUtils.cpp
   )
 
 include(imstkAddLibrary)

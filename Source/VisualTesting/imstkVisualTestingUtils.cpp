@@ -128,16 +128,13 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
         mouseControl->setSceneManager(m_sceneManager);
         m_scene->addControl(mouseControl);
 
-        // Implicitly create an object from two components
-        auto keyControlObj = {};
-
         auto keyControl = std::make_shared<KeyboardSceneControl>();
         keyControl->setDevice(m_viewer->getKeyboardDevice());
         keyControl->setSceneManager(m_sceneManager);
         keyControl->setModuleDriver(m_driver);
         auto keyControlText = std::make_shared<SceneControlText>();
         keyControlText->setUseTextStatus(false);
-        m_scene->addControl(keyControl);
+        //m_scene->addSceneObject(Entity::createEntity(keyControl, keyControlText));
     }
 
     m_dt = fixedTimestep;

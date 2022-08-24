@@ -36,6 +36,20 @@ Viewer::setInfoLevel(const int level)
     m_infoLevel = level;
 }
 
+std::shared_ptr<KeyboardDeviceClient>
+Viewer::getKeyboardDevice() const
+{
+    LOG(FATAL) << "No KeyboardDeviceClient implemented for Viewer";
+    return nullptr;
+}
+
+std::shared_ptr<MouseDeviceClient>
+Viewer::getMouseDevice() const
+{
+    LOG(FATAL) << "No MouseDeviceClient implemented for Viewer";
+    return nullptr;
+}
+
 void
 Viewer::updateModule()
 {

@@ -63,7 +63,7 @@ public:
     using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
 
     Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
-    virtual ~Scene() override = default;
+    ~Scene() override = default;
 
     // *INDENT-OFF*
     SIGNAL(Scene, configureTaskGraph);

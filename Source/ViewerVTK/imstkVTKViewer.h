@@ -72,12 +72,12 @@ public:
     ///
     /// \brief Returns the device that emits key events
     ///
-    std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const;
+    std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const override;
 
     ///
     /// \brief Returns the device that emits mouse events
     ///
-    std::shared_ptr<MouseDeviceClient> getMouseDevice() const;
+    std::shared_ptr<MouseDeviceClient> getMouseDevice() const override;
 
 protected:
     bool initModule() override;

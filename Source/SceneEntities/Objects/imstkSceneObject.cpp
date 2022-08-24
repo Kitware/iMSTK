@@ -54,19 +54,7 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
 std::shared_ptr<VisualModel>
 SceneObject::getVisualModel(const int index) const
 {
-    int count = 0;
-    for (auto comp : m_components)
-    {
-        if (auto visualModel = std::dynamic_pointer_cast<VisualModel>(comp))
-        {
-            if (count == index)
-            {
-                return visualModel;
-            }
-            count++;
-        }
-    }
-    return nullptr;
+    return getComponentN<VisualModel>(index);
 }
 
 void

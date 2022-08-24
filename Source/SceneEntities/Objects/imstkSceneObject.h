@@ -9,7 +9,6 @@
 #include "imstkEntity.h"
 #include "imstkMacros.h"
 
-#include <memory>
 #include <vector>
 
 namespace imstk

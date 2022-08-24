@@ -17,14 +17,14 @@ class SceneManager;
 
 ///
 /// \class KeyboardSceneControlText
-/// 
+///
 /// \brief This implements a text on screen that will notify the user of the current
 /// state of the simulation. ie: If paused or not. It can be toggled on and off.
-/// 
+///
 class SceneControlText : public TextVisualModel
 {
 public:
-    SceneControlText(const std::string& name = "SceneControlText") : TextVisualModel(name) { }
+    SceneControlText(const std::string& name = "SceneControlText");
 
     bool initialize() override;
 
@@ -80,27 +80,8 @@ public:
     void OnKeyRelease(const char key) override;
 
 protected:
-    std::weak_ptr<ModuleDriver> m_driver;
-    std::weak_ptr<SceneManager> m_sceneManager;
+    std::weak_ptr<ModuleDriver>       m_driver;
+    std::weak_ptr<SceneManager>       m_sceneManager;
     std::shared_ptr<SceneControlText> m_sceneControlText;
-};
-
-///
-/// \class KeyboardSceneControlObject
-/// 
-/// \brief Adds a common custom control scheme to pause/resume, stop, toggle debug mode,
-/// display text information, and reset the scene.
-/// \todo: Prefabs, keep hierachy flat by not extending this
-/// 
-class KeyboardSceneControlObject : public SceneObject
-{
-public:
-    KeyboardSceneControlObject(const std::string& name = "KeyboardSceneControlObject");
-
-    bool initialize() override;
-
-protected:
-    std::shared_ptr<SceneControlText> m_textVisualModel;
-    std::shared_ptr<KeyboardSceneControl> m_control;
 };
 } // namespace imstk

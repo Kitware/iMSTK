@@ -32,9 +32,9 @@ class vtkTable;
 namespace imstk
 {
 class Camera;
+class Entity;
 class Light;
 class Scene;
-class SceneObject;
 class VisualModel;
 class VTKRenderDelegate;
 
@@ -128,14 +128,14 @@ protected:
     void setConfig(std::shared_ptr<RendererConfig> config) override;
 
     ///
-    /// \brief Adds a SceneObject to be rendered
+    /// \brief Adds an entity to be rendered
     ///
-    void addSceneObject(std::shared_ptr<SceneObject> sceneObject);
+    void addEntity(std::shared_ptr<Entity> sceneObject);
 
     ///
     /// \brief Removes a SceneObject to be rendered
     ///
-    std::unordered_set<std::shared_ptr<SceneObject>>::iterator removeSceneObject(std::shared_ptr<SceneObject> sceneObject);
+    std::unordered_set<std::shared_ptr<Entity>>::iterator removeEntity(std::shared_ptr<Entity> sceneObject);
 
     ///
     /// \brief Callback for when the scene this renderer renders is modified
@@ -146,23 +146,23 @@ protected:
     ///
     /// \brief Add a VisualModel to be rendered, creates a delegate for it
     ///
-    void addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel);
+    void addVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Remove a VisualModel from rendering
     ///
-    std::unordered_set<std::shared_ptr<VisualModel>>::iterator removeVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel);
+    std::unordered_set<std::shared_ptr<VisualModel>>::iterator removeVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Callback for when a SceneObject is modified
     /// This involves adding/removing visual models to render lists
     ///
-    void sceneObjectModified(Event* e);
+    void entityModified(Event* e);
 
     ///
     /// \brief Function call for processing diffs on a SceneObject
     ///
-    void sceneObjectModified(std::shared_ptr<SceneObject> sceneObject);
+    void entityModified(std::shared_ptr<Entity> sceneObject);
 
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
 
@@ -182,8 +182,8 @@ protected:
     std::shared_ptr<Scene> m_scene;
 
     // Rendered Objects, this gives whats currently being rendered
-    std::unordered_set<std::shared_ptr<SceneObject>> m_renderedObjects;
-    std::unordered_map<std::shared_ptr<SceneObject>, std::unordered_set<std::shared_ptr<VisualModel>>> m_renderedVisualModels;
+    std::unordered_set<std::shared_ptr<Entity>> m_renderedObjects;
+    std::unordered_map<std::shared_ptr<Entity>, std::unordered_set<std::shared_ptr<VisualModel>>> m_renderedVisualModels;
 
     // Render Delegates
     std::unordered_map<std::shared_ptr<VisualModel>, std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
