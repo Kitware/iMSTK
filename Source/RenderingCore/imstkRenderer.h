@@ -50,7 +50,11 @@ public:
     };
 
     Renderer() : m_config(std::make_shared<RendererConfig>()) { }
-    virtual ~Renderer() = default;
+    ~Renderer() override = default;
+
+    virtual void initialize() = 0;
+
+    bool getIsInitialized() const { return m_isInitialized; }
 
     ///
     /// \brief Set rendering mode
@@ -82,7 +86,8 @@ public:
     virtual void setConfig(std::shared_ptr<RendererConfig> config) = 0;
 
 protected:
-    bool m_VrEnabled = false;
+    bool m_VrEnabled     = false;
+    bool m_isInitialized = false;
     Renderer::Mode m_currentMode = Renderer::Mode::Simulation;
 
     std::shared_ptr<RendererConfig> m_config;

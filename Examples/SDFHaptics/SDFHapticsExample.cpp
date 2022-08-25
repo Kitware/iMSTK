@@ -53,15 +53,12 @@ main()
 
             isoExtract.getOutputMesh()->flipNormals();
             bunnyObj->setVisualGeometry(isoExtract.getOutputMesh());
-
-            scene->addSceneObject(bunnyObj);
         }
+        scene->addSceneObject(bunnyObj);
 
         auto axesObj = std::make_shared<SceneObject>("Axes");
-        {
-            axesObj->setVisualGeometry(axesMesh);
-            scene->addSceneObject(axesObj);
-        }
+        axesObj->setVisualGeometry(axesMesh);
+        scene->addSceneObject(axesObj);
 
         // Light
         auto light = std::make_shared<DirectionalLight>();

@@ -5,6 +5,7 @@
 */
 
 #include "imstkEntity.h"
+#include "imstkComponent.h"
 
 namespace imstk
 {
@@ -26,7 +27,15 @@ Entity::addComponent(std::shared_ptr<Component> component)
         return;
     }
     m_components.push_back(component);
+    component->m_entity = this;
     this->postEvent(Event(modified()));
+}
+
+bool
+Entity::containsComponent(std::shared_ptr<Component> component) const
+{
+    auto iter = std::find(m_components.begin(), m_components.end(), component);
+    return iter != m_components.end();
 }
 
 std::shared_ptr<Component>
@@ -43,6 +52,7 @@ Entity::removeComponent(std::shared_ptr<Component> component)
     auto iter = std::find(m_components.begin(), m_components.end(), component);
     if (iter != m_components.end())
     {
+        (*iter)->m_entity = nullptr;
         m_components.erase(iter);
     }
     else

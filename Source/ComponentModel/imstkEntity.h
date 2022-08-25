@@ -76,6 +76,7 @@ public:
     {
         auto component = std::make_shared<T>();
         m_components.push_back(component);
+        component->m_entity = this;
         this->postEvent(Event(modified()));
         return component;
     }
@@ -152,6 +153,10 @@ public:
     ///
     template<class T>
     bool containsComponent() const { return getComponent<T>() != nullptr; }
+    ///
+    /// \brief Check if contains given component
+    ///
+    bool containsComponent(std::shared_ptr<Component> component) const;
 
     ///
     /// \brief Get all components of type T

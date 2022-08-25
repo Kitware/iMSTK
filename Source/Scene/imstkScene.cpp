@@ -81,7 +81,7 @@ Scene::initialize()
         auto comps = ent->getComponents();
         for (const auto& comp : comps)
         {
-            CHECK(comp->initialize()) << "Error initializing component";
+            comp->initialize();
         }
     }
 
@@ -503,13 +503,21 @@ Scene::advance(const double dt)
         }
     }
 
-    // Process all inputs (haptics, keyboard, mouse, VR control)
-    // before updating the scene
+    // Process all behaviours before updating the scene.
+    // This includes controls such as haptics, keyboard, mouse, etc.
     for (auto obj : this->getSceneObjects())
     {
-        if (auto controlObj = std::dynamic_pointer_cast<DeviceControl>(obj))
+        // SceneObject update for supporting old imstk
+        if (auto sceneObj = std::dynamic_pointer_cast<SceneObject>(obj))
         {
-            controlObj->update(dt);
+            sceneObj->update();
+        }
+        for (auto comp : obj->getComponents())
+        {
+            if (auto behaviour = std::dynamic_pointer_cast<Behaviour<double>>(comp))
+            {
+                behaviour->update(dt);
+            }
         }
     }
 
@@ -551,6 +559,13 @@ Scene::updateVisuals()
         if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
         {
             obj->visualUpdate();
+        }
+        for (auto comp : ent->getComponents())
+        {
+            if (auto behaviour = std::dynamic_pointer_cast<Behaviour<double>>(comp))
+            {
+                behaviour->visualUpdate();
+            }
         }
     }
 }

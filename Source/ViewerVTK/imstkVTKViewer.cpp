@@ -78,7 +78,7 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
     // If the current scene has a renderer, remove it
     if (m_activeScene != nullptr)
     {
-        auto vtkRenderer = std::dynamic_pointer_cast<VTKRenderer>(this->getActiveRenderer())->getVtkRenderer();
+        auto vtkRenderer = getActiveVtkRenderer()->getVtkRenderer();
         if (m_vtkRenderWindow->HasRenderer(vtkRenderer))
         {
             m_vtkRenderWindow->RemoveRenderer(vtkRenderer);
@@ -95,46 +95,35 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
     }
 
     // Cast to VTK renderer
-    auto vtkRenderer = std::dynamic_pointer_cast<VTKRenderer>(this->getActiveRenderer())->getVtkRenderer();
+    auto vtkRenderer = getActiveVtkRenderer()->getVtkRenderer();
 
     // Set renderer to renderWindow
     m_vtkRenderWindow->AddRenderer(vtkRenderer);
 
     // Move text actors from old to new renderer
-    if (m_vtkInteractorStyle->GetCurrentRenderer() != NULL)
-    {
-        // Remove from old renderer
-        for (int i = 0; i < static_cast<int>(VTKTextStatusManager::StatusType::NumStatusTypes); i++)
-        {
-            m_vtkInteractorStyle->GetCurrentRenderer()->RemoveActor2D(m_textStatusManager->getTextActor(i));
-        }
-    }
-    m_vtkInteractorStyle->SetCurrentRenderer(vtkRenderer);
-    // Add to new renderer
-    for (int i = 0; i < static_cast<int>(VTKTextStatusManager::StatusType::NumStatusTypes); i++)
-    {
-        vtkRenderer->AddActor2D(m_textStatusManager->getTextActor(i));
-    }
+    //if (m_vtkInteractorStyle->GetCurrentRenderer() != NULL)
+    //{
+    //    // Remove from old renderer
+    //    for (int i = 0; i < static_cast<int>(VTKTextStatusManager::StatusType::NumStatusTypes); i++)
+    //    {
+    //        m_vtkInteractorStyle->GetCurrentRenderer()->RemoveActor2D(m_textStatusManager->getTextActor(i));
+    //    }
+    //}
+    //m_vtkInteractorStyle->SetCurrentRenderer(vtkRenderer);
+    //// Add to new renderer
+    //for (int i = 0; i < static_cast<int>(VTKTextStatusManager::StatusType::NumStatusTypes); i++)
+    //{
+    //    vtkRenderer->AddActor2D(m_textStatusManager->getTextActor(i));
+    //}
 
     // Set name to renderWindow
     m_vtkRenderWindow->SetWindowName(m_activeScene->getName().data());
-
-    // Update the camera
-    std::shared_ptr<VTKRenderer> ren = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
-    if (ren != nullptr)
-    {
-        ren->updateCamera();
-    }
 }
 
 void
 VTKViewer::setDebugAxesLength(double x, double y, double z)
 {
-    auto vtkRenderer = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
-    if (vtkRenderer != nullptr)
-    {
-        vtkRenderer->setAxesLength(x, y, z);
-    }
+    getActiveVtkRenderer()->setAxesLength(x, y, z);
 }
 
 void
@@ -202,6 +191,15 @@ VTKViewer::initModule()
     if (!AbstractVTKViewer::initModule())
     {
         return false;
+    }
+
+    std::shared_ptr<VTKRenderer> ren = getActiveVtkRenderer();
+    ren->initialize();
+
+    // Update the camera
+    if (ren != nullptr)
+    {
+        ren->updateCamera();
     }
 
     m_vtkRenderWindow->SetWindowName(m_config->m_windowName.c_str());

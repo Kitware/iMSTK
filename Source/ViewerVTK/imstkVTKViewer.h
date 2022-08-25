@@ -90,7 +90,8 @@ protected:
 
     std::shared_ptr<VTKTextStatusManager> m_textStatusManager;      ///< Handle text statuses, including fps status and custom text status
 
-    bool   m_displayFps = false;                                    ///< hide or display framerate
+    Vec3d  m_debugAxesLength = Vec3d(1.0, 1.0, 1.0);
+    bool   m_displayFps      = false;                               ///< hide or display framerate
     double m_lastFps;                                               ///< last framerate value used for moving average estimate
 };
 } // namespace imstk

@@ -16,6 +16,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRigidBodyCH.h"
 #include "imstkRigidBodyModel2.h"
@@ -97,14 +98,6 @@ main()
     std::shared_ptr<RigidObject2> rbdObj = makeRigidObj("ToolObject");
     scene->addSceneObject(rbdObj);
 
-    // Setup a copy of the tool slightly transparent to show physical pose
-    auto rbdGhostObj = std::make_shared<SceneObject>("ToolObjectGhost");
-    rbdGhostObj->setVisualGeometry(rbdObj->getPhysicsGeometry()->clone());
-    auto ghostMat = std::make_shared<RenderMaterial>(*rbdObj->getVisualModel(0)->getRenderMaterial());
-    ghostMat->setOpacity(0.4);
-    rbdGhostObj->getVisualModel(0)->setRenderMaterial(ghostMat);
-    scene->addSceneObject(rbdGhostObj);
-
     // Setup cutting interaction between level set femur and rigid object tool
     auto cutting = std::make_shared<RigidObjectLevelSetCollision>(rbdObj, femurObj);
     {
@@ -179,10 +172,14 @@ main()
         }
         scene->addControl(controller);
 
+        std::shared_ptr<ObjectControllerGhost> ghostObj = rbdObj->addComponent<ObjectControllerGhost>();
+        ghostObj->setController(controller);
+
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
                 rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
                 femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
+<<<<<<< HEAD
 
                 // Also apply controller transform to ghost geometry
                 std::shared_ptr<Geometry> ghostMesh = rbdGhostObj->getVisualGeometry();
@@ -190,6 +187,8 @@ main()
                 ghostMesh->setRotation(controller->getOrientation());
                 ghostMesh->updatePostTransformData();
                 ghostMesh->postModified();
+=======
+>>>>>>> 6fe24854 (ENH: Rework initialization for dependent components)
         });
 
         // Add default mouse and keyboard controls to the viewer

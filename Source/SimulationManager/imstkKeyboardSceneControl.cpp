@@ -26,11 +26,10 @@ SceneControlText::SceneControlText(const std::string& name) : TextVisualModel(na
     setPosition(TextVisualModel::DisplayPosition::CenterCenter);
 }
 
-bool
-SceneControlText::initialize()
+void
+SceneControlText::init()
 {
     setVisibility(m_useTextStatus ? m_sceneManager.lock()->getPaused() : false);
-    return true;
 }
 
 void

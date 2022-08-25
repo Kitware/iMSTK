@@ -46,8 +46,17 @@ class VTKRenderDelegate;
 class VTKRenderer : public Renderer
 {
 public:
+    ///
+    /// \brief Scene is tied to this renderer
+    ///
     VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR);
     ~VTKRenderer() override = default;
+
+    ///
+    /// \brief Create the rendering delegates and related VTK objects according
+    /// to the scene.
+    ///
+    void initialize() override;
 
     ///
     /// \brief Set the rendering mode to display debug actors or not
@@ -58,7 +67,7 @@ public:
     /// \brief Change the debug axes length
     ///@{
     void setAxesLength(const double x, const double y, const double z);
-    void setAxesLength(const Vec3d& len);
+    void setAxesLength(const Vec3d& len) { setAxesLength(len[0], len[1], len[2]); }
     ///@}
 
     ///
@@ -177,6 +186,7 @@ protected:
     std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
     vtkSmartPointer<vtkAxesActor> m_AxesActor;
+    Vec3d m_axesLength = Vec3d(1.0, 1.0, 1.0);
 
     // imstk scene
     std::shared_ptr<Scene> m_scene;

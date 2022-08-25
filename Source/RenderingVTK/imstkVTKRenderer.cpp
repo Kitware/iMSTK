@@ -61,13 +61,17 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
         vtkOpenVRRenderer::SafeDownCast(m_vtkRenderer)->SetAutomaticLightCreation(false);
         vtkOpenVRRenderer::SafeDownCast(m_vtkRenderer)->SetLightFollowCamera(false);
     }
+}
 
+void
+VTKRenderer::initialize()
+{
     // Process all the changes initially (add all the delegates)
     sceneModifed(nullptr);
     this->updateRenderDelegates();
 
     // Lights and light actors
-    for (const auto& light : scene->getLights())
+    for (const auto& light : m_scene->getLights())
     {
         std::string name = light->getTypeName();
         if (name == DirectionalLight::getStaticTypeName())
@@ -137,10 +141,11 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     m_AxesActor = vtkSmartPointer<vtkAxesActor>::New();
     m_AxesActor->SetShaftType(vtkAxesActor::CYLINDER_SHAFT);
     m_AxesActor->SetAxisLabels(false);
+    m_AxesActor->SetTotalLength(m_axesLength[0], m_axesLength[1], m_axesLength[2]);
     m_debugVtkActors.push_back(m_AxesActor);
 
     // Camera and camera actor
-    if (!enableVR)
+    if (!m_VrEnabled)
     {
         m_camera = vtkSmartPointer<vtkCamera>::New();
     }
@@ -219,6 +224,8 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     m_ssaoPass->SetDelegatePass(m_renderStepsPass);
 
     this->setConfig(this->m_config);
+
+    m_isInitialized = true;
 }
 
 void
@@ -276,13 +283,12 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
 void
 VTKRenderer::setAxesLength(const double x, const double y, const double z)
 {
-    m_AxesActor->SetTotalLength(x, y, z);
-}
-
-void
-VTKRenderer::setAxesLength(const Vec3d& len)
-{
-    m_AxesActor->SetTotalLength(len.x(), len.y(), len.z());
+    m_axesLength = Vec3d(x, y, z);
+    // If not initialized yet
+    if (m_AxesActor != nullptr)
+    {
+        m_AxesActor->SetTotalLength(x, y, z);
+    }
 }
 
 Vec3d

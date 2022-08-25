@@ -26,8 +26,6 @@ class SceneControlText : public TextVisualModel
 public:
     SceneControlText(const std::string& name = "SceneControlText");
 
-    bool initialize() override;
-
     ///
     /// \brief If on, text status will be shown when paused.
     /// On by default.
@@ -40,6 +38,9 @@ public:
     /// \brief Set the scene manager whose fps we should track
     ///
     void setSceneManager(std::weak_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
+
+protected:
+    void init() override;
 
 protected:
     std::weak_ptr<SceneManager> m_sceneManager;

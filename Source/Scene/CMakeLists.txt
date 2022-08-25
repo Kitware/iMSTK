@@ -33,7 +33,6 @@ imstk_add_library( Scene
     CollisionDetection
     CollisionHandling
     SceneEntities
-    Controllers
     Filtering
   )
 

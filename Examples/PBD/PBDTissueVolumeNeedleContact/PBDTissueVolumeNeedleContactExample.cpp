@@ -14,6 +14,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdContactConstraint.h"
 #include "imstkPbdModel.h"
@@ -283,17 +284,6 @@ main()
         Quatd::Identity(), Mat3d::Identity() * 10000.0);
     scene->addSceneObject(toolObj);
 
-    // Setup a debug ghost tool for virtual coupling
-    auto ghostToolObj = std::make_shared<SceneObject>("ghostTool");
-    {
-        ghostToolObj->setVisualGeometry(toolObj->getVisualGeometry()->clone());
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.3);
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
-    }
-    scene->addSceneObject(ghostToolObj);
-
     // Setup a text to display forces
     std::shared_ptr<SceneObject> txtObj = makeTextObj();
     scene->addSceneObject(txtObj);
@@ -375,6 +365,10 @@ main()
         controller->setUseForceSmoothening(true);
         scene->addControl(controller);
 
+        // Add extra component to tool for the ghost
+        std::shared_ptr<ObjectControllerGhost> controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+        controllerGhost->setController(controller);
+
         int counter = 0;
         connect<Event>(viewer, &SceneManager::preUpdate,
             [&](Event*)
@@ -388,14 +382,6 @@ main()
                     updateTxtObj(txtObj, interaction, controller);
                     counter = 0;
                 }
-
-                // Update the ghost debug geometry
-                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-                toolGhostMesh->setRotation(controller->getOrientation());
-                toolGhostMesh->setTranslation(controller->getPosition());
-                toolGhostMesh->updatePostTransformData();
-                toolGhostMesh->postModified();
-                //ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
             });
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)

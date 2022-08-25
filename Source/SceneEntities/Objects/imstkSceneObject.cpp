@@ -47,6 +47,7 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
     else
     {
         auto visualModel = addComponent<VisualModel>();
+        visualModel->setName(m_name + "_VisualModel");
         visualModel->setGeometry(geometry);
     }
 }
