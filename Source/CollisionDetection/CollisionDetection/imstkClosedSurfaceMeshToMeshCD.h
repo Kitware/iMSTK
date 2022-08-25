@@ -80,6 +80,15 @@ public:
     double getProximity() const { return m_proximity; }
 ///@}
 
+    ///
+    /// \brief Get/Set whether to do AABB broad phase. The volume bounded by the object
+    /// could be larger than the volume of the pointset. For instance triangle on
+    /// a single plane vs a point
+    ///
+    void setDoBroadPhase(const bool doBroadPhase) { m_doBroadPhase = doBroadPhase; }
+    bool getDoBroadPhase() const { return m_doBroadPhase; }
+///
+
 protected:
     ///
     /// \brief Compute collision data for AB simultaneously
@@ -119,6 +128,7 @@ private:
 
     bool m_generateEdgeEdgeContacts       = false;
     bool m_generateVertexTriangleContacts = true;
+    bool m_doBroadPhase = true;
 
     std::vector<bool> m_vertexInside;
     DataArray<double> m_signedDistances;

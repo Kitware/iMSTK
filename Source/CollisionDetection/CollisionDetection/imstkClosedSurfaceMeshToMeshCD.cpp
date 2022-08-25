@@ -640,6 +640,11 @@ ClosedSurfaceMeshToMeshCD::doBroadPhaseCollisionCheck(
     std::shared_ptr<Geometry> geomA,
     std::shared_ptr<Geometry> geomB) const
 {
+    if (!m_doBroadPhase)
+    {
+        return true;
+    }
+
     const auto mesh1 = std::dynamic_pointer_cast<PointSet>(geomA);
     const auto mesh2 = std::dynamic_pointer_cast<PointSet>(geomB);
 
