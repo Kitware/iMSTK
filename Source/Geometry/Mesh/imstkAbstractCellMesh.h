@@ -131,7 +131,7 @@ protected:
                                 const int expectedNumComponents, const ScalarTypeId expectedScalarType);
 
     std::vector<std::unordered_set<int>> m_vertexToCells;          ///< Map of vertices to neighbor cells
-    std::vector<std::unordered_set<int>> m_vertexToNeighborVertex; ///< Map of vertice sto neighbor vertices
+    std::vector<std::unordered_set<int>> m_vertexToNeighborVertex; ///< Map of vertices to neighbor vertices
 
     ///< Per cell attributes
     std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> m_cellAttributes;

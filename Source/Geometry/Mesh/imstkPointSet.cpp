@@ -144,11 +144,15 @@ PointSet::getNumVertices() const
     return m_vertexPositions->size();
 }
 
+// Note: cannot apply tranform twice, let shader tranform if not dyanmic
 void
 PointSet::applyTransform(const Mat4d& m)
 {
     VecDataArray<double, 3>& initVertices = *m_initialVertexPositions;
     VecDataArray<double, 3>& vertices     = *m_vertexPositions;
+
+    std::shared_ptr<VecDataArray<double, 3>> normalsPtr  = getVertexNormals();
+    std::shared_ptr<VecDataArray<float, 3>>  tangentsPtr = getVertexTangents();
 
     ParallelUtils::parallelFor(initVertices.size(),
         [&](const size_t i)
@@ -156,6 +160,54 @@ PointSet::applyTransform(const Mat4d& m)
             initVertices[i] = (m * Vec4d(initVertices[i][0], initVertices[i][1], initVertices[i][2], 1.0)).head<3>();
             vertices[i]     = initVertices[i];
         });
+
+    // If there are normals, rotate them here
+    if (normalsPtr != NULL)
+    {
+        // Assumes affine, no shear
+        const Vec3d& x = m.block<3, 1>(0, 0);
+        const Vec3d& y = m.block<3, 1>(0, 1);
+        const Vec3d& z = m.block<3, 1>(0, 2);
+
+        Mat3d r; // rotation part of transformation
+        r.block<3, 1>(0, 0) = x.normalized();
+        r.block<3, 1>(0, 1) = y.normalized();
+        r.block<3, 1>(0, 2) = z.normalized();
+
+        VecDataArray<double, 3>& normals = *normalsPtr;
+        ParallelUtils::parallelFor(normals.size(),
+            [&](const size_t i)
+            {
+                normals[i] = (r * Vec3d(normals[i][0], normals[i][1], normals[i][2]));
+            });
+
+        normals.postModified();
+    }
+    // If there are tangents, rotate them here
+    if (tangentsPtr != NULL)
+    {
+        // Assumes affine, no shear
+        const Vec3d& x = m.block<3, 1>(0, 0);
+        const Vec3d& y = m.block<3, 1>(0, 1);
+        const Vec3d& z = m.block<3, 1>(0, 2);
+
+        Mat3d rd; // rotation part of transformation
+        rd.block<3, 1>(0, 0) = x.normalized();
+        rd.block<3, 1>(0, 1) = y.normalized();
+        rd.block<3, 1>(0, 2) = z.normalized();
+
+        Mat3f r = rd.cast<float>();
+
+        VecDataArray<float, 3>& tangents = *tangentsPtr;
+        ParallelUtils::parallelFor(tangents.size(),
+            [&](const size_t i)
+            {
+                tangents[i] = (r * Vec3f(tangents[i][0], tangents[i][1], tangents[i][2]));
+            });
+
+        tangents.postModified();
+    }
+
     m_transformApplied = false;
     this->updatePostTransformData();
 }
