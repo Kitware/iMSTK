@@ -6,7 +6,7 @@
 
 #include "imstkVTKRenderDelegate.h"
 
-class vtkTextActor;
+class vtkActor2D;
 class vtkTextMapper;
 
 namespace imstk
@@ -30,7 +30,7 @@ public:
     void updateRenderProperties() override;
 
 protected:
-    vtkSmartPointer<vtkTextActor>  m_textActor;
+    vtkSmartPointer<vtkActor2D>    m_textActor;
     vtkSmartPointer<vtkTextMapper> m_textMapper;
 };
 } // namespace imstk
