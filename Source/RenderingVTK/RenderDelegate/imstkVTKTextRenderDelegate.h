@@ -30,7 +30,7 @@ public:
     void updateRenderProperties() override;
 
 protected:
-    vtkSmartPointer<vtkActor2D>  m_textActor;
+    vtkSmartPointer<vtkActor2D>    m_textActor;
     vtkSmartPointer<vtkTextMapper> m_textMapper;
 };
 } // namespace imstk

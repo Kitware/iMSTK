@@ -74,7 +74,7 @@ VTKTextRenderDelegate::VTKTextRenderDelegate(std::shared_ptr<VisualModel> visual
     }
 
     m_mapper = m_textMapper;
-    m_actor = m_textActor;
+    m_actor  = m_textActor;
 
     processEvents();
 }
