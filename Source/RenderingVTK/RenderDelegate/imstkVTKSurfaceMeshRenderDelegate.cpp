@@ -100,7 +100,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     // When index buffer internals are modified
     queueConnect<Event>(m_indices, &VecDataArray<int, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::indexDataModified);
 
-    // When index buffer internals are modified
+    // When vertex normals are modified
     queueConnect<Event>(m_geometry->getVertexNormals(), &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::normalDataModified);
 
     connect<Event>(m_material, &RenderMaterial::texturesModified, this, &VTKSurfaceMeshRenderDelegate::texturesModified);
@@ -153,9 +153,11 @@ VTKSurfaceMeshRenderDelegate::processEvents()
     std::shared_ptr<AbstractDataArray>    vertexScalarsPtr      = m_geometry->getVertexScalars();
     std::shared_ptr<AbstractDataArray>    textureCoordinatesPtr = m_geometry->getVertexTCoords();
 
+    std::shared_ptr<VecDataArray<double, 3>> normalsPtr = m_geometry->getVertexNormals();
+
     // Only use the most recent event from respective sender
-    std::array<Command, 8> cmds;
-    std::array<bool, 8>    contains = { false, false, false, false, false, false, false, false };
+    std::array<Command, 9> cmds;
+    std::array<bool, 9>    contains = { false, false, false, false, false, false, false, false, false };
     rforeachEvent([&](Command cmd)
         {
             if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
@@ -198,6 +200,11 @@ VTKSurfaceMeshRenderDelegate::processEvents()
                 cmds[7]     = cmd;
                 contains[7] = true;
             }
+            else if (cmd.m_event->m_sender == normalsPtr.get() && !contains[8])
+            {
+                cmds[8]     = cmd;
+                contains[8] = true;
+            }
         });
 
     // Now do all the commands
@@ -206,6 +213,7 @@ VTKSurfaceMeshRenderDelegate::processEvents()
     cmds[3].invoke(); // Update vertices
     cmds[4].invoke(); // Update cell scalars
     cmds[5].invoke(); // Update vertex scalars
+    cmds[8].invoke(); // Update vertex normals
     cmds[6].invoke(); // Update indices
     cmds[7].invoke(); // Update texture coordinates
     cmds[2].invoke(); // Update geometry as a whole

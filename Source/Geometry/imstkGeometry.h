@@ -25,7 +25,7 @@ public:
     ///
     /// \brief Enumeration for the transformation to apply
     /// \params ApplyToTransform to apply the transformation to the data
-    /// \params ApplyToTransform to apply the transformation to the transform matrix
+    /// \params ConcatenateToTransform to apply the transformation to the transform matrix
     ///
     enum class TransformType
     {
