@@ -13,6 +13,7 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkLineMesh.h"
 #include "imstkOrientedBox.h"
+#include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -219,6 +220,7 @@ public:
         m_pbdCollision->setFriction(m_friction);
         m_pbdCollision->setRestitution(m_restitution);
         m_pbdCollision->setDeformableStiffnessA(m_collisionStiffness);
+        std::dynamic_pointer_cast<PbdCollisionHandling>(m_pbdCollision->getCollisionHandlingA())->setEnableBoundaryCollisions(true);
         m_scene->addInteraction(m_pbdCollision);
 
         // Debug geometry to visualize collision data
@@ -252,6 +254,7 @@ public:
             [&](Event*)
             {
                 const VecDataArray<double, 3>& vertices = *m_currVerticesPtr;
+                // Assert to avoid hitting numerous times
                 ASSERT_TRUE(assertBounds(vertices, m_assertionBoundsMin, m_assertionBoundsMax));
                 ASSERT_TRUE(assertMinDisplacement(m_prevVertices, vertices, 0.01));
                 m_prevVertices = vertices;
