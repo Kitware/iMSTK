@@ -120,26 +120,7 @@ ObjectIO::importSceneObject(
             const unsigned int meshIndex = currNode->mMeshes[i];
 
             // Copy, transform, and insert the mesh (\todo: Better deep copy support)
-            std::shared_ptr<PointSet> copyMesh = nullptr;
-            if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(meshes[meshIndex]))
-            {
-                copyMesh = std::make_shared<SurfaceMesh>();
-                std::dynamic_pointer_cast<SurfaceMesh>(copyMesh)->deepCopy(surfMesh);
-            }
-            else if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(meshes[meshIndex]))
-            {
-                // Doesn't copy attributes
-                copyMesh = std::make_shared<LineMesh>();
-                std::dynamic_pointer_cast<LineMesh>(copyMesh)->initialize(
-                    std::make_shared<VecDataArray<double, 3>>(*lineMesh->getVertexPositions()),
-                    std::make_shared<VecDataArray<int, 2>>(*lineMesh->getCells()));
-            }
-            else
-            {
-                // Doesn't copy attributes
-                copyMesh = std::make_shared<PointSet>();
-                copyMesh->initialize(std::make_shared<VecDataArray<double, 3>>(*meshes[meshIndex]->getVertexPositions()));
-            }
+            std::shared_ptr<PointSet> copyMesh = meshes[meshIndex]->clone();
 
             auto visualModel = std::make_shared<VisualModel>();
             visualModel->setGeometry(copyMesh);

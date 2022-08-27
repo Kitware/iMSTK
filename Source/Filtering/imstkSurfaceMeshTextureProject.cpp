@@ -122,7 +122,7 @@ SurfaceMeshTextureProject::requestUpdate()
     std::shared_ptr<SurfaceMesh> inputSrcMesh   = std::dynamic_pointer_cast<SurfaceMesh>(getInput(0));
     std::shared_ptr<SurfaceMesh> inputDestMesh  = std::dynamic_pointer_cast<SurfaceMesh>(getInput(1));
     std::shared_ptr<SurfaceMesh> outputDestMesh = std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0));
-    outputDestMesh->deepCopy(inputDestMesh);
+    *outputDestMesh = *inputDestMesh->clone();
 
     if (inputSrcMesh == nullptr || inputDestMesh == nullptr)
     {

@@ -160,6 +160,15 @@ public:
     ///
     void updatePostTransformData() const override;
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<PointSet> clone()
+    {
+        return std::unique_ptr<PointSet>(cloneImplementation());
+    }
+
 protected:
     ///
     /// \brief Applies transformation m directly the initial and post transform data
@@ -181,5 +190,8 @@ protected:
     std::string m_activeVertexScalars  = "";
     std::string m_activeVertexTangents = "";
     std::string m_activeVertexTCoords  = "";
+
+private:
+    PointSet* cloneImplementation() const;
 };
 } // namespace imstk

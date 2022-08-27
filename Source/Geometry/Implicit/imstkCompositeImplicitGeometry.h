@@ -50,7 +50,22 @@ public:
         geometries.push_back(GeometryBoolPair(geometry, type));
     }
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<CompositeImplicitGeometry> clone()
+    {
+        return std::unique_ptr<CompositeImplicitGeometry>(cloneImplementation());
+    }
+
 protected:
     std::list<GeometryBoolPair> geometries;
+
+private:
+    CompositeImplicitGeometry* cloneImplementation() const
+    {
+        return new CompositeImplicitGeometry(*this);
+    }
 };
 } // namespace imstk

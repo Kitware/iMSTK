@@ -81,6 +81,15 @@ public:
 
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent) override;
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<SignedDistanceField> clone()
+    {
+        return std::unique_ptr<SignedDistanceField>(cloneImplementation());
+    }
+
 protected:
     std::shared_ptr<ImageData> m_imageDataSdf;
 
@@ -90,5 +99,15 @@ protected:
     double m_scale;
 
     std::shared_ptr<DataArray<double>> m_scalars;
+
+private:
+    SignedDistanceField* cloneImplementation() const
+    {
+        SignedDistanceField* geom = new SignedDistanceField(*this);
+        // Deal with deep copy members
+        geom->m_imageDataSdf = m_imageDataSdf->clone();
+        geom->m_scalars      = std::dynamic_pointer_cast<DataArray<double>>(geom->m_imageDataSdf->getScalars());
+        return geom;
+    }
 };
 } // namespace imstk

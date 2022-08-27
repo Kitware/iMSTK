@@ -60,7 +60,19 @@ public:
     void setTetrahedraIndices(std::shared_ptr<VecDataArray<int, 4>> indices) { setCells(indices); }
     std::shared_ptr<VecDataArray<int, 4>> getTetrahedraIndices() const { return getCells(); }
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<TetrahedralMesh> clone()
+    {
+        return std::unique_ptr<TetrahedralMesh>(cloneImplementation());
+    }
+
 protected:
     std::vector<bool> m_removedMeshElems;
+
+private:
+    TetrahedralMesh* cloneImplementation() const;
 };
 } // namespace imstk

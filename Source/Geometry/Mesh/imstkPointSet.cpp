@@ -396,4 +396,19 @@ PointSet::setActiveVertexAttribute(std::string& activeAttributeName, std::string
     }
     activeAttributeName = attributeName;
 }
+
+PointSet*
+PointSet::cloneImplementation() const
+{
+    // Do shallow copy
+    PointSet* geom = new PointSet(*this);
+    // Deal with deep copy members
+    geom->m_initialVertexPositions = std::make_shared<VecDataArray<double, 3>>(*m_initialVertexPositions);
+    geom->m_vertexPositions = std::make_shared<VecDataArray<double, 3>>(*m_vertexPositions);
+    for (auto i : m_vertexAttributes)
+    {
+        geom->m_vertexAttributes[i.first] = i.second->clone();
+    }
+    return geom;
+}
 } // namespace imstk

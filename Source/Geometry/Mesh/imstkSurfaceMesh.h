@@ -198,7 +198,19 @@ public:
     void setTriangleIndices(std::shared_ptr<VecDataArray<int, 3>> indices) { setCells(indices); }
     std::shared_ptr<VecDataArray<int, 3>> getTriangleIndices() const { return getCells(); }
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<SurfaceMesh> clone()
+    {
+        return std::unique_ptr<SurfaceMesh>(cloneImplementation());
+    }
+
 protected:
     std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
+
+private:
+    SurfaceMesh* cloneImplementation() const;
 };
 } // namespace imstk

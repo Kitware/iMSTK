@@ -14,14 +14,14 @@
 %ignore imstk::PbdModelConfig::addPbdConstraintFunctor(std::function<void(PbdConstraintContainer&)>);
 %ignore imstk::PbdModelConfig::getFunctors();
 
-%ignore imstk::AbstractDataArray::clone();
+%ignore imstk::AbstractDataArray::clone(); /* unique_ptrs can't be returned in SWIG right now */
 %ignore imstk::DataArray::iterator; /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::const_iterator; /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::begin(); /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::cbegin() const; /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::end(); /* fix the multiple-definition problem. */
 %ignore imstk::DataArray::cend() const; /* fix the multiple-definition problem. */
-%ignore imstk::DataArray::clone();
+%ignore imstk::DataArray::clone(); /* unique_ptrs can't be returned in SWIG right now */
 %ignore imstk::VecDataArray::iterator; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::const_iterator;
 %ignore imstk::VecDataArray::begin(); /* fix the multiple-definition problem. */ 
@@ -29,7 +29,7 @@
 %ignore imstk::VecDataArray::end(); /* fix the multiple-definition problem. */ 
 %ignore imstk::VecDataArray::cend() const; /* fix the multiple-definition problem. */
 %ignore imstk::VecDataArray::setData();
-%ignore imstk::VecDataArray::clone();
+%ignore imstk::VecDataArray::clone(); /* unique_ptrs can't be returned in SWIG right now */
 %ignore imstk::stdSink;
 %ignore imstk::LogManager;
 %ignore imstk::LoggerG3::Logger();
@@ -76,6 +76,25 @@
 %ignore imstk::GeometryUtils::copyToDataArray;
 %ignore imstk::GeometryUtils::copyToVecDataArray;
 %ignore imstk::GeometryUtils::copyToImageData;
+
+%ignore imstk::Geometry::clone; /* unique_ptrs can't be returned in SWIG right now */
+%ignore imstk::PointSet::clone;
+%ignore imstk::LineMesh::clone;
+%ignore imstk::SurfaceMesh::clone;
+%ignore imstk::TetrahedralMesh::clone;
+%ignore imstk::HexahedralMesh::clone;
+%ignore imstk::Capsule::clone;
+%ignore imstk::Cylinder::clone;
+%ignore imstk::OrientedBox::clone;
+%ignore imstk::Plane::clone;
+%ignore imstk::Sphere::clone;
+%ignore imstk::CompositeImplicitGeometry::clone;
+%ignore imstk::ImageData::clone;
+%ignore imstk::SignedDistanceField::clone;
+%ignore imstk::CellMesh<2>::clone;
+%ignore imstk::CellMesh<3>::clone;
+%ignore imstk::CellMesh<4>::clone;
+%ignore imstk::CellMesh<8>::clone;
 
 %ignore imstk::CollisionElement::m_element;
 %ignore imstk::CollisionElement::m_type;

@@ -68,6 +68,15 @@ public:
     ///
     void updatePostTransformData() const override;
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<Cylinder> clone()
+    {
+        return std::unique_ptr<Cylinder>(cloneImplementation());
+    }
+
 protected:
     // Hide these unimplemented functions
     using AnalyticalGeometry::getFunctionValue;
@@ -78,5 +87,11 @@ protected:
     double m_length = 1.0;                      ///< Length of the cylinder
     mutable double m_radiusPostTransform = 1.0; ///< Radius of the cylinder oncee transform applied
     mutable double m_lengthPostTransform = 1.0; ///< Length of the cylinder onc transform applied
+
+private:
+    Cylinder* cloneImplementation() const
+    {
+        return new Cylinder(*this);
+    }
 };
 } // namespace imstk

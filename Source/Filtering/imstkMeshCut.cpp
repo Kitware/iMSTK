@@ -31,16 +31,8 @@ MeshCut::requestUpdate()
         return;
     }
     // Copy input to output
+    setOutput(inputGeom->clone());
     auto outputGeom = std::dynamic_pointer_cast<AbstractCellMesh>(getOutput(0));
-    if (auto outputLineMesh = std::dynamic_pointer_cast<CellMesh<2>>(outputGeom))
-    {
-        outputLineMesh->deepCopy(std::dynamic_pointer_cast<CellMesh<2>>(inputGeom));
-    }
-    else if (auto outputTriMesh = std::dynamic_pointer_cast<CellMesh<3>>(outputGeom))
-    {
-        outputTriMesh->deepCopy(std::dynamic_pointer_cast<CellMesh<3>>(inputGeom));
-    }
-    setOutput(outputGeom);
 
     // Vertices on the cutting path and whether they will be split
     std::map<int, bool> cutVerts;

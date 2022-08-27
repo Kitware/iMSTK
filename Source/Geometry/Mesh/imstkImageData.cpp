@@ -121,4 +121,13 @@ ImageData::clear()
     //this->m_dataTransform->Identity();
     this->postModified();
 }
+
+ImageData*
+ImageData::cloneImplementation() const
+{
+    ImageData* geom = new ImageData(*this);
+    // Deal with deep copy members
+    geom->m_scalarArray = m_scalarArray->clone();
+    return geom;
+}
 } // namespace imstk

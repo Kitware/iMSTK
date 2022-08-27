@@ -92,6 +92,15 @@ public:
     ///
     unsigned int getMaxNumParticles();
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<RenderParticles> clone()
+    {
+        return std::unique_ptr<RenderParticles>(cloneImplementation());
+    }
+
 protected:
     unsigned int m_numParticles    = 0;
     unsigned int m_maxNumParticles = 128; ///< Maximum particles
@@ -107,5 +116,8 @@ protected:
     void applyTransform(const Mat4d& m) override;
 
     void updatePostTransformData() const override {}
+
+private:
+    RenderParticles* cloneImplementation() const;
 };
 } // namespace imstk

@@ -153,13 +153,8 @@ main()
     std::shared_ptr<RigidObject2> toolObj = makeCapsuleToolObj();
     scene->addSceneObject(toolObj);
 
-    auto rbdGhost     = std::make_shared<SceneObject>("ghost");
-    auto ghostCapsule = std::make_shared<Capsule>();
-    ghostCapsule->setRadius(0.5);
-    ghostCapsule->setLength(1);
-    ghostCapsule->setPosition(Vec3d(0.0, 0.0, 0.0));
-    ghostCapsule->setOrientation(Quatd(0.707, 0.0, 0.0, 0.707));
-    rbdGhost->setVisualGeometry(ghostCapsule);
+    auto rbdGhost = std::make_shared<SceneObject>("ghost");
+    rbdGhost->setVisualGeometry(toolObj->getVisualGeometry()->clone());
 
     std::shared_ptr<RenderMaterial> ghostMat =
         std::make_shared<RenderMaterial>(*toolObj->getVisualModel(0)->getRenderMaterial());
@@ -289,6 +284,7 @@ main()
                 ghostMat->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
 
                 // Also apply controller transform to ghost geometry
+                std::shared_ptr<Geometry> ghostCapsule = rbdGhost->getVisualGeometry();
                 ghostCapsule->setTranslation(controller->getPosition());
                 ghostCapsule->setRotation(controller->getOrientation());
                 ghostCapsule->updatePostTransformData();

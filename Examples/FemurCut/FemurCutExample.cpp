@@ -98,9 +98,7 @@ main()
 
     // Setup a copy of the tool slightly transparent to show physical pose
     auto rbdGhostObj = std::make_shared<SceneObject>("ToolObjectGhost");
-    auto ghostMesh   = std::make_shared<SurfaceMesh>();
-    ghostMesh->deepCopy(std::dynamic_pointer_cast<SurfaceMesh>(rbdObj->getPhysicsGeometry()));
-    rbdGhostObj->setVisualGeometry(ghostMesh);
+    rbdGhostObj->setVisualGeometry(rbdObj->getPhysicsGeometry()->clone());
     auto ghostMat = std::make_shared<RenderMaterial>(*rbdObj->getVisualModel(0)->getRenderMaterial());
     ghostMat->setOpacity(0.4);
     rbdGhostObj->getVisualModel(0)->setRenderMaterial(ghostMat);
@@ -186,6 +184,7 @@ main()
                 femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
 
                 // Also apply controller transform to ghost geometry
+                std::shared_ptr<Geometry> ghostMesh = rbdGhostObj->getVisualGeometry();
                 ghostMesh->setTranslation(controller->getPosition());
                 ghostMesh->setRotation(controller->getOrientation());
                 ghostMesh->updatePostTransformData();

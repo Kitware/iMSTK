@@ -73,10 +73,25 @@ public:
     ///
     void updatePostTransformData() const override;
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<OrientedBox> clone()
+    {
+        return std::unique_ptr<OrientedBox>(cloneImplementation());
+    }
+
 protected:
     void applyTransform(const Mat4d& m) override;
 
     Vec3d m_extents = Vec3d(0.5, 0.5, 0.5);                      // Half dimensions of the oriented box
     mutable Vec3d m_extentsPostTransform = Vec3d(0.5, 0.5, 0.5); ///< Half dimensions of the oriented box once transform applied
+
+private:
+    OrientedBox* cloneImplementation() const
+    {
+        return new OrientedBox(*this);
+    }
 };
 } // namespace imstk
