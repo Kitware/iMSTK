@@ -39,7 +39,7 @@ static void
 queueToArray(std::deque<T>& vals, DataArray<T>& arr)
 {
     arr.resize(vals.size());
-    int i = 0;
+    size_t i = 0;
     for (auto val : vals)
     {
         arr[i++] = val;

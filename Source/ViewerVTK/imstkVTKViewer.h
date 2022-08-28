@@ -46,14 +46,6 @@ public:
     void setDebugAxesLength(double x, double y, double z);
 
     ///
-    /// \brief The VTKViewer has 3 levels
-    /// 0 - no info
-    /// 1 - framerate
-    /// 2 - timing graph
-    ///
-    void setInfoLevel(const int level) override;
-
-    ///
     /// \brief Get the amount of info levels
     ///
     const int getInfoLevelCount() const override { return 3; }

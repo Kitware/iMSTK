@@ -111,31 +111,6 @@ VTKViewer::setDebugAxesLength(double x, double y, double z)
 }
 
 void
-VTKViewer::setInfoLevel(const int level)
-{
-    Viewer::setInfoLevel(level);
-
-    // Level 0 show no info
-    if (level == 0)
-    {
-        getActiveScene()->setEnableTaskTiming(false);
-        std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer())->setTimeTableVisibility(false);
-    }
-    // Level 1, show fps only
-    else if (level == 1)
-    {
-        getActiveScene()->setEnableTaskTiming(false);
-        std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer())->setTimeTableVisibility(false);
-    }
-    // Level 2 show fps and timing graph
-    else if (level == 2)
-    {
-        getActiveScene()->setEnableTaskTiming(true);
-        std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer())->setTimeTableVisibility(true);
-    }
-}
-
-void
 VTKViewer::setRenderingMode(const Renderer::Mode mode)
 {
     if (!m_activeScene)
@@ -227,7 +202,7 @@ VTKViewer::updateModule()
     ren->updateCamera();
 
     // Call visual update on every scene object
-    getActiveScene()->updateVisuals();
+    getActiveScene()->updateVisuals(getDt());
     // Update all the rendering delegates
     ren->updateRenderDelegates();
 
@@ -241,30 +216,6 @@ VTKViewer::updateModule()
     m_lastFps   = m_visualFps;
 
     m_pre = now;
-
-    //// If fps status is on, measure it
-    //if (getTextStatusManager()->getStatusVisibility(VTKTextStatusManager::StatusType::FPS))
-    //{
-    //    // Update framerate value display
-    //    auto   now       = std::chrono::high_resolution_clock::now();
-    //    m_visualFps = 1e6 / static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(now - m_pre).count());
-    //    m_visualFps = 0.1 * m_visualFps + 0.9 * m_lastFps;
-    //    m_lastFps = m_visualFps;
-
-    //    const int t = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastFpsUpdate).count());
-    //    if (t > 150) // wait 150ms before updating displayed value
-    //    {
-    //        const double m_physicsFps = getActiveScene()->getFPS();
-    //        m_textStatusManager->setFPS(m_visualFps, m_physicsFps);
-    //        m_lastFpsUpdate = now;
-
-    //        // Update the timing table
-    //        getActiveScene()->lockComputeTimes();
-    //        ren->setTimeTable(getActiveScene()->getTaskComputeTimes());
-    //        getActiveScene()->unlockComputeTimes();
-    //    }
-    //    m_pre = now;
-    //}
 
     // Render
     m_vtkRenderWindow->Render();

@@ -7,6 +7,7 @@ set(H_FILES
   imstkFpsTxtCounter.h
   imstkKeyboardSceneControl.h
   imstkMouseSceneControl.h
+  imstkPerformanceGraph.h
   imstkSceneManager.h
   imstkSimulationManager.h
   imstkSimulationUtils.h
@@ -17,6 +18,7 @@ set(SRC_FILES
   imstkFpsTxtCounter.cpp
   imstkKeyboardSceneControl.cpp
   imstkMouseSceneControl.cpp
+  imstkPerformanceGraph.cpp
   imstkSceneManager.cpp
   imstkSimulationManager.cpp
   imstkSimulationUtils.cpp

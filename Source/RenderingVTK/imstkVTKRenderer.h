@@ -12,7 +12,6 @@
 #include "imstkEventObject.h"
 
 #include <vtkSmartPointer.h>
-#include <unordered_map>
 #include <unordered_set>
 
 class vtkAxesActor;
@@ -85,17 +84,14 @@ public:
     ///
     /// \brief Sets the benchmarking table using unordered_map
     ///
-    void setTimeTable(const std::unordered_map<std::string, double>& timeTable);
+    void setTimeTable(const std::unordered_map<std::string, double>& timeTable) override;
 
     ///
-    /// \brief Set the visibility of the benchmark graph
-    ///
-    void setTimeTableVisibility(const bool visible);
-
-    ///
-    /// \brief Get the visibility of the benchmark graph
-    ///
-    bool getTimeTableVisibility() const;
+    /// \brief Get/Set the visibility of the benchmark graph
+    /// @{
+    void setTimeTableVisibility(const bool visible) override;
+    bool getTimeTableVisibility() const override;
+    /// @}
 
     ///
     /// \brief Updates the camera

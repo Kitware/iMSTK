@@ -203,7 +203,7 @@ VTKOpenVRViewer::updateModule()
     //renderer->updateSceneCamera(getActiveScene()->getCamera());
 
     // Call visual update on every scene object
-    getActiveScene()->updateVisuals();
+    getActiveScene()->updateVisuals(getDt());
     // Update all the rendering delegates
     ren->updateRenderDelegates();
 

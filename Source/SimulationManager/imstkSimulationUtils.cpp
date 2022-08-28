@@ -10,6 +10,7 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkPerformanceGraph.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkViewer.h"
@@ -54,11 +55,22 @@ createDefaultSceneControlEntity(
     mouseControl->setDevice(viewer->getMouseDevice());
     mouseControl->setSceneManager(sceneManager);
 
+    // Setup an fps counter (toggled on info level of viewer)
     auto fpsCounter = std::make_shared<FpsTxtCounter>();
     fpsCounter->setSceneManager(sceneManager);
     fpsCounter->setViewer(viewer);
 
-    return Entity::createEntity(keyControl, statusText, mouseControl, fpsCounter);
+    // Setup a task node performance graph (toggled on info level of viewer)
+    auto perfGraph = std::make_shared<PerformanceGraph>();
+    perfGraph->setSceneManager(sceneManager);
+    perfGraph->setViewer(viewer);
+
+    return Entity::createEntity(
+        keyControl,
+        statusText,
+        mouseControl,
+        fpsCounter,
+        perfGraph);
 }
 } // namespace SimulationUtils
 } // namespace imstk

@@ -49,7 +49,7 @@ ObjectControllerGhost::init()
 }
 
 void
-ObjectControllerGhost::visualUpdate()
+ObjectControllerGhost::visualUpdate(const double&)
 {
     Quatd orientation = Quatd::Identity();
     Vec3d position    = Vec3d::Zero();

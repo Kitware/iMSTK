@@ -552,7 +552,7 @@ Scene::advance(const double dt)
 }
 
 void
-Scene::updateVisuals()
+Scene::updateVisuals(const double dt)
 {
     for (const auto& ent : m_sceneEntities)
     {
@@ -564,7 +564,7 @@ Scene::updateVisuals()
         {
             if (auto behaviour = std::dynamic_pointer_cast<Behaviour<double>>(comp))
             {
-                behaviour->visualUpdate();
+                behaviour->visualUpdate(dt);
             }
         }
     }

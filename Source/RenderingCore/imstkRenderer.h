@@ -10,6 +10,8 @@
 #include "imstkMath.h"
 #include "imstkColor.h"
 
+#include <unordered_map>
+
 namespace imstk
 {
 struct SSAOConfig
@@ -64,6 +66,18 @@ public:
         m_VrEnabled   = enableVR;
         m_currentMode = mode;
     }
+
+    ///
+    /// \brief Sets the benchmarking table using unordered_map
+    ///
+    virtual void setTimeTable(const std::unordered_map<std::string, double>&) { }
+
+    ///
+    /// \brief Get/Set the visibility of the benchmark graph
+    /// @{
+    virtual void setTimeTableVisibility(const bool) { }
+    virtual bool getTimeTableVisibility() const { return false; }
+    /// @}
 
     ///
     /// \brief Get rendering mode

@@ -33,7 +33,7 @@ FpsTxtCounter::init()
 }
 
 void
-FpsTxtCounter::visualUpdate()
+FpsTxtCounter::visualUpdate(const double&)
 {
     std::shared_ptr<Viewer> viewer    = m_viewer.lock();
     const int               infoLevel = viewer->getInfoLevel();

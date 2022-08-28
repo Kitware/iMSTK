@@ -42,7 +42,7 @@ public:
     bool getUseForceFade() const { return m_useForceFade; }
     ///@}
 
-    void visualUpdate() override;
+    void visualUpdate(const double& dt) override;
 
 protected:
     void init() override;

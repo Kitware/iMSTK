@@ -112,7 +112,7 @@ public:
     ///
     /// \brief Update visuals of all scene objects
     ///
-    virtual void updateVisuals();
+    virtual void updateVisuals(const double dt);
 
     ///
     /// \brief If true, tasks will be time and a table produced

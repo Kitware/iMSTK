@@ -75,6 +75,6 @@ public:
     ~Behaviour() override = default;
 
     virtual void update(const UpdateInfo& imstkNotUsed(updateData)) { }
-    virtual void visualUpdate() { }
+    virtual void visualUpdate(const UpdateInfo& imstkNotUsed(updateData)) { }
 };
 } // namespace imstk

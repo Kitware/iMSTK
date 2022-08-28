@@ -11,19 +11,19 @@
 namespace imstk
 {
 class SceneManager;
-class TextVisualModel;
+//class TextVisualModel;
 class Viewer;
 
 ///
-/// \class FpsTxtCounter
+/// \class PerformanceGraph
 ///
-/// \brief Displays visual and physics framerates through dependent
-/// TextVisualModel
+/// \brief Displays task graph node durations of a scene as overlay on the screen
+/// \todo: There is no delegate for this yet, it hooks directly into VTKRenderer
 ///
-class FpsTxtCounter : public Behaviour<double>
+class PerformanceGraph : public Behaviour<double>
 {
 public:
-    FpsTxtCounter(const std::string& name = "FpsTxtCounter") : Behaviour<double>(name) { }
+    PerformanceGraph(const std::string& name = "PerformanceGraph") : Behaviour<double>(name) { }
 
     ///
     /// \brief Update the display of the last frames update times
@@ -34,12 +34,12 @@ public:
     void setSceneManager(std::weak_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
 
 protected:
-    void init() override;
-
-protected:
-    std::shared_ptr<TextVisualModel> m_fpsTextVisualModel;
+    //std::shared_ptr<TextVisualModel> m_fpsTextVisualModel;
     std::weak_ptr<Viewer>       m_viewer;
     std::weak_ptr<SceneManager> m_sceneManager;
-    int m_prevInfoLevel = -1;
+    int    m_prevInfoLevel = -1;
+    double m_t = 0.0;
+    double m_updateDuration = 0.15; ///< seconds long to wait before updating again
+    bool   m_enabled = false;
 };
 } // namespace imstk
