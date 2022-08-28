@@ -4,6 +4,7 @@
 
 set(H_FILES
   imstkConsoleModule.h
+  imstkFpsTxtCounter.h
   imstkKeyboardSceneControl.h
   imstkMouseSceneControl.h
   imstkSceneManager.h
@@ -13,6 +14,7 @@ set(H_FILES
 
 set(SRC_FILES
   imstkConsoleModule.cpp
+  imstkFpsTxtCounter.cpp
   imstkKeyboardSceneControl.cpp
   imstkMouseSceneControl.cpp
   imstkSceneManager.cpp

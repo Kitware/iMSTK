@@ -130,6 +130,8 @@ public:
     ///
     virtual std::shared_ptr<MouseDeviceClient> getMouseDevice() const;
 
+    double getVisualFps() const { return m_visualFps; }
+
 protected:
     void updateModule() override;
 
@@ -141,5 +143,7 @@ protected:
 
     std::shared_ptr<ViewerConfig> m_config;
     int m_infoLevel = 0; ///< Info level
+
+    double m_visualFps = 0.0;
 };
 } // namespace imstk

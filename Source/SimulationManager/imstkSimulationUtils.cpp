@@ -5,6 +5,7 @@
 */
 
 #include "imstkSimulationUtils.h"
+#include "imstkFpsTxtCounter.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
@@ -53,7 +54,11 @@ createDefaultSceneControlEntity(
     mouseControl->setDevice(viewer->getMouseDevice());
     mouseControl->setSceneManager(sceneManager);
 
-    return Entity::createEntity(keyControl, statusText, mouseControl);
+    auto fpsCounter = std::make_shared<FpsTxtCounter>();
+    fpsCounter->setSceneManager(sceneManager);
+    fpsCounter->setViewer(viewer);
+
+    return Entity::createEntity(keyControl, statusText, mouseControl, fpsCounter);
 }
 } // namespace SimulationUtils
 } // namespace imstk

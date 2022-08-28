@@ -13,10 +13,12 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkTestingUtils.h"
 #include "imstkVTKRenderer.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkMouseSceneControl.h"
 
 using namespace imstk;
 
@@ -101,17 +103,36 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
                 ren->setAxesVisibility(!ren->getAxesVisibility());
             }
         });
+
+    // Setup a default key control scheme (commonly used in examples)
+    auto keyControl = std::make_shared<KeyboardSceneControl>();
+    keyControl->setDevice(m_viewer->getKeyboardDevice());
+    keyControl->setSceneManager(m_sceneManager);
+    keyControl->setModuleDriver(m_driver);
+
+    // Setup a default mouse control scheme (commonly used in examples)
+    auto mouseControl = std::make_shared<MouseSceneControl>();
+    mouseControl->setDevice(m_viewer->getMouseDevice());
+    mouseControl->setSceneManager(m_sceneManager);
+
+    // Add extra text object to display time and paused status of the test
+    auto testStatusTxtModel = std::make_shared<TextVisualModel>("TestStatusText");
+    testStatusTxtModel->setFontSize(30.0);
+    testStatusTxtModel->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
+    testStatusTxtModel->setText("0.000s");
+    m_scene->addSceneObject(Entity::createEntity(keyControl, mouseControl, testStatusTxtModel));
+
     connect<Event>(m_sceneManager, &SceneManager::postUpdate,
         [&](Event*)
         {
             if (m_timerPaused)
             {
-                m_viewer->getTextStatusManager()->setCustomStatus("Paused at " +
+                testStatusTxtModel->setText("Paused at " +
                     to_string_with_precision(m_scene->getSceneTime(), 3) + 's');
             }
             else
             {
-                m_viewer->getTextStatusManager()->setCustomStatus(
+                testStatusTxtModel->setText(
                     to_string_with_precision(m_scene->getSceneTime(), 3) + 's');
                 if (m_duration != -1.0 && m_scene->getSceneTime() > m_duration)
                 {
@@ -119,23 +140,6 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
                 }
             }
         });
-    m_viewer->getTextStatusManager()->setCustomStatus("0.000s");
-
-    // Add mouse and keyboard controls to the viewer
-    {
-        auto mouseControl = std::make_shared<MouseSceneControl>();
-        mouseControl->setDevice(m_viewer->getMouseDevice());
-        mouseControl->setSceneManager(m_sceneManager);
-        m_scene->addControl(mouseControl);
-
-        auto keyControl = std::make_shared<KeyboardSceneControl>();
-        keyControl->setDevice(m_viewer->getKeyboardDevice());
-        keyControl->setSceneManager(m_sceneManager);
-        keyControl->setModuleDriver(m_driver);
-        auto keyControlText = std::make_shared<SceneControlText>();
-        keyControlText->setUseTextStatus(false);
-        //m_scene->addSceneObject(Entity::createEntity(keyControl, keyControlText));
-    }
 
     m_dt = fixedTimestep;
     m_driver->setDesiredDt(m_dt);

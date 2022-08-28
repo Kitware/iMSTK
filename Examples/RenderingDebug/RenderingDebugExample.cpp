@@ -17,7 +17,6 @@
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -64,11 +63,13 @@ main()
     // Seed with system time
     srand(time(NULL));
 
-    auto statusManager = viewer->getTextStatusManager();
-    statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
-    statusManager->setStatusFontColor(VTKTextStatusManager::StatusType::Custom, Color::Orange);
+    auto statusText = std::make_shared<TextVisualModel>("StatusText");
+    statusText->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
+    statusText->setFontSize(30.0);
+    statusText->setTextColor(Color::Orange);
 
     imstkNew<DebugGeometryObject> debugGeometryObj;
+    debugGeometryObj->addComponent(statusText);
     scene->addSceneObject(debugGeometryObj);
 
     int mode  = 0; // 0: add point, 1: add line, 2: add triangle
@@ -109,7 +110,7 @@ main()
             }
             mode++;
 
-            statusManager->setCustomStatus("Primitives: " +
+            statusText->setText("Primitives: " +
                            std::to_string(debugGeometryObj->getNumPoints()) + " (points) | " +
                            std::to_string(debugGeometryObj->getNumLines()) + " (lines) | " +
                            std::to_string(debugGeometryObj->getNumTriangles()) + " (triangles)"

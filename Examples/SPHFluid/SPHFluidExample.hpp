@@ -15,7 +15,6 @@
 #include "imstkSimulationUtils.h"
 #include "imstkSphObject.h"
 #include "imstkSphObjectCollision.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -94,16 +93,6 @@ main(int argc, char* argv[])
         viewer->setActiveScene(scene);
         viewer->setWindowTitle("SPH Fluid");
         viewer->setSize(1920, 1080);
-        auto statusManager = viewer->getTextStatusManager();
-        statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
-        statusManager->setStatusFontColor(VTKTextStatusManager::StatusType::Custom, Color::Red);
-        connect<Event>(viewer, &VTKViewer::postUpdate,
-            [&](Event*)
-            {
-                statusManager->setCustomStatus("Number of particles: " +
-                    std::to_string(fluidObj->getSphModel()->getCurrentState()->getNumParticles()) +
-                    "\nNumber of solids: " + std::to_string(solids.size()));
-            });
 
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager;
@@ -118,6 +107,18 @@ main(int argc, char* argv[])
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
             SimulationUtils::createDefaultSceneControlEntity(driver);
+        auto txtStatus = std::make_shared<TextVisualModel>("StatusText");
+        txtStatus->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
+        txtStatus->setFontSize(30);
+        txtStatus->setTextColor(Color::Red);
+        connect<Event>(viewer, &VTKViewer::preUpdate,
+            [&](Event*)
+            {
+                txtStatus->setText("Number of particles: " +
+                    std::to_string(fluidObj->getSphModel()->getCurrentState()->getNumParticles()) +
+                    "\nNumber of solids: " + std::to_string(solids.size()));
+            });
+        mouseAndKeyControls->addComponent(txtStatus);
         scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();

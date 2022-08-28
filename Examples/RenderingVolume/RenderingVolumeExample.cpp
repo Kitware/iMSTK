@@ -21,7 +21,6 @@
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVolumeRenderMaterialPresets.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -63,9 +62,9 @@ main()
     viewer->setActiveScene(scene);
     viewer->setBackgroundColors(Color(0.3285, 0.3285, 0.6525), Color(0.13836, 0.13836, 0.2748), true);
 
-    auto statusManager = viewer->getTextStatusManager();
-    statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
-    statusManager->setStatusDisplayCorner(VTKTextStatusManager::StatusType::Custom, VTKTextStatusManager::DisplayCorner::UpperLeft);
+    auto statusTxt = std::make_shared<TextVisualModel>("StatusText");
+    statusTxt->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
+    statusTxt->setFontSize(30);
 
     StopWatch timer;
     timer.start();
@@ -88,7 +87,7 @@ main()
 
                               std::ostringstream ss;
                               ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(static_cast<VolumeRenderMaterialPresets::Presets>(currMatId));
-                              statusManager->setCustomStatus(ss.str());
+                              statusTxt->setText(ss.str());
                           }
                       };
 
@@ -106,6 +105,7 @@ main()
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
             SimulationUtils::createDefaultSceneControlEntity(driver);
+        mouseAndKeyControls->addComponent(statusTxt);
         scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();

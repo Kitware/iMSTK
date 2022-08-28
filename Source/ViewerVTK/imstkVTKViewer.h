@@ -15,7 +15,6 @@ class KeyboardDeviceClient;
 class MouseDeviceClient;
 class Scene;
 class VTKScreenCaptureUtility;
-class VTKTextStatusManager;
 
 ///
 /// \class VTKViewer
@@ -65,11 +64,6 @@ public:
     std::shared_ptr<VTKScreenCaptureUtility> getScreenCaptureUtility() const;
 
     ///
-    /// \brief Return the window status handler
-    ///
-    std::shared_ptr<VTKTextStatusManager> getTextStatusManager() const { return m_textStatusManager; }
-
-    ///
     /// \brief Returns the device that emits key events
     ///
     std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const override;
@@ -87,8 +81,6 @@ protected:
     std::chrono::high_resolution_clock::time_point m_pre;           ///< time point pre-rendering
     std::chrono::high_resolution_clock::time_point m_post;          ///< time point post-rendering
     std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///< time point for last framerate display update
-
-    std::shared_ptr<VTKTextStatusManager> m_textStatusManager;      ///< Handle text statuses, including fps status and custom text status
 
     Vec3d  m_debugAxesLength = Vec3d(1.0, 1.0, 1.0);
     bool   m_displayFps      = false;                               ///< hide or display framerate
