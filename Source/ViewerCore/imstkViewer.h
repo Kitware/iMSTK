@@ -14,6 +14,7 @@
 namespace imstk
 {
 class Camera;
+class Entity;
 class InteractorStyle;
 class KeyboardDeviceClient;
 class MouseDeviceClient;
@@ -51,6 +52,11 @@ public:
     /// \brief Get scene currently being rendered
     ///
     std::shared_ptr<Scene> getActiveScene() const { return m_activeScene; }
+
+    ///
+    /// \brief Set the length of the debug axes
+    ///
+    void setDebugAxesLength(double x, double y, double z);
 
     ///
     /// \brief Set scene to be rendered
@@ -138,6 +144,7 @@ protected:
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 
     std::shared_ptr<Scene>  m_activeScene;
+    std::shared_ptr<Entity> m_debugEntity;
     std::shared_ptr<Camera> m_debugCamera;
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///< Screen shot utility
 

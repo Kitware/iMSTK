@@ -137,13 +137,6 @@ VTKRenderer::initialize()
         m_vtkRenderer->AddLight(light.second);
     }
 
-    // Global Axis
-    m_AxesActor = vtkSmartPointer<vtkAxesActor>::New();
-    m_AxesActor->SetShaftType(vtkAxesActor::CYLINDER_SHAFT);
-    m_AxesActor->SetAxisLabels(false);
-    m_AxesActor->SetTotalLength(m_axesLength[0], m_axesLength[1], m_axesLength[2]);
-    m_debugVtkActors.push_back(m_AxesActor);
-
     // Camera and camera actor
     if (!m_VrEnabled)
     {
@@ -278,36 +271,6 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
     m_camera = vtkSmartPointer<vtkCamera>::New();
 
     Renderer::setMode(mode, enableVR);
-}
-
-void
-VTKRenderer::setAxesLength(const double x, const double y, const double z)
-{
-    m_axesLength = Vec3d(x, y, z);
-    // If not initialized yet
-    if (m_AxesActor != nullptr)
-    {
-        m_AxesActor->SetTotalLength(x, y, z);
-    }
-}
-
-Vec3d
-VTKRenderer::getAxesLength()
-{
-    const auto ptr = m_AxesActor->GetTotalLength();
-    return Vec3d(ptr[0], ptr[1], ptr[2]);
-}
-
-void
-VTKRenderer::setAxesVisibility(const bool visible)
-{
-    m_AxesActor->SetVisibility(visible);
-}
-
-bool
-VTKRenderer::getAxesVisibility() const
-{
-    return m_AxesActor->GetVisibility();
 }
 
 void

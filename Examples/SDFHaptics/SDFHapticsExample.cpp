@@ -4,6 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkAxesModel.h"
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkDeviceManager.h"
@@ -11,10 +12,7 @@
 #include "imstkDirectionalLight.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 #include "imstkKeyboardDeviceClient.h"
-#include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
-#include "imstkMouseDeviceClient.h"
-#include "imstkMouseSceneControl.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -35,37 +33,34 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
-    auto                         scene    = std::make_shared<Scene>("SDFHaptics");
-    std::shared_ptr<SurfaceMesh> axesMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/axesPoly.vtk");
-    std::shared_ptr<ImageData>   sdfImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/stanfordBunny/stanfordBunny_SDF.nii");
-    auto                         sdf      = std::make_shared<SignedDistanceField>(sdfImage->cast(IMSTK_DOUBLE));
+    auto scene = std::make_shared<Scene>("SDFHaptics");
+    scene->getActiveCamera()->setPosition(-2.3, 23.81, 45.65);
+    scene->getActiveCamera()->setFocalPoint(9.41, 8.45, 5.76);
+
+    auto                       bunnyObj = std::make_shared<CollidingObject>("Bunny");
+    std::shared_ptr<ImageData> sdfImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/stanfordBunny/stanfordBunny_SDF.nii");
+    auto                       sdf      = std::make_shared<SignedDistanceField>(sdfImage->cast(IMSTK_DOUBLE));
     {
-        scene->getActiveCamera()->setPosition(-2.3, 23.81, 45.65);
-        scene->getActiveCamera()->setFocalPoint(9.41, 8.45, 5.76);
+        bunnyObj->setCollidingGeometry(sdf);
 
-        auto bunnyObj = std::make_shared<CollidingObject>("Bunny");
-        {
-            bunnyObj->setCollidingGeometry(sdf);
+        SurfaceMeshFlyingEdges isoExtract;
+        isoExtract.setInputImage(sdfImage);
+        isoExtract.update();
 
-            SurfaceMeshFlyingEdges isoExtract;
-            isoExtract.setInputImage(sdfImage);
-            isoExtract.update();
-
-            isoExtract.getOutputMesh()->flipNormals();
-            bunnyObj->setVisualGeometry(isoExtract.getOutputMesh());
-        }
-        scene->addSceneObject(bunnyObj);
-
-        auto axesObj = std::make_shared<SceneObject>("Axes");
-        axesObj->setVisualGeometry(axesMesh);
-        scene->addSceneObject(axesObj);
-
-        // Light
-        auto light = std::make_shared<DirectionalLight>();
-        light->setDirection(Vec3d(0.0, -8.0, -5.0));
-        light->setIntensity(1.0);
-        scene->addLight("light", light);
+        isoExtract.getOutputMesh()->flipNormals();
+        bunnyObj->setVisualGeometry(isoExtract.getOutputMesh());
     }
+    scene->addSceneObject(bunnyObj);
+
+    auto axesObj   = std::make_shared<Entity>("Axes");
+    auto axesModel = axesObj->addComponent<AxesModel>("AxesModel");
+    scene->addSceneObject(axesObj);
+
+    // Light
+    auto light = std::make_shared<DirectionalLight>();
+    light->setDirection(Vec3d(0.0, -8.0, -5.0));
+    light->setIntensity(1.0);
+    scene->addLight("light", light);
 
     // Setup default haptics manager
     std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
@@ -93,9 +88,8 @@ main()
             {
                 const Vec3d pos = deviceClient->getPosition() * 100.0 + Vec3d(10.0, 0.1, 10.0);
 
-                axesMesh->setTranslation(pos);
-                axesMesh->setRotation(deviceClient->getOrientation());
-                axesMesh->postModified();
+                axesModel->setPosition(pos);
+                axesModel->setOrientation(deviceClient->getOrientation());
 
                 double dx = sdf->getFunctionValue(pos);
                 if (dx < 0.0)

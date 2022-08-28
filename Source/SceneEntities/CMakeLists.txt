@@ -12,6 +12,7 @@ set(H_FILES
   Loader/imstkVisualObjectImporter.h
   Objects/imstkAnimationModel.h
   Objects/imstkAnimationObject.h
+  Objects/imstkAxesModel.h
   Objects/imstkCollidingObject.h
   Objects/imstkCollisionDataDebugObject.h
   Objects/imstkDebugGeometryObject.h

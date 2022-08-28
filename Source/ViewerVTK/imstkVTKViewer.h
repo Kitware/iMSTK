@@ -41,11 +41,6 @@ public:
     void setActiveScene(std::shared_ptr<Scene> scene) override;
 
     ///
-    /// \brief Set the length of the debug axes
-    ///
-    void setDebugAxesLength(double x, double y, double z);
-
-    ///
     /// \brief Get the amount of info levels
     ///
     const int getInfoLevelCount() const override { return 3; }
@@ -74,8 +69,7 @@ protected:
     std::chrono::high_resolution_clock::time_point m_post;          ///< time point post-rendering
     std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///< time point for last framerate display update
 
-    Vec3d  m_debugAxesLength = Vec3d(1.0, 1.0, 1.0);
-    bool   m_displayFps      = false;                               ///< hide or display framerate
+    bool   m_displayFps = false;                                    ///< hide or display framerate
     double m_lastFps;                                               ///< last framerate value used for moving average estimate
 };
 } // namespace imstk

@@ -81,6 +81,16 @@ public:
         return component;
     }
 
+    template<typename T>
+    std::shared_ptr<T> addComponent(std::string name)
+    {
+        auto component = std::make_shared<T>(name);
+        m_components.push_back(component);
+        component->m_entity = this;
+        this->postEvent(Event(modified()));
+        return component;
+    }
+
     ///
     /// \brief Add existing components to entity
     ///

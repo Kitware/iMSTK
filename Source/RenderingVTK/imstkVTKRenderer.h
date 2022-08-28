@@ -14,7 +14,6 @@
 #include <vtkSmartPointer.h>
 #include <unordered_set>
 
-class vtkAxesActor;
 class vtkCamera;
 class vtkCameraPass;
 class vtkChartXY;
@@ -61,25 +60,6 @@ public:
     /// \brief Set the rendering mode to display debug actors or not
     ///
     void setMode(const Mode mode, const bool enableVR) override;
-
-    ///
-    /// \brief Change the debug axes length
-    ///@{
-    void setAxesLength(const double x, const double y, const double z);
-    void setAxesLength(const Vec3d& len) { setAxesLength(len[0], len[1], len[2]); }
-    ///@}
-
-    ///
-    /// \brief Get the debug axes length
-    ///
-    Vec3d getAxesLength();
-
-    ///
-    /// \brief Change the visibility of the debug axes
-    ///@{
-    void setAxesVisibility(const bool visible);
-    bool getAxesVisibility() const;
-    ///@}
 
     ///
     /// \brief Sets the benchmarking table using unordered_map
@@ -181,8 +161,6 @@ protected:
     // Props to be rendered
     std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
-    vtkSmartPointer<vtkAxesActor> m_AxesActor;
-    Vec3d m_axesLength = Vec3d(1.0, 1.0, 1.0);
 
     // imstk scene
     std::shared_ptr<Scene> m_scene;

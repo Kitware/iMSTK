@@ -136,6 +136,11 @@ public:
     void addInteraction(std::shared_ptr<Entity> interaction);
 
     ///
+    /// \brief Check if Entity exists in scene
+    ///
+    bool hasEntity(std::shared_ptr<Entity> entity) { return m_sceneEntities.find(entity) != m_sceneEntities.end(); }
+
+    ///
     /// \brief Add a scene object
     ///
     void addSceneObject(std::shared_ptr<Entity> entity);

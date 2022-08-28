@@ -95,13 +95,6 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
                 m_scene->advance(0.001);
                 m_sceneManager->postEvent(Event(SceneManager::postUpdate()));
             }
-            // Toggle visibility of debug axes
-            else if (e->m_key == '0')
-            {
-                auto ren = std::dynamic_pointer_cast<VTKRenderer>(m_viewer->getActiveRenderer());
-                CHECK(ren != nullptr);
-                ren->setAxesVisibility(!ren->getAxesVisibility());
-            }
         });
 
     // Setup a default key control scheme (commonly used in examples)

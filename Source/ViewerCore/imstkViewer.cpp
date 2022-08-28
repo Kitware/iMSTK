@@ -5,19 +5,31 @@
 */
 
 #include "imstkViewer.h"
+#include "imstkAxesModel.h"
 #include "imstkCamera.h"
+#include "imstkEntity.h"
 #include "imstkLogger.h"
 
 namespace imstk
 {
 Viewer::Viewer(std::string name) :
     m_activeScene(nullptr),
+    m_debugEntity(std::make_shared<Entity>("DebugEntity")),
     m_debugCamera(std::make_shared<Camera>()),
     m_screenCapturer(nullptr),
     m_config(std::make_shared<ViewerConfig>())
 {
     // Set the preferred execution type
     m_executionType = ExecutionType::SEQUENTIAL;
+
+    // Add a debug axes
+    m_debugEntity->addComponent<AxesModel>();
+}
+
+void
+Viewer::setDebugAxesLength(double x, double y, double z)
+{
+    m_debugEntity->getComponent<AxesModel>()->setScale(Vec3d(x, y, z));
 }
 
 std::shared_ptr<Renderer>

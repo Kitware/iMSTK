@@ -64,7 +64,7 @@ void
 VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
 {
     // This function could be called before or after the viewer & renderer
-    // have even started.
+    // has even started.
 
     // If already current scene
     if (scene == m_activeScene)
@@ -97,17 +97,10 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
 
     // Set renderer to renderWindow
     m_vtkRenderWindow->AddRenderer(vtkRenderer);
-
     m_vtkInteractorStyle->SetCurrentRenderer(vtkRenderer);
 
     // Set name to renderWindow
     m_vtkRenderWindow->SetWindowName(m_activeScene->getName().data());
-}
-
-void
-VTKViewer::setDebugAxesLength(double x, double y, double z)
-{
-    getActiveVtkRenderer()->setAxesLength(x, y, z);
 }
 
 void
@@ -116,12 +109,27 @@ VTKViewer::setRenderingMode(const Renderer::Mode mode)
     if (!m_activeScene)
     {
         LOG(WARNING) << "Missing scene, can not set rendering mode.\n"
-                     << "Use Viewer::setCurrentScene to setup scene.";
+                     << "Use Viewer::setActiveScene to set the scene.";
         return;
     }
 
     // Switch the renderer to the mode
-    this->getActiveRenderer()->setMode(mode, false);
+    getActiveRenderer()->setMode(mode, false);
+
+    if (mode == Renderer::Mode::Debug)
+    {
+        if (!m_activeScene->hasEntity(m_debugEntity))
+        {
+            m_activeScene->addSceneObject(m_debugEntity);
+        }
+    }
+    else if (mode == Renderer::Mode::Simulation)
+    {
+        if (m_activeScene->hasEntity(m_debugEntity))
+        {
+            m_activeScene->removeSceneObject(m_debugEntity);
+        }
+    }
 
     updateModule();
 
