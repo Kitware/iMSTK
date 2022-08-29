@@ -4,7 +4,6 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "../PBDStaticSuture/NeedleObject.h"
 #include "imstkCamera.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -15,7 +14,10 @@
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
+#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
+#include "imstkRigidBodyModel2.h"
+#include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -158,6 +160,37 @@ makePbdString(const std::string& name, const std::string& filename)
     return stringObj;
 }
 
+static std::shared_ptr<RigidObject2>
+makeNeedleObj()
+{
+    auto needleObj = std::make_shared<RigidObject2>();
+
+    auto sutureMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
+
+    const Mat4d rot = mat4dRotation(Rotd(-PI_2, Vec3d(0.0, 1.0, 0.0))) *
+                      mat4dRotation(Rotd(-0.6, Vec3d(1.0, 0.0, 0.0)));
+    sutureMesh->transform(rot, Geometry::TransformType::ApplyToData);
+
+    needleObj->setVisualGeometry(sutureMesh);
+    needleObj->setCollidingGeometry(sutureMesh);
+    needleObj->setPhysicsGeometry(sutureMesh);
+    needleObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
+    needleObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    needleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
+    needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
+
+    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
+    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
+    rbdModel->getConfig()->m_maxNumIterations = 5;
+    needleObj->setDynamicalModel(rbdModel);
+
+    needleObj->getRigidBody()->m_mass = 1.0;
+    needleObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
+    needleObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
+
+    return needleObj;
+}
+
 ///
 /// \brief This example demonstrates suture on suture collision via CCD
 int
@@ -180,8 +213,7 @@ main()
     scene->addInteraction(interaction);
 
     // Create the arc needle
-    auto needleObj = std::make_shared<NeedleObject>();
-    needleObj->setForceThreshold(2.0);
+    std::shared_ptr<RigidObject2> needleObj = makeNeedleObj();
     scene->addSceneObject(needleObj);
 
     // Adjust the camera
@@ -241,9 +273,11 @@ main()
             [&](Event*)
             {
                 auto threadLineMesh = std::dynamic_pointer_cast<LineMesh>(threadObj->getPhysicsGeometry());
-                auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getPhysicsGeometry());
-                (*threadLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
-                (*threadLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
+                std::shared_ptr<Geometry> geom = needleObj->getPhysicsGeometry();
+                const Vec3d pos = geom->getTranslation();
+                const Mat3d rot = geom->getRotation();
+                (*threadLineMesh->getVertexPositions())[1] = pos;
+                (*threadLineMesh->getVertexPositions())[0] = pos + rot * Vec3d(0.0, 0.002, 0.0);
             });
 
         // Add default mouse and keyboard controls to the viewer

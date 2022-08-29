@@ -5,25 +5,28 @@
 */
 
 #include "NeedleInteraction.h"
-#include "imstkLineMesh.h"
-#include "imstkPbdObject.h"
 #include "imstkCollisionDetectionAlgorithm.h"
+#include "imstkLineMesh.h"
+#include "imstkNeedle.h"
+#include "imstkPbdObject.h"
+#include "imstkRigidObject2.h"
 #include "NeedlePbdCH.h"
-#include "NeedleObject.h"
 
 using namespace imstk;
 
 NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
-                                     std::shared_ptr<NeedleObject> needleObj,
+                                     std::shared_ptr<RigidObject2> needleObj,
                                      std::shared_ptr<PbdObject>    threadObj)
     : PbdObjectCollision(tissueObj, needleObj)
 {
     // Check inputs
-    CHECK(tissueObj != nullptr) << "NeedleInteraction requires a PbdObject tissue";
+    CHECK(needleObj->containsComponent<Needle>())
+        << "NeedleInteraction only works with objects that have a Needle component";
+    CHECK(tissueObj->containsComponent<Puncturable>())
+        << "NeedleInteraction only works with objects that have a Puncturable component";
+
     CHECK(std::dynamic_pointer_cast<SurfaceMesh>(tissueObj->getCollidingGeometry()) != nullptr) <<
         "NeedleInteraction only works with SufraceMesh collision geometry on the tissue object";
-
-    CHECK(threadObj != nullptr) << "NeedleInteraction requires a PbdObject thread";
     CHECK(std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry()) != nullptr) <<
         "NeedleInteraction only works with LineMesh collision geometry on NeedleObject";
 

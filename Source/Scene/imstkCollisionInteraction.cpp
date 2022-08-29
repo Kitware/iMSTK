@@ -20,6 +20,9 @@ CollisionInteraction::CollisionInteraction(
     std::string                      cdType = "") : SceneObject(objName),
     m_objA(objA), m_objB(objB)
 {
+    CHECK(objA != nullptr) << "CollisionInteraction requires a CollidingObject objA";
+    CHECK(objB != nullptr) << "CollisionInteraction requires a CollidingObject objB";
+
     m_collisionDetectionNode = std::make_shared<TaskNode>(std::bind(&CollisionInteraction::updateCD, this),
         objA->getName() + "_vs_" + objB->getName() + "_CollisionDetection");
     m_taskGraph->addNode(m_collisionDetectionNode);

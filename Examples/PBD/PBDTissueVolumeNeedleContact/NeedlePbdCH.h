@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "imstkMacros.h"
 #include "imstkNeedle.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdObject.h"
@@ -34,6 +35,7 @@ protected:
         auto needle      = getInputObjectB()->getComponent<Needle>();
 
         PunctureId punctureId = { getInputObjectA()->getID(), -1 };
+
         if ((elementsA.size() > 0 || elementsB.size() > 0)
             && needle->getState(punctureId) == Puncture::State::REMOVED)
         {

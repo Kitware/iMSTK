@@ -12,7 +12,6 @@
 using namespace imstk;
 
 class NeedleEmbedder;
-class NeedleObject;
 
 namespace imstk
 {
@@ -28,8 +27,9 @@ class TetraToLineMeshCD;
 class NeedleInteraction : public PbdObjectCollision
 {
 public:
-    NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
-                      std::shared_ptr<NeedleObject> needleObj);
+    NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
+                      std::shared_ptr<PbdObject> needleObj,
+                      const std::string&         collisionName = "");
     ~NeedleInteraction() override = default;
 
     IMSTK_TYPE_NAME(NeedleInteraction)

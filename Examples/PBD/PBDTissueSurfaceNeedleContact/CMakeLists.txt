@@ -16,7 +16,6 @@ if (iMSTK_USE_RENDERING_VTK)
     PBDTissueSurfaceNeedleContactExample.cpp
     NeedleRigidBodyCH.h
     NeedlePbdCH.h
-    NeedleObject.h
     RbdAngularLockingConstraint.h
     RbdAxesLockingConstraint.h
     NeedleInteraction.h)

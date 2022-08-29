@@ -15,11 +15,13 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkNeedle.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
+#include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -143,10 +145,12 @@ makeTissueObj(const std::string& name,
         }
     }
 
+    tissueObj->addComponent<Puncturable>();
+
     return tissueObj;
 }
 
-static std::shared_ptr<NeedleObject>
+static std::shared_ptr<RigidObject2>
 makeToolObj()
 {
     auto                    toolGeom = std::make_shared<LineMesh>();
@@ -160,7 +164,7 @@ makeToolObj()
     syringeMesh->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2, Geometry::TransformType::ApplyToData);
     syringeMesh->translate(Vec3d(0.0, 4.4, 0.0), Geometry::TransformType::ApplyToData);
 
-    auto toolObj = std::make_shared<NeedleObject>("NeedleRbdTool");
+    auto toolObj = std::make_shared<RigidObject2>("NeedleRbdTool");
     toolObj->setVisualGeometry(syringeMesh);
     toolObj->setCollidingGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
@@ -178,6 +182,9 @@ makeToolObj()
     toolObj->getRigidBody()->m_mass = 0.1;
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 2.0, 0.0);
+
+    auto needle = toolObj->addComponent<StraightNeedle>();
+    needle->setNeedleGeometry(toolGeom);
 
     return toolObj;
 }
@@ -203,8 +210,7 @@ main()
         Vec3d(10.0, 3.0, 10.0), Vec3i(7, 3, 6), Vec3d(0.1, -1.0, 0.0));
     scene->addSceneObject(tissueObj);
 
-    std::shared_ptr<NeedleObject> toolObj = makeToolObj();
-    toolObj->setForceThreshold(1.0);
+    std::shared_ptr<RigidObject2> toolObj = makeToolObj();
     scene->addSceneObject(toolObj);
 
     // Setup a ghost tool object to show off virtual coupling

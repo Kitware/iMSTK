@@ -10,8 +10,6 @@
 
 using namespace imstk;
 
-class NeedleObject;
-
 ///
 /// \class NeedleInteraction
 ///
@@ -21,6 +19,7 @@ class NeedleInteraction : public RigidObjectCollision
 {
 public:
     NeedleInteraction(std::shared_ptr<CollidingObject> tissueObj,
-                      std::shared_ptr<NeedleObject>    needleObj);
+                      std::shared_ptr<RigidObject2>    needleObj,
+                      const std::string&               collisionName = "");
     ~NeedleInteraction() override = default;
 };

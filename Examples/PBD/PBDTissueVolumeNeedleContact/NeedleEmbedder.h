@@ -10,8 +10,6 @@
 
 #include <unordered_map>
 
-class NeedleObject;
-
 namespace imstk
 {
 class CollisionData;
@@ -19,7 +17,12 @@ class EmbeddingConstraint;
 class LineMesh;
 class PbdConstraint;
 class PbdObject;
+<<<<<<< HEAD:Examples/PBD/PBDTissueVolumeNeedleContact/NeedleEmbedder.h
 class TaskNode;
+=======
+class Puncturable;
+class StraightNeedle;
+>>>>>>> cee7aaf77 (ENH: Needle and Puncturable component):Examples/PBD/PBDTissueVolumeNeedleContact/NeedleEmbeddedCH.h
 class TetrahedralMesh;
 } // namespace imstk
 
@@ -42,15 +45,13 @@ struct TissueData
 };
 struct NeedleData
 {
-    std::shared_ptr<NeedleObject> obj;
+    std::shared_ptr<PbdObject> obj;
 
-    NeedleData(std::shared_ptr<NeedleObject> obj);
+    NeedleData(std::shared_ptr<PbdObject> obj);
 
-    std::shared_ptr<LineMesh> geom;
+    std::shared_ptr<StraightNeedle> needle;
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr;
     VecDataArray<double, 3>& vertices;
-    std::shared_ptr<VecDataArray<int, 2>> indicesPtr;
-    VecDataArray<int, 2>& indices;
 };
 
 ///
@@ -86,7 +87,24 @@ public:
     /// \brief Add embedding constraints based off contact data
     /// We need to add the constraint once and then update it later
     ///
+<<<<<<< HEAD:Examples/PBD/PBDTissueVolumeNeedleContact/NeedleEmbedder.h
     void update();
+=======
+    void handle(
+        const std::vector<CollisionElement>& elementsA,
+        const std::vector<CollisionElement>& elementsB) override;
+
+    ///
+    /// \brief Updates puncture state for the needle. Could be not
+    /// touching, touching, or inserted.
+    /// Works via projection and thresholding of the force on the needle axes.
+    /// Returns whether embedded
+    ///
+    void updatePunctureState(
+        std::shared_ptr<Puncturable> puncturable,
+        std::shared_ptr<StraightNeedle> needle, Vec3d force,
+        bool notIntersecting);
+>>>>>>> cee7aaf77 (ENH: Needle and Puncturable component):Examples/PBD/PBDTissueVolumeNeedleContact/NeedleEmbeddedCH.h
 
 protected:
     ///

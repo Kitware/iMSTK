@@ -13,7 +13,7 @@
 
 namespace imstk
 {
-using EntityID = unsigned long;
+using EntityID = std::uint32_t;
 
 class Component;
 

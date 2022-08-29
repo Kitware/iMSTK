@@ -19,6 +19,7 @@ set(H_FILES
   Objects/imstkDynamicObject.h
   Objects/imstkFeDeformableObject.h
   Objects/imstkLevelSetDeformableObject.h
+  Objects/imstkNeedle.h
   Objects/imstkObjectControllerGhost.h
   Objects/imstkPbdObject.h
   Objects/imstkRigidObject2.h
@@ -40,6 +41,7 @@ set(SRC_FILES
   Objects/imstkDynamicObject.cpp
   Objects/imstkFeDeformableObject.cpp
   Objects/imstkLevelSetDeformableObject.cpp
+  Objects/imstkNeedle.cpp
   Objects/imstkObjectControllerGhost.cpp
   Objects/imstkPbdObject.cpp
   Objects/imstkRigidObject2.cpp

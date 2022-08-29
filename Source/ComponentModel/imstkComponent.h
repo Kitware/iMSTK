@@ -38,6 +38,11 @@ protected:
 public:
     virtual ~Component() = default;
 
+    ///
+    /// \brief Get parent entity
+    ///
+    Entity* getEntity() const { return m_entity; }
+
     // \todo: Component initialization doesn't make much sense
     // Behaviour does though (since it's a system), so might move
     void initialize();

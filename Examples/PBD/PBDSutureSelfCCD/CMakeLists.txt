@@ -13,9 +13,7 @@ if (iMSTK_USE_RENDERING_VTK)
     # Create executable
     #-----------------------------------------------------------------------------
     imstk_add_executable(${PROJECT_NAME}
-        pbdSutureSelfCCD.cpp
-        ../PBDStaticSuture/NeedleObject.h
-        ../PBDStaticSuture/NeedleObject.cpp)
+        pbdSutureSelfCCD.cpp)
 
     #-----------------------------------------------------------------------------
     # Add the target to Examples folder

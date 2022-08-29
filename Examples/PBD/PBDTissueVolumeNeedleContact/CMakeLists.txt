@@ -20,8 +20,6 @@ if (iMSTK_USE_RENDERING_VTK)
     NeedleEmbedder.cpp
     NeedleInteraction.h
     NeedleInteraction.cpp
-    NeedleObject.h
-    NeedleObject.cpp
     )
 
   #-----------------------------------------------------------------------------

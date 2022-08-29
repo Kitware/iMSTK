@@ -5,26 +5,27 @@
 */
 
 #include "NeedleInteraction.h"
-#include "NeedleObject.h"
-#include "NeedleRigidBodyCH.h"
 #include "imstkCollisionDetectionAlgorithm.h"
-#include "imstkLineMesh.h"
 #include "imstkImplicitGeometry.h"
+#include "imstkLineMesh.h"
+#include "imstkNeedle.h"
+#include "imstkRigidObject2.h"
 #include "imstkTaskGraph.h"
+#include "NeedleRigidBodyCH.h"
 
 using namespace imstk;
 
 NeedleInteraction::NeedleInteraction(std::shared_ptr<CollidingObject> tissueObj,
-                                     std::shared_ptr<NeedleObject>    needleObj) : RigidObjectCollision(needleObj, tissueObj, "ImplicitGeometryToPointSetCD")
+                                     std::shared_ptr<RigidObject2>    needleObj,
+                                     const std::string&               collisionName) :
+    RigidObjectCollision(needleObj, tissueObj, collisionName)
 {
-    if (std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry()) == nullptr)
-    {
-        LOG(WARNING) << "NeedleInteraction only works with LineMesh collision geometry on rigid DrillObject";
-    }
-    if (std::dynamic_pointer_cast<ImplicitGeometry>(tissueObj->getCollidingGeometry()) == nullptr)
-    {
-        LOG(WARNING) << "NeedleInteraction only works with SDF colliding geometry on colliding tissueObj";
-    }
+    CHECK(needleObj->containsComponent<ArcNeedle>())
+        << "NeedleInteraction only works with objects that have a ArcNeedle component";
+    CHECK(tissueObj->containsComponent<Puncturable>())
+        << "NeedleInteraction only works with objects that have a Puncturable component";
+    CHECK(std::dynamic_pointer_cast<ImplicitGeometry>(tissueObj->getCollidingGeometry()) != nullptr)
+        << "NeedleInteraction only works with SDF colliding geometry on colliding tissueObj";
 
     // First replace the handlers with our needle subclasses
 

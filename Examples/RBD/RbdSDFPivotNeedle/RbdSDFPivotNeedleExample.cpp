@@ -13,10 +13,13 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkNeedle.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
+#include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -26,7 +29,6 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
-#include "NeedleObject.h"
 
 #ifdef iMSTK_USE_HAPTICS
 #include "imstkDeviceManager.h"
@@ -58,10 +60,12 @@ createTissueObj()
     material->setMetalness(0.1);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
 
+    tissueObj->addComponent<Puncturable>();
+
     return tissueObj;
 }
 
-static std::shared_ptr<NeedleObject>
+static std::shared_ptr<RigidObject2>
 createNeedleObj()
 {
     auto                    toolGeom = std::make_shared<LineMesh>();
@@ -76,7 +80,7 @@ createNeedleObj()
     toolGeom->rotate(Vec3d(0.0, 1.0, 0.0), PI, Geometry::TransformType::ApplyToData);
     syringeMesh->translate(Vec3d(0.0, 0.0, 0.1), Geometry::TransformType::ApplyToData);
 
-    auto toolObj = std::make_shared<NeedleObject>("NeedleRbdTool");
+    auto toolObj = std::make_shared<RigidObject2>("NeedleRbdTool");
     toolObj->setVisualGeometry(syringeMesh);
     toolObj->setCollidingGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
@@ -102,6 +106,9 @@ createNeedleObj()
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 1000.0;
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.1, 0.0);
 
+    auto needle = toolObj->addComponent<StraightNeedle>();
+    needle->setNeedleGeometry(toolGeom);
+
     return toolObj;
 }
 
@@ -121,19 +128,8 @@ main()
     scene->addSceneObject(tissueObj);
 
     // Create the needle
-    std::shared_ptr<NeedleObject> needleObj = createNeedleObj();
-    needleObj->setForceThreshold(50.0);
+    std::shared_ptr<RigidObject2> needleObj = createNeedleObj();
     scene->addSceneObject(needleObj);
-
-    // Setup a debug ghost tool for virtual coupling
-    auto ghostToolObj = std::make_shared<SceneObject>("ghostTool");
-    {
-        ghostToolObj->setVisualGeometry(needleObj->getVisualGeometry()->clone());
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.3);
-    }
-    scene->addSceneObject(ghostToolObj);
 
     // Setup interaction between tissue and needle
     scene->addInteraction(std::make_shared<NeedleInteraction>(tissueObj, needleObj));
@@ -195,10 +191,14 @@ main()
         controller->setUseForceSmoothening(true);
         scene->addControl(controller);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        auto ghostTool = needleObj->addComponent<ObjectControllerGhost>();
+        ghostTool->setController(controller);
+
+        connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Keep the tool moving in real time
                 needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+<<<<<<< HEAD
 
                 // Update the ghost debug geometry
                 std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
@@ -207,8 +207,14 @@ main()
                 toolGhostMesh->updatePostTransformData();
                 toolGhostMesh->postModified();
 
+<<<<<<< HEAD
                 ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(
                     std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+=======
+                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+=======
+>>>>>>> eadd1c73 (ENH: Needle and Puncturable component)
+>>>>>>> 12dc778a (ENH: Needle and Puncturable component)
             });
 
         // Add default mouse and keyboard controls to the viewer

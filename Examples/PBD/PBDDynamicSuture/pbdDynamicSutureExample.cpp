@@ -9,16 +9,21 @@
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkIsometricMap.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkNeedle.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPointwiseMap.h"
+#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
+#include "imstkRigidBodyModel2.h"
+#include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -27,7 +32,6 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
-#include "NeedleObject.h"
 
 using namespace imstk;
 
@@ -75,6 +79,8 @@ createTissue(std::shared_ptr<PbdModel> model)
     // Fix the borders
     pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
     model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.3);
+
+    pbdObject->addComponent<Puncturable>();
 
     return pbdObject;
 }
@@ -140,6 +146,44 @@ makePbdString(
     return stringObj;
 }
 
+static std::shared_ptr<RigidObject2>
+makeToolObj()
+{
+    auto needleObj      = std::make_shared<RigidObject2>();
+    auto sutureMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
+    auto sutureLineMesh = MeshIO::read<LineMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture_hull.vtk");
+
+    const Mat4d rot = mat4dRotation(Rotd(-PI_2, Vec3d(0.0, 1.0, 0.0))) *
+                      mat4dRotation(Rotd(-0.6, Vec3d(1.0, 0.0, 0.0)));
+
+    sutureMesh->transform(rot, Geometry::TransformType::ApplyToData);
+    sutureLineMesh->transform(rot, Geometry::TransformType::ApplyToData);
+
+    needleObj->setVisualGeometry(sutureMesh);
+    // setVisualGeometry(sutureLineMesh);
+    needleObj->setCollidingGeometry(sutureLineMesh);
+    needleObj->setPhysicsGeometry(sutureLineMesh);
+    needleObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(sutureLineMesh, sutureMesh));
+
+    needleObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
+    needleObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    needleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
+    needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
+
+    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
+    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
+    rbdModel->getConfig()->m_maxNumIterations = 5;
+    needleObj->setDynamicalModel(rbdModel);
+
+    needleObj->getRigidBody()->m_mass = 1.0;
+    needleObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
+    needleObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
+
+    needleObj->addComponent<Needle>();
+
+    return needleObj;
+}
+
 ///
 /// \brief This example demonstrates suturing of a hole in a tissue
 ///
@@ -178,8 +222,7 @@ main()
     scene->addSceneObject(tissueHole);
 
     // Create arced needle
-    auto needleObj = std::make_shared<NeedleObject>();
-    needleObj->setForceThreshold(0.0001);
+    std::shared_ptr<RigidObject2> needleObj = makeToolObj();
     scene->addSceneObject(needleObj);
 
     // Create the suture pbd-based string
