@@ -71,6 +71,8 @@ public:
 
     const Vec3i& getNumberOfChunks() const { return m_numChunks; }
 
+    std::unordered_map<int, Vec3i> getModifiedChunks() { return m_modifiedChunks; }
+
 protected:
     void requestUpdate() override;
 
@@ -84,5 +86,7 @@ private:
 
     Vec3i  m_numChunks  = Vec3i(0, 0, 0); // Number of chunks along x, y, z
     size_t m_chunkCount = 0;              ///< Total chunk count x * y * z
+
+    std::unordered_map<int, Vec3i> m_modifiedChunks;
 };
 } // namespace imstk

@@ -683,7 +683,7 @@ LocalMarchingCubes::requestUpdate()
         }
 
         // Set of modified chunks (all in one map to remove duplicates)
-        std::unordered_map<int, Vec3i> modifiedChunks;
+        m_modifiedChunks.clear();
         {
             for (auto modifiedBlock : modifiedBlocks)
             {
@@ -694,11 +694,11 @@ LocalMarchingCubes::requestUpdate()
                 const Vec3i chunkCoord = blockCoord.cast<double>().cwiseQuotient(dim1.cast<double>()).cwiseProduct(m_numChunks.cast<double>()).cast<int>();
 
                 const int chunkId = chunkCoord[0] + (chunkCoord[1] + chunkCoord[2] * m_numChunks[1]) * m_numChunks[0];
-                modifiedChunks.insert(std::pair<int, Vec3i>(chunkId, chunkCoord));
+                m_modifiedChunks.insert(std::pair<int, Vec3i>(chunkId, chunkCoord));
             }
         }
         // Updates all the modified chunks
-        for (auto i : modifiedChunks)
+        for (auto i : m_modifiedChunks)
         {
             const Vec3i&                 chunkCoord = i.second;
             std::shared_ptr<SurfaceMesh> outputSurf = std::dynamic_pointer_cast<SurfaceMesh>(getOutput(i.first));
