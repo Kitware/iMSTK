@@ -9,6 +9,8 @@
 #include "imstkLogger.h"
 #include "imstkMath.h"
 
+#include <cmath>
+
 namespace imstk
 {
 TrackingDeviceControl::TrackingDeviceControl(const std::string& name) :
@@ -75,10 +77,15 @@ TrackingDeviceControl::updateTrackingData(const double dt)
     m_currentPos = m_rotationOffset * m_currentPos * m_scaling + m_translationOffset;
     m_currentOrientation = m_effectorRotationOffset * m_rotationOffset * m_currentOrientation;
 
+    // Apply scaling
+    m_currentVelocity = m_currentVelocity * m_scaling;
+
     // With simulation substeps this may produce 0 deltas, but its fine
     // Another option is to divide velocity by number of substeps and then
     // maintain it for N substeps
-
+    // Note: This velocity will not be as accurate as the one returned by the
+    // haptic device, since the haptic devices runs on a seperate thread at a
+    // higher rate.
     if (m_computeVelocity)
     {
         m_currentDisplacement = (m_currentPos - prevPos);
@@ -86,10 +93,20 @@ TrackingDeviceControl::updateTrackingData(const double dt)
     }
     if (m_computeAngularVelocity)
     {
-        m_currentRotation = prevOrientation * m_currentOrientation.inverse();
-        /* Rotd r = Rotd(m_currentRotation);
-           r.angle() /= timestepInfo.m_dt;*/
-        m_currentAngularVelocity = m_currentRotation.toRotationMatrix().eulerAngles(0, 1, 2) /= dt;
+        // Get axis of rotation in current configuration
+        Rotd currentR = Rotd(m_currentOrientation);
+
+        // Arbitrary normalized basis
+        Vec3d basis = { 1.0, 0.0, 0.0 };
+
+        // Vectors created by rotating basis using orientations
+        Vec3d vec1 = m_currentOrientation.normalized().toRotationMatrix() * basis;
+        Vec3d vec2 = prevOrientation.normalized().toRotationMatrix() * basis;
+
+        // Angal between the two vectors after rotation, divided by timestep to get rate
+        auto angle = std::acos(std::min(1.0, std::max(-1.0, vec1.dot(vec2)))) / dt;
+        // Assume small change in rotation axis
+        m_currentAngularVelocity = (angle * currentR.axis());
     }
 
     return true;

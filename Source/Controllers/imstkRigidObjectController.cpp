@@ -90,7 +90,7 @@ RigidObjectController::update(const double dt)
             currTorque += torque;
         }
 
-        // Uses relative force
+        // Uses relative velocity
         //{
         //    const Vec3d& deviceVelocity = getVelocity();
         //    const Vec3d& deviceAngularVelocity = getAngularVelocity();
@@ -102,7 +102,7 @@ RigidObjectController::update(const double dt)
 
         //    // Compute torque
         //    const Quatd dq = deviceOrientation * currOrientation.inverse();
-        //    const Rotd angleAxes = Rotd(dq);
+        //    const Rotd  angleAxes = Rotd(dq);
         //    m_tS = deviceOffset.cross(force) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle());
         //    m_tD = m_angularKd * (deviceAngularVelocity - currAngularVelocity);
         //    Vec3d torque = m_tS + m_tD;

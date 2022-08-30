@@ -122,7 +122,8 @@ main()
     controller->setDevice(deviceClient);
     controller->setTranslationOffset(Vec3d(0.0, 0.05, 0.0));
     controller->setLinearKs(50000.0);
-    controller->setAngularKs(10000000000.0);
+    controller->setAngularKs(1000000000000.0);
+    controller->setTranslationScaling(1.0);
     controller->setForceScaling(0.01);
     controller->setSmoothingKernelSize(15);
     controller->setUseForceSmoothening(true);

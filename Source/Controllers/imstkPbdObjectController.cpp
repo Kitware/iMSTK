@@ -92,23 +92,23 @@ PbdObjectController::update(const double dt)
             currTorque += torque;
         }
 
-        // Uses relative force
+        // Uses relative velocity
         //{
         //    const Vec3d& deviceVelocity = getVelocity();
         //    const Vec3d& deviceAngularVelocity = getAngularVelocity();
-
+        //
         //    // Compute force
         //    m_fS = m_linearKs.cwiseProduct(devicePos - currPos - deviceOffset);
         //    m_fD = m_linearKd * (deviceVelocity - currVelocity - currAngularVelocity.cross(deviceOffset));
         //    Vec3d force = m_fS + m_fD;
-
+        //
         //    // Compute torque
         //    const Quatd dq = deviceOrientation * currOrientation.inverse();
-        //    const Rotd angleAxes = Rotd(dq);
+        //    const Rotd  angleAxes = Rotd(dq);
         //    m_tS = deviceOffset.cross(force) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle());
         //    m_tD = m_angularKd * (deviceAngularVelocity - currAngularVelocity);
         //    Vec3d torque = m_tS + m_tD;
-
+        //
         //    currForce += force;
         //    currTorque += torque;
         //}
