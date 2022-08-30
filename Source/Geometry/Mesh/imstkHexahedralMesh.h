@@ -48,5 +48,34 @@ public:
     /// \brief Compute and return the volume of the hexahedral mesh
     ///
     double getVolume() override;
+
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<HexahedralMesh> clone()
+    {
+        return std::unique_ptr<HexahedralMesh>(cloneImplementation());
+    }
+
+private:
+    HexahedralMesh* cloneImplementation() const
+    {
+        // Do shallow copy
+        HexahedralMesh* geom = new HexahedralMesh(*this);
+        // Deal with deep copy members
+        geom->m_indices = std::make_shared<VecDataArray<int, 8>>(*m_indices);
+        for (auto i : m_cellAttributes)
+        {
+            geom->m_cellAttributes[i.first] = i.second->clone();
+        }
+        geom->m_initialVertexPositions = std::make_shared<VecDataArray<double, 3>>(*m_initialVertexPositions);
+        geom->m_vertexPositions = std::make_shared<VecDataArray<double, 3>>(*m_vertexPositions);
+        for (auto i : m_vertexAttributes)
+        {
+            geom->m_vertexAttributes[i.first] = i.second->clone();
+        }
+        return geom;
+    }
 };
 } // namespace imstk

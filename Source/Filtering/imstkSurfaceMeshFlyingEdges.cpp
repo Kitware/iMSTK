@@ -54,6 +54,7 @@ SurfaceMeshFlyingEdges::requestUpdate()
     filter->ComputeGradientsOff();
     filter->Update();
 
-    std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0))->deepCopy(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));
+    std::shared_ptr<SurfaceMesh> outputSurfMesh = GeometryUtils::copyToSurfaceMesh(filter->GetOutput());
+    *std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0)) = *outputSurfMesh->clone();
 }
 } // namespace imstk

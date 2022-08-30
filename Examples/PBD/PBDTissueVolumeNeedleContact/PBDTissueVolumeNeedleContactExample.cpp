@@ -209,12 +209,7 @@ main()
     // Setup a debug ghost tool for virtual coupling
     auto ghostToolObj = std::make_shared<SceneObject>("ghostTool");
     {
-        auto toolMesh      = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getVisualGeometry());
-        auto toolGhostMesh = std::make_shared<SurfaceMesh>();
-        toolGhostMesh->initialize(
-            std::make_shared<VecDataArray<double, 3>>(*toolMesh->getVertexPositions(Geometry::DataType::PreTransform)),
-            std::make_shared<VecDataArray<int, 3>>(*toolMesh->getCells()));
-        ghostToolObj->setVisualGeometry(toolGhostMesh);
+        ghostToolObj->setVisualGeometry(toolObj->getVisualGeometry()->clone());
         ghostToolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
         ghostToolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
         ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.3);

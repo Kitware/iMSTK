@@ -100,13 +100,8 @@ main()
     scene->addSceneObject(rbdObj);
 
     // Setup a ghost tool object to show off virtual coupling
-    auto ghostToolObj  = std::make_shared<SceneObject>("GhostTool");
-    auto toolMesh      = std::dynamic_pointer_cast<SurfaceMesh>(rbdObj->getVisualGeometry());
-    auto toolGhostMesh = std::make_shared<SurfaceMesh>();
-    toolGhostMesh->initialize(
-        std::make_shared<VecDataArray<double, 3>>(*toolMesh->getVertexPositions()),
-        std::make_shared<VecDataArray<int, 3>>(*toolMesh->getCells()));
-    ghostToolObj->setVisualGeometry(toolGhostMesh);
+    auto ghostToolObj = std::make_shared<SceneObject>("GhostTool");
+    ghostToolObj->setVisualGeometry(rbdObj->getVisualGeometry()->clone());
     auto ghostMaterial = std::make_shared<RenderMaterial>();
     ghostMaterial->setColor(Color::Orange);
     ghostMaterial->setLineWidth(5.0);
@@ -174,6 +169,7 @@ main()
                 ghostMaterial->setOpacity(1.0);
 
                 // Also apply controller transform to ghost geometry
+                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
                 toolGhostMesh->setTranslation(controller->getPosition());
                 toolGhostMesh->setRotation(controller->getOrientation());
                 toolGhostMesh->updatePostTransformData();

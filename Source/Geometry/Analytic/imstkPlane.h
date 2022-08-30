@@ -61,11 +61,26 @@ public:
     ///
     void updatePostTransformData() const override;
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<Plane> clone()
+    {
+        return std::unique_ptr<Plane>(cloneImplementation());
+    }
+
 protected:
     void applyTransform(const Mat4d& m) override;
 
     Vec3d m_normal;
     mutable Vec3d m_normalPostTransform;
     double m_width; ///< Width of plane, only used for visual purposes
+
+private:
+    Plane* cloneImplementation() const
+    {
+        return new Plane(*this);
+    }
 };
 } // namespace imstk

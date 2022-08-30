@@ -48,7 +48,7 @@ protected:
     Geometry() : m_globalId(getUniqueId()) { }
 
 public:
-    Geometry(Geometry& other)
+    Geometry(const Geometry& other)
     {
         m_transformApplied = other.m_transformApplied;
         m_transform = other.m_transform;
@@ -165,6 +165,15 @@ public:
     ///@}
 
     ///
+    /// \brief polymorphic clone function, utilize this to get a copy of the geometry
+    /// without casting to the expected geometry type
+    ///
+    std::unique_ptr<Geometry> clone()
+    {
+        return std::unique_ptr<Geometry>(cloneImplementation());
+    }
+
+    ///
     /// \brief Get the name of the geometry
     ///
     const std::string& getName() const { return m_name; }
@@ -218,5 +227,8 @@ protected:
 
     /// Total number of geometries that have been created in this program
     static std::atomic<size_t> s_numGlobalIds;
+
+private:
+    virtual Geometry* cloneImplementation() const = 0;
 };
 } // namespace imstk

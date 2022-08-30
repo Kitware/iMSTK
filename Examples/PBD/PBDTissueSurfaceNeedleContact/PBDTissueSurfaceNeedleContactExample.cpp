@@ -207,13 +207,8 @@ main()
     scene->addSceneObject(toolObj);
 
     // Setup a ghost tool object to show off virtual coupling
-    auto ghostToolObj  = std::make_shared<SceneObject>("GhostTool");
-    auto toolMesh      = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getVisualGeometry());
-    auto toolGhostMesh = std::make_shared<SurfaceMesh>();
-    toolGhostMesh->initialize(
-        std::make_shared<VecDataArray<double, 3>>(*toolMesh->getVertexPositions()),
-        std::make_shared<VecDataArray<int, 3>>(*toolMesh->getCells()));
-    ghostToolObj->setVisualGeometry(toolGhostMesh);
+    auto ghostToolObj = std::make_shared<SceneObject>("GhostTool");
+    ghostToolObj->setVisualGeometry(toolObj->getVisualGeometry()->clone());
     ghostToolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
     ghostToolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
     ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.3);
@@ -280,6 +275,7 @@ main()
                 ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
 
                 // Also apply controller transform to ghost geometry
+                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
                 toolGhostMesh->setTranslation(controller->getPosition());
                 toolGhostMesh->setRotation(controller->getOrientation());
                 toolGhostMesh->updatePostTransformData();

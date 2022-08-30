@@ -127,12 +127,7 @@ main()
     // Setup a debug ghost tool for virtual coupling
     auto ghostToolObj = std::make_shared<SceneObject>("ghostTool");
     {
-        auto toolMesh      = std::dynamic_pointer_cast<SurfaceMesh>(needleObj->getVisualGeometry());
-        auto toolGhostMesh = std::make_shared<SurfaceMesh>();
-        toolGhostMesh->initialize(
-            std::make_shared<VecDataArray<double, 3>>(*toolMesh->getVertexPositions(Geometry::DataType::PreTransform)),
-            std::make_shared<VecDataArray<int, 3>>(*toolMesh->getCells()));
-        ghostToolObj->setVisualGeometry(toolGhostMesh);
+        ghostToolObj->setVisualGeometry(needleObj->getVisualGeometry()->clone());
         ghostToolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
         ghostToolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
         ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.3);
@@ -211,7 +206,8 @@ main()
                 toolGhostMesh->updatePostTransformData();
                 toolGhostMesh->postModified();
 
-                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
+                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(
+                    std::min(1.0, controller->getDeviceForce().norm() / 15.0));
             });
 
         // Add mouse and keyboard controls to the viewer

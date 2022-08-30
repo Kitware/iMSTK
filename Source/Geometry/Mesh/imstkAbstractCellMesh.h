@@ -21,7 +21,6 @@ namespace imstk
 class AbstractCellMesh : public PointSet
 {
 public:
-    AbstractCellMesh() = default;
     ~AbstractCellMesh() override = default;
 
     ///

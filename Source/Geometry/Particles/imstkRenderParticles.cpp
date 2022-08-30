@@ -81,4 +81,28 @@ RenderParticles::applyTransform(const Mat4d& imstkNotUsed(m))
 {
     LOG(WARNING) << "applyTransform Not implemented!";
 }
+
+RenderParticles*
+RenderParticles::cloneImplementation() const
+{
+    RenderParticles* geom = new RenderParticles();
+    // Because of unique ptr in particle copy must be reimplemented
+    geom->m_maxNumParticles = m_maxNumParticles;
+    geom->m_particleSize    = m_particleSize;
+    geom->m_particles.resize(m_particles.size());
+    for (int i = 0; i < m_particles.size(); i++)
+    {
+        geom->m_particles[i] = std::make_unique<RenderParticle>(*m_particles[i]);
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        geom->m_vertexPositions[i] = m_vertexPositions[i];
+        geom->m_vertexNormals[i]   = m_vertexNormals[i];
+        geom->m_vertexTangents[i]  = m_vertexTangents[i];
+        geom->m_vertexUVs[i]       = m_vertexUVs[i];
+    }
+    geom->m_triangles[0] = m_triangles[0];
+    geom->m_triangles[1] = m_triangles[1];
+    return geom;
+}
 } // namespace imstk

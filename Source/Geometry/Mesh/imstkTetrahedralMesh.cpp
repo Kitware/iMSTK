@@ -220,4 +220,24 @@ TetrahedralMesh::computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, 
     max[1] = *std::max_element(arrayy.begin(), arrayy.end());
     max[2] = *std::max_element(arrayz.begin(), arrayz.end());
 }
+
+TetrahedralMesh*
+TetrahedralMesh::cloneImplementation() const
+{
+    // Do shallow copy
+    TetrahedralMesh* geom = new TetrahedralMesh(*this);
+    // Deal with deep copy members
+    geom->m_indices = std::make_shared<VecDataArray<int, 4>>(*m_indices);
+    for (auto i : m_cellAttributes)
+    {
+        geom->m_cellAttributes[i.first] = i.second->clone();
+    }
+    geom->m_initialVertexPositions = std::make_shared<VecDataArray<double, 3>>(*m_initialVertexPositions);
+    geom->m_vertexPositions = std::make_shared<VecDataArray<double, 3>>(*m_vertexPositions);
+    for (auto i : m_vertexAttributes)
+    {
+        geom->m_vertexAttributes[i.first] = i.second->clone();
+    }
+    return geom;
+}
 } // namespace imstk

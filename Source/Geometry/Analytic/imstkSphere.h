@@ -63,10 +63,25 @@ public:
     ///
     void updatePostTransformData() const override;
 
+    ///
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
+    ///
+    std::unique_ptr<Sphere> clone()
+    {
+        return std::unique_ptr<Sphere>(cloneImplementation());
+    }
+
 protected:
     void applyTransform(const Mat4d& m) override;
 
     double m_radius = 1.0;                      ///< Radius of the sphere
     mutable double m_radiusPostTransform = 1.0; ///< Radius of the sphere once transform applied
+
+private:
+    Sphere* cloneImplementation() const
+    {
+        return new Sphere(*this);
+    }
 };
 } // namespace imstk

@@ -18,6 +18,8 @@ public:
     MockGeometry() : Geometry() { }
 
     IMSTK_TYPE_NAME(MockGeometry)
+
+    MockGeometry* cloneImplementation() const { return nullptr; }
 };
 } // namespace
 

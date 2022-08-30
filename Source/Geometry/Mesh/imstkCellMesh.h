@@ -128,44 +128,35 @@ public:
     int getNumCells() const override { return m_indices->size(); }
 
     ///
-    /// \brief Copy the contents of one SurfaceMesh to the other (no pointers to shared data between this and srcMesh)
-    /// \todo: generalize base classes and implement for every geometry
+    /// \brief Polymorphic clone, hides the declaration in superclass
+    /// return own type
     ///
-    void deepCopy(std::shared_ptr<CellMesh<N>> srcMesh)
+    std::unique_ptr<CellMesh<N>> clone()
     {
-        // \todo: Add deep copies to all geometry classes
-        // SurfaceMesh members
-        this->m_indices       = std::make_shared<VecDataArray<int, N>>(*srcMesh->m_indices);
-        this->m_vertexToCells = srcMesh->m_vertexToCells;
-        this->m_vertexToNeighborVertex = srcMesh->m_vertexToNeighborVertex;
-        // \todo: abstract DataArray's can't be copied currently
-        for (auto i : srcMesh->m_cellAttributes)
-        {
-            this->m_cellAttributes[i.first] = i.second;
-        }
-        this->m_activeCellNormals  = srcMesh->m_activeCellNormals;
-        this->m_activeCellScalars  = srcMesh->m_activeCellScalars;
-        this->m_activeCellTangents = srcMesh->m_activeCellTangents;
-
-        // PointSet members
-        this->m_initialVertexPositions = std::make_shared<VecDataArray<double, 3>>(*srcMesh->m_initialVertexPositions);
-        this->m_vertexPositions = std::make_shared<VecDataArray<double, 3>>(*srcMesh->m_vertexPositions);
-        // \todo: abstract DataArray's can't be copied currently
-        for (auto i : srcMesh->m_vertexAttributes)
-        {
-            this->m_vertexAttributes[i.first] = i.second;
-        }
-        this->m_activeVertexNormals  = srcMesh->m_activeVertexNormals;
-        this->m_activeVertexScalars  = srcMesh->m_activeVertexScalars;
-        this->m_activeVertexTangents = srcMesh->m_activeVertexTangents;
-        this->m_activeVertexTCoords  = srcMesh->m_activeVertexTCoords;
-
-        // Geometry members
-        this->m_transformApplied = srcMesh->m_transformApplied;
-        this->m_transform = srcMesh->m_transform;
+        return std::unique_ptr<CellMesh<N>>(cloneImplementation());
     }
 
 protected:
     std::shared_ptr<VecDataArray<int, N>> m_indices = nullptr;
+
+private:
+    CellMesh<N>* cloneImplementation() const
+    {
+        // Do shallow copy
+        CellMesh<N>* geom = new CellMesh<N>(*this);
+        // Deal with deep copy members
+        geom->m_indices = std::make_shared<VecDataArray<int, N>>(*m_indices);
+        for (auto i : m_cellAttributes)
+        {
+            geom->m_cellAttributes[i.first] = i.second->clone();
+        }
+        geom->m_initialVertexPositions = std::make_shared<VecDataArray<double, 3>>(*m_initialVertexPositions);
+        geom->m_vertexPositions = std::make_shared<VecDataArray<double, 3>>(*m_vertexPositions);
+        for (auto i : m_vertexAttributes)
+        {
+            geom->m_vertexAttributes[i.first] = i.second->clone();
+        }
+        return geom;
+    }
 };
 } // namespace imstk
