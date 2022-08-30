@@ -4,6 +4,11 @@
 
 set(H_FILES
   Camera/imstkCamera.h
+  Components/imstkAxesModel.h
+  Components/imstkNeedle.h
+  Components/imstkObjectControllerGhost.h
+  Components/imstkVisualModel.h
+  Components/imstkVertexLabelVisualModel.h
   Lights/imstkDirectionalLight.h
   Lights/imstkIBLProbe.h
   Lights/imstkLight.h
@@ -12,25 +17,23 @@ set(H_FILES
   Loader/imstkVisualObjectImporter.h
   Objects/imstkAnimationModel.h
   Objects/imstkAnimationObject.h
-  Objects/imstkAxesModel.h
   Objects/imstkCollidingObject.h
   Objects/imstkCollisionDataDebugObject.h
   Objects/imstkDebugGeometryObject.h
   Objects/imstkDynamicObject.h
   Objects/imstkFeDeformableObject.h
   Objects/imstkLevelSetDeformableObject.h
-  Objects/imstkNeedle.h
-  Objects/imstkObjectControllerGhost.h
   Objects/imstkPbdObject.h
   Objects/imstkRigidObject2.h
   Objects/imstkSceneObject.h
   Objects/imstkSphObject.h
-  Objects/imstkVisualModel.h
-  Objects/imstkVertexLabelVisualModel.h
   )
 
 set(SRC_FILES
   Camera/imstkCamera.cpp
+  Components/imstkNeedle.cpp
+  Components/imstkObjectControllerGhost.cpp
+  Components/imstkVisualModel.cpp
   Lights/imstkIBLProbe.cpp
   Loader/imstkVisualObjectImporter.cpp
   Objects/imstkAnimationModel.cpp
@@ -41,13 +44,10 @@ set(SRC_FILES
   Objects/imstkDynamicObject.cpp
   Objects/imstkFeDeformableObject.cpp
   Objects/imstkLevelSetDeformableObject.cpp
-  Objects/imstkNeedle.cpp
-  Objects/imstkObjectControllerGhost.cpp
   Objects/imstkPbdObject.cpp
   Objects/imstkRigidObject2.cpp
   Objects/imstkSceneObject.cpp
   Objects/imstkSphObject.cpp
-  Objects/imstkVisualModel.cpp
   )
 
 if (iMSTK_USE_MODEL_REDUCTION)
