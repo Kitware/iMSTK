@@ -48,6 +48,7 @@ PbdObjectCutting::apply()
         SurfaceMeshCut cutter;
         cutter.setInputMesh(surfMesh);
         cutter.setCutGeometry(m_objB->getCollidingGeometry());
+        cutter.setEpsilon(m_Epsilon);
         cutter.update();
 
         std::shared_ptr<SurfaceMesh> newMesh = cutter.getOutputMesh();
@@ -66,6 +67,7 @@ PbdObjectCutting::apply()
         LineMeshCut cutter;
         cutter.setInputMesh(lineMesh);
         cutter.setCutGeometry(m_objB->getCollidingGeometry());
+        cutter.setEpsilon(m_Epsilon);
         cutter.update();
 
         std::shared_ptr<LineMesh> newMesh = cutter.getOutputMesh();
