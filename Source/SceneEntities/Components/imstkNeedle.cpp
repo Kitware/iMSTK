@@ -104,4 +104,12 @@ Puncturable::getPunctured() const
     }
     return false;
 }
+
+PunctureId
+getPunctureId(std::shared_ptr<Needle>      needle,
+              std::shared_ptr<Puncturable> puncturable,
+              const int                    supportId)
+{
+    return { needle->getEntity()->getID(), puncturable->getEntity()->getID(), supportId };
+}
 } // namespace imstk

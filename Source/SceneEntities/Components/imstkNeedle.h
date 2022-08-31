@@ -18,21 +18,16 @@ class Entity;
 class LineMesh;
 
 ///
-/// \brief Punctures are identified via two ints. The entity id that was
-/// punctured, and the id of something local to that entity. This could
-/// be a cell (face), vertex, index into some other structure.
+/// \brief Punctures are identified via three ints.
+/// The needle id, the puncturable id, and a local id that allows multi punctures
+/// on the needle,puncture pair. This could be a cell (face) id, vertex id, or
+/// an index into some other structure.
 ///
-/// \todo: Technically this isn't enough for a fully unique key. In the
-/// case two needles puncture the same entity.
-///
-using PunctureId = std::pair<int, int>;
+using PunctureId = std::tuple<int, int, int>;
 
 ///
-/// \brief The puncture itself is composed of an id, state, and extra
+/// \brief The puncture itself is composed of a state and extra
 /// non-essential user data.
-/// It's important that each puncture is shared between a Needle and
-/// Puncturable allowing each to be aware of their respective punctures
-/// but also update in a shared respect.
 ///
 struct Puncture
 {
@@ -63,20 +58,40 @@ struct Puncture
 ///
 /// \struct PunctureIdHash
 ///
+/// \brief The entity and tissue id should be reversible
+///
 struct PunctureIdHash
 {
-    // A 128 int could garuntee no collisions but its harder to find support for
     std::size_t operator()(const imstk::PunctureId& k) const
     {
-        using std::size_t;
-        using std::hash;
-
-        return static_cast<std::uint64_t>(k.first) ^
-               (static_cast<std::uint64_t>(k.second) << 32);
+        // Swapping 0 and 1 should result in equivalence.
+        return cantor(symCantor(std::get<0>(k), std::get<1>(k)), std::get<2>(k));
+    }
+};
+///
+/// \struct PunctureIdEq
+///
+/// \brief The entity and tissue id should be reversible
+///
+struct PunctureIdEq
+{
+    bool operator()(const imstk::PunctureId& a, const imstk::PunctureId& b) const
+    {
+        std::pair<int, int> a1 = { std::get<0>(a), std::get<1>(a) };
+        if (a1.second < a1.first)
+        {
+            std::swap(a1.first, a1.second);
+        }
+        std::pair<int, int> b1 = { std::get<0>(b), std::get<1>(b) };
+        if (b1.second < b1.first)
+        {
+            std::swap(b1.first, b1.second);
+        }
+        return (a1.first == b1.first) && (a1.second == b1.second) && (std::get<2>(a) == std::get<2>(b));
     }
 };
 
-using PunctureMap = std::unordered_map<PunctureId, std::shared_ptr<Puncture>, PunctureIdHash>;
+using PunctureMap = std::unordered_map<PunctureId, std::shared_ptr<Puncture>, PunctureIdHash, PunctureIdEq>;
 
 ///
 /// \class Needle
@@ -246,4 +261,11 @@ public:
 protected:
     PunctureMap m_punctures;
 };
+
+///
+/// \brief Get puncture id between needle and puncturable
+///
+PunctureId getPunctureId(std::shared_ptr<Needle>      needle,
+                         std::shared_ptr<Puncturable> puncturable,
+                         const int                    supportId = -1);
 } // namespace imstk

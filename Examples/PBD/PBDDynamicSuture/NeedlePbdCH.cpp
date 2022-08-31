@@ -64,6 +64,7 @@ NeedlePbdCH::handle(
     auto                                     needleRigid       = std::dynamic_pointer_cast<RigidBody>(getInputObjectB());
     auto                                     needleObj         = std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
     auto                                     needle            = needleObj->getComponent<Needle>();
+    const int                                needleId          = needleObj->getID();
     auto                                     needleMesh        = std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry());
     std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleMesh->getVertexPositions();
     VecDataArray<double, 3>&                 needleVertices    = *needleVerticesPtr;
@@ -116,7 +117,7 @@ NeedlePbdCH::handle(
             Vec3d uvw = Vec3d::Zero();
 
             // If this triangle has not already been punctured
-            const PunctureId punctureId = { tissueId, triangleId };
+            const PunctureId punctureId = getPunctureId(needle, puncturable, triangleId);
             if (needle->getState(punctureId) != Puncture::State::INSERTED)
             {
                 // Check for intersection
@@ -248,7 +249,7 @@ NeedlePbdCH::handle(
             Vec3d uvw = Vec3d::Zero();
 
             // If this triangle has already been punctured by the needle
-            if (needle->getState({ tissueId, triangleId }) == Puncture::State::INSERTED)
+            if (needle->getState({ tissueId, needleId, triangleId }) == Puncture::State::INSERTED)
             {
                 // If it has not yet been punctured by thread
                 if (m_isThreadPunctured[triangleId] == false)
@@ -262,7 +263,7 @@ NeedlePbdCH::handle(
                         Puncture::UserData punctureData;
                         for (auto puncture : needle->getPunctures())
                         {
-                            if (puncture.first.second == triangleId)
+                            if (std::get<2>(puncture.first) == triangleId)
                             {
                                 punctureData = puncture.second->userData;
                             }
@@ -475,7 +476,7 @@ NeedlePbdCH::addConstraint_V_T(
         << "Suturing only works with CDs that report CellIndex contact";
     CHECK(sideB.elem->m_element.m_CellIndexElement.parentId != -1)
         << "Suturing only works with CDs that report parent ids";
-    PunctureId punctureId = { tissueObj->getID(), sideB.elem->m_element.m_CellIndexElement.parentId };
+    const PunctureId punctureId = getPunctureId(needle, puncturable, sideB.elem->m_element.m_CellIndexElement.parentId);
 
     // If removed and we are here, we must now be touching
     if (needle->getState(punctureId) == Puncture::State::REMOVED) // Removed

@@ -33,7 +33,7 @@ protected:
         auto puncturable = getInputObjectA()->getComponent<Puncturable>();
         auto needle      = getInputObjectB()->getComponent<Needle>();
 
-        PunctureId punctureId = { getInputObjectA()->getID(), -1 };
+        const PunctureId punctureId = getPunctureId(needle, puncturable);
         if ((elementsA.size() > 0 || elementsB.size() > 0)
             && needle->getState(punctureId) == Puncture::State::REMOVED)
         {

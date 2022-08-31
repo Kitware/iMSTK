@@ -85,7 +85,7 @@ NeedleEmbeddedCH::updatePunctureState(
     bool notIntersecting)
 {
     // If needle needle is touching the surface
-    const PunctureId& punctureId = { puncturable->getEntity()->getID(), -1 };
+    const PunctureId punctureId = getPunctureId(needle, puncturable);
     if (needle->getState(punctureId) == Puncture::State::TOUCHING)
     {
         // Get force along the needle axes

@@ -30,7 +30,7 @@ NeedleRigidBodyCH::handle(
     auto                             needle      = needleObj->getComponent<Needle>();
     std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
     auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    PunctureId                       punctureId  = { tissueObj->getID(), -1 };
+    const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
 
     Puncture::State state = needle->getState(punctureId);
     if (elementsA.size() == 0)
@@ -56,7 +56,7 @@ NeedleRigidBodyCH::addConstraint(
     auto                             needle      = rbdObj->getComponent<Needle>();
     std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
     auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    PunctureId                       punctureId  = { tissueObj->getID(), -1 };
+    const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
 
     // If the normal force exceeds threshold the needle may insert
     if (needle->getState(punctureId) == Puncture::State::REMOVED)

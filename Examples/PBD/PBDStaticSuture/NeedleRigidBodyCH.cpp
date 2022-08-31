@@ -26,8 +26,8 @@ NeedleRigidBodyCH::handle(
     std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
     auto                             puncturable = tissueObj->getComponent<Puncturable>();
 
-    PunctureId      punctureId = { tissueObj->getID(), -1 };
-    Puncture::State state      = needle->getState(punctureId);
+    const PunctureId      punctureId = getPunctureId(needle, puncturable);
+    const Puncture::State state      = needle->getState(punctureId);
 
     if (elementsA.size() != 0)
     {
@@ -80,7 +80,7 @@ NeedleRigidBodyCH::addConstraint(
 
     std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
     auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    PunctureId                       punctureId  = { tissueObj->getID(), -1 };
+    const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
 
     // If removed and we are here, we must now be touching
     if (needle->getState(punctureId) == Puncture::State::REMOVED)

@@ -48,7 +48,7 @@ protected:
         // If no collision, needle must be removed
         if (elementsA.size() == 0)
         {
-            m_needle->setState({ tissueObj->getID(), -1 }, Puncture::State::REMOVED);
+            m_needle->setState(getPunctureId(m_needle, m_puncturable), Puncture::State::REMOVED);
         }
     }
 
@@ -61,7 +61,7 @@ protected:
         const double contactDepth) override
     {
         // If the normal force exceeds threshold the needle may insert
-        PunctureId punctureId = { getInputObjectB()->getID(), -1 };
+        const PunctureId punctureId = getPunctureId(m_needle, m_puncturable);
 
         const Vec3d n = contactNormal.normalized();
         if (m_needle->getState(punctureId) == Puncture::State::TOUCHING)
