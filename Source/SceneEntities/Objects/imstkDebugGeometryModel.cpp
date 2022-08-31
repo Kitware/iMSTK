@@ -4,16 +4,17 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkDebugGeometryObject.h"
+#include "imstkDebugGeometryModel.h"
 #include "imstkLineMesh.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVecDataArray.h"
 #include "imstkVisualModel.h"
+#include "imstkEntity.h"
 
 namespace imstk
 {
-DebugGeometryObject::DebugGeometryObject(const std::string& name) : SceneObject(name),
+DebugGeometryModel::DebugGeometryModel(const std::string& name) : Behaviour<double>(name),
     m_arrowScale(1.0),
     m_arrowColor(Color(0.0, 1.0, 0.0)),
     m_debugLineMesh(std::make_shared<LineMesh>()),
@@ -43,9 +44,9 @@ DebugGeometryObject::DebugGeometryObject(const std::string& name) : SceneObject(
     lineMaterial->setLineWidth(20.0);
     lineMaterial->setColor(Color::Blue);
 
-    auto lineModel = addComponent<VisualModel>();
-    lineModel->setGeometry(m_debugLineMesh);
-    lineModel->setRenderMaterial(lineMaterial);
+    m_debugLineModel = std::make_shared<VisualModel>();
+    m_debugLineModel->setGeometry(m_debugLineMesh);
+    m_debugLineModel->setRenderMaterial(lineMaterial);
 
     auto pointMaterial = std::make_shared<RenderMaterial>();
     pointMaterial->setDisplayMode(RenderMaterial::DisplayMode::Points);
@@ -54,28 +55,48 @@ DebugGeometryObject::DebugGeometryObject(const std::string& name) : SceneObject(
     pointMaterial->setPointSize(10.0);
     pointMaterial->setColor(Color::Red);
 
-    auto pointModel = addComponent<VisualModel>();
-    pointModel->setGeometry(m_debugPointSet);
-    pointModel->setRenderMaterial(pointMaterial);
+    m_debugPointModel = std::make_shared<VisualModel>();
+    m_debugPointModel->setGeometry(m_debugPointSet);
+    m_debugPointModel->setRenderMaterial(pointMaterial);
 
     auto faceMaterial = std::make_shared<RenderMaterial>();
     faceMaterial->setRecomputeVertexNormals(false);
     faceMaterial->setBackFaceCulling(false);
     faceMaterial->setColor(Color::Orange);
 
-    auto faceModel = addComponent<VisualModel>();
-    faceModel->setGeometry(m_debugSurfMesh);
-    faceModel->setRenderMaterial(faceMaterial);
+    m_debugSurfModel = std::make_shared<VisualModel>();
+    m_debugSurfModel->setGeometry(m_debugSurfMesh);
+    m_debugSurfModel->setRenderMaterial(faceMaterial);
 }
 
 void
-DebugGeometryObject::addLine(const Vec3d& a, const Vec3d& b)
+DebugGeometryModel::init()
 {
-    addLine(a, b, getVisualModel(0)->getRenderMaterial()->getColor());
+    if (!m_entity->containsComponent(m_debugPointModel))
+    {
+        m_debugPointModel->setName(m_entity->getName() + "_DebugPointModel");
+        m_entity->addComponent(m_debugPointModel);
+    }
+    if (!m_entity->containsComponent(m_debugLineModel))
+    {
+        m_debugLineModel->setName(m_entity->getName() + "_DebugLineModel");
+        m_entity->addComponent(m_debugLineModel);
+    }
+    if (!m_entity->containsComponent(m_debugSurfModel))
+    {
+        m_debugSurfModel->setName(m_entity->getName() + "_DebugSurfModel");
+        m_entity->addComponent(m_debugSurfModel);
+    }
 }
 
 void
-DebugGeometryObject::addLine(const Vec3d& a, const Vec3d& b, const Color& color)
+DebugGeometryModel::addLine(const Vec3d& a, const Vec3d& b)
+{
+    addLine(a, b, m_debugLineModel->getRenderMaterial()->getColor());
+}
+
+void
+DebugGeometryModel::addLine(const Vec3d& a, const Vec3d& b, const Color& color)
 {
     const int startI = static_cast<int>(m_lineVerticesPtr->size());
     m_lineVerticesPtr->push_back(a);
@@ -92,13 +113,13 @@ DebugGeometryObject::addLine(const Vec3d& a, const Vec3d& b, const Color& color)
 }
 
 void
-DebugGeometryObject::addTriangle(const Vec3d& a, const Vec3d& b, const Vec3d& c)
+DebugGeometryModel::addTriangle(const Vec3d& a, const Vec3d& b, const Vec3d& c)
 {
-    addTriangle(a, b, c, getVisualModel(2)->getRenderMaterial()->getColor());
+    addTriangle(a, b, c, m_debugSurfModel->getRenderMaterial()->getColor());
 }
 
 void
-DebugGeometryObject::addTriangle(const Vec3d& a, const Vec3d& b, const Vec3d& c, const Color& color)
+DebugGeometryModel::addTriangle(const Vec3d& a, const Vec3d& b, const Vec3d& c, const Color& color)
 {
     const int startI = static_cast<int>(m_triVerticesPtr->size());
     m_triVerticesPtr->push_back(a);
@@ -117,13 +138,13 @@ DebugGeometryObject::addTriangle(const Vec3d& a, const Vec3d& b, const Vec3d& c,
 }
 
 void
-DebugGeometryObject::addPoint(const Vec3d& a)
+DebugGeometryModel::addPoint(const Vec3d& a)
 {
-    addPoint(a, getVisualModel(1)->getRenderMaterial()->getColor());
+    addPoint(a, m_debugPointModel->getRenderMaterial()->getColor());
 }
 
 void
-DebugGeometryObject::addPoint(const Vec3d& a, const Color& color)
+DebugGeometryModel::addPoint(const Vec3d& a, const Color& color)
 {
     m_pointVerticesPtr->push_back(a);
 
@@ -137,13 +158,13 @@ DebugGeometryObject::addPoint(const Vec3d& a, const Color& color)
 }
 
 void
-DebugGeometryObject::addArrow(const Vec3d& start, const Vec3d& end)
+DebugGeometryModel::addArrow(const Vec3d& start, const Vec3d& end)
 {
     addArrow(start, end, m_arrowColor);
 }
 
 void
-DebugGeometryObject::addArrow(const Vec3d& start, const Vec3d& end, const Color& color)
+DebugGeometryModel::addArrow(const Vec3d& start, const Vec3d& end, const Color& color)
 {
     const Vec3d scaledEnd = start + (end - start) * m_arrowScale;
 
@@ -157,7 +178,7 @@ DebugGeometryObject::addArrow(const Vec3d& start, const Vec3d& end, const Color&
 }
 
 void
-DebugGeometryObject::clear()
+DebugGeometryModel::clear()
 {
     // \todo: Resize 0 shouldn't reallocate
     m_triVerticesPtr->resize(0);
@@ -182,7 +203,7 @@ DebugGeometryObject::clear()
 }
 
 void
-DebugGeometryObject::visualUpdate()
+DebugGeometryModel::visualUpdate(const double&)
 {
     if (m_trianglesChanged)
     {
@@ -207,73 +228,73 @@ DebugGeometryObject::visualUpdate()
 }
 
 std::shared_ptr<RenderMaterial>
-DebugGeometryObject::getPointMaterial() const
+DebugGeometryModel::getPointMaterial() const
 {
-    return getVisualModel(1)->getRenderMaterial();
+    return m_debugPointModel->getRenderMaterial();
 }
 
 std::shared_ptr<RenderMaterial>
-DebugGeometryObject::getLineMaterial() const
+DebugGeometryModel::getLineMaterial() const
 {
-    return getVisualModel(0)->getRenderMaterial();
+    return m_debugLineModel->getRenderMaterial();
 }
 
 std::shared_ptr<RenderMaterial>
-DebugGeometryObject::getFaceMaterial() const
+DebugGeometryModel::getFaceMaterial() const
 {
-    return getVisualModel(2)->getRenderMaterial();
+    return m_debugSurfModel->getRenderMaterial();
 }
 
 void
-DebugGeometryObject::setLineWidth(const double width)
+DebugGeometryModel::setLineWidth(const double width)
 {
-    getVisualModel(0)->getRenderMaterial()->setLineWidth(width);
+    m_debugLineModel->getRenderMaterial()->setLineWidth(width);
 }
 
 void
-DebugGeometryObject::setTriColor(const Color& color)
+DebugGeometryModel::setTriColor(const Color& color)
 {
-    getVisualModel(2)->getRenderMaterial()->setColor(color);
+    m_debugSurfModel->getRenderMaterial()->setColor(color);
 }
 
 void
-DebugGeometryObject::setLineColor(const Color& color)
+DebugGeometryModel::setLineColor(const Color& color)
 {
-    getVisualModel(0)->getRenderMaterial()->setColor(color);
+    m_debugLineModel->getRenderMaterial()->setColor(color);
 }
 
 void
-DebugGeometryObject::setPointColor(const Color& color)
+DebugGeometryModel::setPointColor(const Color& color)
 {
-    getVisualModel(1)->getRenderMaterial()->setColor(color);
+    m_debugPointModel->getRenderMaterial()->setColor(color);
 }
 
 void
-DebugGeometryObject::setArrowColor(const Color& color)
+DebugGeometryModel::setArrowColor(const Color& color)
 {
     m_arrowColor = color;
 }
 
 void
-DebugGeometryObject::setPointSize(const double size)
+DebugGeometryModel::setPointSize(const double size)
 {
-    getVisualModel(1)->getRenderMaterial()->setPointSize(size);
+    m_debugPointModel->getRenderMaterial()->setPointSize(size);
 }
 
 int
-DebugGeometryObject::getNumPoints() const
+DebugGeometryModel::getNumPoints() const
 {
     return m_debugPointSet->getNumVertices();
 }
 
 int
-DebugGeometryObject::getNumLines() const
+DebugGeometryModel::getNumLines() const
 {
     return m_debugLineMesh->getNumCells();
 }
 
 int
-DebugGeometryObject::getNumTriangles() const
+DebugGeometryModel::getNumTriangles() const
 {
     return m_debugSurfMesh->getNumCells();
 }

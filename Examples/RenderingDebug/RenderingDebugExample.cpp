@@ -5,7 +5,7 @@
 */
 
 #include "imstkCamera.h"
-#include "imstkDebugGeometryObject.h"
+#include "imstkDebugGeometryModel.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -63,14 +63,13 @@ main()
     // Seed with system time
     srand(time(NULL));
 
-    auto statusText = std::make_shared<TextVisualModel>("StatusText");
+    auto debugGeomObj = std::make_shared<Entity>();
+    auto statusText   = debugGeomObj->addComponent<TextVisualModel>("StatusText");
     statusText->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
     statusText->setFontSize(30.0);
     statusText->setTextColor(Color::Orange);
 
-    imstkNew<DebugGeometryObject> debugGeometryObj;
-    debugGeometryObj->addComponent(statusText);
-    scene->addSceneObject(debugGeometryObj);
+    auto debugGeometryModel = debugGeomObj->addComponent<DebugGeometryModel>();
 
     int mode  = 0; // 0: add point, 1: add line, 2: add triangle
     int count = 0; // The number of times cycling between modes
@@ -81,12 +80,12 @@ main()
             if (count > 100)
             {
                 count = 0;
-                debugGeometryObj->clear();
+                debugGeometryModel->clear();
             }
 
             if (mode % 3 == 0)
             {
-                debugGeometryObj->addPoint(
+                debugGeometryModel->addPoint(
                     getRandomPositions(15.0),
                     getRandomColor());
             }
@@ -94,12 +93,12 @@ main()
             {
                 Vec3d p     = getRandomPositions(50.0);
                 Vec3d shift = getRandomPositions(1.0);
-                debugGeometryObj->addLine(p + shift, -p + shift, getRandomColor());
+                debugGeometryModel->addLine(p + shift, -p + shift, getRandomColor());
             }
             else
             {
                 Vec3d shift = getRandomPositions(10.0);
-                debugGeometryObj->addTriangle(
+                debugGeometryModel->addTriangle(
                     getRandomPositions(5.0) + shift,
                     getRandomPositions(5.0) + shift,
                     getRandomPositions(5.0) + shift,
@@ -111,9 +110,9 @@ main()
             mode++;
 
             statusText->setText("Primitives: " +
-                           std::to_string(debugGeometryObj->getNumPoints()) + " (points) | " +
-                           std::to_string(debugGeometryObj->getNumLines()) + " (lines) | " +
-                           std::to_string(debugGeometryObj->getNumTriangles()) + " (triangles)"
+                           std::to_string(debugGeometryModel->getNumPoints()) + " (points) | " +
+                           std::to_string(debugGeometryModel->getNumLines()) + " (lines) | " +
+                           std::to_string(debugGeometryModel->getNumTriangles()) + " (triangles)"
                 );
         };
 

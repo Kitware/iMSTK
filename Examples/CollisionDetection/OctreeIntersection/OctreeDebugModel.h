@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkDebugGeometryObject.h"
+#include "imstkDebugGeometryModel.h"
 
 namespace imstk
 {
@@ -14,18 +14,18 @@ class LooseOctree;
 class OctreeNode;
 
 ///
-/// \class OctreeDebugObject
+/// \class OctreeDebugModel
 ///
-/// \brief DebugGeometryObject for debug visualizing an octree
+/// \brief OctreeDebugModel for debug visualizing an octree
 ///
-class OctreeDebugObject : public DebugGeometryObject
+class OctreeDebugModel : public DebugGeometryModel
 {
 public:
-    OctreeDebugObject() : DebugGeometryObject(),
+    OctreeDebugModel() : DebugGeometryModel(),
         m_looseOctree(nullptr),
         m_maxDisplayDepth(5),
         m_drawNonEmptyParents(true) { }
-    virtual ~OctreeDebugObject() override = default;
+    ~OctreeDebugModel() override = default;
 
 public:
     ///

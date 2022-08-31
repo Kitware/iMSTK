@@ -20,7 +20,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "OctreeDebugObject.h"
+#include "OctreeDebugModel.h"
 
 using namespace imstk;
 
@@ -149,10 +149,11 @@ main()
     // This is significantly slower than incremental update!
     // octree.setAlwaysRebuild(true);
 
-    imstkNew<OctreeDebugObject> debugOctreeObj;
-    debugOctreeObj->setInputOctree(octree);
-    debugOctreeObj->setLineWidth(1.0);
-    debugOctreeObj->setLineColor(Color::Green);
+    auto debugOctreeObj   = std::make_shared<Entity>();
+    auto debugOctreeModel = debugOctreeObj->addComponent<OctreeDebugModel>();
+    debugOctreeModel->setInputOctree(octree);
+    debugOctreeModel->setLineWidth(1.0);
+    debugOctreeModel->setLineColor(Color::Green);
     scene->addSceneObject(debugOctreeObj);
 
     // Data for animation
@@ -256,7 +257,7 @@ main()
             {
                 // Update debug rendering data
                 // Involves a larger buffer update so we only do it before rendering
-                debugOctreeObj->debugUpdate(8, true);
+                debugOctreeModel->debugUpdate(8, true);
             });
 
         // Add default mouse and keyboard controls to the viewer

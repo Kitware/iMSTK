@@ -4,13 +4,13 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "OctreeDebugObject.h"
+#include "OctreeDebugModel.h"
 #include "imstkLooseOctree.h"
 
 namespace imstk
 {
 bool
-OctreeDebugObject::updateGeom(OctreeNode* node)
+OctreeDebugModel::updateGeom(OctreeNode* node)
 {
     if (node->m_Depth > static_cast<uint32_t>(m_maxDisplayDepth))
     {
@@ -103,7 +103,7 @@ OctreeDebugObject::updateGeom(OctreeNode* node)
 }
 
 void
-OctreeDebugObject::debugUpdate(int maxDisplayDepth, bool drawNonEmptyParents)
+OctreeDebugModel::debugUpdate(int maxDisplayDepth, bool drawNonEmptyParents)
 {
     m_maxDisplayDepth     = maxDisplayDepth;
     m_drawNonEmptyParents = drawNonEmptyParents;

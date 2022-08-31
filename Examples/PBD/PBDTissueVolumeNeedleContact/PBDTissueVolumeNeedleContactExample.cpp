@@ -6,7 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkControllerForceText.h"
-#include "imstkDebugGeometryObject.h"
+#include "imstkDebugGeometryModel.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkIsometricMap.h"
@@ -173,8 +173,8 @@ makeNeedleObj(const std::string&        name,
 }
 
 static void
-updateDebugGeom(std::shared_ptr<NeedleInteraction>   interaction,
-                std::shared_ptr<DebugGeometryObject> debugGeomObj)
+updateDebugGeom(std::shared_ptr<NeedleInteraction>  interaction,
+                std::shared_ptr<DebugGeometryModel> debugGeomObj)
 {
     auto                      needleEmbedder     = std::dynamic_pointer_cast<NeedleEmbedder>(interaction->getEmbedder());
     const std::vector<Vec3d>& debugEmbeddingPts  = needleEmbedder->m_debugEmbeddingPoints;
@@ -257,13 +257,10 @@ main()
     scene->addSceneObject(tissueObj2);
 
     // Setup a tool for the user to move
-    std::shared_ptr<PbdObject> toolObj = makeNeedleObj("PbdNeedle", pbdModel);
+    std::shared_ptr<PbdObject> toolObj   = makeNeedleObj("PbdNeedle", pbdModel);
+    auto                       debugGeom = toolObj->addComponent<DebugGeometryModel>();
+    debugGeom->setLineWidth(0.1);
     scene->addSceneObject(toolObj);
-
-    // Setup a debug polygon soup for debug contact points
-    auto debugGeomObj = std::make_shared<DebugGeometryObject>();
-    debugGeomObj->setLineWidth(0.1);
-    scene->addSceneObject(debugGeomObj);
 
     // This adds both contact and puncture functionality
     auto interaction = std::make_shared<NeedleInteraction>(tissueObj, toolObj);
@@ -334,7 +331,7 @@ main()
             [&](Event*)
             {
                 // Copy constraint faces and points to debug geometry for display
-                updateDebugGeom(interaction, debugGeomObj);
+                updateDebugGeom(interaction, debugGeom);
             });
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)

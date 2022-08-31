@@ -7,22 +7,22 @@
 #pragma once
 
 #include "imstkCollisionData.h"
-#include "imstkDebugGeometryObject.h"
+#include "imstkDebugGeometryModel.h"
 
 namespace imstk
 {
 ///
-/// \class CollisionDataDebugObject
+/// \class CollisionDataDebugModel
 ///
 /// \brief Class for visualizing CollisionData. Give it collision data and add it to the scene
 /// This class intentionally does not automatically update it provides debugUpdate which may be
 /// called by the user when appropriate (for debug purposes)
 ///
-class CollisionDataDebugObject : public DebugGeometryObject
+class CollisionDataDebugModel : public DebugGeometryModel
 {
 public:
-    CollisionDataDebugObject() : DebugGeometryObject() { }
-    ~CollisionDataDebugObject() override = default;
+    CollisionDataDebugModel() : DebugGeometryModel() { }
+    ~CollisionDataDebugModel() override = default;
 
     ///
     /// \brief Append visual representation to the debug meshes for the given contact and geometry

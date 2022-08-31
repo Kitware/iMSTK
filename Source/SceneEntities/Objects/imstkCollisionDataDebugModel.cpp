@@ -4,7 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkCollisionDataDebugObject.h"
+#include "imstkCollisionDataDebugModel.h"
 #include "imstkLineMesh.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVecDataArray.h"
@@ -12,7 +12,7 @@
 namespace imstk
 {
 void
-CollisionDataDebugObject::addCollisionElement(std::shared_ptr<PointSet> pointSet, const CollisionElement& elem)
+CollisionDataDebugModel::addCollisionElement(std::shared_ptr<PointSet> pointSet, const CollisionElement& elem)
 {
     VecDataArray<double, 3>  dummy;
     VecDataArray<double, 3>& vertices = dummy;
@@ -102,7 +102,7 @@ CollisionDataDebugObject::addCollisionElement(std::shared_ptr<PointSet> pointSet
 }
 
 void
-CollisionDataDebugObject::printContactInfo(const CollisionElement& elem)
+CollisionDataDebugModel::printContactInfo(const CollisionElement& elem)
 {
     if (elem.m_type == CollisionElementType::CellVertex)
     {
@@ -153,7 +153,7 @@ CollisionDataDebugObject::printContactInfo(const CollisionElement& elem)
 }
 
 void
-CollisionDataDebugObject::debugUpdate()
+CollisionDataDebugModel::debugUpdate()
 {
     if (m_cdData == nullptr)
     {

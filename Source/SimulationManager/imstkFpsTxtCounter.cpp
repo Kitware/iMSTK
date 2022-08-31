@@ -26,7 +26,6 @@ void
 FpsTxtCounter::init()
 {
     // Add a visual representation for the object
-    // how to avoid adding it twice?
     if (!m_entity->containsComponent(m_fpsTextVisualModel))
     {
         m_fpsTextVisualModel->setName(m_entity->getName() + "_FpsCounterTxt");

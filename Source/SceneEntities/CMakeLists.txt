@@ -18,8 +18,8 @@ set(H_FILES
   Objects/imstkAnimationModel.h
   Objects/imstkAnimationObject.h
   Objects/imstkCollidingObject.h
-  Objects/imstkCollisionDataDebugObject.h
-  Objects/imstkDebugGeometryObject.h
+  Objects/imstkCollisionDataDebugModel.h
+  Objects/imstkDebugGeometryModel.h
   Objects/imstkDynamicObject.h
   Objects/imstkFeDeformableObject.h
   Objects/imstkLevelSetDeformableObject.h
@@ -39,8 +39,8 @@ set(SRC_FILES
   Objects/imstkAnimationModel.cpp
   Objects/imstkAnimationObject.cpp
   Objects/imstkCollidingObject.cpp
-  Objects/imstkCollisionDataDebugObject.cpp
-  Objects/imstkDebugGeometryObject.cpp
+  Objects/imstkCollisionDataDebugModel.cpp
+  Objects/imstkDebugGeometryModel.cpp
   Objects/imstkDynamicObject.cpp
   Objects/imstkFeDeformableObject.cpp
   Objects/imstkLevelSetDeformableObject.cpp

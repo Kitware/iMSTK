@@ -6,9 +6,9 @@
 
 #pragma once
 
+#include "imstkComponent.h"
 #include "imstkColor.h"
 #include "imstkMath.h"
-#include "imstkSceneObject.h"
 
 namespace imstk
 {
@@ -17,20 +17,25 @@ class PointSet;
 class RenderMaterial;
 class SurfaceMesh;
 template<typename T, int N> class VecDataArray;
+class VisualModel;
 
 ///
-/// \class DebugGeometryObject
+/// \class DebugGeometryModel
 ///
 /// \brief Class for quickly rendering and showing various primivites such as
 /// line segments, triangles, arrows, points
 /// \todo: Allow per vertex and per cell coloring
 ///
-class DebugGeometryObject : public SceneObject
+class DebugGeometryModel : public Behaviour<double>
 {
 public:
-    DebugGeometryObject(const std::string& name = "DebugGeometryObject");
-    ~DebugGeometryObject() override = default;
+    DebugGeometryModel(const std::string& name = "DebugGeometryModel");
+    ~DebugGeometryModel() override = default;
 
+protected:
+    void init() override;
+
+public:
     ///
     /// \brief Adds a line to the debug lines with default color
     ///
@@ -92,7 +97,7 @@ public:
     ///
     /// \brief Update the primitives
     ///
-    void visualUpdate() override;
+    void visualUpdate(const double& dt) override;
 
     void setLineWidth(const double width);
 
@@ -112,6 +117,10 @@ public:
 protected:
     double m_arrowScale;
     Color  m_arrowColor;
+
+    std::shared_ptr<VisualModel> m_debugLineModel;
+    std::shared_ptr<VisualModel> m_debugPointModel;
+    std::shared_ptr<VisualModel> m_debugSurfModel;
 
     std::shared_ptr<LineMesh>    m_debugLineMesh;
     std::shared_ptr<PointSet>    m_debugPointSet;

@@ -7,7 +7,7 @@
 #include "imstkCollisionDetectionVisualTest.h"
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
-#include "imstkCollisionDataDebugObject.h"
+#include "imstkCollisionDataDebugModel.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometry.h"
@@ -69,10 +69,11 @@ CollisionDetectionVisualTest::createScene()
         "Missing a m_collisionMethod CollisionDetectionAlgorithm for CollisionDetectionVisualTest";
 
     // Debug geometry to visualize collision data
-    m_cdDebugObject = std::make_shared<CollisionDataDebugObject>();
+    auto cdDebugObj = std::make_shared<Entity>();
+    m_cdDebugObject = cdDebugObj->addComponent<CollisionDataDebugModel>();
     m_cdDebugObject->setInputCD(m_collisionMethod->getCollisionData());
     m_cdDebugObject->setPrintContacts(m_printContacts);
-    m_scene->addSceneObject(m_cdDebugObject);
+    m_scene->addSceneObject(cdDebugObj);
 
     connect<KeyEvent>(m_viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
         [this](KeyEvent* e)
