@@ -188,6 +188,14 @@ makeNeedleObj()
     needleObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     needleObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
 
+    auto controller = needleObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(needleObj);
+    controller->setTranslationOffset(Vec3d(-0.02, 0.02, 0.0));
+    controller->setLinearKs(1000.0);
+    controller->setAngularKs(10000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.0);
+
     return needleObj;
 }
 
@@ -240,7 +248,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.0005); // 1ms, 1000hz //timestep
 
-        auto controller = std::make_shared<RigidObjectController>();
+        auto controller = needleObj->getComponent<RigidObjectController>();
 #ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
@@ -258,15 +266,7 @@ main()
                 deviceClient->setPosition(Vec3d(pos[0], pos[1], 0.0));
             });
 #endif
-
-        controller->setControlledObject(needleObj);
         controller->setDevice(deviceClient);
-        controller->setTranslationOffset(Vec3d(-0.02, 0.02, 0.0));
-        controller->setLinearKs(1000.0);
-        controller->setAngularKs(10000000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.0);
-        scene->addControl(controller);
 
         // Update the thread fixed points to the controlled needle
         connect<Event>(sceneManager, &SceneManager::preUpdate,

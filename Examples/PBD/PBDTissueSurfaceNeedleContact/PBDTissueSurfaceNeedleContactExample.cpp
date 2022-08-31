@@ -16,6 +16,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNeedle.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -183,8 +184,24 @@ makeToolObj()
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 2.0, 0.0);
 
+    // Add a component for needle puncturing
     auto needle = toolObj->addComponent<StraightNeedle>();
     needle->setNeedleGeometry(toolGeom);
+
+    // Add a component for controlling via another device
+    auto controller = toolObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setTranslationScaling(50.0);
+    controller->setLinearKs(1000.0);
+    controller->setAngularKs(10000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.0045);
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setController(controller);
 
     return toolObj;
 }
@@ -212,15 +229,6 @@ main()
 
     std::shared_ptr<RigidObject2> toolObj = makeToolObj();
     scene->addSceneObject(toolObj);
-
-    // Setup a ghost tool object to show off virtual coupling
-    auto ghostToolObj = std::make_shared<SceneObject>("GhostTool");
-    ghostToolObj->setVisualGeometry(toolObj->getVisualGeometry()->clone());
-    ghostToolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
-    ghostToolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
-    ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.3);
-    ghostToolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
-    scene->addSceneObject(ghostToolObj);
 
     scene->addInteraction(std::make_shared<NeedleInteraction>(tissueObj, toolObj));
 
@@ -265,29 +273,8 @@ main()
             });
 #endif
 
-        auto controller = std::make_shared<RigidObjectController>();
-        controller->setControlledObject(toolObj);
+        auto controller = toolObj->getComponent<RigidObjectController>();
         controller->setDevice(deviceClient);
-        controller->setTranslationScaling(50.0);
-        controller->setLinearKs(1000.0);
-        controller->setAngularKs(10000000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.0045);
-        controller->setSmoothingKernelSize(15);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
-
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
-            {
-                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
-
-                // Also apply controller transform to ghost geometry
-                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-                toolGhostMesh->setTranslation(controller->getPosition());
-                toolGhostMesh->setRotation(controller->getOrientation());
-                toolGhostMesh->updatePostTransformData();
-                toolGhostMesh->postModified();
-            });
 
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)

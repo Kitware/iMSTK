@@ -180,8 +180,19 @@ makeNeedleObj()
     const Vec3d  arcCenter = (rot * Vec4d(0.0, -0.005455, 0.008839, 1.0)).head<3>();
     const double arcRadius = 0.010705;
 
+    // Add a component for needles
     auto needle = needleObj->addComponent<ArcNeedle>();
     needle->setArc(arcCenter, arcBasis, arcRadius, 0.558, 2.583);
+
+    // Add a component to control the tool
+    auto controller = needleObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(needleObj);
+    controller->setLinearKs(1000.0);
+    controller->setAngularKs(10000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.2);
+    controller->setSmoothingKernelSize(5);
+    controller->setUseForceSmoothening(true);
 
     return needleObj;
 }
@@ -260,7 +271,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001); // 1ms, 1000hz
 
-        auto controller = std::make_shared<RigidObjectController>();
+        auto controller = needleObj->getComponent<RigidObjectController>();
 #ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
@@ -281,16 +292,7 @@ main()
                 deviceClient->setOrientation(deviceClient->getOrientation() * delta);
             });
 #endif
-
-        controller->setControlledObject(needleObj);
         controller->setDevice(deviceClient);
-        controller->setLinearKs(1000.0);
-        controller->setAngularKs(10000000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.2);
-        controller->setSmoothingKernelSize(5);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
 
         // Update the timesteps for real time
         connect<Event>(sceneManager, &SceneManager::preUpdate,

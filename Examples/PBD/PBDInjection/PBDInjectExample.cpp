@@ -67,6 +67,16 @@ makeToolObj(const std::string& name)
     toolObj->getRigidBody()->m_initPos  = Vec3d(0.0, 0.8, 0.0);
     toolObj->getRigidBody()->m_isStatic = false;
 
+    auto controller = toolObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setTranslationScaling(10.0);
+    controller->setLinearKs(20000.0);
+    controller->setAngularKs(10000000.0);
+    controller->setForceScaling(0.0);
+    controller->setSmoothingKernelSize(15);
+    controller->setUseCritDamping(true);
+    controller->setUseForceSmoothening(true);
+
     return toolObj;
 }
 
@@ -174,17 +184,8 @@ main()
                 deviceClient->setPosition(worldPos);
             });
 #endif
-        auto controller = std::make_shared<RigidObjectController>();
-        controller->setControlledObject(toolObj);
+        auto controller = toolObj->getComponent<RigidObjectController>();
         controller->setDevice(deviceClient);
-        controller->setTranslationScaling(10.0);
-        controller->setLinearKs(20000.0);
-        controller->setAngularKs(10000000.0);
-        controller->setForceScaling(0.0);
-        controller->setSmoothingKernelSize(15);
-        controller->setUseCritDamping(true);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
 
         // Key controls for injection
         connect<Event>(sceneManager, SceneManager::preUpdate, [&](Event*)
@@ -199,7 +200,7 @@ main()
                 }
             });
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Keep the tool moving in real time
                 toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();

@@ -13,6 +13,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
@@ -162,6 +163,19 @@ makeToolObj(std::shared_ptr<PbdModel> model)
     toolObj->getPbdBody()->setRigid(Vec3d(0.0, 0.8, 0.0), 0.2,
         Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
+    // Add a component for controlling via a device
+    auto controller = toolObj->addComponent<PbdObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setLinearKs(5000.0);
+    controller->setAngularKs(10000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.0025);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setController(controller);
+
     return toolObj;
 }
 
@@ -218,9 +232,7 @@ main()
     std::shared_ptr<SceneObject> txtObj = makeTextObj();
     scene->addSceneObject(txtObj);
 
-    // With PbdRigidObjectCollision we have Pbd-Rigid coupling
-    // The toolObj responds to the tissue (the tool is pushed partly out of the way of the tissue whilst the
-    // tissue deforms)
+    // Setup a collision
     auto collision = std::make_shared<PbdObjectCollision>(tissueObj, toolObj, "ClosedSurfaceMeshToMeshCD");
     //std::dynamic_pointer_cast<ClosedSurfaceMeshToMeshCD>(collision->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
     scene->addInteraction(collision);
@@ -248,7 +260,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-        auto controller = std::make_shared<PbdObjectController>();
+        auto controller = toolObj->getComponent<PbdObjectController>();
 #ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
@@ -272,14 +284,7 @@ main()
 
         controller->setTranslationScaling(1.0);
 #endif
-        controller->setControlledObject(toolObj);
         controller->setDevice(deviceClient);
-        controller->setLinearKs(5000.0);
-        controller->setAngularKs(10000000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.0025);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {

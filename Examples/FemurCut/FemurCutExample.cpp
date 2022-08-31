@@ -74,6 +74,21 @@ makeRigidObj(const std::string& name)
     rigidObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     rigidObj->getRigidBody()->m_initPos = Vec3d(0.0, 1.0, 2.0);
 
+    // Add a component for controlling via another device
+    auto controller = rigidObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(rigidObj);
+    controller->setLinearKs(50000.0);
+    controller->setAngularKs(300000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.005);
+    controller->setTranslationOffset(Vec3d(0.4, 0.7, 1.6));
+    controller->setSmoothingKernelSize(30);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = rigidObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setUseForceFade(true);
+    controllerGhost->setController(controller);
+
     return rigidObj;
 }
 
@@ -153,42 +168,17 @@ main()
             });
 #endif
 
-        auto controller = std::make_shared<RigidObjectController>();
-        {
-            controller->setControlledObject(rbdObj);
-            controller->setDevice(deviceClient);
-            controller->setLinearKs(50000.0);
-            controller->setAngularKs(300000000.0);
-            controller->setUseCritDamping(true);
-            controller->setForceScaling(0.005);
-
-            // The particular device we are using doesn't produce this quantity
-            // with this flag its computed
-            // in code
-            controller->setComputeVelocity(true);
-            controller->setComputeAngularVelocity(true);
-            controller->setTranslationOffset(Vec3d(0.4, 0.7, 1.6));
-            controller->setSmoothingKernelSize(30);
-        }
-        scene->addControl(controller);
+        auto controller = rbdObj->getComponent<RigidObjectController>();
+        controller->setDevice(deviceClient);
 
         std::shared_ptr<ObjectControllerGhost> ghostObj = rbdObj->addComponent<ObjectControllerGhost>();
         ghostObj->setController(controller);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::preUpdate,
+            [&](Event*)
             {
                 rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
                 femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
-<<<<<<< HEAD
-
-                // Also apply controller transform to ghost geometry
-                std::shared_ptr<Geometry> ghostMesh = rbdGhostObj->getVisualGeometry();
-                ghostMesh->setTranslation(controller->getPosition());
-                ghostMesh->setRotation(controller->getOrientation());
-                ghostMesh->updatePostTransformData();
-                ghostMesh->postModified();
-=======
->>>>>>> 6fe24854 (ENH: Rework initialization for dependent components)
         });
 
         // Add default mouse and keyboard controls to the viewer

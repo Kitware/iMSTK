@@ -200,6 +200,16 @@ makeToolObj()
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
 
+    // Add a component for controller via another device
+    auto controller = toolObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setLinearKs(1000.0);
+    controller->setAngularKs(10000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.0045);
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
     return toolObj;
 }
 
@@ -307,16 +317,8 @@ main()
             });
 #endif
 
-        auto controller = std::make_shared<RigidObjectController>();
-        controller->setControlledObject(toolObj);
+        auto controller = toolObj->getComponent<RigidObjectController>();
         controller->setDevice(deviceClient);
-        controller->setLinearKs(1000.0);
-        controller->setAngularKs(10000000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.0045);
-        controller->setSmoothingKernelSize(15);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
 
 #ifdef iMSTK_USE_HAPTICS
         connect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged,

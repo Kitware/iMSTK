@@ -109,6 +109,22 @@ createNeedleObj()
     auto needle = toolObj->addComponent<StraightNeedle>();
     needle->setNeedleGeometry(toolGeom);
 
+    // Add a component for controlling via another device
+    auto controller = toolObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setLinearKs(8000.0);
+    controller->setLinearKd(200.0);
+    controller->setAngularKs(1000000.0);
+    controller->setAngularKd(100000.0);
+    controller->setForceScaling(0.02);
+    controller->setSmoothingKernelSize(5);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setUseForceFade(true);
+    controllerGhost->setController(controller);
+
     return toolObj;
 }
 
@@ -179,42 +195,13 @@ main()
                 deviceClient->setOrientation(desiredOrientation);
             });
 #endif
-        auto controller = std::make_shared<RigidObjectController>();
-        controller->setControlledObject(needleObj);
+        auto controller = needleObj->getComponent<RigidObjectController>();
         controller->setDevice(deviceClient);
-        controller->setLinearKs(8000.0);
-        controller->setLinearKd(200.0);
-        controller->setAngularKs(1000000.0);
-        controller->setAngularKd(100000.0);
-        controller->setForceScaling(0.02);
-        controller->setSmoothingKernelSize(5);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
-
-        auto ghostTool = needleObj->addComponent<ObjectControllerGhost>();
-        ghostTool->setController(controller);
 
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Keep the tool moving in real time
                 needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-<<<<<<< HEAD
-
-                // Update the ghost debug geometry
-                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-                toolGhostMesh->setRotation(controller->getOrientation());
-                toolGhostMesh->setTranslation(controller->getPosition());
-                toolGhostMesh->updatePostTransformData();
-                toolGhostMesh->postModified();
-
-<<<<<<< HEAD
-                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(
-                    std::min(1.0, controller->getDeviceForce().norm() / 15.0));
-=======
-                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
-=======
->>>>>>> eadd1c73 (ENH: Needle and Puncturable component)
->>>>>>> 12dc778a (ENH: Needle and Puncturable component)
             });
 
         // Add default mouse and keyboard controls to the viewer

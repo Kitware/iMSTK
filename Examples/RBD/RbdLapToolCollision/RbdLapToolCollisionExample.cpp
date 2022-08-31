@@ -16,6 +16,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkPlane.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
@@ -65,6 +66,20 @@ createToolObject(std::shared_ptr<RigidBodyModel2> model,
     toolObject->getRigidBody()->m_mass = 0.1;
     toolObject->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     toolObject->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, -1.0);
+
+    // Add a component for controlling via another device
+    auto controller = toolObject->addComponent<RigidObjectController>();
+    controller->setControlledObject(toolObject);
+    controller->setLinearKs(5000.0);
+    controller->setAngularKs(100000000.0);
+    controller->setForceScaling(0.1);
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObject->addComponent<ObjectControllerGhost>();
+    controllerGhost->setUseForceFade(true);
+    controllerGhost->setController(controller);
 
     return toolObject;
 }
@@ -127,40 +142,23 @@ main()
     scene->addLight("light", light);
 
     // Setup default haptics manager
-    std::shared_ptr<DeviceManager> hapticManager   = DeviceManagerFactory::makeDeviceManager();
-    std::shared_ptr<DeviceClient>  deviceClient    = hapticManager->makeDeviceClient();
-    auto                           rightController = std::make_shared<RigidObjectController>();
+    std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+    std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
+
+    auto rightController = lapTool1->getComponent<RigidObjectController>();
+    rightController->setDevice(deviceClient);
+    rightController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
+    if (hapticManager->getTypeName() == "HaplyDeviceManager")
     {
-        rightController->setDevice(deviceClient);
-        rightController->setControlledObject(lapTool1);
-        rightController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
-        if (hapticManager->getTypeName() == "HaplyDeviceManager")
-        {
-            rightController->setTranslationOffset(Vec3d(0.2, 0.0, -1.2));
-        }
-        rightController->setLinearKs(5000.0);
-        rightController->setAngularKs(100000000.0);
-        rightController->setForceScaling(0.1);
-        rightController->setSmoothingKernelSize(15);
-        rightController->setUseForceSmoothening(true);
+        rightController->setTranslationOffset(Vec3d(0.2, 0.0, -1.2));
     }
-    scene->addControl(rightController);
 
     auto       dummyClient = std::make_shared<DummyClient>();
     const Rotd rotX = Rotd(1.3, Vec3d(0.0, 0.0, 1.0));
     const Rotd rotY = Rotd(1.0, Vec3d(0.0, 1.0, 0.0));
     dummyClient->setOrientation(Quatd(rotX.matrix() * rotY.matrix()));
-    auto leftController = std::make_shared<RigidObjectController>();
-    {
-        leftController->setDevice(dummyClient);
-        leftController->setControlledObject(lapTool2);
-        leftController->setLinearKs(5000.0);
-        leftController->setAngularKs(100000000.0);
-        leftController->setForceScaling(0.1);
-        leftController->setSmoothingKernelSize(15);
-        leftController->setUseForceSmoothening(true);
-    }
-    scene->addControl(leftController);
+    auto leftController = lapTool2->getComponent<RigidObjectController>();
+    leftController->setDevice(dummyClient);
 
     // Run the simulation
     {
@@ -207,7 +205,6 @@ main()
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
             {
-                //printf("dt: %f\n", sceneManager->getDt());
                 rbdModel->getConfig()->m_dt = sceneManager->getDt();
             });
 

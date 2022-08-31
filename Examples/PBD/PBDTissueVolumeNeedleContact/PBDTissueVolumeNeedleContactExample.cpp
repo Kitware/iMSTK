@@ -166,11 +166,30 @@ makeNeedleObj(const std::string&        name,
     toolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
     toolObj->setDynamicalModel(model);
-    toolObj->getPbdBody()->setRigid(Vec3d(0.0, 1.0, 0.0), 1.0,
-        Quatd::Identity(), Mat3d::Identity() * 10000.0);
+    toolObj->getPbdBody()->setRigid(
+        Vec3d(0.0, 1.0, 0.0),         // Position
+        1.0,                          // Mass
+        Quatd::Identity(),            // Orientation
+        Mat3d::Identity() * 10000.0); // Inertia
 
+    // Add a component for needle puncturing
     auto needle = toolObj->addComponent<StraightNeedle>();
     needle->setNeedleGeometry(toolGeometry);
+
+    // Add a component for controlling via another device
+    auto controller = toolObj->addComponent<PbdObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setLinearKs(20000.0);
+    controller->setAngularKs(8000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.05);
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setUseForceFade(true);
+    controllerGhost->setController(controller);
 
     return toolObj;
 }
@@ -378,7 +397,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001); // 1ms, 1000hz
 
-        auto controller = std::make_shared<PbdObjectController>();
+        auto controller = toolObj->getComponent<PbdObjectController>();
 #ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
@@ -403,19 +422,7 @@ main()
                 deviceClient->setOrientation(desiredOrientation);
             });
 #endif
-        controller->setControlledObject(toolObj);
         controller->setDevice(deviceClient);
-        controller->setLinearKs(20000.0);
-        controller->setAngularKs(8000000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.05);
-        controller->setSmoothingKernelSize(15);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
-
-        // Add extra component to tool for the ghost
-        std::shared_ptr<ObjectControllerGhost> controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
-        controllerGhost->setController(controller);
 
         int counter = 0;
 <<<<<<< HEAD
