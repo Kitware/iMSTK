@@ -15,6 +15,13 @@
 
 namespace imstk
 {
+FpsTxtCounter::FpsTxtCounter(const std::string& name) : Behaviour<double>(name),
+    m_fpsTextVisualModel(std::make_shared<TextVisualModel>("FpsCounterTxt"))
+{
+    m_fpsTextVisualModel->setPosition(TextVisualModel::DisplayPosition::LowerLeft);
+    m_fpsTextVisualModel->setFontSize(30.0);
+}
+
 void
 FpsTxtCounter::init()
 {
@@ -22,14 +29,10 @@ FpsTxtCounter::init()
     // how to avoid adding it twice?
     if (!m_entity->containsComponent(m_fpsTextVisualModel))
     {
-        m_fpsTextVisualModel = std::make_shared<TextVisualModel>(m_entity->getName() + "_FpsCounterTxt");
+        m_fpsTextVisualModel->setName(m_entity->getName() + "_FpsCounterTxt");
         m_entity->addComponent(m_fpsTextVisualModel);
     }
-
     CHECK(m_viewer.lock() != nullptr) << "FpsTxtCounter must have a Viewer to track";
-
-    m_fpsTextVisualModel->setPosition(TextVisualModel::DisplayPosition::LowerLeft);
-    m_fpsTextVisualModel->setFontSize(30.0);
 }
 
 void

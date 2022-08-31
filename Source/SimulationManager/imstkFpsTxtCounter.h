@@ -23,7 +23,7 @@ class Viewer;
 class FpsTxtCounter : public Behaviour<double>
 {
 public:
-    FpsTxtCounter(const std::string& name = "FpsTxtCounter") : Behaviour<double>(name) { }
+    FpsTxtCounter(const std::string& name = "FpsTxtCounter");
 
     ///
     /// \brief Update the display of the last frames update times

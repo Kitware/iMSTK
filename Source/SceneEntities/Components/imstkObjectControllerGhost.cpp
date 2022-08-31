@@ -14,6 +14,15 @@
 
 namespace imstk
 {
+ObjectControllerGhost::ObjectControllerGhost(const std::string& name) : Behaviour<double>(name),
+    m_ghostVisualModel(std::make_shared<VisualModel>("GhostVisualModel"))
+{
+    m_ghostVisualModel->getRenderMaterial()->setColor(Color::Orange);
+    m_ghostVisualModel->getRenderMaterial()->setLineWidth(5.0);
+    m_ghostVisualModel->getRenderMaterial()->setOpacity(0.3);
+    m_ghostVisualModel->getRenderMaterial()->setIsDynamicMesh(false);
+}
+
 void
 ObjectControllerGhost::init()
 {
@@ -21,7 +30,7 @@ ObjectControllerGhost::init()
     // how to avoid adding it twice?
     if (!m_entity->containsComponent(m_ghostVisualModel))
     {
-        m_ghostVisualModel = std::make_shared<VisualModel>("GhostVisualModel");
+        m_ghostVisualModel->setName(m_entity->getName() + "_GhostVisualModel");
         m_entity->addComponent(m_ghostVisualModel);
     }
 
@@ -42,10 +51,6 @@ ObjectControllerGhost::init()
     CHECK(ghostGeom != nullptr) << "Failed to copy controller geometry";
 
     m_ghostVisualModel->setGeometry(ghostGeom);
-    m_ghostVisualModel->getRenderMaterial()->setColor(Color::Orange);
-    m_ghostVisualModel->getRenderMaterial()->setLineWidth(5.0);
-    m_ghostVisualModel->getRenderMaterial()->setOpacity(0.3);
-    m_ghostVisualModel->getRenderMaterial()->setIsDynamicMesh(false);
 }
 
 void

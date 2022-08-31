@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkControllerForceText.h"
 #include "imstkDebugGeometryObject.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -116,49 +117,26 @@ makeTissueObj(const std::string&               name,
     return tissueObj;
 }
 
-///
-/// \brief Creates a text object with text in the top right
-///
-static std::shared_ptr<SceneObject>
-makeTextObj()
-{
-    auto txtVisualModel = std::make_shared<TextVisualModel>();
-    txtVisualModel->setText(
-        "Device Force: 0N\n"
-        "Device Torque: 0Nm\n"
-        "Contact Force: 0N\n"
-        "Contact Torque: 0Nm");
-    txtVisualModel->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
-    auto obj = std::make_shared<SceneObject>();
-    obj->addVisualModel(txtVisualModel);
-    return obj;
-}
-
 static std::shared_ptr<PbdObject>
 makeNeedleObj(const std::string&        name,
               std::shared_ptr<PbdModel> model)
 {
     auto toolObj = std::make_shared<PbdObject>(name);
 
-    // Setup the geometry for a straight needle
     auto toolGeometry = std::make_shared<LineMesh>();
-    auto verticesPtr  = std::make_shared<VecDataArray<double, 3>>(2);
-    (*verticesPtr)[0] = Vec3d(0.0, -0.05, 0.0);
-    (*verticesPtr)[1] = Vec3d(0.0, 0.05, 0.0);
+    auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(2);
+    (*verticesPtr)[0] = Vec3d(0.0, 0.0, 0.0);
+    (*verticesPtr)[1] = Vec3d(0.0, 0.0, 0.25);
     auto indicesPtr = std::make_shared<VecDataArray<int, 2>>(1);
     (*indicesPtr)[0] = Vec2i(0, 1);
     toolGeometry->initialize(verticesPtr, indicesPtr);
 
-    auto syringeMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Syringes/Disposable_Syringe.stl");
-    syringeMesh->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2, Geometry::TransformType::ApplyToData);
-    syringeMesh->translate(Vec3d(0.0, 4.4, 0.0), Geometry::TransformType::ApplyToData);
-    syringeMesh->scale(0.0055, Geometry::TransformType::ApplyToData);
-    syringeMesh->translate(Vec3d(0.0, 0.1, 0.0));
+    auto trocarMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/trocar.obj");
 
-    toolObj->setVisualGeometry(syringeMesh);
+    toolObj->setVisualGeometry(trocarMesh);
     toolObj->setCollidingGeometry(toolGeometry);
     toolObj->setPhysicsGeometry(toolGeometry);
-    toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeometry, syringeMesh));
+    toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeometry, trocarMesh));
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
     toolObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
     toolObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
@@ -192,47 +170,6 @@ makeNeedleObj(const std::string&        name,
     controllerGhost->setController(controller);
 
     return toolObj;
-}
-
-static void
-updateTxtObj(std::shared_ptr<SceneObject>         txtObj,
-             std::shared_ptr<NeedleInteraction>   interaction,
-             std::shared_ptr<PbdObjectController> controller)
-{
-    // Display the contact and device force
-    double                             contactForceMag  = 0.0;
-    double                             contactTorqueMag = 0.0;
-    auto                               pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(interaction->getCollisionHandlingAB());
-    const std::vector<PbdConstraint*>& collisionConstraints = pbdCH->getConstraints();
-    auto                               pbdObj = std::dynamic_pointer_cast<PbdObject>(controller->getControlledObject());
-    if (collisionConstraints.size() > 0)
-    {
-        const double dt = pbdObj->getPbdModel()->getConfig()->m_dt;
-
-        auto contactConstraint = dynamic_cast<PbdContactConstraint*>(collisionConstraints[0]);
-
-        // Multiply with gradient for direction
-        contactForceMag   = std::abs(contactConstraint->getForce(dt));
-        contactForceMag  *= controller->getForceScaling(); // Scale to bring in device space
-        contactTorqueMag  = std::abs(contactConstraint->getTorque(dt, 0));
-        contactTorqueMag *= controller->getForceScaling();
-    }
-
-    // Note: The controller force is the only external body force/torque so we can just use
-    // the unscaled version of it
-
-    // Get a desired precision
-    std::ostringstream strStream;
-    strStream.precision(2);
-    strStream <<
-        "Body Force: " << controller->getDeviceForce().norm() / controller->getForceScaling() << "N\n"
-        "Body Torque: " << controller->getDeviceTorque().norm() / controller->getForceScaling() << "Nm\n"
-        "Device Force: " << controller->getDeviceForce().norm() << "N\n"
-        "Device Torque: " << controller->getDeviceTorque().norm() << "Nm\n"
-        "Contact Force (scaled): " << contactForceMag << "N\n"
-        "Contact Torque (scaled): " << contactTorqueMag << "Nm";
-
-    std::dynamic_pointer_cast<TextVisualModel>(txtObj->getVisualModel(0))->setText(strStream.str());
 }
 
 static void
@@ -320,40 +257,8 @@ main()
     scene->addSceneObject(tissueObj2);
 
     // Setup a tool for the user to move
-<<<<<<< HEAD
-    auto toolObj = std::make_shared<NeedleObject>("PbdNeedle");
-    {
-        auto toolGeometry = std::make_shared<LineMesh>();
-        auto verticesPtr  = std::make_shared<VecDataArray<double, 3>>(2);
-        (*verticesPtr)[0] = Vec3d(0.0, 0.0, 0.0);
-        (*verticesPtr)[1] = Vec3d(0.0, 0.0, 0.25);
-        auto indicesPtr = std::make_shared<VecDataArray<int, 2>>(1);
-        (*indicesPtr)[0] = Vec2i(0, 1);
-        toolGeometry->initialize(verticesPtr, indicesPtr);
-
-        auto trocarMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/trocar.obj");
-
-        toolObj->setVisualGeometry(trocarMesh);
-        toolObj->setCollidingGeometry(toolGeometry);
-        toolObj->setPhysicsGeometry(toolGeometry);
-        toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeometry, trocarMesh));
-        toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
-        toolObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-        toolObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-        toolObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-        toolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
-    }
-    toolObj->setDynamicalModel(pbdModel);
-    toolObj->getPbdBody()->setRigid(Vec3d(0.0, 1.0, 0.0), 1.0,
-        Quatd::Identity(), Mat3d::Identity() * 10000.0);
-=======
     std::shared_ptr<PbdObject> toolObj = makeNeedleObj("PbdNeedle", pbdModel);
->>>>>>> cee7aaf77 (ENH: Needle and Puncturable component)
     scene->addSceneObject(toolObj);
-
-    // Setup a text to display forces
-    std::shared_ptr<SceneObject> txtObj = makeTextObj();
-    scene->addSceneObject(txtObj);
 
     // Setup a debug polygon soup for debug contact points
     auto debugGeomObj = std::make_shared<DebugGeometryObject>();
@@ -425,22 +330,11 @@ main()
         controller->setDevice(deviceClient);
 
         int counter = 0;
-<<<<<<< HEAD
-        connect<Event>(viewer, &SceneManager::preUpdate,
-=======
         connect<Event>(viewer, &VTKViewer::preUpdate,
->>>>>>> cee7aaf77 (ENH: Needle and Puncturable component)
             [&](Event*)
             {
                 // Copy constraint faces and points to debug geometry for display
                 updateDebugGeom(interaction, debugGeomObj);
-
-                // Update the force text every 10 frames
-                if (counter++ % 10 == 0)
-                {
-                    updateTxtObj(txtObj, interaction, controller);
-                    counter = 0;
-                }
             });
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
@@ -452,6 +346,10 @@ main()
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
             SimulationUtils::createDefaultSceneControlEntity(driver);
+        // Add something to display controller force
+        auto controllerForceTxt = mouseAndKeyControls->addComponent<ControllerForceText>();
+        controllerForceTxt->setController(controller);
+        controllerForceTxt->setCollision(interaction);
         scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();

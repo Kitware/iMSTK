@@ -95,6 +95,11 @@ public:
     /// @}
 
     ///
+    /// \brief Get gradient given the particle index in constraint
+    ///
+    const Vec3d& getGradient(const int i) const { return m_dcdx[i]; }
+
+    ///
     /// \brief Get the force magnitude, valid after solving lambda
     /// Only valid with xpbd
     ///

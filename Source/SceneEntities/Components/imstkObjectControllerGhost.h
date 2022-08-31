@@ -26,12 +26,14 @@ class VisualModel;
 class ObjectControllerGhost : public Behaviour<double>
 {
 public:
-    ObjectControllerGhost(const std::string& name = "ObjectControllerGhost") : Behaviour<double>(name) { }
+    ObjectControllerGhost(const std::string& name = "ObjectControllerGhost");
 
     void setController(std::shared_ptr<PbdObjectController> controller) { m_pbdController = controller; }
     std::shared_ptr<PbdObjectController> getPbdController() const { return m_pbdController; }
     void setController(std::shared_ptr<RigidObjectController> controller) { m_rbdController = controller; }
     std::shared_ptr<RigidObjectController> getRbdController() const { return m_rbdController; }
+
+    std::shared_ptr<VisualModel> getGhostModel() const { return m_ghostVisualModel; }
 
     ///
     /// \brief Get/Set whether to use force fade or not. Force fade sets

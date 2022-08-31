@@ -6,6 +6,7 @@ include(imstkAddLibrary)
 imstk_add_library( Scene
   H_FILES
     imstkCollisionInteraction.h
+    imstkControllerForceText.h
     imstkPbdObjectCollision.h
     imstkPbdObjectCutting.h
     imstkPbdObjectGrasping.h
@@ -18,6 +19,7 @@ imstk_add_library( Scene
     imstkSphObjectCollision.h
   CPP_FILES
     imstkCollisionInteraction.cpp
+    imstkControllerForceText.cpp
     imstkPbdObjectCollision.cpp
     imstkPbdObjectCutting.cpp
     imstkPbdObjectGrasping.cpp
