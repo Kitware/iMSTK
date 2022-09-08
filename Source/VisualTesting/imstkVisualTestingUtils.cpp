@@ -98,22 +98,24 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
         });
 
     // Setup a default key control scheme (commonly used in examples)
-    auto keyControl = std::make_shared<KeyboardSceneControl>();
+    auto debugEntity = std::make_shared<Entity>();
+    auto keyControl  = debugEntity->addComponent<KeyboardSceneControl>();
     keyControl->setDevice(m_viewer->getKeyboardDevice());
     keyControl->setSceneManager(m_sceneManager);
     keyControl->setModuleDriver(m_driver);
 
     // Setup a default mouse control scheme (commonly used in examples)
-    auto mouseControl = std::make_shared<MouseSceneControl>();
+    auto mouseControl = debugEntity->addComponent<MouseSceneControl>();
     mouseControl->setDevice(m_viewer->getMouseDevice());
     mouseControl->setSceneManager(m_sceneManager);
 
     // Add extra text object to display time and paused status of the test
-    auto testStatusTxtModel = std::make_shared<TextVisualModel>("TestStatusText");
+    auto testStatusTxtModel = debugEntity->addComponent<TextVisualModel>("TestStatusText");
     testStatusTxtModel->setFontSize(30.0);
     testStatusTxtModel->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
     testStatusTxtModel->setText("0.000s");
-    m_scene->addSceneObject(Entity::createEntity(keyControl, mouseControl, testStatusTxtModel));
+
+    m_scene->addSceneObject(debugEntity);
 
     connect<Event>(m_sceneManager, &SceneManager::postUpdate,
         [&](Event*)

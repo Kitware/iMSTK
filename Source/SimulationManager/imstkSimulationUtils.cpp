@@ -65,12 +65,14 @@ createDefaultSceneControlEntity(
     perfGraph->setSceneManager(sceneManager);
     perfGraph->setViewer(viewer);
 
-    return Entity::createEntity(
-        keyControl,
-        statusText,
-        mouseControl,
-        fpsCounter,
-        perfGraph);
+    auto entity = std::make_shared<Entity>("DefaultSceneControlEntity");
+    entity->addComponent(keyControl);
+    entity->addComponent(statusText);
+    entity->addComponent(mouseControl);
+    entity->addComponent(fpsCounter);
+    entity->addComponent(perfGraph);
+
+    return entity;
 }
 } // namespace SimulationUtils
 } // namespace imstk

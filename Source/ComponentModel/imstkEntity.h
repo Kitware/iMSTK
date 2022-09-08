@@ -49,26 +49,6 @@ public:
     ///@}
 
     ///
-    /// \brief Create components on this entity
-    ///
-    template<typename T, typename ... Args>
-    static void addComponents()
-    {
-        // Create and add the component
-        addComponent<T>();
-
-        // Recurse to Args
-        addComponents<Args>();
-    }
-
-    template<typename T>
-    static void addComponents()
-    {
-        // Create and add the component
-        addComponent<T>();
-    }
-
-    ///
     /// \brief Create and return a component on this entity
     ///
     template<typename T>
@@ -89,26 +69,6 @@ public:
         component->m_entity = this;
         this->postEvent(Event(modified()));
         return component;
-    }
-
-    ///
-    /// \brief Add existing components to entity
-    ///
-    template<typename T, typename ... Args>
-    void addComponents(T comp, Args... otherComps)
-    {
-        // Create and add the component
-        addComponent(comp);
-
-        // Recurse to Args
-        addComponents<Args...>(otherComps ...);
-    }
-
-    template<typename T>
-    void addComponents(T comp)
-    {
-        // Create and add the component
-        addComponent(comp);
     }
 
     ///
@@ -191,25 +151,6 @@ public:
     /// \brief Remove component if it exists
     ///
     void removeComponent(std::shared_ptr<Component> component);
-
-    ///
-    /// \brief Create entity with the given components
-    ///
-    template<typename ... Args>
-    static std::shared_ptr<Entity> createEntity()
-    {
-        auto entity = std::make_shared<Entity>();
-        entity->addComponents<Args>();
-        return entity;
-    }
-
-    template<typename ... Args>
-    static std::shared_ptr<Entity> createEntity(Args... args)
-    {
-        auto entity = std::make_shared<Entity>();
-        entity->addComponents(args ...);
-        return entity;
-    }
 
 protected:
     std::vector<std::shared_ptr<Component>> m_components;
