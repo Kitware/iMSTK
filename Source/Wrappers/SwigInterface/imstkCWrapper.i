@@ -113,6 +113,12 @@
 #include "imstkPbdConstraint.h"
 #include "imstkRbdConstraint.h"
 
+/*
+ * ComponentModel
+ */
+#include "imstkEntity.h"
+#include "imstkComponent.h"
+
 /* 
  * SceneEntities
  */
@@ -200,7 +206,6 @@
  * ViewerVTK
  */
 #include "imstkAbstractVTKViewer.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 #endif
 
@@ -379,13 +384,19 @@ namespace std
 %include "../../Materials/imstkTexture.h";
 
 /*
+ * ComponentModel
+ */
+%include "../../ComponentModel/imstkEntity.h"
+%include "../../ComponentModel/imstkComponent.h"
+
+/*
  * SceneEntities
  */
+%include "../../SceneEntities/Components/imstkVisualModel.h";
 %include "../../SceneEntities/Objects/imstkSceneObject.h";
 %include "../../SceneEntities/Objects/imstkCollidingObject.h";
 %include "../../SceneEntities/Objects/imstkDynamicObject.h";
 %include "../../SceneEntities/Objects/imstkPbdObject.h";
-%include "../../SceneEntities/Objects/imstkVisualModel.h";
 %include "../../SceneEntities/Objects/imstkFeDeformableObject.h";
 %include "../../SceneEntities/Objects/imstkRigidObject2.h";
 %include "../../SceneEntities/Objects/imstkSphObject.h";
@@ -457,7 +468,6 @@ namespace std
  */
 %include "../../ViewerVTK/imstkAbstractVTKViewer.h";
 %include "../../ViewerVTK/imstkVTKViewer.h";
-%include "../../ViewerVTK/imstkVTKTextStatusManager.h";
 #endif
 
 /*

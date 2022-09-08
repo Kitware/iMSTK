@@ -118,6 +118,12 @@
 %shared_ptr(imstk::PbdState)
 %shared_ptr(imstk::RigidBody)
 
+/*
+ * ComponentModel
+ */
+%shared_ptr(imstk::Entity)
+%shared_ptr(imstk::Component)
+
 /* 
  * SceneEntities
  */
