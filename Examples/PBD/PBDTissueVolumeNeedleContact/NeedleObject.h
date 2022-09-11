@@ -21,7 +21,7 @@ public:
     };
 
 public:
-    NeedleObject(const std::string& name);
+    NeedleObject(const std::string& name) : PbdObject(name) { }
     ~NeedleObject() override = default;
 
     IMSTK_TYPE_NAME(NeedleObject)

@@ -10,8 +10,8 @@
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraToLineMeshCD.h"
-#include "NeedleEmbeddedCH.h"
-#include "NeedlePbdCH.h"
+#include "NeedleEmbedder.h"
+#include "NeedleObject.h"
 
 using namespace imstk;
 
@@ -28,81 +28,65 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
     }
     CHECK(tissueObj->getPbdModel() == needleObj->getPbdModel()) << "PbdObject's must share a model";
 
-    // Replace the CH, to disable collision upon needle contact
-    auto needlePbdCH = std::make_shared<NeedlePbdCH>();
-    needlePbdCH->setInputObjectA(tissueObj);
-    needlePbdCH->setInputObjectB(needleObj);
-    needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
-    setCollisionHandlingAB(needlePbdCH);
-
-    // Then add a separate scheme for when the needle is embedded
-
     // Assumes usage of physics geometry for this
-    m_tetMeshCD = std::make_shared<TetraToLineMeshCD>();
-    m_tetMeshCD->setInputGeometryA(tissueObj->getPhysicsGeometry());
-    m_tetMeshCD->setInputGeometryB(needleObj->getCollidingGeometry());
-
-    m_embeddedCH = std::make_shared<NeedleEmbeddedCH>();
-    m_embeddedCH->setInputCollisionData(m_tetMeshCD->getCollisionData());
-    m_embeddedCH->setInputObjectA(tissueObj);
-    m_embeddedCH->setInputObjectB(needleObj);
-    m_embeddedCH->setCompliance(0.0001);
+    m_embedder = std::make_shared<NeedleEmbedder>();
+    m_embedder->setCollisionHandleNode(m_collisionHandleANode);
+    m_embedder->setCollisionData(getCollisionDetection()->getCollisionData());
+    m_embedder->setTissueObject(tissueObj);
+    m_embedder->setNeedleObject(needleObj);
 
     // Needle interaction introduces its own collision detection step, handling, solve, and velocity correction
-    m_embeddingCDNode =
-        std::make_shared<TaskNode>([&]() { m_tetMeshCD->update(); }, "NeedleEmbeddingCD", true);
-    m_taskGraph->addNode(m_embeddingCDNode);
-    m_embeddingCHNode =
-        std::make_shared<TaskNode>([&]() { m_embeddedCH->update(); }, "NeedleEmbeddingCH", true);
-    m_taskGraph->addNode(m_embeddingCHNode);
+    m_embedderNode =
+        std::make_shared<TaskNode>([&]() { m_embedder->update(); }, "NeedleEmbedding", true);
+    m_taskGraph->addNode(m_embedderNode);
 }
 
 void
 NeedleInteraction::setFriction(const double friction)
 {
-    m_embeddedCH->setFriction(friction);
+    m_embedder->setFriction(friction);
 }
 
 double
 NeedleInteraction::getFriction() const
 {
-    return m_embeddedCH->getFriction();
+    return m_embedder->getFriction();
 }
 
 void
-NeedleInteraction::setCompliance(const double compliance)
+NeedleInteraction::setNeedleCompliance(const double compliance)
 {
-    m_embeddedCH->setCompliance(compliance);
+    m_embedder->setCompliance(compliance);
 }
 
 double
-NeedleInteraction::getCompliance() const
+NeedleInteraction::getNeedleCompliance() const
 {
-    return m_embeddedCH->getCompliance();
+    return m_embedder->getCompliance();
 }
 
 void
 NeedleInteraction::setStaticFrictionForceThreshold(const double force)
 {
-    m_embeddedCH->setStaticFrictionForceThreshold(force);
+    m_embedder->setStaticFrictionForceThreshold(force);
 }
 
 const double
 NeedleInteraction::getStaticFrictionForceThreshold() const
 {
-    return m_embeddedCH->getStaticFrictionForceThreshold();
+    return m_embedder->getStaticFrictionForceThreshold();
 }
 
 void
 NeedleInteraction::setPunctureForceThreshold(const double forceThreshold)
 {
-    m_embeddedCH->setPunctureForceThreshold(forceThreshold);
+    m_embedder->setPunctureForceThreshold(forceThreshold);
 }
 
 const double
 NeedleInteraction::getPunctureForceThreshold() const
 {
-    return m_embeddedCH->getPunctureForceThreshold();
+    return m_embedder->getPunctureForceThreshold();
 }
 
 void
@@ -115,9 +99,8 @@ NeedleInteraction::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_
     auto                               pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objA);
     std::shared_ptr<CollisionHandling> pbdCH  = m_colHandlingA;
 
-    // Add some extra steps after the collision handling to do embedding handling
-    // PBD CH -> EmbeddedCD -> EmbeddedCH -> Collision Solve
-    m_taskGraph->addEdge(m_collisionHandleANode, m_embeddingCDNode);
-    m_taskGraph->addEdge(m_embeddingCDNode, m_embeddingCHNode);
-    m_taskGraph->addEdge(m_embeddingCHNode, pbdObj->getPbdModel()->getCollisionSolveNode());
+    // Collision detection should be done before so we can tell if touching or not
+    // This way state can transition Removed -> Touching -> Punctured in one step
+    m_taskGraph->addEdge(m_collisionDetectionNode, m_embedderNode);
+    m_taskGraph->addEdge(m_embedderNode, m_collisionHandleANode);
 }

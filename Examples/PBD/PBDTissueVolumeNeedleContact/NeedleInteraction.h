@@ -11,7 +11,7 @@
 
 using namespace imstk;
 
-class NeedleEmbeddedCH;
+class NeedleEmbedder;
 class NeedleObject;
 
 namespace imstk
@@ -34,14 +34,13 @@ public:
 
     IMSTK_TYPE_NAME(NeedleInteraction)
 
-    std::shared_ptr<TetraToLineMeshCD> getEmbeddingCD() const { return m_tetMeshCD; }
-    std::shared_ptr<NeedleEmbeddedCH> getEmbeddingCH() const { return m_embeddedCH; }
+    std::shared_ptr<NeedleEmbedder> getEmbedder() const { return m_embedder; }
 
     void setFriction(const double friction);
     double getFriction() const;
 
-    void setCompliance(const double compliance);
-    double getCompliance() const;
+    void setNeedleCompliance(const double compliance);
+    double getNeedleCompliance() const;
 
     void setStaticFrictionForceThreshold(const double force);
     const double getStaticFrictionForceThreshold() const;
@@ -55,9 +54,6 @@ public:
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
-    std::shared_ptr<TetraToLineMeshCD> m_tetMeshCD;
-    std::shared_ptr<NeedleEmbeddedCH>  m_embeddedCH;
-
-    std::shared_ptr<TaskNode> m_embeddingCDNode = nullptr;
-    std::shared_ptr<TaskNode> m_embeddingCHNode = nullptr;
+    std::shared_ptr<NeedleEmbedder> m_embedder;
+    std::shared_ptr<TaskNode>       m_embedderNode = nullptr;
 };
