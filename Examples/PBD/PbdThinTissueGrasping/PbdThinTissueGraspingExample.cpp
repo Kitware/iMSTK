@@ -115,7 +115,7 @@ main()
     geomShaft->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 0.5));
     auto objShaft = std::make_shared<CollidingObject>("ShaftObject");
-    objShaft->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/pivot.obj"));
+    objShaft->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/pivot.obj"));
     objShaft->setCollidingGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
@@ -125,7 +125,7 @@ main()
     geomUpperJaw->setRadius(0.004);
     geomUpperJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     auto objUpperJaw = std::make_shared<CollidingObject>("UpperJawObject");
-    objUpperJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/upper.obj"));
+    objUpperJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/upper.obj"));
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
     scene->addSceneObject(objUpperJaw);
 
@@ -135,7 +135,7 @@ main()
     geomLowerJaw->setRadius(0.004);
     geomLowerJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     auto objLowerJaw = std::make_shared<CollidingObject>("LowerJawObject");
-    objLowerJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/lower.obj"));
+    objLowerJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/lower.obj"));
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 

@@ -93,9 +93,9 @@ makeTissueObj(const std::string&               name,
     auto functor = std::make_shared<PbdFemTetConstraintFunctor>();
     functor->setGeometry(tissueMesh);
     functor->setBodyIndex(tissueObj->getPbdBody()->bodyHandle);
-    const double youngsModulus = 100000.0;
-    const double poissonRatio = 0.48;
-    auto   constraintConfig = std::make_shared<PbdFemConstraintConfig>(
+    const double youngsModulus    = 100000.0;
+    const double poissonRatio     = 0.48;
+    auto         constraintConfig = std::make_shared<PbdFemConstraintConfig>(
         youngsModulus / 2.0 / (1.0 + poissonRatio),
         youngsModulus * poissonRatio / ((1.0 + poissonRatio) * (1.0 - 2.0 * poissonRatio)),
         youngsModulus,
