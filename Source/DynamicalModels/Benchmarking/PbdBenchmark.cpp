@@ -269,10 +269,10 @@ BENCHMARK(BM_DistanceDihedral)
 // ->ArgsProduct({{4,6,8,10,16,20}, {2, 5, 8}});
 
 ///
-/// \brief Time evolution step of PBD using FEM constraints on volume mesh
+/// \brief Time evolution step of PBD using FEM constraints (StVK) on volume mesh
 ///
 static void
-BM_PbdFem(benchmark::State& state)
+BM_PbdFemStVK(benchmark::State& state)
 {
     // Setup simulation
     auto scene = std::make_shared<Scene>("PbdBenchmark");
@@ -308,6 +308,7 @@ BM_PbdFem(benchmark::State& state)
     prismObj->setPhysicsGeometry(prismMesh);
     prismObj->setDynamicalModel(pbdModel);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
+
     // Fix the borders
     for (int z = 0; z < state.range(0); z++)
     {
@@ -339,9 +340,240 @@ BM_PbdFem(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_PbdFem)
+BENCHMARK(BM_PbdFemStVK)
 ->Unit(benchmark::kMillisecond)
-->Name("FEM Constraints: Tet Mesh")
+->Name("FEM StVK Constraints: Tet Mesh")
+->ArgsProduct({ { 4, 6, 8, 10, 16, 20 }, { 2, 5, 8 } });
+
+///
+/// \brief Time evolution step of PBD using FEM constraints (Corotation) on volume mesh
+///
+static void
+BM_PbdFemCorotation(benchmark::State& state)
+{
+    // Setup simulation
+    auto scene = std::make_shared<Scene>("PbdBenchmark");
+
+    double dt = 0.05;
+
+    // Create PBD object
+    auto prismObj = std::make_shared<PbdObject>("Prism");
+
+    // Setup the Geometry
+    std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(
+        Vec3d(4.0, 4.0, 4.0),
+        Vec3i(state.range(0), state.range(0), state.range(0)),
+        Vec3d(0.0, 0.0, 0.0));
+
+    // Setup the Parameters
+    auto pbdParams = std::make_shared<PbdModelConfig>();
+    // Use FEM Tet constraints
+    pbdParams->m_femParams->m_YoungModulus = 5.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.4;
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::Corotation);
+    pbdParams->m_doPartitioning = false;
+    pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdParams->m_dt         = dt;
+    pbdParams->m_iterations = state.range(1);
+    pbdParams->m_linearDampingCoeff = 0.03;
+
+    // Setup the Model
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->configure(pbdParams);
+
+    // Setup the Object
+    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setDynamicalModel(pbdModel);
+    prismObj->getPbdBody()->uniformMassValue = 0.05;
+
+    // Fix the borders
+    for (int z = 0; z < state.range(0); z++)
+    {
+        for (int y = 0; y < state.range(0); y++)
+        {
+            for (int x = 0; x < state.range(0); x++)
+            {
+                if (y == state.range(0) - 1)
+                {
+                    prismObj->getPbdBody()->fixedNodeIds.push_back(x + state.range(0) * (y + state.range(0) * z));
+                }
+            }
+        }
+    }
+
+    // Create the scene
+    scene->addSceneObject(prismObj);
+    scene->initialize();
+
+    // Setup outputs for results
+    state.counters["DOFs"]       = prismMesh->getNumVertices();
+    state.counters["Tets"]       = prismMesh->getNumTetrahedra();
+    state.counters["Iterations"] = state.range(1);
+
+    // This loop gets timed
+    for (auto _ : state)
+    {
+        scene->advance(dt);
+    }
+}
+
+BENCHMARK(BM_PbdFemCorotation)
+->Unit(benchmark::kMillisecond)
+->Name("FEM Corotation Constraints: Tet Mesh")
+->ArgsProduct({ { 4, 6, 8, 10, 16, 20 }, { 2, 5, 8 } });
+
+///
+/// \brief Time evolution step of PBD using FEM constraints (NeoHookean) on volume mesh
+///
+static void
+BM_PbdFemNeoHookean(benchmark::State& state)
+{
+    // Setup simulation
+    auto scene = std::make_shared<Scene>("PbdBenchmark");
+
+    double dt = 0.05;
+
+    // Create PBD object
+    auto prismObj = std::make_shared<PbdObject>("Prism");
+
+    // Setup the Geometry
+    std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(
+        Vec3d(4.0, 4.0, 4.0),
+        Vec3i(state.range(0), state.range(0), state.range(0)),
+        Vec3d(0.0, 0.0, 0.0));
+
+    // Setup the Parameters
+    auto pbdParams = std::make_shared<PbdModelConfig>();
+    // Use FEM Tet constraints
+    pbdParams->m_femParams->m_YoungModulus = 5.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.4;
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
+    pbdParams->m_doPartitioning = false;
+    pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdParams->m_dt         = dt;
+    pbdParams->m_iterations = state.range(1);
+    pbdParams->m_linearDampingCoeff = 0.03;
+
+    // Setup the Model
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->configure(pbdParams);
+
+    // Setup the Object
+    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setDynamicalModel(pbdModel);
+    prismObj->getPbdBody()->uniformMassValue = 0.05;
+
+    // Fix the borders
+    for (int z = 0; z < state.range(0); z++)
+    {
+        for (int y = 0; y < state.range(0); y++)
+        {
+            for (int x = 0; x < state.range(0); x++)
+            {
+                if (y == state.range(0) - 1)
+                {
+                    prismObj->getPbdBody()->fixedNodeIds.push_back(x + state.range(0) * (y + state.range(0) * z));
+                }
+            }
+        }
+    }
+
+    // Create the scene
+    scene->addSceneObject(prismObj);
+    scene->initialize();
+
+    // Setup outputs for results
+    state.counters["DOFs"]       = prismMesh->getNumVertices();
+    state.counters["Tets"]       = prismMesh->getNumTetrahedra();
+    state.counters["Iterations"] = state.range(1);
+
+    // This loop gets timed
+    for (auto _ : state)
+    {
+        scene->advance(dt);
+    }
+}
+
+BENCHMARK(BM_PbdFemNeoHookean)
+->Unit(benchmark::kMillisecond)
+->Name("FEM NeoHookean Constraints: Tet Mesh")
+->ArgsProduct({ { 4, 6, 8, 10, 16, 20 }, { 2, 5, 8 } });
+
+///
+/// \brief Time evolution step of PBD using FEM constraints (Linear) on volume mesh
+///
+static void
+BM_PbdFemLinear(benchmark::State& state)
+{
+    // Setup simulation
+    auto scene = std::make_shared<Scene>("PbdBenchmark");
+
+    double dt = 0.05;
+
+    // Create PBD object
+    auto prismObj = std::make_shared<PbdObject>("Prism");
+
+    // Setup the Geometry
+    std::shared_ptr<TetrahedralMesh> prismMesh = makeTetGrid(
+        Vec3d(4.0, 4.0, 4.0),
+        Vec3i(state.range(0), state.range(0), state.range(0)),
+        Vec3d(0.0, 0.0, 0.0));
+
+    // Setup the Parameters
+    auto pbdParams = std::make_shared<PbdModelConfig>();
+    // Use FEM Tet constraints
+    pbdParams->m_femParams->m_YoungModulus = 5.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.4;
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::Linear);
+    pbdParams->m_doPartitioning = false;
+    pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdParams->m_dt         = dt;
+    pbdParams->m_iterations = state.range(1);
+    pbdParams->m_linearDampingCoeff = 0.03;
+
+    // Setup the Model
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->configure(pbdParams);
+
+    // Setup the Object
+    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setDynamicalModel(pbdModel);
+    prismObj->getPbdBody()->uniformMassValue = 0.05;
+
+    // Fix the borders
+    for (int z = 0; z < state.range(0); z++)
+    {
+        for (int y = 0; y < state.range(0); y++)
+        {
+            for (int x = 0; x < state.range(0); x++)
+            {
+                if (y == state.range(0) - 1)
+                {
+                    prismObj->getPbdBody()->fixedNodeIds.push_back(x + state.range(0) * (y + state.range(0) * z));
+                }
+            }
+        }
+    }
+
+    // Create the scene
+    scene->addSceneObject(prismObj);
+    scene->initialize();
+
+    // Setup outputs for results
+    state.counters["DOFs"]       = prismMesh->getNumVertices();
+    state.counters["Tets"]       = prismMesh->getNumTetrahedra();
+    state.counters["Iterations"] = state.range(1);
+
+    // This loop gets timed
+    for (auto _ : state)
+    {
+        scene->advance(dt);
+    }
+}
+
+BENCHMARK(BM_PbdFemLinear)
+->Unit(benchmark::kMillisecond)
+->Name("FEM Linear Constraints: Tet Mesh")
 ->ArgsProduct({ { 4, 6, 8, 10, 16, 20 }, { 2, 5, 8 } });
 
 ///
