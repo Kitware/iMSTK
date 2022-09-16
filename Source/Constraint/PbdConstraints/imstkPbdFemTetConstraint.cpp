@@ -84,29 +84,14 @@ PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
     // E = (F^T*F - I)/2
     case MaterialType::StVK:
     {
-        Mat3d E;
-        E(0, 0) = 0.5 * (F(0, 0) * F(0, 0) + F(1, 0) * F(1, 0) + F(2, 0) * F(2, 0) - 1.0);                  // xx
-        E(1, 1) = 0.5 * (F(0, 1) * F(0, 1) + F(1, 1) * F(1, 1) + F(2, 1) * F(2, 1) - 1.0);                  // yy
-        E(2, 2) = 0.5 * (F(0, 2) * F(0, 2) + F(1, 2) * F(1, 2) + F(2, 2) * F(2, 2) - 1.0);                  // zz
-        E(0, 1) = 0.5 * (F(0, 0) * F(0, 1) + F(1, 0) * F(1, 1) + F(2, 0) * F(2, 1));                        // xy
-        E(0, 2) = 0.5 * (F(0, 0) * F(0, 2) + F(1, 0) * F(1, 2) + F(2, 0) * F(2, 2));                        // xz
-        E(1, 2) = 0.5 * (F(0, 1) * F(0, 2) + F(1, 1) * F(1, 2) + F(2, 1) * F(2, 2));                        // yz
-        E(1, 0) = E(0, 1);
-        E(2, 0) = E(0, 2);
-        E(2, 1) = E(1, 2);
+        Mat3d I = Mat3d::Identity();
+        Mat3d E = 0.5 * (F.transpose() * F - I);
 
-        P = 2 * mu * E;
-        double tr = E.trace();
-        double lt = lambda * tr;
-        P(0, 0) += lt;
-        P(1, 1) += lt;
-        P(2, 2) += lt;
-        P        = F * P;
+        P = F * (2.0 * mu * E + lambda * E.trace() * I);
 
-        C = E(0, 0) * E(0, 0) + E(0, 1) * E(0, 1) + E(0, 2) * E(0, 2)
-            + E(1, 0) * E(1, 0) + E(1, 1) * E(1, 1) + E(1, 2) * E(1, 2)
-            + E(2, 0) * E(2, 0) + E(2, 1) * E(2, 1) + E(2, 2) * E(2, 2);
-        C = mu * C + 0.5 * lambda * tr * tr;
+        // C here is strain energy (Often denoted as W in literature)
+        // for the StVK mondel W = mu[tr(E^{T}E)] + 0.5*lambda*(tr(E))^2
+        C = mu * ((E.transpose() * E).trace()) + 0.5 * lambda * (E.trace() * E.trace());
 
         break;
     }
@@ -133,23 +118,36 @@ PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
 
         break;
     }
-    // P(F) = mu*(F - mu*F^-T) + lambda*log(J)F^-T;
+    // P(F) = mu*(F - mu*F^-T) + 0.5*lambda*log^{2}(J)F^-T;
+    // C = 0.5*mu*(I1 - log(I3) - 3) + (lambda/8)*log^{2}(I3)
     case MaterialType::NeoHookean:
     {
-        Mat3d  invFT = F.inverse().transpose();
-        double logJ  = log(F.determinant());
-        P = mu * (F - invFT) + lambda * logJ * invFT;
+        // First invariant
+        double I1 = (F * F.transpose()).trace();
 
-        C = F(0, 0) * F(0, 0) + F(0, 1) * F(0, 1) + F(0, 2) * F(0, 2)
-            + F(1, 0) * F(1, 0) + F(1, 1) * F(1, 1) + F(1, 2) * F(1, 2)
-            + F(2, 0) * F(2, 0) + F(2, 1) * F(2, 1) + F(2, 2) * F(2, 2);
+        // Third invariant
+        double I3    = (F.transpose() * F).determinant();
+        auto   logI3 = log(I3);
 
-        C = 0.5 * mu * (C - 3) - mu * logJ + 0.5 * lambda * logJ * logJ;
+        auto F_invT = F.inverse().transpose();
+
+        P = mu * (F - F_invT) + 0.5 * lambda * logI3 * F_invT;
+
+        C = 0.5 * mu * (I1 - logI3 - 3.0) + 0.125 * lambda * (logI3 * logI3);
 
         break;
     }
+    // e = 0.5*(F*F^{T} - I)
+    // P = 2*mu*e + lambda*tr(e)*I
     case MaterialType::Linear:
     {
+        Mat3d I = Mat3d::Identity();
+
+        Mat3d e = 0.5 * (F * F.transpose() - I);
+
+        P = 2.0 * mu * e + lambda * e.trace() * I;
+        C = mu * (e * e).trace() + 0.5 * lambda * e.trace() * e.trace();
+
         break;
     }
     default:
