@@ -85,7 +85,7 @@ main()
 
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
-            SimulationUtils::createDefaultSceneControlEntity(driver);
+            SimulationUtils::createDefaultSceneControl(driver);
         scene->addSceneObject(mouseAndKeyControls);
 
         // Enable SSAO

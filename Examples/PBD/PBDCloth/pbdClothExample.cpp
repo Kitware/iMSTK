@@ -140,7 +140,7 @@ main()
 
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
-            SimulationUtils::createDefaultSceneControlEntity(driver);
+            SimulationUtils::createDefaultSceneControl(driver);
         scene->addSceneObject(mouseAndKeyControls);
 
         using Vec3uc = Eigen::Matrix<unsigned char, 3, 1>;

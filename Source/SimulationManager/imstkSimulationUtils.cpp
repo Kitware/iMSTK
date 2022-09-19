@@ -20,7 +20,7 @@ namespace imstk
 namespace SimulationUtils
 {
 std::shared_ptr<Entity>
-createDefaultSceneControlEntity(
+createDefaultSceneControl(
     std::shared_ptr<SimulationManager> driver)
 {
     std::shared_ptr<SceneManager> sceneManager = nullptr;

@@ -178,7 +178,7 @@ planeContactScene()
         {
             // Add default mouse and keyboard controls to the viewer
             std::shared_ptr<Entity> mouseAndKeyControls =
-                SimulationUtils::createDefaultSceneControlEntity(driver);
+                SimulationUtils::createDefaultSceneControl(driver);
             scene->addSceneObject(mouseAndKeyControls);
 
             std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
@@ -361,7 +361,7 @@ bowlScene()
 
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
-            SimulationUtils::createDefaultSceneControlEntity(driver);
+            SimulationUtils::createDefaultSceneControl(driver);
         scene->addSceneObject(mouseAndKeyControls);
 
         LOG(INFO) << "Cube Controls:";
@@ -514,7 +514,7 @@ tissueCapsuleDrop()
 
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
-            SimulationUtils::createDefaultSceneControlEntity(driver);
+            SimulationUtils::createDefaultSceneControl(driver);
         scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();
@@ -606,7 +606,7 @@ hingeScene()
 
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
-            SimulationUtils::createDefaultSceneControlEntity(driver);
+            SimulationUtils::createDefaultSceneControl(driver);
         scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();

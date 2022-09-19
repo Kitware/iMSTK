@@ -106,7 +106,7 @@ main(int argc, char* argv[])
 
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
-            SimulationUtils::createDefaultSceneControlEntity(driver);
+            SimulationUtils::createDefaultSceneControl(driver);
         auto txtStatus = std::make_shared<TextVisualModel>("StatusText");
         txtStatus->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
         txtStatus->setFontSize(30);

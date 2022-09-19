@@ -279,7 +279,7 @@ main()
 
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =
-            SimulationUtils::createDefaultSceneControlEntity(driver);
+            SimulationUtils::createDefaultSceneControl(driver);
         // Add something to display controller force
         auto controllerForceTxt = mouseAndKeyControls->addComponent<ControllerForceText>();
         controllerForceTxt->setController(controller);

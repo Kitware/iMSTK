@@ -19,7 +19,7 @@ namespace SimulationUtils
 /// \brief Create default components for the scene. These aren't applicable
 /// to all scene's but commonly used
 ///
-std::shared_ptr<Entity> createDefaultSceneControlEntity(
+std::shared_ptr<Entity> createDefaultSceneControl(
     std::shared_ptr<SimulationManager> driver);
 } // namespace SimulationUtils
 } // namespace imstk

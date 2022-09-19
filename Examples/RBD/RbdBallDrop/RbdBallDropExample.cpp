@@ -144,7 +144,7 @@ main()
 
     // Add default mouse and keyboard controls to the viewer
     std::shared_ptr<Entity> mouseAndKeyControls =
-        SimulationUtils::createDefaultSceneControlEntity(simulationManager);
+        SimulationUtils::createDefaultSceneControl(simulationManager);
     scene->addSceneObject(mouseAndKeyControls);
 
     // iMSTK utilizes an event system this is one of many ways to connect to this system
