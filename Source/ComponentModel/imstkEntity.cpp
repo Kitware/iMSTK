@@ -20,6 +20,7 @@ Entity::Entity(const std::string& name) : m_name(name)
 void
 Entity::addComponent(std::shared_ptr<Component> component)
 {
+    CHECK(component != nullptr) << "Tried to add nullptr component";
     auto iter = std::find(m_components.begin(), m_components.end(), component);
     if (iter != m_components.end())
     {
