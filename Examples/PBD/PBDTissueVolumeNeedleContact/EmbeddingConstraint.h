@@ -11,8 +11,8 @@
 namespace imstk
 {
 ///
-/// \brief Constraints a triangle and a rigid body needle,
-/// via a point on the triangle described as a barycentric coordinate
+/// \brief Constrains a rigid body line segment defined via p and q to a
+/// "puncture" point defined via barycentric coordinates on a triangle.
 ///
 class EmbeddingConstraint : public PbdContactConstraint
 {
@@ -48,11 +48,16 @@ public:
 
 // Vec3d computeRelativeVelocity(PbdState& bodies) override;
 
+    const Vec3d& getIntersectionPoint() const { return m_iPt; }
+    Vec3d* getP() const { return m_p; }
+    Vec3d* getQ() const { return m_q; }
+
 protected:
     // Intersection point via interpolants on triangle
     Vec3d m_uvw = Vec3d::Zero();
     // Intersection point via interpolants on line
-    double m_t = 0.0;
+    Vec2d  m_uv = Vec2d::Zero();
+    double t    = 0.0;
 
     // The actual line
     Vec3d* m_p = nullptr;

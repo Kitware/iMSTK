@@ -10,6 +10,7 @@
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
 #include "imstkDummyClient.h"
+#include "imstkIsometricMap.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
@@ -46,10 +47,13 @@ createToolObject(std::shared_ptr<RigidBodyModel2> model,
         capsuleLength,
         Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
 
+    auto lapToolVisualGeom = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/laptool_body.obj");
+
     toolObject->setDynamicalModel(model);
     toolObject->setPhysicsGeometry(toolGeom);
     toolObject->setCollidingGeometry(toolGeom);
-    toolObject->setVisualGeometry(toolGeom);
+    toolObject->setVisualGeometry(lapToolVisualGeom);
+    toolObject->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, lapToolVisualGeom));
 
     std::shared_ptr<RenderMaterial> material = toolObject->getVisualModel(0)->getRenderMaterial();
     material->setIsDynamicMesh(false);

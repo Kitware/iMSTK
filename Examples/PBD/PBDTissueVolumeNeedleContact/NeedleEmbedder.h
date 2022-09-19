@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "imstkCollisionHandling.h"
 #include "imstkSurfaceMesh.h"
 
 #include <unordered_map>
@@ -15,10 +14,12 @@ class NeedleObject;
 
 namespace imstk
 {
+class CollisionData;
 class EmbeddingConstraint;
 class LineMesh;
 class PbdConstraint;
 class PbdObject;
+class TaskNode;
 class TetrahedralMesh;
 } // namespace imstk
 
@@ -38,10 +39,6 @@ struct TissueData
     VecDataArray<double, 3>& vertices;
     std::shared_ptr<VecDataArray<int, 4>> indicesPtr;
     VecDataArray<int, 4>& indices;
-    std::shared_ptr<VecDataArray<double, 3>> velocitiesPtr;
-    VecDataArray<double, 3>& velocities;
-    std::shared_ptr<DataArray<double>> invMassesPtr;
-    DataArray<double>& invMasses;
 };
 struct NeedleData
 {
@@ -57,22 +54,22 @@ struct NeedleData
 };
 
 ///
-/// \class NeedleEmbeddedCH
+/// \class NeedleEmbedder
 ///
-/// \brief Implements PBD-RBD embedded tissue handling for when the
-/// needle is embedded in the tissue
+/// \brief Implements PBD embedded tissue handling for when the needle is
+/// embedded in the tissue.
 ///
-class NeedleEmbeddedCH : public CollisionHandling
+class NeedleEmbedder
 {
 public:
-    ~NeedleEmbeddedCH() override = default;
+    void setTissueObject(std::shared_ptr<PbdObject> tissueObject) { m_tissueObject = tissueObject; }
+    std::shared_ptr<PbdObject> getTissueObject() const { return m_tissueObject; }
+    void setNeedleObject(std::shared_ptr<PbdObject> needleObject) { m_needleObject = needleObject; }
+    std::shared_ptr<PbdObject> getNeedleObject() const { return m_needleObject; }
 
-    IMSTK_TYPE_NAME(NeedleEmbeddedCH)
+    void setCollisionData(std::shared_ptr<CollisionData> cdData) { m_cdData = cdData; }
+    void setCollisionHandleNode(std::shared_ptr<TaskNode> pbdCHNode) { m_pbdCHNode = pbdCHNode; }
 
-public:
-    std::shared_ptr<Geometry> getHandlingGeometryA() override;
-
-public:
     void setFriction(const double friction) { m_friction = friction; }
     double getFriction() const { return m_friction; }
 
@@ -85,26 +82,13 @@ public:
     void setPunctureForceThreshold(const double forceThreshold) { m_forceThreshold = forceThreshold; }
     const double getPunctureForceThreshold() const { return m_forceThreshold; }
 
-protected:
     ///
     /// \brief Add embedding constraints based off contact data
     /// We need to add the constraint once and then update it later
     ///
-    void handle(
-        const std::vector<CollisionElement>& elementsA,
-        const std::vector<CollisionElement>& elementsB) override;
+    void update();
 
-    ///
-    /// \brief Updates puncture state for the needle. Could be not
-    /// touching, touching, or inserted.
-    /// Works via projection and thresholding of the force on the needle axes.
-    /// Returns whether embedded
-    ///
-    void updatePunctureState(
-        TissueData& tissueData,
-        NeedleData& needleData,
-        bool        notIntersecting);
-
+protected:
     ///
     /// \brief Adds embedding constraint (ie: The constraint maintained after puncture)
     ///
@@ -114,17 +98,24 @@ protected:
         int v1, int v2, int v3,
         const Vec3d& iPt);
 
-private:
+protected:
+    std::shared_ptr<PbdObject> m_tissueObject = nullptr;
+    std::shared_ptr<PbdObject> m_needleObject = nullptr;
+
+    std::shared_ptr<TaskNode>      m_pbdCHNode = nullptr;
+    std::shared_ptr<CollisionData> m_cdData    = nullptr;
+
     // TriCell takes care of duplicate faces
     std::unordered_map<TriCell, std::shared_ptr<EmbeddingConstraint>> m_faceConstraints;
-    std::unordered_set<std::shared_ptr<EmbeddingConstraint>> m_constraintEnabled;
-
     std::vector<PbdConstraint*> m_constraints; ///< List of PBD constraints
 
     double m_friction   = 0.0;                 ///< Coefficient of friction (1.0 = full frictional force, 0.0 = none)
     double m_compliance = 0.000001;
     double m_staticFrictionForceThreshold = 0.0;
     double m_forceThreshold = 10.0;
+
+    VecDataArray<double, 3> tissuePrevVertices;
+    VecDataArray<double, 3> needlePrevVertices;
 
 public:
     std::vector<Vec3d> m_debugEmbeddingPoints; ///< Used for debug visualization

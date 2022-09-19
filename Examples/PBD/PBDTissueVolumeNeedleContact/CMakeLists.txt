@@ -16,13 +16,12 @@ if (iMSTK_USE_RENDERING_VTK)
     PBDTissueVolumeNeedleContactExample.cpp
     EmbeddingConstraint.h
     EmbeddingConstraint.cpp
-    NeedleEmbeddedCH.h
-    NeedleEmbeddedCH.cpp
+    NeedleEmbedder.h
+    NeedleEmbedder.cpp
     NeedleInteraction.h
     NeedleInteraction.cpp
     NeedleObject.h
     NeedleObject.cpp
-    NeedlePbdCH.h
     )
 
   #-----------------------------------------------------------------------------
