@@ -150,7 +150,7 @@ LineMeshToCapsuleCD::computeCollisionDataAB(
                         elemA.ids[0]   = cell[0];
                         elemA.ids[1]   = cell[1];
                         elemA.idCount  = 2;
-                        elemA.parentId = i; // Triangle id
+                        elemA.parentId = i; // Edge id
                         elemA.cellType = IMSTK_EDGE;
 
                         const double penetrationDepth = capsuleRadius - seperationDistance;

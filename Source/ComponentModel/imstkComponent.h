@@ -24,7 +24,7 @@ class Entity;
 /// We do not garuntee the raw pointer is not null.
 /// Components are not required/enforced to exist on an Entity.
 /// This effects whether you can add a component through another components
-/// constructor. Comopnents are able to not exist on an entity.
+/// constructor. Components are able to not exist on an entity.
 /// Instead we provide a separate initialize step that should be called when
 /// the components have entities ready
 ///
@@ -49,8 +49,8 @@ public:
 
 protected:
     ///
-    /// \brief Configure the component at a later time
-    /// Generally these would be after the system of the ECS is composed
+    /// \brief Initialize the component, called at a later time after all
+    /// component construction is complete.
     ///
     virtual void init() { }
 

@@ -194,10 +194,11 @@ edgePseudoNormalFromTriangle(const Vec2i& vertexIds, const SurfMeshData& surfMes
 ///
 /// \brief Returns signed distance, reports caseType (ie: which element type
 /// is nearest, vertex, edge, or triangle)
-/// \param position to measure signed distance from
-/// \param SurfaceMesh to measure signed distance too
-/// \param nearest element case, vertex-0, edge-1, triangle-2
-/// \param vertexIds of nearest element (maximum 3 verts)
+/// \param pos, position to measure signed distance from
+/// \param surfMeshData, SurfaceMesh to measure signed distance too
+/// \param caseType, nearest element case, vertex-0, edge-1, triangle-2
+/// \param vIds, vertexIds of nearest element (maximum 3 verts)
+/// \param closestCell, id of the closest cell (vertex, edge, or triangle)
 ///
 static double
 polySignedDist(const Vec3d& pos, const SurfMeshData& surfMeshData,
