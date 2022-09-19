@@ -55,9 +55,7 @@ public:
     std::shared_ptr<T> addComponent()
     {
         auto component = std::make_shared<T>();
-        m_components.push_back(component);
-        component->m_entity = this;
-        this->postEvent(Event(modified()));
+        addComponent(component);
         return component;
     }
 
@@ -65,9 +63,7 @@ public:
     std::shared_ptr<T> addComponent(std::string name)
     {
         auto component = std::make_shared<T>(name);
-        m_components.push_back(component);
-        component->m_entity = this;
-        this->postEvent(Event(modified()));
+        addComponent(component);
         return component;
     }
 
