@@ -8,8 +8,10 @@
 #include "imstkDebugGeometryObject.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkIsometricMap.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdCollisionHandling.h"
@@ -27,8 +29,6 @@
 #include "NeedleEmbedder.h"
 #include "NeedleInteraction.h"
 #include "NeedleObject.h"
-#include "imstkMeshIO.h"
-#include "imstkIsometricMap.h"
 
 #ifdef iMSTK_USE_HAPTICS
 #include "imstkDeviceManager.h"
