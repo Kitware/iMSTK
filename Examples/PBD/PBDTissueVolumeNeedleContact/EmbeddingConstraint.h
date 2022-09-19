@@ -11,12 +11,8 @@
 namespace imstk
 {
 ///
-/// \brief Constraints a triangle and a rigid body needle,
-/// via a point on the triangle described as a barycentric coordinate.
-///
-/// As the constraint is solved its looking to tell if its been unpunctured
-/// or not. Movement along the triangle plane is fine but against the normal
-/// if projected above/below the triangle it may exit.
+/// \brief Constrains a rigid body line segment defined via p and q to a
+/// "puncture" point defined via barycentric coordinates on a triangle.
 ///
 class EmbeddingConstraint : public PbdContactConstraint
 {

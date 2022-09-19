@@ -37,8 +37,6 @@ struct TissueData
     std::shared_ptr<TetrahedralMesh> geom;
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr;
     VecDataArray<double, 3>& vertices;
-    //std::shared_ptr<VecDataArray<double, 3>> prevVerticesPtr;
-    //VecDataArray<double, 3>& prevVertices;
     std::shared_ptr<VecDataArray<int, 4>> indicesPtr;
     VecDataArray<int, 4>& indices;
 };
@@ -51,7 +49,6 @@ struct NeedleData
     std::shared_ptr<LineMesh> geom;
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr;
     VecDataArray<double, 3>& vertices;
-    //VecDataArray<double, 3> prevVertices;
     std::shared_ptr<VecDataArray<int, 2>> indicesPtr;
     VecDataArray<int, 2>& indices;
 };
@@ -59,8 +56,8 @@ struct NeedleData
 ///
 /// \class NeedleEmbedder
 ///
-/// \brief Implements PBD-RBD embedded tissue handling for when the
-/// needle is embedded in the tissue
+/// \brief Implements PBD embedded tissue handling for when the needle is
+/// embedded in the tissue.
 ///
 class NeedleEmbedder
 {

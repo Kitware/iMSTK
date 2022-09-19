@@ -65,8 +65,6 @@ TissueData::TissueData(std::shared_ptr<PbdObject> obj) :
     geom(std::dynamic_pointer_cast<TetrahedralMesh>(obj->getPhysicsGeometry())),
     verticesPtr(geom->getVertexPositions()),
     vertices(*verticesPtr),
-    //prevVerticesPtr(obj->getPbdBody()->prevVertices),
-    //prevVertices(*prevVerticesPtr),
     indicesPtr(geom->getCells()),
     indices(*indicesPtr)
 {
@@ -77,26 +75,10 @@ NeedleData::NeedleData(std::shared_ptr<NeedleObject> obj) :
     geom(std::dynamic_pointer_cast<LineMesh>(obj->getCollidingGeometry())),
     verticesPtr(geom->getVertexPositions()),
     vertices(*verticesPtr),
-    //prevVertices(VecDataArray<double, 3>(vertices.size())),
     indicesPtr(geom->getCells()),
     indices(*indicesPtr)
 {
     geom->updatePostTransformData();
-
-    const Vec3d bodyPos = (*obj->getPbdBody()->vertices)[0];
-    const Quatd bodyOrientation     = (*obj->getPbdBody()->orientations)[0];
-    const Vec3d bodyPrevPos         = (*obj->getPbdBody()->prevVertices)[0];
-    const Quatd bodyPrevOrientation = (*obj->getPbdBody()->prevOrientations)[0];
-
-    // From the needle rigid body data compute the vertex velocities
-    //for (int i = 0; i < vertices.size(); i++)
-    //{
-    //    const Vec3d r = vertices[i] - bodyPos;
-    //    velocities[i] = (*obj->getPbdBody()->velocities)[0] +
-    //                    (*obj->getPbdBody()->angularVelocities)[0].cross(r);
-    //    //const Vec3d restR = bodyOrientation.inverse()._transformVector(r);
-    //    //prevVertices[i] = bodyPrevPos + bodyPrevOrientation._transformVector(restR);
-    //}
 }
 
 void
@@ -311,7 +293,7 @@ NeedleEmbedder::update()
         tissueData.obj->getPbdModel()->getCollisionSolver()->addConstraints(&m_constraints);
     }
 
-    // Stash the vertices at this point
+    // Stash the vertices (at this timestep) for use on the next iteration
     tissuePrevVertices.resize(tissueData.vertices.size());
     std::copy(tissueData.vertices.begin(), tissueData.vertices.end(), tissuePrevVertices.begin());
     needlePrevVertices.resize(needleData.vertices.size());

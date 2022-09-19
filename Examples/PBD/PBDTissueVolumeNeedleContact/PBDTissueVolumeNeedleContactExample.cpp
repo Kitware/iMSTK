@@ -39,6 +39,10 @@
 
 using namespace imstk;
 
+///
+/// \brief Given a child mesh, find all the vertices of the parent that
+/// are coincident to the child.
+///
 static std::vector<int>
 computeFixedPtsViaMap(std::shared_ptr<PointSet> parent,
                       std::shared_ptr<PointSet> child,
@@ -219,12 +223,12 @@ main()
     pbdModel->getConfig()->m_collisionIterations = 5;
 
     // Setup a tissue with surface collision geometry
-    const Vec3i                dim       = Vec3i(6, 3, 6);
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("PbdTissue1", pbdModel,
-        GeometryUtils::toTetGrid(
-            Vec3d(0.0, 0.0, 0.0),  // Center
-            Vec3d(0.2, 0.01, 0.2), // Size (meters)
-            dim));                 // Dimensions
+    const Vec3i dim = Vec3i(6, 3, 6);
+    auto        tetGridMesh = GeometryUtils::toTetGrid(
+        Vec3d(0.0, 0.0, 0.0),  // Center
+        Vec3d(0.2, 0.01, 0.2), // Size (meters)
+        dim);                  // Dimensions
+    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("PbdTissue1", pbdModel, tetGridMesh);
     // Fix the borders
     for (int z = 0; z < dim[2]; z++)
     {
@@ -242,10 +246,10 @@ main()
     scene->addSceneObject(tissueObj);
 
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Kidney/kidney_vol_low_rez.vtk");
-    tetMesh->translate(Vec3d(0.0, -0.07, 0.0), Geometry::TransformType::ApplyToData);
+    tetMesh->translate(Vec3d(0.0, -0.07, -0.05), Geometry::TransformType::ApplyToData);
     std::shared_ptr<PbdObject> tissueObj2  = makeTissueObj("PbdTissue2", pbdModel, tetMesh);
     auto                       fixedPtMesh = MeshIO::read<PointSet>(iMSTK_DATA_ROOT "/Organs/Kidney/kidney_fixedpts_low_rez.obj");
-    fixedPtMesh->translate(Vec3d(0.0, -0.07, 0.0), Geometry::TransformType::ApplyToData);
+    fixedPtMesh->translate(Vec3d(0.0, -0.07, -0.05), Geometry::TransformType::ApplyToData);
     tissueObj2->getPbdBody()->fixedNodeIds = computeFixedPtsViaMap(tetMesh, fixedPtMesh, 0.001);
     tissueObj2->getVisualModel(0)->getRenderMaterial()->setColor(Color::Blood);
     scene->addSceneObject(tissueObj2);
@@ -392,12 +396,12 @@ main()
                 toolGhostMesh->postModified();
                 //ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
             });
-        //connect<Event>(sceneManager, &SceneManager::preUpdate,
-        //    [&](Event*)
-        //    {
-        //        // Keep the tool moving in real time
-        //        toolObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
-        //    });
+        connect<Event>(sceneManager, &SceneManager::preUpdate,
+            [&](Event*)
+            {
+                // Keep the tool moving in real time
+                pbdModel->getConfig()->m_dt = sceneManager->getDt();
+            });
 
         // Add mouse and keyboard controls to the viewer
         {
