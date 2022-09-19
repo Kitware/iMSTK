@@ -50,16 +50,15 @@ DeviceManagerFactory::makeDeviceManager(const std::string typeName)
 std::shared_ptr<DeviceManager>
 DeviceManagerFactory::makeDeviceManager()
 {
-#ifdef iMSTK_USE_HAPLY
+#if defined iMSTK_USE_HAPLY
     return makeDeviceManager("HaplyDeviceManager");
-#endif
-#ifdef iMSTK_USE_OPENHAPTICS
+#elif defined iMSTK_USE_OPENHAPTICS
     return makeDeviceManager("OpenHapticDeviceManager");
-#endif
-#ifdef iMSTK_USE_VRPN
+#elif defined iMSTK_USE_VRPN
     return makeDeviceManager("VRPNDeviceManager");
-#endif
+#else
     LOG(FATAL) << "Tried to make default DeviceManager but no haptic API was found";
     return nullptr;
+#endif
 }
 } // namespace imstk

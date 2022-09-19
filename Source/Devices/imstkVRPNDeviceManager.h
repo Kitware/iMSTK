@@ -65,10 +65,7 @@ public:
     ///                   will be observable
     ///
     std::shared_ptr<DeviceClient> makeDeviceClient(const std::string& deviceName, VRPNDeviceType deviceType);
-    std::shared_ptr<DeviceClient> makeDeviceClient(const std::string deviceName) override
-    {
-        return makeDeviceClient(deviceName, VRPNAnalog);
-    }
+    std::shared_ptr<DeviceClient> makeDeviceClient(const std::string deviceName) override;
 
 protected:
     ///
@@ -88,8 +85,8 @@ protected:
 
 private:
 
-    const std::string m_machine;                                       ///< machine name or IP
-    const int m_port;                                                  ///< connection port
+    const std::string m_machine = "localhost";                                       ///< machine name or IP
+    const int m_port = vrpn_DEFAULT_LISTEN_PORT_NO;                                  ///< connection port
 
     struct Client
     {

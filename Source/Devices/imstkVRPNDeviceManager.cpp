@@ -71,6 +71,12 @@ VRPNDeviceManager::makeDeviceClient(const std::string& deviceName, VRPNDeviceTyp
     return client;
 }
 
+std::shared_ptr<imstk::DeviceClient>
+VRPNDeviceManager::makeDeviceClient(const std::string deviceName)
+{
+    return makeDeviceClient(deviceName, VRPNAnalog);
+}
+
 bool
 VRPNDeviceManager::initModule()
 {

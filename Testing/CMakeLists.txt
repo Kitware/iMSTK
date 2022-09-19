@@ -2,7 +2,7 @@ include(FetchContent)
 
 
 # Download project template
-set(proj "iMSTKExternalProjectTemplate")
+set(proj "iMSTKExtProj")
 set(templates_src_dir "${CMAKE_CURRENT_BINARY_DIR}/${proj}")
 set(SHA e525e661300b978d2cdede812adfdf1c81ba8df8)
 FetchContent_Populate(${proj}
