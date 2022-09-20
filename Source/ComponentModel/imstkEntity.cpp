@@ -28,7 +28,7 @@ Entity::addComponent(std::shared_ptr<Component> component)
         return;
     }
     m_components.push_back(component);
-    component->m_entity = this;
+    component->m_entity = shared_from_this();
     this->postEvent(Event(modified()));
 }
 
@@ -53,7 +53,7 @@ Entity::removeComponent(std::shared_ptr<Component> component)
     auto iter = std::find(m_components.begin(), m_components.end(), component);
     if (iter != m_components.end())
     {
-        (*iter)->m_entity = nullptr;
+        (*iter)->m_entity = std::weak_ptr<Entity>();
         m_components.erase(iter);
     }
     else

@@ -33,7 +33,7 @@ class Component
 friend class Entity;
 
 protected:
-    Component(const std::string& name = "Component") : m_name(name), m_entity(nullptr) { }
+    Component(const std::string& name = "Component") : m_name(name) { }
 
 public:
     virtual ~Component() = default;
@@ -41,10 +41,12 @@ public:
     ///
     /// \brief Get parent entity
     ///
-    Entity* getEntity() const { return m_entity; }
+    std::weak_ptr<Entity> getEntity() const { return m_entity; }
 
-    // \todo: Component initialization doesn't make much sense
-    // Behaviour does though (since it's a system), so might move
+    ///
+    /// \brief Initialize the component, called at a later time after all
+    /// component construction is complete.
+    ///
     void initialize();
 
 protected:
@@ -58,7 +60,7 @@ protected:
     std::string m_name;
     /// Raw pointer to parent entity
     /// Used as shared_from_this cannot be used in a constructor
-    Entity* m_entity;
+    std::weak_ptr<Entity> m_entity;
 };
 
 ///

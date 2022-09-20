@@ -28,10 +28,11 @@ ObjectControllerGhost::init()
 {
     // Add a visual representation for the object
     // how to avoid adding it twice?
-    if (!m_entity->containsComponent(m_ghostVisualModel))
+    std::shared_ptr<Entity> entity = m_entity.lock();
+    if (!entity->containsComponent(m_ghostVisualModel))
     {
-        m_ghostVisualModel->setName(m_entity->getName() + "_GhostVisualModel");
-        m_entity->addComponent(m_ghostVisualModel);
+        m_ghostVisualModel->setName(entity->getName() + "_GhostVisualModel");
+        entity->addComponent(m_ghostVisualModel);
     }
 
     CHECK(m_pbdController != nullptr || m_rbdController != nullptr)

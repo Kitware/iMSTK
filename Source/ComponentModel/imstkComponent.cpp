@@ -13,7 +13,7 @@ void
 Component::initialize()
 {
     // Generally the callee should only initialize entities
-    CHECK(m_entity != nullptr) << "Tried to initialize a component that doesn't exist"
+    CHECK(m_entity.lock() != nullptr) << "Tried to initialize a component that doesn't exist"
         " on any entity.";
 
     // Initialize

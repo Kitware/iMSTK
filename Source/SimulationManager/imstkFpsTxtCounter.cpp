@@ -26,10 +26,11 @@ void
 FpsTxtCounter::init()
 {
     // Add a visual representation for the object
-    if (!m_entity->containsComponent(m_fpsTextVisualModel))
+    std::shared_ptr<Entity> entity = m_entity.lock();
+    if (!entity->containsComponent(m_fpsTextVisualModel))
     {
-        m_fpsTextVisualModel->setName(m_entity->getName() + "_FpsCounterTxt");
-        m_entity->addComponent(m_fpsTextVisualModel);
+        m_fpsTextVisualModel->setName(entity->getName() + "_FpsCounterTxt");
+        entity->addComponent(m_fpsTextVisualModel);
     }
     CHECK(m_viewer.lock() != nullptr) << "FpsTxtCounter must have a Viewer to track";
 }

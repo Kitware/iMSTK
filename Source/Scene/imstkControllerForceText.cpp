@@ -35,10 +35,11 @@ ControllerForceText::init()
 {
     // Add a visual representation for the object
     // how to avoid adding it twice?
-    if (!m_entity->containsComponent(m_textVisualModel))
+    std::shared_ptr<Entity> entity = m_entity.lock();
+    if (!entity->containsComponent(m_textVisualModel))
     {
-        m_textVisualModel->setName(m_entity->getName() + "_ControllerForceText");
-        m_entity->addComponent(m_textVisualModel);
+        m_textVisualModel->setName(entity->getName() + "_ControllerForceText");
+        entity->addComponent(m_textVisualModel);
     }
 
     CHECK(m_pbdController != nullptr || m_rbdController != nullptr)

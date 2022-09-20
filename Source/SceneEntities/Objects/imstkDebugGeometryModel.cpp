@@ -72,20 +72,21 @@ DebugGeometryModel::DebugGeometryModel(const std::string& name) : Behaviour<doub
 void
 DebugGeometryModel::init()
 {
-    if (!m_entity->containsComponent(m_debugPointModel))
+    std::shared_ptr<Entity> entity = m_entity.lock();
+    if (!entity->containsComponent(m_debugPointModel))
     {
-        m_debugPointModel->setName(m_entity->getName() + "_DebugPointModel");
-        m_entity->addComponent(m_debugPointModel);
+        m_debugPointModel->setName(entity->getName() + "_DebugPointModel");
+        entity->addComponent(m_debugPointModel);
     }
-    if (!m_entity->containsComponent(m_debugLineModel))
+    if (!entity->containsComponent(m_debugLineModel))
     {
-        m_debugLineModel->setName(m_entity->getName() + "_DebugLineModel");
-        m_entity->addComponent(m_debugLineModel);
+        m_debugLineModel->setName(entity->getName() + "_DebugLineModel");
+        entity->addComponent(m_debugLineModel);
     }
-    if (!m_entity->containsComponent(m_debugSurfModel))
+    if (!entity->containsComponent(m_debugSurfModel))
     {
-        m_debugSurfModel->setName(m_entity->getName() + "_DebugSurfModel");
-        m_entity->addComponent(m_debugSurfModel);
+        m_debugSurfModel->setName(entity->getName() + "_DebugSurfModel");
+        entity->addComponent(m_debugSurfModel);
     }
 }
 

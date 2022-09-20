@@ -23,7 +23,7 @@ class Component;
 /// \brief Top-level class for entities. Entities contain a collection of
 /// components which define how to be used in a system.
 ///
-class Entity : public EventObject
+class Entity : public EventObject, public std::enable_shared_from_this<Entity>
 {
 public:
     Entity(const std::string& name = "Entity");
