@@ -1,7 +1,0 @@
-
-// These variables are defined by settings in the iMSKT build
-// if you need any of the components that are not defined you 
-// may have to build iMSTK by yourself
-
-#cmakedefine IMSTK_USE_OPENHAPTICS
-#cmakedefine IMSTK_USE_VRPN

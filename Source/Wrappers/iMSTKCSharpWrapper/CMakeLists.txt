@@ -15,7 +15,6 @@ endif()
 if(iMSTK_USE_VRPN)
     set(IMSTK_USE_VRPN ON)
 endif()
-configure_file("Configuration.cs.in" ${SWIG_OUTPUT_DIR}/Configuration.cs)
 
 # Get all the csharp files from the output directory
 file(GLOB SRC_FILES "${SWIG_OUTPUT_DIR}/*.cs")
