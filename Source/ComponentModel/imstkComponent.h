@@ -18,15 +18,12 @@ class Entity;
 ///
 /// \class Component
 ///
-/// \brief Represents a part of a component, involved in a system.
+/// \brief Represents a part of an entity, involved in a system.
 /// The component system is doubly linked meaning the Entity contains
-/// a shared_ptr to Component while the Component keeps a raw pointer to Entity.
-/// We do not garuntee the raw pointer is not null.
-/// Components are not required/enforced to exist on an Entity.
-/// This effects whether you can add a component through another components
-/// constructor. Components are able to not exist on an entity.
-/// Instead we provide a separate initialize step that should be called when
-/// the components have entities ready
+/// a shared_ptr to Component while the Component keeps a weak_ptr to Entity.
+/// Components are able to not exist on an entity as the entity parent is not
+/// garunteed to exist.
+/// The initialize call cannot be issue'd without a valid entity.
 ///
 class Component
 {
@@ -37,6 +34,9 @@ protected:
 
 public:
     virtual ~Component() = default;
+
+    const std::string& getName() const { return m_name; }
+    void setName(const std::string& name) { m_name = name; }
 
     ///
     /// \brief Get parent entity
@@ -56,10 +56,8 @@ protected:
     ///
     virtual void init() { }
 
-protected:
     std::string m_name;
-    /// Raw pointer to parent entity
-    /// Used as shared_from_this cannot be used in a constructor
+    /// Parent entity this component exists on
     std::weak_ptr<Entity> m_entity;
 };
 
@@ -84,4 +82,13 @@ public:
     virtual void update(const UpdateInfo& imstkNotUsed(updateData)) { }
     virtual void visualUpdate(const UpdateInfo& imstkNotUsed(updateData)) { }
 };
+
+///
+/// \class SceneBehaviour
+///
+/// \brief A SceneBehaviour represents a single component system
+/// that resides in the scene. It makes the assumption that all
+/// components used are updated with a double for deltaTime/time passed.
+///
+using SceneBehaviour = Behaviour<double>;
 } // namespace imstk

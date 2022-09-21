@@ -14,7 +14,7 @@
 
 namespace imstk
 {
-DebugGeometryModel::DebugGeometryModel(const std::string& name) : Behaviour<double>(name),
+DebugGeometryModel::DebugGeometryModel(const std::string& name) : SceneBehaviour(name),
     m_arrowScale(1.0),
     m_arrowColor(Color(0.0, 1.0, 0.0)),
     m_debugLineMesh(std::make_shared<LineMesh>()),

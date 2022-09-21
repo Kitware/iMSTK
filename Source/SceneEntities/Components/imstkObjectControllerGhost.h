@@ -23,7 +23,7 @@ class VisualModel;
 /// \todo: Device render mode to render the actual arm and body of the device
 /// \todo: This should be simplified when PbdObject and RbdObject are removed
 ///
-class ObjectControllerGhost : public Behaviour<double>
+class ObjectControllerGhost : public SceneBehaviour
 {
 public:
     ObjectControllerGhost(const std::string& name = "ObjectControllerGhost");

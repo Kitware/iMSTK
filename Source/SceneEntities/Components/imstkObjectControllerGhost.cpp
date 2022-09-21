@@ -14,7 +14,7 @@
 
 namespace imstk
 {
-ObjectControllerGhost::ObjectControllerGhost(const std::string& name) : Behaviour<double>(name),
+ObjectControllerGhost::ObjectControllerGhost(const std::string& name) : SceneBehaviour(name),
     m_ghostVisualModel(std::make_shared<VisualModel>("GhostVisualModel"))
 {
     m_ghostVisualModel->getRenderMaterial()->setColor(Color::Orange);

@@ -15,7 +15,7 @@
 
 namespace imstk
 {
-FpsTxtCounter::FpsTxtCounter(const std::string& name) : Behaviour<double>(name),
+FpsTxtCounter::FpsTxtCounter(const std::string& name) : SceneBehaviour(name),
     m_fpsTextVisualModel(std::make_shared<TextVisualModel>("FpsCounterTxt"))
 {
     m_fpsTextVisualModel->setPosition(TextVisualModel::DisplayPosition::LowerLeft);

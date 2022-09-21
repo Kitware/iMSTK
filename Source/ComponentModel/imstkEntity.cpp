@@ -24,7 +24,7 @@ Entity::addComponent(std::shared_ptr<Component> component)
     auto iter = std::find(m_components.begin(), m_components.end(), component);
     if (iter != m_components.end())
     {
-        LOG(FATAL) << "Tried to add component to object twice";
+        LOG(FATAL) << "Tried to add component to entity twice";
         return;
     }
     m_components.push_back(component);
@@ -43,7 +43,7 @@ std::shared_ptr<Component>
 Entity::getComponent(const unsigned int index) const
 {
     CHECK(index >= 0 && index < m_components.size()) <<
-        "component with index does not exist, index out of range";
+        "Component with index does not exist, index out of range";
     return m_components[index];
 }
 

@@ -20,10 +20,10 @@ class DeviceClient;
 /// \brief While the DeviceClient provides quantities from the device, the control
 /// defines what to do with those quantities
 ///
-class DeviceControl : public Behaviour<double>, public EventObject
+class DeviceControl : public SceneBehaviour, public EventObject
 {
 protected:
-    DeviceControl(const std::string& name = "DeviceControl") : Behaviour<double>(name) { }
+    DeviceControl(const std::string& name = "DeviceControl") : SceneBehaviour(name) { }
 
 public:
     ~DeviceControl() override = default;

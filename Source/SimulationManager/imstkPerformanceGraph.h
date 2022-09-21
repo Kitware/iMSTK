@@ -19,10 +19,10 @@ class Viewer;
 /// \brief Displays task graph node durations of a scene as overlay on the screen
 /// \todo: There is no delegate for this yet, it hooks directly into VTKRenderer
 ///
-class PerformanceGraph : public Behaviour<double>
+class PerformanceGraph : public SceneBehaviour
 {
 public:
-    PerformanceGraph(const std::string& name = "PerformanceGraph") : Behaviour<double>(name) { }
+    PerformanceGraph(const std::string& name = "PerformanceGraph") : SceneBehaviour(name) { }
 
     ///
     /// \brief Update the display of the last frames update times

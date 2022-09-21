@@ -26,7 +26,7 @@ class VisualModel;
 /// line segments, triangles, arrows, points
 /// \todo: Allow per vertex and per cell coloring
 ///
-class DebugGeometryModel : public Behaviour<double>
+class DebugGeometryModel : public SceneBehaviour
 {
 public:
     DebugGeometryModel(const std::string& name = "DebugGeometryModel");

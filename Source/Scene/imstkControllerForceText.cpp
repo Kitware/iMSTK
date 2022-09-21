@@ -23,7 +23,7 @@
 
 namespace imstk
 {
-ControllerForceText::ControllerForceText(const std::string& name) : Behaviour<double>(name),
+ControllerForceText::ControllerForceText(const std::string& name) : SceneBehaviour(name),
     m_textVisualModel(std::make_shared<TextVisualModel>("ControllerForceText"))
 {
     m_textVisualModel->setPosition(TextVisualModel::DisplayPosition::UpperRight);

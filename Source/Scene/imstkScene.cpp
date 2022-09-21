@@ -534,7 +534,7 @@ Scene::advance(const double dt)
         }
         for (auto comp : obj->getComponents())
         {
-            if (auto behaviour = std::dynamic_pointer_cast<Behaviour<double>>(comp))
+            if (auto behaviour = std::dynamic_pointer_cast<SceneBehaviour>(comp))
             {
                 behaviour->update(dt);
             }
@@ -582,7 +582,7 @@ Scene::updateVisuals(const double dt)
         }
         for (auto comp : ent->getComponents())
         {
-            if (auto behaviour = std::dynamic_pointer_cast<Behaviour<double>>(comp))
+            if (auto behaviour = std::dynamic_pointer_cast<SceneBehaviour>(comp))
             {
                 behaviour->visualUpdate(dt);
             }

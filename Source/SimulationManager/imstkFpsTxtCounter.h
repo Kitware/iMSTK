@@ -20,7 +20,7 @@ class Viewer;
 /// \brief Displays visual and physics framerates through dependent
 /// TextVisualModel
 ///
-class FpsTxtCounter : public Behaviour<double>
+class FpsTxtCounter : public SceneBehaviour
 {
 public:
     FpsTxtCounter(const std::string& name = "FpsTxtCounter");

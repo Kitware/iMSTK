@@ -21,7 +21,7 @@ class TextVisualModel;
 ///
 /// \brief Displays virtual coupling force text in the top right
 ///
-class ControllerForceText : public Behaviour<double>
+class ControllerForceText : public SceneBehaviour
 {
 public:
     ControllerForceText(const std::string& name = "ControllerForceText");

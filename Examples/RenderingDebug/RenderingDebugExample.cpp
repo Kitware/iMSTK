@@ -40,7 +40,7 @@ getRandomColor()
         1.0);
 }
 
-class DebugGeometryGenerator : public Behaviour<double>
+class DebugGeometryGenerator : public SceneBehaviour
 {
 protected:
     void init() override
