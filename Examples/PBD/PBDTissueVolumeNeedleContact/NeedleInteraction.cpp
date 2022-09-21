@@ -8,11 +8,11 @@
 #include "imstkLineMesh.h"
 #include "imstkNeedle.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraToLineMeshCD.h"
 #include "NeedleEmbedder.h"
-#include "NeedleObject.h"
 
 using namespace imstk;
 

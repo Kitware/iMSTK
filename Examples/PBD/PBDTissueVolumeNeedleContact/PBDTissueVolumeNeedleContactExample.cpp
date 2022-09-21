@@ -124,7 +124,7 @@ makeNeedleObj(const std::string&        name,
     auto toolObj = std::make_shared<PbdObject>(name);
 
     auto toolGeometry = std::make_shared<LineMesh>();
-    auto verticesPtr = std::make_shared<VecDataArray<double, 3>>(2);
+    auto verticesPtr  = std::make_shared<VecDataArray<double, 3>>(2);
     (*verticesPtr)[0] = Vec3d(0.0, 0.0, 0.0);
     (*verticesPtr)[1] = Vec3d(0.0, 0.0, 0.25);
     auto indicesPtr = std::make_shared<VecDataArray<int, 2>>(1);
@@ -218,10 +218,9 @@ main()
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->getConfig()->m_doPartitioning = false;
-    pbdModel->getConfig()->m_dt = 0.001;                     // realtime used in update calls later in main
-    pbdModel->getConfig()->m_iterations = 1;                 // Prefer small timestep over iterations
-    //pbdModel->getConfig()->m_gravity    = Vec3d::Zero();
-    pbdModel->getConfig()->m_gravity = Vec3d(0.0, 0.0, 0.0); // Zero gravity to approximate boundary conditions
+    pbdModel->getConfig()->m_dt = 0.001;     // realtime used in update calls later in main
+    pbdModel->getConfig()->m_iterations = 1; // Prefer small timestep over iterations
+    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdModel->getConfig()->m_collisionIterations = 5;
 
     // Setup a tissue with surface collision geometry
@@ -264,13 +263,13 @@ main()
 
     // This adds both contact and puncture functionality
     auto interaction = std::make_shared<NeedleInteraction>(tissueObj, toolObj);
-    interaction->setPunctureForceThreshold(15.0);
+    interaction->setPunctureForceThreshold(3.0);
     interaction->setNeedleCompliance(0.000001);
     interaction->setFriction(0.1);
     scene->addInteraction(interaction);
     // This adds both contact and puncture functionality
     auto interaction2 = std::make_shared<NeedleInteraction>(tissueObj2, toolObj);
-    interaction2->setPunctureForceThreshold(15.0);
+    interaction2->setPunctureForceThreshold(3.0);
     interaction2->setNeedleCompliance(0.000001);
     interaction2->setFriction(0.1);
     scene->addInteraction(interaction2);
