@@ -9,12 +9,12 @@
 
 namespace imstk
 {
-std::atomic<EntityID> Entity::s_count { 0 };
+std::atomic<EntityID> Entity::m_count{ 0 };
 
 Entity::Entity(const std::string& name) : m_name(name)
 {
-    s_count++;
-    m_ID = s_count;
+    m_count++;
+    m_ID = m_count;
 }
 
 void

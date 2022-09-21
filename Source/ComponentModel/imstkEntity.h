@@ -151,7 +151,7 @@ public:
 protected:
     std::vector<std::shared_ptr<Component>> m_components;
 
-    static std::atomic<EntityID> s_count; ///< current count of entities
+    static std::atomic<EntityID> m_count; ///< current count of entities
 
     EntityID    m_ID;                     ///< unique ID of entity
     std::string m_name;                   ///< Not unique name
