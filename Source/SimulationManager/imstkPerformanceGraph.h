@@ -11,7 +11,6 @@
 namespace imstk
 {
 class SceneManager;
-//class TextVisualModel;
 class Viewer;
 
 ///
@@ -30,8 +29,8 @@ public:
     ///
     void visualUpdate(const double& dt);
 
-    void setViewer(std::weak_ptr<Viewer> viewer) { m_viewer = viewer; }
-    void setSceneManager(std::weak_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
+    void setViewer(std::weak_ptr<Viewer> viewer);
+    void setSceneManager(std::weak_ptr<SceneManager> sceneManager);
 
 protected:
     //std::shared_ptr<TextVisualModel> m_fpsTextVisualModel;

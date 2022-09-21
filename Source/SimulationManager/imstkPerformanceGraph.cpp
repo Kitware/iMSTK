@@ -5,6 +5,7 @@
 */
 
 #include "imstkPerformanceGraph.h"
+#include "imstkLogger.h"
 #include "imstkRenderer.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -13,10 +14,25 @@
 namespace imstk
 {
 void
+PerformanceGraph::setViewer(std::weak_ptr<Viewer> viewer)
+{
+    CHECK(viewer.lock() != nullptr) << "Tried to set null viewer";
+    m_viewer = viewer;
+}
+
+void
+PerformanceGraph::setSceneManager(std::weak_ptr<SceneManager> sceneManager)
+{
+    CHECK(sceneManager.lock() != nullptr) << "Tried to set null sceneManager";
+    m_sceneManager = sceneManager;
+}
+
+void
 PerformanceGraph::visualUpdate(const double& dt)
 {
-    std::shared_ptr<Viewer> viewer    = m_viewer.lock();
-    const int               infoLevel = viewer->getInfoLevel();
+    std::shared_ptr<Viewer> viewer = m_viewer.lock();
+    CHECK(viewer != nullptr) << "PerformanceGraph must have viewer";
+    const int infoLevel = viewer->getInfoLevel();
     if (infoLevel != m_prevInfoLevel)
     {
         // If level 1 or 2 enable, else disable
