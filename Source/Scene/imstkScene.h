@@ -248,6 +248,9 @@ public:
     ///
     double getFPS() const { return m_fps; }
 
+    ///
+    /// \brief Get the total scene time passed (accumulated deltatime)
+    ///
     double getSceneTime() const { return m_sceneTime; }
 
     ///

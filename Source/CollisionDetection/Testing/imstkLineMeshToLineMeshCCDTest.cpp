@@ -75,6 +75,10 @@ intersectionTest(
     EXPECT_EQ(IMSTK_EDGE, colData->elementsA[0].m_element.m_CellIndexElement.cellType);
     EXPECT_EQ(IMSTK_EDGE, colData->elementsB[0].m_element.m_CellIndexElement.cellType);
 
+    // Check edge ids
+    EXPECT_EQ(0, colData->elementsA[0].m_element.m_CellIndexElement.parentId);
+    EXPECT_EQ(0, colData->elementsB[0].m_element.m_CellIndexElement.parentId);
+
     // Check id counts
     EXPECT_EQ(2, colData->elementsA[0].m_element.m_CellIndexElement.idCount);
     EXPECT_EQ(2, colData->elementsB[0].m_element.m_CellIndexElement.idCount);
@@ -190,6 +194,10 @@ TEST(imstkLineMeshToLineMeshCCDTest, IntersectionTestAA_self)
     // Check cell types
     EXPECT_EQ(IMSTK_EDGE, colData->elementsA[0].m_element.m_CellIndexElement.cellType);
     EXPECT_EQ(IMSTK_EDGE, colData->elementsB[0].m_element.m_CellIndexElement.cellType);
+
+    // Check edge/parent ids
+    EXPECT_EQ(0, colData->elementsA[0].m_element.m_CellIndexElement.parentId);
+    EXPECT_EQ(2, colData->elementsB[0].m_element.m_CellIndexElement.parentId);
 
     // Check id counts
     EXPECT_EQ(2, colData->elementsA[0].m_element.m_CellIndexElement.idCount);
