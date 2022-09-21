@@ -75,13 +75,33 @@ Scene::initialize()
         }
     }
 
-    // Initialize all behaviours (single entity systems)
+    // Initialize all components
+    // If any components are added during initialize, initialize those
+    // as well, do this until all are initialized
+    std::unordered_map<std::shared_ptr<Component>, bool> compIsInitd;
     for (const auto& ent : m_sceneEntities)
     {
-        auto comps = ent->getComponents();
-        for (const auto& comp : comps)
+        std::vector<std::shared_ptr<Component>> compsToInit = ent->getComponents();
+        while (compsToInit.size() > 0)
         {
-            comp->initialize();
+            // Initialize all components and denote which are now complete
+            for (const auto& comp : compsToInit)
+            {
+                comp->initialize();
+                compIsInitd[comp] = true;
+            }
+
+            // Rnu through all the components again, if any were added (found not init'd)
+            // then add them to the compsToInit
+            std::vector<std::shared_ptr<Component>> newComps = ent->getComponents();
+            compsToInit.clear();
+            for (const auto& comp : newComps)
+            {
+                if (!compIsInitd[comp])
+                {
+                    compsToInit.push_back(comp);
+                }
+            }
         }
     }
 
