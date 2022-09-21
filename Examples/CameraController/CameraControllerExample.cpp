@@ -16,6 +16,7 @@
 #include "imstkPlane.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkSpotLight.h"

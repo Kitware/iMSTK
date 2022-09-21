@@ -8,6 +8,7 @@ set(H_FILES
   imstkKeyboardSceneControl.h
   imstkMouseSceneControl.h
   imstkPerformanceGraph.h
+  imstkSceneControlText.h
   imstkSceneManager.h
   imstkSimulationManager.h
   imstkSimulationUtils.h
@@ -19,6 +20,7 @@ set(SRC_FILES
   imstkKeyboardSceneControl.cpp
   imstkMouseSceneControl.cpp
   imstkPerformanceGraph.cpp
+  imstkSceneControlText.cpp
   imstkSceneManager.cpp
   imstkSimulationManager.cpp
   imstkSimulationUtils.cpp

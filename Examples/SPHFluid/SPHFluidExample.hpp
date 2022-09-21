@@ -6,8 +6,10 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionDetectionAlgorithm.h"
-#include "imstkKeyboardSceneControl.h"
 #include "imstkDirectionalLight.h"
+#include "imstkKeyboardDeviceClient.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkSceneManager.h"
@@ -15,9 +17,8 @@
 #include "imstkSimulationUtils.h"
 #include "imstkSphObject.h"
 #include "imstkSphObjectCollision.h"
+#include "imstkTextVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkMouseDeviceClient.h"
-#include "imstkKeyboardDeviceClient.h"
 
 #include "Fluid.hpp"
 #include "Solid.hpp"

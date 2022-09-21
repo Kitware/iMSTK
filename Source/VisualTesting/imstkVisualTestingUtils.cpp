@@ -5,6 +5,7 @@
 */
 
 #include "imstkVisualTestingUtils.h"
+#include "imstkEntity.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
@@ -15,10 +16,9 @@
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkTestingUtils.h"
+#include "imstkTextVisualModel.h"
 #include "imstkVTKRenderer.h"
 #include "imstkVTKViewer.h"
-#include "imstkKeyboardSceneControl.h"
-#include "imstkMouseSceneControl.h"
 
 using namespace imstk;
 

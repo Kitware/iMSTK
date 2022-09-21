@@ -10,28 +10,12 @@
 #include "imstkModuleDriver.h"
 #include "imstkRenderer.h"
 #include "imstkScene.h"
+#include "imstkSceneControlText.h"
 #include "imstkSceneManager.h"
 #include "imstkViewer.h"
 
 namespace imstk
 {
-SceneControlText::SceneControlText(const std::string& name) : TextVisualModel(name)
-{
-    // Create visual model
-    setFontSize(40);
-    setVisibility(false);
-    setText("Simulation Paused\nPress Space to Continue\n"
-        "Press R to Reset\nPress C to clear pause screen");
-
-    setPosition(TextVisualModel::DisplayPosition::CenterCenter);
-}
-
-void
-SceneControlText::init()
-{
-    setVisibility(m_useTextStatus ? m_sceneManager.lock()->getPaused() : false);
-}
-
 void
 KeyboardSceneControl::printControls()
 {
@@ -156,10 +140,5 @@ KeyboardSceneControl::OnKeyPress(const char key)
             m_sceneControlText->setVisibility(m_sceneControlText->getUseTextStatus() ? !paused : false);
         }
     }
-}
-
-void
-KeyboardSceneControl::OnKeyRelease(const char imstkNotUsed(key))
-{
 }
 } // namespace imstk

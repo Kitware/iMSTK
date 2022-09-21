@@ -18,6 +18,7 @@
 #include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
+#include "imstkTextVisualModel.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVolumeRenderMaterialPresets.h"

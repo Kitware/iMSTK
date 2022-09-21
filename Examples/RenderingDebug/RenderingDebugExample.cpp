@@ -16,6 +16,7 @@
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
+#include "imstkTextVisualModel.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;

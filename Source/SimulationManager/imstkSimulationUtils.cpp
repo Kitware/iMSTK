@@ -5,12 +5,15 @@
 */
 
 #include "imstkSimulationUtils.h"
+#include "imstkEntity.h"
 #include "imstkFpsTxtCounter.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkLogger.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPerformanceGraph.h"
+#include "imstkSceneControlText.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkViewer.h"
