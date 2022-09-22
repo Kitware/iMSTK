@@ -8,10 +8,11 @@
 #include "EmbeddingConstraint.h"
 #include "imstkCollisionData.h"
 #include "imstkLineMesh.h"
-#include "imstkNeedle.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
+#include "imstkPuncturable.h"
+#include "imstkStraightNeedle.h"
 #include "imstkTaskNode.h"
 #include "imstkTetrahedralMesh.h"
 

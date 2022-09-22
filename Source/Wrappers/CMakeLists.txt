@@ -92,6 +92,7 @@ set(CWRAPPER_DEPENDENCIES
 	CollisionDetection
 	CollisionHandling
 	SceneEntities
+    Needle
 	Scene
 	SimulationManager
     ViewerCore

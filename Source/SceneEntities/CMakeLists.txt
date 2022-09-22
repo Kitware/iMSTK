@@ -5,7 +5,6 @@
 set(H_FILES
   Camera/imstkCamera.h
   Components/imstkAxesModel.h
-  Components/imstkNeedle.h
   Components/imstkObjectControllerGhost.h
   Components/imstkVisualModel.h
   Components/imstkVertexLabelVisualModel.h
@@ -31,7 +30,6 @@ set(H_FILES
 
 set(SRC_FILES
   Camera/imstkCamera.cpp
-  Components/imstkNeedle.cpp
   Components/imstkObjectControllerGhost.cpp
   Components/imstkVisualModel.cpp
   Lights/imstkIBLProbe.cpp

@@ -5,10 +5,11 @@
 */
 
 #include "NeedleInteraction.h"
+#include "imstkArcNeedle.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkImplicitGeometry.h"
 #include "imstkLineMesh.h"
-#include "imstkNeedle.h"
+#include "imstkPuncturable.h"
 #include "imstkRigidObject2.h"
 #include "imstkTaskGraph.h"
 #include "NeedleRigidBodyCH.h"

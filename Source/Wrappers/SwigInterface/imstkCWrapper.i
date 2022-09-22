@@ -175,6 +175,15 @@
 #include "imstkRigidObjectController.h"
 
 /*
+ * Needle
+ */
+#include "imstkPuncture.h"
+#include "imstkNeedle.h"
+#include "imstkStraightNeedle.h"
+#include "imstkArcNeedle.h"
+#include "imstkPuncturable.h"
+
+/*
  * Scene
  */
 #include "imstkScene.h"
@@ -443,6 +452,15 @@ namespace std
 %include "../../Controllers/imstkTrackingDeviceControl.h"
 %include "../../Controllers/imstkSceneObjectController.h"
 %include "../../Controllers/imstkRigidObjectController.h"
+
+/*
+ * Needle
+ */
+%include "../../Needle/imstkPuncture.h"
+%include "../../Needle/imstkNeedle.h"
+%include "../../Needle/imstkStraightNeedle.h"
+%include "../../Needle/imstkArcNeedle.h"
+%include "../../Needle/imstkPuncturable.h"
 
 /* 
  * Scene

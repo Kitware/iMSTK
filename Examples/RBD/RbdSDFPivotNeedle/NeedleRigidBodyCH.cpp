@@ -7,6 +7,7 @@
 #include "NeedleRigidBodyCH.h"
 #include "imstkLineMesh.h"
 #include "imstkNeedle.h"
+#include "imstkPuncturable.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"

@@ -182,6 +182,15 @@
 %shared_ptr(imstk::RigidObjectController)
 
 /*
+ * Needle
+ */
+%shared_ptr(imstk::Puncture)
+%shared_ptr(imstk::Needle)
+%shared_ptr(imstk::StraightNeedle)
+%shared_ptr(imstk::ArcNeedle)
+%shared_ptr(imstk::Puncturable)
+
+/*
  * Scene
  */
 %shared_ptr(imstk::SceneConfig)

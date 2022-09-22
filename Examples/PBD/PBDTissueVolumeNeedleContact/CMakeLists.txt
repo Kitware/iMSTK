@@ -33,5 +33,7 @@ if (iMSTK_USE_RENDERING_VTK)
   target_link_libraries(${PROJECT_NAME}
     SimulationManager
     Filtering
-    ViewerVTK)
+    ViewerVTK
+    Needle
+    )
 endif()

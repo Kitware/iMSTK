@@ -8,6 +8,7 @@
 
 #include "imstkPbdRigidObjectCollision.h"
 #include "imstkRigidObject2.h"
+#include "imstkStraightNeedle.h"
 #include "NeedlePbdCH.h"
 #include "NeedleRigidBodyCH.h"
 

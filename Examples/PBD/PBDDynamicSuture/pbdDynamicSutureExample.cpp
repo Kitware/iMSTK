@@ -20,6 +20,7 @@
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPointwiseMap.h"
+#include "imstkPuncturable.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"

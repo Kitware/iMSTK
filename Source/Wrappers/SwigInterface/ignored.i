@@ -42,11 +42,12 @@
 %ignore imstk::Log;
 %rename("%s") imstk::Logger::startLogger();
 
+%ignore imstk::PunctureMap;
+
 %ignore imstk::Scene::getCameras() const;
 
 %ignore imstk::InteractionPair::getTaskNodeInputs();
 %ignore imstk::InteractionPair::getTaskNodeOutputs();
-%ignore imstk::CollisionGraph::getInteractionPairMap();
 
 %ignore imstk::FeDeformableObject::getFEMModel();
 %ignore imstk::FemDeformableBodyModel::initializeEigenMatrixFromVegaMatrix;

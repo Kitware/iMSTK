@@ -35,5 +35,7 @@ if(iMSTK_USE_HAPTICS AND iMSTK_USE_RENDERING_VTK)
     #-----------------------------------------------------------------------------
     target_link_libraries(${PROJECT_NAME}
         SimulationManager
-        ViewerVTK)
+        ViewerVTK
+        Needle
+        )
 endif()

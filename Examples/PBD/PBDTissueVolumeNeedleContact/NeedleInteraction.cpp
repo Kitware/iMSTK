@@ -6,9 +6,10 @@
 
 #include "NeedleInteraction.h"
 #include "imstkLineMesh.h"
-#include "imstkNeedle.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkPuncturable.h"
+#include "imstkStraightNeedle.h"
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraToLineMeshCD.h"

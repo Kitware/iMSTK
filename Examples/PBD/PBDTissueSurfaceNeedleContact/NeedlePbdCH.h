@@ -9,6 +9,7 @@
 #include "imstkNeedle.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdObject.h"
+#include "imstkPuncturable.h"
 
 using namespace imstk;
 

@@ -8,9 +8,10 @@
 #include "imstkCollidingObject.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkLineMesh.h"
-#include "imstkNeedle.h"
+#include "imstkPuncturable.h"
 #include "imstkRigidObject2.h"
 #include "imstkSignedDistanceField.h"
+#include "imstkStraightNeedle.h"
 #include "imstkTaskGraph.h"
 #include "NeedleRigidBodyCH.h"
 

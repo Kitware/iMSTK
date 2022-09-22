@@ -5,7 +5,8 @@
 */
 
 #include "NeedleRigidBodyCH.h"
-#include "imstkNeedle.h"
+#include "imstkArcNeedle.h"
+#include "imstkPuncturable.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"

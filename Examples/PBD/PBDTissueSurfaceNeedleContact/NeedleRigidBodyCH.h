@@ -8,6 +8,7 @@
 
 #include "imstkMacros.h"
 #include "imstkNeedle.h"
+#include "imstkPuncturable.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRigidBodyCH.h"
 #include "imstkRigidBodyModel2.h"
