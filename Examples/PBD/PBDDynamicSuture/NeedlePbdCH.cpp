@@ -9,15 +9,16 @@
 #include "NeedlePbdCH.h"
 #include "imstkCollisionUtils.h"
 #include "imstkLineMesh.h"
+#include "imstkNeedle.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkPointwiseMap.h"
+#include "imstkPuncturable.h"
+#include "imstkRigidObject2.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkRigidObject2.h"
-#include "imstkNeedle.h"
 
 #include <cmath>
 

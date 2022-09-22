@@ -9,6 +9,7 @@
 #include "imstkLineMesh.h"
 #include "imstkNeedle.h"
 #include "imstkPbdObject.h"
+#include "imstkPuncturable.h"
 #include "imstkRigidObject2.h"
 #include "NeedlePbdCH.h"
 
