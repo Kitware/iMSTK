@@ -90,6 +90,11 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
     if (!m_rendererMap.count(m_activeScene))
     {
         m_rendererMap[m_activeScene] = std::make_shared<VTKRenderer>(m_activeScene, false);
+        // If we already ran past init, then init it here
+        if (m_init)
+        {
+            m_rendererMap[m_activeScene]->initialize();
+        }
     }
 
     // Cast to VTK renderer
