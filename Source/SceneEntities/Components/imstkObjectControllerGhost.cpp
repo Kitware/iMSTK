@@ -29,6 +29,7 @@ ObjectControllerGhost::init()
     // Add a visual representation for the object
     // how to avoid adding it twice?
     std::shared_ptr<Entity> entity = m_entity.lock();
+    CHECK(entity != nullptr) << "ObjectControllerGhost must have entity to initialize";
     if (!entity->containsComponent(m_ghostVisualModel))
     {
         m_ghostVisualModel->setName(entity->getName() + "_GhostVisualModel");

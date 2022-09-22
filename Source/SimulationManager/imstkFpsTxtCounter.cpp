@@ -4,8 +4,6 @@
 ** See accompanying NOTICE for details.
 */
 
-#pragma once
-
 #include "imstkFpsTxtCounter.h"
 #include "imstkEntity.h"
 #include "imstkScene.h"
@@ -27,6 +25,7 @@ FpsTxtCounter::init()
 {
     // Add a visual representation for the object
     std::shared_ptr<Entity> entity = m_entity.lock();
+    CHECK(entity != nullptr) << "FpsTxtCounter must have entity to initialize";
     if (!entity->containsComponent(m_fpsTextVisualModel))
     {
         m_fpsTextVisualModel->setName(entity->getName() + "_FpsCounterTxt");

@@ -73,6 +73,7 @@ void
 DebugGeometryModel::init()
 {
     std::shared_ptr<Entity> entity = m_entity.lock();
+    CHECK(entity != nullptr) << "DebugGeometryModel must have entity to initialize";
     if (!entity->containsComponent(m_debugPointModel))
     {
         m_debugPointModel->setName(entity->getName() + "_DebugPointModel");

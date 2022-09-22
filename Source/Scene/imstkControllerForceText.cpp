@@ -36,6 +36,7 @@ ControllerForceText::init()
     // Add a visual representation for the object
     // how to avoid adding it twice?
     std::shared_ptr<Entity> entity = m_entity.lock();
+    CHECK(entity != nullptr) << "ControllerForceText must have entity to initialize";
     if (!entity->containsComponent(m_textVisualModel))
     {
         m_textVisualModel->setName(entity->getName() + "_ControllerForceText");
