@@ -44,8 +44,6 @@ public:
     ///
     virtual void printControls() { }
 
-    void update(const double& imstkNotUsed(dt)) override { }
-
 protected:
     std::shared_ptr<DeviceClient> m_deviceClient;
 };
