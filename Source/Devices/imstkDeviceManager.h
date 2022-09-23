@@ -21,7 +21,7 @@ class DeviceClient;
 ///
 class DeviceManager : public Module
 {
-protected:
+public:
     DeviceManager()
     {
         // Throwing events at high rates is a bad idea for this thread
@@ -30,7 +30,6 @@ protected:
         m_executionType = ExecutionType::PARALLEL;
     }
 
-public:
     ~DeviceManager() override = default;
 
     ///

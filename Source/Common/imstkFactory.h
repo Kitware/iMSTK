@@ -4,6 +4,8 @@
 ** See accompanying NOTICE for details.
 */
 
+#pragma once
+
 #include <unordered_map>
 #include <functional>
 #include <string>

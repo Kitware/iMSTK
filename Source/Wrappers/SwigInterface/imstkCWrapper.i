@@ -24,6 +24,7 @@
 #include "imstkColor.h"
 #include "imstkEventObject.h"
 #include "imstkTypes.h"
+#include "imstkFactory.h"
 
 /*
  * DataStructures
@@ -476,6 +477,19 @@ namespace std
 %include "../../Devices/imstkDeviceClient.h"
 %include "../../Devices/imstkKeyboardDeviceClient.h"
 %include "../../Devices/imstkMouseDeviceClient.h"
+%include "../../Devices/imstkDeviceManager.h"
+%include "../../Devices/imstkDeviceManagerFactory.h"
+
+/*
+ * The Superclass static functions don't seem to get exposed, 
+ * this adds a "local" static function that just invokes the builtin
+ * contains function
+ */
+%extend imstk::DeviceManagerFactory {
+	static bool contains(const std::string& val) {
+		return imstk::DeviceManagerFactory::contains(val);
+	}
+}
 
 #ifdef iMSTK_USE_HAPLY
 	%include "../../Devices/imstkHaplyDeviceManager.h"
@@ -488,9 +502,6 @@ namespace std
 	%include "../../Devices/imstkOpenHapticDeviceClient.h"
 #endif
 
-%include "../../Devices/imstkDeviceManager.h"
-%include "../../Devices/imstkDeviceManagerFactory.h"
-
 #ifdef iMSTK_USE_VRPN
 	// The static calls in DeviceClient are getting ignored anyway define these
 	// Rather than dealing with the correct includes for VRPN
@@ -499,6 +510,10 @@ namespace std
 	#define _vrpn_TRACKERVELCB void*
 	#define _vrpn_ANALOGCB void*
 	#define _vrpn_BUTTONCB void*
+
+	// Swig things that VRPNDeviceManager is abstract, that will
+	// mean no constructors are created
+	%feature("notabstract") imstk::VRPNDeviceManager;
 
 	%include "../../Devices/imstkVRPNDeviceManager.h"
 	%include "../../Devices/imstkVRPNDeviceClient.h"
