@@ -16,6 +16,8 @@ class vtkInteractorStyle;
 
 namespace imstk
 {
+class VTKRenderer;
+
 ///
 /// \class AbstractVTKViewer
 ///
@@ -79,6 +81,11 @@ public:
     /// \brief Set the logger mode
     ///
     void setVtkLoggerMode(VTKLoggerMode loggerMode);
+
+    ///
+    /// \brief Retrieve the renderer associated with the current scene
+    ///
+    std::shared_ptr<VTKRenderer> getActiveVtkRenderer() const;
 
 protected:
     bool initModule() override;

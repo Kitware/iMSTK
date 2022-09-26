@@ -22,7 +22,7 @@ RigidObjectController::setControlledObject(std::shared_ptr<SceneObject> obj)
 }
 
 void
-RigidObjectController::update(const double dt)
+RigidObjectController::update(const double& dt)
 {
     if (!updateTrackingData(dt))
     {

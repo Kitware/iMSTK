@@ -194,16 +194,17 @@ edgePseudoNormalFromTriangle(const Vec2i& vertexIds, const SurfMeshData& surfMes
 ///
 /// \brief Returns signed distance, reports caseType (ie: which element type
 /// is nearest, vertex, edge, or triangle)
-/// \param position to measure signed distance from
-/// \param SurfaceMesh to measure signed distance too
-/// \param nearest element case, vertex-0, edge-1, triangle-2
-/// \param vertexIds of nearest element (maximum 3 verts)
+/// \param pos, position to measure signed distance from
+/// \param surfMeshData, SurfaceMesh to measure signed distance too
+/// \param caseType, nearest element case, vertex-0, edge-1, triangle-2
+/// \param vIds, vertexIds of nearest element (maximum 3 verts)
+/// \param closestCell, id of the closest cell (vertex, edge, or triangle)
 ///
 static double
 polySignedDist(const Vec3d& pos, const SurfMeshData& surfMeshData,
-               int& caseType, Vec3i& vIds)
+               int& caseType, Vec3i& vIds, int& closestCell)
 {
-    int    closestCell     = -1;
+    closestCell = -1;
     Vec3d  closestPt       = Vec3d::Zero();
     double minSqrDist      = IMSTK_DOUBLE_MAX;
     int    closestCellCase = -1;
@@ -354,9 +355,10 @@ ClosedSurfaceMeshToMeshCD::vertexToTriangleTest(
     {
         const Vec3d& p = pointSetData.vertices[i];
 
-        int          caseType   = -1;
-        Vec3i        vertexIds  = Vec3i::Zero();
-        const double signedDist = polySignedDist(p, surfMeshData, caseType, vertexIds);
+        int          caseType    = -1;
+        int          closestCell = -1;
+        Vec3i        vertexIds   = Vec3i::Zero();
+        const double signedDist  = polySignedDist(p, surfMeshData, caseType, vertexIds, closestCell);
         m_signedDistances[i] = signedDist;
         if (signedDist <= 0.0)
         {
@@ -371,6 +373,7 @@ ClosedSurfaceMeshToMeshCD::vertexToTriangleTest(
 
                 CellIndexElement elemB;
                 elemB.ids[0]   = vertexIds[0];
+                elemB.parentId = closestCell; // Triangle id
                 elemB.idCount  = 1;
                 elemB.cellType = IMSTK_VERTEX;
 
@@ -388,6 +391,7 @@ ClosedSurfaceMeshToMeshCD::vertexToTriangleTest(
                 CellIndexElement elemB;
                 elemB.ids[0]   = vertexIds[0];
                 elemB.ids[1]   = vertexIds[1];
+                elemB.parentId = closestCell; // Triangle id
                 elemB.idCount  = 2;
                 elemB.cellType = IMSTK_EDGE;
 
@@ -406,6 +410,7 @@ ClosedSurfaceMeshToMeshCD::vertexToTriangleTest(
                 elemB.ids[0]   = vertexIds[0];
                 elemB.ids[1]   = vertexIds[1];
                 elemB.ids[2]   = vertexIds[2];
+                elemB.parentId = closestCell; // Triangle id
                 elemB.idCount  = 3;
                 elemB.cellType = IMSTK_TRIANGLE;
 
@@ -474,9 +479,10 @@ ClosedSurfaceMeshToMeshCD::lineMeshEdgeToTriangleTest(
                         if (sqrDist < minSqrDist)
                         {
                             // Check if the point on the oppositie edge nearest to edgeB is inside B
-                            int          caseType   = -1;
+                            int          caseType    = -1;
+                            int          closestCell = -1;
                             Vec3i        vIds       = Vec3i::Zero();
-                            const double signedDist = polySignedDist(ptA, surfMeshBData, caseType, vIds);
+                            const double signedDist = polySignedDist(ptA, surfMeshBData, caseType, vIds, closestCell);
                             if (signedDist <= 0.0)
                             {
                                 minSqrDist    = sqrDist;
@@ -493,12 +499,14 @@ ClosedSurfaceMeshToMeshCD::lineMeshEdgeToTriangleTest(
                 CellIndexElement elemA;
                 elemA.ids[0]   = edgeA[0];
                 elemA.ids[1]   = edgeA[1];
+                elemA.parentId = i; // Edge id
                 elemA.idCount  = 2;
                 elemA.cellType = IMSTK_EDGE;
 
                 CellIndexElement elemB;
                 elemB.ids[0]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][0]];
                 elemB.ids[1]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][1]];
+                elemB.parentId = closestTriId; // Triangle id
                 elemB.idCount  = 2;
                 elemB.cellType = IMSTK_EDGE;
 
@@ -587,9 +595,10 @@ ClosedSurfaceMeshToMeshCD::surfMeshEdgeToTriangleTest(
                                     if (sqrDist < minSqrDist)
                                     {
                                         // Check if the point on the oppositie edge nearest to edgeB is inside B
-                                        int          caseType   = -1;
+                                        int          caseType    = -1;
+                                        int          closestCell = -1;
                                         Vec3i        vIds       = Vec3i::Zero();
-                                        const double signedDist = polySignedDist(ptA, surfMeshBData, caseType, vIds);
+                                        const double signedDist = polySignedDist(ptA, surfMeshBData, caseType, vIds, closestCell);
                                         if (signedDist <= 0.0)
                                         {
                                             minSqrDist    = sqrDist;
@@ -614,12 +623,14 @@ ClosedSurfaceMeshToMeshCD::surfMeshEdgeToTriangleTest(
                             CellIndexElement elemA;
                             elemA.ids[0]   = edgeA[0];
                             elemA.ids[1]   = edgeA[1];
+                            elemA.parentId = i; // Triangle id
                             elemA.idCount  = 2;
                             elemA.cellType = IMSTK_EDGE;
 
                             CellIndexElement elemB;
                             elemB.ids[0]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][0]];
                             elemB.ids[1]   = surfMeshBData.cells[closestTriId][triEdgePattern[closestEdgeId][1]];
+                            elemB.parentId = closestTriId; // Triangle id
                             elemB.idCount  = 2;
                             elemB.cellType = IMSTK_EDGE;
 

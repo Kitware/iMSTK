@@ -10,8 +10,6 @@
 
 #include <unordered_map>
 
-class NeedleObject;
-
 namespace imstk
 {
 class CollisionData;
@@ -19,6 +17,8 @@ class EmbeddingConstraint;
 class LineMesh;
 class PbdConstraint;
 class PbdObject;
+class Puncturable;
+class StraightNeedle;
 class TaskNode;
 class TetrahedralMesh;
 } // namespace imstk
@@ -42,15 +42,15 @@ struct TissueData
 };
 struct NeedleData
 {
-    std::shared_ptr<NeedleObject> obj;
+    std::shared_ptr<PbdObject> obj;
 
-    NeedleData(std::shared_ptr<NeedleObject> obj);
+    NeedleData(std::shared_ptr<PbdObject> obj);
 
-    std::shared_ptr<LineMesh> geom;
+    std::shared_ptr<StraightNeedle> needle;
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr;
     VecDataArray<double, 3>& vertices;
-    std::shared_ptr<VecDataArray<int, 2>> indicesPtr;
-    VecDataArray<int, 2>& indices;
+    std::shared_ptr<VecDataArray<int, 2>> cellsPtr;
+    VecDataArray<int, 2>& cells;
 };
 
 ///

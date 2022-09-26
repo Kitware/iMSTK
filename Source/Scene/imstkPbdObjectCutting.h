@@ -36,6 +36,14 @@ public:
     IMSTK_TYPE_NAME(PbdObjectCutting)
 
     ///
+    /// \brief Epsilon controls the distance a point needs to be to
+    /// be considered "inside" the cutting zone
+    /// @{
+    double getEpsilon() const { return m_epsilon; }
+    void setEpsilon(const double eps) { m_epsilon = eps; }
+    /// @}
+
+    ///
     /// \brief Applies the cut when called
     ///
     void apply();
@@ -85,6 +93,8 @@ protected:
     void modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
                          std::shared_ptr<std::vector<size_t>> elementIndices,
                          std::shared_ptr<VecDataArray<int, 3>> elements);
+
+    double m_epsilon = 0.1;
 
     std::shared_ptr<PbdObject>       m_objA = nullptr;
     std::shared_ptr<CollidingObject> m_objB = nullptr;

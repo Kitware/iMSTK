@@ -153,6 +153,7 @@ SurfaceMeshToSurfaceMeshCD::computeCollisionDataAB(
                 elemB.ids[0]   = vtContact.second[0];
                 elemB.ids[1]   = vtContact.second[1];
                 elemB.ids[2]   = vtContact.second[2];
+                elemA.parentId = j; // Triangle id
 
                 elementsA.push_back(elemA);
                 elementsB.push_back(elemB);
@@ -174,12 +175,14 @@ SurfaceMeshToSurfaceMeshCD::computeCollisionDataAB(
                     elemA.cellType = IMSTK_EDGE;
                     elemA.ids[0]   = eeContact.first[0];
                     elemA.ids[1]   = eeContact.first[1];
+                    elemA.parentId = i; // Triangle id
 
                     CellIndexElement elemB;
                     elemB.idCount  = 2;
                     elemB.cellType = IMSTK_EDGE;
                     elemB.ids[0]   = eeContact.second[0];
                     elemB.ids[1]   = eeContact.second[1];
+                    elemA.parentId = j; // Triangle id
 
                     elementsA.push_back(elemA);
                     elementsB.push_back(elemB);
@@ -195,6 +198,7 @@ SurfaceMeshToSurfaceMeshCD::computeCollisionDataAB(
                 elemA.ids[0]   = tvContact.first[0];
                 elemA.ids[1]   = tvContact.first[1];
                 elemA.ids[2]   = tvContact.first[2];
+                elemA.parentId = i; // Triangle id
 
                 CellIndexElement elemB;
                 elemB.idCount  = 1;

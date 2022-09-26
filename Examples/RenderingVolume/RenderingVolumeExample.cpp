@@ -17,10 +17,11 @@
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
+#include "imstkTextVisualModel.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVolumeRenderMaterialPresets.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -62,9 +63,9 @@ main()
     viewer->setActiveScene(scene);
     viewer->setBackgroundColors(Color(0.3285, 0.3285, 0.6525), Color(0.13836, 0.13836, 0.2748), true);
 
-    auto statusManager = viewer->getTextStatusManager();
-    statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
-    statusManager->setStatusDisplayCorner(VTKTextStatusManager::StatusType::Custom, VTKTextStatusManager::DisplayCorner::UpperLeft);
+    auto statusTxt = std::make_shared<TextVisualModel>("StatusText");
+    statusTxt->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
+    statusTxt->setFontSize(30);
 
     StopWatch timer;
     timer.start();
@@ -87,7 +88,7 @@ main()
 
                               std::ostringstream ss;
                               ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(static_cast<VolumeRenderMaterialPresets::Presets>(currMatId));
-                              statusManager->setCustomStatus(ss.str());
+                              statusTxt->setText(ss.str());
                           }
                       };
 
@@ -102,19 +103,11 @@ main()
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
-
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        mouseAndKeyControls->addComponent(statusTxt);
+        scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();
     }

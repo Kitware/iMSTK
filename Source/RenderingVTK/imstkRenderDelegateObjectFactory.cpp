@@ -19,6 +19,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKAxesRenderDelegate.h"
 #include "imstkVTKCapsuleRenderDelegate.h"
 #include "imstkVTKCylinderRenderDelegate.h"
 #include "imstkVTKFluidRenderDelegate.h"
@@ -55,12 +56,19 @@ IMSTK_REGISTER_RENDERDELEGATE(VertexLabel, VTKVertexLabelRenderDelegate)
 IMSTK_REGISTER_RENDERDELEGATE(TextRenderDelegate, VTKTextRenderDelegate)
 
 // Custom algorithms
+RenderDelegateRegistrar<VTKAxesRenderDelegate>          _imstk_registerrenderdelegate_axes("AxesModel");
 RenderDelegateRegistrar<VTKFluidRenderDelegate>         _imstk_registerrenderdelegate_fluid("Fluid");
 RenderDelegateRegistrar<VTKSurfaceNormalRenderDelegate> _imstk_registerrenderdelegate_surfacenormals("SurfaceNormals");
 
 std::shared_ptr<VTKRenderDelegate>
 RenderDelegateObjectFactory::makeRenderDelegate(std::shared_ptr<VisualModel> visualModel)
 {
+    if (visualModel == nullptr)
+    {
+        LOG(FATAL) << "RenderDelegate::makeDelegate error: Called with null visualModel";
+        return nullptr;
+    }
+
     // If delegate hint is provided & it exists in map, override the creation of the delegate
     const std::string& delegateHint = visualModel->getDelegateHint();
     if (delegateHint == "")

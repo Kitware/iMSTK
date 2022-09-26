@@ -26,12 +26,10 @@ RenderTest::createScene()
 
     ASSERT_NE(geom, nullptr) << "ERROR: No geometry";
 
-    visualModel = std::make_shared<VisualModel>();
+    sceneObj    = std::make_shared<SceneObject>("SceneObject");
+    visualModel = sceneObj->addComponent<VisualModel>();
     visualModel->setGeometry(geom);
     visualModel->setRenderMaterial(renderMaterial);
-
-    sceneObj = std::make_shared<SceneObject>("SceneObject");
-    sceneObj->addVisualModel(visualModel);
     m_scene->addSceneObject(sceneObj);
 }
 

@@ -44,6 +44,8 @@ TEST(imstkLineMeshToCapsuleCDTest, LineEdgePerpindicularIntersectCapsule)
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsA[0].m_type);
     EXPECT_EQ(CollisionElementType::PointDirection, colData->elementsB[0].m_type);
 
+    EXPECT_EQ(0, colData->elementsA[0].m_element.m_CellIndexElement.parentId);
+
     EXPECT_EQ(IMSTK_EDGE, colData->elementsA[0].m_element.m_CellIndexElement.cellType);
 }
 
@@ -77,6 +79,8 @@ TEST(imstkLineMeshToCapsuleCDTest, LineEdgeIntersectCapsule)
 
     EXPECT_EQ(CollisionElementType::CellIndex, colData->elementsA[0].m_type);
     EXPECT_EQ(CollisionElementType::PointDirection, colData->elementsB[0].m_type);
+
+    EXPECT_EQ(0, colData->elementsA[0].m_element.m_CellIndexElement.parentId);
 
     EXPECT_EQ(IMSTK_EDGE, colData->elementsA[0].m_element.m_CellIndexElement.cellType);
 }

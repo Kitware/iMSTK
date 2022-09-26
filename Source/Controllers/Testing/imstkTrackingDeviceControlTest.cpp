@@ -32,6 +32,8 @@ public:
 // Derive to enable protected constructor
 class MockTrackingDeviceControl : public TrackingDeviceControl
 {
+public:
+    void update(const double&) override { }
 };
 
 class TrackingDeviceControlTest : public testing::Test

@@ -61,13 +61,17 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
         vtkOpenVRRenderer::SafeDownCast(m_vtkRenderer)->SetAutomaticLightCreation(false);
         vtkOpenVRRenderer::SafeDownCast(m_vtkRenderer)->SetLightFollowCamera(false);
     }
+}
 
+void
+VTKRenderer::initialize()
+{
     // Process all the changes initially (add all the delegates)
     sceneModifed(nullptr);
     this->updateRenderDelegates();
 
     // Lights and light actors
-    for (const auto& light : scene->getLights())
+    for (const auto& light : m_scene->getLights())
     {
         std::string name = light->getTypeName();
         if (name == DirectionalLight::getStaticTypeName())
@@ -133,14 +137,8 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
         m_vtkRenderer->AddLight(light.second);
     }
 
-    // Global Axis
-    m_AxesActor = vtkSmartPointer<vtkAxesActor>::New();
-    m_AxesActor->SetShaftType(vtkAxesActor::CYLINDER_SHAFT);
-    m_AxesActor->SetAxisLabels(false);
-    m_debugVtkActors.push_back(m_AxesActor);
-
     // Camera and camera actor
-    if (!enableVR)
+    if (!m_VrEnabled)
     {
         m_camera = vtkSmartPointer<vtkCamera>::New();
     }
@@ -219,6 +217,8 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     m_ssaoPass->SetDelegatePass(m_renderStepsPass);
 
     this->setConfig(this->m_config);
+
+    m_isInitialized = true;
 }
 
 void
@@ -271,37 +271,6 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
     m_camera = vtkSmartPointer<vtkCamera>::New();
 
     Renderer::setMode(mode, enableVR);
-}
-
-void
-VTKRenderer::setAxesLength(const double x, const double y, const double z)
-{
-    m_AxesActor->SetTotalLength(x, y, z);
-}
-
-void
-VTKRenderer::setAxesLength(const Vec3d& len)
-{
-    m_AxesActor->SetTotalLength(len.x(), len.y(), len.z());
-}
-
-Vec3d
-VTKRenderer::getAxesLength()
-{
-    const auto ptr = m_AxesActor->GetTotalLength();
-    return Vec3d(ptr[0], ptr[1], ptr[2]);
-}
-
-void
-VTKRenderer::setAxesVisibility(const bool visible)
-{
-    m_AxesActor->SetVisibility(visible);
-}
-
-bool
-VTKRenderer::getAxesVisibility() const
-{
-    return m_AxesActor->GetVisibility();
 }
 
 void
@@ -482,17 +451,17 @@ VTKRenderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
 }
 
 void
-VTKRenderer::addSceneObject(std::shared_ptr<SceneObject> sceneObject)
+VTKRenderer::addEntity(std::shared_ptr<Entity> entity)
 {
-    m_renderedObjects.insert(sceneObject);
-    m_renderedVisualModels[sceneObject] = std::unordered_set<std::shared_ptr<VisualModel>>();
-    sceneObjectModified(sceneObject);
+    m_renderedObjects.insert(entity);
+    m_renderedVisualModels[entity] = std::unordered_set<std::shared_ptr<VisualModel>>();
+    entityModified(entity);
     // Observe changes on this SceneObject
-    connect<Event>(sceneObject, &SceneObject::modified, this, &VTKRenderer::sceneObjectModified);
+    connect<Event>(entity, &Entity::modified, this, &VTKRenderer::entityModified);
 }
 
 void
-VTKRenderer::addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel)
+VTKRenderer::addVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr<VisualModel> visualModel)
 {
     // Create a delegate for the visual m odel
     auto renderDelegate = m_renderDelegates[visualModel] = VTKRenderDelegate::makeDelegate(visualModel);
@@ -517,7 +486,7 @@ VTKRenderer::addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::share
 }
 
 std::unordered_set<std::shared_ptr<VisualModel>>::iterator
-VTKRenderer::removeVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel)
+VTKRenderer::removeVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr<VisualModel> visualModel)
 {
     auto renderDelegate = m_renderDelegates[visualModel];
     auto iter = std::find(m_objectVtkActors.begin(), m_objectVtkActors.end(), renderDelegate->getVtkActor());
@@ -531,21 +500,21 @@ VTKRenderer::removeVisualModel(std::shared_ptr<SceneObject> sceneObject, std::sh
     return m_renderedVisualModels[sceneObject].erase(m_renderedVisualModels[sceneObject].find(visualModel));
 }
 
-std::unordered_set<std::shared_ptr<SceneObject>>::iterator
-VTKRenderer::removeSceneObject(std::shared_ptr<SceneObject> sceneObject)
+std::unordered_set<std::shared_ptr<Entity>>::iterator
+VTKRenderer::removeEntity(std::shared_ptr<Entity> entity)
 {
-    auto iter = m_renderedObjects.erase(m_renderedObjects.find(sceneObject));
+    auto iter = m_renderedObjects.erase(m_renderedObjects.find(entity));
 
     // Remove every delegate associated and remove its actors from the scene
-    for (auto visualModel : sceneObject->getVisualModels())
+    for (auto visualModel : entity->getComponents<VisualModel>())
     {
-        removeVisualModel(sceneObject, visualModel);
+        removeVisualModel(entity, visualModel);
     }
 
-    m_renderedVisualModels.erase(sceneObject);
+    m_renderedVisualModels.erase(entity);
 
     // Stop observing changes on the scene object
-    disconnect(sceneObject, this, &SceneObject::modified);
+    disconnect(entity, this, &SceneObject::modified);
     return iter;
 }
 
@@ -553,11 +522,11 @@ void
 VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
 {
     // If the SceneObject is in the scene but not being rendered
-    for (auto sceneObject : m_scene->getSceneObjects())
+    for (auto ent : m_scene->getSceneObjects())
     {
-        if (m_renderedObjects.count(sceneObject) == 0)
+        if (m_renderedObjects.count(ent) == 0)
         {
-            addSceneObject(sceneObject);
+            addEntity(ent);
         }
     }
     // If the SceneObject is being rendered but not in the scene
@@ -566,29 +535,29 @@ VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
         auto sos = m_scene->getSceneObjects();
         if (sos.find(*i) == sos.end())
         {
-            i = removeSceneObject(*i);
+            i = removeEntity(*i);
         }
     }
 }
 
 void
-VTKRenderer::sceneObjectModified(Event* e)
+VTKRenderer::entityModified(Event* e)
 {
-    SceneObject* sceneObject = static_cast<SceneObject*>(e->m_sender);
+    Entity* sceneObject = static_cast<Entity*>(e->m_sender);
     if (sceneObject != nullptr)
     {
         // Note: All other solutions lead to some ugly variant, I went with this one
         auto iter = std::find_if(m_renderedObjects.begin(), m_renderedObjects.end(),
-            [sceneObject](const std::shared_ptr<SceneObject>& i) { return i.get() == sceneObject; });
+            [sceneObject](const std::shared_ptr<Entity>& i) { return i.get() == sceneObject; });
         if (iter != m_renderedObjects.end())
         {
-            sceneObjectModified(*iter);
+            entityModified(*iter);
         }
     }
 }
 
 void
-VTKRenderer::sceneObjectModified(std::shared_ptr<SceneObject> sceneObject)
+VTKRenderer::entityModified(std::shared_ptr<Entity> sceneObject)
 {
     // Only diff a sceneObject being rendered
     if (m_renderedObjects.count(sceneObject) == 0 || m_renderedVisualModels.count(sceneObject) == 0)
@@ -599,7 +568,8 @@ VTKRenderer::sceneObjectModified(std::shared_ptr<SceneObject> sceneObject)
     // Now check for added/removed VisualModels
 
     // If the VisualModel of the SceneObject is in the SceneObject but not being rendered
-    for (auto visualModel : sceneObject->getVisualModels())
+    const auto& visualModels = sceneObject->getComponents<VisualModel>();
+    for (auto visualModel : visualModels)
     {
         if (m_renderedVisualModels[sceneObject].count(visualModel) == 0)
         {
@@ -607,7 +577,6 @@ VTKRenderer::sceneObjectModified(std::shared_ptr<SceneObject> sceneObject)
         }
     }
     // If the VisualModel of the SceneObject is being rendered but not part of the SceneObject anymore
-    const auto& visualModels = sceneObject->getVisualModels();
     for (auto i = m_renderedVisualModels[sceneObject].begin(); i != m_renderedVisualModels[sceneObject].end(); i++)
     {
         auto iter = std::find(visualModels.begin(), visualModels.end(), *i);

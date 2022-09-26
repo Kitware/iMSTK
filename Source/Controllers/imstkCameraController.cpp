@@ -11,7 +11,7 @@
 namespace imstk
 {
 void
-CameraController::update(const double dt)
+CameraController::update(const double& dt)
 {
     if (!updateTrackingData(dt))
     {

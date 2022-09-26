@@ -9,10 +9,12 @@
 #include "imstkCollisionData.h"
 #include "imstkLineMesh.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
+#include "imstkPuncturable.h"
+#include "imstkStraightNeedle.h"
 #include "imstkTaskNode.h"
 #include "imstkTetrahedralMesh.h"
-#include "NeedleObject.h"
 
 using namespace imstk;
 
@@ -70,15 +72,15 @@ TissueData::TissueData(std::shared_ptr<PbdObject> obj) :
 {
 }
 
-NeedleData::NeedleData(std::shared_ptr<NeedleObject> obj) :
+NeedleData::NeedleData(std::shared_ptr<PbdObject> obj) :
     obj(obj),
-    geom(std::dynamic_pointer_cast<LineMesh>(obj->getCollidingGeometry())),
-    verticesPtr(geom->getVertexPositions()),
+    needle(obj->getComponent<StraightNeedle>()),
+    verticesPtr(needle->getNeedleGeometry()->getVertexPositions()),
     vertices(*verticesPtr),
-    indicesPtr(geom->getCells()),
-    indices(*indicesPtr)
+    cellsPtr(needle->getNeedleGeometry()->getCells()),
+    cells(*cellsPtr)
 {
-    geom->updatePostTransformData();
+    needle->getNeedleGeometry()->updatePostTransformData();
 }
 
 void
@@ -113,29 +115,35 @@ NeedleEmbedder::addFaceEmbeddingConstraint(
 void
 NeedleEmbedder::update()
 {
+    auto puncturable = m_tissueObject->getComponent<Puncturable>();
+    auto needle      = m_needleObject->getComponent<StraightNeedle>();
+
     TissueData tissueData(m_tissueObject);
-    NeedleData needleData(std::dynamic_pointer_cast<NeedleObject>(m_needleObject));
+    NeedleData needleData(m_needleObject);
 
     // If collision elements are present transition to touching
+    const PunctureId punctureId = getPunctureId(needle, puncturable);
     if ((m_cdData->elementsA.size() > 0 || m_cdData->elementsB.size() > 0)
-        && needleData.obj->getCollisionState(tissueData.obj) == NeedleObject::CollisionState::REMOVED)
+        && needle->getState(punctureId) == Puncture::State::REMOVED)
     {
-        needleData.obj->setCollisionState(tissueData.obj, NeedleObject::CollisionState::TOUCHING);
+        needle->setState(punctureId, Puncture::State::TOUCHING);
+        puncturable->setPuncture(punctureId, needle->getPuncture(punctureId));
     }
 
     // If needle needle is touching the surface then test for puncture/insertion
-    if (needleData.obj->getCollisionState(tissueData.obj) == NeedleObject::CollisionState::TOUCHING)
+    if (needle->getState(punctureId) == Puncture::State::TOUCHING)
     {
         // Get force along the needle axes
-        const Vec3d  needleAxes = needleData.obj->getNeedleAxes();
+        const Vec3d  needleAxes = needle->getNeedleDirection();
         const double fN = std::max(needleAxes.dot(needleData.obj->getPbdBody()->externalForce), 0.0);
 
         // If the normal force exceeds the threshold, mark needle as inserted
         if (fN > m_forceThreshold)
         {
             // Disable collision handling if needle is inside
-            needleData.obj->setCollisionState(tissueData.obj, NeedleObject::CollisionState::INSERTED);
+            needle->setState(punctureId, Puncture::State::INSERTED);
             m_pbdCHNode->setEnabled(false);
+            //LOG(INFO) << "Punctured at " << fN << "N";
         }
     }
 
@@ -143,7 +151,7 @@ NeedleEmbedder::update()
     m_debugEmbeddingPoints.clear();
     m_debugEmbeddedTriangles.clear();
 
-    if (needleData.obj->getCollisionState(tissueData.obj) == NeedleObject::CollisionState::INSERTED)
+    if (needle->getState(punctureId) == Puncture::State::INSERTED)
     {
         // To "enter" a triangle we must be previously above it and then below it
         // To "exit" a triangle the same is true but we need to be "inside" the triangle
@@ -155,9 +163,9 @@ NeedleEmbedder::update()
         // sphere for the line.
 
         const double dt = m_needleObject->getPbdModel()->getTimeStep();
-        for (int i = 0; i < needleData.indices.size(); i++)
+        for (int i = 0; i < needleData.cells.size(); i++)
         {
-            const Vec2i& seg = needleData.indices[i];
+            const Vec2i& seg = needleData.cells[i];
 
             const Vec3d& line_x0 = needleData.vertices[seg[0]];
             const Vec3d& line_x1 = needleData.vertices[seg[1]];
@@ -286,7 +294,7 @@ NeedleEmbedder::update()
         }
         if (m_constraints.size() == 0)
         {
-            needleData.obj->setCollisionState(tissueData.obj, NeedleObject::CollisionState::REMOVED);
+            needle->setState(punctureId, Puncture::State::REMOVED);
             m_pbdCHNode->setEnabled(true);
             //LOG(INFO) << "Unpunctured!";
         }

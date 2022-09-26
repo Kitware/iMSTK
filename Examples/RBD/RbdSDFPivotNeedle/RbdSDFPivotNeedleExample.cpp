@@ -13,19 +13,23 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkPlane.h"
+#include "imstkPuncturable.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
+#include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
+#include "imstkStraightNeedle.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
-#include "NeedleObject.h"
 
 #ifdef iMSTK_USE_HAPTICS
 #include "imstkDeviceManager.h"
@@ -57,10 +61,12 @@ createTissueObj()
     material->setMetalness(0.1);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
 
+    tissueObj->addComponent<Puncturable>();
+
     return tissueObj;
 }
 
-static std::shared_ptr<NeedleObject>
+static std::shared_ptr<RigidObject2>
 createNeedleObj()
 {
     auto                    toolGeom = std::make_shared<LineMesh>();
@@ -75,7 +81,7 @@ createNeedleObj()
     toolGeom->rotate(Vec3d(0.0, 1.0, 0.0), PI, Geometry::TransformType::ApplyToData);
     syringeMesh->translate(Vec3d(0.0, 0.0, 0.1), Geometry::TransformType::ApplyToData);
 
-    auto toolObj = std::make_shared<NeedleObject>("NeedleRbdTool");
+    auto toolObj = std::make_shared<RigidObject2>("NeedleRbdTool");
     toolObj->setVisualGeometry(syringeMesh);
     toolObj->setCollidingGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
@@ -101,6 +107,25 @@ createNeedleObj()
     toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 1000.0;
     toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.1, 0.0);
 
+    auto needle = toolObj->addComponent<StraightNeedle>();
+    needle->setNeedleGeometry(toolGeom);
+
+    // Add a component for controlling via another device
+    auto controller = toolObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setLinearKs(8000.0);
+    controller->setLinearKd(200.0);
+    controller->setAngularKs(1000000.0);
+    controller->setAngularKd(100000.0);
+    controller->setForceScaling(0.02);
+    controller->setSmoothingKernelSize(5);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setUseForceFade(true);
+    controllerGhost->setController(controller);
+
     return toolObj;
 }
 
@@ -120,19 +145,8 @@ main()
     scene->addSceneObject(tissueObj);
 
     // Create the needle
-    std::shared_ptr<NeedleObject> needleObj = createNeedleObj();
-    needleObj->setForceThreshold(50.0);
+    std::shared_ptr<RigidObject2> needleObj = createNeedleObj();
     scene->addSceneObject(needleObj);
-
-    // Setup a debug ghost tool for virtual coupling
-    auto ghostToolObj = std::make_shared<SceneObject>("ghostTool");
-    {
-        ghostToolObj->setVisualGeometry(needleObj->getVisualGeometry()->clone());
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
-        ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.3);
-    }
-    scene->addSceneObject(ghostToolObj);
 
     // Setup interaction between tissue and needle
     scene->addInteraction(std::make_shared<NeedleInteraction>(tissueObj, needleObj));
@@ -182,47 +196,19 @@ main()
                 deviceClient->setOrientation(desiredOrientation);
             });
 #endif
-        auto controller = std::make_shared<RigidObjectController>();
-        controller->setControlledObject(needleObj);
+        auto controller = needleObj->getComponent<RigidObjectController>();
         controller->setDevice(deviceClient);
-        controller->setLinearKs(8000.0);
-        controller->setLinearKd(200.0);
-        controller->setAngularKs(1000000.0);
-        controller->setAngularKd(100000.0);
-        controller->setForceScaling(0.02);
-        controller->setSmoothingKernelSize(5);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Keep the tool moving in real time
                 needleObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-
-                // Update the ghost debug geometry
-                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-                toolGhostMesh->setRotation(controller->getOrientation());
-                toolGhostMesh->setTranslation(controller->getPosition());
-                toolGhostMesh->updatePostTransformData();
-                toolGhostMesh->postModified();
-
-                ghostToolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(
-                    std::min(1.0, controller->getDeviceForce().norm() / 15.0));
             });
 
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
-
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();
     }

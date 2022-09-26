@@ -502,6 +502,7 @@ set(${PROJECT_NAME}_INSTALL_FOLDER ${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_MAJ
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
 add_subdirectory(Source/Common)
+add_subdirectory(Source/ComponentModel)
 add_subdirectory(Source/Materials)
 add_subdirectory(Source/Geometry)
 add_subdirectory(Source/MeshIO)
@@ -520,6 +521,7 @@ add_subdirectory(Source/Animation)
 add_subdirectory(Source/Controllers)
 add_subdirectory(Source/CollisionDetection)
 add_subdirectory(Source/CollisionHandling)
+add_subdirectory(Source/Needle)
 add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/ViewerCore)

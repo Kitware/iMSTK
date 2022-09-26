@@ -20,8 +20,6 @@ if (iMSTK_USE_RENDERING_VTK)
     NeedleEmbedder.cpp
     NeedleInteraction.h
     NeedleInteraction.cpp
-    NeedleObject.h
-    NeedleObject.cpp
     )
 
   #-----------------------------------------------------------------------------
@@ -35,5 +33,7 @@ if (iMSTK_USE_RENDERING_VTK)
   target_link_libraries(${PROJECT_NAME}
     SimulationManager
     Filtering
-    ViewerVTK)
+    ViewerVTK
+    Needle
+    )
 endif()

@@ -140,6 +140,7 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     elemA.ids[0]   = edgeContact[0];
                     elemA.ids[1]   = edgeContact[1];
                     elemA.idCount  = 2;
+                    elemA.parentId = i; // Triangle id
                     elemA.cellType = IMSTK_EDGE;
 
                     Vec3d contactNormal = (spherePos - triangleContactPt);
@@ -165,6 +166,7 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     elemA.ids[1]   = cell[1];
                     elemA.ids[2]   = cell[2];
                     elemA.idCount  = 3;
+                    elemA.parentId = i; // Triangle id
                     elemA.cellType = IMSTK_TRIANGLE;
 
                     Vec3d contactNormal = (spherePos - triangleContactPt);
@@ -214,6 +216,7 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     elemA.ids[1]   = cell[1];
                     elemA.ids[2]   = cell[2];
                     elemA.idCount  = 3;
+                    elemA.parentId = i; // Triangle id
                     elemA.cellType = IMSTK_TRIANGLE;
 
                     Vec3d contactNormal = (triTipProjection - nearestTip);

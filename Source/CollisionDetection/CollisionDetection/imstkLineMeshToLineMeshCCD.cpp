@@ -126,8 +126,8 @@ LineMeshToLineMeshCCD::internalComputeCollision(
     const VecDataArray<int, 2>&           linesB    = *linesBPtr;
     for (size_t i = 0; i < static_cast<size_t>(meshA->getNumCells()); ++i)
     {
-        const imstk::Vec2i& cellA = linesA[i];
-        size_t              j     = selfCollision ? i + 2 : 0;
+        const Vec2i& cellA = linesA[i];
+        size_t       j     = selfCollision ? i + 2 : 0;
         for (; j < static_cast<size_t>(meshB->getNumCells()); ++j)
         {
             // If performing self-collision, do not process self or immediate neighboring cells (lines).
@@ -135,7 +135,7 @@ LineMeshToLineMeshCCD::internalComputeCollision(
             {
                 continue;
             }
-            const imstk::Vec2i& cellB = linesB[j];
+            const Vec2i& cellB = linesB[j];
 
             EdgeEdgeCCDState currState(verticesA[cellA(0)], verticesA[cellA(1)], verticesB[cellB(0)], verticesB[cellB(1)]);
             EdgeEdgeCCDState prevState(prevA[cellA(0)], prevA[cellA(1)], prevB[cellB(0)], prevB[cellB(1)]);
@@ -150,6 +150,7 @@ LineMeshToLineMeshCCD::internalComputeCollision(
                     CellIndexElement elemA;
                     elemA.cellType = IMSTK_EDGE;
                     elemA.idCount  = 2;
+                    elemA.parentId = i; // line id
                     elemA.ids[0]   = cellA(0);
                     elemA.ids[1]   = cellA(1);
                     CollisionElement e(elemA);
@@ -161,6 +162,7 @@ LineMeshToLineMeshCCD::internalComputeCollision(
                     CellIndexElement elemB;
                     elemB.cellType = IMSTK_EDGE;
                     elemB.idCount  = 2;
+                    elemB.parentId = j; // line id
                     elemB.ids[0]   = cellB(0);
                     elemB.ids[1]   = cellB(1);
                     CollisionElement e(elemB);

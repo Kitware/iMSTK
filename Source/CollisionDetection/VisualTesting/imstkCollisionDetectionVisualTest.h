@@ -9,7 +9,7 @@
 namespace imstk
 {
 class Camera;
-class CollisionDataDebugObject;
+class CollisionDataDebugModel;
 class CollisionDetectionAlgorithm;
 class CollidingObject;
 class Geometry;
@@ -49,7 +49,7 @@ public:
     std::shared_ptr<imstk::Camera> m_camera = nullptr;
 
     std::shared_ptr<imstk::CollisionDetectionAlgorithm> m_collisionMethod = nullptr;
-    std::shared_ptr<imstk::CollisionDataDebugObject>    m_cdDebugObject   = nullptr;
+    std::shared_ptr<imstk::CollisionDataDebugModel>     m_cdDebugObject   = nullptr;
 
     bool m_geom1Moveable = false;
     bool m_geom2Moveable = true;

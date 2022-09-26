@@ -7,7 +7,8 @@
 #pragma once
 
 #include "imstkPbdRigidObjectCollision.h"
-
+#include "imstkRigidObject2.h"
+#include "imstkStraightNeedle.h"
 #include "NeedlePbdCH.h"
 #include "NeedleRigidBodyCH.h"
 
@@ -21,12 +22,14 @@ using namespace imstk;
 class NeedleInteraction : public PbdRigidObjectCollision
 {
 public:
-    NeedleInteraction(std::shared_ptr<PbdObject> tissueObj, std::shared_ptr<NeedleObject> needleObj) : PbdRigidObjectCollision(tissueObj, needleObj)
+    NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
+                      std::shared_ptr<RigidObject2> needleObj,
+                      const std::string&            collisionName = "") : PbdRigidObjectCollision(tissueObj, needleObj, collisionName)
     {
-        if (std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry()) == nullptr)
-        {
-            LOG(WARNING) << "NeedleInteraction only works with LineMesh collision geometry on NeedleObject";
-        }
+        CHECK(needleObj->containsComponent<StraightNeedle>())
+            << "NeedleInteraction only works with objects that have a StraightNeedle component";
+        CHECK(tissueObj->containsComponent<Puncturable>())
+            << "NeedleInteraction only works with objects that have a Puncturable component";
 
         auto needleRbdCH = std::make_shared<NeedleRigidBodyCH>();
         needleRbdCH->setInputRigidObjectA(needleObj);

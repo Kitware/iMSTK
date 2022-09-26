@@ -15,12 +15,14 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTextVisualModel.h"
 #include "imstkVisualModel.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
-#include "OctreeDebugObject.h"
+#include "OctreeDebugModel.h"
 
 using namespace imstk;
 
@@ -102,9 +104,10 @@ main()
     viewer->setWindowTitle("Octree Example");
     viewer->setSize(1920, 1080);
 
-    auto statusManager = viewer->getTextStatusManager();
-    statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
-    statusManager->setStatusFontColor(VTKTextStatusManager::StatusType::Custom, Color::Orange);
+    auto statusText = std::make_shared<TextVisualModel>("StatusText");
+    statusText->setFontSize(30.0);
+    statusText->setTextColor(Color::Orange);
+    statusText->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
 
     // Seed based on CPU time for random colors
     srand(static_cast<unsigned int>(time(nullptr)));
@@ -148,10 +151,11 @@ main()
     // This is significantly slower than incremental update!
     // octree.setAlwaysRebuild(true);
 
-    imstkNew<OctreeDebugObject> debugOctreeObj;
-    debugOctreeObj->setInputOctree(octree);
-    debugOctreeObj->setLineWidth(1.0);
-    debugOctreeObj->setLineColor(Color::Green);
+    auto debugOctreeObj   = std::make_shared<Entity>();
+    auto debugOctreeModel = debugOctreeObj->addComponent<OctreeDebugModel>();
+    debugOctreeModel->setInputOctree(octree);
+    debugOctreeModel->setLineWidth(1.0);
+    debugOctreeModel->setLineColor(Color::Green);
     scene->addSceneObject(debugOctreeObj);
 
     // Data for animation
@@ -216,7 +220,7 @@ main()
                << " % usage / total allocated nodes: " << numAllocatedNodes << ")\n"
                << "Max number of primitives in tree nodes: " << maxNumPrimitivesInNodes;
 
-            statusManager->setCustomStatus(ss.str());
+            statusText->setText(ss.str());
         };
 
     // Set Camera configuration
@@ -255,22 +259,14 @@ main()
             {
                 // Update debug rendering data
                 // Involves a larger buffer update so we only do it before rendering
-                debugOctreeObj->debugUpdate(8, true);
+                debugOctreeModel->debugUpdate(8, true);
             });
 
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
-
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        mouseAndKeyControls->addComponent(statusText);
+        scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();
     }

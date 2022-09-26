@@ -6,7 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
-#include "imstkCollisionDataDebugObject.h"
+#include "imstkCollisionDataDebugModel.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -63,10 +63,9 @@ public:
         m_scene->addInteraction(m_rbdCollision);
 
         // Debug geometry to visualize collision data
-        m_cdDebugObject = std::make_shared<CollisionDataDebugObject>();
+        m_cdDebugObject = m_rbdCollision->addComponent<CollisionDataDebugModel>();
         m_cdDebugObject->setInputCD(m_rbdCollision->getCollisionDetection()->getCollisionData());
         m_cdDebugObject->setPrintContacts(m_printContacts);
-        m_scene->addSceneObject(m_cdDebugObject);
 
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
             [&](Event*)
@@ -115,7 +114,7 @@ public:
     std::string m_collisionName = "";
     double      m_friction      = 0.0;
     double      m_beta = 0.01;
-    std::shared_ptr<CollisionDataDebugObject> m_cdDebugObject = nullptr;
+    std::shared_ptr<CollisionDataDebugModel> m_cdDebugObject = nullptr;
 
     // For assertions
     Vec3d m_prevBodyPos;

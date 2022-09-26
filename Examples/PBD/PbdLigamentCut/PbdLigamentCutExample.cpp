@@ -23,6 +23,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkSurfaceMeshDistanceTransform.h"
 #include "imstkTriangleToTetMap.h"
 #include "imstkVertexLabelVisualModel.h"
@@ -210,17 +211,28 @@ makeToolObj(const std::string& name, std::shared_ptr<PbdModel> model)
     cutGeom->setTranslation(Vec3d(-10, -20, 0));
     cutGeom->updatePostTransformData();
 
-    auto cutObj = std::make_shared<PbdObject>(name);
-    cutObj->setVisualGeometry(cutGeom);
-    cutObj->setPhysicsGeometry(cutGeom);
-    cutObj->setCollidingGeometry(cutGeom);
-    cutObj->setDynamicalModel(model);
-    cutObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    cutObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
+    auto toolObj = std::make_shared<PbdObject>(name);
+    toolObj->setVisualGeometry(cutGeom);
+    toolObj->setPhysicsGeometry(cutGeom);
+    toolObj->setCollidingGeometry(cutGeom);
+    toolObj->setDynamicalModel(model);
+    toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    toolObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
 
-    cutObj->getPbdBody()->setRigid(Vec3d(0.0, 0.0, 0.0), 1.0);
+    toolObj->getPbdBody()->setRigid(Vec3d(0.0, 0.0, 0.0), 1.0);
 
-    return cutObj;
+    auto controller = toolObj->addComponent<PbdObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setTranslationOffset(Vec3d(0.0, 1.1, 0.0));
+    controller->setTranslationScaling(1.0);
+    controller->setForceScaling(0.0);
+    controller->setLinearKs(2000.0);
+    controller->setAngularKs(500.0);
+    // Damping doesn't work well here. The force is applied at the start of pbd
+    // Because velocities are ulimately computed after the fact from positions
+    controller->setUseCritDamping(true);
+
+    return toolObj;
 }
 
 static std::shared_ptr<PbdObject>
@@ -339,6 +351,7 @@ main()
 
     // Setup cutting between ligaments and plane
     auto pbdCutting = std::make_shared<PbdObjectCutting>(ligamentObj, toolObj);
+    pbdCutting->setEpsilon(0.5);
     scene->addInteraction(pbdCutting);
 
     // Light
@@ -374,9 +387,11 @@ main()
         queueConnect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged, sceneManager,
             [&](ButtonEvent* e)
             {
+                LOG(INFO) << "Button Press";
                 // When button 0 is pressed replace the PBD cloth with a cut one
                 if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
                 {
+                    LOG(INFO) << "Cutting!";
                     pbdCutting->apply();
                 }
             });
@@ -401,32 +416,13 @@ main()
             });
 #endif
 
-        auto controller = std::make_shared<PbdObjectController>();
+        auto controller = toolObj->getComponent<PbdObjectController>();
         controller->setDevice(deviceClient);
-        controller->setControlledObject(toolObj);
-        controller->setTranslationOffset(Vec3d(0.0, 1.1, 0.0));
-        controller->setTranslationScaling(1.0);
-        controller->setForceScaling(0.0);
-        controller->setLinearKs(2000.0);
-        controller->setAngularKs(500.0);
-        // Damping doesn't work well here. The force is applied at the start of pbd
-        // Because velocities are ulimately computed after the fact from positions
-        controller->setUseCritDamping(true);
-        scene->addControl(controller);
 
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
-
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();
     }

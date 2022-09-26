@@ -29,10 +29,6 @@ SimulationManager::start()
     }
 
     // Initialization
-    for (auto viewer : m_viewers)
-    {
-        viewer->init();
-    }
     for (auto syncModule : m_syncModules)
     {
         syncModule->init();
@@ -40,6 +36,11 @@ SimulationManager::start()
     for (auto adaptiveModule : m_adaptiveModules)
     {
         adaptiveModule->init();
+    }
+    // Initialize viewer last (dependence on above)
+    for (auto viewer : m_viewers)
+    {
+        viewer->init();
     }
 
     // Start parallel modules

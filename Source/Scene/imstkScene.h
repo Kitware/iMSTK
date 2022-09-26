@@ -21,9 +21,9 @@ namespace imstk
 class Camera;
 class CameraController;
 class DeviceControl;
+class Entity;
 class IblProbe;
 class Light;
-class SceneObject;
 class TaskGraph;
 class TaskGraphController;
 class TrackingDeviceControl;
@@ -63,7 +63,7 @@ public:
     using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
 
     Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
-    virtual ~Scene() override = default;
+    ~Scene() override = default;
 
     // *INDENT-OFF*
     SIGNAL(Scene, configureTaskGraph);
@@ -112,7 +112,7 @@ public:
     ///
     /// \brief Update visuals of all scene objects
     ///
-    virtual void updateVisuals();
+    virtual void updateVisuals(const double dt);
 
     ///
     /// \brief If true, tasks will be time and a table produced
@@ -123,22 +123,27 @@ public:
     ///
     /// \brief Return the SceneObjects of the scene
     ///
-    const std::unordered_set<std::shared_ptr<SceneObject>>& getSceneObjects() const { return m_sceneObjects; }
+    const std::unordered_set<std::shared_ptr<Entity>>& getSceneObjects() const { return m_sceneEntities; }
 
     ///
     /// \brief Get SceneObject by name, returns nullptr if doesn't exist
     ///
-    std::shared_ptr<SceneObject> getSceneObject(const std::string& sceneObjectName) const;
+    std::shared_ptr<Entity> getSceneObject(const std::string& name) const;
 
     ///
     /// \brief Add an interaction
     ///
-    void addInteraction(std::shared_ptr<SceneObject> interaction);
+    void addInteraction(std::shared_ptr<Entity> interaction);
+
+    ///
+    /// \brief Check if Entity exists in scene
+    ///
+    bool hasEntity(std::shared_ptr<Entity> entity) { return m_sceneEntities.find(entity) != m_sceneEntities.end(); }
 
     ///
     /// \brief Add a scene object
     ///
-    void addSceneObject(std::shared_ptr<SceneObject> newSceneObject);
+    void addSceneObject(std::shared_ptr<Entity> entity);
 
     ///
     /// \brief Remove scene object by name
@@ -148,7 +153,7 @@ public:
     ///
     /// \brief Remove scene object
     ///
-    void removeSceneObject(std::shared_ptr<SceneObject> sceneObject);
+    void removeSceneObject(std::shared_ptr<Entity> sceneObject);
 
     ///
     /// \brief Return a vector of lights in the scene
@@ -234,7 +239,7 @@ public:
     void removeCamera(const std::string name);
 
     ///
-    /// \brief Add a device control
+    /// \brief Adds a device control to a newly created SceneObject
     ///
     void addControl(std::shared_ptr<DeviceControl> control);
 
@@ -243,6 +248,9 @@ public:
     ///
     double getFPS() const { return m_fps; }
 
+    ///
+    /// \brief Get the total scene time passed (accumulated deltatime)
+    ///
     double getSceneTime() const { return m_sceneTime; }
 
     ///
@@ -266,7 +274,7 @@ protected:
     std::shared_ptr<SceneConfig> m_config;
 
     std::string m_name; ///< Name of the scene
-    std::unordered_set<std::shared_ptr<SceneObject>> m_sceneObjects;
+    std::unordered_set<std::shared_ptr<Entity>> m_sceneEntities;
     std::unordered_map<std::string, std::shared_ptr<Light>> m_lightsMap;
     std::shared_ptr<IblProbe> m_globalIBLProbe = nullptr;
 

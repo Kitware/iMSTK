@@ -35,7 +35,7 @@ public:
     ///
     /// \brief Updates the view of the provided camera
     ///
-    void update(const double dt) override;
+    void update(const double& dt) override;
 
 protected:
     std::shared_ptr<Camera> m_camera; ///< Camera controlled by the external device

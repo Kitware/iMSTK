@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include "imstkSceneObject.h"
+#include "imstkComponent.h"
+#include "imstkEventObject.h"
 #include "imstkMacros.h"
 
 namespace imstk
@@ -19,13 +20,17 @@ class DeviceClient;
 /// \brief While the DeviceClient provides quantities from the device, the control
 /// defines what to do with those quantities
 ///
-class DeviceControl : public SceneObject
+class DeviceControl : public SceneBehaviour, public EventObject
 {
 protected:
-    DeviceControl(const std::string& name = "DeviceControl") : SceneObject(name) { }
+    DeviceControl(const std::string& name = "DeviceControl") : SceneBehaviour(name) { }
 
 public:
     ~DeviceControl() override = default;
+
+    // *INDENT-OFF*
+    SIGNAL(DeviceControl, modified);
+    // *INDENT-ON*
 
     ///
     /// \brief Set/Get the device client used in the control
@@ -34,19 +39,10 @@ public:
     virtual void setDevice(std::shared_ptr<DeviceClient> device) { m_deviceClient = device; }
     ///@}
 
-    using SceneObject::update;
-
     ///
     /// \brief Prints the controls
     ///
     virtual void printControls() { }
-
-    ///
-    /// \brief Updates control based on current device state
-    ///
-    virtual void update(const double imstkNotUsed(dt)) { }
-
-    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     std::shared_ptr<DeviceClient> m_deviceClient;

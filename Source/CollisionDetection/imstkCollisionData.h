@@ -54,15 +54,20 @@ struct CellVertexElement
     int size     = 0;
 };
 ///
-/// \brief Represents a cell by a single cell id OR by N vertex ids
-/// Which case can be determined by the idCount
+/// \brief Represents a cell by a single cell id OR by N vertex ids.
+/// Which case can be determined by the idCount.
+///
 /// Possible cells may be: point, edge, triangle, quad, or tetrahedron
 /// maximum 4 ids (tetrahedron by vertex ids is maximum cell it could represent)
 ///
+/// Sometimes parentId is provided. It usually refers to some parent cell.
+/// Can be ambiguous though. Dictated by the individual CollisionDetectionAlgorithm.
+///
 struct CellIndexElement
 {
-    int ids[4]  = { -1, -1, -1, -1 };
-    int idCount = 0;
+    int ids[4]   = { -1, -1, -1, -1 };
+    int parentId = -1; // Often doesn't exist
+    int idCount  = 0;
     CellTypeId cellType = IMSTK_VERTEX;
 };
 

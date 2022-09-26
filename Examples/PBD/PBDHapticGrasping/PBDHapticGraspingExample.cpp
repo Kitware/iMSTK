@@ -12,6 +12,7 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -24,6 +25,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -126,6 +128,21 @@ makeCapsuleToolObj()
 
     toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.9);
 
+    // Add a component for controlling via another device
+    auto controller = toolObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setTranslationScaling(50.0);
+    controller->setLinearKs(5000.0);
+    controller->setAngularKs(1000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.001);
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setController(controller);
+
     return toolObj;
 }
 
@@ -152,16 +169,6 @@ main()
 
     std::shared_ptr<RigidObject2> toolObj = makeCapsuleToolObj();
     scene->addSceneObject(toolObj);
-
-    auto rbdGhost = std::make_shared<SceneObject>("ghost");
-    rbdGhost->setVisualGeometry(toolObj->getVisualGeometry()->clone());
-
-    std::shared_ptr<RenderMaterial> ghostMat =
-        std::make_shared<RenderMaterial>(*toolObj->getVisualModel(0)->getRenderMaterial());
-    ghostMat->setOpacity(0.4);
-    ghostMat->setColor(Color::Red);
-    rbdGhost->getVisualModel(0)->setRenderMaterial(ghostMat);
-    scene->addSceneObject(rbdGhost);
 
     // Add collision
     /*auto pbdToolCollision = std::make_shared<PbdObjectCollision>(PbdObj, toolObj, "SurfaceMeshToCapsuleCD");
@@ -266,42 +273,13 @@ main()
                 }
             });
 
-        auto controller = std::make_shared<RigidObjectController>();
-        controller->setControlledObject(toolObj);
+        auto controller = toolObj->getComponent<RigidObjectController>();
         controller->setDevice(deviceClient);
-        controller->setTranslationScaling(50.0);
-        controller->setLinearKs(5000.0);
-        controller->setAngularKs(1000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.001);
-        controller->setSmoothingKernelSize(15);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
-            {
-                ghostMat->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 15.0));
-
-                // Also apply controller transform to ghost geometry
-                std::shared_ptr<Geometry> ghostCapsule = rbdGhost->getVisualGeometry();
-                ghostCapsule->setTranslation(controller->getPosition());
-                ghostCapsule->setRotation(controller->getOrientation());
-                ghostCapsule->updatePostTransformData();
-                ghostCapsule->postModified();
-            });
-
-        // Add mouse and keyboard controls to the viewer
-        auto mouseControl = std::make_shared<MouseSceneControl>();
-        mouseControl->setDevice(viewer->getMouseDevice());
-        mouseControl->setSceneManager(sceneManager);
-        scene->addControl(mouseControl);
-
-        auto keyControl = std::make_shared<KeyboardSceneControl>();
-        keyControl->setDevice(viewer->getKeyboardDevice());
-        keyControl->setSceneManager(sceneManager);
-        keyControl->setModuleDriver(driver);
-        scene->addControl(keyControl);
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        scene->addSceneObject(mouseAndKeyControls);
 
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {

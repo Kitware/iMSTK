@@ -6,8 +6,10 @@
 
 #pragma once
 
+#include "imstkNeedle.h"
 #include "imstkPbdCollisionHandling.h"
-#include "NeedleObject.h"
+#include "imstkPbdObject.h"
+#include "imstkPuncturable.h"
 
 using namespace imstk;
 
@@ -29,9 +31,19 @@ protected:
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override
     {
+        auto puncturable = getInputObjectA()->getComponent<Puncturable>();
+        auto needle      = getInputObjectB()->getComponent<Needle>();
+
+        const PunctureId punctureId = getPunctureId(needle, puncturable);
+        if ((elementsA.size() > 0 || elementsB.size() > 0)
+            && needle->getState(punctureId) == Puncture::State::REMOVED)
+        {
+            needle->setState(punctureId, Puncture::State::TOUCHING);
+            puncturable->setPuncture(punctureId, needle->getPuncture(punctureId));
+        }
+
         // Don't handle collision data when punctured
-        auto needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectB());
-        if (needleObj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
+        if (needle->getState(punctureId) == Puncture::State::TOUCHING)
         {
             PbdCollisionHandling::handle(elementsA, elementsB);
         }

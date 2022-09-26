@@ -12,10 +12,8 @@
 #include "imstkEventObject.h"
 
 #include <vtkSmartPointer.h>
-#include <unordered_map>
 #include <unordered_set>
 
-class vtkAxesActor;
 class vtkCamera;
 class vtkCameraPass;
 class vtkChartXY;
@@ -32,9 +30,9 @@ class vtkTable;
 namespace imstk
 {
 class Camera;
+class Entity;
 class Light;
 class Scene;
-class SceneObject;
 class VisualModel;
 class VTKRenderDelegate;
 
@@ -46,8 +44,17 @@ class VTKRenderDelegate;
 class VTKRenderer : public Renderer
 {
 public:
+    ///
+    /// \brief Scene is tied to this renderer
+    ///
     VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR);
     ~VTKRenderer() override = default;
+
+    ///
+    /// \brief Create the rendering delegates and related VTK objects according
+    /// to the scene.
+    ///
+    void initialize() override;
 
     ///
     /// \brief Set the rendering mode to display debug actors or not
@@ -55,38 +62,16 @@ public:
     void setMode(const Mode mode, const bool enableVR) override;
 
     ///
-    /// \brief Change the debug axes length
-    ///@{
-    void setAxesLength(const double x, const double y, const double z);
-    void setAxesLength(const Vec3d& len);
-    ///@}
-
-    ///
-    /// \brief Get the debug axes length
-    ///
-    Vec3d getAxesLength();
-
-    ///
-    /// \brief Change the visibility of the debug axes
-    ///@{
-    void setAxesVisibility(const bool visible);
-    bool getAxesVisibility() const;
-    ///@}
-
-    ///
     /// \brief Sets the benchmarking table using unordered_map
     ///
-    void setTimeTable(const std::unordered_map<std::string, double>& timeTable);
+    void setTimeTable(const std::unordered_map<std::string, double>& timeTable) override;
 
     ///
-    /// \brief Set the visibility of the benchmark graph
-    ///
-    void setTimeTableVisibility(const bool visible);
-
-    ///
-    /// \brief Get the visibility of the benchmark graph
-    ///
-    bool getTimeTableVisibility() const;
+    /// \brief Get/Set the visibility of the benchmark graph
+    /// @{
+    void setTimeTableVisibility(const bool visible) override;
+    bool getTimeTableVisibility() const override;
+    /// @}
 
     ///
     /// \brief Updates the camera
@@ -128,14 +113,14 @@ protected:
     void setConfig(std::shared_ptr<RendererConfig> config) override;
 
     ///
-    /// \brief Adds a SceneObject to be rendered
+    /// \brief Adds an entity to be rendered
     ///
-    void addSceneObject(std::shared_ptr<SceneObject> sceneObject);
+    void addEntity(std::shared_ptr<Entity> sceneObject);
 
     ///
     /// \brief Removes a SceneObject to be rendered
     ///
-    std::unordered_set<std::shared_ptr<SceneObject>>::iterator removeSceneObject(std::shared_ptr<SceneObject> sceneObject);
+    std::unordered_set<std::shared_ptr<Entity>>::iterator removeEntity(std::shared_ptr<Entity> sceneObject);
 
     ///
     /// \brief Callback for when the scene this renderer renders is modified
@@ -146,23 +131,23 @@ protected:
     ///
     /// \brief Add a VisualModel to be rendered, creates a delegate for it
     ///
-    void addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel);
+    void addVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Remove a VisualModel from rendering
     ///
-    std::unordered_set<std::shared_ptr<VisualModel>>::iterator removeVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel);
+    std::unordered_set<std::shared_ptr<VisualModel>>::iterator removeVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Callback for when a SceneObject is modified
     /// This involves adding/removing visual models to render lists
     ///
-    void sceneObjectModified(Event* e);
+    void entityModified(Event* e);
 
     ///
     /// \brief Function call for processing diffs on a SceneObject
     ///
-    void sceneObjectModified(std::shared_ptr<SceneObject> sceneObject);
+    void entityModified(std::shared_ptr<Entity> sceneObject);
 
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
 
@@ -176,14 +161,13 @@ protected:
     // Props to be rendered
     std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
-    vtkSmartPointer<vtkAxesActor> m_AxesActor;
 
     // imstk scene
     std::shared_ptr<Scene> m_scene;
 
     // Rendered Objects, this gives whats currently being rendered
-    std::unordered_set<std::shared_ptr<SceneObject>> m_renderedObjects;
-    std::unordered_map<std::shared_ptr<SceneObject>, std::unordered_set<std::shared_ptr<VisualModel>>> m_renderedVisualModels;
+    std::unordered_set<std::shared_ptr<Entity>> m_renderedObjects;
+    std::unordered_map<std::shared_ptr<Entity>, std::unordered_set<std::shared_ptr<VisualModel>>> m_renderedVisualModels;
 
     // Render Delegates
     std::unordered_map<std::shared_ptr<VisualModel>, std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;

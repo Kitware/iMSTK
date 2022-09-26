@@ -18,7 +18,7 @@ SceneObjectController::SceneObjectController(const std::string& name) :
 }
 
 void
-SceneObjectController::update(const double dt)
+SceneObjectController::update(const double& dt)
 {
     if (!updateTrackingData(dt))
     {

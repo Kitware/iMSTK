@@ -10,34 +10,12 @@
 #include "imstkModuleDriver.h"
 #include "imstkRenderer.h"
 #include "imstkScene.h"
+#include "imstkSceneControlText.h"
 #include "imstkSceneManager.h"
 #include "imstkViewer.h"
-#include "imstkVisualModel.h"
-#include "imstkTextVisualModel.h"
 
 namespace imstk
 {
-KeyboardSceneControl::KeyboardSceneControl(const std::string& name) : KeyboardControl(name)
-{
-    // Create visual model
-    m_textVisualModel = std::make_shared<TextVisualModel>();
-    m_textVisualModel->setFontSize(40);
-    m_textVisualModel->setVisibility(false);
-    m_textVisualModel->setText(
-        "Simulation Paused\nPress Space to Continue\nPress R to Reset\nPress C to clear pause screen");
-
-    m_textVisualModel->setPosition(TextVisualModel::DisplayPosition::CenterCenter);
-
-    addVisualModel(m_textVisualModel);
-}
-
-bool
-KeyboardSceneControl::initialize()
-{
-    m_textVisualModel->setVisibility(m_useTextStatus ? m_sceneManager.lock()->getPaused() : false);
-    return true;
-}
-
 void
 KeyboardSceneControl::printControls()
 {
@@ -76,7 +54,10 @@ KeyboardSceneControl::OnKeyPress(const char key)
         const bool paused = sceneManager->getPaused();
 
         // Switch pause screen visibility
-        m_textVisualModel->setVisibility(m_useTextStatus ? !paused : false);
+        if (m_sceneControlText != nullptr)
+        {
+            m_sceneControlText->setVisibility(m_sceneControlText->getUseTextStatus() ? !paused : false);
+        }
 
         // Resume or pause all modules, expect viewers
         for (auto module : driver->getModules())
@@ -149,17 +130,15 @@ KeyboardSceneControl::OnKeyPress(const char key)
     {
         sceneManager->getActiveScene()->getActiveCamera()->print();
     }
-    // Toggle text on pause screen
+    // Toggle text on pause screen (if used)
     else if (key == 'c' || key == 'C')
     {
-        m_useTextStatus = !m_useTextStatus;
-        const bool paused = sceneManager->getPaused();
-        m_textVisualModel->setVisibility(m_useTextStatus ? !paused : false);
+        if (m_sceneControlText != nullptr)
+        {
+            m_sceneControlText->setUseTextStatus(!m_sceneControlText->getUseTextStatus());
+            const bool paused = sceneManager->getPaused();
+            m_sceneControlText->setVisibility(m_sceneControlText->getUseTextStatus() ? !paused : false);
+        }
     }
-}
-
-void
-KeyboardSceneControl::OnKeyRelease(const char imstkNotUsed(key))
-{
 }
 } // namespace imstk

@@ -6,7 +6,6 @@
 #
 ###########################################################################
 
-
 if (iMSTK_USE_RENDERING_VTK)
   project(Example-OctreeIntersection)
 
@@ -16,8 +15,8 @@ if (iMSTK_USE_RENDERING_VTK)
   imstk_add_executable(${PROJECT_NAME}
     OctreeIntersectionExample.cpp
     ../BunnyMesh.cpp
-    OctreeDebugObject.h
-    OctreeDebugObject.cpp)
+    OctreeDebugModel.h
+    OctreeDebugModel.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder

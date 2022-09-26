@@ -6,7 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
-#include "imstkCollisionDataDebugObject.h"
+#include "imstkCollisionDataDebugModel.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkCylinder.h"
 #include "imstkDirectionalLight.h"
@@ -221,20 +221,18 @@ public:
         m_pbdCollision->setRestitution(m_restitution);
         m_pbdCollision->setDeformableStiffnessA(m_collisionStiffness);
         std::dynamic_pointer_cast<PbdCollisionHandling>(m_pbdCollision->getCollisionHandlingA())->setEnableBoundaryCollisions(true);
-        m_scene->addInteraction(m_pbdCollision);
-
         // Debug geometry to visualize collision data
-        m_cdDebugObject = std::make_shared<CollisionDataDebugObject>();
-        m_cdDebugObject->setInputCD(m_pbdCollision->getCollisionDetection()->getCollisionData());
-        m_cdDebugObject->setPrintContacts(m_printContacts);
-        m_scene->addSceneObject(m_cdDebugObject);
+        m_cdDebugModel = m_pbdCollision->addComponent<CollisionDataDebugModel>();
+        m_cdDebugModel->setInputCD(m_pbdCollision->getCollisionDetection()->getCollisionData());
+        m_cdDebugModel->setPrintContacts(m_printContacts);
+        m_scene->addInteraction(m_pbdCollision);
 
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
             [&](Event*)
             {
-                m_cdDebugObject->debugUpdate();
+                m_cdDebugModel->debugUpdate();
                 if (m_pauseOnContact && !m_timerPaused
-                    && m_cdDebugObject->getInputCD()->elementsA.size() > 0)
+                    && m_cdDebugModel->getInputCD()->elementsA.size() > 0)
                 {
                     m_timerPaused = true;
                     m_sceneManager->pause();
@@ -278,7 +276,7 @@ public:
     double      m_restitution    = 0.0;
     int    m_collisionIterations = 5;
     double m_collisionStiffness  = 1.0;
-    std::shared_ptr<CollisionDataDebugObject> m_cdDebugObject = nullptr;
+    std::shared_ptr<CollisionDataDebugModel> m_cdDebugModel = nullptr;
 
     // For assertions
     std::shared_ptr<VecDataArray<double, 3>> m_currVerticesPtr;

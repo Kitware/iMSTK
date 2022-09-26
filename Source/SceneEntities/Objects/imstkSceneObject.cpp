@@ -12,7 +12,7 @@
 
 namespace imstk
 {
-SceneObject::SceneObject(const std::string& name) : SceneEntity(), m_name(name),
+SceneObject::SceneObject(const std::string& name) : Entity(name),
     m_taskGraph(std::make_shared<TaskGraph>(
         "SceneObject_" + m_name + "_Source",
         "SceneObject_" + m_name + "_Sink"))
@@ -24,9 +24,10 @@ SceneObject::SceneObject(const std::string& name) : SceneEntity(), m_name(name),
 std::shared_ptr<Geometry>
 SceneObject::getVisualGeometry() const
 {
-    if (!m_visualModels.empty())
+    auto visualModel = getComponent<VisualModel>();
+    if (visualModel != nullptr)
     {
-        return m_visualModels[0]->getGeometry();
+        return visualModel->getGeometry();
     }
     return nullptr;
 }
@@ -34,16 +35,39 @@ SceneObject::getVisualGeometry() const
 void
 SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
 {
-    if (m_visualModels.empty())
+    auto iter = std::find_if(m_components.begin(), m_components.end(),
+        [](std::shared_ptr<Component> comp)
+        {
+            return std::dynamic_pointer_cast<VisualModel>(comp) != nullptr;
+        });
+    if (iter != m_components.end())
     {
-        auto visualModel = std::make_shared<VisualModel>();
-        visualModel->setGeometry(geometry);
-        m_visualModels.push_back(visualModel);
+        std::dynamic_pointer_cast<VisualModel>(*iter)->setGeometry(geometry);
     }
     else
     {
-        m_visualModels[0]->setGeometry(geometry);
+        auto visualModel = addComponent<VisualModel>();
+        visualModel->setName(m_name + "_VisualModel");
+        visualModel->setGeometry(geometry);
     }
+}
+
+std::shared_ptr<VisualModel>
+SceneObject::getVisualModel(const int index) const
+{
+    return getComponentN<VisualModel>(index);
+}
+
+void
+SceneObject::addVisualModel(std::shared_ptr<VisualModel> visualModel)
+{
+    addComponent(visualModel);
+}
+
+void
+SceneObject::removeVisualModel(std::shared_ptr<VisualModel> visualModel)
+{
+    removeComponent(visualModel);
 }
 
 void
@@ -65,9 +89,12 @@ void
 SceneObject::postModifiedAll()
 {
     // Assume geometry may be changed upon reset
-    for (auto visualModel : m_visualModels)
+    for (auto comp : m_components)
     {
-        visualModel->getGeometry()->postModified();
+        if (auto visualModel = std::dynamic_pointer_cast<VisualModel>(comp))
+        {
+            visualModel->getGeometry()->postModified();
+        }
     }
 }
 } // namespace imstk

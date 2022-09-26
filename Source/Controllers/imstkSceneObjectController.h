@@ -28,7 +28,7 @@ public:
     ///
     /// \brief Update controlled scene object using latest tracking information
     ///
-    void update(const double dt) override;
+    void update(const double& dt) override;
 
     ///
     /// \brief Get/Set controlled scene object

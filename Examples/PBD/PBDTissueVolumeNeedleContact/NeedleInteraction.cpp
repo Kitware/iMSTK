@@ -7,26 +7,27 @@
 #include "NeedleInteraction.h"
 #include "imstkLineMesh.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
+#include "imstkPuncturable.h"
+#include "imstkStraightNeedle.h"
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraToLineMeshCD.h"
 #include "NeedleEmbedder.h"
-#include "NeedleObject.h"
 
 using namespace imstk;
 
-NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
-                                     std::shared_ptr<NeedleObject> needleObj) : PbdObjectCollision(tissueObj, needleObj)
+NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
+                                     std::shared_ptr<PbdObject> needleObj,
+                                     const std::string&         collisionName) :
+    PbdObjectCollision(tissueObj, needleObj, collisionName)
 {
-    if (std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry()) == nullptr)
-    {
-        LOG(WARNING) << "NeedleInteraction only works with LineMesh collision geometry on rigid NeedleObject";
-    }
-    if (std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry()) == nullptr)
-    {
-        LOG(WARNING) << "NeedleInteraction only works with TetrahedralMesh physics geometry on pbd tissueObj";
-    }
-    CHECK(tissueObj->getPbdModel() == needleObj->getPbdModel()) << "PbdObject's must share a model";
+    CHECK(needleObj->containsComponent<StraightNeedle>())
+        << "NeedleInteraction only works with objects that have a StraightNeedle component";
+    CHECK(tissueObj->containsComponent<Puncturable>())
+        << "NeedleInteraction only works with objects that have a Puncturable component";
+    CHECK(std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry()) != nullptr)
+        << "NeedleInteraction only works with TetrahedralMesh physics geometry on pbd tissueObj";
 
     // Assumes usage of physics geometry for this
     m_embedder = std::make_shared<NeedleEmbedder>();

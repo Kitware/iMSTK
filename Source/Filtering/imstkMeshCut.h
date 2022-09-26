@@ -132,6 +132,6 @@ protected:
     std::shared_ptr<std::unordered_set<size_t>> m_RemoveConstraintVertices = nullptr;
     std::shared_ptr<std::unordered_set<size_t>> m_AddConstraintVertices    = nullptr;
 
-    double m_Epsilon = 1.0;
+    double m_Epsilon = 0.001;
 };
 } // namespace imstk

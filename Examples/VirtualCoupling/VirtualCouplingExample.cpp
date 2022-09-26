@@ -12,6 +12,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkOrientedBox.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
@@ -27,6 +28,7 @@
 
 #ifdef iMSTK_USE_RENDERING_VTK
 #include "imstkKeyboardSceneControl.h"
+#include "imstkSimulationUtils.h"
 #include "imstkVTKViewer.h"
 #include "imstkVTKRenderer.h"
 #endif
@@ -50,6 +52,9 @@ main()
 
     // Scene
     auto scene = std::make_shared<Scene>("VirtualCoupling");
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 0.2, 0.35));
+    scene->getActiveCamera()->setFocalPoint(Vec3d(0.0, 0.0, 0.0));
+    scene->getActiveCamera()->setViewUp(Vec3d(0.0, 1.0, 0.0));
 
     std::shared_ptr<CollidingObject> obstacleObjs[] =
     {
@@ -82,9 +87,11 @@ main()
         model->getConfig()->m_dt      = 0.001;
         model->getConfig()->m_gravity = Vec3d::Zero();
         rbdObj->setDynamicalModel(model);
-        rbdObj->getPbdBody()->setRigid(Vec3d(0.0, 0.05, 0.0),
-            7.0, Quatd::Identity(),
-            Mat3d::Identity() * 100000000.0);
+        rbdObj->getPbdBody()->setRigid(
+            Vec3d(0.0, 0.05, 0.0),            // Position
+            7.0,                              // Mass
+            Quatd::Identity(),                // Orientation
+            Mat3d::Identity() * 100000000.0); // Inertia
 
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
         rbdObj->setCollidingGeometry(surfMesh);
@@ -96,45 +103,31 @@ main()
         mat->setRoughness(0.5);
         mat->setMetalness(1.0);
         mat->setIsDynamicMesh(false);
+
+        // Add a component for controlling via another device
+        auto controller = rbdObj->addComponent<PbdObjectController>();
+        controller->setControlledObject(rbdObj);
+        controller->setDevice(deviceClient);
+        controller->setTranslationOffset(Vec3d(0.0, 0.05, 0.0));
+        controller->setLinearKs(50000.0);
+        controller->setAngularKs(1000000000000.0);
+        controller->setTranslationScaling(1.0);
+        controller->setForceScaling(0.005);
+        controller->setSmoothingKernelSize(10);
+        controller->setUseForceSmoothening(true);
+        controller->setUseCritDamping(true);
+
+        // Add extra component to tool for the ghost
+        auto controllerGhost = rbdObj->addComponent<ObjectControllerGhost>();
+        controllerGhost->setController(controller);
     }
     scene->addSceneObject(rbdObj);
-
-    // Setup a ghost tool object to show off virtual coupling
-    auto ghostToolObj = std::make_shared<SceneObject>("GhostTool");
-    ghostToolObj->setVisualGeometry(rbdObj->getVisualGeometry()->clone());
-    auto ghostMaterial = std::make_shared<RenderMaterial>();
-    ghostMaterial->setColor(Color::Orange);
-    ghostMaterial->setLineWidth(5.0);
-    ghostMaterial->setOpacity(0.3);
-    ghostMaterial->setIsDynamicMesh(false);
-    ghostToolObj->getVisualModel(0)->setRenderMaterial(ghostMaterial);
-    scene->addSceneObject(ghostToolObj);
-
-    // Create a virtual coupling controller
-    // Balancing ks, device force scaling, and the mass
-    auto controller = std::make_shared<PbdObjectController>();
-    controller->setControlledObject(rbdObj);
-    controller->setDevice(deviceClient);
-    controller->setTranslationOffset(Vec3d(0.0, 0.05, 0.0));
-    controller->setLinearKs(50000.0);
-    controller->setAngularKs(1000000000000.0);
-    controller->setTranslationScaling(1.0);
-    controller->setForceScaling(0.01);
-    controller->setSmoothingKernelSize(15);
-    controller->setUseForceSmoothening(true);
-    controller->setUseCritDamping(true);
-    scene->addControl(controller);
 
     // Add interaction between the rigid object sphere and static plane
     scene->addInteraction(
         std::make_shared<PbdObjectCollision>(rbdObj, obstacleObjs[0]));
     scene->addInteraction(
         std::make_shared<PbdObjectCollision>(rbdObj, obstacleObjs[1]));
-
-    // Camera
-    scene->getActiveCamera()->setPosition(Vec3d(0.0, 0.2, 0.35));
-    scene->getActiveCamera()->setFocalPoint(Vec3d(0.0, 0.0, 0.0));
-    scene->getActiveCamera()->setViewUp(Vec3d(0.0, 1.0, 0.0));
 
     // Light
     auto light = std::make_shared<DirectionalLight>();
@@ -160,34 +153,18 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Run the rbd model in real time
                 rbdObj->getPbdModel()->getConfig()->m_dt = driver->getDt();
-
-                //ghostMaterial->setOpacity(std::min(1.0,controller->getDeviceForce().norm() / 15.0));
-                ghostMaterial->setOpacity(1.0);
-
-                // Also apply controller transform to ghost geometry
-                std::shared_ptr<Geometry> toolGhostMesh = ghostToolObj->getVisualGeometry();
-                toolGhostMesh->setTranslation(controller->getPosition());
-                toolGhostMesh->setRotation(controller->getOrientation());
-                toolGhostMesh->updatePostTransformData();
-                toolGhostMesh->postModified();
             });
 
         // Add mouse and keyboard controls to the viewer
 #ifdef iMSTK_USE_RENDERING_VTK
-        auto mouseControl = std::make_shared<MouseSceneControl>();
-        mouseControl->setDevice(viewer->getMouseDevice());
-        mouseControl->setSceneManager(sceneManager);
-        scene->addControl(mouseControl);
-
-        auto keyControl = std::make_shared<KeyboardSceneControl>();
-        keyControl->setDevice(viewer->getKeyboardDevice());
-        keyControl->setSceneManager(sceneManager);
-        keyControl->setModuleDriver(driver);
-        scene->addControl(keyControl);
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        scene->addSceneObject(mouseAndKeyControls);
 #endif
 
         driver->start();

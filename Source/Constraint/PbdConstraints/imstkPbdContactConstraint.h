@@ -39,6 +39,11 @@ public:
     virtual Vec3d computeRelativeVelocity(PbdState& bodies) { return Vec3d::Zero(); }
 
     ///
+    /// \brief Get the support point r/the difference to the contact point
+    ///
+    const Vec3d& getR(const int i) const { return m_r[i]; }
+
+    ///
     /// \brief Solve the velocities given to the constraint
     ///
     void correctVelocity(PbdState& bodies, const double dt) override;

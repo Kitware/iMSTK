@@ -4,8 +4,10 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkArcNeedle.h"
 #include "imstkCamera.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkIsometricMap.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
@@ -16,16 +18,19 @@
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
+#include "imstkPuncturable.h"
+#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel2.h"
+#include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
-#include "NeedleObject.h"
 
 #ifdef iMSTK_USE_HAPTICS
 #include "imstkDeviceManager.h"
@@ -112,6 +117,8 @@ makeTissueObj()
     box2Model->getRenderMaterial()->setColor(Color::darken(Color::Yellow, 0.2));
     tissueObj->addVisualModel(box2Model);
 
+    tissueObj->addComponent<Puncturable>();
+
     return tissueObj;
 }
 
@@ -133,6 +140,64 @@ makeToolObj(std::string name)
     return toolObj;
 }
 
+static std::shared_ptr<RigidObject2>
+makeNeedleObj()
+{
+    auto needleObj = std::make_shared<RigidObject2>();
+
+    auto sutureMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
+    auto sutureLineMesh = MeshIO::read<LineMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture_hull.vtk");
+
+    const Mat4d rot = mat4dRotation(Rotd(-PI_2, Vec3d(0.0, 1.0, 0.0))) *
+                      mat4dRotation(Rotd(-0.6, Vec3d(1.0, 0.0, 0.0)));
+    sutureMesh->transform(rot, Geometry::TransformType::ApplyToData);
+    sutureLineMesh->transform(rot, Geometry::TransformType::ApplyToData);
+
+    needleObj->setVisualGeometry(sutureMesh);
+    needleObj->setCollidingGeometry(sutureLineMesh);
+    needleObj->setPhysicsGeometry(sutureLineMesh);
+    needleObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(sutureLineMesh, sutureMesh));
+    needleObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
+    needleObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    needleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
+    needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
+
+    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
+    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
+    rbdModel->getConfig()->m_maxNumIterations = 5;
+    needleObj->setDynamicalModel(rbdModel);
+
+    needleObj->getRigidBody()->m_mass = 1.0;
+    needleObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
+    needleObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
+
+    // Manually setup an arc aligned with the geometry, some sort of needle+arc generator
+    // could be a nice addition to imstk
+    Mat3d arcBasis = Mat3d::Identity();
+    arcBasis.col(0) = Vec3d(0.0, 0.0, -1.0);
+    arcBasis.col(1) = Vec3d(1.0, 0.0, 0.0);
+    arcBasis.col(2) = Vec3d(0.0, 1.0, 0.0);
+    arcBasis = rot.block<3, 3>(0, 0) * arcBasis;
+    const Vec3d  arcCenter = (rot * Vec4d(0.0, -0.005455, 0.008839, 1.0)).head<3>();
+    const double arcRadius = 0.010705;
+
+    // Add a component for needles
+    auto needle = needleObj->addComponent<ArcNeedle>();
+    needle->setArc(arcCenter, arcBasis, arcRadius, 0.558, 2.583);
+
+    // Add a component to control the tool
+    auto controller = needleObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(needleObj);
+    controller->setLinearKs(1000.0);
+    controller->setAngularKs(10000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.2);
+    controller->setSmoothingKernelSize(5);
+    controller->setUseForceSmoothening(true);
+
+    return needleObj;
+}
+
 ///
 /// \brief This example is an initial suturing example testbed. It provides the constraint
 /// required for an arc shaped needle puncturing vs a static/immovable tissue. What it
@@ -151,8 +216,7 @@ main()
     auto scene = std::make_shared<Scene>("PbdStaticSuture");
 
     // Create the arc needle
-    auto needleObj = std::make_shared<NeedleObject>();
-    needleObj->setForceThreshold(2.0);
+    std::shared_ptr<RigidObject2> needleObj = makeNeedleObj();
     scene->addSceneObject(needleObj);
 
     // Create the suture pbd-based string
@@ -208,7 +272,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001); // 1ms, 1000hz
 
-        auto controller = std::make_shared<RigidObjectController>();
+        auto controller = needleObj->getComponent<RigidObjectController>();
 #ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
@@ -229,16 +293,7 @@ main()
                 deviceClient->setOrientation(deviceClient->getOrientation() * delta);
             });
 #endif
-
-        controller->setControlledObject(needleObj);
         controller->setDevice(deviceClient);
-        controller->setLinearKs(1000.0);
-        controller->setAngularKs(10000000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.2);
-        controller->setSmoothingKernelSize(5);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
 
         // Update the timesteps for real time
         connect<Event>(sceneManager, &SceneManager::preUpdate,
@@ -280,19 +335,10 @@ main()
                 ghostClampsObj->getVisualModel(0)->getRenderMaterial()->setOpacity(std::min(1.0, controller->getDeviceForce().norm() / 5.0));
             });
 
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
-
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();
     }

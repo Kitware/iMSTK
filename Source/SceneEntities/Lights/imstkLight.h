@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "imstkMath.h"
 #include "imstkColor.h"
-#include "imstkSceneEntity.h"
+#include "imstkEntity.h"
+#include "imstkMath.h"
 
 #include <string>
 
@@ -19,7 +19,7 @@ namespace imstk
 ///
 /// \brief Abstract base class for lights
 ///
-class Light : public SceneEntity
+class Light : public Entity
 {
 protected:
     Light() = default;

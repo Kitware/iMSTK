@@ -4,6 +4,10 @@
 
 set(H_FILES
   Camera/imstkCamera.h
+  Components/imstkAxesModel.h
+  Components/imstkObjectControllerGhost.h
+  Components/imstkVisualModel.h
+  Components/imstkVertexLabelVisualModel.h
   Lights/imstkDirectionalLight.h
   Lights/imstkIBLProbe.h
   Lights/imstkLight.h
@@ -13,8 +17,8 @@ set(H_FILES
   Objects/imstkAnimationModel.h
   Objects/imstkAnimationObject.h
   Objects/imstkCollidingObject.h
-  Objects/imstkCollisionDataDebugObject.h
-  Objects/imstkDebugGeometryObject.h
+  Objects/imstkCollisionDataDebugModel.h
+  Objects/imstkDebugGeometryModel.h
   Objects/imstkDynamicObject.h
   Objects/imstkFeDeformableObject.h
   Objects/imstkLevelSetDeformableObject.h
@@ -22,21 +26,19 @@ set(H_FILES
   Objects/imstkRigidObject2.h
   Objects/imstkSceneObject.h
   Objects/imstkSphObject.h
-  Objects/imstkVisualModel.h
-  Objects/imstkVertexLabelVisualModel.h
-  Objects/imstkTextVisualModel.h
-  imstkSceneEntity.h
   )
 
 set(SRC_FILES
   Camera/imstkCamera.cpp
+  Components/imstkObjectControllerGhost.cpp
+  Components/imstkVisualModel.cpp
   Lights/imstkIBLProbe.cpp
   Loader/imstkVisualObjectImporter.cpp
   Objects/imstkAnimationModel.cpp
   Objects/imstkAnimationObject.cpp
   Objects/imstkCollidingObject.cpp
-  Objects/imstkCollisionDataDebugObject.cpp
-  Objects/imstkDebugGeometryObject.cpp
+  Objects/imstkCollisionDataDebugModel.cpp
+  Objects/imstkDebugGeometryModel.cpp
   Objects/imstkDynamicObject.cpp
   Objects/imstkFeDeformableObject.cpp
   Objects/imstkLevelSetDeformableObject.cpp
@@ -44,8 +46,6 @@ set(SRC_FILES
   Objects/imstkRigidObject2.cpp
   Objects/imstkSceneObject.cpp
   Objects/imstkSphObject.cpp
-  Objects/imstkVisualModel.cpp
-  imstkSceneEntity.cpp
   )
 
 if (iMSTK_USE_MODEL_REDUCTION)
@@ -63,9 +63,8 @@ imstk_add_library(SceneEntities
     ${H_FILES}
   CPP_FILES
     ${SRC_FILES}
-  DEPENDS    
-    Common
-    Geometry
+  DEPENDS
+    ComponentModel
     GeometryMappers
     Materials
     MeshIO
@@ -73,6 +72,7 @@ imstk_add_library(SceneEntities
     Devices
     DynamicalModels
     CollisionDetection
+    Controllers
   )
 
 #-----------------------------------------------------------------------------

@@ -114,10 +114,15 @@
 #include "imstkPbdConstraint.h"
 #include "imstkRbdConstraint.h"
 
+/*
+ * ComponentModel
+ */
+#include "imstkEntity.h"
+#include "imstkComponent.h"
+
 /* 
  * SceneEntities
  */
-#include "imstkSceneEntity.h"
 #include "imstkSceneObject.h"
 #include "imstkCollidingObject.h"
 #include "imstkDynamicObject.h"
@@ -171,6 +176,15 @@
 #include "imstkRigidObjectController.h"
 
 /*
+ * Needle
+ */
+#include "imstkPuncture.h"
+#include "imstkNeedle.h"
+#include "imstkStraightNeedle.h"
+#include "imstkArcNeedle.h"
+#include "imstkPuncturable.h"
+
+/*
  * Scene
  */
 #include "imstkScene.h"
@@ -202,7 +216,6 @@
  * ViewerVTK
  */
 #include "imstkAbstractVTKViewer.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 #endif
 
@@ -381,14 +394,19 @@ namespace std
 %include "../../Materials/imstkTexture.h";
 
 /*
+ * ComponentModel
+ */
+%include "../../ComponentModel/imstkEntity.h"
+%include "../../ComponentModel/imstkComponent.h"
+
+/*
  * SceneEntities
  */
-%include "../../SceneEntities/imstkSceneEntity.h"
+%include "../../SceneEntities/Components/imstkVisualModel.h";
 %include "../../SceneEntities/Objects/imstkSceneObject.h";
 %include "../../SceneEntities/Objects/imstkCollidingObject.h";
 %include "../../SceneEntities/Objects/imstkDynamicObject.h";
 %include "../../SceneEntities/Objects/imstkPbdObject.h";
-%include "../../SceneEntities/Objects/imstkVisualModel.h";
 %include "../../SceneEntities/Objects/imstkFeDeformableObject.h";
 %include "../../SceneEntities/Objects/imstkRigidObject2.h";
 %include "../../SceneEntities/Objects/imstkSphObject.h";
@@ -436,6 +454,15 @@ namespace std
 %include "../../Controllers/imstkSceneObjectController.h"
 %include "../../Controllers/imstkRigidObjectController.h"
 
+/*
+ * Needle
+ */
+%include "../../Needle/imstkPuncture.h"
+%include "../../Needle/imstkNeedle.h"
+%include "../../Needle/imstkStraightNeedle.h"
+%include "../../Needle/imstkArcNeedle.h"
+%include "../../Needle/imstkPuncturable.h"
+
 /* 
  * Scene
  */
@@ -460,7 +487,6 @@ namespace std
  */
 %include "../../ViewerVTK/imstkAbstractVTKViewer.h";
 %include "../../ViewerVTK/imstkVTKViewer.h";
-%include "../../ViewerVTK/imstkVTKTextStatusManager.h";
 #endif
 
 /*

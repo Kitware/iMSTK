@@ -5,9 +5,11 @@
 */
 
 #include "NeedleRigidBodyCH.h"
-#include "NeedleObject.h"
+#include "imstkArcNeedle.h"
+#include "imstkPuncturable.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRigidBodyModel2.h"
+#include "imstkRigidObject2.h"
 #include "RbdPointToArcConstraint.h"
 
 void
@@ -19,18 +21,27 @@ NeedleRigidBodyCH::handle(
     RigidBodyCH::handle(elementsA, elementsB);
 
     // If no collision, needle must be removed
-    auto                         needleObj = std::dynamic_pointer_cast<NeedleObject>(getInputObjectA());
-    NeedleObject::CollisionState state     = needleObj->getCollisionState();
+    auto needleObj = std::dynamic_pointer_cast<RigidObject2>(getInputObjectA());
+    auto needle    = needleObj->getComponent<ArcNeedle>();
+
+    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
+    auto                             puncturable = tissueObj->getComponent<Puncturable>();
+
+    const PunctureId      punctureId = getPunctureId(needle, puncturable);
+    const Puncture::State state      = needle->getState(punctureId);
 
     if (elementsA.size() != 0)
     {
-        if (state == NeedleObject::CollisionState::INSERTED)
+        if (state == Puncture::State::INSERTED)
         {
-            const Mat3d& arcBasis    = needleObj->getArcBasis();
-            const Vec3d& arcCenter   = needleObj->getArcCenter();
-            const double arcRadius   = needleObj->getArcRadius();
-            const double arcBeginRad = needleObj->getBeginRad();
-            const double arcEndRad   = needleObj->getEndRad();
+            const Mat3d& rot = needleObj->getRigidBody()->getOrientation().toRotationMatrix();
+            const Vec3d& pos = needleObj->getRigidBody()->getPosition();
+
+            const Mat3d& arcBasis    = rot * needle->getArcBasis();
+            const Vec3d& arcCenter   = pos + rot * needle->getArcCenter();
+            const double arcRadius   = needle->getArcRadius();
+            const double arcBeginRad = needle->getBeginRad();
+            const double arcEndRad   = needle->getEndRad();
 
             // Constrain along the axes, whilst allowing "pushing" of the contact point
             auto pointToArcConstraint = std::make_shared<RbdPointToArcConstraint>(
@@ -47,13 +58,13 @@ NeedleRigidBodyCH::handle(
     }
     else
     {
-        if (state == NeedleObject::CollisionState::INSERTED || state == NeedleObject::CollisionState::TOUCHING)
+        if (state == Puncture::State::INSERTED || state == Puncture::State::TOUCHING)
         {
-            if (state == NeedleObject::CollisionState::INSERTED)
+            if (state == Puncture::State::INSERTED)
             {
                 LOG(INFO) << "Unpuncture!";
             }
-            needleObj->setCollisionState(NeedleObject::CollisionState::REMOVED);
+            needle->setState(punctureId, Puncture::State::REMOVED);
         }
     }
 }
@@ -64,26 +75,33 @@ NeedleRigidBodyCH::addConstraint(
     const Vec3d& contactPt, const Vec3d& contactNormal,
     const double contactDepth)
 {
-    auto obj = std::dynamic_pointer_cast<NeedleObject>(rbdObj);
+    // If no collision, needle must be removed
+    auto needleObj = std::dynamic_pointer_cast<RigidObject2>(getInputObjectA());
+    auto needle    = needleObj->getComponent<ArcNeedle>();
+
+    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
+    auto                             puncturable = tissueObj->getComponent<Puncturable>();
+    const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
 
     // If removed and we are here, we must now be touching
-    if (obj->getCollisionState() == NeedleObject::CollisionState::REMOVED)
+    if (needle->getState(punctureId) == Puncture::State::REMOVED)
     {
-        obj->setCollisionState(NeedleObject::CollisionState::TOUCHING);
+        needle->setState(punctureId, Puncture::State::TOUCHING);
     }
 
     // If touching we may test for insertion
     const Vec3d n = contactNormal.normalized();
-    if (obj->getCollisionState() == NeedleObject::CollisionState::TOUCHING)
+    if (needle->getState(punctureId) == Puncture::State::TOUCHING)
     {
         // Get all inwards force
-        const double fN = std::max(-contactNormal.dot(obj->getRigidBody()->getForce()), 0.0);
+        const double fN = std::max(-contactNormal.dot(rbdObj->getRigidBody()->getForce()), 0.0);
 
         // If the normal force exceeds threshold the needle may insert
-        if (fN > obj->getForceThreshold())
+        if (fN > m_forceThreshold)
         {
             LOG(INFO) << "Puncture!";
-            obj->setCollisionState(NeedleObject::CollisionState::INSERTED);
+            needle->setState(punctureId, Puncture::State::INSERTED);
+            puncturable->setPuncture(punctureId, needle->getPuncture(punctureId));
 
             // Record the initial contact point
             m_initOrientation = Quatd(rbdObj->getCollidingGeometry()->getRotation());
@@ -92,8 +110,8 @@ NeedleRigidBodyCH::addConstraint(
     }
 
     // Only add contact normal constraint if not inserted
-    NeedleObject::CollisionState state = obj->getCollisionState();
-    if (state == NeedleObject::CollisionState::TOUCHING)
+    Puncture::State state = needle->getState(punctureId);
+    if (state == Puncture::State::TOUCHING)
     {
         auto contactConstraint = std::make_shared<RbdContactConstraint>(
             rbdObj->getRigidBody(), nullptr,

@@ -118,10 +118,15 @@
 %shared_ptr(imstk::PbdState)
 %shared_ptr(imstk::RigidBody)
 
+/*
+ * ComponentModel
+ */
+%shared_ptr(imstk::Entity)
+%shared_ptr(imstk::Component)
+
 /* 
  * SceneEntities
  */
-%shared_ptr(imstk::SceneEntity)
 %shared_ptr(imstk::SceneObject)
 %shared_ptr(imstk::CollidingObject)
 %shared_ptr(imstk::DynamicObject)
@@ -175,6 +180,15 @@
 %shared_ptr(imstk::TrackingDeviceControl)
 %shared_ptr(imstk::SceneObjectController)
 %shared_ptr(imstk::RigidObjectController)
+
+/*
+ * Needle
+ */
+%shared_ptr(imstk::Puncture)
+%shared_ptr(imstk::Needle)
+%shared_ptr(imstk::StraightNeedle)
+%shared_ptr(imstk::ArcNeedle)
+%shared_ptr(imstk::Puncturable)
 
 /*
  * Scene

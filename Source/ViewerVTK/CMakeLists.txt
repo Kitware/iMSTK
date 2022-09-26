@@ -12,7 +12,6 @@ imstk_add_library(ViewerVTK
     imstkVtkOpenVRRenderWindowInteractorImstk.h
     imstkVTKOpenVRViewer.h
     imstkVTKScreenCaptureUtility.h
-    imstkVTKTextStatusManager.h
     imstkVTKViewer.h
   CPP_FILES
     imstkAbstractVTKViewer.cpp
@@ -22,7 +21,6 @@ imstk_add_library(ViewerVTK
     imstkVtkOpenVRRenderWindowInteractorImstk.cpp
     imstkVTKOpenVRViewer.cpp
     imstkVTKScreenCaptureUtility.cpp
-    imstkVTKTextStatusManager.cpp
     imstkVTKViewer.cpp
   DEPENDS
     ViewerCore

@@ -131,4 +131,10 @@ AbstractVTKViewer::uninitModule()
     iren->ProcessEvents();
     m_vtkRenderWindow->Finalize();
 }
+
+std::shared_ptr<VTKRenderer>
+AbstractVTKViewer::getActiveVtkRenderer() const
+{
+    return std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
+}
 } // namespace imstk

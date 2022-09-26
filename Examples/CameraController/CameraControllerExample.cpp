@@ -16,7 +16,9 @@
 #include "imstkPlane.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkSpotLight.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVTKViewer.h"
@@ -91,17 +93,10 @@ main()
         camController->setDevice(deviceClient);
         scene->addControl(camController);
 
-        // Add mouse and keyboard controls to the viewer
-        auto mouseControl = std::make_shared<MouseSceneControl>();
-        mouseControl->setDevice(viewer->getMouseDevice());
-        mouseControl->setSceneManager(sceneManager);
-        scene->addControl(mouseControl);
-
-        auto keyControl = std::make_shared<KeyboardSceneControl>();
-        keyControl->setDevice(viewer->getKeyboardDevice());
-        keyControl->setSceneManager(sceneManager);
-        keyControl->setModuleDriver(driver);
-        scene->addControl(keyControl);
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        scene->addSceneObject(mouseAndKeyControls);
 
         // Change the spot angle when haptic button is pressed
         connect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged,

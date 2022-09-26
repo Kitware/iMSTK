@@ -14,7 +14,10 @@
 namespace imstk
 {
 class Camera;
+class Entity;
 class InteractorStyle;
+class KeyboardDeviceClient;
+class MouseDeviceClient;
 class Scene;
 class ScreenCaptureUtility;
 
@@ -49,6 +52,11 @@ public:
     /// \brief Get scene currently being rendered
     ///
     std::shared_ptr<Scene> getActiveScene() const { return m_activeScene; }
+
+    ///
+    /// \brief Set the length of the debug axes
+    ///
+    void setDebugAxesLength(double x, double y, double z);
 
     ///
     /// \brief Set scene to be rendered
@@ -118,16 +126,31 @@ public:
 
     virtual void processEvents() = 0;
 
+    ///
+    /// \brief Returns the device that emits key events
+    ///
+    virtual std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const;
+
+    ///
+    /// \brief Returns the device that emits mouse events
+    ///
+    virtual std::shared_ptr<MouseDeviceClient> getMouseDevice() const;
+
+    double getVisualFps() const { return m_visualFps; }
+
 protected:
     void updateModule() override;
 
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 
     std::shared_ptr<Scene>  m_activeScene;
+    std::shared_ptr<Entity> m_debugEntity;
     std::shared_ptr<Camera> m_debugCamera;
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///< Screen shot utility
 
     std::shared_ptr<ViewerConfig> m_config;
     int m_infoLevel = 0; ///< Info level
+
+    double m_visualFps = 0.0;
 };
 } // namespace imstk

@@ -13,7 +13,6 @@ if (iMSTK_USE_RENDERING_VTK)
   # Create executable
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME} RbdSDFPivotNeedleExample.cpp
-    NeedleObject.h
     NeedleInteraction.h
     NeedleInteraction.cpp
     NeedleRigidBodyCH.h
@@ -33,5 +32,7 @@ if (iMSTK_USE_RENDERING_VTK)
   target_link_libraries(${PROJECT_NAME}
     SimulationManager
     Filtering
-    ViewerVTK)
+    ViewerVTK
+    Needle
+    )
 endif()

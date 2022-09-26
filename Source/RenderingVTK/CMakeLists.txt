@@ -10,6 +10,7 @@ imstk_add_library(RenderingVTK
     imstkVolumeRenderMaterialPresets.h
     imstkVTKRenderer.h
     imstkVTKTextureDelegate.h
+    RenderDelegate/imstkVTKAxesRenderDelegate.h
     RenderDelegate/imstkVTKCapsuleRenderDelegate.h
     RenderDelegate/imstkVTKCylinderRenderDelegate.h
     RenderDelegate/imstkVTKFluidRenderDelegate.h
@@ -34,6 +35,7 @@ imstk_add_library(RenderingVTK
     imstkVolumeRenderMaterialPresets.cpp
     imstkVTKRenderer.cpp
     imstkVTKTextureDelegate.cpp
+    RenderDelegate/imstkVTKAxesRenderDelegate.cpp
     RenderDelegate/imstkVTKCapsuleRenderDelegate.cpp
     RenderDelegate/imstkVTKCylinderRenderDelegate.cpp
     RenderDelegate/imstkVTKFluidRenderDelegate.cpp

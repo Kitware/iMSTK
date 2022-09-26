@@ -11,8 +11,8 @@
 namespace imstk
 {
 class ModuleDriver;
+class SceneControlText;
 class SceneManager;
-class TextVisualModel;
 
 ///
 /// \class KeyboardSceneControl
@@ -26,11 +26,8 @@ class TextVisualModel;
 class KeyboardSceneControl : public KeyboardControl
 {
 public:
-
-    KeyboardSceneControl(const std::string& name = "KeyboardSceneControl");
+    KeyboardSceneControl(const std::string& name = "KeyboardSceneControl") : KeyboardControl(name) { }
     ~KeyboardSceneControl() override = default;
-
-    bool initialize() override;
 
     ///
     /// \brief The driver is used to stop the simulation
@@ -42,24 +39,15 @@ public:
     ///
     void setSceneManager(std::weak_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
 
-    ///
-    /// \brief If on, text status will be shown when paused.
-    /// On by default.
-    ///@{
-    void setUseTextStatus(const bool useTextStatus) { m_useTextStatus = useTextStatus; }
-    bool getUseTextStatus() const { return m_useTextStatus; }
-    ///@}
+    void setSceneControlText(std::shared_ptr<SceneControlText> sceneControlText) { m_sceneControlText = sceneControlText; }
 
     void printControls() override;
 
     void OnKeyPress(const char key) override;
 
-    void OnKeyRelease(const char key) override;
-
 protected:
-    std::weak_ptr<ModuleDriver>      m_driver;
-    std::weak_ptr<SceneManager>      m_sceneManager;
-    std::shared_ptr<TextVisualModel> m_textVisualModel;
-    bool m_useTextStatus = true;
+    std::weak_ptr<ModuleDriver>       m_driver;
+    std::weak_ptr<SceneManager>       m_sceneManager;
+    std::shared_ptr<SceneControlText> m_sceneControlText;
 };
 } // namespace imstk

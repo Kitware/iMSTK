@@ -23,7 +23,7 @@ protected:
     ///
     /// \brief Handle the collision/contact data
     ///
-    virtual void handle(
+    void handle(
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override;
 
@@ -36,7 +36,8 @@ protected:
         const double contactDepth) override;
 
 protected:
-    Vec3d m_initContactPt   = Vec3d::Zero();
-    Vec3d m_initAxes        = Vec3d::Zero();
-    Quatd m_initOrientation = Quatd::Identity();
+    Vec3d  m_initContactPt   = Vec3d::Zero();
+    Vec3d  m_initAxes        = Vec3d::Zero();
+    Quatd  m_initOrientation = Quatd::Identity();
+    double m_forceThreshold  = 2.0;
 };

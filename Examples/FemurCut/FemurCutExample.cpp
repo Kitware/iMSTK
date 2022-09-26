@@ -16,6 +16,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRigidBodyCH.h"
 #include "imstkRigidBodyModel2.h"
@@ -25,6 +26,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
@@ -72,6 +74,21 @@ makeRigidObj(const std::string& name)
     rigidObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     rigidObj->getRigidBody()->m_initPos = Vec3d(0.0, 1.0, 2.0);
 
+    // Add a component for controlling via another device
+    auto controller = rigidObj->addComponent<RigidObjectController>();
+    controller->setControlledObject(rigidObj);
+    controller->setLinearKs(50000.0);
+    controller->setAngularKs(300000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.005);
+    controller->setTranslationOffset(Vec3d(0.4, 0.7, 1.6));
+    controller->setSmoothingKernelSize(30);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = rigidObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setUseForceFade(true);
+    controllerGhost->setController(controller);
+
     return rigidObj;
 }
 
@@ -95,14 +112,6 @@ main()
     // Setup the tool that cuts the femur
     std::shared_ptr<RigidObject2> rbdObj = makeRigidObj("ToolObject");
     scene->addSceneObject(rbdObj);
-
-    // Setup a copy of the tool slightly transparent to show physical pose
-    auto rbdGhostObj = std::make_shared<SceneObject>("ToolObjectGhost");
-    rbdGhostObj->setVisualGeometry(rbdObj->getPhysicsGeometry()->clone());
-    auto ghostMat = std::make_shared<RenderMaterial>(*rbdObj->getVisualModel(0)->getRenderMaterial());
-    ghostMat->setOpacity(0.4);
-    rbdGhostObj->getVisualModel(0)->setRenderMaterial(ghostMat);
-    scene->addSceneObject(rbdGhostObj);
 
     // Setup cutting interaction between level set femur and rigid object tool
     auto cutting = std::make_shared<RigidObjectLevelSetCollision>(rbdObj, femurObj);
@@ -159,50 +168,23 @@ main()
             });
 #endif
 
-        auto controller = std::make_shared<RigidObjectController>();
-        {
-            controller->setControlledObject(rbdObj);
-            controller->setDevice(deviceClient);
-            controller->setLinearKs(50000.0);
-            controller->setAngularKs(300000000.0);
-            controller->setUseCritDamping(true);
-            controller->setForceScaling(0.005);
+        auto controller = rbdObj->getComponent<RigidObjectController>();
+        controller->setDevice(deviceClient);
 
-            // The particular device we are using doesn't produce this quantity
-            // with this flag its computed
-            // in code
-            controller->setComputeVelocity(true);
-            controller->setComputeAngularVelocity(true);
-            controller->setTranslationOffset(Vec3d(0.4, 0.7, 1.6));
-            controller->setSmoothingKernelSize(30);
-        }
-        scene->addControl(controller);
+        std::shared_ptr<ObjectControllerGhost> ghostObj = rbdObj->addComponent<ObjectControllerGhost>();
+        ghostObj->setController(controller);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::preUpdate,
+            [&](Event*)
             {
                 rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
                 femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
-
-                // Also apply controller transform to ghost geometry
-                std::shared_ptr<Geometry> ghostMesh = rbdGhostObj->getVisualGeometry();
-                ghostMesh->setTranslation(controller->getPosition());
-                ghostMesh->setRotation(controller->getOrientation());
-                ghostMesh->updatePostTransformData();
-                ghostMesh->postModified();
         });
 
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
-
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();
     }

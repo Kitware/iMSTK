@@ -125,6 +125,7 @@ LineMeshToSphereCD::computeCollisionDataAB(
                         elemA.ids[0]   = cell[0];
                         elemA.ids[1]   = cell[1];
                         elemA.idCount  = 2;
+                        elemA.parentId = i; // line id
                         elemA.cellType = IMSTK_EDGE;
 
                         Vec3d contactNormal = (spherePos - lineContactPt);

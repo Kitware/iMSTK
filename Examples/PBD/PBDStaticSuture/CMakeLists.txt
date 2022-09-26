@@ -17,8 +17,6 @@ if (iMSTK_USE_RENDERING_VTK)
     pbdStaticSutureExample.cpp
     NeedleInteraction.h
     NeedleInteraction.cpp
-    NeedleObject.h
-    NeedleObject.cpp
     NeedleRigidBodyCH.h
     NeedleRigidBodyCH.cpp
     RbdPointToArcConstraint.h)
@@ -33,5 +31,7 @@ if (iMSTK_USE_RENDERING_VTK)
   #-----------------------------------------------------------------------------
   target_link_libraries(${PROJECT_NAME}
     SimulationManager
-    ViewerVTK)
+    ViewerVTK
+    Needle
+    )
 endif()

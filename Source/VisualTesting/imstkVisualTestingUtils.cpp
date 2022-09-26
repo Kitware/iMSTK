@@ -5,6 +5,7 @@
 */
 
 #include "imstkVisualTestingUtils.h"
+#include "imstkEntity.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
@@ -13,9 +14,10 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkTestingUtils.h"
+#include "imstkTextVisualModel.h"
 #include "imstkVTKRenderer.h"
-#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -93,25 +95,39 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
                 m_scene->advance(0.001);
                 m_sceneManager->postEvent(Event(SceneManager::postUpdate()));
             }
-            // Toggle visibility of debug axes
-            else if (e->m_key == '0')
-            {
-                auto ren = std::dynamic_pointer_cast<VTKRenderer>(m_viewer->getActiveRenderer());
-                CHECK(ren != nullptr);
-                ren->setAxesVisibility(!ren->getAxesVisibility());
-            }
         });
+
+    // Setup a default key control scheme (commonly used in examples)
+    auto debugEntity = std::make_shared<Entity>();
+    auto keyControl  = debugEntity->addComponent<KeyboardSceneControl>();
+    keyControl->setDevice(m_viewer->getKeyboardDevice());
+    keyControl->setSceneManager(m_sceneManager);
+    keyControl->setModuleDriver(m_driver);
+
+    // Setup a default mouse control scheme (commonly used in examples)
+    auto mouseControl = debugEntity->addComponent<MouseSceneControl>();
+    mouseControl->setDevice(m_viewer->getMouseDevice());
+    mouseControl->setSceneManager(m_sceneManager);
+
+    // Add extra text object to display time and paused status of the test
+    auto testStatusTxtModel = debugEntity->addComponent<TextVisualModel>("TestStatusText");
+    testStatusTxtModel->setFontSize(30.0);
+    testStatusTxtModel->setPosition(TextVisualModel::DisplayPosition::UpperLeft);
+    testStatusTxtModel->setText("0.000s");
+
+    m_scene->addSceneObject(debugEntity);
+
     connect<Event>(m_sceneManager, &SceneManager::postUpdate,
         [&](Event*)
         {
             if (m_timerPaused)
             {
-                m_viewer->getTextStatusManager()->setCustomStatus("Paused at " +
+                testStatusTxtModel->setText("Paused at " +
                     to_string_with_precision(m_scene->getSceneTime(), 3) + 's');
             }
             else
             {
-                m_viewer->getTextStatusManager()->setCustomStatus(
+                testStatusTxtModel->setText(
                     to_string_with_precision(m_scene->getSceneTime(), 3) + 's');
                 if (m_duration != -1.0 && m_scene->getSceneTime() > m_duration)
                 {
@@ -119,22 +135,6 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
                 }
             }
         });
-    m_viewer->getTextStatusManager()->setCustomStatus("0.000s");
-
-    // Add mouse and keyboard controls to the viewer
-    {
-        auto mouseControl = std::make_shared<MouseSceneControl>();
-        mouseControl->setDevice(m_viewer->getMouseDevice());
-        mouseControl->setSceneManager(m_sceneManager);
-        m_scene->addControl(mouseControl);
-
-        auto keyControl = std::make_shared<KeyboardSceneControl>();
-        keyControl->setUseTextStatus(false);
-        keyControl->setDevice(m_viewer->getKeyboardDevice());
-        keyControl->setSceneManager(m_sceneManager);
-        keyControl->setModuleDriver(m_driver);
-        m_scene->addControl(keyControl);
-    }
 
     m_dt = fixedTimestep;
     m_driver->setDesiredDt(m_dt);

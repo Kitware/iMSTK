@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkControllerForceText.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
@@ -13,6 +14,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
@@ -24,6 +26,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkSimulationUtils.h"
 #include "imstkTextVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -158,24 +161,25 @@ makeToolObj(std::shared_ptr<PbdModel> model)
 
     model->getConfig()->setBodyDamping(toolObj->getPbdBody()->bodyHandle, 0.05, 0.0);
 
-    toolObj->getPbdBody()->setRigid(Vec3d(0.0, 0.8, 0.0), 0.2,
-        Quatd::Identity(), Mat3d::Identity() * 10000.0);
+    toolObj->getPbdBody()->setRigid(Vec3d(0.0, 0.8, 0.0), // Position
+        0.2,                                              // Mass
+        Quatd::Identity(),                                // Orientation
+        Mat3d::Identity() * 10.0);                        // Inertia
+
+    // Add a component for controlling via a device
+    auto controller = toolObj->addComponent<PbdObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setLinearKs(5000.0);
+    controller->setAngularKs(10000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.0025);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setController(controller);
 
     return toolObj;
-}
-
-///
-/// \brief Creates a text object with text in the top right
-///
-static std::shared_ptr<SceneObject>
-makeTextObj()
-{
-    auto txtVisualModel = std::make_shared<TextVisualModel>();
-    txtVisualModel->setText("Device Force: 0N\nContact Force: 0N");
-    txtVisualModel->setPosition(TextVisualModel::DisplayPosition::UpperRight);
-    auto obj = std::make_shared<SceneObject>();
-    obj->addVisualModel(txtVisualModel);
-    return obj;
 }
 
 ///
@@ -213,13 +217,7 @@ main()
     std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdModel);
     scene->addSceneObject(toolObj);
 
-    // Setup a text to display forces
-    std::shared_ptr<SceneObject> txtObj = makeTextObj();
-    scene->addSceneObject(txtObj);
-
-    // With PbdRigidObjectCollision we have Pbd-Rigid coupling
-    // The toolObj responds to the tissue (the tool is pushed partly out of the way of the tissue whilst the
-    // tissue deforms)
+    // Setup a collision
     auto collision = std::make_shared<PbdObjectCollision>(tissueObj, toolObj, "ClosedSurfaceMeshToMeshCD");
     //std::dynamic_pointer_cast<ClosedSurfaceMeshToMeshCD>(collision->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
     scene->addInteraction(collision);
@@ -247,7 +245,7 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
 
-        auto controller = std::make_shared<PbdObjectController>();
+        auto controller = toolObj->getComponent<PbdObjectController>();
 #ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
@@ -271,50 +269,22 @@ main()
 
         controller->setTranslationScaling(1.0);
 #endif
-        controller->setControlledObject(toolObj);
         controller->setDevice(deviceClient);
-        controller->setLinearKs(5000.0);
-        controller->setAngularKs(10000000.0);
-        controller->setUseCritDamping(true);
-        controller->setForceScaling(0.0025);
-        controller->setUseForceSmoothening(true);
-        scene->addControl(controller);
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Keep the tool moving in real time
                 pbdModel->getConfig()->m_dt = sceneManager->getDt();
-
-                // Assume first collision constraint
-                double contactForceMag = 0.0;
-                auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(collision->getCollisionHandlingAB());
-                const std::vector<PbdConstraint*>& collisionConstraints = pbdCH->getConstraints();
-                if (collisionConstraints.size() > 0)
-                {
-                    // Multiply with gradient for direction
-                    contactForceMag  = std::abs(collisionConstraints[0]->getForce(pbdModel->getConfig()->m_dt));
-                    contactForceMag *= controller->getForceScaling(); // Scale to bring in device space
-                }
-
-                // Display spring and contact force
-                const std::string forceTxt = "Device Force: " + std::to_string(controller->getDeviceForce().norm()) + "N\n" +
-                                             "Scaled Contact Force: " + std::to_string(contactForceMag) + 'N';
-                std::dynamic_pointer_cast<TextVisualModel>(txtObj->getVisualModel(0))->setText(forceTxt);
         });
 
-        // Add mouse and keyboard controls to the viewer
-        {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
-
-            auto keyControl = std::make_shared<KeyboardSceneControl>();
-            keyControl->setDevice(viewer->getKeyboardDevice());
-            keyControl->setSceneManager(sceneManager);
-            keyControl->setModuleDriver(driver);
-            scene->addControl(keyControl);
-        }
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        // Add something to display controller force
+        auto controllerForceTxt = mouseAndKeyControls->addComponent<ControllerForceText>();
+        controllerForceTxt->setController(controller);
+        controllerForceTxt->setCollision(collision);
+        scene->addSceneObject(mouseAndKeyControls);
 
         driver->start();
     }
