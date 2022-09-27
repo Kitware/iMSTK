@@ -57,9 +57,8 @@ makeTetTissueObj(const std::string& name,
     // something much more stretchy to wrap)
     pbdParams->m_femParams->m_YoungModulus = 1000.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.45; // 0.48 for tissue
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
-    /* pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 0.01);
-     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.4);*/
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK,
+        tissueObj->getPbdBody()->bodyHandle);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
@@ -114,8 +113,10 @@ makeTriTissueObj(const std::string& name,
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+        tissueObj->getPbdBody()->bodyHandle);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6,
+        tissueObj->getPbdBody()->bodyHandle);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
@@ -159,9 +160,8 @@ makeLineThreadObj(const std::string& name,
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1);
-    //pbdParams->enableBendConstraint(100000.0, 1);
-    //pbdParams->enableBendConstraint(100000.0, 2);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+        tissueObj->getPbdBody()->bodyHandle);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
@@ -367,6 +367,9 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_TetMapping)
     m_collisionName = "PointSetToPlaneCD";
     m_friction      = 0.0;
     m_restitution   = 0.0;
+
+    m_assertionBoundsMin = Vec3d(-1.0, -0.15, -1.0);
+    m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
 
     createScene();
     runFor(2.0);
