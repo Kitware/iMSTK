@@ -23,11 +23,19 @@ OpenHapticDeviceManager::makeDeviceClient(std::string name)
 bool
 OpenHapticDeviceManager::initModule()
 {
-    for (const auto& client : m_deviceClients)
+    // \todo: Figure out how to stop module in order to reinitialize
+    if (!getInit())
     {
-        client->initialize();
+        for (const auto& client : m_deviceClients)
+        {
+            client->initialize();
+        }
+        hdStartScheduler();
     }
-    hdStartScheduler();
+    else
+    {
+        LOG(WARNING) << "OpenHapticDeviceManager already initialized. Reinitialization not implemented.";
+    }
     return true;
 }
 
