@@ -15,7 +15,6 @@
 
 namespace imstk
 {
-class PbdCollisionSolver;
 class PbdConstraintContainer;
 class PbdModelConfig;
 class PbdSolver;
@@ -32,9 +31,6 @@ class PbdSolver;
 /// This means it simulates dynamics by modifying positions directly. Velocities
 /// of the model are computed after positions are solved. Velocities from the
 /// previous iteration are applied at the start of the update.
-///
-/// The PbdModel only takes care of internal body simulation. Collisions
-/// are solved in separate systems afterwards to ensure non-penetration.
 ///
 /// References:
 /// Matthias Muller, Bruno Heidelberger, Marcus Hennix, and John Ratcliff. 2007. Position based dynamics.
@@ -129,11 +125,6 @@ public:
     void solveConstraints();
 
     ///
-    /// \brief Solve the collision constraints
-    ///
-    void solveCollisionConstraints();
-
-    ///
     /// \brief Initialize the PBD model
     ///
     bool initialize() override;
@@ -149,18 +140,12 @@ public:
     std::shared_ptr<PbdSolver> getSolver() const { return m_pbdSolver; }
 
     ///
-    /// \brief Returns the solver used for collision constraints
-    ///
-    std::shared_ptr<PbdSolver> getCollisionSolver() const { return m_pbdCollisionSolver; }
-
-    ///
     /// \brief Sets the solver used for internal constraints
     ///
     void setSolver(std::shared_ptr<PbdSolver> solver) { this->m_pbdSolver = solver; }
 
     std::shared_ptr<TaskNode> getIntegratePositionNode() const { return m_integrationPositionNode; }
     std::shared_ptr<TaskNode> getSolveNode() const { return m_solveConstraintsNode; }
-    std::shared_ptr<TaskNode> getCollisionSolveNode() const { return m_collisionSolveConstraintsNode; }
     std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
 
 protected:
@@ -186,7 +171,6 @@ protected:
     PbdState m_state;
 
     std::shared_ptr<PbdSolver> m_pbdSolver = nullptr;          ///< PBD solver
-    std::shared_ptr<PbdSolver> m_pbdCollisionSolver = nullptr; ///< PBD Collision Solver
 
     std::shared_ptr<PbdModelConfig> m_config = nullptr;        ///< Model parameters, must be set before simulation
 
@@ -194,10 +178,9 @@ protected:
 
     ///< Computational Nodes
     ///@{
-    std::shared_ptr<TaskNode> m_integrationPositionNode       = nullptr;
-    std::shared_ptr<TaskNode> m_solveConstraintsNode          = nullptr;
-    std::shared_ptr<TaskNode> m_collisionSolveConstraintsNode = nullptr;
-    std::shared_ptr<TaskNode> m_updateVelocityNode = nullptr;
+    std::shared_ptr<TaskNode> m_integrationPositionNode = nullptr;
+    std::shared_ptr<TaskNode> m_solveConstraintsNode    = nullptr;
+    std::shared_ptr<TaskNode> m_updateVelocityNode      = nullptr;
     ///@}
 };
 } // namespace imstk

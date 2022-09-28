@@ -218,7 +218,7 @@ main()
     scene->addSceneObject(toolObj);
 
     // Setup a collision
-    auto collision = std::make_shared<PbdObjectCollision>(tissueObj, toolObj, "ClosedSurfaceMeshToMeshCD");
+    auto collision = std::make_shared<PbdObjectCollision>(tissueObj, toolObj);
     //std::dynamic_pointer_cast<ClosedSurfaceMeshToMeshCD>(collision->getCollisionDetection())->setGenerateEdgeEdgeContacts(true);
     scene->addInteraction(collision);
 

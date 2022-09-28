@@ -49,6 +49,14 @@ public:
     /// @}
 
     ///
+    /// \brief Get/Set whether velocity is corrected (in some cases this could
+    /// cause instabilities)
+    /// @{
+    bool getUseCorrectVelocity() const;
+    void setUseCorrectVelocity(const bool useCorrectVelocity);
+    /// @}
+
+    ///
     /// \brief Get/Set compliance of rigid body contacts. Defaults to 0
     /// compliance/infinitely stiff. This is what is needed most of the time
     /// but sometimes making a contact a bit softer can be helpful.

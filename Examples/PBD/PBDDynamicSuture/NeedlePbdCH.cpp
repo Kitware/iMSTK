@@ -394,7 +394,7 @@ NeedlePbdCH::handle(
     {
         m_solverConstraints[i] = m_constraints[i].get();
     }
-    m_pbdTissueObj->getPbdModel()->getCollisionSolver()->addConstraints(&m_solverConstraints);
+    m_pbdTissueObj->getPbdModel()->getSolver()->addConstraints(&m_solverConstraints);
 }
 
 // Create stitching constraints

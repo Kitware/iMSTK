@@ -298,7 +298,7 @@ NeedleEmbedder::update()
             m_pbdCHNode->setEnabled(true);
             //LOG(INFO) << "Unpunctured!";
         }
-        tissueData.obj->getPbdModel()->getCollisionSolver()->addConstraints(&m_constraints);
+        tissueData.obj->getPbdModel()->getSolver()->addConstraints(&m_constraints);
     }
 
     // Stash the vertices (at this timestep) for use on the next iteration

@@ -16,7 +16,8 @@ PbdEdgeEdgeCCDConstraint::initConstraint(
     Vec3d* prevPtB0, Vec3d* prevPtB1,
     const PbdParticleId& ptA0, const PbdParticleId& ptA1,
     const PbdParticleId& ptB0, const PbdParticleId& ptB1,
-    double stiffnessA, double stiffnessB)
+    double stiffnessA, double stiffnessB,
+    int ccdSubsteps)
 {
     m_prevEdgeA[0] = prevPtA0;
     m_prevEdgeA[1] = prevPtA1;
@@ -30,6 +31,19 @@ PbdEdgeEdgeCCDConstraint::initConstraint(
 
     m_stiffness[0] = stiffnessA;
     m_stiffness[1] = stiffnessB;
+    m_ccdSubsteps  = ccdSubsteps;
+}
+
+void
+PbdEdgeEdgeCCDConstraint::projectConstraint(PbdState& bodies,
+                                            const double dt, const SolverType& type)
+{
+    // The CCD constraint takes many more substeps to ensure
+    // convergence of the constraint
+    for (int k = 0; k < m_ccdSubsteps; k++)
+    {
+        PbdCollisionConstraint::projectConstraint(bodies, dt / m_ccdSubsteps, type);
+    }
 }
 
 bool

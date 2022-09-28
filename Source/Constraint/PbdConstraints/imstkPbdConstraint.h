@@ -95,6 +95,12 @@ public:
     /// @}
 
     ///
+    /// \brief Get/Set whether velocity should be corrected for this constraint
+    ///
+    bool getCorrectVelocity() const { return m_correctVelocity; }
+    void setCorrectVelocity(const bool correctVelocity) { m_correctVelocity = correctVelocity; }
+
+    ///
     /// \brief Get gradient given the particle index in constraint
     ///
     const Vec3d& getGradient(const int i) const { return m_dcdx[i]; }
@@ -178,7 +184,8 @@ protected:
 
     std::vector<Vec3d> m_dcdx;              ///< Normalized constraint gradients (per particle)
 
-    double m_friction    = 0.0;
-    double m_restitution = 0.0;
+    double m_friction        = 0.0;
+    double m_restitution     = 0.0;
+    bool   m_correctVelocity = false;
 };
 } // namespace imstk

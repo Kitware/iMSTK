@@ -128,7 +128,6 @@ public:
     double m_angularDampingCoeff = 0.01;      ///< Damping coefficient applied to angular velcoity [0, 1]
 
     unsigned int m_iterations = 10;           ///< Internal constraints pbd solver iterations
-    unsigned int m_collisionIterations = 5;
     double       m_dt     = 0.01;             ///< Time step size
     bool m_doPartitioning = true;             ///< Does graph coloring to solve in parallel
 

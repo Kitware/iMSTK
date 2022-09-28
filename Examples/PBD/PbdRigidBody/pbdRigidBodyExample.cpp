@@ -106,7 +106,6 @@ planeContactScene()
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_dt         = 0.001;
     pbdConfig->m_iterations = 10;
-    pbdConfig->m_collisionIterations = 10;
     pbdConfig->m_linearDampingCoeff  = 0.001;
     pbdConfig->m_angularDampingCoeff = 0.001;
     pbdConfig->m_doPartitioning      = false;
@@ -252,8 +251,7 @@ bowlScene()
         // Slightly larger gravity to compensate damping
         pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
         pbdConfig->m_dt         = 0.001;
-        pbdConfig->m_iterations = 1;
-        pbdConfig->m_collisionIterations = 10;
+        pbdConfig->m_iterations = 10;
         pbdConfig->m_linearDampingCoeff  = 0.001;
         pbdConfig->m_angularDampingCoeff = 0.001;
         pbdConfig->m_doPartitioning      = false;
@@ -332,6 +330,7 @@ bowlScene()
         auto rbdInteraction = std::make_shared<PbdObjectCollision>(cubeObj, planeObj, "ImplicitGeometryToPointSetCD");
         rbdInteraction->setRigidBodyCompliance(0.00001);
         //rbdInteraction->setFriction(0.5);
+        //rbdInteraction->setUseCorrectVelocity(false);
         scene->addInteraction(rbdInteraction);
 
         // Camera
@@ -437,7 +436,6 @@ tissueCapsuleDrop()
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0); // Slightly larger gravity to compensate viscosity
     pbdConfig->m_dt         = 0.001;
     pbdConfig->m_iterations = 5;
-    pbdConfig->m_collisionIterations = 5;
     pbdConfig->m_linearDampingCoeff  = 0.0;
     pbdConfig->m_angularDampingCoeff = 0.0;
     pbdConfig->m_doPartitioning      = false;
@@ -538,8 +536,8 @@ hingeScene()
     pbdConfig->m_gravity    = Vec3d(0.0, 0.0, 0.0); // Slightly larger gravity to compensate viscosity
     pbdConfig->m_dt         = 0.001;
     pbdConfig->m_iterations = 5;
-    pbdConfig->m_linearDampingCoeff  = 0.03;
-    pbdConfig->m_angularDampingCoeff = 0.03;
+    pbdConfig->m_linearDampingCoeff  = 0.003;
+    pbdConfig->m_angularDampingCoeff = 0.003;
     pbdConfig->m_doPartitioning      = false;
     pbdModel->configure(pbdConfig);
 
@@ -574,7 +572,7 @@ hingeScene()
         pbdModel->getConfig()->addPbdConstraintFunctor([&](PbdConstraintContainer& container)
             {
                 auto hingeConstraint = std::make_shared<PbdHingeJointConstraint>();
-                hingeConstraint->initConstraint({ rigidPbdObj->getPbdBody()->bodyHandle, 0 }, Vec3d(1.0, 0.0, 0.0), 30.0);
+                hingeConstraint->initConstraint({ rigidPbdObj->getPbdBody()->bodyHandle, 0 }, Vec3d(1.0, 0.0, 0.0), 0.1);
                 container.addConstraint(hingeConstraint);
             });
     }

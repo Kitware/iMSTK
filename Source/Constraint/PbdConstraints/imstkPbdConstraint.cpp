@@ -66,8 +66,12 @@ PbdConstraint::projectConstraint(PbdState& bodies,
 void
 PbdConstraint::correctVelocity(PbdState& bodies, const double)
 {
-    const double fricFrac = 1.0 - m_friction;
+    if (!m_correctVelocity)
+    {
+        return;
+    }
 
+    const double fricFrac = 1.0 - m_friction;
     for (size_t i = 0; i < m_particles.size(); i++)
     {
         const double invMass = bodies.getInvMass(m_particles[i]);

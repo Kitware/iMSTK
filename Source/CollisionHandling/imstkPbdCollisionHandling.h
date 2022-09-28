@@ -176,6 +176,21 @@ public:
     /// @}
 
     ///
+    /// \brief Get/Set whether velocity is corrected (in some cases this could
+    /// cause instabilities)
+    /// @{
+    bool getUseCorrectVelocity() const { return m_useCorrectVelocity; }
+    void setUseCorrectVelocity(const bool useCorrectVelocity) { m_useCorrectVelocity = useCorrectVelocity; }
+    /// @}
+
+    ///
+    /// \brief Get/Set the number of substeps used in CCD constraints
+    /// @{
+    int getCCDSubsteps() const { return m_ccdSubsteps; }
+    void setCCDSubsteps(const int ccdSubsteps) { m_ccdSubsteps = ccdSubsteps; }
+    /// @}
+
+    ///
     /// \brief Get enableBoundaryCollision
     ///@{
     void setEnableBoundaryCollisions(const double enableBoundaryCollisions) { m_enableBoundaryCollisions = enableBoundaryCollisions; }
@@ -294,7 +309,9 @@ private:
     /// as the collisions near the fixed vertices.
     bool   m_enableBoundaryCollisions = false;
     double m_compliance = 0.0;
+    bool   m_useCorrectVelocity       = true;
     std::array<double, 2> m_stiffness = { 1.0, 1.0 };
+    int m_ccdSubsteps = 25;
 
 protected:
     std::vector<PbdConstraint*> m_constraints; ///< Constraints users can add too

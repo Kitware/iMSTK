@@ -137,7 +137,6 @@ main()
     pbdModel->getConfig()->m_iterations = 5;
     //pbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
     pbdModel->getConfig()->m_gravity = Vec3d(0.0, -7.0, 0.0);
-    pbdModel->getConfig()->m_collisionIterations = 5;
 
     std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdModel);
     scene->addSceneObject(toolObj);
