@@ -280,9 +280,9 @@ protected:
         const ColElemSide& sideA,
         const ColElemSide& sideB);
     // ---------------Two-Way Rigid on Rigid Cases---------------
-    /*virtual void addConstraint_Body_Body(
+    virtual void addConstraint_Body_Body(
         const ColElemSide& sideA,
-        const ColElemSide& sideB);*/
+        const ColElemSide& sideB);
 
     // ----------DeformableMesh on DeformableMesh Cases----------
     virtual void addConstraint_V_T(

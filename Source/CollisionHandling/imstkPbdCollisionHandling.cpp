@@ -171,6 +171,7 @@ PbdCollisionHandling::PbdCollisionHandling()
     REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Edge, false, addConstraint_Body_E);
     REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Vertex, false, addConstraint_Body_V);
     REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Primitive, false, addConstraint_Body_V);
+    REGISTER_CASE(PbdContactCase::Body, PbdContactCase::Body, false, addConstraint_Body_Body);
 
     // If swap occurs the colliding object could be on the LHS causing issues
     REGISTER_CASE(PbdContactCase::Primitive, PbdContactCase::Triangle, false, addConstraint_V_T);
@@ -495,10 +496,32 @@ PbdCollisionHandling::addConstraint_Body_T(const ColElemSide& sideA, const ColEl
     m_constraints.push_back(constraint);
 }
 
-//void
-//PbdCollisionHandling::addConstraint_Body_Body(const ColElemSide& sideA, const ColElemSide& sideB)
-//{
-//}
+void
+PbdCollisionHandling::addConstraint_Body_Body(const ColElemSide& sideA, const ColElemSide& sideB)
+{
+    const std::pair<PbdParticleId, Vec3d>& ptAAndContact = getBodyAndContactPoint(*sideA.elem, *sideA.data);
+    const std::pair<PbdParticleId, Vec3d>& ptBAndContact = getBodyAndContactPoint(*sideB.elem, *sideB.data);
+
+    Vec3d normal = Vec3d::Zero();
+    if (sideA.elem->m_type == CollisionElementType::PointDirection)
+    {
+        normal = sideA.elem->m_element.m_PointDirectionElement.dir;
+    }
+
+    PbdBodyToBodyNormalConstraint* constraint = new PbdBodyToBodyNormalConstraint();
+    constraint->initConstraint(
+        sideA.data->model->getBodies(),
+        ptAAndContact.first,
+        ptAAndContact.second,
+        ptBAndContact.first,
+        ptBAndContact.second,
+        normal,
+        sideA.data->compliance);
+    constraint->setFriction(m_friction);
+    constraint->setRestitution(m_restitution);
+    constraint->setCorrectVelocity(m_useCorrectVelocity);
+    m_constraints.push_back(constraint);
+}
 
 void
 PbdCollisionHandling::addConstraint_V_T(const ColElemSide& sideA, const ColElemSide& sideB)

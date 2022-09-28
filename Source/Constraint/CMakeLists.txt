@@ -8,7 +8,6 @@ imstk_add_library( Constraints
     PbdConstraints/imstkPbdAngularConstraint.h
     PbdConstraints/imstkPbdHingeJointConstraint.h
     PbdConstraints/imstkPbdContactConstraint.h
-
     imstkLinearProjectionConstraint.h
     MultiModelConstraints/imstkPbdRigidBaryPointToPointConstraint.h
     PbdConstraints/imstkPbdAreaConstraint.h
@@ -37,7 +36,6 @@ imstk_add_library( Constraints
     PbdConstraints/imstkPbdAngularConstraint.cpp
     PbdConstraints/imstkPbdHingeJointConstraint.cpp
     PbdConstraints/imstkPbdContactConstraint.cpp
-
     imstkLinearProjectionConstraint.cpp
     MultiModelConstraints/imstkPbdRigidBaryPointToPointConstraint.cpp
     PbdConstraints/imstkPbdAreaConstraint.cpp

@@ -17,31 +17,33 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkObjectControllerGhost.h"
+#include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
+#include "imstkPbdObject.h"
+#include "imstkPbdObjectCollision.h"
+#include "imstkPbdObjectController.h"
 #include "imstkPlane.h"
+#include "imstkPortHoleInteraction.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidObjectCollision.h"
-#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
+#include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
 
-///
-/// \brief creates a tool rigid object under the provided rigid body model
-///
-std::shared_ptr<RigidObject2>
-createToolObject(std::shared_ptr<RigidBodyModel2> model,
-                 std::string                      name)
+//#define USE_TWO_HAPTIC_DEVICES
+
+std::shared_ptr<PbdObject>
+makeLapToolObj(const std::string&        name,
+               std::shared_ptr<PbdModel> model)
 {
-    auto toolObject = std::make_shared<RigidObject2>(name);
+    auto lapTool = std::make_shared<PbdObject>(name);
 
     const double capsuleLength = 0.3;
     auto         toolGeom      = std::make_shared<Capsule>(Vec3d(0.0, 0.0, capsuleLength * 0.5 - 0.005),
@@ -51,37 +53,33 @@ createToolObject(std::shared_ptr<RigidBodyModel2> model,
 
     auto lapToolVisualGeom = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/laptool_body.obj");
 
-    toolObject->setDynamicalModel(model);
-    toolObject->setPhysicsGeometry(toolGeom);
-    toolObject->setCollidingGeometry(toolGeom);
-    toolObject->setVisualGeometry(lapToolVisualGeom);
-    toolObject->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, lapToolVisualGeom));
+    lapTool->setDynamicalModel(model);
+    lapTool->setPhysicsGeometry(toolGeom);
+    lapTool->setCollidingGeometry(toolGeom);
+    lapTool->setVisualGeometry(lapToolVisualGeom);
+    lapTool->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, lapToolVisualGeom));
 
-    std::shared_ptr<RenderMaterial> material = toolObject->getVisualModel(0)->getRenderMaterial();
+    std::shared_ptr<RenderMaterial> material = lapTool->getVisualModel(0)->getRenderMaterial();
     material->setIsDynamicMesh(false);
     material->setMetalness(1.0);
     material->setRoughness(0.2);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
 
-    toolObject->getRigidBody()->m_mass = 0.1;
-    toolObject->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
-    toolObject->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, -1.0);
+    lapTool->getPbdBody()->setRigid(
+        Vec3d(0.0, 0.0, capsuleLength * 0.5) + Vec3d(0.0, 0.0, -1.2),
+        10.0,
+        Quatd::Identity(),
+        Mat3d::Identity() * 0.1);
 
-    // Add a component for controlling via another device
-    auto controller = toolObject->addComponent<RigidObjectController>();
-    controller->setControlledObject(toolObject);
-    controller->setLinearKs(5000.0);
-    controller->setAngularKs(100000000.0);
-    controller->setForceScaling(0.1);
+    auto controller = lapTool->addComponent<PbdObjectController>();
+    controller->setControlledObject(lapTool);
+    controller->setLinearKs(500000.0);
+    controller->setAngularKs(100.0);
+    controller->setForceScaling(0.001);
     controller->setSmoothingKernelSize(15);
     controller->setUseForceSmoothening(true);
 
-    // Add extra component to tool for the ghost
-    auto controllerGhost = toolObject->addComponent<ObjectControllerGhost>();
-    controllerGhost->setUseForceFade(true);
-    controllerGhost->setController(controller);
-
-    return toolObject;
+    return lapTool;
 }
 
 ///
@@ -95,7 +93,7 @@ main()
     // Write log to stdout and file
     Logger::startLogger();
 
-    auto scene = std::make_shared<Scene>("Rigid Body Dynamics");
+    auto scene = std::make_shared<Scene>("RbdLapToolCollision");
 
     auto bodyObject = std::make_shared<CollidingObject>("body");
     {
@@ -113,20 +111,19 @@ main()
     }
     scene->addSceneObject(bodyObject);
 
-    auto rbdModel = std::make_shared<RigidBodyModel2>();
-    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-    rbdModel->getConfig()->m_dt      = 0.001;
+    auto model = std::make_shared<PbdModel>();
+    model->getConfig()->m_gravity = Vec3d::Zero();
+    model->getConfig()->m_dt      = 0.001;
+    model->getConfig()->m_doPartitioning = false;
 
-    std::shared_ptr<RigidObject2> lapTool1 = createToolObject(rbdModel, "lapTool1");
+    std::shared_ptr<PbdObject> lapTool1 = makeLapToolObj("lapTool1", model);
     scene->addSceneObject(lapTool1);
 
-    std::shared_ptr<RigidObject2> lapTool2 = createToolObject(rbdModel, "lapTool2");
+    std::shared_ptr<PbdObject> lapTool2 = makeLapToolObj("lapTool2", model);
     scene->addSceneObject(lapTool2);
 
-    auto rbdInteraction = std::make_shared<RigidObjectCollision>(lapTool1, lapTool2);
-    rbdInteraction->setFriction(0.0); // Don't use friction
-    rbdInteraction->setBaumgarteStabilization(0.01);
-    scene->addInteraction(rbdInteraction);
+    auto collision = std::make_shared<PbdObjectCollision>(lapTool1, lapTool2);
+    scene->addInteraction(collision);
 
     auto mousePlane = std::make_shared<Plane>(Vec3d(0.03, 0.0, -1.23), Vec3d(0.1, 0.0, 1.0));
     mousePlane->setWidth(0.1);
@@ -141,30 +138,51 @@ main()
     light->setIntensity(1.0);
     scene->addLight("light", light);
 
-    // Setup default haptics manager
     std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
-    std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
 
-    auto rightController = lapTool1->getComponent<RigidObjectController>();
-    rightController->setDevice(deviceClient);
+#ifdef USE_TWO_HAPTIC_DEVICES
+    std::shared_ptr<DeviceClient> leftDeviceClient = hapticManager->makeDeviceClient("Default Device");
+    auto                          leftController   = lapTool2->getComponent<PbdObjectController>();
+    leftController->setDevice(leftDeviceClient);
+    leftController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
+
+    std::shared_ptr<DeviceClient> rightDeviceClient = hapticManager->makeDeviceClient("Device2");
+    auto                          rightController   = lapTool1->getComponent<PbdObjectController>();
+    rightController->setDevice(rightDeviceClient);
     rightController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
-    if (hapticManager->getTypeName() == "HaplyDeviceManager")
-    {
-        rightController->setTranslationOffset(Vec3d(0.2, 0.0, -1.2));
-    }
+#else
+    std::shared_ptr<DeviceClient> leftDeviceClient = hapticManager->makeDeviceClient(); // Default device
+    auto                          leftController   = lapTool2->getComponent<PbdObjectController>();
+    leftController->setDevice(leftDeviceClient);
+    leftController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
 
-    auto       dummyClient = std::make_shared<DummyClient>();
-    const Rotd rotX = Rotd(1.3, Vec3d(0.0, 0.0, 1.0));
-    const Rotd rotY = Rotd(1.0, Vec3d(0.0, 1.0, 0.0));
-    dummyClient->setOrientation(Quatd(rotX.matrix() * rotY.matrix()));
-    auto leftController = lapTool2->getComponent<RigidObjectController>();
-    leftController->setDevice(dummyClient);
+    auto rightDeviceClient = std::make_shared<DummyClient>();
+    auto rightController   = lapTool1->getComponent<PbdObjectController>();
+    rightController->setDevice(rightDeviceClient);
+#endif
+
+    auto portHoleInteraction = std::make_shared<PortHoleInteraction>(lapTool1);
+    portHoleInteraction->setPortHoleLocation(Vec3d(0.015, 0.092, -1.117));
+    auto sphere = std::make_shared<Sphere>(Vec3d(0.015, 0.092, -1.117), 0.01);
+    portHoleInteraction->setVisualGeometry(sphere);
+    portHoleInteraction->setToolGeometry(lapTool1->getCollidingGeometry());
+    portHoleInteraction->setCompliance(0.00001);
+    scene->addInteraction(portHoleInteraction);
+
+    auto portHoleInteraction2 = std::make_shared<PortHoleInteraction>(lapTool2);
+    portHoleInteraction2->setPortHoleLocation(Vec3d(-0.065, 0.078, -1.127));
+    auto sphere2 = std::make_shared<Sphere>(Vec3d(-0.065, 0.078, -1.127), 0.01);
+    portHoleInteraction2->setVisualGeometry(sphere2);
+    portHoleInteraction2->setToolGeometry(lapTool2->getCollidingGeometry());
+    portHoleInteraction2->setCompliance(0.00001);
+    scene->addInteraction(portHoleInteraction2);
 
     // Run the simulation
     {
         // Setup a viewer to render in its own thread
         auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
+        viewer->setDebugAxesLength(0.01, 0.01, 0.01);
 
         // Setup a scene manager to advance the scene in its own thread
         auto sceneManager = std::make_shared<SceneManager>();
@@ -182,6 +200,7 @@ main()
             SimulationUtils::createDefaultSceneControl(driver);
         scene->addSceneObject(mouseAndKeyControls);
 
+#ifndef USE_TWO_HAPTIC_DEVICES
         // Process Mouse tool movement & presses
         double dummyOffset = 0.0;
         connect<Event>(sceneManager, &SceneManager::postUpdate,
@@ -197,15 +216,21 @@ main()
                 Vec3d a = Vec3d(0.0, 1.0, 0.0);
                 Vec3d b = a.cross(mousePlane->getNormal()).normalized();
                 const double width = mousePlane->getWidth();
-                dummyClient->setPosition(mousePlane->getPosition() + a * width * (mousePos[1] - 0.5) +
+                rightDeviceClient->setPosition(mousePlane->getPosition() + a * width * (mousePos[1] - 0.5) +
                     b * width * (mousePos[0] - 0.5) +
                     geom->getOrientation().toRotationMatrix().col(1).normalized() *
                     dummyOffset);
             });
+        connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseScroll,
+            [&](MouseEvent* e)
+            {
+                dummyOffset += e->m_scrollDx * 0.01;
+            });
+#endif
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
             {
-                rbdModel->getConfig()->m_dt = sceneManager->getDt();
+                model->getConfig()->m_dt = sceneManager->getDt();
             });
 
         driver->start();
