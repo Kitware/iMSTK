@@ -288,33 +288,6 @@ public:
 };
 
 ///
-/// \brief Test PointSetToSphereCD with PbdObjectCollision
-///
-TEST_F(PbdObjectCollisionTest, PbdTissue_PointSetToSphereCD)
-{
-    // Setup the tissue
-    m_pbdObj = makeTriTissueObj("Tissue",
-        Vec2d(0.1, 0.1), Vec2i(3, 3), Vec3d::Zero(),
-        Quatd(Rotd(0.4, Vec3d(0.0, 0.0, 1.0))));
-
-    // Setup the geometry
-    auto implicitGeom = std::make_shared<Sphere>();
-    implicitGeom->setPosition(0.0, -0.3, 0.0);
-    implicitGeom->setRadius(0.2);
-    m_collidingGeometry = implicitGeom;
-
-    m_collisionName = "PointSetToSphereCD";
-    m_friction = 0.0;
-    m_restitution = 0.0;
-
-    m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
-    m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
-
-    createScene();
-    runFor(2.0);
-}
-
-///
 /// \brief Test PbdObjectCollision with line on line CCD
 /// This test is currently disabled as there is an edge case at the vertex that
 /// causes the test to indeterminstically fail according to some floating point
@@ -552,7 +525,32 @@ TEST_F(PbdObjectCollisionTest, PbdTissue_SurfaceMeshToCapsuleCD)
     runFor(2.0);
 }
 
+///
+/// \brief Test PointSetToSphereCD with PbdObjectCollision
+///
+TEST_F(PbdObjectCollisionTest, PbdTissue_PointSetToSphereCD)
+{
+    // Setup the tissue
+    m_pbdObj = makeTriTissueObj("Tissue",
+        Vec2d(0.1, 0.1), Vec2i(3, 3), Vec3d::Zero(),
+        Quatd(Rotd(0.4, Vec3d(0.0, 0.0, 1.0))));
 
+    // Setup the geometry
+    auto implicitGeom = std::make_shared<Sphere>();
+    implicitGeom->setPosition(0.0, -0.3, 0.0);
+    implicitGeom->setRadius(0.2);
+    m_collidingGeometry = implicitGeom;
+
+    m_collisionName = "PointSetToSphereCD";
+    m_friction      = 0.0;
+    m_restitution   = 0.0;
+
+    m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
+    m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
+
+    createScene();
+    runFor(2.0);
+}
 
 ///
 /// \brief Test PointSetToOrientedBoxCD with PbdObjectCollision

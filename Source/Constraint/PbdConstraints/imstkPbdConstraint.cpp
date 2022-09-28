@@ -66,27 +66,28 @@ PbdConstraint::projectConstraint(PbdState& bodies,
 void
 PbdConstraint::correctVelocity(PbdState& bodies, const double)
 {
-    if (m_correctVelocity)
+    if (!m_correctVelocity)
     {
-        const double fricFrac = 1.0 - m_friction;
+        return;
+    }
 
-        for (size_t i = 0; i < m_particles.size(); i++)
+    const double fricFrac = 1.0 - m_friction;
+    for (size_t i = 0; i < m_particles.size(); i++)
+    {
+        const double invMass = bodies.getInvMass(m_particles[i]);
+        // If immovable, don't bother.
+        // If no lambda was computed, constraint failed, or had no effect
+        if (invMass > 0.0 && m_lambda > 0.0)
         {
-            const double invMass = bodies.getInvMass(m_particles[i]);
-            // If immovable, don't bother.
-            // If no lambda was computed, constraint failed, or had no effect
-            if (invMass > 0.0 && m_lambda > 0.0)
-            {
-                const Vec3d n = m_dcdx[i].normalized();
-                Vec3d&      v = bodies.getVelocity(m_particles[i]);
+            const Vec3d n = m_dcdx[i].normalized();
+            Vec3d&      v = bodies.getVelocity(m_particles[i]);
 
-                // Separate velocity into normal and tangent components
-                const Vec3d vN = n.dot(v) * n;
-                const Vec3d vT = v - vN;
+            // Separate velocity into normal and tangent components
+            const Vec3d vN = n.dot(v) * n;
+            const Vec3d vT = v - vN;
 
-                // Put back together fractionally based on defined restitution and frictional coefficients
-                v = vN * m_restitution + vT * fricFrac;
-            }
+            // Put back together fractionally based on defined restitution and frictional coefficients
+            v = vN * m_restitution + vT * fricFrac;
         }
     }
 }
