@@ -122,11 +122,11 @@ PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> obj) :
         "PbdPickingUpdate", true);
     m_taskGraph->addNode(m_pickingNode);
 
-    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getSolveNode());
-    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getCollisionSolveNode());
-
     m_taskGraph->addNode(m_objectToGrasp->getTaskGraph()->getSource());
     m_taskGraph->addNode(m_objectToGrasp->getTaskGraph()->getSink());
+
+    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getSolveNode());
+    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getIntegratePositionNode());
 }
 
 void
@@ -420,7 +420,7 @@ PbdObjectGrasping::updateConstraints()
 
     if (m_collisionConstraints.size() > 0)
     {
-        model->getCollisionSolver()->addConstraints(&m_collisionConstraints);
+        model->getSolver()->addConstraints(&m_collisionConstraints);
     }
 }
 
@@ -429,12 +429,13 @@ PbdObjectGrasping::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_
 {
     std::shared_ptr<PbdModel> pbdModel = m_objectToGrasp->getPbdModel();
 
+    // Add source and sink connections for a valid graph at all times
     m_taskGraph->addEdge(source, m_objectToGrasp->getTaskGraph()->getSource());
     m_taskGraph->addEdge(m_objectToGrasp->getTaskGraph()->getSink(), sink);
 
     // The ideal location is after the internal positional solve, but before collisions are solved
-    m_taskGraph->addEdge(pbdModel->getSolveNode(), m_pickingNode);
-    m_taskGraph->addEdge(m_pickingNode, pbdModel->getCollisionSolveNode());
+    m_taskGraph->addEdge(pbdModel->getIntegratePositionNode(), m_pickingNode);
+    m_taskGraph->addEdge(m_pickingNode, pbdModel->getSolveNode());
 }
 
 bool

@@ -35,60 +35,6 @@
 
 using namespace imstk;
 
-/// String geometry for interactive example.
-const std::vector<Vec3d> selfCCDStringMesh = {
-    // move right
-    { 0.00, 0.02, 0 },
-    { 0.01, 0.02, 0 },
-    { 0.02, 0.02, 0 },
-    { 0.03, 0.02, 0 },
-    { 0.04, 0.02, 0 },
-    { 0.05, 0.02, 0 },
-    { 0.06, 0.02, 0 },
-    { 0.07, 0.02, 0 },
-    { 0.08, 0.02, 0 },
-    { 0.09, 0.02, 0 },
-
-    // jump (back / down / left) and then move forward
-    { 0.05, 0, -0.04 },
-    { 0.05, 0, -0.03 },
-    { 0.05, 0, -0.02 },
-    { 0.05, 0, -0.01 },
-    { 0.05, 0, 0.00 },
-    { 0.05, 0, 0.01 },
-    { 0.05, 0, 0.02 },
-    { 0.05, 0, 0.03 },
-    { 0.05, 0, 0.04 }
-};
-
-///
-/// \brief Create self-ccd string geometry
-///
-static std::shared_ptr<LineMesh>
-makeSelfCCDGeometry()
-{
-    // Create the geometry
-    auto                     stringGeom  = std::make_shared<LineMesh>();
-    size_t                   numVerts    = selfCCDStringMesh.size();
-    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(static_cast<int>(numVerts));
-    VecDataArray<double, 3>& vertices    = *verticesPtr;
-    for (size_t i = 0; i < numVerts; i++)
-    {
-        vertices[i] = selfCCDStringMesh[i];
-    }
-
-    // Add connectivity data
-    auto                  segmentsPtr = std::make_shared<VecDataArray<int, 2>>();
-    VecDataArray<int, 2>& segments    = *segmentsPtr;
-    for (int i = 0; i < numVerts - 1; i++)
-    {
-        segments.push_back(Vec2i(i, i + 1));
-    }
-
-    stringGeom->initialize(verticesPtr, segmentsPtr);
-    return stringGeom;
-}
-
 ///
 /// \brief Create pbd string object
 ///
@@ -96,15 +42,7 @@ static std::shared_ptr<PbdObject>
 makePbdString(const std::string& name, const std::string& filename)
 {
     // Setup the Geometry
-    std::shared_ptr<LineMesh> stringMesh;
-    if (!filename.empty())
-    {
-        stringMesh = MeshIO::read<LineMesh>(filename);
-    }
-    else
-    {
-        stringMesh = makeSelfCCDGeometry();
-    }
+    auto stringMesh = MeshIO::read<LineMesh>(filename);
 
     const int numVerts = stringMesh->getNumVertices();
 
@@ -113,8 +51,7 @@ makePbdString(const std::string& name, const std::string& filename)
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.0005;
     pbdParams->m_iterations = 1;
-    pbdParams->m_linearDampingCoeff  = 0.03;
-    pbdParams->m_collisionIterations = 25;
+    pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
@@ -139,23 +76,12 @@ makePbdString(const std::string& name, const std::string& filename)
     stringObj->setCollidingGeometry(stringMesh);
     stringObj->setDynamicalModel(pbdModel);
 
-    if (name == "granny_knot")
-    {
-        stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // grams
-        stringObj->getPbdBody()->fixedNodeIds     = { 0, 1, stringMesh->getNumVertices() - 2, stringMesh->getNumVertices() - 1 };
-        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
-        pbdParams->enableBendConstraint(0.01, 1);
-        //pbdParams->enableBendConstraint(.5, 2);
-    }
-    else
-    {
-        stringObj->getPbdBody()->fixedNodeIds = { 9, 10,
-                                                  static_cast<int>(selfCCDStringMesh.size() - 2),
-                                                  static_cast<int>(selfCCDStringMesh.size() - 1) };
-        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
-        pbdParams->enableBendConstraint(0.01, 1);
-        //pbdParams->enableBendConstraint(.5, 2);
-    }
+    stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // grams
+    stringObj->getPbdBody()->fixedNodeIds     = { 0, 1,
+                                                  stringMesh->getNumVertices() - 2, stringMesh->getNumVertices() - 1 };
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
+    pbdParams->enableBendConstraint(0.01, 1);
+    //pbdParams->enableBendConstraint(.5, 2);
 
     return stringObj;
 }

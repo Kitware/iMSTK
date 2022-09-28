@@ -37,8 +37,6 @@ PbdModel::PbdModel() : AbstractDynamicalModel(DynamicalModelType::PositionBasedD
         [&]() { integratePosition(); });
     m_solveConstraintsNode = m_taskGraph->addFunction("PbdModel_SolveConstraints",
         [&]() { solveConstraints(); });
-    m_collisionSolveConstraintsNode = m_taskGraph->addFunction("PbdModel_SolveCollisionConstraints",
-        [&]() { solveCollisionConstraints(); });
     m_updateVelocityNode = m_taskGraph->addFunction("PbdModel_UpdateVelocity",
         [&]() { updateVelocity(); });
 }
@@ -49,7 +47,7 @@ PbdModel::resetToInitialState()
     m_state.deepCopy(m_initialState);
 
     // Set previous particle positions, orientations to current to avoid a jump
-    for (auto bodyIter = std::next(std::next(m_state.m_bodies.begin()));
+    for (auto bodyIter = m_state.m_bodies.begin();
          bodyIter != m_state.m_bodies.end(); bodyIter++)
     {
         PbdBody& body = **bodyIter;
@@ -211,10 +209,6 @@ PbdModel::initialize()
     {
         m_pbdSolver = std::make_shared<PbdSolver>();
     }
-    if (m_pbdCollisionSolver == nullptr)
-    {
-        m_pbdCollisionSolver = std::make_shared<PbdSolver>();
-    }
 
     return true;
 }
@@ -225,8 +219,7 @@ PbdModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
     // Setup graph connectivity
     m_taskGraph->addEdge(source, m_integrationPositionNode);
     m_taskGraph->addEdge(m_integrationPositionNode, m_solveConstraintsNode);
-    m_taskGraph->addEdge(m_solveConstraintsNode, m_collisionSolveConstraintsNode);
-    m_taskGraph->addEdge(m_collisionSolveConstraintsNode, m_updateVelocityNode);
+    m_taskGraph->addEdge(m_solveConstraintsNode, m_updateVelocityNode);
     m_taskGraph->addEdge(m_updateVelocityNode, sink);
 }
 
@@ -360,14 +353,14 @@ PbdModel::updateVelocity()
 
     // Correctly velocities for friction and restitution
     // Unfortunately the constraint would be clear after a solve
-    for (const auto& colConstraintList : m_pbdCollisionSolver->getConstraintLists())
+    for (const auto& colConstraintList : m_pbdSolver->getConstraintLists())
     {
         for (auto& colConstraint : *colConstraintList)
         {
             colConstraint->correctVelocity(m_state, m_config->m_dt);
         }
     }
-    m_pbdCollisionSolver->clearConstraintLists();
+    m_pbdSolver->clearConstraintLists();
 }
 
 void
@@ -436,16 +429,6 @@ PbdModel::solveConstraints()
     m_pbdSolver->setIterations(m_config->m_iterations);
     m_pbdSolver->setSolverType(m_config->m_solverType);
     m_pbdSolver->solve();
-}
-
-void
-PbdModel::solveCollisionConstraints()
-{
-    m_pbdCollisionSolver->setPbdBodies(&m_state);
-    m_pbdCollisionSolver->setTimeStep(m_config->m_dt);
-    m_pbdCollisionSolver->setIterations(m_config->m_collisionIterations);
-    m_pbdCollisionSolver->setSolverType(m_config->m_solverType);
-    m_pbdCollisionSolver->solve();
 }
 
 void

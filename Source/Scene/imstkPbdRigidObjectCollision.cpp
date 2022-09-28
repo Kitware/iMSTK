@@ -42,8 +42,8 @@ PbdRigidObjectCollision::PbdRigidObjectCollision(std::shared_ptr<PbdObject> obj1
     // Nodes from objectA
     auto pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objA);
     m_taskGraph->addNode(pbdObj->getTaskGraph()->getSource());
+    m_taskGraph->addNode(pbdObj->getPbdModel()->getIntegratePositionNode());
     m_taskGraph->addNode(pbdObj->getPbdModel()->getSolveNode());
-    m_taskGraph->addNode(pbdObj->getPbdModel()->getCollisionSolveNode());
     m_taskGraph->addNode(pbdObj->getTaskGraph()->getSink());
 
     // Nodes from objectB
@@ -106,10 +106,10 @@ PbdRigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::s
         // InternalConstraint Solve -> Update Collision Geometry ->
         // Collision Detect -> Collision Handle -> Solve Collision ->
         // Update Pbd Velocity -> Correct Velocity -> PbdModelSink
-        m_taskGraph->addEdge(pbdObj->getPbdModel()->getSolveNode(), m_collisionGeometryUpdateNode);
+        m_taskGraph->addEdge(pbdObj->getPbdModel()->getIntegratePositionNode(), m_collisionGeometryUpdateNode);
         m_taskGraph->addEdge(m_collisionGeometryUpdateNode, m_collisionDetectionNode);
         m_taskGraph->addEdge(m_collisionDetectionNode, pbdHandlerNode);
-        m_taskGraph->addEdge(pbdHandlerNode, pbdObj->getPbdModel()->getCollisionSolveNode());
+        m_taskGraph->addEdge(pbdHandlerNode, pbdObj->getPbdModel()->getSolveNode());
     }
 
     std::shared_ptr<CollisionHandling> rbdCH = m_colHandlingB;
@@ -122,8 +122,8 @@ PbdRigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::s
         m_taskGraph->addEdge(m_collisionDetectionNode, pbdHandlerNode);
         m_taskGraph->addEdge(pbdHandlerNode, rbdObj->getRigidBodyModel2()->getSolveNode()); // Ensure we aren't handling PBD whilst solving RBD
         m_taskGraph->addEdge(rbdHandlerNode, rbdObj->getRigidBodyModel2()->getSolveNode());
-        m_taskGraph->addEdge(rbdObj->getRigidBodyModel2()->getSolveNode(), pbdObj->getPbdModel()->getCollisionSolveNode());
-        m_taskGraph->addEdge(pbdObj->getPbdModel()->getCollisionSolveNode(), rbdObj->getRigidBodyModel2()->getIntegrateNode());
+        m_taskGraph->addEdge(rbdObj->getRigidBodyModel2()->getSolveNode(), pbdObj->getPbdModel()->getSolveNode());
+        m_taskGraph->addEdge(pbdObj->getPbdModel()->getSolveNode(), rbdObj->getRigidBodyModel2()->getIntegrateNode());
     }
 }
 } // namespace imstk

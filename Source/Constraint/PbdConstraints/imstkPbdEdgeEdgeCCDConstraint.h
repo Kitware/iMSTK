@@ -30,7 +30,11 @@ public:
         Vec3d* prevPtB0, Vec3d* prevPtB1,
         const PbdParticleId& ptA0, const PbdParticleId& ptA1,
         const PbdParticleId& ptB0, const PbdParticleId& ptB1,
-        double stiffnessA, double stiffnessB);
+        double stiffnessA, double stiffnessB,
+        int ccdSubsteps = 25);
+
+    void projectConstraint(PbdState& bodies,
+                           const double dt, const SolverType& type) override;
 
     ///
     /// \brief Compute value and gradient of constraint function
@@ -43,7 +47,8 @@ public:
 
 protected:
     // Extra particles used but not solved for
-    std::array<Vec3d*, 2> m_prevEdgeA;
-    std::array<Vec3d*, 2> m_prevEdgeB;
+    std::array<Vec3d*, 2> m_prevEdgeA = { nullptr, nullptr };
+    std::array<Vec3d*, 2> m_prevEdgeB = { nullptr, nullptr };
+    int m_ccdSubsteps = 25;
 };
 } // namespace imstk

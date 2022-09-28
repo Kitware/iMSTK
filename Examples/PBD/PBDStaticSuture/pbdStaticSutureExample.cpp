@@ -13,6 +13,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkNeedle.h"
 #include "imstkOrientedBox.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"

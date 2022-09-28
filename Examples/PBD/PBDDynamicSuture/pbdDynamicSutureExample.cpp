@@ -214,8 +214,7 @@ main()
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.01;
-    pbdParams->m_iterations = 5;
-    pbdParams->m_collisionIterations = 50;
+    pbdParams->m_iterations = 10;
     pbdModel->configure(pbdParams);
 
     // Mesh with hole for suturing

@@ -222,7 +222,6 @@ main()
     pbdModel->getConfig()->m_dt = 0.001;     // realtime used in update calls later in main
     pbdModel->getConfig()->m_iterations = 1; // Prefer small timestep over iterations
     pbdModel->getConfig()->m_gravity    = Vec3d(0.0, 0.0, 0.0);
-    pbdModel->getConfig()->m_collisionIterations = 5;
 
     // Setup a tissue with surface collision geometry
     const Vec3i dim = Vec3i(6, 3, 6);

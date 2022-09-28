@@ -74,8 +74,7 @@ makeTetTissueObj(const std::string& name,
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
-    pbdParams->m_linearDampingCoeff  = 0.05;
-    pbdParams->m_collisionIterations = 4;
+    pbdParams->m_linearDampingCoeff = 0.05;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();

@@ -75,8 +75,8 @@ PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
     // energy constraint
     double C = 0;
 
-    const auto mu     = m_config->m_mu;
-    const auto lambda = m_config->m_lambda;
+    const double mu     = m_config->m_mu;
+    const double lambda = m_config->m_lambda;
 
     switch (m_material)
     {

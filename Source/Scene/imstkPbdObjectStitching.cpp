@@ -119,8 +119,8 @@ PbdObjectStitching::PbdObjectStitching(std::shared_ptr<PbdObject> obj) :
         "PbdStitchingUpdate", true);
     m_taskGraph->addNode(m_stitchingNode);
 
+    m_taskGraph->addNode(m_objectToStitch->getPbdModel()->getIntegratePositionNode());
     m_taskGraph->addNode(m_objectToStitch->getPbdModel()->getSolveNode());
-    m_taskGraph->addNode(m_objectToStitch->getPbdModel()->getCollisionSolveNode());
 
     m_taskGraph->addNode(m_objectToStitch->getTaskGraph()->getSource());
     m_taskGraph->addNode(m_objectToStitch->getTaskGraph()->getSink());
@@ -348,7 +348,7 @@ PbdObjectStitching::updateStitching()
 
     if (m_collisionConstraints.size() > 0)
     {
-        m_objectToStitch->getPbdModel()->getCollisionSolver()->addConstraints(&m_collisionConstraints);
+        m_objectToStitch->getPbdModel()->getSolver()->addConstraints(&m_collisionConstraints);
     }
 }
 
@@ -361,7 +361,7 @@ PbdObjectStitching::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     m_taskGraph->addEdge(m_objectToStitch->getTaskGraph()->getSink(), sink);
 
     // The ideal location is after the internal positional solve, before the collision solve
-    m_taskGraph->addEdge(pbdModel->getSolveNode(), m_stitchingNode);
-    m_taskGraph->addEdge(m_stitchingNode, pbdModel->getCollisionSolveNode());
+    m_taskGraph->addEdge(pbdModel->getIntegratePositionNode(), m_stitchingNode);
+    m_taskGraph->addEdge(m_stitchingNode, pbdModel->getSolveNode());
 }
 } // namespace imstk

@@ -360,7 +360,7 @@ PbdCollisionHandling::handle(
 
     // ObjA garunteed to be PbdObject
     auto pbdObjectA = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
-    pbdObjectA->getPbdModel()->getCollisionSolver()->addConstraints(&m_constraints);
+    pbdObjectA->getPbdModel()->getSolver()->addConstraints(&m_constraints);
 }
 
 void
@@ -455,6 +455,7 @@ PbdCollisionHandling::addConstraint_Body_V(const ColElemSide& sideA, const ColEl
         sideA.data->compliance);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
+    constraint->setCorrectVelocity(m_useCorrectVelocity);
     m_constraints.push_back(constraint);
 }
 
@@ -472,6 +473,7 @@ PbdCollisionHandling::addConstraint_Body_E(const ColElemSide& sideA, const ColEl
         sideA.data->compliance);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
+    constraint->setCorrectVelocity(m_useCorrectVelocity);
     m_constraints.push_back(constraint);
 }
 
@@ -489,6 +491,7 @@ PbdCollisionHandling::addConstraint_Body_T(const ColElemSide& sideA, const ColEl
         sideA.data->compliance);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
+    constraint->setCorrectVelocity(m_useCorrectVelocity);
     m_constraints.push_back(constraint);
 }
 
@@ -509,6 +512,7 @@ PbdCollisionHandling::addConstraint_V_T(const ColElemSide& sideA, const ColElemS
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
+    constraint->setCorrectVelocity(m_useCorrectVelocity);
     m_constraints.push_back(constraint);
 }
 
@@ -524,6 +528,7 @@ PbdCollisionHandling::addConstraint_E_E(const ColElemSide& sideA, const ColElemS
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
+    constraint->setCorrectVelocity(m_useCorrectVelocity);
     m_constraints.push_back(constraint);
 }
 
@@ -544,8 +549,10 @@ PbdCollisionHandling::addConstraint_E_E_CCD(
     constraint->initConstraint(
         prevPtsA[0], prevPtsA[1], prevPtsB[0], prevPtsB[1],
         ptsA[0], ptsA[1], ptsB[0], ptsB[1],
-        sideA.data->stiffness, sideB.data->stiffness);
+        sideA.data->stiffness, sideB.data->stiffness,
+        m_ccdSubsteps);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
+    constraint->setCorrectVelocity(m_useCorrectVelocity);
     m_constraints.push_back(constraint);
 }
 
@@ -561,6 +568,7 @@ PbdCollisionHandling::addConstraint_V_E(const ColElemSide& sideA, const ColElemS
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
+    constraint->setCorrectVelocity(m_useCorrectVelocity);
     m_constraints.push_back(constraint);
 }
 
@@ -609,6 +617,7 @@ PbdCollisionHandling::addConstraint_V_V(const ColElemSide& sideA, const ColElemS
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
+    constraint->setCorrectVelocity(m_useCorrectVelocity);
     m_constraints.push_back(constraint);
 }
 } // namespace imstk

@@ -60,7 +60,6 @@ makeThinTissueObj(const std::string& name,
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 10;
-    pbdParams->m_collisionIterations = 4;
 
     // Setup the DynamicalModel to simulate
     imstkNew<PbdModel> pbdModel;
@@ -200,7 +199,7 @@ main()
                 }
             });
 
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Run the model in real time
                 tissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
