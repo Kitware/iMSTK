@@ -11,14 +11,15 @@
 #include "imstkGeometry.h"
 #include "imstkImplicitGeometryToPointSetCCD.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
+#include "imstkLineMeshToCapsuleCD.h"
 #include "imstkLineMeshToLineMeshCCD.h"
 #include "imstkLineMeshToSphereCD.h"
-#include "imstkLineMeshToCapsuleCD.h"
 #include "imstkPointSetToCapsuleCD.h"
 #include "imstkPointSetToCylinderCD.h"
 #include "imstkPointSetToOrientedBoxCD.h"
 #include "imstkPointSetToPlaneCD.h"
 #include "imstkPointSetToSphereCD.h"
+#include "imstkSphereToCapsuleCD.h"
 #include "imstkSphereToCylinderCD.h"
 #include "imstkSphereToSphereCD.h"
 #include "imstkSurfaceMeshToCapsuleCD.h"
@@ -27,6 +28,7 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraToLineMeshCD.h"
 #include "imstkTetraToPointSetCD.h"
+#include "imstkUnidirectionalPlaneToCapsuleCD.h"
 #include "imstkUnidirectionalPlaneToSphereCD.h"
 
 namespace imstk
@@ -44,6 +46,7 @@ IMSTK_REGISTER_COLLISION_DETECTION(PointSetToCylinderCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToPlaneCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToSphereCD);
 IMSTK_REGISTER_COLLISION_DETECTION(PointSetToOrientedBoxCD);
+IMSTK_REGISTER_COLLISION_DETECTION(SphereToCapsuleCD);
 IMSTK_REGISTER_COLLISION_DETECTION(SphereToCylinderCD);
 IMSTK_REGISTER_COLLISION_DETECTION(SphereToSphereCD);
 IMSTK_REGISTER_COLLISION_DETECTION(SurfaceMeshToSurfaceMeshCD);
@@ -52,6 +55,7 @@ IMSTK_REGISTER_COLLISION_DETECTION(SurfaceMeshToSphereCD);
 IMSTK_REGISTER_COLLISION_DETECTION(TetraToPointSetCD);
 IMSTK_REGISTER_COLLISION_DETECTION(TetraToLineMeshCD);
 IMSTK_REGISTER_COLLISION_DETECTION(UnidirectionalPlaneToSphereCD);
+IMSTK_REGISTER_COLLISION_DETECTION(UnidirectionalPlaneToCapsuleCD);
 
 // Map types so order does not matter
 #define IMSTK_MAP_TYPES(geomA, geomB, cdType)                            \
@@ -97,10 +101,12 @@ CDObjectFactory::getCDType(
         IMSTK_MAP_TYPES(LineMesh, SurfaceMesh, ClosedSurfaceMeshToMeshCD),
         IMSTK_MAP_TYPES(OrientedBox, PointSet, PointSetToOrientedBoxCD),
         IMSTK_MAP_TYPES(Plane, PointSet, PointSetToPlaneCD),
+        IMSTK_MAP_TYPES(Plane, Capsule, UnidirectionalPlaneToCapsuleCD),
         IMSTK_MAP_TYPES(Plane, Sphere, BidirectionalPlaneToSphereCD),
         IMSTK_MAP_TYPES(Plane, SurfaceMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(PointSet, Sphere, PointSetToSphereCD),
         IMSTK_MAP_TYPES(PointSet, SurfaceMesh, ClosedSurfaceMeshToMeshCD),
+        IMSTK_MAP_TYPES(Sphere, Capsule, SphereToCapsuleCD),
         IMSTK_MAP_TYPES(Sphere, Sphere, SphereToSphereCD),
         IMSTK_MAP_TYPES(Sphere, SurfaceMesh, SurfaceMeshToSphereCD),
         IMSTK_MAP_TYPES(SurfaceMesh, SurfaceMesh, ClosedSurfaceMeshToMeshCD),

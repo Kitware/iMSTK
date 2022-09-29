@@ -235,6 +235,6 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     lock.unlock();
                 }
             }
-    });
+    }, false);
 }
 } // namespace imstk
