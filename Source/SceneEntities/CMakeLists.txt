@@ -6,6 +6,7 @@ set(H_FILES
   Camera/imstkCamera.h
   Components/imstkAxesModel.h
   Components/imstkObjectControllerGhost.h
+  Components/imstkPortHoleInteraction.h
   Components/imstkVisualModel.h
   Components/imstkVertexLabelVisualModel.h
   Lights/imstkDirectionalLight.h
@@ -31,6 +32,7 @@ set(H_FILES
 set(SRC_FILES
   Camera/imstkCamera.cpp
   Components/imstkObjectControllerGhost.cpp
+  Components/imstkPortHoleInteraction.cpp
   Components/imstkVisualModel.cpp
   Lights/imstkIBLProbe.cpp
   Loader/imstkVisualObjectImporter.cpp

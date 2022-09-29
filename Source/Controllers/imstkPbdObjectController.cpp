@@ -26,6 +26,10 @@ PbdObjectController::setControlledObject(std::shared_ptr<SceneObject> obj)
 void
 PbdObjectController::update(const double& dt)
 {
+    if (m_deviceClient == nullptr)
+    {
+        return;
+    }
     if (!updateTrackingData(dt))
     {
         LOG(WARNING) << "warning: could not update tracking info.";

@@ -96,6 +96,11 @@ PbdContactConstraint::projectConstraint(PbdState& bodies,
 void
 PbdContactConstraint::correctVelocity(PbdState& bodies, const double dt)
 {
+    if (!m_correctVelocity)
+    {
+        return;
+    }
+
     // Assumed equal and opposite normals/constraint gradients
     const Vec3d contactNormal = m_dcdx[0].normalized();
 
@@ -460,12 +465,20 @@ PbdBodyToBodyDistanceConstraint::computeValueAndGradient(PbdState&           bod
 {
     // Transform local position to acquire transformed global (for constraint reprojection)
     const Vec3d& bodyPos0 = bodies.getPosition(m_particles[0]);
-    m_r[0] = bodies.getOrientation(m_particles[0])._transformVector(m_rest_r[0]);
-    const Vec3d p0 = bodyPos0 + m_r[0];
+    Vec3d        p0       = bodyPos0;
+    if (bodies.getBodyType(m_particles[0]) != PbdBody::Type::DEFORMABLE)
+    {
+        m_r[0] = bodies.getOrientation(m_particles[0])._transformVector(m_rest_r[0]);
+        p0    += m_r[0];
+    }
 
     const Vec3d& bodyPos1 = bodies.getPosition(m_particles[1]);
-    m_r[1] = bodies.getOrientation(m_particles[1])._transformVector(m_rest_r[1]);
-    const Vec3d p1 = bodyPos1 + m_r[1];
+    Vec3d        p1       = bodyPos1;
+    if (bodies.getBodyType(m_particles[1]) != PbdBody::Type::DEFORMABLE)
+    {
+        m_r[1] = bodies.getOrientation(m_particles[1])._transformVector(m_rest_r[1]);
+        p1    += m_r[1];
+    }
 
     // Move according to the difference
     Vec3d        diff   = p1 - p0;
@@ -482,6 +495,59 @@ PbdBodyToBodyDistanceConstraint::computeValueAndGradient(PbdState&           bod
     n[1] = -n[0];
 
     c = -length;
+
+    return true;
+}
+
+bool
+PbdBodyToBodyNormalConstraint::computeValueAndGradient(PbdState&           bodies,
+                                                       double&             c,
+                                                       std::vector<Vec3d>& n)
+{
+    const Vec3d& bodyPos0 = bodies.getPosition(m_particles[0]);
+    m_r[0] = bodies.getOrientation(m_particles[0])._transformVector(m_rest_r[0]);
+    const Vec3d p0 = bodyPos0 + m_r[0];
+
+    const Vec3d& bodyPos1 = bodies.getPosition(m_particles[1]);
+    m_r[1] = bodies.getOrientation(m_particles[1])._transformVector(m_rest_r[1]);
+    const Vec3d p1 = bodyPos1 + m_r[1];
+
+    const Vec3d diff = p1 - p0;
+
+    c = diff.dot(m_contactNormal);
+
+    // A
+    n[0] = -m_contactNormal;
+    // B
+    n[1] = m_contactNormal;
+
+    return true;
+}
+
+bool
+PbdRigidLineToPointConstraint::computeValueAndGradient(PbdState& bodies,
+                                                       double& c, std::vector<Vec3d>& n)
+{
+    const Vec3d& bodyPos = bodies.getPosition(m_particles[0]);
+    const Quatd& bodyOrientation = bodies.getOrientation(m_particles[0]);
+    const Vec3d  p = bodyPos + bodyOrientation._transformVector(m_p_rest);
+    const Vec3d  q = bodyPos + bodyOrientation._transformVector(m_q_rest);
+
+    // Compute distance to pq
+    const Vec3d dir = (q - p).normalized();
+
+    const Vec3d& pt = bodies.getPosition(m_particles[1]);
+
+    const Vec3d  diff = pt - q;
+    const double l    = diff.dot(dir);
+    const Vec3d  dist = diff - l * dir;
+
+    n[1] = dist.normalized();
+    n[0] = -n[1];
+    // Pt on line - line body center
+    m_r[0] = (pt - dist) - bodyPos;
+
+    c = dist.norm();
 
     return true;
 }

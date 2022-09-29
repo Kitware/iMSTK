@@ -19,6 +19,8 @@ RigidObjectController::setControlledObject(std::shared_ptr<SceneObject> obj)
 {
     SceneObjectController::setControlledObject(obj);
     m_rigidObject = std::dynamic_pointer_cast<RigidObject2>(obj);
+    CHECK(m_rigidObject != nullptr) <<
+        "RigidObjectController controlled object must be type RigidObject2";
 }
 
 void

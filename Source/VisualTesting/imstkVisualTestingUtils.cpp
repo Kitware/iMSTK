@@ -35,6 +35,8 @@ VisualTest::SetUp()
     m_driver       = std::make_shared<SimulationManager>();
     m_sceneManager = std::make_shared<SceneManager>();
     m_viewer       = std::make_shared<VTKViewer>();
+    m_viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
+    m_viewer->setDebugAxesLength(0.05, 0.05, 0.05);
 }
 
 void
@@ -52,8 +54,6 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
 
     // Setup a viewer to render
     m_viewer->setActiveScene(m_scene);
-    m_viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
-    m_viewer->setDebugAxesLength(0.05, 0.05, 0.05);
     m_viewer->setWindowTitle(m_scene->getName());
 
     // Setup a scene manager to advance the scene
