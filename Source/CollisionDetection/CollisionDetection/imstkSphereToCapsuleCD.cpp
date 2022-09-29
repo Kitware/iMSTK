@@ -54,7 +54,7 @@ SphereToCapsuleCD::computeCollisionDataAB(
     {
         PointDirectionElement elemA;
         elemA.dir = sphereAContactNormal; // Direction to resolve sphereA
-        elemA.pt  = sphereAContactPt;     // Contact point on sphereB
+        elemA.pt  = sphereAContactPt;     // Contact point on sphereA
         elemA.penetrationDepth = depth;
 
         PointDirectionElement elemB;
