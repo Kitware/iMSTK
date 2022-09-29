@@ -17,6 +17,7 @@ imstk_add_library( CollisionDetection
     CollisionDetection/imstkPointSetToOrientedBoxCD.h
     CollisionDetection/imstkPointSetToPlaneCD.h
     CollisionDetection/imstkPointSetToSphereCD.h
+    CollisionDetection/imstkSphereToCapsuleCD.h
     CollisionDetection/imstkSphereToCylinderCD.h
     CollisionDetection/imstkSphereToSphereCD.h
     CollisionDetection/imstkSurfaceMeshToCapsuleCD.h
@@ -24,6 +25,7 @@ imstk_add_library( CollisionDetection
     CollisionDetection/imstkSurfaceMeshToSurfaceMeshCD.h
     CollisionDetection/imstkTetraToLineMeshCD.h
     CollisionDetection/imstkTetraToPointSetCD.h
+    CollisionDetection/imstkUnidirectionalPlaneToCapsuleCD.h
     CollisionDetection/imstkUnidirectionalPlaneToSphereCD.h
     CollisionDetection/imstkLineMeshToSphereCD.h
     CollisionDetection/imstkLineMeshToCapsuleCD.h
@@ -49,6 +51,7 @@ imstk_add_library( CollisionDetection
     CollisionDetection/imstkPointSetToOrientedBoxCD.cpp
     CollisionDetection/imstkPointSetToPlaneCD.cpp
     CollisionDetection/imstkPointSetToSphereCD.cpp
+    CollisionDetection/imstkSphereToCapsuleCD.cpp
     CollisionDetection/imstkSphereToCylinderCD.cpp
     CollisionDetection/imstkSphereToSphereCD.cpp
     CollisionDetection/imstkSurfaceMeshToCapsuleCD.cpp
@@ -56,6 +59,7 @@ imstk_add_library( CollisionDetection
     CollisionDetection/imstkSurfaceMeshToSurfaceMeshCD.cpp
     CollisionDetection/imstkTetraToLineMeshCD.cpp
     CollisionDetection/imstkTetraToPointSetCD.cpp
+    CollisionDetection/imstkUnidirectionalPlaneToCapsuleCD.cpp
     CollisionDetection/imstkUnidirectionalPlaneToSphereCD.cpp
     CollisionDetection/imstkLineMeshToSphereCD.cpp
     CollisionDetection/imstkLineMeshToCapsuleCD.cpp

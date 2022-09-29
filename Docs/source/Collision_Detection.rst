@@ -32,11 +32,11 @@ Supported Collision Detection
    "Capsule",	            X,         ,                   ,           ,              ,        ,           ,         ,      
    "Cylinder",	        `-`,      `-`,                   ,           ,              ,        ,           ,         ,      
    "ImplicitGeometry",  `-`,      `-`,                `-`,           ,              ,        ,           ,         ,      
-   "LineMesh",          `-`,      `-`,                `-`,          X,              ,        ,           ,         ,      
+   "LineMesh",            X,      `-`,                `-`,          X,              ,        ,           ,         ,      
    "OrientedBox",     	`-`,      `-`,                `-`,        `-`,           `-`,        ,           ,         ,     
-   "Plane",	            `-`,      `-`,                `-`,        `-`,           `-`,     N/A,           ,         ,      
+   "Plane",	              X,      `-`,                `-`,        `-`,           `-`,     N/A,           ,         ,      
    "PointSet",        	  X,        X,                  X,        N/A,             X,       X,        N/A,         ,      
-   "Sphere",            `-`,        X,                `-`,        `-`,           `-`,       X,          X,        X,      
+   "Sphere",              X,        X,                `-`,          X,           `-`,       X,          X,        X,      
    "SurfaceMesh",         X,      `-`,                `-`,          X,           `-`,       X,          X,        X,      X
 
 
