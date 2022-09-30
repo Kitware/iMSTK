@@ -53,12 +53,6 @@ makeTetTissueObj(const std::string& name,
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
-    // Use FEMTet constraints (42k - 85k for tissue, but we want
-    // something much more stretchy to wrap)
-    pbdParams->m_femParams->m_YoungModulus = 1000.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.45; // 0.48 for tissue
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK,
-        tissueObj->getPbdBody()->bodyHandle);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
@@ -94,6 +88,11 @@ makeTetTissueObj(const std::string& name,
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
+    pbdParams->m_femParams->m_YoungModulus = 1000.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.45; // 0.48 for tissue
+    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK,
+        tissueObj->getPbdBody()->bodyHandle);
+
     return tissueObj;
 }
 
@@ -113,10 +112,6 @@ makeTriTissueObj(const std::string& name,
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
-        tissueObj->getPbdBody()->bodyHandle);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6,
-        tissueObj->getPbdBody()->bodyHandle);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
@@ -141,6 +136,11 @@ makeTriTissueObj(const std::string& name,
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+        tissueObj->getPbdBody()->bodyHandle);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6,
+        tissueObj->getPbdBody()->bodyHandle);
+
     return tissueObj;
 }
 
@@ -160,8 +160,6 @@ makeLineThreadObj(const std::string& name,
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
-        tissueObj->getPbdBody()->bodyHandle);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
@@ -186,6 +184,9 @@ makeLineThreadObj(const std::string& name,
     tissueObj->setCollidingGeometry(lineMesh);
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
+
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+        tissueObj->getPbdBody()->bodyHandle);
 
     return tissueObj;
 }
