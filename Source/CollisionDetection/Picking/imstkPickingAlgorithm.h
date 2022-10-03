@@ -21,6 +21,7 @@ struct PickData
     int idCount = 0;                     ///< Indicates number of vertices (if 1 a cell or individual vertex)
     CellTypeId cellType = IMSTK_VERTEX;  ///< Indicates picked cell type
     Vec3d pickPoint     = Vec3d::Zero(); ///< Some pickings may produce specific points on an element
+    int cellId = -1;                     ///< Suplemental cell id (when vertices are provided above and cell id is available)
 };
 
 ///
