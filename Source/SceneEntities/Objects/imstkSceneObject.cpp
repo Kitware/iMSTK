@@ -93,7 +93,10 @@ SceneObject::postModifiedAll()
     {
         if (auto visualModel = std::dynamic_pointer_cast<VisualModel>(comp))
         {
-            visualModel->getGeometry()->postModified();
+            if (visualModel->getGeometry() != nullptr)
+            {
+                visualModel->getGeometry()->postModified();
+            }
         }
     }
 }

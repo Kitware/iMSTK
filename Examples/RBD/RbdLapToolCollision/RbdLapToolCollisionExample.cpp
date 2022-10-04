@@ -66,18 +66,27 @@ makeLapToolObj(const std::string&        name,
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
 
     lapTool->getPbdBody()->setRigid(
-        Vec3d(0.0, 0.0, capsuleLength * 0.5) + Vec3d(0.0, 0.0, -1.2),
+        Vec3d(0.0, 0.0, capsuleLength * 0.5) + Vec3d(0.0, 0.1, -1.0),
         10.0,
         Quatd::Identity(),
-        Mat3d::Identity() * 0.1);
+        Mat3d::Identity() * 0.08);
 
     auto controller = lapTool->addComponent<PbdObjectController>();
     controller->setControlledObject(lapTool);
-    controller->setLinearKs(500000.0);
-    controller->setAngularKs(100.0);
-    controller->setForceScaling(0.001);
+    controller->setLinearKs(10000.0);
+    controller->setAngularKs(10.0);
+    controller->setForceScaling(0.01);
     controller->setSmoothingKernelSize(15);
     controller->setUseForceSmoothening(true);
+
+    // The center of mass of the object is at the tip this allows most force applied
+    // to the tool at the tip upon touch to be translated into linear force. Suitable
+    // for 3dof devices.
+    //
+    // However, the point at which you actually apply force is on the back of the tool,
+    // this is important for the inversion of control in lap tools (right movement at the
+    // back should move the tip left).
+    controller->setHapticOffset(Vec3d(0.0, 0.0, capsuleLength));
 
     return lapTool;
 }
@@ -123,15 +132,17 @@ main()
     scene->addSceneObject(lapTool2);
 
     auto collision = std::make_shared<PbdObjectCollision>(lapTool1, lapTool2);
+    collision->setRigidBodyCompliance(0.00001);
     scene->addInteraction(collision);
 
-    auto mousePlane = std::make_shared<Plane>(Vec3d(0.03, 0.0, -1.23), Vec3d(0.1, 0.0, 1.0));
-    mousePlane->setWidth(0.1);
+    // Plane with which to move haptic point of tool on
+    auto mousePlane = std::make_shared<Plane>(Vec3d(0.03, 0.1, -0.95), Vec3d(0.1, 0.0, 1.0));
+    mousePlane->setWidth(0.3);
 
     // Camera
-    scene->getActiveCamera()->setPosition(0.0, 0.4, -1.1);
-    scene->getActiveCamera()->setFocalPoint(0.02, 0.03, -1.2);
-    scene->getActiveCamera()->setViewUp(0.020056, 0.299489, -0.953889);
+    scene->getActiveCamera()->setPosition(-0.039, 0.57, -0.608);
+    scene->getActiveCamera()->setFocalPoint(0.001, 0.178, -1.043);
+    scene->getActiveCamera()->setViewUp(0.018, 0.742, -0.671);
 
     // Light
     auto light = std::make_shared<DirectionalLight>();
@@ -144,17 +155,17 @@ main()
     std::shared_ptr<DeviceClient> leftDeviceClient = hapticManager->makeDeviceClient("Default Device");
     auto                          leftController   = lapTool2->getComponent<PbdObjectController>();
     leftController->setDevice(leftDeviceClient);
-    leftController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
+    leftController->setTranslationOffset(Vec3d(0.0, 0.1, -1.0));
 
     std::shared_ptr<DeviceClient> rightDeviceClient = hapticManager->makeDeviceClient("Device2");
     auto                          rightController   = lapTool1->getComponent<PbdObjectController>();
     rightController->setDevice(rightDeviceClient);
-    rightController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
+    rightController->setTranslationOffset(Vec3d(0.0, 0.1, -1.0));
 #else
     std::shared_ptr<DeviceClient> leftDeviceClient = hapticManager->makeDeviceClient(); // Default device
     auto                          leftController   = lapTool2->getComponent<PbdObjectController>();
     leftController->setDevice(leftDeviceClient);
-    leftController->setTranslationOffset(Vec3d(0.0, 0.0, -1.2));
+    leftController->setTranslationOffset(Vec3d(0.0, 0.1, -1.0));
 
     auto rightDeviceClient = std::make_shared<DummyClient>();
     auto rightController   = lapTool1->getComponent<PbdObjectController>();
@@ -166,7 +177,7 @@ main()
     auto sphere = std::make_shared<Sphere>(Vec3d(0.015, 0.092, -1.117), 0.01);
     portHoleInteraction->setVisualGeometry(sphere);
     portHoleInteraction->setToolGeometry(lapTool1->getCollidingGeometry());
-    portHoleInteraction->setCompliance(0.00001);
+    portHoleInteraction->setCompliance(0.000001);
     scene->addInteraction(portHoleInteraction);
 
     auto portHoleInteraction2 = std::make_shared<PortHoleInteraction>(lapTool2);
@@ -174,7 +185,7 @@ main()
     auto sphere2 = std::make_shared<Sphere>(Vec3d(-0.065, 0.078, -1.127), 0.01);
     portHoleInteraction2->setVisualGeometry(sphere2);
     portHoleInteraction2->setToolGeometry(lapTool2->getCollidingGeometry());
-    portHoleInteraction2->setCompliance(0.00001);
+    portHoleInteraction2->setCompliance(0.000001);
     scene->addInteraction(portHoleInteraction2);
 
     // Run the simulation
@@ -215,8 +226,10 @@ main()
                 // Use plane definition for dummy movement
                 Vec3d a = Vec3d(0.0, 1.0, 0.0);
                 Vec3d b = a.cross(mousePlane->getNormal()).normalized();
+                a       = b.cross(mousePlane->getNormal());
                 const double width = mousePlane->getWidth();
-                rightDeviceClient->setPosition(mousePlane->getPosition() + a * width * (mousePos[1] - 0.5) +
+                rightDeviceClient->setPosition(mousePlane->getPosition() +
+                    a * width * (mousePos[1] - 0.5) +
                     b * width * (mousePos[0] - 0.5) +
                     geom->getOrientation().toRotationMatrix().col(1).normalized() *
                     dummyOffset);

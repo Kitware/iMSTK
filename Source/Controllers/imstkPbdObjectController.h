@@ -102,6 +102,15 @@ public:
     ///@}
 
     ///
+    /// \brief Set/Get the haptic manipuladum offset. This is a local offset on the object
+    /// for which haptics are felt and force is exerted on the body. By default this is
+    /// the center of mass of the object.
+    ///@{
+    Vec3d getHapticOffset() const { return m_hapticOffset; }
+    void setHapticOffset(const Vec3d& offset) { m_hapticOffset = offset; }
+    ///@}
+
+    ///
     /// \brief Return the device applied force (scaled)
     ///
     Vec3d getDeviceForce() const { return (m_fS + m_fD) * m_forceScaling; }
@@ -158,6 +167,7 @@ protected:
     Vec3d m_tS = Vec3d::Zero();
     Vec3d m_tD = Vec3d::Zero();
 
+    Vec3d  m_hapticOffset       = Vec3d::Zero();
     double m_forceScaling       = 0.0000075;
     bool   m_useSpring          = true; ///< If off, pos & orientation directly set
     bool   m_useCriticalDamping = true; ///< If on, kd is automatically computed

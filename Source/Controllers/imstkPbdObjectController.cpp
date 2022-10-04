@@ -54,7 +54,7 @@ PbdObjectController::update(const double& dt)
 
         const Vec3d& devicePos = getPosition();
         const Quatd& deviceOrientation = getOrientation();
-        const Vec3d& deviceOffset      = Vec3d(0.0, 0.0, 0.0);
+        const Vec3d  hapticOffsetLocal = currOrientation._transformVector(m_hapticOffset);
 
         // If using critical damping automatically compute kd
         if (m_useCriticalDamping)
@@ -81,14 +81,14 @@ PbdObjectController::update(const double& dt)
         // Uses non-relative force
         {
             // Compute force
-            m_fS = m_linearKs.cwiseProduct(devicePos - currPos - deviceOffset);
-            m_fD = m_linearKd * (-currVelocity - currAngularVelocity.cross(deviceOffset));
+            m_fS = m_linearKs.cwiseProduct(devicePos - currPos - hapticOffsetLocal);
+            m_fD = m_linearKd * (-currVelocity - currAngularVelocity.cross(hapticOffsetLocal));
             Vec3d force = m_fS + m_fD;
 
             // Computer torque
             const Quatd dq = deviceOrientation * currOrientation.inverse();
             const Rotd  angleAxes = Rotd(dq);
-            m_tS = deviceOffset.cross(force) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle());
+            m_tS = hapticOffsetLocal.cross(force) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle());
             m_tD = m_angularKd * -currAngularVelocity;
             Vec3d torque = m_tS + m_tD;
 
