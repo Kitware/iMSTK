@@ -102,11 +102,13 @@ public:
     ///@}
 
     ///
-    /// \brief Set/Get the haptic manipuladum offset. That is the point controlled on the
-    /// the rigid body. By default this is the center of mass of the object.
-    ///
+    /// \brief Set/Get the haptic manipuladum offset. This is a local offset on the object
+    /// for which haptics are felt and force is exerted on the body. By default this is
+    /// the center of mass of the object.
+    ///@{
     Vec3d getHapticOffset() const { return m_hapticOffset; }
     void setHapticOffset(const Vec3d& offset) { m_hapticOffset = offset; }
+    ///@}
 
     ///
     /// \brief Return the device applied force (scaled)

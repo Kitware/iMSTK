@@ -132,6 +132,7 @@ main()
     scene->addSceneObject(lapTool2);
 
     auto collision = std::make_shared<PbdObjectCollision>(lapTool1, lapTool2);
+    collision->setRigidBodyCompliance(0.00001);
     scene->addInteraction(collision);
 
     // Plane with which to move haptic point of tool on
