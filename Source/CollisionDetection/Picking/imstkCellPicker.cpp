@@ -63,9 +63,29 @@ CellPicker::requestUpdate()
             for (auto cellId : vertexToCellMap[vertexId])
             {
                 PickData data;
-                data.ids[0]   = cellId;
-                data.idCount  = 1;
-                data.cellType = IMSTK_EDGE;
+                data.ids[0]  = cellId;
+                data.idCount = 1;
+                const int numComps = cellMesh->getAbstractCells()->getNumberOfComponents();
+                if (numComps == 1)
+                {
+                    data.cellType = IMSTK_VERTEX;
+                }
+                else if (numComps == 2)
+                {
+                    data.cellType = IMSTK_EDGE;
+                }
+                else if (numComps == 3)
+                {
+                    data.cellType = IMSTK_TRIANGLE;
+                }
+                else if (numComps == 4)
+                {
+                    data.cellType = IMSTK_TETRAHEDRON;
+                }
+                else
+                {
+                    LOG(FATAL) << "Unrecognized cell type";
+                }
                 m_results.push_back(data);
                 resultsMap[cellId] = data;
             }
