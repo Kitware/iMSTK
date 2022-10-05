@@ -49,7 +49,9 @@ PbdObject::setBodyFromGeometry()
                 if (bodyFunctor->m_bodyIndex == body->bodyHandle)
                 {
                     auto pointSet = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
-                    CHECK(pointSet != nullptr) << "PbdObject " << m_name << " only supports PointSet geometries";
+                    CHECK(pointSet != nullptr) <<
+                        "Tried to generate constraints with functor on PbdObject " << m_name << " but "
+                        " object does not have PointSet geometry";
                     bodyFunctor->setGeometry(pointSet);
                 }
             }
