@@ -66,9 +66,8 @@ LineMeshToSphereCD::computeCollisionDataAB(
                         x1, x2,
                         caseType);
 
-                double sphereDist = (lineContactPt - spherePos).norm();
-
-                if (sphereDist <= sphereRadius)
+                const double sphereDist = (lineContactPt - spherePos).squaredNorm();
+                if (sphereDist <= sphereRadius * sphereRadius)
                 {
                     // Sphere contact with x1
                     if (caseType == 0)
@@ -145,6 +144,6 @@ LineMeshToSphereCD::computeCollisionDataAB(
                     }
                 }
             }
-            });
+            }, indices.size() > 500);
 }
 } // namespace imstk

@@ -9,14 +9,13 @@
 #include "imstkCollisionInteraction.h"
 #include "imstkMacros.h"
 #include "imstkMath.h"
-#include "imstkPbdCollisionConstraint.h"
+#include "imstkPbdConstraint.h"
 
 #include <unordered_map>
 
 namespace imstk
 {
 class AnalyticalGeometry;
-class PbdCollisionConstraint;
 class PbdObject;
 class PickingAlgorithm;
 class PointwiseMap;
@@ -32,7 +31,7 @@ class PointwiseMap;
 ///
 class PbdObjectGrasping : public SceneObject
 {
-protected:
+public:
     enum class GraspMode
     {
         Vertex,     // Grab a vertex (most performant)
@@ -41,8 +40,14 @@ protected:
         RayCell     // Grab a cell along the ray
     };
 
-public:
-    PbdObjectGrasping(std::shared_ptr<PbdObject> obj1);
+    ///
+    /// \brief Construct PbdObjectGrasping with a object to grasp and
+    /// and optionally an object that does the grasping. Whilst grasping
+    /// can work with any grasping criteria, if you want a two-way response
+    /// you must supply an object to grasp with.
+    ///
+    PbdObjectGrasping(std::shared_ptr<PbdObject> graspedObject,
+                      std::shared_ptr<PbdObject> grasperObject = nullptr);
     ~PbdObjectGrasping() override = default;
 
     IMSTK_TYPE_NAME(PbdObjectGrasping)
@@ -56,6 +61,13 @@ public:
     ///@}
 
     ///
+    /// \brief Set/Get the compliance
+    ///@{
+    void setCompliance(const double compliance) { m_compliance = compliance; }
+    double getCompliance() const { return m_compliance; }
+    ///@}
+
+    ///
     /// \brief Begin a vertex grasp (picking will begin on the next update)
     /// \param Geometry attached/grasped too
     ///
@@ -63,10 +75,11 @@ public:
 
     ///
     /// \brief Begin a cell grasp (picking will begin on the next update)
+    /// Also works for rigid on rigid
     /// \param Geometry attached/grasped too
     /// \param The intersection type/class name
     ///
-    void beginCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType);
+    void beginCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry, std::string cdType = "");
 
     ///
     /// \brief Begin a ray point grasp (picking will begin on the next update)
@@ -106,12 +119,32 @@ public:
     /// barycentric coordinates
     /// pt position = weightA_0 * ptsA_0 + weightA_1 * ptsA_1 + ...
     ///
-    virtual void addConstraint(
+    virtual void addPointToPointConstraint(
         const std::vector<PbdParticleId>& ptsA,
         const std::vector<double>& weightsA,
         const std::vector<PbdParticleId>& ptsB,
         const std::vector<double>& weightsB,
         const double stiffnessA, const double stiffnessB);
+
+    ///
+    /// \brief Add 0 distance constraint between two points defined on
+    /// two separate bodies.
+    ///
+    virtual void addBodyToBodyConstraint(
+        const PbdParticleId& graspedBodyId,
+        const PbdParticleId& grasperBodyId,
+        const Vec3d&         pointOnBodies,
+        const double         compliance);
+
+    ///
+    /// \brief Add a 0 distance constraint between a deformable point and
+    /// a point on a body
+    ///
+    virtual void addPointToBodyConstraint(
+        const PbdParticleId& graspedParticleId,
+        const PbdParticleId& grasperBodyId,
+        const Vec3d&         pointOnBody,
+        const double         compliance);
 
     ///
     /// \brief Get/Set the method use for picking, default is CellPicker
@@ -157,6 +190,7 @@ protected:
     std::shared_ptr<PointwiseMap> m_geometryToPickMap = nullptr;
 
     std::shared_ptr<PbdObject> m_objectToGrasp      = nullptr;
+    std::shared_ptr<PbdObject> m_grasperObject      = nullptr; // Optional
     std::shared_ptr<AnalyticalGeometry> m_graspGeom = nullptr;
 
     std::shared_ptr<PickingAlgorithm> m_pickMethod = nullptr;
@@ -167,7 +201,8 @@ protected:
 
     /// Stiffness of grasp, when 1 the position is completely moved too the grasp point
     /// when stiffness < 1 it will slowly converge on the grasp point
-    double m_stiffness = 0.4;
+    double m_stiffness  = 0.4;    // For deformables
+    double m_compliance = 0.0001; // For rigid bodies (inverse of stiffness)
 
     /// Vec of virtual particle grasp point ids, and local positions when grasped
     std::vector<std::tuple<PbdParticleId, Vec3d>> m_constraintPts;

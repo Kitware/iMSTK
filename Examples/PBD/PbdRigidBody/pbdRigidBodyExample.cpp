@@ -15,7 +15,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkOrientedBox.h"
-#include "imstkPbdHingeJointConstraint.h"
+#include "imstkPbdAngularConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"

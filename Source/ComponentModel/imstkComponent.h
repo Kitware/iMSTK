@@ -8,6 +8,7 @@
 
 #include "imstkMacros.h"
 
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -91,4 +92,21 @@ public:
 /// components used are updated with a double for deltaTime/time passed.
 ///
 using SceneBehaviour = Behaviour<double>;
+
+///
+/// \brief A SceneBehaviour that can update via a lambda function
+///
+class LambdaBehaviour : public SceneBehaviour
+{
+public:
+    LambdaBehaviour(const std::string& name = "LambdaBehaviour") : Behaviour(name) { }
+    ~LambdaBehaviour() override = default;
+
+    void update(const double& dt) override;
+
+    void setUpdate(std::function<void(const double& dt)> updateFunc) { m_updateFunc = updateFunc; }
+
+protected:
+    std::function<void(const double& dt)> m_updateFunc;
+};
 } // namespace imstk

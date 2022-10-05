@@ -83,4 +83,87 @@ PbdAngularConstraint::projectConstraint(PbdState& bodies,
         q.normalize();
     }
 }
+
+void
+PbdHingeJointConstraint::initConstraint(
+    const PbdParticleId& pIdx0,
+    const Vec3d&         hingeAxes,
+    const double         compliance)
+{
+    m_particles[0] = pIdx0;
+    m_hingeAxes    = hingeAxes;
+    setCompliance(compliance);
+}
+
+bool
+PbdHingeJointConstraint::computeValueAndGradient(PbdState& bodies,
+                                                 double& c, std::vector<Vec3d>& dcdx)
+{
+    // Is this the fastest way to get basis vectors?
+    const Vec3d up = bodies.getOrientation(m_particles[0]).toRotationMatrix().col(1);
+
+    // Gives rotation
+    Vec3d dir = m_hingeAxes.cross(up);
+    dcdx[0] = dir.normalized();
+    c       = dir.norm();
+
+    return true;
+}
+
+void
+PbdAngularDistanceConstraint::initConstraint(
+    const PbdParticleId& p0,
+    const PbdParticleId& p1,
+    const double         compliance)
+{
+    m_particles[0] = p0;
+    m_particles[1] = p1;
+    setCompliance(compliance);
+}
+
+void
+PbdAngularDistanceConstraint::initConstraintOffset(
+    const PbdState&      bodies,
+    const PbdParticleId& p0,
+    const PbdParticleId& p1,
+    const double         compliance)
+{
+    m_particles[0] = p0;
+    m_particles[1] = p1;
+
+    const Quatd& q0 = bodies.getOrientation(m_particles[0]);
+    const Quatd& q1 = bodies.getOrientation(m_particles[1]);
+
+    m_offset = q0.inverse() * q1;
+
+    setCompliance(compliance);
+}
+
+void
+PbdAngularDistanceConstraint::initConstraintOffset(
+    const PbdParticleId& p0,
+    const PbdParticleId& p1,
+    const Quatd          rotationalOffset,
+    const double         compliance)
+{
+    initConstraint(p0, p1, compliance);
+    m_offset = rotationalOffset;
+}
+
+bool
+PbdAngularDistanceConstraint::computeValueAndGradient(PbdState& bodies,
+                                                      double& c, std::vector<Vec3d>& dcdx)
+{
+    const Quatd& q0 = bodies.getOrientation(m_particles[0]);
+    const Quatd& q1 = bodies.getOrientation(m_particles[1]);
+
+    // Gives rotation from q0->q1 (ie: q1 = dq * q0)
+    const Quatd       dq = q1 * (q0 * m_offset).inverse();
+    Eigen::AngleAxisd angleAxes(dq);
+    dcdx[0] = angleAxes.axis();
+    dcdx[1] = -dcdx[0];
+    c       = -angleAxes.angle();
+
+    return true;
+}
 } // namespace imstk

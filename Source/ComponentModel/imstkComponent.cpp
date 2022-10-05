@@ -19,4 +19,17 @@ Component::initialize()
     // Initialize
     init();
 }
+
+void
+LambdaBehaviour::update(const double& dt)
+{
+    if (m_updateFunc != nullptr)
+    {
+        m_updateFunc(dt);
+    }
+    else
+    {
+        LOG(FATAL) << "LambdaBehaviour has no function set";
+    }
+}
 } // namespace imstk

@@ -5,6 +5,7 @@
 */
 
 #include "imstkCellPicker.h"
+#include "imstkAbstractCellMesh.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkPointSet.h"
 
@@ -28,14 +29,20 @@ CellPicker::requestUpdate()
     m_colDetect->setInputGeometryB(m_pickGeometry);
     m_colDetect->update();
 
+    // When CD reports point contacts we can assume all its connected cells are
+    // intersecting
+    if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(geomToPick))
+    {
+        cellMesh->computeVertexToCellMap();
+    }
+    // Used to resolve duplicates
+    std::unordered_map<int, PickData> resultsMap;
+
     const std::vector<CollisionElement>& elementsA = m_colDetect->getCollisionData()->elementsA;
-    //const std::vector<CollisionElement>& elementsB = m_colDetect->getCollisionData()->elementsB;
     for (size_t i = 0; i < elementsA.size(); i++)
     {
-        // A is the mesh, B is the analytic geometry
+        // A is always the geometry to pick
         const CollisionElement& colElemA = elementsA[i];
-        //const CollisionElement& colElemB = elementsB[i];
-
         if (colElemA.m_type == CollisionElementType::CellIndex)
         {
             PickData data;
@@ -44,14 +51,35 @@ CellPicker::requestUpdate()
             data.idCount  = colElemA.m_element.m_CellIndexElement.idCount;
             data.cellType = colElemA.m_element.m_CellIndexElement.cellType;
             data.cellId   = colElemA.m_element.m_CellIndexElement.parentId;
-            m_results.push_back(data);
+            resultsMap[data.cellId] = data;
         }
         else if (colElemA.m_type == CollisionElementType::PointIndexDirection)
         {
+            const int vertexId = colElemA.m_element.m_PointIndexDirectionElement.ptIndex;
+
+            // Get the connected cells to the vertex that is intersecting
+            auto                                        cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(geomToPick);
+            const std::vector<std::unordered_set<int>>& vertexToCellMap = cellMesh->getVertexToCellMap();
+            for (auto cellId : vertexToCellMap[vertexId])
+            {
+                PickData data;
+                data.ids[0]   = cellId;
+                data.idCount  = 1;
+                data.cellType = IMSTK_EDGE;
+                m_results.push_back(data);
+                resultsMap[cellId] = data;
+            }
+        }
+        else if (colElemA.m_type == CollisionElementType::PointDirection)
+        {
+            // A cell is not picked but point specified
             PickData data;
-            data.ids[0]   = colElemA.m_element.m_PointIndexDirectionElement.ptIndex;
-            data.idCount  = 1;
+            data.idCount  = 0;
             data.cellType = IMSTK_VERTEX;
+            // Yeilds the point on body
+            data.pickPoint = colElemA.m_element.m_PointDirectionElement.pt +
+                             colElemA.m_element.m_PointDirectionElement.dir *
+                             colElemA.m_element.m_PointDirectionElement.penetrationDepth;
             m_results.push_back(data);
         }
         else if (colElemA.m_type == CollisionElementType::PointDirection)
@@ -66,6 +94,10 @@ CellPicker::requestUpdate()
                              colElemA.m_element.m_PointDirectionElement.penetrationDepth;
             m_results.push_back(data);
         }
+    }
+    for (auto pickData : resultsMap)
+    {
+        m_results.push_back(pickData.second);
     }
 }
 } // namespace imstk

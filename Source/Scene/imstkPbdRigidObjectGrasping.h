@@ -27,7 +27,7 @@ public:
 
     void updatePicking();
 
-    void addConstraint(
+    void addPointToPointConstraint(
         const std::vector<PbdParticleId>& ptsA,
         const std::vector<double>& weightsA,
         const std::vector<PbdParticleId>& ptsB,

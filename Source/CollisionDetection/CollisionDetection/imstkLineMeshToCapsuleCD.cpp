@@ -195,6 +195,6 @@ LineMeshToCapsuleCD::computeCollisionDataAB(
                     }
                 }
             }
-            }, indices.size() > 100);
+            }, indices.size() > 500);
 }
 } // namespace imstk
