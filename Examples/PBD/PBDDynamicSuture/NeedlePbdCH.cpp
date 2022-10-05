@@ -369,7 +369,7 @@ NeedlePbdCH::handle(
                 { tissueBodyId, m_threadPData[pPointId].triVertIds[1] },
                 { tissueBodyId, m_threadPData[pPointId].triVertIds[2] },
                 m_threadPData[pPointId].triBaryPuncturePoint,
-                0.01, 0.0); // Tissue is not currently moved
+                0.1, 0.0); // Tissue is not currently moved
             m_constraints.push_back(threadTriangleConstraint);
         }
     }
