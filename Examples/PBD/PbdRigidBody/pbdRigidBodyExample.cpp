@@ -15,7 +15,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkOrientedBox.h"
-#include "imstkPbdHingeJointConstraint.h"
+#include "imstkPbdAngularConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -571,7 +571,7 @@ hingeScene()
         // Custom constaint addition
         pbdModel->getConfig()->addPbdConstraintFunctor([&](PbdConstraintContainer& container)
             {
-                auto hingeConstraint = std::make_shared<PbdHingeJointConstraint>();
+                auto hingeConstraint = std::make_shared<PbdAngularHingeConstraint>();
                 hingeConstraint->initConstraint({ rigidPbdObj->getPbdBody()->bodyHandle, 0 }, Vec3d(1.0, 0.0, 0.0), 0.1);
                 container.addConstraint(hingeConstraint);
             });

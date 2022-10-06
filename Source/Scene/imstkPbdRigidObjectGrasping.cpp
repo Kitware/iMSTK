@@ -36,7 +36,7 @@ PbdRigidObjectGrasping::updatePicking()
 }
 
 void
-PbdRigidObjectGrasping::addConstraint(
+PbdRigidObjectGrasping::addPointToPointConstraint(
     const std::vector<PbdParticleId>& ptsA,
     const std::vector<double>& weightsA,
     const std::vector<PbdParticleId>& ptsB,

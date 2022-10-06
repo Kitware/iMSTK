@@ -51,7 +51,7 @@ makeLapToolObj(const std::string&        name,
         capsuleLength,
         Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
 
-    auto lapToolVisualGeom = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/laptool_body.obj");
+    auto lapToolVisualGeom = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/laptool_all_in_one.obj");
 
     lapTool->setDynamicalModel(model);
     lapTool->setPhysicsGeometry(toolGeom);

@@ -10,6 +10,7 @@
 #include "imstkCellPicker.h"
 #include "imstkLineMesh.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
+#include "imstkPbdContactConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
@@ -19,36 +20,126 @@
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVertexPicker.h"
+#include "imstkPbdAngularConstraint.h"
 
 namespace imstk
 {
 ///
-/// \brief Packs the info needed to add a constraint to a side
-/// by reference (this way dynamic casting & dereferencing is not
-/// being done in tight loops)
+/// \struct GraspedData
 ///
-struct MeshSide
+/// \brief Info needed to add a constraint for the grasped object
+/// Garunteed to be a PbdObject
+///
+struct GraspedData
 {
-    MeshSide(VecDataArray<double, 3>& verticest, AbstractDataArray* indicesPtrt,
-             PointwiseMap* mapt, int bodyIdt) : vertices(verticest),
-        indicesPtr(indicesPtrt), map(mapt), bodyId(bodyIdt)
+    // You can grasp a deformable or rigid
+    enum class Type
     {
-    }
+        Deformable,
+        Rigid
+    };
 
-    VecDataArray<double, 3>& vertices;
-    AbstractDataArray* indicesPtr = nullptr;
+    GraspedData() = default;
+
+    PbdObject* pbdObj = nullptr;
+    Type objType      = Type::Deformable;
+
+    VecDataArray<double, 3>* vertices = nullptr;
+    AbstractDataArray* indices = nullptr;
     PointwiseMap* map = nullptr;
     int bodyId = -1;
 };
 
+static GraspedData
+unpackGraspedSide(std::shared_ptr<PbdObject>   obj,
+                  std::shared_ptr<Geometry>    geometry,
+                  std::shared_ptr<GeometryMap> geomMap)
+{
+    GraspedData data;
+    data.pbdObj = obj.get();
+    data.bodyId = obj->getPbdBody()->bodyHandle;
+    if (obj->getPbdBody()->bodyType == PbdBody::Type::RIGID)
+    {
+        data.objType = GraspedData::Type::Rigid;
+    }
+    else
+    {
+        data.objType = GraspedData::Type::Deformable;
+    }
+
+    if (auto pointSetToPick = std::dynamic_pointer_cast<PointSet>(geometry))
+    {
+        // Always should be the data that is constrained (ie: the physics mesh)
+        data.vertices = std::dynamic_pointer_cast<PointSet>(obj->getPhysicsGeometry())->getVertexPositions().get();
+
+        // This should stil be the picked geometry
+        std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
+        if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(pointSetToPick))
+        {
+            data.indices = cellMesh->getAbstractCells().get();
+        }
+
+        // If the user tries to pick
+        PointwiseMap* map = nullptr;
+        if (geomMap != nullptr)
+        {
+            if (auto ptMap = std::dynamic_pointer_cast<PointwiseMap>(geomMap))
+            {
+                data.map = ptMap.get();
+            }
+        }
+    }
+    return data;
+}
+
+///
+/// \struct GrasperData
+///
+/// \brief GrasperData is either a ray, a grasping geometry, or
+/// another PbdObject (rigid)
+///
+struct GrasperData
+{
+    // You can grasp with a geometry or with another pbd object
+    enum class Type
+    {
+        Geometry,
+        Rigid
+    };
+
+    GrasperData() = default;
+
+    Type objType      = Type::Geometry;
+    PbdObject* pbdObj = nullptr;
+    Geometry* grasperGeometry = nullptr;
+    int bodyId = -1;
+};
+
+static GrasperData
+unpackGrasperSide(std::shared_ptr<PbdObject> grasperObject,
+                  std::shared_ptr<Geometry>  grasperGeometry)
+{
+    GrasperData data;
+    data.objType = GrasperData::Type::Geometry;
+    if (grasperObject != nullptr)
+    {
+        data.bodyId  = grasperObject->getPbdBody()->bodyHandle;
+        data.pbdObj  = grasperObject.get();
+        data.objType = GrasperData::Type::Rigid;
+    }
+
+    data.grasperGeometry = grasperGeometry.get();
+    return data;
+}
+
 template<int N>
 static std::vector<PbdParticleId>
-getElement(const PickData& pickData, const MeshSide& side)
+getElement(const PickData& pickData, const GraspedData& side)
 {
     std::vector<PbdParticleId> results(N);
     if (pickData.idCount == 1 && pickData.cellType != IMSTK_VERTEX) // If given cell index
     {
-        const Eigen::Matrix<int, N, 1>& cell = (*dynamic_cast<VecDataArray<int, N>*>(side.indicesPtr))[pickData.ids[0]];
+        const Eigen::Matrix<int, N, 1>& cell = (*dynamic_cast<VecDataArray<int, N>*>(side.indices))[pickData.ids[0]];
         for (int i = 0; i < N; i++)
         {
             int vertexId = cell[i];
@@ -115,8 +206,11 @@ getWeights(const PbdState& bodies, const std::vector<PbdParticleId>& particles, 
     return weights;
 }
 
-PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> obj) :
-    m_objectToGrasp(obj), m_pickMethod(std::make_shared<CellPicker>())
+PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> graspedObject,
+                                     std::shared_ptr<PbdObject> grasperObject) :
+    m_objectToGrasp(graspedObject),
+    m_grasperObject(grasperObject),
+    m_pickMethod(std::make_shared<CellPicker>())
 {
     m_pickingNode = std::make_shared<TaskNode>(std::bind(&PbdObjectGrasping::updatePicking, this),
         "PbdPickingUpdate", true);
@@ -127,6 +221,14 @@ PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> obj) :
 
     m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getSolveNode());
     m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getIntegratePositionNode());
+
+    if (grasperObject != nullptr)
+    {
+        CHECK(grasperObject->getPbdModel() == m_objectToGrasp->getPbdModel()) <<
+            "Grasper object and object to grasp must shared a PbdModel";
+        m_taskGraph->addNode(grasperObject->getTaskGraph()->getSource());
+        m_taskGraph->addNode(grasperObject->getTaskGraph()->getSink());
+    }
 }
 
 void
@@ -147,7 +249,18 @@ PbdObjectGrasping::beginCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry, 
 {
     auto cellPicker = std::make_shared<CellPicker>();
     cellPicker->setPickingGeometry(geometry);
+
+    // If no cd provided try to automatically pick one
+    if (cdType == "")
+    {
+        std::shared_ptr<Geometry> pbdPhysicsGeom = m_objectToGrasp->getPhysicsGeometry();
+
+        // If a specific geometry wasn't specified to pick, then use the physics geometry
+        std::shared_ptr<Geometry> geomtryToPick = (m_geomToPick == nullptr) ? pbdPhysicsGeom : m_geomToPick;
+        cdType = CDObjectFactory::getCDType(*geometry, *geomtryToPick);
+    }
     cellPicker->setCollisionDetection(CDObjectFactory::makeCollisionDetection(cdType));
+
     m_pickMethod = cellPicker;
     m_graspMode  = GraspMode::Cell;
     m_graspGeom  = geometry;
@@ -205,46 +318,19 @@ PbdObjectGrasping::addPickConstraints()
     removePickConstraints();
 
     std::shared_ptr<PbdModel> model = m_objectToGrasp->getPbdModel();
-    auto                      pbdPhysicsGeom =
-        std::dynamic_pointer_cast<PointSet>(m_objectToGrasp->getPhysicsGeometry());
+    std::shared_ptr<Geometry> pbdPhysicsGeom = m_objectToGrasp->getPhysicsGeometry();
 
-    // If the point set to pick hasn't been set yet, default it to the physics geometry
-    // This would be the case if the user was mapping a geometry to another
-    auto pointSetToPick = std::dynamic_pointer_cast<PointSet>(m_geomToPick);
-    if (m_geomToPick == nullptr)
-    {
-        pointSetToPick = pbdPhysicsGeom;
-    }
+    // If a specific geometry wasn't specified to pick, then use the physics geometry
+    std::shared_ptr<Geometry> geomtryToPick = (m_geomToPick == nullptr) ? pbdPhysicsGeom : m_geomToPick;
 
-    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pbdPhysicsGeom->getVertexPositions();
-    VecDataArray<double, 3>&                 vertices    = *verticesPtr;
-
-    std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
-    if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(pointSetToPick))
-    {
-        indicesPtr = cellMesh->getAbstractCells();
-    }
-
-    // If the user tries to pick
-    PointwiseMap* map = nullptr;
-    if (m_geometryToPickMap != nullptr)
-    {
-        map = m_geometryToPickMap.get();
-    }
-
-    // Place all the data into a struct to pass around & for quick access without casting
-    // or dereferencing
-    MeshSide meshStruct(
-        *verticesPtr,
-        indicesPtr.get(),
-        map,
-        m_objectToGrasp->getPbdBody()->bodyHandle);
+    GraspedData graspedData = unpackGraspedSide(m_objectToGrasp, geomtryToPick, m_geometryToPickMap);
+    GrasperData grasperData = unpackGrasperSide(m_grasperObject, m_graspGeom);
 
     const Vec3d& pickGeomPos = m_graspGeom->getPosition();
     const Mat3d  pickGeomRot = m_graspGeom->getRotation().transpose();
 
     // Perform the picking
-    const std::vector<PickData>& pickData = m_pickMethod->pick(pointSetToPick);
+    const std::vector<PickData>& pickData = m_pickMethod->pick(geomtryToPick);
 
     // Digest the pick data based on grasp mode
     if (m_graspMode == GraspMode::Vertex)
@@ -253,19 +339,32 @@ PbdObjectGrasping::addPickConstraints()
         {
             const PickData& data     = pickData[i];
             int             vertexId = data.ids[0];
-            if (meshStruct.map != nullptr)
+            if (graspedData.map != nullptr)
             {
-                vertexId = meshStruct.map->getParentVertexId(vertexId);
+                vertexId = graspedData.map->getParentVertexId(vertexId);
             }
 
-            const Vec3d         relativePos   = pickGeomRot * (vertices[vertexId] - pickGeomPos);
-            const PbdParticleId graspPointPid = model->addVirtualParticle(vertices[vertexId], 0.0);
-            m_constraintPts.push_back({ graspPointPid, relativePos });
+            if (graspedData.objType == GraspedData::Type::Deformable
+                && grasperData.objType == GrasperData::Type::Geometry)
+            {
+                const Vec3d         relativePos   = pickGeomRot * ((*graspedData.vertices)[vertexId] - pickGeomPos);
+                const PbdParticleId graspPointPid = model->addVirtualParticle((*graspedData.vertices)[vertexId], 0.0);
+                m_constraintPts.push_back({ graspPointPid, relativePos });
 
-            addConstraint(
-                { { meshStruct.bodyId, vertexId } }, { 1.0 },
-                { graspPointPid }, { 1.0 },
-                m_stiffness, 0.0);
+                addPointToPointConstraint(
+                    { { graspedData.bodyId, vertexId } }, { 1.0 },
+                    { graspPointPid }, { 1.0 },
+                    m_stiffness, 0.0);
+            }
+            else if (graspedData.objType == GraspedData::Type::Deformable
+                     && grasperData.objType == GrasperData::Type::Rigid)
+            {
+                addPointToBodyConstraint(
+                    { graspedData.bodyId, vertexId },
+                    { grasperData.bodyId, 0 },
+                    (*graspedData.vertices)[vertexId],
+                    m_compliance);
+            }
         }
     }
     else if (m_graspMode == GraspMode::Cell || m_graspMode == GraspMode::RayCell)
@@ -275,38 +374,102 @@ PbdObjectGrasping::addPickConstraints()
             const PickData&  data = pickData[i];
             const CellTypeId pickedCellType = data.cellType;
 
-            std::vector<PbdParticleId> particles;
-            if (pickedCellType == IMSTK_TETRAHEDRON)
+            // If we select something without ids (typically analytic geometry)
+            if (data.idCount == 0)
             {
-                particles = getElement<4>(data, meshStruct);
+                // Just add one constraint at the pick point
+                if (graspedData.objType == GraspedData::Type::Rigid)
+                {
+                    if (grasperData.objType == GrasperData::Type::Geometry)
+                    {
+                        LOG(FATAL) << "Grasping rigid with static geometry (analytic) not supported";
+                    }
+                    else if (grasperData.objType == GrasperData::Type::Rigid)
+                    {
+                        addBodyToBodyConstraint(
+                            { grasperData.bodyId, 0 },
+                            { graspedData.bodyId, 0 },
+                            data.pickPoint,
+                            m_compliance);
+                    }
+                }
+                else
+                {
+                    LOG(FATAL) << "Grasping deformable without any ids not supported";
+                }
             }
-            else if (pickedCellType == IMSTK_TRIANGLE)
+            // If we select something with ids (typically meshes)
+            else
             {
-                particles = getElement<3>(data, meshStruct);
-            }
-            else if (pickedCellType == IMSTK_EDGE)
-            {
-                particles = getElement<2>(data, meshStruct);
-            }
-            else if (pickedCellType == IMSTK_VERTEX)
-            {
-                particles = getElement<1>(data, meshStruct);
-            }
+                // Get vertices selected (if cells selected, get vertices of those cells)
+                std::vector<PbdParticleId> particles;
+                if (pickedCellType == IMSTK_TETRAHEDRON)
+                {
+                    particles = getElement<4>(data, graspedData);
+                }
+                else if (pickedCellType == IMSTK_TRIANGLE)
+                {
+                    particles = getElement<3>(data, graspedData);
+                }
+                else if (pickedCellType == IMSTK_EDGE)
+                {
+                    particles = getElement<2>(data, graspedData);
+                }
+                else if (pickedCellType == IMSTK_VERTEX)
+                {
+                    particles = getElement<1>(data, graspedData);
+                }
 
-            // Does not resolve duplicate vertices yet
-            // But pbd implicit solve with reprojection avoids issues
-            for (size_t j = 0; j < particles.size(); j++)
-            {
-                const int vertexId = particles[j].second;
+                // Does not resolve duplicate vertices yet, but implicit solve makes that ok
+                for (size_t j = 0; j < particles.size(); j++)
+                {
+                    const int    vertexId  = particles[j].second;
+                    const Vec3d& vertexPos = (*graspedData.vertices)[vertexId];
 
-                const Vec3d         relativePos   = pickGeomRot * (vertices[vertexId] - pickGeomPos);
-                const PbdParticleId graspPointPid = model->addVirtualParticle(vertices[vertexId], 0.0);
-                m_constraintPts.push_back({ graspPointPid, relativePos });
+                    // If grasper is rigid
+                    if (grasperData.objType == GrasperData::Type::Rigid)
+                    {
+                        // If grasped is a mesh, at pbd particle poitn to pbd body constraint
+                        if (graspedData.objType == GraspedData::Type::Deformable)
+                        {
+                            // Deformable point to body constraint
+                            addPointToBodyConstraint(particles[j],
+                                { grasperData.bodyId, 0 },
+                                vertexPos,
+                                m_compliance);
+                        }
+                        // If grasped is a rigid (but still has a mesh), add body to body constraint
+                        else if (graspedData.objType == GraspedData::Type::Rigid)
+                        {
+                            addBodyToBodyConstraint(
+                                { grasperData.bodyId, 0 },
+                                { graspedData.bodyId, 0 },
+                                vertexPos,
+                                m_compliance);
+                        }
+                    }
+                    // If grasper is not rigid, static/unsimulated, then add virtual
+                    // points moved around relative to the grasping geometry (in updateConstraints)
+                    else
+                    {
+                        // If grasped is a mesh add virtual points at mesh positions
+                        if (graspedData.objType == GraspedData::Type::Deformable)
+                        {
+                            const Vec3d         relativePos   = pickGeomRot * (vertexPos - pickGeomPos);
+                            const PbdParticleId graspPointPid = model->addVirtualParticle(vertexPos, 0.0);
+                            m_constraintPts.push_back({ graspPointPid, relativePos });
 
-                addConstraint(
-                    { particles[j] }, { 1.0 },
-                    { graspPointPid }, { 1.0 },
-                    m_stiffness, 0.0);
+                            addPointToPointConstraint(
+                                { particles[j] }, { 1.0 },
+                                { graspPointPid }, { 1.0 },
+                                m_stiffness, 0.0);
+                        }
+                        else
+                        {
+                            LOG(FATAL) << "Grasping rigid with static geometry (mesh) not supported";
+                        }
+                    }
+                }
             }
         }
     }
@@ -320,15 +483,15 @@ PbdObjectGrasping::addPickConstraints()
             std::vector<PbdParticleId> particles;
             if (pickedCellType == IMSTK_TETRAHEDRON)
             {
-                particles = getElement<4>(data, meshStruct);
+                particles = getElement<4>(data, graspedData);
             }
             else if (pickedCellType == IMSTK_TRIANGLE)
             {
-                particles = getElement<3>(data, meshStruct);
+                particles = getElement<3>(data, graspedData);
             }
             else if (pickedCellType == IMSTK_EDGE)
             {
-                particles = getElement<2>(data, meshStruct);
+                particles = getElement<2>(data, graspedData);
             }
 
             // The point to constrain the element too
@@ -341,7 +504,7 @@ PbdObjectGrasping::addPickConstraints()
             m_constraintPts.push_back({ graspPointPid, relativePos });
 
             // Cell to single point constraint
-            addConstraint(
+            addPointToPointConstraint(
                 particles, weights,
                 { graspPointPid }, { 1.0 },
                 m_stiffness, 0.0);
@@ -356,7 +519,7 @@ PbdObjectGrasping::addPickConstraints()
 }
 
 void
-PbdObjectGrasping::addConstraint(
+PbdObjectGrasping::addPointToPointConstraint(
     const std::vector<PbdParticleId>& ptsA,
     const std::vector<double>& weightsA,
     const std::vector<PbdParticleId>& ptsB,
@@ -368,6 +531,53 @@ PbdObjectGrasping::addConstraint(
         ptsA, weightsA,
         ptsB, weightsB,
         stiffnessA, stiffnessB);
+    m_constraints.push_back(constraint);
+}
+
+void
+PbdObjectGrasping::addBodyToBodyConstraint(
+    const PbdParticleId& graspedBodyId,
+    const PbdParticleId& grasperBodyId,
+    const Vec3d&         supportPt,
+    const double         compliance)
+{
+    std::shared_ptr<PbdModel> model = m_objectToGrasp->getPbdModel();
+
+    // Rigid on rigid grasping
+    // Constrain supportPt on body0 to supportPt on body1 by a distance of 0
+    auto constraint = std::make_shared<PbdBodyToBodyDistanceConstraint>();
+    constraint->initConstraint(
+        model->getBodies(),
+        graspedBodyId,
+        supportPt,
+        grasperBodyId,
+        supportPt,
+        0.0, m_compliance);
+    m_constraints.push_back(constraint);
+    auto angularConstraint = std::make_shared<PbdAngularDistanceConstraint>();
+    angularConstraint->initConstraintOffset(model->getBodies(),
+        graspedBodyId, grasperBodyId, 0.0);
+    m_constraints.push_back(angularConstraint);
+}
+
+void
+PbdObjectGrasping::addPointToBodyConstraint(
+    const PbdParticleId& graspedParticleId,
+    const PbdParticleId& grasperBodyId,
+    const Vec3d&         pointOnBody,
+    const double         compliance)
+{
+    std::shared_ptr<PbdModel> model = m_objectToGrasp->getPbdModel();
+
+    // Rigid on deformable
+    // Constrain supportPt on body0 to supportPt on body1 by a distance of 0
+    auto constraint = std::make_shared<PbdBodyToBodyDistanceConstraint>();
+    constraint->initConstraint(
+        model->getBodies(),
+        grasperBodyId,
+        pointOnBody,
+        graspedParticleId,
+        0.0, m_compliance);
     m_constraints.push_back(constraint);
 }
 
@@ -400,7 +610,11 @@ PbdObjectGrasping::updateConstraints()
 {
     std::shared_ptr<PbdModel> model = m_objectToGrasp->getPbdModel();
 
-    // Update constraint point positions
+    // Update the grasp points when not doing two-way.
+    // In two-way the points are automatically recomputed in the constraint relative
+    // to the rigid body (via local position saved).
+    // When not doing two-way we need to update the points manually.
+    if (m_grasperObject == nullptr)
     {
         const Vec3d& pos = m_graspGeom->getPosition();
         const Mat3d  rot = m_graspGeom->getRotation();
@@ -432,6 +646,12 @@ PbdObjectGrasping::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_
     // Add source and sink connections for a valid graph at all times
     m_taskGraph->addEdge(source, m_objectToGrasp->getTaskGraph()->getSource());
     m_taskGraph->addEdge(m_objectToGrasp->getTaskGraph()->getSink(), sink);
+
+    if (m_grasperObject != nullptr)
+    {
+        m_taskGraph->addEdge(source, m_grasperObject->getTaskGraph()->getSource());
+        m_taskGraph->addEdge(m_grasperObject->getTaskGraph()->getSink(), sink);
+    }
 
     // The ideal location is after the internal positional solve, but before collisions are solved
     m_taskGraph->addEdge(pbdModel->getIntegratePositionNode(), m_pickingNode);

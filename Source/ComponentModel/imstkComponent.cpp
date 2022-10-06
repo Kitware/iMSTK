@@ -19,4 +19,22 @@ Component::initialize()
     // Initialize
     init();
 }
+
+void
+LambdaBehaviour::update(const double& dt)
+{
+    if (m_updateFunc != nullptr)
+    {
+        m_updateFunc(dt);
+    }
+}
+
+void
+LambdaBehaviour::visualUpdate(const double& dt)
+{
+    if (m_visualUpdateFunc != nullptr)
+    {
+        m_visualUpdateFunc(dt);
+    }
+}
 } // namespace imstk
