@@ -104,13 +104,12 @@ struct GrasperData
     enum class Type
     {
         Geometry,
-        Pbd
+        Rigid
     };
 
     GrasperData() = default;
 
-    Type objType = Type::Geometry;
-    //PbdObjectGrasping::GraspMode mode = PbdObjectGrasping::GraspMode::Cell;
+    Type objType      = Type::Geometry;
     PbdObject* pbdObj = nullptr;
     Geometry* grasperGeometry = nullptr;
     int bodyId = -1;
@@ -126,7 +125,7 @@ unpackGrasperSide(std::shared_ptr<PbdObject> grasperObject,
     {
         data.bodyId  = grasperObject->getPbdBody()->bodyHandle;
         data.pbdObj  = grasperObject.get();
-        data.objType = GrasperData::Type::Pbd;
+        data.objType = GrasperData::Type::Rigid;
     }
 
     data.grasperGeometry = grasperGeometry.get();
@@ -358,7 +357,7 @@ PbdObjectGrasping::addPickConstraints()
                     m_stiffness, 0.0);
             }
             else if (graspedData.objType == GraspedData::Type::Deformable
-                     && grasperData.objType == GrasperData::Type::Pbd)
+                     && grasperData.objType == GrasperData::Type::Rigid)
             {
                 addPointToBodyConstraint(
                     { graspedData.bodyId, vertexId },
@@ -378,14 +377,14 @@ PbdObjectGrasping::addPickConstraints()
             // If we select something without ids (typically analytic geometry)
             if (data.idCount == 0)
             {
-                // Just add one constraint add the pick point
+                // Just add one constraint at the pick point
                 if (graspedData.objType == GraspedData::Type::Rigid)
                 {
                     if (grasperData.objType == GrasperData::Type::Geometry)
                     {
                         LOG(FATAL) << "Grasping rigid with static geometry (analytic) not supported";
                     }
-                    else if (grasperData.objType == GrasperData::Type::Pbd)
+                    else if (grasperData.objType == GrasperData::Type::Rigid)
                     {
                         addBodyToBodyConstraint(
                             { grasperData.bodyId, 0 },
@@ -428,7 +427,7 @@ PbdObjectGrasping::addPickConstraints()
                     const Vec3d& vertexPos = (*graspedData.vertices)[vertexId];
 
                     // If grasper is rigid
-                    if (grasperData.objType == GrasperData::Type::Pbd)
+                    if (grasperData.objType == GrasperData::Type::Rigid)
                     {
                         // If grasped is a mesh, at pbd particle poitn to pbd body constraint
                         if (graspedData.objType == GraspedData::Type::Deformable)

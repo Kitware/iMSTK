@@ -15,7 +15,7 @@ using namespace imstk;
 /// \brief Test that the particle with orientation rotates to the other
 /// along the hinge, but is free to rotate on one axes
 ///
-TEST_F(PbdConstraintTest, HingeConstraint_TestConvergence1)
+TEST_F(PbdConstraintTest, AngularHingeConstraint_TestConvergence1)
 {
     setNumParticles(1);
 
@@ -25,7 +25,7 @@ TEST_F(PbdConstraintTest, HingeConstraint_TestConvergence1)
 
     // Hinge axes restores y of the initial rotational basis to hinge axes
     //const Vec3d initAxes = m_orientations[0].toRotationMatrix().col(1);
-    PbdHingeJointConstraint constraint;
+    PbdAngularHingeConstraint constraint;
     m_constraint = &constraint;
     constraint.initConstraint(
         { 0, 0 },             // Particle id
@@ -45,7 +45,7 @@ TEST_F(PbdConstraintTest, HingeConstraint_TestConvergence1)
 ///
 /// \brief Test rotation along the hinge axes doesn't effect the rotation at all
 ///
-TEST_F(PbdConstraintTest, HingeConstraint_TestConvergence2)
+TEST_F(PbdConstraintTest, AngularHingeConstraint_TestConvergence2)
 {
     setNumParticles(1);
 
@@ -56,7 +56,7 @@ TEST_F(PbdConstraintTest, HingeConstraint_TestConvergence2)
     const Quatd initOrientation = m_orientations[0];
 
     // Hinge axes restores y of the initial rotational basis to hinge axes
-    PbdHingeJointConstraint constraint;
+    PbdAngularHingeConstraint constraint;
     m_constraint = &constraint;
     constraint.initConstraint(
         { 0, 0 },             // Particle id
@@ -74,7 +74,7 @@ TEST_F(PbdConstraintTest, HingeConstraint_TestConvergence2)
 
 ///
 /// \brief Test that the particle with orientation rotates to the other
-/// along the hinge, but is free to rotate on one axes
+/// with 0 angular distance
 ///
 TEST_F(PbdConstraintTest, AngularDistanceConstraint_TestConvergenceNoOffset)
 {
@@ -108,7 +108,7 @@ TEST_F(PbdConstraintTest, AngularDistanceConstraint_TestConvergenceNoOffset)
 
 ///
 /// \brief Test that the particle with orientation rotates to the other
-/// along the hinge, but is free to rotate on one axes
+/// with a given angular offset
 ///
 TEST_F(PbdConstraintTest, AngularDistanceConstraint_TestConvergenceWithOffset)
 {

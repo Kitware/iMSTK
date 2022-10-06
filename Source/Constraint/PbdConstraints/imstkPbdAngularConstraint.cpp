@@ -85,7 +85,7 @@ PbdAngularConstraint::projectConstraint(PbdState& bodies,
 }
 
 void
-PbdHingeJointConstraint::initConstraint(
+PbdAngularHingeConstraint::initConstraint(
     const PbdParticleId& pIdx0,
     const Vec3d&         hingeAxes,
     const double         compliance)
@@ -96,14 +96,14 @@ PbdHingeJointConstraint::initConstraint(
 }
 
 bool
-PbdHingeJointConstraint::computeValueAndGradient(PbdState& bodies,
-                                                 double& c, std::vector<Vec3d>& dcdx)
+PbdAngularHingeConstraint::computeValueAndGradient(PbdState& bodies,
+                                                   double& c, std::vector<Vec3d>& dcdx)
 {
     // Is this the fastest way to get basis vectors?
-    const Vec3d up = bodies.getOrientation(m_particles[0]).toRotationMatrix().col(1);
+    const Vec3d localY = bodies.getOrientation(m_particles[0]).toRotationMatrix().col(1);
 
     // Gives rotation
-    Vec3d dir = m_hingeAxes.cross(up);
+    Vec3d dir = m_hingeAxes.cross(localY);
     dcdx[0] = dir.normalized();
     c       = dir.norm();
 

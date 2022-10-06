@@ -155,14 +155,6 @@ makePbdString(
             container.addConstraint(attachmentConstraint);
         });
 
-    // Gavity only on the thread
-    // Because of two way this would just make the needle fall with the thread (check masses)
-    /*auto externalForceAdd = stringObj->addComponent<LambdaBehaviour>("ExternalForceFix");
-    externalForceAdd->setUpdate([=](const double&)
-        {
-            stringObj->getPbdBody()->externalForce = Vec3d(0.0, -9.8, 0.0) * 0.02 * 0.1;
-        });*/
-
     return stringObj;
 }
 

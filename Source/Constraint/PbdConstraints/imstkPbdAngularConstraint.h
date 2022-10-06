@@ -29,16 +29,16 @@ public:
 };
 
 ///
-/// \class PbdHingeJointConstraint
+/// \class PbdAngularHingeConstraint
 ///
 /// \brief Constraint a single oriented particle along an axes of rotation
 /// Aligns oriented particles up axes to hinge axes
 ///
-class PbdHingeJointConstraint : public PbdAngularConstraint
+class PbdAngularHingeConstraint : public PbdAngularConstraint
 {
 public:
-    PbdHingeJointConstraint() : PbdAngularConstraint(1) { }
-    ~PbdHingeJointConstraint() override = default;
+    PbdAngularHingeConstraint() : PbdAngularConstraint(1) { }
+    ~PbdAngularHingeConstraint() override = default;
 
     void initConstraint(const PbdParticleId& pIdx0,
                         const Vec3d&         hingeAxes,
@@ -60,7 +60,8 @@ protected:
 ///
 /// \class PbdAngularDistanceConstraint
 ///
-/// \brief Constraints rotation to another one
+/// \brief Constraints one orientation to be relative by a given angular distance/offset
+/// to another orientation.
 ///
 class PbdAngularDistanceConstraint : public PbdAngularConstraint
 {
