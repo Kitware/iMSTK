@@ -27,9 +27,14 @@ LambdaBehaviour::update(const double& dt)
     {
         m_updateFunc(dt);
     }
-    else
+}
+
+void
+LambdaBehaviour::visualUpdate(const double& dt)
+{
+    if (m_visualUpdateFunc != nullptr)
     {
-        LOG(FATAL) << "LambdaBehaviour has no function set";
+        m_visualUpdateFunc(dt);
     }
 }
 } // namespace imstk

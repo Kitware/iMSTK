@@ -79,3 +79,23 @@ TEST(BehaviourTest, TestUpdate)
     behaviour.visualUpdate(0.0);
     EXPECT_EQ(true, behaviour.visualUpdated);
 }
+
+TEST(LambdaBehaviourTest, TestLambdaUpdate)
+{
+    LambdaBehaviour behaviour;
+    bool            isUpdated = false;
+    behaviour.setUpdate([&](const double&)
+        {
+            isUpdated = true;
+        });
+    behaviour.update(0.0);
+    EXPECT_EQ(true, isUpdated);
+
+    bool isVisualUpdated = false;
+    behaviour.setVisualUpdate([&](const double&)
+        {
+            isVisualUpdated = true;
+        });
+    behaviour.visualUpdate(0.0);
+    EXPECT_EQ(true, isVisualUpdated);
+}

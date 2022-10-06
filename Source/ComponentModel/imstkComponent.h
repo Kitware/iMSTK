@@ -103,10 +103,13 @@ public:
     ~LambdaBehaviour() override = default;
 
     void update(const double& dt) override;
+    void visualUpdate(const double& dt) override;
 
     void setUpdate(std::function<void(const double& dt)> updateFunc) { m_updateFunc = updateFunc; }
+    void setVisualUpdate(std::function<void(const double& dt)> updateFunc) { m_visualUpdateFunc = updateFunc; }
 
 protected:
     std::function<void(const double& dt)> m_updateFunc;
+    std::function<void(const double& dt)> m_visualUpdateFunc;
 };
 } // namespace imstk
