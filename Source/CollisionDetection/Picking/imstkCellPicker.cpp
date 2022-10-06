@@ -58,49 +58,50 @@ CellPicker::requestUpdate()
             const int vertexId = colElemA.m_element.m_PointIndexDirectionElement.ptIndex;
 
             // Get the connected cells to the vertex that is intersecting
-            auto                                        cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(geomToPick);
-            const std::vector<std::unordered_set<int>>& vertexToCellMap = cellMesh->getVertexToCellMap();
-            for (auto cellId : vertexToCellMap[vertexId])
+            auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(geomToPick);
+            if (cellMesh != nullptr)
+            {
+                const std::vector<std::unordered_set<int>>& vertexToCellMap = cellMesh->getVertexToCellMap();
+                for (auto cellId : vertexToCellMap[vertexId])
+                {
+                    PickData data;
+                    data.ids[0]  = cellId;
+                    data.idCount = 1;
+                    data.cellId  = cellId;
+                    const int numComps = cellMesh->getAbstractCells()->getNumberOfComponents();
+                    if (numComps == 1)
+                    {
+                        data.cellType = IMSTK_VERTEX;
+                    }
+                    else if (numComps == 2)
+                    {
+                        data.cellType = IMSTK_EDGE;
+                    }
+                    else if (numComps == 3)
+                    {
+                        data.cellType = IMSTK_TRIANGLE;
+                    }
+                    else if (numComps == 4)
+                    {
+                        data.cellType = IMSTK_TETRAHEDRON;
+                    }
+                    else
+                    {
+                        LOG(FATAL) << "Unrecognized cell type";
+                    }
+                    resultsMap[cellId] = data;
+                }
+            }
+            // Otherwise we have a PointSet
+            else
             {
                 PickData data;
-                data.ids[0]  = cellId;
-                data.idCount = 1;
-                const int numComps = cellMesh->getAbstractCells()->getNumberOfComponents();
-                if (numComps == 1)
-                {
-                    data.cellType = IMSTK_VERTEX;
-                }
-                else if (numComps == 2)
-                {
-                    data.cellType = IMSTK_EDGE;
-                }
-                else if (numComps == 3)
-                {
-                    data.cellType = IMSTK_TRIANGLE;
-                }
-                else if (numComps == 4)
-                {
-                    data.cellType = IMSTK_TETRAHEDRON;
-                }
-                else
-                {
-                    LOG(FATAL) << "Unrecognized cell type";
-                }
+                data.ids[0]   = vertexId;
+                data.idCount  = 1;
+                data.cellId   = vertexId;
+                data.cellType = IMSTK_VERTEX;
                 m_results.push_back(data);
-                resultsMap[cellId] = data;
             }
-        }
-        else if (colElemA.m_type == CollisionElementType::PointDirection)
-        {
-            // A cell is not picked but point specified
-            PickData data;
-            data.idCount  = 0;
-            data.cellType = IMSTK_VERTEX;
-            // Yeilds the point on body
-            data.pickPoint = colElemA.m_element.m_PointDirectionElement.pt +
-                             colElemA.m_element.m_PointDirectionElement.dir *
-                             colElemA.m_element.m_PointDirectionElement.penetrationDepth;
-            m_results.push_back(data);
         }
         else if (colElemA.m_type == CollisionElementType::PointDirection)
         {
