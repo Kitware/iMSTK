@@ -65,13 +65,6 @@ CollidingObject::updateGeometries()
 std::string
 getCDType(const CollidingObject& obj1, const CollidingObject& obj2)
 {
-    // Check for nullptr in colliding objects
-    if (&obj1 == nullptr || &obj2 == nullptr)
-    {
-        LOG(FATAL) << "Nullptr passed into getCDType";
-        return std::string("");
-    }
-
     std::string cdType = CDObjectFactory::getCDType(*obj1.getCollidingGeometry(), *obj2.getCollidingGeometry());
     return cdType;
 }

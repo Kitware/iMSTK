@@ -35,8 +35,9 @@ CellPicker::requestUpdate()
     {
         cellMesh->computeVertexToCellMap();
     }
-    // Used to resolve duplicates
-    std::unordered_map<int, PickData> resultsMap;
+
+    // Used to resolve duplicates (ordered)
+    std::map<int, PickData> resultsMap;
 
     const std::vector<CollisionElement>& elementsA = m_colDetect->getCollisionData()->elementsA;
     for (size_t i = 0; i < elementsA.size(); i++)

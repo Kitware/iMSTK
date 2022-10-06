@@ -116,7 +116,7 @@ PbdContactConstraint::correctVelocity(PbdState& bodies, const double dt)
         return;
     }
     // Avoid jitter with threshold here
-    const double restitution = (std::abs(vNMag) < 1.0e-10) ? 0.0 : m_restitution;
+    //const double restitution = (std::abs(vNMag) < 1.0e-10) ? 0.0 : m_restitution;
 
     // Velocity correction for friction & restitution
     const Vec3d dV = (vT / vTMag) * std::min(m_friction * getForce(dt) * dt, vTMag) +
@@ -227,7 +227,6 @@ PbdTriangleToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
                                                      double&             c,
                                                      std::vector<Vec3d>& n)
 {
-    Vec3d  uvw    = Vec3d::Zero();
     Vec3d  normal = Vec3d::Zero();
     double depth  = 0.0;
     if (!computeInterpolantsAndContact(bodies, m_weights, normal, depth))
@@ -271,9 +270,6 @@ PbdTriangleToBodyConstraint::computeRelativeVelocity(PbdState& bodies)
     //const Vec3d& x3 = bodies.getPosition(m_particles[3]);
     const Vec3d& v3   = bodies.getPosition(m_particles[3]);
     const Vec3d  v123 = v1 * m_weights[1] + v2 * m_weights[2] + v3 * m_weights[3];
-
-    // Assumed equal and opposite normals/constraint gradients
-    const Vec3d contactNormal = m_dcdx[0].normalized();
 
     // We can also assume equal and opposite normals/constraint gradients
     return v0 - v123;
@@ -413,7 +409,6 @@ PbdEdgeToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
                                                  double&             c,
                                                  std::vector<Vec3d>& n)
 {
-    Vec3d  uvw    = Vec3d::Zero();
     Vec3d  normal = Vec3d::Zero();
     double depth  = 0.0;
     if (!computeInterpolantsAndContact(bodies, m_weights, normal, depth))
@@ -436,7 +431,6 @@ PbdEdgeToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
 Vec3d
 PbdEdgeToBodyConstraint::computeRelativeVelocity(PbdState& bodies)
 {
-    Vec2d  uv     = Vec2d::Zero();
     Vec3d  normal = Vec3d::Zero();
     double depth  = 0.0;
     if (!computeInterpolantsAndContact(bodies, m_weights, normal, depth))

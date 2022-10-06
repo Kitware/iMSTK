@@ -33,7 +33,7 @@ PbdCollisionHandling::getBodyAndContactPoint(const CollisionElement& elem, const
     }
     else
     {
-        const PbdParticleId& ptBv = getVertex(elem, data)[0];
+        const PbdParticleId ptBv = getVertex(elem, data)[0];
         return { { data.bodyId, 0 }, (*data.vertices)[ptBv.second] };
     }
 }
@@ -48,7 +48,7 @@ static std::array<PbdParticleId, ArrType::NumComponents>
 getElementVertIds(const CollisionElement& elem, const PbdCollisionHandling::CollisionSideData& side)
 {
     // Note: The unrolling of this functions loops could be important to performance
-    typename ArrType::ValueType cell;
+    typename ArrType::ValueType cell = -ArrType::ValueType::Ones();
     if (elem.m_type == CollisionElementType::CellIndex && elem.m_element.m_CellIndexElement.cellType == cellType)
     {
         // If one index it refers to the cell
@@ -66,6 +66,10 @@ getElementVertIds(const CollisionElement& elem, const PbdCollisionHandling::Coll
     }
 
     std::array<PbdParticleId, ArrType::NumComponents> results;
+    for (int i = 0; i < ArrType::NumComponents; i++)
+    {
+        results[i] = { -1, -1 };
+    }
     if (cell[0] != -1)
     {
         if (side.mapPtr != nullptr)
@@ -103,8 +107,8 @@ PbdCollisionHandling::getTriangle(const CollisionElement& elem, const CollisionS
 std::array<PbdParticleId, 1>
 PbdCollisionHandling::getVertex(const CollisionElement& elem, const CollisionSideData& side)
 {
-    std::array<PbdParticleId, 1> results;
-    int                          ptId = -1;
+    std::array<PbdParticleId, 1> results = { PbdParticleId(-1, -1) };
+    int                          ptId    = -1;
     if (elem.m_type == CollisionElementType::CellIndex && elem.m_element.m_CellIndexElement.cellType == IMSTK_VERTEX)
     {
         ptId = elem.m_element.m_CellIndexElement.ids[0];
@@ -526,7 +530,7 @@ PbdCollisionHandling::addConstraint_Body_Body(const ColElemSide& sideA, const Co
 void
 PbdCollisionHandling::addConstraint_V_T(const ColElemSide& sideA, const ColElemSide& sideB)
 {
-    const PbdParticleId&         ptA  = getVertex(*sideA.elem, *sideA.data)[0];
+    const PbdParticleId          ptA  = getVertex(*sideA.elem, *sideA.data)[0];
     std::array<PbdParticleId, 3> ptsB = getTriangle(*sideB.elem, *sideB.data);
 
     PbdPointTriangleConstraint* constraint = new PbdPointTriangleConstraint();
@@ -582,7 +586,7 @@ PbdCollisionHandling::addConstraint_E_E_CCD(
 void
 PbdCollisionHandling::addConstraint_V_E(const ColElemSide& sideA, const ColElemSide& sideB)
 {
-    const PbdParticleId&         ptA  = getVertex(*sideA.elem, *sideA.data)[0];
+    const PbdParticleId          ptA  = getVertex(*sideA.elem, *sideA.data)[0];
     std::array<PbdParticleId, 2> ptsB = getEdge(*sideB.elem, *sideB.data);
 
     PbdPointEdgeConstraint* constraint = new PbdPointEdgeConstraint();
@@ -599,8 +603,8 @@ void
 PbdCollisionHandling::addConstraint_V_V(const ColElemSide& sideA, const ColElemSide& sideB)
 {
     // One special case with one-way
-    const PbdParticleId& ptA = getVertex(*sideA.elem, *sideA.data)[0];
-    PbdParticleId        ptB;
+    const PbdParticleId ptA = getVertex(*sideA.elem, *sideA.data)[0];
+    PbdParticleId       ptB;
 
     // If one-way/sideB doesn't exist
     if (sideB.data == nullptr)

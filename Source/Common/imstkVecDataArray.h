@@ -330,7 +330,7 @@ public:
     inline ValueType& operator[](const size_t pos)
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_vecSize) { throw std::out_of_range("Index out of range"); }
+        if (pos >= static_cast<size_t>(m_vecSize)) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_dataCast[pos];
     }
@@ -338,7 +338,7 @@ public:
     inline const ValueType& operator[](const size_t pos) const
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_vecSize) { throw std::out_of_range("Index out of range"); }
+        if (pos >= static_cast<size_t>(m_vecSize)) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_dataCast[pos];
     }
@@ -350,7 +350,7 @@ public:
     inline ValueType& at(const size_t pos)
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_vecSize) { throw std::out_of_range("Index out of range"); }
+        if (pos >= static_cast<size_t>(m_vecSize)) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_dataCast[pos];
     }
@@ -362,7 +362,7 @@ public:
     inline const ValueType& at(const size_t pos) const
     {
 #ifdef IMSTK_CHECK_ARRAY_RANGE
-        if (pos >= m_vecSize) { throw std::out_of_range("Index out of range"); }
+        if (pos >= static_cast<size_t>(m_vecSize)) { throw std::out_of_range("Index out of range"); }
 #endif
         return m_dataCast[pos];
     }
