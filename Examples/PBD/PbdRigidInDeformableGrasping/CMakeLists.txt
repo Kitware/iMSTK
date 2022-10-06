@@ -17,7 +17,7 @@ if (iMSTK_USE_RENDERING_VTK)
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples)
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
 
   #-----------------------------------------------------------------------------
   # Link libraries to executable
