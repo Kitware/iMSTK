@@ -12,9 +12,9 @@ PbdCollisionConstraint::PbdCollisionConstraint(const int numParticlesA, const in
     PbdConstraint(numParticlesA + numParticlesB)
 {
     m_bodiesSides.resize(numParticlesA + numParticlesB);
-    for (int i = 0; i < m_bodiesSides.size(); i++)
+    for (size_t i = 0; i < m_bodiesSides.size(); i++)
     {
-        m_bodiesSides[i] = (i >= numParticlesA); // false/0 for A, true/1 for B
+        m_bodiesSides[i] = (i >= static_cast<size_t>(numParticlesA)); // false/0 for A, true/1 for B
     }
 }
 

@@ -85,7 +85,7 @@ public:
 
         // For every vertex
         const VecDataArray<int, N>& indices = *m_indices;
-        for (int vertexId = 0; vertexId < m_vertexToNeighborVertex.size(); vertexId++)
+        for (size_t vertexId = 0; vertexId < m_vertexToNeighborVertex.size(); vertexId++)
         {
             // For every cell it is connected too
             for (const int cellId : m_vertexToCells.at(vertexId))
@@ -95,7 +95,7 @@ public:
                 {
                     // So long as its not the source vertex (not a neighbor of itself)
                     const int vertexId2 = indices[cellId][i];
-                    if (vertexId2 != vertexId)
+                    if (vertexId2 != static_cast<int>(vertexId))
                     {
                         m_vertexToNeighborVertex.at(vertexId).insert(vertexId2);
                     }

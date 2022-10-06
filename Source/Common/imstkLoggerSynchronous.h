@@ -139,7 +139,7 @@ class LoggerSynchronous
 public:
     /// Constructor.
     /// \param output The LogOutput instance used to display or log the data.
-    LoggerSynchronous(std::shared_ptr<LogOutput> output) : m_threshold(DEBUG.value), m_output(output), m_name("imstk") {}
+    LoggerSynchronous(std::shared_ptr<LogOutput> output) : m_threshold(DEBUG.value), m_name("imstk"), m_output(output) { }
 
     static std::shared_ptr<LoggerSynchronous> instance()
     {
