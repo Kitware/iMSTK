@@ -17,6 +17,7 @@ imstk_add_library( Filtering
     imstkLineMeshCut.h
     imstkLocalMarchingCubes.h
     imstkMeshCut.h
+    imstkProximitySurfaceSelector.h
     imstkQuadricDecimate.h
     imstkSelectEnclosedPoints.h
     imstkSurfaceMeshCut.h
@@ -39,6 +40,7 @@ imstk_add_library( Filtering
     imstkLineMeshCut.cpp
     imstkLocalMarchingCubes.cpp
     imstkMeshCut.cpp
+    imstkProximitySurfaceSelector.cpp
     imstkQuadricDecimate.cpp
     imstkSelectEnclosedPoints.cpp
     imstkSurfaceMeshCut.cpp
