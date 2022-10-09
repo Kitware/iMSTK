@@ -32,7 +32,8 @@ public:
     FemurObject();
     ~FemurObject() override = default;
 
-public:
+    bool initialize() override;
+
     ///
     /// \brief Update the isosurface before rendering, the isosurface
     /// is not used for simulation so we can afford to update it

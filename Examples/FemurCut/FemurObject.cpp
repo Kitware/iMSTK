@@ -40,8 +40,6 @@ FemurObject::FemurObject() : LevelSetDeformableObject("Femur"),
         srand(static_cast<unsigned int>(time(NULL)));
     }
 
-    createVisualModels();
-
     // Setup the Object
     auto sdf = std::make_shared<SignedDistanceField>(initLvlSetImage);
 
@@ -59,6 +57,13 @@ FemurObject::FemurObject() : LevelSetDeformableObject("Femur"),
     m_forwardModifiedVoxels = std::make_shared<TaskNode>(
         std::bind(&FemurObject::updateModifiedVoxels, this), "Isosurface: SetModifiedVoxels");
     m_taskGraph->addNode(m_forwardModifiedVoxels);
+}
+
+bool
+FemurObject::initialize()
+{
+    createVisualModels();
+    return true;
 }
 
 void

@@ -28,7 +28,7 @@ class LevelSetCH : public CollisionHandling
 {
 public:
     LevelSetCH();
-    virtual ~LevelSetCH() override;
+    ~LevelSetCH() override;
 
     IMSTK_TYPE_NAME(LevelSetCH)
 

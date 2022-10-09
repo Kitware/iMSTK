@@ -21,8 +21,6 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
                                        std::string cdType) :
     CollisionInteraction("PbdObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, cdType)
 {
-    std::shared_ptr<PbdModel> pbdModel1 = obj1->getPbdModel();
-
     // Setup the handler
     std::shared_ptr<PbdCollisionHandling> ch = std::make_shared<PbdCollisionHandling>();
     ch->setInputObjectA(obj1);
@@ -35,6 +33,9 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
             // and update the cached geometry accordingly.
             if (auto pbdCCD = std::dynamic_pointer_cast<CCDAlgorithm>(getCollisionDetection()))
             {
+                // \todo: These inputs could be flipped in the algorithm
+                std::dynamic_pointer_cast<CollidingObject>(m_objA)->updateGeometries();
+                std::dynamic_pointer_cast<CollidingObject>(m_objB)->updateGeometries();
                 pbdCCD->updatePreviousTimestepGeometry(pbdCCD->getInput(0), pbdCCD->getInput(1));
             }
         });
@@ -47,13 +48,14 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
     m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
     m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
 
-    m_taskGraph->addNode(pbdModel1->getSolveNode());
-    m_taskGraph->addNode(pbdModel1->getIntegratePositionNode());
-    m_taskGraph->addNode(pbdModel1->getUpdateVelocityNode());
+    std::shared_ptr<PbdModel> pbdModel = obj1->getPbdModel();
+    m_taskGraph->addNode(pbdModel->getSolveNode());
+    m_taskGraph->addNode(pbdModel->getIntegratePositionNode());
+    m_taskGraph->addNode(pbdModel->getUpdateVelocityNode());
 
     if (auto pbdObj2 = std::dynamic_pointer_cast<PbdObject>(obj2))
     {
-        CHECK(pbdModel1 == pbdObj2->getPbdModel()) << "PbdObjectCollision may only be used with PbdObjects that share the same PbdModel";
+        CHECK(pbdModel == pbdObj2->getPbdModel()) << "PbdObjectCollision may only be used with PbdObjects that share the same PbdModel";
     }
     else
     {

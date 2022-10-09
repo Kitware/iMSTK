@@ -34,11 +34,11 @@ namespace
 /// from source to destionation object.
 ///
 bool
-copyLineMeshGeometry(const Geometry* source, LineMesh& dest)
+copyPointSetGeometry(const Geometry* source, PointSet& dest)
 {
     bool success = false;
     // Make sure its a LineMesh.
-    if (auto sourceLineMeshPtr = dynamic_cast<const LineMesh*>(source))
+    if (auto sourceLineMeshPtr = dynamic_cast<const PointSet*>(source))
     {
         // Make sure it has a vertex buffer.
         if (auto srcPointsPtr = sourceLineMeshPtr->getVertexPositions())
@@ -56,8 +56,8 @@ LineMeshToLineMeshCCD::updatePreviousTimestepGeometry(
     std::shared_ptr<const Geometry> geomA,
     std::shared_ptr<const Geometry> geomB)
 {
-    bool success = copyLineMeshGeometry(geomA.get(), *m_prevA);
-    success = success && copyLineMeshGeometry(geomB.get(), *m_prevB);
+    bool success = copyPointSetGeometry(geomA.get(), *m_prevA);
+    success = success && copyPointSetGeometry(geomB.get(), *m_prevB);
     if (!success)
     {
         LOG(WARNING) << "Failed to make a copy of previous geometries.";

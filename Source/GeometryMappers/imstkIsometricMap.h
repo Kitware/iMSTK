@@ -8,6 +8,7 @@
 
 #include "imstkGeometryMap.h"
 #include "imstkMacros.h"
+#include "imstkMath.h"
 
 namespace imstk
 {
@@ -36,10 +37,20 @@ public:
     ///
     void compute() override { }
 
+    const Vec3d& getLinearOffset() const { return m_linearOffset; }
+    void setLinearOffset(const Vec3d& offset)
+    {
+        m_linearOffset = offset;
+        m_useOffset    = true;
+    }
+
 protected:
     ///
     /// \brief Apply the map
     ///
     void requestUpdate() override;
+
+    bool  m_useOffset    = false;
+    Vec3d m_linearOffset = Vec3d::Zero();
 };
 } // namespace imstk

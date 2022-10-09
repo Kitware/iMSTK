@@ -25,7 +25,7 @@ class RigidObjectLevelSetCollision : public CollisionInteraction
 {
 public:
     RigidObjectLevelSetCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2);
-    virtual ~RigidObjectLevelSetCollision() override = default;
+    ~RigidObjectLevelSetCollision() override = default;
 
     IMSTK_TYPE_NAME(RigidObjectLevelSetCollision)
 
