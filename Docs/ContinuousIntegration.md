@@ -38,7 +38,7 @@ We can break down each part of the command as follows:
 - `-v /path/to/iMSTK-build:/iMSTK-build`: Bind mount the local path to the iMSTK build repository on the host machine to the path `/iMSTK-build` in the container. For a new build your `iMSTK-build` directory should be empty as initialization.
 - `-v /tmp/.X11-unix:/tmp/.X11-unix`: Bind mount the X11 directory so that the container can access display sockets from the host machine. Note that Unix paths are case-sensitive. Necessary for running iMSTK tests and examples with graphics. See https://gitlab.kitware.com/utils/gitlab-ci-docs/-/wikis/local-ci#forwarding-machine-resources for more information.
 - `-e DISPLAY`: Set the DISPLAY environment variable to the value on the host machine. The value of DISPLAY indicates the X11 socket to use for window graphics such as `:X0.0` on physical access to the host or `:X10.0` on remote access. See https://gitlab.kitware.com/utils/gitlab-ci-docs/-/wikis/local-ci#forwarding-machine-resources for more information.
-- `kitware/imstk:ci-fedora36-20220621`: The image to use for creating the container. iMSTK uses a Fedora Linux 36 image for Linux CI workflows.
+- `kitware/imstk:ci-fedora36-20220621`: The image to use for creating the container. At the time of writing iMSTK uses a Fedora Linux 36 image for Linux CI testing. You can find the most up-to-date image name at `iMSTK/.gitlab/os-linux.yml`.
 
 By omitting a command at the end of the docker image we enter an interactive shell for building and testing. Set up build tools with the following commands:
 ```bash
