@@ -15,6 +15,8 @@
 namespace imstk
 {
 class Entity;
+class TaskGraph;
+class TaskNode;
 
 ///
 /// \class Component
@@ -82,6 +84,35 @@ public:
 
     virtual void update(const UpdateInfo& imstkNotUsed(updateData)) { }
     virtual void visualUpdate(const UpdateInfo& imstkNotUsed(updateData)) { }
+};
+
+///
+/// \class TaskBehaviour
+///
+/// \brief Defines a behaviour that can be updated by invoking its
+/// TaskGraph pipeline. It's pipeline can also be "joined"/combined with
+/// other TaskGraphs. Nodes shared between two graphs are combined.
+///
+class TaskBehaviour : public Component
+{
+public:
+    TaskBehaviour(const std::string& name = "TaskBehaviour");
+
+    ///
+    /// \brief Setup the edges/connections of the TaskGraph
+    ///
+    void initGraphEdges();
+
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
+
+protected:
+    ///
+    /// \brief Setup the edges/connections of the TaskGraph
+    ///
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) = 0;
+
+protected:
+    std::shared_ptr<TaskGraph> m_taskGraph = nullptr;
 };
 
 ///

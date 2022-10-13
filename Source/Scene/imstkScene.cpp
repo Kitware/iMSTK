@@ -180,27 +180,50 @@ Scene::buildTaskGraph()
     m_taskGraph->clear();
     m_taskGraph->addEdge(m_taskGraph->getSource(), m_taskGraph->getSink());
 
-    // Setup all SceneObject compute graphs
+    // Setup all SceneObject & their components compute graphs
+    // \todo: Remove SceneObject TaskGraphs
     for (const auto& ent : m_sceneEntities)
     {
         if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
         {
             obj->initGraphEdges();
         }
+        for (const auto& comp : ent->getComponents())
+        {
+            if (auto taskBehaviour = std::dynamic_pointer_cast<TaskBehaviour>(comp))
+            {
+                taskBehaviour->initGraphEdges();
+            }
+        }
     }
 
-    // Nest all the SceneObject graphs within this Scene's ComputeGraph
+    // Nest all the SceneObject graphs & TaskBehaviour graphs within this Scene's ComputeGraph
+    // \todo: Remove SceneObject TaskGraphs
     for (const auto& ent : m_sceneEntities)
     {
         if (auto obj = std::dynamic_pointer_cast<SceneObject>(ent))
         {
-            std::shared_ptr<TaskGraph> objComputeGraph = obj->getTaskGraph();
-            if (objComputeGraph != nullptr)
+            std::shared_ptr<TaskGraph> taskGraph = obj->getTaskGraph();
+            if (taskGraph != nullptr)
             {
                 // Remove any unused nodes
-                objComputeGraph = TaskGraph::removeUnusedNodes(objComputeGraph);
+                taskGraph = TaskGraph::removeUnusedNodes(taskGraph);
                 // Sum and nest the graph
-                m_taskGraph->nestGraph(objComputeGraph, m_taskGraph->getSource(), m_taskGraph->getSink());
+                m_taskGraph->nestGraph(taskGraph, m_taskGraph->getSource(), m_taskGraph->getSink());
+            }
+        }
+        for (const auto& comp : ent->getComponents())
+        {
+            if (auto taskBehaviour = std::dynamic_pointer_cast<TaskBehaviour>(comp))
+            {
+                std::shared_ptr<TaskGraph> taskGraph = taskBehaviour->getTaskGraph();
+                if (taskGraph != nullptr)
+                {
+                    // Remove any unused nodes
+                    taskGraph = TaskGraph::removeUnusedNodes(taskGraph);
+                    // Sum and nest the graph
+                    m_taskGraph->nestGraph(taskGraph, m_taskGraph->getSource(), m_taskGraph->getSink());
+                }
             }
         }
     }
