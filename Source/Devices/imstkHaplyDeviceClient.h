@@ -20,7 +20,7 @@ namespace Devices
 {
 class Handle;
 class Inverse3;
-}
+} // namespace Devices
 namespace IO { class SerialStream; }
 } // namespace HardwareAPI
 } // namespace Haply
@@ -77,7 +77,7 @@ protected:
 private:
     ///
     /// \brief Haply requires a subclass to get orientation data from a handle via an overridden function.
-    /// 
+    ///
     class HaplyHandle : public Haply::HardwareAPI::Devices::Handle
     {
     public:
@@ -89,7 +89,7 @@ private:
         void OnReceiveHandleErrorResponse(HandleErrorResponse& response) override { m_errorResponse = response; }
 
     public:
-        Haply::HardwareAPI::Devices::Handle::HandleInfoResponse m_infoResponse;
+        Haply::HardwareAPI::Devices::Handle::HandleInfoResponse   m_infoResponse;
         Haply::HardwareAPI::Devices::Handle::HandleStatusResponse m_statusResponse;
         //Haply::HardwareAPI::Devices::Handle::HandleStatusResponse statusResponseCalibrated;
         Haply::HardwareAPI::Devices::Handle::HandleErrorResponse m_errorResponse;
@@ -100,7 +100,7 @@ private:
     std::shared_ptr<Haply::HardwareAPI::IO::SerialStream>  m_deviceStream;
 
     std::string m_handleName = "";
-    bool m_handleEnabled = false;
+    bool m_handleEnabled     = false;
     unsigned char m_lastReturnType;
     std::shared_ptr<HaplyHandle> m_handleDevice;
     std::shared_ptr<Haply::HardwareAPI::IO::SerialStream> m_handleDeviceStream;

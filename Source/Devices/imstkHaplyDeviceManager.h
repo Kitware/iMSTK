@@ -49,7 +49,7 @@ public:
 
     ///
     /// \brief Autodetect and get all the Haply handle port names
-    /// 
+    ///
     static std::vector<std::string> getHandlePortNames();
 
     static bool isDevicePresent();

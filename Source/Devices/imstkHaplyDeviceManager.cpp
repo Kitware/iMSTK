@@ -20,7 +20,7 @@ HaplyDeviceManager::getInverse3PortNames()
 {
     // Get all the inverse3 devices (max 10)
     std::string portNames[10];
-    const int portCount = Devices::DeviceDetection::AutoDetectInverse3(portNames);
+    const int   portCount = Devices::DeviceDetection::AutoDetectInverse3(portNames);
     // \note: The above detection function prints stuff. Undesirable
     std::cout << std::endl;
 
@@ -37,7 +37,7 @@ HaplyDeviceManager::getHandlePortNames()
 {
     // Find Handle
     std::string portNames[10];
-    const int portCount = Devices::DeviceDetection::AutoDetectHandle(portNames);
+    const int   portCount = Devices::DeviceDetection::AutoDetectHandle(portNames);
 
     std::vector<std::string> results;
     for (int i = 0; i < portCount; i++)

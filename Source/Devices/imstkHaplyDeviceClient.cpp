@@ -27,13 +27,13 @@ void
 HaplyDeviceClient::initialize()
 {
     m_deviceStream = std::make_shared<IO::SerialStream>(m_deviceName.c_str(), true);
-    m_device      = std::make_shared<Devices::Inverse3>(m_deviceStream.get());
+    m_device       = std::make_shared<Devices::Inverse3>(m_deviceStream.get());
 
     if (m_handleName != "")
     {
-        m_handleEnabled = true;
+        m_handleEnabled      = true;
         m_handleDeviceStream = std::make_shared<IO::SerialStream>(m_handleName.c_str(), true);
-        m_handleDevice = std::make_shared<HaplyHandle>(m_handleDeviceStream.get());
+        m_handleDevice       = std::make_shared<HaplyHandle>(m_handleDeviceStream.get());
     }
 
     m_device->SendDeviceWakeup();
