@@ -86,16 +86,20 @@ vtkInteractorStyleVR::addButtonActions()
         "interactor has been initialized";
 
     // Called when buttons are pressed/released
-    std::array<std::string, 6> buttonActionNames =
+    // Note: grips and triggers must use separate binding
+    // else one can't fire while other is down
+    std::array<std::string, 8> buttonActionNames =
     {
         "/actions/vtk/in/Button0Pressed",
         "/actions/vtk/in/Button1Pressed",
         "/actions/vtk/in/Button2Pressed",
         "/actions/vtk/in/Button3Pressed",
-        "/actions/vtk/in/GripPressed",
-        "/actions/vtk/in/TriggerPressed"
+        "/actions/vtk/in/LeftGripPressed",
+        "/actions/vtk/in/RightGripPressed",
+        "/actions/vtk/in/LeftTriggerPressed",
+        "/actions/vtk/in/RightTriggerPressed"
     };
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 8; i++)
     {
         iren->AddAction(buttonActionNames[i], false,
             [this, i](vtkEventData* ed)

@@ -16,7 +16,6 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 
-#include <vtkAxesActor.h>
 #include <vtkCameraActor.h>
 #include <vtkCullerCollection.h>
 #include <vtkLight.h>
@@ -351,7 +350,19 @@ VTKRenderer::updateCamera()
     getVtkRenderer()->SetActiveCamera(m_camera);
 
     // As long as we don't have a VR camera apply the camera view
-    if (vtkOpenVRCamera::SafeDownCast(m_camera) == nullptr)
+    if (auto vtkVRCam = vtkOpenVRCamera::SafeDownCast(m_camera))
+    {
+        // Copy back the view values from the VR cam to hmd_view in ours
+        vtkMatrix4x4* finalView = m_camera->GetModelViewTransformMatrix();
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                cam->m_hmdView(i, j) = finalView->GetElement(j, i);
+            }
+        }
+    }
+    else
     {
         // Update the camera to obtain corrected view/proj matrices
         cam->update();

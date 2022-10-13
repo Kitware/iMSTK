@@ -1,7 +1,7 @@
 {
   "action_manifest_version": 0,
   "alias_info": {},
-  "app_key": "system.generated.paraview.exe",
+  "app_key": "system.generated.imstk.exe",
   "bindings": {
     "/actions/vtk": {
       "sources": [
@@ -26,7 +26,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/GripPressed"
+              "output": "/actions/vtk/in/LeftGripPressed"
             }
           },
           "mode": "button",
@@ -39,7 +39,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/GripPressed"
+              "output": "/actions/vtk/in/RightGripPressed"
             }
           },
           "mode": "button",
@@ -52,7 +52,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/TriggerPressed"
+              "output": "/actions/vtk/in/LeftTriggerPressed"
             }
           },
           "mode": "trigger",
@@ -61,7 +61,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/vtk/in/TriggerPressed"
+              "output": "/actions/vtk/in/RightTriggerPressed"
             }
           },
           "mode": "trigger",

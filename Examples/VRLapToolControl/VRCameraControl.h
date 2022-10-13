@@ -19,41 +19,74 @@ class SceneManager;
 using namespace imstk;
 
 ///
-/// \class CameraOpenVRControl
+/// \class VRCameraControl
 ///
-/// \brief Controls pose of a camera given two trackpads from OpenVRDeviceClient's
+/// \brief Defines a control scheme to move the camera with joysticks.
+/// Left joystick look, right joystick move, a,b up/down
 ///
-///
-class CameraOpenVRControl : public DeviceControl
+class VRCameraControl : public DeviceControl
 {
 public:
-    CameraOpenVRControl(const std::string& name = "CameraOpenVRControl") : DeviceControl(name) { }
-    ~CameraOpenVRControl() override = default;
+    VRCameraControl(const std::string& name = "VRCameraControl") : DeviceControl(name) { }
+    ~VRCameraControl() override = default;
 
 public:
     ///
     /// \brief Get/Set how fast the camera translates
-    ///
-    void setTranslateSpeedScale(const double translateSpeedScale) { m_translateSpeedScale = translateSpeedScale; }
+    ///@{
     double getTranslateSpeedScale() const { return m_translateSpeedScale; }
+    void setTranslateSpeedScale(const double translateSpeedScale)
+    {
+        m_translateSpeedScale = translateSpeedScale;
+    }
+
+    ///@}
 
     ///
     /// \brief Get/Set how fast the camera rotates
-    ///
-    void setRotateSpeedScale(const double rotateSpeedScale) { m_rotateSpeedScale = rotateSpeedScale; }
+    ///@{
     double getRotateSpeedScale() const { return m_rotateSpeedScale; }
+    void setRotateSpeedScale(const double rotateSpeedScale)
+    {
+        m_rotateSpeedScale = rotateSpeedScale;
+    }
+
+    ///@}
+
+    ///
+    /// \brief Get/Set the vertical speed
+    ///@{
+    double getVerticalSpeedScale() const { return m_translateVerticalSpeedScale; }
+    void setVerticalSpeedScale(double verticalSpeed)
+    {
+        m_translateVerticalSpeedScale = verticalSpeed;
+    }
+
+    ///@}
 
     ///
     /// \brief Get/Set the device that can translate the camera
-    ///
-    void setTranslateDevice(std::shared_ptr<OpenVRDeviceClient> translateDevice) { m_translateDevice = translateDevice; }
+    ///@{
     std::shared_ptr<OpenVRDeviceClient> getTranslateDevice() const { return m_translateDevice; }
+    void setTranslateDevice(std::shared_ptr<OpenVRDeviceClient> translateDevice)
+    {
+        m_translateDevice = translateDevice;
+    }
+
+    ///@}
 
     ///
     /// \brief Get/Set the device that can rotate the camera
-    ///
-    void setRotateDevice(std::shared_ptr<OpenVRDeviceClient> rotateDevice) { m_rotateDevice = rotateDevice; }
+    ///@{
     std::shared_ptr<OpenVRDeviceClient> getRotateDevice() const { return m_rotateDevice; }
+    void setRotateDevice(std::shared_ptr<OpenVRDeviceClient> rotateDevice)
+    {
+        m_rotateDevice = rotateDevice;
+    }
+
+    ///@}
+
+    const Mat4d& getDeltaTransform() { return m_deltaTransform; }
 
     ///
     /// \brief Get/Set the camera to be controlled
@@ -78,4 +111,6 @@ protected:
     // User changeable values
     double m_rotateSpeedScale    = 1.0;
     double m_translateSpeedScale = 1.0;
+    double m_translateVerticalSpeedScale = 1.0;
+    Mat4d  m_deltaTransform = Mat4d::Identity();
 };
