@@ -6,16 +6,15 @@
 
 #pragma once
 
-#include <array>
 #include "imstkCCDAlgorithm.h"
-#include "imstkVecDataArray.h"
 #include "imstkMacros.h"
+#include "imstkVecDataArray.h"
+#include <array>
 
 namespace imstk
 {
-template<typename T, int N> class VecDataArray;
-
 class LineMesh;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \class LineMeshToLineMeshCCD
@@ -39,7 +38,7 @@ public:
     /// that are received in computeCollisionDataXX functions for computing
     /// the continuous collision detection.
     ///
-    virtual void updatePreviousTimestepGeometry(
+    void updatePreviousTimestepGeometry(
         std::shared_ptr<const Geometry> geomA,
         std::shared_ptr<const Geometry> geomB) override;
 
@@ -47,7 +46,7 @@ protected:
     ///
     /// \brief Compute collision data for AB simultaneously
     ///
-    virtual void computeCollisionDataAB(
+    void computeCollisionDataAB(
         std::shared_ptr<Geometry>      geomA,
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsA,
@@ -56,7 +55,7 @@ protected:
     ///
     /// \brief Compute collision data for side A
     ///
-    virtual void computeCollisionDataA(
+    void computeCollisionDataA(
         std::shared_ptr<Geometry>      geomA,
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsA) override;
@@ -64,7 +63,7 @@ protected:
     ///
     /// \brief Compute collision data for side B
     ///
-    virtual void computeCollisionDataB(
+    void computeCollisionDataB(
         std::shared_ptr<Geometry>      geomA,
         std::shared_ptr<Geometry>      geomB,
         std::vector<CollisionElement>& elementsB) override;
@@ -76,7 +75,7 @@ private:
         std::vector<CollisionElement>* elementsA,
         std::vector<CollisionElement>* elementsB);
 
-    std::shared_ptr<imstk::LineMesh> m_prevA;
-    std::shared_ptr<imstk::LineMesh> m_prevB;
+    std::shared_ptr<LineMesh> m_prevA;
+    std::shared_ptr<LineMesh> m_prevB;
 };
 } // namespace imstk
