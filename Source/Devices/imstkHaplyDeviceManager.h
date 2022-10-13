@@ -31,14 +31,28 @@ public:
 
     ///
     /// \brief Create a haptic device client and add it to the internal list
-    /// \param COM port name
+    /// \param portName COM port name of device
     ///
-    std::shared_ptr<DeviceClient> makeDeviceClient(std::string portName = "") override;
+    std::shared_ptr<DeviceClient> makeDeviceClient(std::string portName = "") override { return makeDeviceClient(portName, ""); }
+
+    ///
+    /// \brief Create a haptic device client and add it to the internal list
+    /// \param portName COM port name of device
+    /// \param handlePortName Bluetooth port name for the device handle
+    ///
+    std::shared_ptr<DeviceClient> makeDeviceClient(std::string portName, std::string handlePortName);
 
     ///
     /// \brief Autodetect and get all Inverse3 device port names
     ///
-    std::vector<std::string> getPortNames() const;
+    static std::vector<std::string> getInverse3PortNames();
+
+    ///
+    /// \brief Autodetect and get all the Haply handle port names
+    ///
+    static std::vector<std::string> getHandlePortNames();
+
+    static bool isDevicePresent();
 
 protected:
     bool initModule() override;
