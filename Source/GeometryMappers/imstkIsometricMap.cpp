@@ -23,7 +23,7 @@ IsometricMap::requestUpdate()
         mat4dTRS(transform, position, orientation, scale);
 
         getChildGeometry()->setTransform(
-            mat4dTranslate(position + orientation * m_linearOffset) *
+            mat4dTranslate(position + orientation * m_localOffset) *
             mat4dRotation(orientation));
     }
     else

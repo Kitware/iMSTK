@@ -37,12 +37,17 @@ public:
     ///
     void compute() override { }
 
-    const Vec3d& getLinearOffset() const { return m_linearOffset; }
-    void setLinearOffset(const Vec3d& offset)
+    ///
+    /// \brief Get/Set an offset for the child that transforms locally with the parent
+    ///@{
+    const Vec3d& getLocalOffset() const { return m_localOffset; }
+    void setLocalOffset(const Vec3d& offset)
     {
-        m_linearOffset = offset;
-        m_useOffset    = true;
+        m_localOffset = offset;
+        m_useOffset   = true;
     }
+
+///@}
 
 protected:
     ///
@@ -50,7 +55,7 @@ protected:
     ///
     void requestUpdate() override;
 
-    bool  m_useOffset    = false;
-    Vec3d m_linearOffset = Vec3d::Zero();
+    bool  m_useOffset   = false;
+    Vec3d m_localOffset = Vec3d::Zero();
 };
 } // namespace imstk
