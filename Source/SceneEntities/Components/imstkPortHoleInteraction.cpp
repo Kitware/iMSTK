@@ -16,27 +16,42 @@
 
 namespace imstk
 {
-PortHoleInteraction::PortHoleInteraction(std::shared_ptr<PbdObject> toolObject) :
-    m_toolObject(toolObject),
+PortHoleInteraction::PortHoleInteraction(const std::string& name) : TaskBehaviour(name),
     m_portConstraint(std::make_shared<PbdRigidLineToPointConstraint>())
 {
     m_portHoleHandleNode = std::make_shared<TaskNode>([&]()
         {
             handlePortHole();
-                }, "PortHoleHandle");
-    m_taskGraph->addNode(m_portHoleHandleNode);
-
+        }, "PortHoleHandle");
     m_collisionGeometryUpdateNode = std::make_shared<TaskNode>([&]()
         {
             m_toolObject->updateGeometries();
-                }, "CollisionGeometryUpdate");
-    m_taskGraph->addNode(m_collisionGeometryUpdateNode);
-
-    m_taskGraph->addNode(m_toolObject->getPbdModel()->getIntegratePositionNode());
-    m_taskGraph->addNode(m_toolObject->getPbdModel()->getSolveNode());
+        }, "CollisionGeometryUpdate");
 
     m_constraints.resize(1);
     m_constraints[0] = m_portConstraint.get();
+}
+
+void
+PortHoleInteraction::init()
+{
+    CHECK(m_toolObject != nullptr) << "PortHoleInteraction requires a input tool object,"
+        "please provide it with PortHoleInteraction::setTool";
+    CHECK(m_toolGeom != nullptr) << "PortHoleInteraction requires a tool geometry,"
+        "please provide it with PortHoleInteraction::setToolGeometry";
+
+    m_taskGraph->addNode(m_portHoleHandleNode);
+    m_taskGraph->addNode(m_collisionGeometryUpdateNode);
+    m_taskGraph->addNode(m_toolObject->getPbdModel()->getIntegratePositionNode());
+    m_taskGraph->addNode(m_toolObject->getPbdModel()->getSolveNode());
+}
+
+void
+PortHoleInteraction::setTool(std::shared_ptr<PbdObject> toolObject)
+{
+    CHECK(m_toolObject == nullptr) << "PortHoleInteraction does not yet support changing"
+        "the tool at runtime, please set before initialization of the scene";
+    m_toolObject = toolObject;
 }
 
 void
