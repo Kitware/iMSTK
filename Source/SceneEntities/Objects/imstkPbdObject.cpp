@@ -71,10 +71,10 @@ PbdObject::initialize()
 
     setBodyFromGeometry();
 
-    updateGeometries();
-
-    // Sets up maps
+    // Set up maps before updating geometry
     DynamicObject::initialize();
+
+    updateGeometries();
 
     return true;
 }
