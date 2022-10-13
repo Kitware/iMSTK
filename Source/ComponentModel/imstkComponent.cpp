@@ -6,7 +6,6 @@
 
 #include "imstkComponent.h"
 #include "imstkLogger.h"
-#include "imstkTaskGraph.h"
 
 namespace imstk
 {
@@ -19,18 +18,6 @@ Component::initialize()
 
     // Initialize
     init();
-}
-
-TaskBehaviour::TaskBehaviour(const std::string& name) : Component(name),
-    m_taskGraph(std::make_shared<TaskGraph>())
-{
-}
-
-void
-TaskBehaviour::initGraphEdges()
-{
-    m_taskGraph->clearEdges();
-    initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
 }
 
 void

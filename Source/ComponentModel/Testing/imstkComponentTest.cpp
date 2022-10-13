@@ -6,6 +6,8 @@
 
 #include "imstkComponent.h"
 #include "imstkEntity.h"
+#include "imstkSequentialTaskGraphController.h"
+#include "imstkTaskNode.h"
 
 #include <gtest/gtest.h>
 
@@ -19,6 +21,8 @@ public:
     TestComponent(const std::string& name = "TestComponent") : Component(name)
     {
     }
+
+    ~TestComponent() override = default;
 
 protected:
     void init() override
@@ -34,12 +38,41 @@ class TestBehaviour : public Behaviour<double>
 {
 public:
     TestBehaviour(const std::string& name = "TestBehaviour") : Behaviour<double>(name) { }
+    ~TestBehaviour() override = default;
 
     void update(const double&) { updated = true; }
     void visualUpdate(const double&) { visualUpdated = true; }
 
     bool updated       = false;
     bool visualUpdated = false;
+};
+
+class TestTaskBehaviour : public TaskBehaviour<double>
+{
+public:
+    TestTaskBehaviour(const std::string& name = "TestTaskBehaviour") : TaskBehaviour<double>(name),
+        testNode(std::make_shared<TaskNode>(std::bind(&TestTaskBehaviour::updateFunc, this), "TestNode"))
+    {
+        m_taskGraph->addNode(testNode);
+    }
+
+    ~TestTaskBehaviour() override = default;
+
+    void updateFunc()
+    {
+        nodeHasRun = true;
+    }
+
+protected:
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override
+    {
+        m_taskGraph->addEdge(source, testNode);
+        m_taskGraph->addEdge(testNode, sink);
+    }
+
+public:
+    std::shared_ptr<TaskNode> testNode;
+    bool nodeHasRun = false;
 };
 } // namespace
 
@@ -78,6 +111,19 @@ TEST(BehaviourTest, TestUpdate)
 
     behaviour.visualUpdate(0.0);
     EXPECT_EQ(true, behaviour.visualUpdated);
+}
+
+TEST(TaskBehaviourTest, TestGraphUpdate)
+{
+    TestTaskBehaviour behaviour;
+    behaviour.initGraph();
+
+    SequentialTaskGraphController taskGraphExecutor;
+    taskGraphExecutor.setTaskGraph(behaviour.getTaskGraph());
+    taskGraphExecutor.init();
+    taskGraphExecutor.execute();
+
+    EXPECT_EQ(true, behaviour.nodeHasRun);
 }
 
 TEST(LambdaBehaviourTest, TestLambdaUpdate)

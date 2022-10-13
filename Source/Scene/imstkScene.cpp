@@ -190,9 +190,9 @@ Scene::buildTaskGraph()
         }
         for (const auto& comp : ent->getComponents())
         {
-            if (auto taskBehaviour = std::dynamic_pointer_cast<TaskBehaviour>(comp))
+            if (auto taskBehaviour = std::dynamic_pointer_cast<SceneTaskBehaviour>(comp))
             {
-                taskBehaviour->initGraphEdges();
+                taskBehaviour->initGraph();
             }
         }
     }
@@ -214,7 +214,7 @@ Scene::buildTaskGraph()
         }
         for (const auto& comp : ent->getComponents())
         {
-            if (auto taskBehaviour = std::dynamic_pointer_cast<TaskBehaviour>(comp))
+            if (auto taskBehaviour = std::dynamic_pointer_cast<SceneTaskBehaviour>(comp))
             {
                 std::shared_ptr<TaskGraph> taskGraph = taskBehaviour->getTaskGraph();
                 if (taskGraph != nullptr)

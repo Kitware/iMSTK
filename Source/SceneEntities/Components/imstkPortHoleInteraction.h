@@ -26,7 +26,7 @@ class TaskNode;
 /// Alternatively a physical setup can be used when the hardware, space, and
 /// registration is available.
 ///
-class PortHoleInteraction : public TaskBehaviour
+class PortHoleInteraction : public SceneTaskBehaviour
 {
 public:
     PortHoleInteraction(const std::string& name = "PortHoleInteraction");
