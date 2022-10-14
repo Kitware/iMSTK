@@ -49,17 +49,6 @@ public class PbdCloth
             viewer.setActiveScene(scene);
             viewer.setWindowTitle("SPH Fluid");
             viewer.setSize(1920, 1080);
-            VTKTextStatusManager statusManager = viewer.getTextStatusManager();
-            statusManager.setStatusFontSize(VTKTextStatusManager.StatusType.Custom, 30);
-            statusManager.setStatusFontColor(VTKTextStatusManager.StatusType.Custom, Color.Red);
-
-            Utils.connectKeyEvent(viewer, Utils.VTKViewer_getPostUpdate_cb,
-                (KeyEvent e) =>
-                {
-                    statusManager.setCustomStatus(
-                        "Number of particles: " + fluidObj.getSphModel().getCurrentState().getNumParticles().ToString() +
-                        "\nNumber of Solids: " + solids.Length);
-                });
 
             // Setup a scene manager to advance the scene
             SceneManager sceneManager = new SceneManager("Scene Manager");

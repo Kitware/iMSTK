@@ -121,12 +121,12 @@ public class PbdCloth
                     if (indexToShow != -1)
                     {
                         // Hide all models
-                        for (uint i = 0; i < 4; i++)
+                        for (int i = 0; i < 4; i++)
                         {
                             collisionObj.getVisualModel(i).hide();
                         }
                         // Show the selected one
-                        VisualModel visualModel = collisionObj.getVisualModel((uint)indexToShow);
+                        VisualModel visualModel = collisionObj.getVisualModel((int)indexToShow);
                         visualModel.show();
                         collisionObj.setCollidingGeometry(visualModel.getGeometry());
 
