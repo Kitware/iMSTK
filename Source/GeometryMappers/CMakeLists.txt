@@ -25,4 +25,5 @@ imstk_add_library( GeometryMappers
 #-----------------------------------------------------------------------------
 if( ${PROJECT_NAME}_BUILD_TESTING )
   add_subdirectory( Testing )
+  add_subdirectory( VisualTesting )
 endif()
