@@ -47,6 +47,10 @@ if(CMAKE_PROJECT_NAME STREQUAL "iMSTK")
   set(Haply_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 endif()
 
+if (WIN32 AND MSVC_VERSION LESS_EQUAL 1930)
+  message(FATAL_ERROR "iMSTK only works with Haply HardwareAPI 0.0.5, this version of Haply only works with MSVC version 1930 (vs2022) or greater")
+endif()
+
 if(WIN32)
   set(lib_ext "lib")
   set(bin_ext "dll")
