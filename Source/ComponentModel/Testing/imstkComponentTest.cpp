@@ -37,7 +37,13 @@ public:
 class TestBehaviour : public Behaviour<double>
 {
 public:
-    TestBehaviour(const std::string& name = "TestBehaviour") : Behaviour<double>(name) { }
+    TestBehaviour() : Behaviour<double>("TestBehaviour") { }
+    TestBehaviour(const bool useTaskGraph) : Behaviour<double>(useTaskGraph, "TestBehaviour"),
+        testNode(std::make_shared<TaskNode>(std::bind(&TestBehaviour::updateFunc, this), "TestNode"))
+    {
+        m_taskGraph->addNode(testNode);
+    }
+
     ~TestBehaviour() override = default;
 
     void update(const double&) { updated = true; }
@@ -45,18 +51,6 @@ public:
 
     bool updated       = false;
     bool visualUpdated = false;
-};
-
-class TestTaskBehaviour : public TaskBehaviour<double>
-{
-public:
-    TestTaskBehaviour(const std::string& name = "TestTaskBehaviour") : TaskBehaviour<double>(name),
-        testNode(std::make_shared<TaskNode>(std::bind(&TestTaskBehaviour::updateFunc, this), "TestNode"))
-    {
-        m_taskGraph->addNode(testNode);
-    }
-
-    ~TestTaskBehaviour() override = default;
 
     void updateFunc()
     {
@@ -113,10 +107,10 @@ TEST(BehaviourTest, TestUpdate)
     EXPECT_EQ(true, behaviour.visualUpdated);
 }
 
-TEST(TaskBehaviourTest, TestGraphUpdate)
+TEST(BehaviourTest, TestTaskGraphUpdate)
 {
-    TestTaskBehaviour behaviour;
-    behaviour.initGraph();
+    TestBehaviour behaviour(true);
+    behaviour.initTaskGraphEdges();
 
     SequentialTaskGraphController taskGraphExecutor;
     taskGraphExecutor.setTaskGraph(behaviour.getTaskGraph());

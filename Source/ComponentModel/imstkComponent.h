@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "imstkLogger.h"
 #include "imstkMacros.h"
 #include "imstkTaskGraph.h"
 
@@ -66,45 +67,38 @@ protected:
 /// A template is used here for UpdateInfo to keep the ComponentModel
 /// library more general and separable. UpdateInfo could be anything
 /// you need from outside to update the component, this would generally
-/// be your own struct or just a single primitive such as double deltatime
+/// be your own struct or just a single primitive such as double timestep
+///
+/// A subclass may provide a m_taskGraph. When present it allows a behaviour
+/// to introduce computational steps inbetween computational steps of other
+/// TaskGraph enabled objects in the scene. For instance, inbetween a physics
+/// pipeline step.
 ///
 template<typename UpdateInfo>
 class Behaviour : public Component
 {
 protected:
     Behaviour(const std::string& name = "Behaviour") : Component(name) { }
+    Behaviour(const bool useTaskGraph, const std::string& name = "Behaviour") : Component(name)
+    {
+        if (useTaskGraph)
+        {
+            m_taskGraph = std::make_shared<TaskGraph>();
+        }
+    }
 
 public:
     ~Behaviour() override = default;
 
     virtual void update(const UpdateInfo& imstkNotUsed(updateData)) { }
     virtual void visualUpdate(const UpdateInfo& imstkNotUsed(updateData)) { }
-};
-
-///
-/// \class TaskBehaviour
-///
-/// \brief Defines a behaviour that also can also schedule TaskGraph functions.
-/// It's pipeline can also be "joined"/combined with other TaskGraphs. Nodes
-/// shared between two graphs are combined.
-///
-template<typename UpdateInfo>
-class TaskBehaviour : public Behaviour<UpdateInfo>
-{
-protected:
-    TaskBehaviour(const std::string& name = "TaskBehaviour") : Behaviour<UpdateInfo>(name),
-        m_taskGraph(std::make_shared<TaskGraph>())
-    {
-    }
-
-public:
-    ~TaskBehaviour() override = default;
 
     ///
     /// \brief Setup the edges/connections of the TaskGraph
     ///
-    void initGraph()
+    void initTaskGraphEdges()
     {
+        CHECK(m_taskGraph != nullptr) << "Tried to setup task graph edges but no TaskGraph exists";
         m_taskGraph->clearEdges();
         initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
     }
@@ -115,7 +109,7 @@ protected:
     ///
     /// \brief Setup the edges/connections of the TaskGraph
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) = 0;
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) { }
 
     std::shared_ptr<TaskGraph> m_taskGraph = nullptr;
 };
@@ -127,8 +121,7 @@ protected:
 /// that resides in the scene. It makes the assumption that all
 /// components used are updated with a double for deltaTime/time passed.
 ///
-using SceneBehaviour     = Behaviour<double>;
-using SceneTaskBehaviour = TaskBehaviour<double>;
+using SceneBehaviour = Behaviour<double>;
 
 ///
 /// \brief A SceneBehaviour that can update via a lambda function

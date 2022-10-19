@@ -16,7 +16,7 @@
 
 namespace imstk
 {
-PortHoleInteraction::PortHoleInteraction(const std::string& name) : TaskBehaviour(name),
+PortHoleInteraction::PortHoleInteraction(const std::string& name) : SceneBehaviour(true, name),
     m_portConstraint(std::make_shared<PbdRigidLineToPointConstraint>())
 {
     m_portHoleHandleNode = std::make_shared<TaskNode>([&]()
