@@ -33,7 +33,7 @@
 
 using namespace imstk;
 
-#define USE_TWO_HAPTIC_DEVICES
+//#define USE_TWO_HAPTIC_DEVICES
 
 #ifndef USE_TWO_HAPTIC_DEVICES
 #include "imstkDummyClient.h"

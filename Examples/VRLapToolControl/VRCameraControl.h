@@ -22,7 +22,8 @@ using namespace imstk;
 /// \class VRCameraControl
 ///
 /// \brief Defines a control scheme to move the camera with joysticks.
-/// Left joystick look, right joystick move, a,b up/down
+/// Relative to world space with Y up.
+/// Left joystick look/rotate around Y, right joystick move along XZ, a,b up/down along Y
 ///
 class VRCameraControl : public DeviceControl
 {
@@ -32,7 +33,7 @@ public:
 
 public:
     ///
-    /// \brief Get/Set how fast the camera translates
+    /// \brief Get/Set how fast the camera translates along XZ plane
     ///@{
     double getTranslateSpeedScale() const { return m_translateSpeedScale; }
     void setTranslateSpeedScale(const double translateSpeedScale)
@@ -43,7 +44,7 @@ public:
     ///@}
 
     ///
-    /// \brief Get/Set how fast the camera rotates
+    /// \brief Get/Set how fast the camera rotates around Y
     ///@{
     double getRotateSpeedScale() const { return m_rotateSpeedScale; }
     void setRotateSpeedScale(const double rotateSpeedScale)
@@ -54,7 +55,7 @@ public:
     ///@}
 
     ///
-    /// \brief Get/Set the vertical speed
+    /// \brief Get/Set the vertical speed, how fast you move along Y
     ///@{
     double getVerticalSpeedScale() const { return m_translateVerticalSpeedScale; }
     void setVerticalSpeedScale(double verticalSpeed)
@@ -65,7 +66,7 @@ public:
     ///@}
 
     ///
-    /// \brief Get/Set the device that can translate the camera
+    /// \brief Get/Set the device that can translate the camera along XZ
     ///@{
     std::shared_ptr<OpenVRDeviceClient> getTranslateDevice() const { return m_translateDevice; }
     void setTranslateDevice(std::shared_ptr<OpenVRDeviceClient> translateDevice)
@@ -76,7 +77,7 @@ public:
     ///@}
 
     ///
-    /// \brief Get/Set the device that can rotate the camera
+    /// \brief Get/Set the device that can rotate the camera around Y
     ///@{
     std::shared_ptr<OpenVRDeviceClient> getRotateDevice() const { return m_rotateDevice; }
     void setRotateDevice(std::shared_ptr<OpenVRDeviceClient> rotateDevice)

@@ -71,16 +71,6 @@ VRCameraControl::update(const double& dt)
 
         const Mat4d inverseFinalView = finalView.inverse();
 
-        static int counter = 0;
-        if (counter % 500 == 0)
-        {
-            //printf("x: %f, %f, %f\n", rotation.col(0)[0], rotation.col(0)[1], rotation.col(0)[2]);
-            //printf("y: %f, %f, %f\n", rotation.col(1)[0], rotation.col(1)[1], rotation.col(1)[2]);
-            const Vec3d viewDir = inverseFinalView.col(2).head<3>();
-            printf("z: %f, %f, %f\n", viewDir[0], viewDir[1], viewDir[2]);
-        }
-        counter++;
-
         /*Matrix3f n;
         n = AngleAxisf(ea[0], Vector3f::UnitX())
             * AngleAxisf(ea[1], Vector3f::UnitY())
