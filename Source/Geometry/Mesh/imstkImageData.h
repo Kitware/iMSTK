@@ -172,7 +172,7 @@ protected:
     Vec3d m_origin     = Vec3d(0.0, 0.0, 0.0);
     Vec3d m_spacing    = Vec3d(1.0, 1.0, 1.0);
     Vec3d m_invSpacing = Vec3d(1.0, 1.0, 1.0);
-    Vec6d m_bounds;
+    Vec6d m_bounds     = Vec6d::Zero();
 
 private:
     ImageData* cloneImplementation() const;
