@@ -14,7 +14,8 @@
 
 namespace imstk
 {
-LevelSetModel::LevelSetModel()
+LevelSetModel::LevelSetModel() :
+    m_config(std::make_shared<LevelSetModelConfig>())
 {
     // If given an image data
     m_validGeometryTypes = { "ImageData", "SignedDistanceField" };
