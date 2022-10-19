@@ -13,7 +13,6 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -36,52 +35,45 @@ using namespace imstk;
 std::shared_ptr<LevelSetDeformableObject>
 makeLevelsetObj(const std::string& name)
 {
-    imstkNew<LevelSetDeformableObject> levelsetObj(name);
+    auto levelSetObj = std::make_shared<LevelSetDeformableObject>(name);
 
     // Setup the Geometry (read dragon mesh)
     auto dragonSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     //dragonSurfMesh->translate(position, Geometry::TransformType::ApplyToData);
-    imstkNew<SurfaceMeshDistanceTransform> computeSdf;
-    computeSdf->setInputMesh(dragonSurfMesh);
-    computeSdf->setDimensions(50, 50, 50);
-    computeSdf->update();
-    std::shared_ptr<ImageData> initLvlsetImage = computeSdf->getOutputImage();
-
-    // Setup the Parameters
-    imstkNew<LevelSetModelConfig> lvlsetConfig;
-    lvlsetConfig->m_sparseUpdate = false;
-    lvlsetConfig->m_dt = 0.003;
-    lvlsetConfig->m_constantVelocity = -1.0;
+    SurfaceMeshDistanceTransform computeSdf;
+    computeSdf.setInputMesh(dragonSurfMesh);
+    computeSdf.setDimensions(50, 50, 50);
+    computeSdf.update();
+    std::shared_ptr<ImageData> initLvlsetImage = computeSdf.getOutputImage();
 
     // Setup the Model
-    imstkNew<LevelSetModel> dynamicalModel;
+    auto dynamicalModel = std::make_shared<LevelSetModel>();
+    dynamicalModel->getConfig()->m_sparseUpdate = false;
+    dynamicalModel->getConfig()->m_dt = 0.003;
+    dynamicalModel->getConfig()->m_constantVelocity = -1.0;
     dynamicalModel->setModelGeometry(initLvlsetImage);
-    dynamicalModel->configure(lvlsetConfig);
 
     // Setup the VisualModel
-    imstkNew<VisualModel> visualModel;
+    auto visualModel = levelSetObj->addComponent<VisualModel>();
     visualModel->setGeometry(initLvlsetImage);
-    imstkNew<VolumeRenderMaterial> mat;
-    {
-        vtkNew<vtkColorTransferFunction> color;
-        color->AddRGBPoint(0.0, 0.0, 0.0, 1.0);
-        color->AddRGBPoint(-0.01, 0.0, 0.0, 1.0);
-        mat->getVolumeProperty()->SetColor(color);
-        vtkNew<vtkPiecewiseFunction> opacity;
-        opacity->AddPoint(0.0, 0.0);
-        opacity->AddPoint(-0.01, 1.0);
-        mat->getVolumeProperty()->SetScalarOpacity(opacity);
-        mat->getVolumeProperty()->SetInterpolationTypeToLinear();
-        mat->getVolumeProperty()->ShadeOn();
-    }
+    auto                             mat = std::make_shared<VolumeRenderMaterial>();
+    vtkNew<vtkColorTransferFunction> color;
+    color->AddRGBPoint(0.0, 0.0, 0.0, 1.0);
+    color->AddRGBPoint(-0.01, 0.0, 0.0, 1.0);
+    mat->getVolumeProperty()->SetColor(color);
+    vtkNew<vtkPiecewiseFunction> opacity;
+    opacity->AddPoint(0.0, 0.0);
+    opacity->AddPoint(-0.01, 1.0);
+    mat->getVolumeProperty()->SetScalarOpacity(opacity);
+    mat->getVolumeProperty()->SetInterpolationTypeToLinear();
+    mat->getVolumeProperty()->ShadeOn();
     visualModel->setRenderMaterial(mat);
 
     // Setup the Object
-    levelsetObj->addVisualModel(visualModel);
-    levelsetObj->setPhysicsGeometry(initLvlsetImage);
-    levelsetObj->setDynamicalModel(dynamicalModel);
+    levelSetObj->setPhysicsGeometry(initLvlsetImage);
+    levelSetObj->setDynamicalModel(dynamicalModel);
 
-    return levelsetObj;
+    return levelSetObj;
 }
 
 ///
@@ -94,44 +86,41 @@ main()
     Logger::startLogger();
 
     // Setup the scene
-    imstkNew<Scene> scene("LevelsetScene");
-    {
-        std::shared_ptr<LevelSetDeformableObject> obj = makeLevelsetObj("DragonLevelset");
-        scene->addSceneObject(obj);
+    auto scene = std::make_shared<Scene>("LevelSetExample");
 
-        // Light (white)
-        imstkNew<DirectionalLight> whiteLight;
-        whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-        whiteLight->setIntensity(1.0);
-        scene->addLight("whitelight", whiteLight);
+    scene->addSceneObject(makeLevelsetObj("DragonLevelset"));
 
-        // Adjust camera
-        scene->getActiveCamera()->setPosition(0.0, 10.0, -10.0);
-    }
+    // Light (white)
+    auto whiteLight = std::make_shared<DirectionalLight>();
+    whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    whiteLight->setIntensity(1.0);
+    scene->addLight("whitelight", whiteLight);
+
+    // Adjust camera
+    scene->getActiveCamera()->setPosition(0.0, 10.0, -10.0);
 
     // Run the simulation
-    {
-        // Setup a viewer to render in its own thread
-        imstkNew<VTKViewer> viewer;
-        viewer->setActiveScene(scene);
 
-        // Setup a scene manager to advance the scene in its own thread
-        imstkNew<SceneManager> sceneManager;
-        sceneManager->setActiveScene(scene);
-        sceneManager->pause();
+    // Setup a viewer to render in its own thread
+    auto viewer = std::make_shared<VTKViewer>();
+    viewer->setActiveScene(scene);
 
-        imstkNew<SimulationManager> driver;
-        driver->addModule(viewer);
-        driver->addModule(sceneManager);
-        driver->setDesiredDt(0.01);
+    // Setup a scene manager to advance the scene in its own thread
+    auto sceneManager = std::make_shared<SceneManager>();
+    sceneManager->setActiveScene(scene);
+    sceneManager->pause();
 
-        // Add default mouse and keyboard controls to the viewer
-        std::shared_ptr<Entity> mouseAndKeyControls =
-            SimulationUtils::createDefaultSceneControl(driver);
-        scene->addSceneObject(mouseAndKeyControls);
+    auto driver = std::make_shared<SimulationManager>();
+    driver->addModule(viewer);
+    driver->addModule(sceneManager);
+    driver->setDesiredDt(0.01);
 
-        driver->start();
-    }
+    // Add default mouse and keyboard controls to the viewer
+    std::shared_ptr<Entity> mouseAndKeyControls =
+        SimulationUtils::createDefaultSceneControl(driver);
+    scene->addSceneObject(mouseAndKeyControls);
+
+    driver->start();
 
     return 0;
 }
