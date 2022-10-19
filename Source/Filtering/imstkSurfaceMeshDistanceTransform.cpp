@@ -80,7 +80,7 @@ isNeighborhoodEquivalent(const Vec3i& pt, const Vec3i& dim, const float val, con
 // Narrow band is WIP, it works but is slow
 static void
 computeNarrowBandedDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh> surfMesh, const int dilateSize,
-                      vtkSmartPointer<vtkImplicitPolyDataDistance> distFunc)
+                      const double tolerance)
 {
     // Rasterize a mask from the polygon
     std::shared_ptr<SurfaceMeshImageMask> imageMask = std::make_shared<SurfaceMeshImageMask>();
@@ -88,10 +88,18 @@ computeNarrowBandedDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<Surf
     imageMask->setReferenceImage(imageData);
     imageMask->update();
 
-    DataArray<float>&  inputScalars  = *std::dynamic_pointer_cast<DataArray<float>>(imageMask->getOutputImage()->getScalars());
-    float*             inputImgPtr   = inputScalars.getPointer();
-    DataArray<double>& outputScalars = *std::dynamic_pointer_cast<DataArray<double>>(imageData->getScalars());
-    double*            outputImgPtr  = outputScalars.getPointer();
+    auto               inputScalarsPtr  = std::dynamic_pointer_cast<DataArray<float>>(imageMask->getOutputImage()->getScalars());
+    DataArray<float>&  inputScalars     = *inputScalarsPtr;
+    float*             inputImgPtr      = inputScalars.getPointer();
+    auto               outputScalarsPtr = std::dynamic_pointer_cast<DataArray<double>>(imageData->getScalars());
+    DataArray<double>& outputScalars    = *outputScalarsPtr;
+    double*            outputImgPtr     = outputScalars.getPointer();
+
+    // Separate polygons used to avoid race conditions
+    vtkSmartPointer<vtkPolyData>                 inputPolyData = GeometryUtils::copyToVtkPolyData(surfMesh);
+    vtkSmartPointer<vtkImplicitPolyDataDistance> distFunc      = vtkSmartPointer<vtkImplicitPolyDataDistance>::New();
+    distFunc->SetInput(inputPolyData);
+    distFunc->SetTolerance(tolerance);
 
     std::fill_n(outputImgPtr, outputScalars.size(), 10000.0);
 
@@ -132,21 +140,28 @@ computeNarrowBandedDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<Surf
 }
 
 static void
-computeFullDT(std::shared_ptr<ImageData> imageData, vtkSmartPointer<vtkImplicitPolyDataDistance> distFunc)
+computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh> surfMesh, const double tolerance)
 {
     // Get the optimal number of threads
-    const size_t numThreads = ParallelUtils::ThreadManager::getThreadPoolSize();
+    const int numThreads = static_cast<int>(ParallelUtils::ThreadManager::getThreadPoolSize());
 
     const Vec3i& dim     = imageData->getDimensions();
     const Vec3d  spacing = imageData->getSpacing();
     const Vec3d  shift   = imageData->getOrigin() + spacing * 0.5;
 
-    DataArray<double>& scalars = *static_cast<DataArray<double>*>(imageData->getScalars().get());
+    auto               scalarsPtr = std::dynamic_pointer_cast<DataArray<double>>(imageData->getScalars());
+    DataArray<double>& scalars    = *scalarsPtr.get();
 
-    // Split the work up along z using thread count to avoid making too many octtrees (may not be most optimal)
-    ParallelUtils::parallelFor(numThreads, [&](const size_t& i)
+    // Split the work up along z
+    ParallelUtils::parallelFor(numThreads, [&](const int& i)
         {
-            for (int z = static_cast<int>(i); z < dim[2]; z += static_cast<int>(numThreads))
+            // Separate polygons used to avoid race conditions
+            vtkSmartPointer<vtkPolyData> inputPolyData = GeometryUtils::copyToVtkPolyData(surfMesh);
+            vtkSmartPointer<vtkImplicitPolyDataDistance> distFunc = vtkSmartPointer<vtkImplicitPolyDataDistance>::New();
+            distFunc->SetInput(inputPolyData);
+            distFunc->SetTolerance(tolerance);
+
+            for (int z = i; z < dim[2]; z += numThreads)
             {
                 int j = z * dim[0] * dim[1];
                 for (int y = 0; y < dim[1]; y++)
@@ -159,21 +174,6 @@ computeFullDT(std::shared_ptr<ImageData> imageData, vtkSmartPointer<vtkImplicitP
                 }
             }
         });
-
-    // Sequential implementation
-    /*
-    int j = 0;
-    for (int z = 0; z < dim[2]; z++)
-    {
-        for (int y = 0; y < dim[1]; y++)
-        {
-            for (int x = 0; x < dim[0]; x++, j++)
-            {
-                double pos[3] = { x * spacing[0] + shift[0], y * spacing[1] + shift[1], z * spacing[2] + shift[2] };
-                scalars[j] = distFunc->FunctionValue(pos);
-            }
-        }
-    }*/
 }
 
 SurfaceMeshDistanceTransform::SurfaceMeshDistanceTransform()
@@ -266,17 +266,14 @@ SurfaceMeshDistanceTransform::requestUpdate()
     /* StopWatch timer;
      timer.start();*/
 
-    setupDistFunc();
-    m_distFunc->SetTolerance(m_Tolerance);
-
     if (m_NarrowBanded)
     {
         computeNarrowBandedDT(outputImageData, inputSurfaceMesh, m_DilateSize,
-            m_distFunc);
+            m_Tolerance);
     }
     else
     {
-        computeFullDT(outputImageData, m_distFunc);
+        computeFullDT(outputImageData, inputSurfaceMesh, m_Tolerance);
     }
 
     //printf("time: %f\n", timer.getTimeElapsed());
