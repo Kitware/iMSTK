@@ -180,6 +180,7 @@
 %shared_ptr(imstk::TrackingDeviceControl)
 %shared_ptr(imstk::SceneObjectController)
 %shared_ptr(imstk::RigidObjectController)
+%shared_ptr(imstk::PbdObjectController)
 
 /*
  * Needle

@@ -174,6 +174,7 @@
 #include "imstkTrackingDeviceControl.h"
 #include "imstkSceneObjectController.h"
 #include "imstkRigidObjectController.h"
+#include "imstkPbdObjectController.h"
 
 /*
  * Needle
@@ -453,6 +454,7 @@ namespace std
 %include "../../Controllers/imstkTrackingDeviceControl.h"
 %include "../../Controllers/imstkSceneObjectController.h"
 %include "../../Controllers/imstkRigidObjectController.h"
+%include "../../Controllers/imstkPbdObjectController.h"
 
 /*
  * Needle
