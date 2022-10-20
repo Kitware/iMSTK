@@ -168,6 +168,11 @@ public:
     void computeVertexTangents();
 
     ///
+    /// \brief compute the barycentric weights of a given point in 3D space for a given the triangle
+    ///
+    Vec3d computeBarycentricWeights(const int tetId, const Vec3d& pos) const override;
+
+    ///
     /// \brief Rewire the node order and triangle connectivity to optimize for memory layout
     ///  The intended use is for large meshes that doesn't fit into CPU/GPU memory.
     ///  \todo Further optimization to find a 1-d uninterrupted sub-graph at each iteration.

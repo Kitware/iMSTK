@@ -268,6 +268,17 @@ SurfaceMesh::computeVertexTangents()
     }
 }
 
+Vec3d
+SurfaceMesh::computeBarycentricWeights(const int triId, const Vec3d& pos) const
+{
+    const VecDataArray<double, 3>& vertices   = *m_vertexPositions;
+    const VecDataArray<int, 3>&    triIndices = *m_indices;
+    return baryCentric(pos,
+        vertices[triIndices[triId][0]],
+        vertices[triIndices[triId][1]],
+        vertices[triIndices[triId][2]]);
+}
+
 void
 SurfaceMesh::optimizeForDataLocality()
 {
