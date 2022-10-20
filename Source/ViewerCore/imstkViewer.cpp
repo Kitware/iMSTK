@@ -17,7 +17,9 @@ Viewer::Viewer(std::string name) :
     m_debugEntity(std::make_shared<Entity>("DebugEntity")),
     m_debugCamera(std::make_shared<Camera>()),
     m_screenCapturer(nullptr),
-    m_config(std::make_shared<ViewerConfig>())
+    m_config(std::make_shared<ViewerConfig>()),
+    m_lastFpsUpdate(std::chrono::high_resolution_clock::now()),
+    m_lastFps(60.0)
 {
     // Set the preferred execution type
     m_executionType = ExecutionType::SEQUENTIAL;
@@ -60,6 +62,17 @@ Viewer::getMouseDevice() const
 {
     LOG(FATAL) << "No MouseDeviceClient implemented for Viewer";
     return nullptr;
+}
+
+void
+Viewer::updateFps()
+{
+    // Update framerate value display
+    auto now = std::chrono::high_resolution_clock::now();
+    m_visualFps = 1e6 / static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(now - m_pre).count());
+    m_visualFps = 0.1 * m_visualFps + 0.9 * m_lastFps;
+    m_lastFps   = m_visualFps;
+    m_pre       = now;
 }
 
 void

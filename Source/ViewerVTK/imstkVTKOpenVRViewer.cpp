@@ -15,10 +15,11 @@
 
 #include "imstkVtkOpenVRRenderWindowInteractorImstk.h"
 
+#include <chrono>
 #include <vtkMatrix4x4.h>
+#include <vtkOpenVRModel.h>
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRRenderWindow.h>
-#include <vtkOpenVRModel.h>
 
 namespace imstk
 {
@@ -70,6 +71,11 @@ VTKOpenVRViewer::setActiveScene(std::shared_ptr<Scene> scene)
     if (!m_rendererMap.count(m_activeScene))
     {
         m_rendererMap[m_activeScene] = std::make_shared<VTKRenderer>(m_activeScene, true);
+        // If we already ran past init, then init it here
+        if (m_init)
+        {
+            m_rendererMap[m_activeScene]->initialize();
+        }
     }
 
     // Cast to VTK renderer
@@ -77,7 +83,6 @@ VTKOpenVRViewer::setActiveScene(std::shared_ptr<Scene> scene)
 
     // Set renderer to renderWindow
     m_vtkRenderWindow->AddRenderer(vtkRenderer);
-
     m_vtkInteractorStyle->SetCurrentRenderer(vtkRenderer);
 }
 
@@ -127,6 +132,23 @@ VTKOpenVRViewer::setRenderingMode(const Renderer::Mode mode)
 
     // Setup renderer
     this->getActiveRenderer()->setMode(mode, true);
+
+    if (mode == Renderer::Mode::Debug)
+    {
+        if (!m_activeScene->hasEntity(m_debugEntity))
+        {
+            m_activeScene->addSceneObject(m_debugEntity);
+        }
+    }
+    else if (mode == Renderer::Mode::Simulation)
+    {
+        if (m_activeScene->hasEntity(m_debugEntity))
+        {
+            m_activeScene->removeSceneObject(m_debugEntity);
+        }
+    }
+
+    updateModule();
 }
 
 void
@@ -145,6 +167,9 @@ VTKOpenVRViewer::initModule()
     {
         return false;
     }
+
+    std::shared_ptr<VTKRenderer> ren = getActiveVtkRenderer();
+    ren->initialize();
 
     // VR interactor doesn't support timers, here we throw timer event every update
     // another option would be to conform VTKs VR interactor
@@ -192,20 +217,26 @@ VTKOpenVRViewer::updateModule()
         return;
     }
 
-    // For the VR view we can't supply the a camera in the normal sense
-    // we need to pre multiply a "user view"
+    // For the VR view we can't supply the camera with a view matrix only
+    // Final view = HMD view * user view
+    // User view is the usual view set by the user
+    // HMD view is the hardware view from the headset pose
+    // This means the view in Camera is not the final
+    //
+    // Inconvienent as some code may want to use that
     std::shared_ptr<Camera> cam  = getActiveScene()->getActiveCamera();
     const Mat4d&            view = cam->getView();
     setPhysicalToWorldTransform(view);
 
-    // Update Camera
-    // \todo: No programmatic control over VR camera currently
-    //renderer->updateSceneCamera(getActiveScene()->getCamera());
+    // Update cam (copy back hmd info)
+    ren->updateCamera();
 
     // Call visual update on every scene object
     getActiveScene()->updateVisuals(getDt());
     // Update all the rendering delegates
     ren->updateRenderDelegates();
+
+    updateFps();
 
     // Render
     //m_vtkRenderWindow->GetInteractor()->Render();

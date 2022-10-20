@@ -33,9 +33,6 @@ public:
 
     IMSTK_TYPE_NAME(VTKOpenVRViewer)
 
-    ///
-    /// \brief Destructor
-    ///
     void setRenderingMode(const Renderer::Mode mode) override;
 
     ///
@@ -44,14 +41,13 @@ public:
     void setActiveScene(std::shared_ptr<Scene> scene) override;
 
     ///
-    /// \brief Transform to physical space
-    ///
-    void setPhysicalToWorldTransform(const Mat4d& physicalToWorldMatrix);
-
-    ///
-    /// \brief Get transform to physical space
-    ///
+    /// \brief Get/Set Transform to physical space
+    /// This would be useful if you needed a permanant space transformation such as
+    /// meters to mm
+    ///@{
     Mat4d getPhysicalToWorldTransform();
+    void setPhysicalToWorldTransform(const Mat4d& physicalToWorldMatrix);
+    ///@}
 
     ///
     /// \brief Get one of the device clients for VR

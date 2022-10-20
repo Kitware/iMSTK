@@ -139,6 +139,11 @@ public:
     double getVisualFps() const { return m_visualFps; }
 
 protected:
+    ///
+    /// \brief Called before render to push back and measure time
+    ///
+    void updateFps();
+
     void updateModule() override;
 
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
@@ -149,8 +154,13 @@ protected:
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///< Screen shot utility
 
     std::shared_ptr<ViewerConfig> m_config;
-    int m_infoLevel = 0; ///< Info level
+    int m_infoLevel = 0;                                            ///< Info level
+
+    std::chrono::high_resolution_clock::time_point m_pre;           ///< time point pre-rendering
+    std::chrono::high_resolution_clock::time_point m_post;          ///< time point post-rendering
+    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///< time point for last framerate display update
 
     double m_visualFps = 0.0;
+    double m_lastFps   = 0.0;
 };
 } // namespace imstk

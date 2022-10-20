@@ -1,7 +1,11 @@
 {
   "actions": [
     {
-      "name": "/actions/vtk/in/TriggerPressed",
+      "name": "/actions/vtk/in/LeftTriggerPressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/RightTriggerPressed",
       "type": "boolean"
     },
     {
@@ -13,7 +17,11 @@
       "type": "vector2"
     },
     {
-      "name": "/actions/vtk/in/GripPressed",
+      "name": "/actions/vtk/in/LeftGripPressed",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/RightGripPressed",
       "type": "boolean"
     },
     {
@@ -53,10 +61,12 @@
   ],
   "localization": [
     {
-      "/actions/vtk/in/GripPressed": "Grip Pressed",
+      "/actions/vtk/in/LeftGripPressed": "Left Grip Pressed",
+      "/actions/vtk/in/RightGripPressed": "Right Grip Pressed",
       "/actions/vtk/in/RightGripMovement": "Right Grip Movement",
       "/actions/vtk/in/LeftGripMovement": "Left Grip Movement",
-      "/actions/vtk/in/TriggerPressed": "Trigger Pressed",
+      "/actions/vtk/in/LeftTriggerPressed": "Left Trigger Pressed",
+      "/actions/vtk/in/RightTriggerPressed": "Right Trigger Pressed",
       "/actions/vtk/in/Button0Pressed": "Button0 Pressed",
       "/actions/vtk/in/Button1Pressed": "Button1 Pressed",
       "/actions/vtk/in/Button2Pressed": "Button2 Pressed",

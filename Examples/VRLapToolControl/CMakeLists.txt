@@ -6,27 +6,28 @@
 #
 ###########################################################################
 
-
 if (iMSTK_USE_RENDERING_VTK)
-  project(Example-OpenVRController)
+  project(Example-VRLapToolControl)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME}
-    OpenVRControllerExample.cpp
-    CameraOpenVRControl.h
-    CameraOpenVRControl.cpp)
+    VRLapToolControlExample.cpp
+    VRCameraControl.h
+    VRCameraControl.cpp
+    )
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/OpenVR)
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples)
 
   #-----------------------------------------------------------------------------
   # Link libraries to executable
   #-----------------------------------------------------------------------------
   target_link_libraries(${PROJECT_NAME}
     SimulationManager
-    ViewerVTK)
+    ViewerVTK
+    )
 endif()

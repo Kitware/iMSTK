@@ -511,6 +511,11 @@ PbdObjectGrasping::addPickConstraints()
         }
     }
 
+    if (m_constraints.size() == 0)
+    {
+        m_isGrasping = false;
+    }
+
     m_collisionConstraints.reserve(m_constraints.size());
     for (int i = 0; i < m_constraints.size(); i++)
     {

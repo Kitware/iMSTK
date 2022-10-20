@@ -74,6 +74,11 @@ public:
     Mat4d& getView() { return m_view; }
 
     ///
+    /// \brief Get the HMD view, supplied when using VR
+    ///
+    const Mat4d& getHMDView() const { return m_hmdView; }
+
+    ///
     /// \brief Get camera projection matrix, this matrix will
     /// be identity until first render is done
     /// \returns Camera projection matrix reference
@@ -244,5 +249,8 @@ protected:
     Vec3d m_position   = Vec3d(0.0, 0.0, 0.0); ///< camera position
     Vec3d m_focalPoint = -Vec3d::UnitZ();      ///< camera focal point
     Vec3d m_viewUp     = Vec3d::UnitY();       ///< camera up vector
+
+    // Optional extra view for VR, which gives (HMD_view * m_view)
+    Mat4d m_hmdView = Mat4d::Identity();
 };
 } // namespace imstk
