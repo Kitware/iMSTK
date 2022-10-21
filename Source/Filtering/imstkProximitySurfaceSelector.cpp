@@ -81,13 +81,11 @@ ProximitySurfaceSelector::requestUpdate()
     std::shared_ptr<VecDataArray<int, 3>>    meshACellsPtr = meshA->getCells();
     VecDataArray<int, 3>&                    meshACells    = *meshACellsPtr;
     std::shared_ptr<VecDataArray<double, 3>> meshAVertsPtr = meshA->getVertexPositions();
-    VecDataArray<double, 3>&                 meshAVerts    = *meshAVertsPtr;
 
     // Unpack cell and vertex data for meshB
     std::shared_ptr<VecDataArray<int, 3>>    meshBCellsPtr = meshB->getCells();
     VecDataArray<int, 3>&                    meshBCells    = *meshBCellsPtr;
     std::shared_ptr<VecDataArray<double, 3>> meshBVertsPtr = meshB->getVertexPositions();
-    VecDataArray<double, 3>&                 meshBVerts    = *meshBVertsPtr;
 
     // Check if the center of a triangle on Mesh A is within maxDistance of any
     // triangle center on mesh B.  If so, add to list. Also, vice versa.
