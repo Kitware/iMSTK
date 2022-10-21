@@ -69,10 +69,21 @@ protected:
 /// you need from outside to update the component, this would generally
 /// be your own struct or just a single primitive such as double timestep
 ///
-/// A subclass may provide a m_taskGraph. When present it allows a behaviour
-/// to introduce computational steps inbetween computational steps of other
-/// TaskGraph enabled objects in the scene. For instance, inbetween a physics
-/// pipeline step.
+/// Behaviour provides two ways of defining system logic.
+/// 1. Updating via the normal update & visualUpdate function
+/// 2. Updating via a TaskGraph definition.
+/// Both may be used together but normal update's will always occur after
+/// all TaskGraph updates. Additionally visualUpdate's occur before renders.
+///
+/// All TaskGraph's are joined into the Scene TaskGraph. If any node is shared
+/// (occurs in both) between TaskGraphs, they will join/become one. For example,
+/// graphA could define A->B->C. Whilst graphB defines D->B->E. B is shared.
+/// This allows one to order calls easily and extensibly.
+///
+/// When dealing with large amounts of similar components one may also consider
+/// making a separate system of components. For example, how the Scene is a system of
+/// Components. The Renderer is a system of VisualModel components. This is more
+/// cache friendly.
 ///
 template<typename UpdateInfo>
 class Behaviour : public Component
@@ -107,9 +118,12 @@ public:
 
 protected:
     ///
-    /// \brief Setup the edges/connections of the TaskGraph
+    /// \brief Setup the edges/connections of the TaskGraph\
+    //     /// \param source, first node of the graph (does no function)
+    /// \param sink, last node of the graph (does no function)
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) { }
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> imstkNotUsed(source),
+                                std::shared_ptr<TaskNode> imstkNotUsed(sink)) { }
 
     std::shared_ptr<TaskGraph> m_taskGraph = nullptr;
 };
