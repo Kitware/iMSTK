@@ -6,11 +6,9 @@
 
 #pragma once
 
+#include "imstkLogger.h"
 #include "imstkMacros.h"
-
-#include <functional>
-#include <memory>
-#include <string>
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
@@ -69,19 +67,65 @@ protected:
 /// A template is used here for UpdateInfo to keep the ComponentModel
 /// library more general and separable. UpdateInfo could be anything
 /// you need from outside to update the component, this would generally
-/// be your own struct or just a single primitive such as double deltatime
+/// be your own struct or just a single primitive such as double timestep
+///
+/// Behaviour provides two ways of defining system logic.
+/// 1. Updating via the normal update & visualUpdate function
+/// 2. Updating via a TaskGraph definition.
+/// Both may be used together but normal update's will always occur after
+/// all TaskGraph updates. Additionally visualUpdate's occur before renders.
+///
+/// All TaskGraph's are joined into the Scene TaskGraph. If any node is shared
+/// (occurs in both) between TaskGraphs, they will join/become one. For example,
+/// graphA could define A->B->C. Whilst graphB defines D->B->E. B is shared.
+/// This allows one to order calls easily and extensibly.
+///
+/// When dealing with large amounts of similar components one may also consider
+/// making a separate system of components. For example, how the Scene is a system of
+/// Components. The Renderer is a system of VisualModel components. This is more
+/// cache friendly.
 ///
 template<typename UpdateInfo>
 class Behaviour : public Component
 {
 protected:
     Behaviour(const std::string& name = "Behaviour") : Component(name) { }
+    Behaviour(const bool useTaskGraph, const std::string& name = "Behaviour") : Component(name)
+    {
+        if (useTaskGraph)
+        {
+            m_taskGraph = std::make_shared<TaskGraph>();
+        }
+    }
 
 public:
     ~Behaviour() override = default;
 
     virtual void update(const UpdateInfo& imstkNotUsed(updateData)) { }
     virtual void visualUpdate(const UpdateInfo& imstkNotUsed(updateData)) { }
+
+    ///
+    /// \brief Setup the edges/connections of the TaskGraph
+    ///
+    void initTaskGraphEdges()
+    {
+        CHECK(m_taskGraph != nullptr) << "Tried to setup task graph edges but no TaskGraph exists";
+        m_taskGraph->clearEdges();
+        initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
+    }
+
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
+
+protected:
+    ///
+    /// \brief Setup the edges/connections of the TaskGraph\
+    //     /// \param source, first node of the graph (does no function)
+    /// \param sink, last node of the graph (does no function)
+    ///
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> imstkNotUsed(source),
+                                std::shared_ptr<TaskNode> imstkNotUsed(sink)) { }
+
+    std::shared_ptr<TaskGraph> m_taskGraph = nullptr;
 };
 
 ///

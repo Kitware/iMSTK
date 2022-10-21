@@ -6,6 +6,8 @@
 
 #include "imstkComponent.h"
 #include "imstkEntity.h"
+#include "imstkSequentialTaskGraphController.h"
+#include "imstkTaskNode.h"
 
 #include <gtest/gtest.h>
 
@@ -20,6 +22,8 @@ public:
     {
     }
 
+    ~TestComponent() override = default;
+
 protected:
     void init() override
     {
@@ -33,13 +37,36 @@ public:
 class TestBehaviour : public Behaviour<double>
 {
 public:
-    TestBehaviour(const std::string& name = "TestBehaviour") : Behaviour<double>(name) { }
+    TestBehaviour() : Behaviour<double>("TestBehaviour") { }
+    TestBehaviour(const bool useTaskGraph) : Behaviour<double>(useTaskGraph, "TestBehaviour"),
+        testNode(std::make_shared<TaskNode>(std::bind(&TestBehaviour::updateFunc, this), "TestNode"))
+    {
+        m_taskGraph->addNode(testNode);
+    }
+
+    ~TestBehaviour() override = default;
 
     void update(const double&) { updated = true; }
     void visualUpdate(const double&) { visualUpdated = true; }
 
     bool updated       = false;
     bool visualUpdated = false;
+
+    void updateFunc()
+    {
+        nodeHasRun = true;
+    }
+
+protected:
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override
+    {
+        m_taskGraph->addEdge(source, testNode);
+        m_taskGraph->addEdge(testNode, sink);
+    }
+
+public:
+    std::shared_ptr<TaskNode> testNode;
+    bool nodeHasRun = false;
 };
 } // namespace
 
@@ -78,6 +105,19 @@ TEST(BehaviourTest, TestUpdate)
 
     behaviour.visualUpdate(0.0);
     EXPECT_EQ(true, behaviour.visualUpdated);
+}
+
+TEST(BehaviourTest, TestTaskGraphUpdate)
+{
+    TestBehaviour behaviour(true);
+    behaviour.initTaskGraphEdges();
+
+    SequentialTaskGraphController taskGraphExecutor;
+    taskGraphExecutor.setTaskGraph(behaviour.getTaskGraph());
+    taskGraphExecutor.init();
+    taskGraphExecutor.execute();
+
+    EXPECT_EQ(true, behaviour.nodeHasRun);
 }
 
 TEST(LambdaBehaviourTest, TestLambdaUpdate)

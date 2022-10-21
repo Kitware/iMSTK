@@ -4,14 +4,14 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkSceneObject.h"
+#include "imstkComponent.h"
 #include "imstkMath.h"
 
 #pragma once
 
 namespace imstk
 {
-class LineMesh;
+class Geometry;
 class PbdConstraint;
 class PbdObject;
 class PbdRigidLineToPointConstraint;
@@ -20,19 +20,47 @@ class TaskNode;
 ///
 /// \class PortHoleInteraction
 ///
-/// \brief Defines the behaviour to constrain a PbdObject needle to a fixed
-/// port hole location.
+/// \brief Defines the behaviour to constrain a PbdObject LineMesh or Capsule
+/// to a fixed port hole location.
 ///
-class PortHoleInteraction : public SceneObject
+/// Alternatively a physical setup can be used when the hardware, space, and
+/// registration is available.
+///
+class PortHoleInteraction : public SceneBehaviour
 {
 public:
-    PortHoleInteraction(std::shared_ptr<PbdObject> toolObject);
+    PortHoleInteraction(const std::string& name = "PortHoleInteraction");
 
+    void init() override;
+
+    ///
+    /// \brief Get/Set the tool to be constrained
+    ///@{
+    std::shared_ptr<PbdObject> getTool() const { return m_toolObject; }
+    void setTool(std::shared_ptr<PbdObject> toolObject);
+    ///@}
+
+    ///
+    /// \brief Get/Set the tool geometry used for constraining
+    ///@{
+    std::shared_ptr<Geometry> getToolGeometry() const { m_toolGeom; }
     void setToolGeometry(std::shared_ptr<Geometry> toolGeom);
-    void setPortHoleLocation(const Vec3d& portHoleLocation) { m_portHoleLocation = portHoleLocation; }
+    ///@}
 
+    ///
+    /// \brief Get/Set the port hole location to constrain the geometry too
+    ///@{
+    const Vec3d& getPortHoleLocation() const { return m_portHoleLocation; }
+    void setPortHoleLocation(const Vec3d& portHoleLocation) { m_portHoleLocation = portHoleLocation; }
+    ///@}
+
+    ///
+    /// \brief Get/Set constraint compliance. This effects how stiff the constraint
+    /// of the line to
+    ///@{
     double getCompliance() const { return m_compliance; }
     void setCompliance(const double compliance) { m_compliance = compliance; }
+///@}
 
 protected:
     void handlePortHole();
