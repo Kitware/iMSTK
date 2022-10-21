@@ -7,6 +7,7 @@ imstk_add_library( Filtering
   H_FILES
     imstkAppendMesh.h
     imstkCleanMesh.h
+    imstkConnectiveStrandGenerator.h
     imstkExtractEdges.h
     imstkFastMarch.h
     imstkImageDistanceTransform.h
@@ -30,6 +31,7 @@ imstk_add_library( Filtering
   CPP_FILES
     imstkAppendMesh.cpp
     imstkCleanMesh.cpp
+    imstkConnectiveStrandGenerator.cpp
     imstkExtractEdges.cpp
     imstkFastMarch.cpp
     imstkImageDistanceTransform.cpp
