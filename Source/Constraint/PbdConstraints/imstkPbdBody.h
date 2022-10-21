@@ -148,6 +148,18 @@ struct PbdBody
             * angularVelocities = { angularVelocity };
         }
 
+        Vec3d getRigidPosition()
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            return vertices->at(0);
+        }
+
+        Quatd getRigidOrientation()
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            return orientations->at(0);
+        }
+
     public:
         int bodyHandle; ///< Id in the system
         Type bodyType = Type::DEFORMABLE;
