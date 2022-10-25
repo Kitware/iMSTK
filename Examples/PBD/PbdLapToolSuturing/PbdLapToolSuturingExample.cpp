@@ -358,21 +358,24 @@ main()
             }
         });
 
-    auto portHoleInteraction = std::make_shared<PortHoleInteraction>(rightToolObj);
+    // Add port holes
+    auto portHoleInteraction = rightToolObj->addComponent<PortHoleInteraction>();
+    portHoleInteraction->setTool(rightToolObj);
     portHoleInteraction->setPortHoleLocation(Vec3d(0.015, 0.092, -1.117));
     auto sphere = std::make_shared<Sphere>(Vec3d(0.015, 0.092, -1.117), 0.01);
-    portHoleInteraction->setVisualGeometry(sphere);
+    auto rightPortVisuals = rightToolObj->addComponent<VisualModel>();
+    rightPortVisuals->setGeometry(sphere);
     portHoleInteraction->setToolGeometry(rightToolObj->getCollidingGeometry());
     portHoleInteraction->setCompliance(0.000001);
-    scene->addInteraction(portHoleInteraction);
 
-    auto portHoleInteraction2 = std::make_shared<PortHoleInteraction>(leftToolObj);
+    auto portHoleInteraction2 = leftToolObj->addComponent<PortHoleInteraction>();
+    portHoleInteraction2->setTool(leftToolObj);
     portHoleInteraction2->setPortHoleLocation(Vec3d(-0.065, 0.078, -1.127));
     auto sphere2 = std::make_shared<Sphere>(Vec3d(-0.065, 0.078, -1.127), 0.01);
-    portHoleInteraction2->setVisualGeometry(sphere2);
+    auto leftPortVisuals = leftToolObj->addComponent<VisualModel>();
+    leftPortVisuals->setGeometry(sphere2);
     portHoleInteraction2->setToolGeometry(leftToolObj->getCollidingGeometry());
     portHoleInteraction2->setCompliance(0.000001);
-    scene->addInteraction(portHoleInteraction2);
 
     // Run the simulation
     {
