@@ -127,13 +127,14 @@ public:
             if (i->first == e.m_type)
             {
                 std::vector<Observer>& observers = i->second;
-                for (std::vector<Observer>::iterator j = observers.begin(); j != observers.end(); j++)
+                for (std::vector<Observer>::iterator j = observers.begin(); j != observers.end();)
                 {
                     // If function of observer does not exist, remove observer
                     if (j->second != nullptr)
                     {
                         // Call the function
                         j->second(ePtr.get());
+                        j++;
                     }
                     else
                     {
@@ -149,7 +150,7 @@ public:
             if (i->first == e.m_type)
             {
                 std::vector<Observer>& observers = i->second;
-                for (std::vector<Observer>::iterator j = observers.begin(); j != observers.end(); j++)
+                for (std::vector<Observer>::iterator j = observers.begin(); j != observers.end();)
                 {
                     // As long as the object exists
                     // Push to its queue, otherwise remove observer
@@ -159,6 +160,7 @@ public:
                         j->first->eventQueueLock.lock();
                         j->first->eventQueue.push_back(Command(j->second, ePtr));
                         j->first->eventQueueLock.unlock();
+                        j++;
                     }
                     else
                     {

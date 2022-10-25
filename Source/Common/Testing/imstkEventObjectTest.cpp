@@ -30,12 +30,24 @@ public:
     {
         postEvent(imstk::Event(SignalTwo()));
     }
+
+    ///
+    /// \brief Remove a specific observer on a specific sender function
+    ///
+    void dropObserver(const std::string& senderFuncName, int i)
+    {
+        // Find the vector of observers to this signal on this sender
+        auto iter = std::find_if(directObservers.begin(), directObservers.end(),
+            [senderFuncName](std::pair<std::string, std::vector<Observer>>& val) { return val.first == senderFuncName; });
+
+        // Drop the i'th one
+        iter->second[i].second = nullptr;
+    }
 };
 
 class MockReceiver : public imstk::EventObject
 {
 public:
-
     void receiverOne(imstk::Event*)
     {
         items.push_back(1);
@@ -179,4 +191,32 @@ TEST(imstkEventObjectTest, PointerQueuedForeachBackwards)
     r.rforeachEvent([&](Command c) { c.invoke(); });
 
     EXPECT_THAT(r.items, ElementsAre(2, 1));
+}
+
+TEST(imstkEventObjectTest, RemoveSingleObserver)
+{
+    MockSender   m;
+    MockReceiver r;
+
+    connect(&m, MockSender::SignalOne, &r, &MockReceiver::receiverOne);
+    connect(&m, MockSender::SignalOne, &r, &MockReceiver::receiverTwo);
+
+    // Invoke and handle
+    m.postOne();
+    r.doAllEvents();
+
+    EXPECT_EQ(2, r.items.size());
+
+    // Remove the middle observer
+    m.dropObserver(MockSender::SignalOne(), 0);
+
+    // Reset items
+    r.items.clear();
+
+    // Invoke and handle
+    m.postOne();
+    r.doAllEvents();
+
+    // Given that one observer was dropped only 1 should exist
+    EXPECT_EQ(1, r.items.size());
 }
