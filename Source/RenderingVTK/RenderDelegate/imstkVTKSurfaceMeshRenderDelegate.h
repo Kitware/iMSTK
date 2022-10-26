@@ -23,12 +23,12 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class VTKSurfaceMeshRenderDelegate
 ///
-/// \brief Surface mesh render delegate with VTK backend.
+/// \brief Delegates rendering of SurfaceMesh to VTK from VisualModel
 ///
 class VTKSurfaceMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKSurfaceMeshRenderDelegate();
     ~VTKSurfaceMeshRenderDelegate() override = default;
 
     ///
@@ -45,6 +45,8 @@ public:
 // to inform that this happened, if the actual buffer on the geometry is swapped then geometry
 // modified would instead be called
 protected:
+    void init() override;
+
     ///
     /// \brief Callback for when vertex values are modified
     ///

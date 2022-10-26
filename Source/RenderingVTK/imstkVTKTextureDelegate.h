@@ -14,8 +14,6 @@ class vtkTexture;
 
 namespace imstk
 {
-class VTKTextureDelegate;
-
 ///
 /// \class VTKTextureDelegate
 ///
@@ -24,7 +22,7 @@ class VTKTextureDelegate;
 class VTKTextureDelegate : public TextureDelegate
 {
 public:
-    VTKTextureDelegate(std::shared_ptr<Texture> texture);
+    VTKTextureDelegate();
     ~VTKTextureDelegate() override = default;
 
     ///
@@ -45,6 +43,8 @@ public:
     /// \returns VTK texture
     ///
     const std::string& getTextureName() const { return m_textureName; }
+
+    void initialize(std::shared_ptr<Texture> texture);
 
 protected:
     void textureModified(Event* e);

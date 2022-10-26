@@ -16,10 +16,16 @@
 
 namespace imstk
 {
-VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+VTKCylinderRenderDelegate::VTKCylinderRenderDelegate() :
     m_cylinderSource(vtkSmartPointer<vtkCylinderSource>::New())
 {
-    auto geometry = std::dynamic_pointer_cast<Cylinder>(visualModel->getGeometry());
+}
+
+void
+VTKCylinderRenderDelegate::init()
+{
+    auto geometry = std::dynamic_pointer_cast<Cylinder>(m_visualModel->getGeometry());
+    CHECK(geometry != nullptr) << "VTKCylinderRenderDelegate only works with Cylinder geometry";
 
     m_cylinderSource->SetCenter(0.0, 0.0, 0.0);
     m_cylinderSource->SetRadius(geometry->getRadius(Geometry::DataType::PreTransform));

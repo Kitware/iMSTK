@@ -19,11 +19,17 @@
 
 namespace imstk
 {
-VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate() :
     m_mesh(vtkSmartPointer<vtkUnstructuredGrid>::New()),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    auto geometry = std::static_pointer_cast<HexahedralMesh>(m_visualModel->getGeometry());
+}
+
+void
+VTKHexahedralMeshRenderDelegate::init()
+{
+    auto geometry = std::dynamic_pointer_cast<HexahedralMesh>(m_visualModel->getGeometry());
+    CHECK(geometry != nullptr) << "VTKHexahedralMeshRenderDelegate only works with HexahedralMesh geometry";
     m_vertices = geometry->getVertexPositions();
     m_indices  = geometry->getCells();
 
@@ -59,10 +65,14 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(geometry, &Geometry::modified, this, &VTKHexahedralMeshRenderDelegate::geometryModified);
+    queueConnect<Event>(geometry, &Geometry::modified,
+        std::static_pointer_cast<VTKHexahedralMeshRenderDelegate>(shared_from_this()),
+        &VTKHexahedralMeshRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKHexahedralMeshRenderDelegate::vertexDataModified);
+    queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified,
+        std::static_pointer_cast<VTKHexahedralMeshRenderDelegate>(shared_from_this()),
+        &VTKHexahedralMeshRenderDelegate::vertexDataModified);
 
     // Setup mapper
     {

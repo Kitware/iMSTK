@@ -15,12 +15,12 @@ namespace imstk
 ///
 /// \class VTKPlaneRenderDelegate
 ///
-/// \brief Plane object render delegate
+/// \brief Delegates rendering of Plane to VTK from VisualModel
 ///
 class VTKPlaneRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKPlaneRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKPlaneRenderDelegate();
     ~VTKPlaneRenderDelegate() override = default;
 
     ///
@@ -29,6 +29,8 @@ public:
     void processEvents() override;
 
 protected:
+    void init() override;
+
     vtkSmartPointer<vtkPlaneSource> m_planeSource;
 };
 } // namespace imstk

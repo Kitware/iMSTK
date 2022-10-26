@@ -43,7 +43,7 @@ class VTKRenderDelegate;
 ///
 class VTKRenderDelegate;
 
-class RenderDelegateObjectFactory : public ObjectFactory<std::shared_ptr<VTKRenderDelegate>, std::shared_ptr<VisualModel>>
+class RenderDelegateObjectFactory : public ObjectFactory<std::shared_ptr<VTKRenderDelegate>>
 {
 public:
     ///
@@ -55,7 +55,7 @@ public:
 /// \brief class for automatically registering a delegate
 /// \tparam T type of the delegate object to register
 template<typename T>
-using RenderDelegateRegistrar = SharedObjectRegistrar<VTKRenderDelegate, T, std::shared_ptr<VisualModel>>;
+using RenderDelegateRegistrar = SharedObjectRegistrar<VTKRenderDelegate, T>;
 
 #define IMSTK_REGISTER_RENDERDELEGATE(geomType, objType) RenderDelegateRegistrar<objType> _imstk_registerrenderdelegate ## geomType(#geomType);
 } // namespace imstk

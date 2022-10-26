@@ -13,7 +13,6 @@ if (iMSTK_USE_RENDERING_VTK)
   # Create executable
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME}
-    imstkMouseDeviceClient3D.h
     pbdStaticSutureExample.cpp
     NeedleInteraction.h
     NeedleInteraction.cpp

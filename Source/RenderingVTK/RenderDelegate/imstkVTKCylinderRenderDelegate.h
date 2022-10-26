@@ -15,12 +15,12 @@ namespace imstk
 ///
 /// \class VTKCylinderRenderDelegate
 ///
-/// \brief Cylinder object render delegate with VTK backend
+/// \brief Delegates rendering of Cylinders to VTK from VisualModel
 ///
 class VTKCylinderRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKCylinderRenderDelegate();
     ~VTKCylinderRenderDelegate() override = default;
 
     ///
@@ -29,6 +29,8 @@ public:
     void processEvents() override;
 
 protected:
+    void init() override;
+
     vtkSmartPointer<vtkCylinderSource> m_cylinderSource;
 };
 } // namespace imstk

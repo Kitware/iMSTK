@@ -15,12 +15,12 @@ namespace imstk
 ///
 /// \class VTKOrientedCubeRenderDelegate
 ///
-/// \brief Oriented box render delegate with VTK backend
+/// \brief Delegates rendering of OrientedBox to VTK from VisualModel
 ///
 class VTKOrientedCubeRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKOrientedCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKOrientedCubeRenderDelegate();
     ~VTKOrientedCubeRenderDelegate() override = default;
 
     ///
@@ -29,6 +29,8 @@ public:
     void processEvents() override;
 
 protected:
+    void init() override;
+
     vtkSmartPointer<vtkCubeSource> m_cubeSource;
 };
 } // namespace imstk

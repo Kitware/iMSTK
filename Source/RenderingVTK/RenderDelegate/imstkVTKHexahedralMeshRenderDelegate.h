@@ -22,12 +22,12 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class VTKHexahedralMeshRenderDelegate
 ///
-/// \brief Hexahedral mesh render delegate with VTK backend
+/// \brief Delegates rendering of HexahedralMesh to VTK from VisualModel
 ///
 class VTKHexahedralMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKHexahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKHexahedralMeshRenderDelegate();
     ~VTKHexahedralMeshRenderDelegate() override = default;
 
     ///
@@ -40,6 +40,8 @@ public:
     void vertexDataModified(Event* e);
 
 protected:
+    void init() override;
+
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
     std::shared_ptr<VecDataArray<int, 8>>    m_indices;
 

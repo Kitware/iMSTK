@@ -18,14 +18,19 @@
 
 using namespace imstk;
 
-VTKChartRenderDelegate::VTKChartRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-    VTKRenderDelegate(visualModel),
+VTKChartRenderDelegate::VTKChartRenderDelegate() :
     m_table(vtkSmartPointer<vtkTable>::New()),
     m_chart(vtkSmartPointer<vtkChartXY>::New()),
     m_chartActor(vtkSmartPointer<vtkContextActor>::New()),
     m_contextScene(vtkSmartPointer<vtkContextScene>::New())
 {
-    auto chartVisualModel = std::dynamic_pointer_cast<ChartVisualModel>(visualModel);
+}
+
+void
+VTKChartRenderDelegate::init()
+{
+    auto chartVisualModel = std::dynamic_pointer_cast<ChartVisualModel>(m_visualModel);
+    CHECK(chartVisualModel != nullptr) << "VTKChartRenderDelegate only works with ChartVisualModel VisualModel";
 
     m_chart->SetAutoSize(false);
     const Vec4d& bounds = chartVisualModel->getViewBounds();

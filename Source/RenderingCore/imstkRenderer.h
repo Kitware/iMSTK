@@ -38,7 +38,7 @@ struct RendererConfig
 ///
 /// \brief Rendering window manager and contains user API to configure the rendering with various backends
 ///
-class Renderer : public EventObject
+class Renderer : public EventObject, public std::enable_shared_from_this<Renderer>
 {
 public:
     ///

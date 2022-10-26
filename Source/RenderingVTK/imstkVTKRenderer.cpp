@@ -165,7 +165,8 @@ VTKRenderer::initialize()
     }
 
     // Observe changes to the scene
-    connect<Event>(m_scene, &Scene::modified, this, &VTKRenderer::sceneModifed);
+    connect<Event>(m_scene, &Scene::modified,
+        std::static_pointer_cast<VTKRenderer>(shared_from_this()), &VTKRenderer::sceneModifed);
 
     {
         // Add the benchmarking chart
@@ -468,7 +469,9 @@ VTKRenderer::addEntity(std::shared_ptr<Entity> entity)
     m_renderedVisualModels[entity] = std::unordered_set<std::shared_ptr<VisualModel>>();
     entityModified(entity);
     // Observe changes on this SceneObject
-    connect<Event>(entity, &Entity::modified, this, &VTKRenderer::entityModified);
+    connect<Event>(entity, &Entity::modified,
+        std::static_pointer_cast<VTKRenderer>(shared_from_this()),
+        &VTKRenderer::entityModified);
 }
 
 void
@@ -476,6 +479,7 @@ VTKRenderer::addVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr
 {
     // Create a delegate for the visual m odel
     auto renderDelegate = m_renderDelegates[visualModel] = VTKRenderDelegate::makeDelegate(visualModel);
+    renderDelegate->initialize(visualModel);
     if (renderDelegate == nullptr)
     {
         LOG(WARNING) << "error: Could not create render delegate for '"
@@ -525,7 +529,8 @@ VTKRenderer::removeEntity(std::shared_ptr<Entity> entity)
     m_renderedVisualModels.erase(entity);
 
     // Stop observing changes on the scene object
-    disconnect(entity, this, &SceneObject::modified);
+    disconnect(entity, std::static_pointer_cast<VTKRenderer>(shared_from_this()),
+        &SceneObject::modified);
     return iter;
 }
 

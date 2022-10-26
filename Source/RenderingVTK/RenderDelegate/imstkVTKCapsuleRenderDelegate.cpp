@@ -15,10 +15,16 @@
 
 namespace imstk
 {
-VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate() :
     m_capsuleSource(vtkSmartPointer<vtkCapsuleSource>::New())
 {
-    auto geometry = std::dynamic_pointer_cast<Capsule>(visualModel->getGeometry());
+}
+
+void
+VTKCapsuleRenderDelegate::init()
+{
+    auto geometry = std::dynamic_pointer_cast<Capsule>(m_visualModel->getGeometry());
+    CHECK(geometry != nullptr) << "VTKCapsuleRenderDelegate only works with Capsule geometry";
 
     m_capsuleSource->SetCenter(0.0, 0.0, 0.0);
     m_capsuleSource->SetRadius(geometry->getRadius(Geometry::DataType::PreTransform));

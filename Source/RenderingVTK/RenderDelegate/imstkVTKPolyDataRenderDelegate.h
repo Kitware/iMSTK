@@ -21,8 +21,6 @@ public:
     ~VTKPolyDataRenderDelegate() override = default;
 
 protected:
-    VTKPolyDataRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKRenderDelegate(visualModel) { }
-
     ///
     /// \brief Updates the actor and mapper properties from the currently set VisualModel
     ///

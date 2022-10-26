@@ -13,14 +13,12 @@
 
 namespace imstk
 {
-VTKTextRenderDelegate::VTKTextRenderDelegate(std::shared_ptr<VisualModel> visualModel)
-    : VTKRenderDelegate(visualModel),
-    m_textActor(vtkSmartPointer<vtkActor2D>::New()),
-    m_textMapper(vtkSmartPointer<vtkTextMapper>::New())
+void
+VTKTextRenderDelegate::init()
 {
-    auto textVisualModel = std::dynamic_pointer_cast<TextVisualModel>(visualModel);
-    m_visualModel = visualModel;
+    auto textVisualModel = std::dynamic_pointer_cast<TextVisualModel>(m_visualModel);
 
+    m_textMapper = vtkSmartPointer<vtkTextMapper>::New();
     m_textMapper->SetInput(textVisualModel->getText().c_str());
 
     // Pull properties from textVisualModel
@@ -36,6 +34,7 @@ VTKTextRenderDelegate::VTKTextRenderDelegate(std::shared_ptr<VisualModel> visual
     txtprop->SetVerticalJustificationToCentered();
 
     // Setup Text Actor
+    m_textActor = vtkSmartPointer<vtkActor2D>::New();
     m_textActor->SetMapper(m_textMapper);
     m_textActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
     m_textActor->GetPositionCoordinate()->SetValue(0.5, 0.5);

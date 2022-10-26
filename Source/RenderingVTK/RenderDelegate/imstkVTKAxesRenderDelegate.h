@@ -8,7 +8,6 @@
 
 #include "imstkVTKRenderDelegate.h"
 
-class vtkSphereSource;
 class vtkAxesActor;
 
 namespace imstk
@@ -16,12 +15,12 @@ namespace imstk
 ///
 /// \class VTKAxesRenderDelegate
 ///
-/// \brief Axes render delegate with VTK backend
+/// \brief Delegates rendering of Axes to VTK from VisualModel
 ///
 class VTKAxesRenderDelegate : public VTKRenderDelegate
 {
 public:
-    VTKAxesRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKAxesRenderDelegate();
     ~VTKAxesRenderDelegate() override = default;
 
     ///
@@ -31,6 +30,8 @@ public:
     void updateRenderProperties() override { }
 
 protected:
+    void init() override;
+
     vtkSmartPointer<vtkAxesActor> m_axesActor;
 };
 } // namespace imstk

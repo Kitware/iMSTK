@@ -25,7 +25,9 @@ SimulationManager::start()
     // exit message happens all modules need to stop
     for (auto module : m_modules)
     {
-        connect<Event>(module, &Module::end, this, &SimulationManager::requestStop);
+        connect<Event>(module, &Module::end,
+            std::static_pointer_cast<SimulationManager>(shared_from_this()),
+            &SimulationManager::requestStop);
     }
 
     // Initialization

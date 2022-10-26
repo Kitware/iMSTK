@@ -19,12 +19,18 @@
 
 namespace imstk
 {
-VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate() :
     m_mesh(vtkSmartPointer<vtkUnstructuredGrid>::New()),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
     m_cellArray(vtkSmartPointer<vtkCellArray>::New())
 {
-    auto geometry = std::static_pointer_cast<TetrahedralMesh>(visualModel->getGeometry());
+}
+
+void
+VTKTetrahedralMeshRenderDelegate::init()
+{
+    auto geometry = std::dynamic_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
+    CHECK(geometry != nullptr) << "VTKTetrahedralMeshRenderDelegate only works with TetrahedralMesh geometry";
 
     // Create vtkUnstructuredGrid vtkPoints
     m_mappedVertexArray->SetNumberOfComponents(3);
@@ -46,7 +52,9 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(geometry, &Geometry::modified, this, &VTKTetrahedralMeshRenderDelegate::geometryModified);
+    queueConnect<Event>(geometry, &Geometry::modified,
+        std::static_pointer_cast<VTKTetrahedralMeshRenderDelegate>(shared_from_this()),
+        &VTKTetrahedralMeshRenderDelegate::geometryModified);
 
     // Setup the mapper
     {
@@ -155,11 +163,15 @@ VTKTetrahedralMeshRenderDelegate::setVertexBuffer(std::shared_ptr<VecDataArray<d
         if (m_vertices != nullptr)
         {
             // stop observing its changes
-            disconnect(m_vertices, this, &VecDataArray<double, 3>::modified);
+            disconnect(m_vertices,
+                std::static_pointer_cast<VTKTetrahedralMeshRenderDelegate>(shared_from_this()),
+                &VecDataArray<double, 3>::modified);
         }
         // Set new buffer and observe
         m_vertices = vertices;
-        queueConnect<Event>(m_vertices, &VecDataArray<double, 3>::modified, this, &VTKTetrahedralMeshRenderDelegate::vertexDataModified);
+        queueConnect<Event>(m_vertices, &VecDataArray<double, 3>::modified,
+            std::static_pointer_cast<VTKTetrahedralMeshRenderDelegate>(shared_from_this()),
+            &VTKTetrahedralMeshRenderDelegate::vertexDataModified);
     }
 
     // Couple the buffer
@@ -179,11 +191,15 @@ VTKTetrahedralMeshRenderDelegate::setIndexBuffer(std::shared_ptr<VecDataArray<in
         if (m_indices != nullptr)
         {
             // stop observing its changes
-            disconnect(m_indices, this, &VecDataArray<int, 4>::modified);
+            disconnect(m_indices,
+                std::static_pointer_cast<VTKTetrahedralMeshRenderDelegate>(shared_from_this()),
+                &VecDataArray<int, 4>::modified);
         }
         // Set new buffer and observe
         m_indices = indices;
-        queueConnect<Event>(m_indices, &VecDataArray<int, 4>::modified, this, &VTKTetrahedralMeshRenderDelegate::indexDataModified);
+        queueConnect<Event>(m_indices, &VecDataArray<int, 4>::modified,
+            std::static_pointer_cast<VTKTetrahedralMeshRenderDelegate>(shared_from_this()),
+            &VTKTetrahedralMeshRenderDelegate::indexDataModified);
     }
 
     // Copy the buffer

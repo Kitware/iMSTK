@@ -22,12 +22,12 @@ class Module;
 ///
 /// \brief Defines the control of modules
 ///
-class ModuleDriver : public EventObject
+class ModuleDriver : public EventObject, public std::enable_shared_from_this<ModuleDriver>
 {
 protected:
     ModuleDriver() = default;
 public:
-    virtual ~ModuleDriver() override = default;
+    ~ModuleDriver() override = default;
 
 public:
     virtual void start() = 0;

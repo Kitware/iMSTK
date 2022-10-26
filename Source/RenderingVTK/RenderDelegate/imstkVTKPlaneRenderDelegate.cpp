@@ -15,9 +15,17 @@
 
 namespace imstk
 {
-VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+VTKPlaneRenderDelegate::VTKPlaneRenderDelegate() :
     m_planeSource(vtkSmartPointer<vtkPlaneSource>::New())
 {
+}
+
+void
+VTKPlaneRenderDelegate::init()
+{
+    auto geometry = std::dynamic_pointer_cast<Plane>(m_visualModel->getGeometry());
+    CHECK(geometry != nullptr) << "VTKPlaneRenderDelegate only works with Plane geometry";
+
     // Setup mapper
     {
         vtkNew<vtkPolyDataMapper> mapper;

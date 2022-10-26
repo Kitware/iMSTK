@@ -14,13 +14,16 @@
 
 namespace imstk
 {
-VTKAxesRenderDelegate::VTKAxesRenderDelegate(
-    std::shared_ptr<VisualModel> visualModel) :
-    VTKRenderDelegate(visualModel)
+VTKAxesRenderDelegate::VTKAxesRenderDelegate() :
+    m_axesActor(nullptr)
 {
-    auto model = std::dynamic_pointer_cast<AxesModel>(visualModel);
-    CHECK(model != nullptr)
-        << "VTKAxesRenderDelegate created with non-AxesModel";
+}
+
+void
+VTKAxesRenderDelegate::init()
+{
+    auto model = std::dynamic_pointer_cast<AxesModel>(m_visualModel);
+    CHECK(model != nullptr) << "VTKAxesRenderDelegate only works with AxesModel VisualModel";
 
     const Mat4d transform =
         (mat4dTranslate(model->getPosition()) *

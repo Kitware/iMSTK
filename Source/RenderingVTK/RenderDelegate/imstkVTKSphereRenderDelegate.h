@@ -15,12 +15,12 @@ namespace imstk
 ///
 /// \class VTKSphereRenderDelegate
 ///
-/// \brief Sphere object render delegate with VTK backend
+/// \brief Delegates rendering of Sphere to VTK from VisualModel
 ///
 class VTKSphereRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKSphereRenderDelegate();
     ~VTKSphereRenderDelegate() override = default;
 
     ///
@@ -29,6 +29,8 @@ public:
     void processEvents() override;
 
 protected:
+    void init() override;
+
     vtkSmartPointer<vtkSphereSource> m_sphereSource;
 };
 } // namespace imstk

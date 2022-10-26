@@ -14,12 +14,12 @@ namespace imstk
 ///
 /// \class VTKTextRenderDelegate
 ///
-/// \brief Render delegate for text on the screen
+/// \brief Delegates rendering of text to VTK from TextVisualModel
 ///
 class VTKTextRenderDelegate : public VTKRenderDelegate
 {
 public:
-    VTKTextRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKTextRenderDelegate() = default;
     ~VTKTextRenderDelegate() override = default;
 
     ///
@@ -30,6 +30,8 @@ public:
     void updateRenderProperties() override;
 
 protected:
+    void init() override;
+
     vtkSmartPointer<vtkActor2D>    m_textActor;
     vtkSmartPointer<vtkTextMapper> m_textMapper;
 };

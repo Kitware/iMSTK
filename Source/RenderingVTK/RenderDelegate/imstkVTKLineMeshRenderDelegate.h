@@ -22,12 +22,12 @@ class AbstractDataArray;
 ///
 /// \class VTKLineMeshRenderDelegate
 ///
-/// \brief
+/// \brief Delegates rendering of LineMesh to VTK from VisualModel
 ///
 class VTKLineMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKLineMeshRenderDelegate();
     ~VTKLineMeshRenderDelegate() override = default;
 
     ///
@@ -39,6 +39,8 @@ public:
 // to inform that this happened, if the actual buffer on the geometry is swapped then geometry
 // modified would instead be called
 protected:
+    void init() override;
+
     ///
     /// \brief Callback for when vertex values are modified
     ///

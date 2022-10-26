@@ -15,10 +15,16 @@
 
 namespace imstk
 {
-VTKOrientedCubeRenderDelegate::VTKOrientedCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+VTKOrientedCubeRenderDelegate::VTKOrientedCubeRenderDelegate() :
     m_cubeSource(vtkSmartPointer<vtkCubeSource>::New())
 {
-    auto geometry = std::dynamic_pointer_cast<OrientedBox>(visualModel->getGeometry());
+}
+
+void
+VTKOrientedCubeRenderDelegate::init()
+{
+    auto geometry = std::dynamic_pointer_cast<OrientedBox>(m_visualModel->getGeometry());
+    CHECK(geometry != nullptr) << "VTKOrientedCubeRenderDelegate only works with OrientedBox geometry";
 
     const Vec3d& extents = geometry->getExtents(Geometry::DataType::PreTransform);
     m_cubeSource->SetCenter(0.0, 0.0, 0.0);

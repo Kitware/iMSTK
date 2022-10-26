@@ -29,7 +29,7 @@ class VisualModel;
 ///
 /// \brief Base class for VTK render delegates
 ///
-class VTKRenderDelegate : public EventObject
+class VTKRenderDelegate : public EventObject, public std::enable_shared_from_this<VTKRenderDelegate>
 {
 public:
     ~VTKRenderDelegate() override = default;
@@ -38,6 +38,11 @@ public:
     /// \brief Instantiate proper render delegate
     ///
     static std::shared_ptr<VTKRenderDelegate> makeDelegate(std::shared_ptr<VisualModel> visualModel);
+
+    ///
+    /// \brief Setup the VTKRenderDelegate with given model
+    ///
+    void initialize(std::shared_ptr<VisualModel> model);
 
     ///
     /// \brief Return geometry to render
@@ -71,7 +76,9 @@ public:
     virtual void updateRenderProperties() = 0;
 
 protected:
-    VTKRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKRenderDelegate();
+
+    virtual void init() = 0;
 
     ///
     /// \brief Callback for updating render properties

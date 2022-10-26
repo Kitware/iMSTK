@@ -21,13 +21,13 @@ namespace imstk
 class RenderDelegateMock : public VTKRenderDelegate
 {
 public:
-    RenderDelegateMock(std::shared_ptr<VisualModel> visualModel) : VTKRenderDelegate(visualModel)
-    {
-    }
-
+    RenderDelegateMock() = default;
     ~RenderDelegateMock() override = default;
 
     void updateRenderProperties() override { }
+
+protected:
+    void init() override { }
 };
 
 TEST(imstkRenderDelegateFactoryTest, CustomRenderDelegate)
