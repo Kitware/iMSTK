@@ -80,7 +80,6 @@ unpackGraspedSide(std::shared_ptr<PbdObject>   obj,
         }
 
         // If the user tries to pick
-        PointwiseMap* map = nullptr;
         if (geomMap != nullptr)
         {
             if (auto ptMap = std::dynamic_pointer_cast<PointwiseMap>(geomMap))
@@ -557,7 +556,7 @@ PbdObjectGrasping::addBodyToBodyConstraint(
         supportPt,
         grasperBodyId,
         supportPt,
-        0.0, m_compliance);
+        0.0, compliance);
     m_constraints.push_back(constraint);
     auto angularConstraint = std::make_shared<PbdAngularDistanceConstraint>();
     angularConstraint->initConstraintOffset(model->getBodies(),
@@ -582,7 +581,7 @@ PbdObjectGrasping::addPointToBodyConstraint(
         grasperBodyId,
         pointOnBody,
         graspedParticleId,
-        0.0, m_compliance);
+        0.0, compliance);
     m_constraints.push_back(constraint);
 }
 

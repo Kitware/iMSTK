@@ -86,7 +86,6 @@ PortHoleInteraction::handlePortHole()
         const Vec3d  capsule1Axis       = capsule->getOrientation().toRotationMatrix().col(1).normalized();
         const double capsule1HalfLength = capsule->getLength() * 0.5;
         const Vec3d  diff1 = capsule1Axis * capsule1HalfLength;
-        const double capsule1Radius = capsule->getRadius();
 
         p = capsule1Pos - diff1;
         q = capsule1Pos + diff1;

@@ -36,7 +36,7 @@ public:
     void projectConstraint(PbdState& bodies,
                            const double dt, const SolverType& type) override;
 
-    virtual Vec3d computeRelativeVelocity(PbdState& bodies) { return Vec3d::Zero(); }
+    virtual Vec3d computeRelativeVelocity(PbdState& imstkNotUsed(bodies)) { return Vec3d::Zero(); }
 
     ///
     /// \brief Get the support point r/the difference to the contact point
