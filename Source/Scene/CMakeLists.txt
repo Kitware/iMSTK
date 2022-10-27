@@ -34,6 +34,7 @@ imstk_add_library( Scene
     Common
     CollisionDetection
     CollisionHandling
+    DynamicalModels
     SceneEntities
     Filtering
   )

@@ -126,6 +126,7 @@
 #include "imstkSceneObject.h"
 #include "imstkCollidingObject.h"
 #include "imstkDynamicObject.h"
+#include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdObject.h"
 #include "imstkVisualModel.h"
 #include "imstkCamera.h"
@@ -407,6 +408,7 @@ namespace std
 %include "../../SceneEntities/Objects/imstkSceneObject.h";
 %include "../../SceneEntities/Objects/imstkCollidingObject.h";
 %include "../../SceneEntities/Objects/imstkDynamicObject.h";
+%include "../../SceneEntities/Objects/imstkPbdConnectiveTissueConstraintGenerator.h";
 %include "../../SceneEntities/Objects/imstkPbdObject.h";
 %include "../../SceneEntities/Objects/imstkFeDeformableObject.h";
 %include "../../SceneEntities/Objects/imstkRigidObject2.h";
