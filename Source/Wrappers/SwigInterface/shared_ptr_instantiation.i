@@ -130,6 +130,7 @@
 %shared_ptr(imstk::SceneObject)
 %shared_ptr(imstk::CollidingObject)
 %shared_ptr(imstk::DynamicObject)
+%shared_ptr(imstk::PbdConnectiveTissueConstraintGenerator)
 %shared_ptr(imstk::PbdObject)
 %shared_ptr(imstk::FeDeformableObject)
 %shared_ptr(imstk::SphObject)

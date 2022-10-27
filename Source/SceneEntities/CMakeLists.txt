@@ -23,6 +23,7 @@ set(H_FILES
   Objects/imstkDynamicObject.h
   Objects/imstkFeDeformableObject.h
   Objects/imstkLevelSetDeformableObject.h
+  Objects/imstkPbdConnectiveTissueConstraintGenerator.h
   Objects/imstkPbdObject.h
   Objects/imstkRigidObject2.h
   Objects/imstkSceneObject.h
@@ -44,6 +45,7 @@ set(SRC_FILES
   Objects/imstkDynamicObject.cpp
   Objects/imstkFeDeformableObject.cpp
   Objects/imstkLevelSetDeformableObject.cpp
+  Objects/imstkPbdConnectiveTissueConstraintGenerator.cpp
   Objects/imstkPbdObject.cpp
   Objects/imstkRigidObject2.cpp
   Objects/imstkSceneObject.cpp
@@ -75,6 +77,7 @@ imstk_add_library(SceneEntities
     DynamicalModels
     CollisionDetection
     Controllers
+    Filtering
   )
 
 #-----------------------------------------------------------------------------
@@ -82,4 +85,5 @@ imstk_add_library(SceneEntities
 #-----------------------------------------------------------------------------
 if( ${PROJECT_NAME}_BUILD_TESTING )
   add_subdirectory(Testing)
+  add_subdirectory(VisualTesting)
 endif()
