@@ -141,3 +141,23 @@ After updating your fork you can proceed with the beginning of this guide on how
 ## Coverage
 
 iMSTK supports calculating the test coverage via a manual process on Linux only. As a prerequisite `lcov` needs to be installed. To enable coverage calcuation set `iMSTK_COVERAGE` to `ON`, make sure `Debug` build is selected and run the superbuild as normal. When this is completed `cd` into the innerbuild directory and execute `<makeCommand> Coverage` this will start executing the coverage calculation, this may take some time. For the process to succeed _all_ of the tests need to succeed otherwise the command will fail and the process will be aborted. The final information will be under `Coverage/index.html` 
+
+# Updating C\# wrapping for imstk
+
+## Updating C\# wrapping for imstk
+
+ - First, build with swig:
+    -  Install swig (`https://www.swig.org/download.html`) 
+    -  Add swig executable directory to path
+      - Windows: `https://www.h3xed.com/windows/how-to-add-to-and-edit-windows-path-variable`
+      - Linux: `https://opensource.com/article/17/6/set-path-linux`
+    -  Modify CMake by setting the `iMSTK_WRAP_CSHARP` flag to true
+    -  Rebuild with swig
+ - Afer building with swig:
+    - Navigate to iMSTK>Source>Wrappers>SwigInterface or open iMSTKCWrapper project under wappers
+    - In the `imstkCWrapper.i` file:
+      - Add the header to the new wrapped file in the appropriate section with the `#include <file.h>`
+      - Add the header file path to the appropriate section with the `%include <../../(path)/file.h>`
+    - In the `shared_ptr_instantiation.i` file:
+      - Add the `%shared_ptr(imstk::<new_type>)` in the appropriate section
+ - Verify that the `iMSTKSharp` project builds
