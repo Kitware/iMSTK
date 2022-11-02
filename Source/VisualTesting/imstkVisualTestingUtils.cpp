@@ -53,6 +53,7 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
     m_duration = duration;
 
     // Setup a viewer to render
+    CHECK(m_scene != nullptr) << "Must give scene to VisualTest";
     m_viewer->setActiveScene(m_scene);
     m_viewer->setWindowTitle(m_scene->getName());
 
