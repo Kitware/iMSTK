@@ -308,9 +308,9 @@ private:
     /// Enables collisions on fixed pbd elements. Collision on these elements can cause instabilities
     /// as the collisions near the fixed vertices.
     bool   m_enableBoundaryCollisions = false;
-    double m_compliance = 0.0;
+    double m_compliance = 0.000001;
     bool   m_useCorrectVelocity       = true;
-    std::array<double, 2> m_stiffness = { 1.0, 1.0 };
+    std::array<double, 2> m_stiffness = { 0.3, 0.3 };
     int m_ccdSubsteps = 25;
 
 protected:
