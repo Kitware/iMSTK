@@ -14,7 +14,7 @@
 #include "imstkPbdSolver.h"
 #include "imstkTaskGraph.h"
 
-#include<algorithm>
+#include <algorithm>
 
 namespace imstk
 {
@@ -44,10 +44,11 @@ PbdModelConfig::enableConstraint(ConstraintGenType type, double stiffness, const
     auto& funcs = m_functors[type];
 
     funcs.erase(std::remove_if(funcs.begin(), funcs.end(), [bodyId](auto item) {
-        if (PbdBodyConstraintFunctor* functor = dynamic_cast<PbdBodyConstraintFunctor*>(item.get())) {
-            return functor->m_bodyIndex == bodyId;
-        }
-        return false;
+            if (PbdBodyConstraintFunctor* functor = dynamic_cast<PbdBodyConstraintFunctor*>(item.get()))
+            {
+                return functor->m_bodyIndex == bodyId;
+            }
+            return false;
         }), funcs.end());
 
     if (type == ConstraintGenType::Distance)
