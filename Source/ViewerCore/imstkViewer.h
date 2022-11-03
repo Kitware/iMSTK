@@ -47,7 +47,6 @@ protected:
 public:
     ~Viewer() override = default;
 
-public:
     ///
     /// \brief Get scene currently being rendered
     ///

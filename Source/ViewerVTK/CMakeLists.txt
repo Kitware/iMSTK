@@ -40,6 +40,6 @@ install(FILES ${VTK_VR_JSON_FILES} DESTINATION bin)
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-# if( ${PROJECT_NAME}_BUILD_TESTING )
-#   add_subdirectory(Testing)
-# endif()
+if( ${PROJECT_NAME}_BUILD_TESTING )
+  add_subdirectory(Testing)
+endif()
