@@ -50,8 +50,8 @@ public:
     /// \brief Get/Set the number of of connective strands attached to each face
     /// Defaults to 1.
     ///@{
-    void setStrandsPerFace(int numSegs) { m_strandsPerFace = numSegs; }
-    int getStrandsPerFace() { return m_strandsPerFace; }
+    void setStrandsPerFace(double density) { m_strandsPerFace = density; }
+    double getStrandsPerFace() { return m_strandsPerFace; }
 ///@}
 
 protected:
@@ -59,7 +59,7 @@ protected:
     std::vector<std::vector<Vec3d>> generateRandomPointsOnMesh(std::shared_ptr<SurfaceMesh>& mesh);
     const Vec3d generateRandomPointOnFace(Vec3d& ptA, Vec3d& ptB, Vec3d& ptC);
 
-    int m_segmentsPerStrand = 3;
-    int m_strandsPerFace    = 1;
+    int    m_segmentsPerStrand = 3;
+    double m_strandsPerFace    = 1;
 };
 } // namespace imstk

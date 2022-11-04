@@ -36,10 +36,10 @@
 using namespace imstk;
 
 ///
-/// \brief Creates pbd simulated gallblader object
+/// \brief Creates pbd simulated gallbladder object
 ///
 std::shared_ptr<PbdObject>
-makeGallBlader(const std::string& name, std::shared_ptr<PbdModel> model)
+makeGallBladder(const std::string& name, std::shared_ptr<PbdModel> model)
 {
     // Setup the Geometry
     auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Gallblader/gallblader.msh");
@@ -205,16 +205,16 @@ main()
     pbdModel->getConfig()->m_linearDampingCoeff  = 0.001; // Removed from velocity
     pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
 
-    // Setup gallblader object
-    std::shared_ptr<PbdObject> gallbladerObj = makeGallBlader("Gallblader", pbdModel);
+    // Setup gallbladder object
+    std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdModel);
     scene->addSceneObject(gallbladerObj);
 
     std::shared_ptr<PbdObject> kidneyObj = makeKidney("Kidney", pbdModel);
     scene->addSceneObject(kidneyObj);
 
-    // Create PBD object of connective strainds with associated constraints
+    // Create PBD object of connective strands with associated constraints
     double maxDist = 0.6;
-    auto   connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdModel, maxDist);
+    auto   connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdModel, maxDist, 0.75);
 
     scene->addSceneObject(connectiveStrands);
 

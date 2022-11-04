@@ -37,19 +37,19 @@ public:
 
     ///
     /// \brief Sets PBD object that represents the connective tissue.
-    /// This must use a line mesh for the phyics mesh
+    /// This must use a line mesh for the physics mesh
     ///
-    void setConnectiveStrandObj(std::shared_ptr<PbdObject> connectiveStraindObj) { m_connectiveStrandObj = connectiveStraindObj; }
+    void setConnectiveStrandObj(std::shared_ptr<PbdObject> connectiveStrandObj) { m_connectiveStrandObj = connectiveStrandObj; }
 
     ///
     /// \brief Creates distance constraints for the connective strands
-    /// using the default m_distStiffness value. To modify the stiffnes,
+    /// using the default m_distStiffness value. To modify the stiffness,
     ///  call setDistStiffness before calling generateDistanceConstraints
     ///
     void generateDistanceConstraints();
 
     ///
-    /// \brief Sets PBD object to connect to connective straints
+    /// \brief Sets PBD object to connect to connective strands
     /// assumes the surface mesh of ObjA is coincident with the
     /// end points of one side of the strands
     ///
@@ -128,7 +128,8 @@ std::shared_ptr<PbdObject> addConnectiveTissueConstraints(
 /// \param objA PbdObject that represents an organ to be connected with connective tissue
 /// \param objB PbdObject that represents an organ to be connected with connective tissue
 /// \param maxDist maximum distance of faces between objA and objB that are connected
-/// \param strandsPerFace number of strands generated per face
+/// \param strandsPerFace number of strands generated per face, if this has a fractional part
+///        there is a chance (equal to the fractional part) of the face having one more strand
 /// \param segmentsPerStrand  number of segments each strand is made of
 /// \param selector the selector type used to generate the faces, currently only ProximitySurfaceSelector
 ///
@@ -136,8 +137,8 @@ std::shared_ptr<PbdObject> makeConnectiveTissue(
     std::shared_ptr<PbdObject>                objA,
     std::shared_ptr<PbdObject>                objB,
     std::shared_ptr<PbdModel>                 model,
-    double                                    maxDist           = 0.0,
-    int                                       strandsPerFace    = 1,
+    double                                    maxDist = 0.0,
+    double                                    strandsPerFace    = 1,
     int                                       segmentsPerStrand = 3,
     std::shared_ptr<ProximitySurfaceSelector> selector = nullptr);
 } // namespace imstk

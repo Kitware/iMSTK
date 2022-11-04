@@ -227,7 +227,7 @@ makeConnectiveTissue(
     std::shared_ptr<PbdObject>                objB,
     std::shared_ptr<PbdModel>                 model,
     double                                    maxDist,
-    int                                       strandsPerFace,
+    double                                    strandsPerFace,
     int                                       segmentsPerStrand,
     std::shared_ptr<ProximitySurfaceSelector> proxSelector)
 {
@@ -269,7 +269,7 @@ makeConnectiveTissue(
     // Get mesh for connective strands
     auto connectiveLineMesh = std::dynamic_pointer_cast<LineMesh>(surfConnector->getOutput(0));
 
-    // Create PBD object of connective strainds with associated constraints
+    // Create PBD object of connective strands with associated constraints
     auto connectiveStrands = addConnectiveTissueConstraints(
         connectiveLineMesh, objA, objB, model);
 

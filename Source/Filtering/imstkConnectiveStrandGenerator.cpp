@@ -113,17 +113,27 @@ ConnectiveStrandGenerator::requestUpdate()
     // Loop over filtered subset of mesh A
     for (int cell_idA = 0; cell_idA < meshAFiltered.size(); cell_idA++)
     {
+        // Turn the float strands per face into an int count
+        // the fractional part turns into a chance to have an "extra"
+        // strand on the triangle
+        int    strandCount = static_cast<int>(m_strandsPerFace);
+        double remainder   = m_strandsPerFace - strandCount;
+
+        if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < remainder)
+        {
+            strandCount++;
+        }
+
         // Loop over generated random points in this cell
-        for (int surfNodeId = 0; surfNodeId < m_strandsPerFace; surfNodeId++)
+        for (int surfNodeId = 0; surfNodeId < strandCount; surfNodeId++)
         {
             const Vec3d positionOnA = sideApts[meshAFiltered[cell_idA]][surfNodeId];
             Vec3d       positionOnB = Vec3d::Zero();
 
             // Get index of cell on B that creates a strand that does not penetrate mesh B
-            int sideBindx = 0;
             while (true)
             {
-                sideBindx   = faceDistr(gen);
+                int sideBindx = faceDistr(gen);
                 positionOnB = sideBpts[sideBindx][surfNodeId];
 
                 // Check that direction is not inside of mesh B
@@ -137,34 +147,17 @@ ConnectiveStrandGenerator::requestUpdate()
 
             Vec3d stepVec = (positionOnB - positionOnA) / static_cast<double>(m_segmentsPerStrand);
 
+            int strandStartIndex = lineMeshVerticesPtr->size();
             for (int i = 0; i < m_segmentsPerStrand + 1; i++)
             {
                 lineMeshVerticesPtr->push_back(positionOnA + static_cast<double>(i) * stepVec);
             }
-        }
-    } // end loop over cells in mesh A
-
-    // Create connectivity for line mesh
-    // Note: the mesh is not continuous, so the connectivity
-    // is also not continuous, this may cause issues when applying
-    // bending constraints with a step size.
-    for (int cell_idA = 0; cell_idA < meshAFiltered.size(); cell_idA++)
-    {
-        for (int ptId = 0; ptId < m_strandsPerFace; ptId++)
-        {
-            int indx = cell_idA * m_strandsPerFace + ptId;
-
-            lineMeshIndicesPtr->push_back(Vec2i(indx * (m_segmentsPerStrand + 1), indx * (m_segmentsPerStrand + 1) + 1));
-
-            for (int i = 0; i < m_segmentsPerStrand - 1; i++)
+            for (int i = 0; i < m_segmentsPerStrand; ++i)
             {
-                int indxA = lineMeshIndicesPtr->at(lineMeshIndicesPtr->size() - 1)[1];
-                int indxB = lineMeshIndicesPtr->at(lineMeshIndicesPtr->size() - 1)[1] + 1;
-
-                lineMeshIndicesPtr->push_back(Vec2i(indxA, indxB));
+                lineMeshIndicesPtr->push_back(Vec2i(strandStartIndex + i, strandStartIndex + i + 1));
             }
         }
-    }
+    } // end loop over cells in mesh A
 
     // Initialize line mesh
     connectiveLineMesh->initialize(lineMeshVerticesPtr, lineMeshIndicesPtr);
@@ -178,7 +171,11 @@ ConnectiveStrandGenerator::generateRandomPointsOnMesh(std::shared_ptr<SurfaceMes
     // Generate random points on the faces of mesh
     for (int cellId = 0; cellId < mesh->getNumCells(); cellId++)
     {
-        for (int ptId = 0; ptId < m_strandsPerFace; ptId++)
+        // This will generate the maximum number of point per face that we
+        // might need not all of these will be used
+        int strandCount = static_cast<int>(m_strandsPerFace + 0.5);
+
+        for (int ptId = 0; ptId < strandCount; ptId++)
         {
             newFacePts.push_back(std::vector<Vec3d>());
 
