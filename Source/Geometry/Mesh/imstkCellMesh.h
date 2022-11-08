@@ -44,6 +44,11 @@ public:
         setCells(indices);
     }
 
+    ///
+    /// \brief Number of verticies associated with the cell type
+    ///
+    int getCellVertexCount() const override { return CellVertexCount; }
+
     void clear() override
     {
         AbstractCellMesh::clear();

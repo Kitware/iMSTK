@@ -9,6 +9,7 @@ imstk_add_library( Scene
     imstkControllerForceText.h
     imstkPbdObjectCollision.h
     imstkPbdObjectCutting.h
+    imstkPbdObjectCellRemoval.h
     imstkPbdObjectGrasping.h
     imstkPbdObjectStitching.h
     imstkPbdRigidObjectCollision.h
@@ -21,6 +22,7 @@ imstk_add_library( Scene
     imstkCollisionInteraction.cpp
     imstkControllerForceText.cpp
     imstkPbdObjectCollision.cpp
+    imstkPbdObjectCellRemoval.cpp
     imstkPbdObjectCutting.cpp
     imstkPbdObjectGrasping.cpp
     imstkPbdObjectStitching.cpp

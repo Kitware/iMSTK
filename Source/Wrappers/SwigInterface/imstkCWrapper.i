@@ -192,6 +192,7 @@
 #include "imstkScene.h"
 #include "imstkCollisionInteraction.h"
 #include "imstkRigidObjectCollision.h"
+#include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdObjectCutting.h"
 #include "imstkPbdObjectGrasping.h"
 #include "imstkPbdObjectCollision.h"
@@ -472,6 +473,7 @@ namespace std
  */
 %include "../../Scene/imstkScene.h";
 %include "../../Scene/imstkCollisionInteraction.h"
+%include "../../Scene/imstkPbdObjectCellRemoval.h"
 %include "../../Scene/imstkRigidObjectCollision.h"
 %include "../../Scene/imstkPbdObjectCutting.h"
 %include "../../Scene/imstkPbdObjectGrasping.h"
