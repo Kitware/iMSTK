@@ -54,6 +54,11 @@ public:
     virtual std::shared_ptr<AbstractDataArray> getAbstractCells() const = 0;
 
     ///
+    /// \brief Number of verticies associated with the cell type
+    ///
+    virtual int getCellVertexCount() const = 0;
+
+    ///
     /// \brief Returns map of vertices to cells that contain the vertex (reverse linkage)
     ///
     const std::vector<std::unordered_set<int>>& getVertexToCellMap() const { return m_vertexToCells; }

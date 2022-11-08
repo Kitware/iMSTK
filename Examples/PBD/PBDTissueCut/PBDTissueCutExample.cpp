@@ -17,6 +17,7 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPlane.h"
@@ -30,54 +31,6 @@
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
-
-static void
-addDummyVertexPointSet(std::shared_ptr<PointSet> pointSet)
-{
-    // Add a dummy vertex to the vertices
-    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSet->getVertexPositions();
-    VecDataArray<double, 3>&                 vertices    = *verticesPtr;
-    vertices.resize(vertices.size() + 1);
-    for (int i = vertices.size() - 1; i >= 1; i--)
-    {
-        vertices[i] = vertices[i - 1];
-    }
-    vertices[0] = Vec3d(0.0, 0.0, 0.0);
-    pointSet->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*verticesPtr));
-}
-
-static void
-addDummyVertex(std::shared_ptr<SurfaceMesh> surfMesh)
-{
-    addDummyVertexPointSet(surfMesh);
-
-    // Then shift all indices by 1
-    std::shared_ptr<VecDataArray<int, 3>> indicesPtr = surfMesh->getCells();
-    VecDataArray<int, 3>&                 indices    = *indicesPtr;
-    for (int i = 0; i < indices.size(); i++)
-    {
-        indices[i][0]++;
-        indices[i][1]++;
-        indices[i][2]++;
-    }
-}
-
-static void
-addDummyVertex(std::shared_ptr<TetrahedralMesh> tetMesh)
-{
-    addDummyVertexPointSet(tetMesh);
-
-    // Then shift all indices by 1
-    std::shared_ptr<VecDataArray<int, 4>> tissueIndicesPtr = tetMesh->getCells();
-    VecDataArray<int, 4>&                 tissueIndices    = *tissueIndicesPtr;
-    for (int i = 0; i < tissueIndices.size(); i++)
-    {
-        tissueIndices[i][0]++;
-        tissueIndices[i][1]++;
-        tissueIndices[i][2]++;
-        tissueIndices[i][3]++;
-    }
-}
 
 ///
 /// \brief Creates tissue object
@@ -94,9 +47,6 @@ makeTissueObj(const std::string& name,
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tissueMesh = GeometryUtils::toTetGrid(center, size, dim);
     std::shared_ptr<SurfaceMesh>     surfMesh   = tissueMesh->extractSurfaceMesh();
-
-    addDummyVertex(tissueMesh);
-    //addDummyVertex(surfMesh);
 
     // Add a mask of ints to denote how many elements are referencing this vertex
     auto referenceCountPtr = std::make_shared<DataArray<int>>(tissueMesh->getNumVertices());
@@ -133,12 +83,11 @@ makeTissueObj(const std::string& name,
             {
                 if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
                 {
-                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z) + 1); // +1 for dummy vertex
+                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z)); // +1 for dummy vertex
                 }
             }
         }
     }
-    tissueObj->getPbdBody()->fixedNodeIds.push_back(0); // Fix dummy vertex
 
     return tissueObj;
 }
@@ -207,6 +156,9 @@ main()
         Vec3d(10.0, 3.0, 10.0), Vec3i(10, 3, 10), Vec3d(0.0, -1.0, 0.0),
         pbdModel);
     scene->addSceneObject(tissueObj);
+
+    auto cellRemoval = std::make_shared<PbdObjectCellRemoval>(tissueObj);
+    scene->addInteraction(cellRemoval);
 
     std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdModel);
     scene->addSceneObject(toolObj);
@@ -288,58 +240,10 @@ main()
 
                         if (splitTest(tetVerts, planePos, left, planeHalfWidth, forward, planeHalfWidth, n))
                         {
-                            // Remove the tet being split
-                            removedTets.insert(i);
+                            cellRemoval->removeCellOnApply(i);
                         }
                     }
-
-                    // Deal with diffs
-                    std::shared_ptr<PbdConstraintContainer> constraintsPtr = tissueObj->getPbdModel()->getConstraints();
-                    const std::vector<std::shared_ptr<PbdConstraint>>& constraints = constraintsPtr->getConstraints();
-
-                    // First process all removed tets by removing the constraints and setting the element to the dummy vertex
-                    for (auto i : removedTets)
-                    {
-                        Vec4i& tet = tissueIndices[i];
-
-                        // Find and remove the associated constraints
-                        for (auto j = constraints.begin(); j != constraints.end(); j++)
-                        {
-                            const std::vector<PbdParticleId>& vertexIds = (*j)->getParticles();
-                            bool isSameTet = true;
-                            for (int k = 0; k < 4; k++)
-                            {
-                                if (vertexIds[k].second != tet[k])
-                                {
-                                    isSameTet = false;
-                                    break;
-                                }
-                            }
-                            if (isSameTet)
-                            {
-                                constraintsPtr->eraseConstraint(j);
-                                break;
-                            }
-                        }
-
-                        // Set removed tet to dummy vertex
-                        tet = Vec4i(0, 0, 0, 0);
-                    }
-
-                    if (removedTets.size() > 0)
-                    {
-                        //// Update collision geometry by re-extracting the entire mesh
-                        //auto map = std::dynamic_pointer_cast<PointwiseMap>(tissueObj->getPhysicsToCollidingMap());
-                        //std::shared_ptr<SurfaceMesh> colMesh = tissueMesh->extractSurfaceMesh();
-                        //map->setChildGeometry(colMesh);
-                        //map->compute();
-                        //map->update();
-                        //colMesh->computeVertexNormals();
-                        //tissueObj->setCollidingGeometry(colMesh);
-
-                        tissueIndicesPtr->postModified();
-                        tissueMesh->postModified();
-                    }
+                    cellRemoval->apply();
                 }
         });
 

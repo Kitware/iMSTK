@@ -198,6 +198,7 @@
 %shared_ptr(imstk::SceneConfig)
 %shared_ptr(imstk::Scene)
 %shared_ptr(imstk::CollisionInteraction)
+%shared_ptr(imstk::PbdObjectCellRemoval)
 %shared_ptr(imstk::RigidObjectCollision)
 %shared_ptr(imstk::PbdObjectCutting)
 %shared_ptr(imstk::PbdObjectGrasping)
