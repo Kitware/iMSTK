@@ -46,36 +46,19 @@ ConnectiveStrandGenerator::requestUpdate()
     std::shared_ptr<SurfaceMesh> meshA = std::dynamic_pointer_cast<SurfaceMesh>(getInput(0));
     std::shared_ptr<SurfaceMesh> meshB = std::dynamic_pointer_cast<SurfaceMesh>(getInput(1));
 
-    // RNG for selecting faces to connect
-    std::random_device              rd;                                     // obtain a random number from hardware
-    std::mt19937                    gen(rd());                              // seed the generator
-    std::uniform_int_distribution<> faceDistr(0, meshB->getNumCells() - 1); // define the range over cells of mesh B
-
-    // Connective tissue geometry
-    auto connectiveLineMesh = std::make_shared<LineMesh>();
-
-    // Storage for connectivity of line mesh
-    auto lineMeshVerticesPtr = std::make_shared<VecDataArray<double, 3>>();
-    auto lineMeshIndicesPtr  = std::make_shared<VecDataArray<int, 2>>();
-
     // Verify normals are up to date
     meshA->computeTrianglesNormals();
     meshB->computeTrianglesNormals();
 
-    // Create storage for new points
-    // accessed by [cell_id, newPtOnCell_id]
-    std::vector<std::vector<Vec3d>> sideApts;
-    std::vector<std::vector<Vec3d>> sideBpts;
+    std::vector<int> meshAFiltered = filterCells(meshA.get(), meshB.get());
 
-    // Generate random points on the faces of mesh A
-    sideApts = generateRandomPointsOnMesh(meshA);
+    setOutput(createStrands(meshA.get(), meshAFiltered, meshB.get()), 0);
+}
 
-    // Generate random points on the faces of mesh B
-    sideBpts = generateRandomPointsOnMesh(meshB);
-
-    // Filter faces on mesh a to remove those facing away from mesh B
-    // Checks nearest faces, if nearest face normal points in same general direction then ignore
-    std::vector<int> meshAFiltered;
+std::vector<int>
+ConnectiveStrandGenerator::filterCells(SurfaceMesh* meshA, SurfaceMesh* meshB) const
+{
+    std::vector<int> result;
     for (int cell_idA = 0; cell_idA < meshA->getNumCells(); cell_idA++)
     {
         // Find nearest cell center on mesh B
@@ -105,13 +88,28 @@ ConnectiveStrandGenerator::requestUpdate()
         double dotCheck = meshA->getCellNormals()->at(cell_idA).dot(meshB->getCellNormals()->at(nearestId));
         if (dotCheck < -0.1)
         {
-            meshAFiltered.push_back(cell_idA);
+            result.push_back(cell_idA);
         }
     } // end loop over faces on mesh A
+    return result;
+}
 
-    // Generate strands of connective tissue between meshA and meshB
-    // Loop over filtered subset of mesh A
-    for (int cell_idA = 0; cell_idA < meshAFiltered.size(); cell_idA++)
+std::shared_ptr<LineMesh>
+ConnectiveStrandGenerator::createStrands(
+    SurfaceMesh*            meshA,
+    const std::vector<int>& faces,
+    SurfaceMesh*            meshB) const
+{
+    // RNG for selecting faces to connect
+    static std::random_device       rd;                                            // obtain a random number from hardware
+    static std::mt19937             gen(rd());                                     // seed the generator
+    std::uniform_int_distribution<> faceDistr(0, meshB->getNumCells() - 1);        // define the range over cells of mesh B
+
+    // Storage for connectivity of line mesh
+    auto lineMeshVerticesPtr = std::make_shared<VecDataArray<double, 3>>();
+    auto lineMeshIndicesPtr  = std::make_shared<VecDataArray<int, 2>>();
+
+    for (int cell_idA = 0; cell_idA < faces.size(); cell_idA++)
     {
         // Turn the float strands per face into an int count
         // the fractional part turns into a chance to have an "extra"
@@ -127,14 +125,14 @@ ConnectiveStrandGenerator::requestUpdate()
         // Loop over generated random points in this cell
         for (int surfNodeId = 0; surfNodeId < strandCount; surfNodeId++)
         {
-            const Vec3d positionOnA = sideApts[meshAFiltered[cell_idA]][surfNodeId];
+            const Vec3d positionOnA = generateRandomPointOnFace(meshA, faces[cell_idA]);
             Vec3d       positionOnB = Vec3d::Zero();
 
             // Get index of cell on B that creates a strand that does not penetrate mesh B
             while (true)
             {
                 int sideBindx = faceDistr(gen);
-                positionOnB = sideBpts[sideBindx][surfNodeId];
+                positionOnB = generateRandomPointOnFace(meshB, sideBindx);
 
                 // Check that direction is not inside of mesh B
                 Vec3d  directionBA = (positionOnA - positionOnB).normalized();
@@ -159,44 +157,21 @@ ConnectiveStrandGenerator::requestUpdate()
         }
     } // end loop over cells in mesh A
 
-    // Initialize line mesh
-    connectiveLineMesh->initialize(lineMeshVerticesPtr, lineMeshIndicesPtr);
-    setOutput(connectiveLineMesh, 0);
-}
-
-std::vector<std::vector<Vec3d>>
-ConnectiveStrandGenerator::generateRandomPointsOnMesh(std::shared_ptr<SurfaceMesh>& mesh)
-{
-    std::vector<std::vector<Vec3d>> newFacePts;
-    // Generate random points on the faces of mesh
-    for (int cellId = 0; cellId < mesh->getNumCells(); cellId++)
-    {
-        // This will generate the maximum number of point per face that we
-        // might need not all of these will be used
-        int strandCount = static_cast<int>(m_strandsPerFace + 0.5);
-
-        for (int ptId = 0; ptId < strandCount; ptId++)
-        {
-            newFacePts.push_back(std::vector<Vec3d>());
-
-            Vec3d newPt = generateRandomPointOnFace(
-                mesh->getVertexPosition(mesh->getCells()->at(cellId)[0]),
-                mesh->getVertexPosition(mesh->getCells()->at(cellId)[1]),
-                mesh->getVertexPosition(mesh->getCells()->at(cellId)[2]));
-
-            newFacePts[cellId].push_back(newPt);
-        }
-    }
-    return newFacePts;
+    auto result = std::make_shared<LineMesh>();
+    result->initialize(lineMeshVerticesPtr, lineMeshIndicesPtr);
+    return result;
 }
 
 const Vec3d
-ConnectiveStrandGenerator::generateRandomPointOnFace(Vec3d& ptA, Vec3d& ptB, Vec3d& ptC)
+ConnectiveStrandGenerator::generateRandomPointOnFace(SurfaceMesh* mesh, int face) const
 {
     float r0 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
     float r1 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
-    Vec3d newPt = (1.0 - sqrt(r0)) * ptA + (sqrt(r0) * (1 - r1)) * ptB + (r1 * sqrt(r0)) * ptC;
-    return newPt;
+    const Vec3d& ptA = mesh->getVertexPosition(mesh->getCells()->at(face)[0]);
+    const Vec3d& ptB = mesh->getVertexPosition(mesh->getCells()->at(face)[1]);
+    const Vec3d& ptC = mesh->getVertexPosition(mesh->getCells()->at(face)[2]);
+
+    return (1.0 - sqrt(r0)) * ptA + (sqrt(r0) * (1 - r1)) * ptB + (r1 * sqrt(r0)) * ptC;
 }
 } // namespace imstk

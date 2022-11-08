@@ -8,6 +8,8 @@
 
 #include "imstkGeometryAlgorithm.h"
 #include "imstkDataArray.h"
+#include "imstkVecDataArray.h"
+
 #include <random>
 namespace imstk
 {
@@ -56,8 +58,25 @@ public:
 
 protected:
     void requestUpdate() override;
-    std::vector<std::vector<Vec3d>> generateRandomPointsOnMesh(std::shared_ptr<SurfaceMesh>& mesh);
-    const Vec3d generateRandomPointOnFace(Vec3d& ptA, Vec3d& ptB, Vec3d& ptC);
+
+    /// \brief Filter faces on meshA to remove those facing away from meshB
+    /// Checks nearest faces, if nearest face normal points in same general direction then ignore
+    std::vector<int> filterCells(SurfaceMesh* meshA, SurfaceMesh* meshB) const;
+
+    ///
+    /// \brief Creates a line mesh by connecting points of the given faces of meshA with with
+    /// random points on random faces on meshB with strands
+    /// \param meshA mesh on one side of the connective tissue
+    /// \param faces list of faces on meshA that will have strands on them
+    /// \param meshB mesh on the other side of the connective tissue
+    /// \return the generate mesh
+    std::shared_ptr<LineMesh> createStrands(
+        SurfaceMesh*            meshA,
+        const std::vector<int>& faces,
+        SurfaceMesh*            meshB) const;
+
+    /// \return A random point on the given face and the given mesh
+    const Vec3d generateRandomPointOnFace(SurfaceMesh* mesh, int face) const;
 
     int    m_segmentsPerStrand = 3;
     double m_strandsPerFace    = 1;
