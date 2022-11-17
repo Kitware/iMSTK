@@ -67,6 +67,13 @@ public:
     ///
     bool initialize() override;
 
+    void computeCellConstraintMap();
+
+    const std::vector<std::shared_ptr<PbdConstraint>>& getCellConstraints(int cellId)
+    {
+        return m_pbdBody->m_cellConstraintMap[cellId];
+    }
+
 protected:
     ///
     /// \brief Creates a deformable PbdBody from Geometry

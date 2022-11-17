@@ -32,6 +32,11 @@ public:
     // Give change in impulse in direction of desired deformation
     void compute(double dt) override;
 
+    ///
+    /// \brief Return the rest configuration for the constraint
+    ///
+    double getRestValue() const { return 0.0; }
+
 private:
     double m_beta = 0.0001; ///< Bauhmgarte stabilization term
     mutable Vec3d m_diff = Vec3d::Zero();

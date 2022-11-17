@@ -4,10 +4,11 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkPbdObject.h"
+#include "imstkCellMesh.h"
 #include "imstkLogger.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
+#include "imstkPbdObject.h"
 #include "imstkPointSet.h"
 
 namespace imstk
@@ -284,5 +285,96 @@ PbdObject::setRigidBody(PbdBody& body)
 
     // Overwrite some masses for specified fixed points
     body.fixedNodeInvMass = std::unordered_map<int, double>();
+}
+
+void
+PbdObject::computeCellConstraintMap()
+{
+    // Note: The PBD Object and constraints must be initialized before calling this function
+    this->initialize();
+
+    CHECK(m_physicsGeometry != nullptr) << "PbdObject \"" << m_name
+                                        << "\" requires physics geometry to compute CellConstraint map";
+
+    // If the map already exists, clear it and recalculate
+    if (m_pbdBody->m_cellConstraintMap.empty() == false)
+    {
+        m_pbdBody->m_cellConstraintMap.clear();
+        LOG(INFO) << "PbdObject \"" << m_name
+                  << "\" already has a CellConstraintMap. Cleared and recalculated \n";
+    }
+
+    // Get body id
+    int bodyId = m_pbdBody->bodyHandle;
+
+    // Mesh data
+    auto      cellMesh     = std::dynamic_pointer_cast<AbstractCellMesh>(this->getPhysicsGeometry());
+    auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(cellMesh->getAbstractCells()); // underlying 1D array
+    const int vertsPerCell = cellMesh->getAbstractCells()->getNumberOfComponents();
+
+    // Constraint Data for all currently existing constraints
+    std::shared_ptr<PbdConstraintContainer> constraintsPtr = this->getPbdModel()->getConstraints();
+    CHECK(constraintsPtr != nullptr) << "PbdObject \"" << m_name
+                                     << "\" does not have constraints in computeCellConstraintMap";
+
+    const std::vector<std::shared_ptr<PbdConstraint>>& constraints = constraintsPtr->getConstraints();
+
+    //For each cell, find all associated constraints
+    std::vector<int> cellVertIds(vertsPerCell);
+    for (int cellId = 0; cellId < cellMesh->getNumCells(); cellId++)
+    {
+        // Get all the vertex ids for this cell
+        cellVertIds.clear();
+        for (int vertId = 0; vertId < vertsPerCell; vertId++)
+        {
+            cellVertIds[vertId] = (*cellVerts)[cellId * vertsPerCell + vertId];
+        }
+
+        // Search all constraints for those that involve the same vertices as the cell
+        for (auto& constraint : constraints)
+        {
+            const std::vector<PbdParticleId>& cVertexIds = constraint->getParticles(); ///< Vertices that are part of the constraint
+            std::unordered_set<int>           constraintVertIds;
+
+            // Check that constraint involves this body and get associated vertices
+            bool isBody = false;
+            for (int cVertId = 0; cVertId < cVertexIds.size(); cVertId++)
+            {
+                if (cVertexIds[cVertId].first == bodyId)
+                {
+                    constraintVertIds.insert(cVertexIds[cVertId].second);
+                    isBody = true;
+                }
+            }
+            if (isBody == false)
+            {
+                continue;
+            }
+
+            // Check if cell vertices exists in the constraint
+            for (int cellVertId = 0; cellVertId < vertsPerCell; cellVertId++)
+            {
+                std::unordered_set<int>::const_iterator indx = constraintVertIds.find(cellVertIds[cellVertId]);
+
+                if (indx != constraintVertIds.end())
+                {
+                    // Make sure constraint has not already been added
+                    bool exists = false;
+                    for (int j = 0; j < m_pbdBody->m_cellConstraintMap[cellId].size(); j++)
+                    {
+                        if (constraint == m_pbdBody->m_cellConstraintMap[cellId][j])
+                        {
+                            exists = true;
+                        }
+                    }
+                    if (exists == false)
+                    {
+                        std::shared_ptr<PbdConstraint> cpy = constraint;
+                        m_pbdBody->m_cellConstraintMap[cellId].push_back(std::move(cpy));
+                    }
+                }
+            }
+        }
+    }
 }
 } // namespace imstk

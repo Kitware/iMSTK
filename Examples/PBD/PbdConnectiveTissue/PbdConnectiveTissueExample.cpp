@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCapsule.h"
 #include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -13,20 +14,21 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkObjectControllerGhost.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectController.h"
+#include "imstkPbdObjectGrasping.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
+#include "imstkTearable.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-
-#include "imstkPbdObjectCellRemoval.h"
 
 #ifdef iMSTK_USE_HAPTICS
 #include "imstkDeviceManager.h"
@@ -76,12 +78,12 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdModel> model)
     // Gallblader is about 60g
     tissueObj->getPbdBody()->uniformMassValue = 60.0 / tissueMesh->getNumVertices();
 
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
+    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 700.0,
         tissueObj->getPbdBody()->bodyHandle);
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 100.0,
+    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 700.0,
         tissueObj->getPbdBody()->bodyHandle);
 
-    tissueObj->getPbdBody()->fixedNodeIds = { 72, 57, 131, 132 };
+    tissueObj->getPbdBody()->fixedNodeIds = { 57, 131, 132 }; // { 72, , 131, 132 };
 
     LOG(INFO) << "Per particle mass: " << tissueObj->getPbdBody()->uniformMassValue;
 
@@ -141,49 +143,44 @@ makeKidney(const std::string& name, std::shared_ptr<PbdModel> model)
     return tissueObj;
 }
 
-///
-/// \brief Creates simulated tool object with cutting plane
-///
 static std::shared_ptr<PbdObject>
-makeToolObj(const std::string& name, std::shared_ptr<PbdModel> model, double shift)
+makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
 {
-    // Create a cutting plane object in the scene
-    std::shared_ptr<SurfaceMesh> cutGeom =
-        GeometryUtils::toTriangleGrid(Vec3d::Zero(),
-            Vec2d(0.25, 0.25), Vec2i(2, 2));
-    cutGeom->setTranslation(Vec3d(-1, 0, 0));
-    cutGeom->rotate(Vec3d(0.0, 0.0, 1.0), (shift * 90.0) / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
-    cutGeom->translate(Vec3d(shift * 0.25, 0, 0), Geometry::TransformType::ApplyToData);
+    auto toolGeometry = std::make_shared<Capsule>();
+    toolGeometry->setRadius(0.1);
+    toolGeometry->setLength(0.2);
+    toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
+    toolGeometry->setOrientation(Quatd(0.707, 0.0, 0.0, 0.707));
 
-    cutGeom->updatePostTransformData();
+    auto toolObj = std::make_shared<PbdObject>("Tool");
 
-    auto toolObj = std::make_shared<PbdObject>(name);
-    toolObj->setVisualGeometry(cutGeom);
-    toolObj->setPhysicsGeometry(cutGeom);
-    toolObj->setCollidingGeometry(cutGeom);
+    // Create the object
+    toolObj->setVisualGeometry(toolGeometry);
+    toolObj->setPhysicsGeometry(toolGeometry);
+    toolObj->setCollidingGeometry(toolGeometry);
     toolObj->setDynamicalModel(model);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
+    toolObj->getPbdBody()->setRigid(
+        Vec3d(0.0, 5.0, 2.0),
+        1.0,
+        Quatd::Identity(),
+        Mat3d::Identity() * 1.0);
 
-    // Add a visual model to render the normals of the surface
-    auto normalsVisualModel = std::make_shared<VisualModel>();
-    normalsVisualModel->setGeometry(cutGeom);
-    normalsVisualModel->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::SurfaceNormals);
-    normalsVisualModel->getRenderMaterial()->setPointSize(0.05);
-    toolObj->addVisualModel(normalsVisualModel);
+    toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(1.0);
 
-    toolObj->getPbdBody()->setRigid(Vec3d(0.0, 0.0, 0.0), 1.0);
-
+    // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
     controller->setControlledObject(toolObj);
-    controller->setTranslationOffset(Vec3d(0.0, 0.0, 0.0));
-    controller->setTranslationScaling(10.0);
-    controller->setForceScaling(0.0);
-    controller->setLinearKs(2000.0);
-    controller->setAngularKs(500.0);
-    // Damping doesn't work well here. The force is applied at the start of pbd
-    // Because velocities are ulimately computed after the fact from positions
+    controller->setTranslationScaling(50.0);
+    controller->setLinearKs(5000.0);
+    controller->setAngularKs(1000.0);
     controller->setUseCritDamping(true);
+    controller->setForceScaling(0.01);
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setController(controller);
 
     return toolObj;
 }
@@ -206,28 +203,32 @@ main()
     pbdModel->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
     pbdModel->getConfig()->m_iterations = 4;
     pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -1.0, 0.0);
-    pbdModel->getConfig()->m_linearDampingCoeff  = 0.001; // Removed from velocity
+    pbdModel->getConfig()->m_linearDampingCoeff  = 0.01; // Removed from velocity
     pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
 
     // Setup gallbladder object
     std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdModel);
     scene->addSceneObject(gallbladerObj);
 
+    // Setup kidney
     std::shared_ptr<PbdObject> kidneyObj = makeKidney("Kidney", pbdModel);
     scene->addSceneObject(kidneyObj);
 
     // Create PBD object of connective strands with associated constraints
-    double maxDist = 0.6;
-    auto   connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdModel, maxDist, 0.75);
-
+    double                     maxDist = 0.35;
+    std::shared_ptr<PbdObject> connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdModel, maxDist, 2.5, 7);
+    // Add Tearing
+    connectiveStrands->addComponent<Tearable>();
     scene->addSceneObject(connectiveStrands);
 
-    auto cellRemoval = std::make_shared<PbdObjectCellRemoval>(connectiveStrands);
-    scene->addInteraction(cellRemoval);
+    // Setup a tool to grasp with
+    std::shared_ptr<PbdObject> graspObj = makeCapsuleToolObj(pbdModel);
+    scene->addSceneObject(graspObj);
 
-    // Setup the tool with cutting plane
-    std::shared_ptr<PbdObject> toolObj = makeToolObj("Tool", pbdModel, 0.0);
-    scene->addSceneObject(toolObj);
+    // Create new picking with constraints
+    auto grasper = std::make_shared<PbdObjectGrasping>(connectiveStrands, graspObj);
+    grasper->setStiffness(0.5);
+    scene->addInteraction(grasper);
 
     // Light
     auto light = std::make_shared<DirectionalLight>();
@@ -253,86 +254,69 @@ main()
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 
+        auto controller = graspObj->getComponent<PbdObjectController>();
 #ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
-        std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
+        if (hapticManager->getTypeName() == "HaplyDeviceManager")
+        {
+            controller->setTranslationOffset(Vec3d(2.0, 0.0, -2.0));
+        }
+        std::shared_ptr<DeviceClient> deviceClient = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        // Queue haptic button press to be called after scene thread
-        queueConnect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged, sceneManager,
+        connect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged,
             [&](ButtonEvent* e)
             {
-                //  LOG(INFO) << "Button Press";
-                // When button 0 is pressed replace the PBD cloth with a cut one
-                if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
+                if (e->m_buttonState == BUTTON_PRESSED)
                 {
-                    auto cutter  = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getPhysicsGeometry());
-                    auto strands = std::dynamic_pointer_cast<LineMesh>(connectiveStrands->getCollidingGeometry());
-
-                    for (int i = 0; i < cutter->getNumCells(); i++)
+                    if (e->m_button == 1)
                     {
-                        const Vec3d a = cutter->getVertexPosition(cutter->getCells()->at(i)[0]);
-                        const Vec3d b = cutter->getVertexPosition(cutter->getCells()->at(i)[1]);
-                        const Vec3d c = cutter->getVertexPosition(cutter->getCells()->at(i)[2]);
-
-                        for (int strandId = 0; strandId < strands->getNumCells(); strandId++)
-                        {
-                            const Vec3d p = strands->getVertexPosition(strands->getCells()->at(strandId)[0]);
-                            const Vec3d q = strands->getVertexPosition(strands->getCells()->at(strandId)[1]);
-
-                            if (CollisionUtils::testSegmentTriangle(p, q, a, b, c))
-                            {
-                                cellRemoval->removeCellOnApply(strandId);
-                            }
-                        }
+                        // Use a slightly larger capsule since collision prevents intersection
+                        auto capsule = std::dynamic_pointer_cast<Capsule>(graspObj->getCollidingGeometry());
+                        auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
+                        dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
+                        grasper->beginVertexGrasp(dilatedCapsule);
+                        // grasper->beginCellGrasp(dilatedCapsule);
+                        //pbdToolCollision->setEnabled(false);
                     }
-
-                    cellRemoval->apply();
+                }
+                else if (e->m_buttonState == BUTTON_RELEASED)
+                {
+                    if (e->m_button == 1)
+                    {
+                        grasper->endGrasp();
+                        //pbdToolCollision->setEnabled(true);
+                    }
                 }
             });
 #else
         auto deviceClient = std::make_shared<DummyClient>();
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
             {
                 const Vec2d mousePos = viewer->getMouseDevice()->getPos();
-                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.1) * 0.5;
+                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.1;
 
                 deviceClient->setPosition(worldPos);
-                deviceClient->setOrientation(Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0),
-                    Vec3d(1.0, 0.0, 0.0)));
             });
-        connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
-            [&](MouseEvent* e)
+
+        // Add click event and side effects
+        connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
+            [&](Event*)
             {
-                if (e->m_buttonId == 0)
-                {
-                    auto cutter  = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getPhysicsGeometry());
-                    auto strands = std::dynamic_pointer_cast<LineMesh>(connectiveStrands->getCollidingGeometry());
-
-                    for (int i = 0; i < cutter->getNumCells(); i++)
-                    {
-                        const Vec3d a = cutter->getVertexPosition(cutter->getCells()->at(i)[0]);
-                        const Vec3d b = cutter->getVertexPosition(cutter->getCells()->at(i)[1]);
-                        const Vec3d c = cutter->getVertexPosition(cutter->getCells()->at(i)[2]);
-
-                        for (int strandId = 0; strandId < strands->getNumCells(); strandId++)
-                        {
-                            const Vec3d p = strands->getVertexPosition(strands->getCells()->at(strandId)[0]);
-                            const Vec3d q = strands->getVertexPosition(strands->getCells()->at(strandId)[1]);
-
-                            if (CollisionUtils::testSegmentTriangle(p, q, a, b, c))
-                            {
-                                cellRemoval->removeCellOnApply(strandId);
-                            }
-                        }
-                    }
-                    cellRemoval->apply();
-                }
+                grasper->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(graspObj->getCollidingGeometry()));
+                //pbdToolCollision->setEnabled(false);
+            });
+        connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
+            [&](Event*)
+            {
+                grasper->endGrasp();
+                //pbdToolCollision->setEnabled(true);
             });
 #endif
 
-        auto controller = toolObj->getComponent<PbdObjectController>();
+        // auto controller = toolObj->getComponent<PbdObjectController>();
         controller->setDevice(deviceClient);
 
         // Add default mouse and keyboard controls to the viewer

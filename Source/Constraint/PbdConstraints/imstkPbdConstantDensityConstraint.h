@@ -111,6 +111,11 @@ private:
     void setNeighborSearchMethod(NeighborSearch::Method method) { m_NeighborSearchMethod = method; }
     NeighborSearch::Method getNeighborSearchMethod() const { return m_NeighborSearchMethod; }
 
+    ///
+    /// \brief Return the rest configuration for the constraint
+    ///
+    double getRestValue() const { return m_restDensity; }
+
 private:
     int    m_bodyHandle  = -1;
     double m_wPoly6Coeff = 0.0;

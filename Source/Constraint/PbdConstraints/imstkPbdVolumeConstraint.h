@@ -38,6 +38,11 @@ public:
     bool computeValueAndGradient(PbdState& bodies,
                                  double& c, std::vector<Vec3d>& dcdx) override;
 
+    ///
+    /// \brief Return the rest configuration for the constraint
+    ///
+    double getRestValue() const { return m_restVolume; }
+
 protected:
     double m_restVolume = 0.0; ///< Rest volume
 };

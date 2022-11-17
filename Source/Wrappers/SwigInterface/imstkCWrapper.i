@@ -128,6 +128,8 @@
 #include "imstkDynamicObject.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectCellRemoval.h"
+#include "imstkTearable.h"
 #include "imstkVisualModel.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
@@ -192,7 +194,6 @@
 #include "imstkScene.h"
 #include "imstkCollisionInteraction.h"
 #include "imstkRigidObjectCollision.h"
-#include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdObjectCutting.h"
 #include "imstkPbdObjectGrasping.h"
 #include "imstkPbdObjectCollision.h"
@@ -406,11 +407,13 @@ namespace std
  * SceneEntities
  */
 %include "../../SceneEntities/Components/imstkVisualModel.h";
+%include "../../SceneEntities/Components/imstkTearable.h";
 %include "../../SceneEntities/Objects/imstkSceneObject.h";
 %include "../../SceneEntities/Objects/imstkCollidingObject.h";
 %include "../../SceneEntities/Objects/imstkDynamicObject.h";
 %include "../../SceneEntities/Objects/imstkPbdConnectiveTissueConstraintGenerator.h";
 %include "../../SceneEntities/Objects/imstkPbdObject.h";
+%include "../../SceneEntities/Objects/imstkPbdObjectCellRemoval.h";
 %include "../../SceneEntities/Objects/imstkFeDeformableObject.h";
 %include "../../SceneEntities/Objects/imstkRigidObject2.h";
 %include "../../SceneEntities/Objects/imstkSphObject.h";
@@ -473,7 +476,6 @@ namespace std
  */
 %include "../../Scene/imstkScene.h";
 %include "../../Scene/imstkCollisionInteraction.h"
-%include "../../Scene/imstkPbdObjectCellRemoval.h"
 %include "../../Scene/imstkRigidObjectCollision.h"
 %include "../../Scene/imstkPbdObjectCutting.h"
 %include "../../Scene/imstkPbdObjectGrasping.h"

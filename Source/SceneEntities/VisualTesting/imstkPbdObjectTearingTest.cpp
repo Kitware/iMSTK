@@ -5,7 +5,6 @@
 */
 
 #include "imstkCamera.h"
-#include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -13,11 +12,11 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdObjectController.h"
+#include "imstkPbdConnectiveTissueConstraintGenerator.h"
+#include "imstkTearable.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -155,7 +154,7 @@ makeVolumeCubeObj(const std::string& name,
     return tissueObj;
 }
 
-class PbdConnectiveTissueTest : public VisualTest
+class PbdObjectTearingTest : public VisualTest
 {
 public:
     void createScene()
@@ -166,15 +165,16 @@ public:
         m_scene->getActiveCamera()->setFocalPoint(0.0703459, -0.539532, 0.148011);
         m_scene->getActiveCamera()->setViewUp(-0.0400007, 0.980577, -0.19201);
 
-        ASSERT_NE(m_pbdObjA, nullptr) << "Missing a pbdObjA for PbdConnectiveTissueTest";
-        ASSERT_NE(m_pbdObjB, nullptr) << "Missing a pbdObjA for PbdConnectiveTissueTest";
-        ASSERT_NE(m_pbdObjCT, nullptr) << "Missing connective tissue for PbdConnectiveTissueTest";
+        ASSERT_NE(m_pbdObj, nullptr) << "Missing a pbdObj for PbdObjectTest";
 
-        m_scene->addSceneObject(m_pbdObjA);
-        m_scene->addSceneObject(m_pbdObjB);
-        m_scene->addSceneObject(m_pbdObjCT);
+        m_scene->addSceneObject(m_pbdObj);
 
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObjB->getPhysicsGeometry());
+        if (m_pbdObjA != nullptr) { m_scene->addSceneObject(m_pbdObjA); }
+        if (m_pbdObjB != nullptr) { m_scene->addSceneObject(m_pbdObjB); }
+
+        m_scene->addSceneObject(m_pbdObj);
+
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObj->getPhysicsGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;
 
@@ -197,6 +197,16 @@ public:
                 m_prevVertices = vertices;
             });
 
+        // Verify that map exists after the first iteration
+        connect<Event>(m_sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+            {
+                if (m_scene->getSceneTime() >= 0.5)
+                {
+                    ASSERT_EQ(false, m_pbdObj->getPbdBody()->m_cellConstraintMap.empty());
+                }
+            });
+
         // Light
         auto light = std::make_shared<DirectionalLight>();
         light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
@@ -209,12 +219,12 @@ public:
     // Pbd model used for simulation
     std::shared_ptr<PbdModel> m_pbdModel = nullptr;
 
-    // Pbd objects to be connected
+    // Pbd object for testing component
+    std::shared_ptr<PbdObject> m_pbdObj = nullptr;
+
+    // Pbd objects to be connected for testing tearing
     std::shared_ptr<PbdObject> m_pbdObjA = nullptr;
     std::shared_ptr<PbdObject> m_pbdObjB = nullptr;
-
-    // Pbd Simulated connective tissue
-    std::shared_ptr<PbdObject> m_pbdObjCT = nullptr;
 
     // For assertions
     std::shared_ptr<VecDataArray<double, 3>> m_currVerticesPtr;
@@ -228,9 +238,39 @@ public:
 };
 
 ///
+/// \brief Test that the constraint map is correct
+///
+TEST_F(PbdObjectTearingTest, TestAddingTearingViaCall)
+{
+    m_pbdModel = makePbdModel();
+
+    // Setup the tissue
+    m_pbdObj = makeVolumeCubeObj("Tissue",
+        Vec3d(0.4, 0.4, 0.4), Vec3i(2, 2, 2), Vec3d(0.0, 0.0, 0.0),
+        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdModel);
+
+    // Initialize Object
+    m_pbdObj->initialize();
+
+    // Do test
+    auto tearing = std::make_shared<Tearable>();
+    m_pbdObj->addComponent(tearing);
+
+    auto testComponent = m_pbdObj->getComponent<Tearable>();
+
+    EXPECT_EQ(testComponent, tearing);
+
+    m_assertionBoundsMin = Vec3d(-3.0, -3.0, -3.0);
+    m_assertionBoundsMax = Vec3d(3.0, 3.0, 3.0);
+
+    createScene();
+    runFor(1.0);
+}
+
+///
 /// \brief Test that connective tissue is generated
 ///
-TEST_F(PbdConnectiveTissueTest, PbdConnectiveDropTest)
+TEST_F(PbdObjectTearingTest, PbdConnectiveDropTest)
 {
     m_pbdModel = makePbdModel();
 
@@ -238,17 +278,24 @@ TEST_F(PbdConnectiveTissueTest, PbdConnectiveDropTest)
     m_pbdObjA = makeVolumeCubeObj("TissueA",
         Vec3d(0.4, 0.4, 0.4), Vec3i(2, 2, 2), Vec3d(0.0, 0.0, 0.0),
         Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdModel);
+    m_pbdObjA->initialize();
 
     m_pbdObjB = makeSurfaceCubeObj("TissueB",
         Vec3d(0.4, 0.4, 0.4), Vec3i(2, 2, 2), Vec3d(1.0, 0.0, 0.0),
         Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdModel);
+    m_pbdObjB->initialize();
 
     // Setup the connective tissue
-    m_pbdObjCT = makeConnectiveTissue(m_pbdObjA, m_pbdObjB, m_pbdModel);
+    m_pbdObj = makeConnectiveTissue(m_pbdObjA, m_pbdObjB, m_pbdModel);
+    m_pbdObj->initialize();
+
+    auto tearing = std::make_shared<Tearable>();
+    m_pbdObj->addComponent(tearing);
+    tearing->setMaxStrain(0.001);
 
     m_assertionBoundsMin = Vec3d(-3.0, -3.0, -3.0);
     m_assertionBoundsMax = Vec3d(3.0, 3.0, 3.0);
 
     createScene();
-    runFor(3.0);
+    runFor(2.0);
 }

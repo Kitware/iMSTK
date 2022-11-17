@@ -112,6 +112,17 @@ public:
     double getForce(const double dt) const { return m_lambda / (dt * dt); }
 
     ///
+    /// \brief Get constraint value C (how much the constraint is violated)
+    ///
+    double getConstraintC() const { return m_C; }
+
+    ///
+    /// \brief Get reference constraint value. This value will have different context depending on
+    /// the constraint being used.
+    ///
+    virtual double getRestValue() const { return 0.0; }
+
+    ///
     /// \brief Zero's out the lagrange multplier before integration
     /// only used for xpbd, must be called before solving
     ///
@@ -177,13 +188,12 @@ protected:
     }
 
     std::vector<PbdParticleId> m_particles; ///< body, particle index
-
-    double m_stiffness  = 1.0;              ///< used in PBD, [0, 1]
-    double m_compliance = 1e-7;             ///< used in xPBD, inverse of Young's Modulus
-    double m_lambda     = 0.0;              ///< Lagrange multiplier
-
     std::vector<Vec3d> m_dcdx;              ///< Normalized constraint gradients (per particle)
 
+    double m_stiffness  = 1.0;              ///< used in PBD, [0, 1]
+    double m_compliance = 1e-7;             ///< used in xPBD, inverse of Stiffness
+    double m_lambda     = 0.0;              ///< Lagrange multiplier
+    double m_C = 0.0;                       ///< Constraint Value
     double m_friction        = 0.0;
     double m_restitution     = 0.0;
     bool   m_correctVelocity = false;

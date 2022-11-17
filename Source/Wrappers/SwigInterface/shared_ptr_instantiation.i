@@ -140,6 +140,7 @@
 %shared_ptr(imstk::Light)
 %shared_ptr(imstk::DirectionalLight)
 %shared_ptr(imstk::PointLight)
+%shared_ptr(imstk::Tearable)
 %shared_ptr(imstk::SpotLight)
 
 /*

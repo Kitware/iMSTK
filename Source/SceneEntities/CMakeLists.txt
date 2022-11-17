@@ -7,6 +7,7 @@ set(H_FILES
   Components/imstkAxesModel.h
   Components/imstkObjectControllerGhost.h
   Components/imstkPortHoleInteraction.h
+  Components/imstkTearable.h
   Components/imstkVisualModel.h
   Components/imstkVertexLabelVisualModel.h
   Lights/imstkDirectionalLight.h
@@ -25,6 +26,7 @@ set(H_FILES
   Objects/imstkLevelSetDeformableObject.h
   Objects/imstkPbdConnectiveTissueConstraintGenerator.h
   Objects/imstkPbdObject.h
+  Objects/imstkPbdObjectCellRemoval.h
   Objects/imstkRigidObject2.h
   Objects/imstkSceneObject.h
   Objects/imstkSphObject.h
@@ -34,6 +36,7 @@ set(SRC_FILES
   Camera/imstkCamera.cpp
   Components/imstkObjectControllerGhost.cpp
   Components/imstkPortHoleInteraction.cpp
+  Components/imstkTearable.cpp
   Components/imstkVisualModel.cpp
   Lights/imstkIBLProbe.cpp
   Loader/imstkVisualObjectImporter.cpp
@@ -47,6 +50,7 @@ set(SRC_FILES
   Objects/imstkLevelSetDeformableObject.cpp
   Objects/imstkPbdConnectiveTissueConstraintGenerator.cpp
   Objects/imstkPbdObject.cpp
+  Objects/imstkPbdObjectCellRemoval.cpp
   Objects/imstkRigidObject2.cpp
   Objects/imstkSceneObject.cpp
   Objects/imstkSphObject.cpp
