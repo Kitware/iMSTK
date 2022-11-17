@@ -20,18 +20,35 @@
 
 namespace imstk
 {
-VTKRenderDelegate::VTKRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
+VTKRenderDelegate::VTKRenderDelegate() :
     m_transform(vtkSmartPointer<vtkTransform>::New()),
     m_actor(nullptr),
     m_mapper(nullptr),
-    m_visualModel(visualModel),
-    m_material(visualModel->getRenderMaterial())
+    m_visualModel(nullptr),
+    m_material(nullptr)
 {
+}
+
+void
+VTKRenderDelegate::initialize(std::shared_ptr<VisualModel> model)
+{
+    CHECK(model != nullptr)
+        << "VTKRenderDelegate was given null VisualModel";
+    m_visualModel = model;
+    CHECK(m_visualModel->getRenderMaterial() != nullptr)
+        << "VTKRenderDelegate was given a VisualModel " << m_visualModel->getName()
+        << " which does not have a material";
+    m_material = m_visualModel->getRenderMaterial();
+
     // When render material is modified call materialModified -> updateRenderProperties()
-    queueConnect<Event>(m_material, &RenderMaterial::modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
+    queueConnect<Event>(m_material, &RenderMaterial::modified,
+        shared_from_this(), &VTKRenderDelegate::materialModified);
 
     // When the visual model is modified call visualModelModified
-    queueConnect<Event>(m_visualModel, &VisualModel::modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::visualModelModified);
+    queueConnect<Event>(m_visualModel, &VisualModel::modified,
+        shared_from_this(), &VTKRenderDelegate::visualModelModified);
+
+    init();
 }
 
 std::shared_ptr<VTKRenderDelegate>
@@ -79,12 +96,13 @@ void
 VTKRenderDelegate::visualModelModified(Event* imstkNotUsed(e))
 {
     // Remove all modified's from the old material
-    disconnect(m_material, this, &RenderMaterial::modified);
+    disconnect(m_material, shared_from_this(), &RenderMaterial::modified);
 
     m_material = m_visualModel->getRenderMaterial(); // Update handle
 
     // Recieve events from new material
-    queueConnect<Event>(m_material, &RenderMaterial::modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
+    queueConnect<Event>(m_material, &RenderMaterial::modified,
+        shared_from_this(), &VTKRenderDelegate::materialModified);
 
     // Update our render properties
     updateRenderProperties();

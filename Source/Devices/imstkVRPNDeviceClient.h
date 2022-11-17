@@ -27,7 +27,6 @@ namespace imstk
 class VRPNDeviceClient : public DeviceClient
 {
 public:
-
     ///
     /// \brief Constructor
     ///

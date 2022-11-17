@@ -32,7 +32,7 @@ using namespace imstk;
 class VTKChartRenderDelegate : public VTKRenderDelegate
 {
 public:
-    VTKChartRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKChartRenderDelegate();
     ~VTKChartRenderDelegate() override = default;
 
     ///
@@ -43,6 +43,8 @@ public:
     void updateRenderProperties() override { }
 
 protected:
+    void init() override;
+
     vtkSmartPointer<vtkTable>   m_table;
     vtkSmartPointer<vtkChartXY> m_chart;
 

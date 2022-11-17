@@ -21,12 +21,12 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class VTKTetrahedralMeshRenderDelegate
 ///
-/// \brief Tetrahedral mesh render delegate with vtk render backend
+/// \brief Delegates rendering of TetrahedralMesh to VTK from VisualModel
 ///
 class VTKTetrahedralMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKTetrahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKTetrahedralMeshRenderDelegate();
     ~VTKTetrahedralMeshRenderDelegate() override = default;
 
     ///
@@ -35,6 +35,8 @@ public:
     void processEvents() override;
 
 protected:
+    void init() override;
+
     ///
     /// \brief Callback for when vertex values are modified
     ///

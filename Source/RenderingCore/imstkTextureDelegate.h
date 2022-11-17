@@ -19,7 +19,7 @@ class Texture;
 ///
 /// \brief iMSTK texture delegate abstract class
 ///
-class TextureDelegate : public EventObject
+class TextureDelegate : public EventObject, public std::enable_shared_from_this<TextureDelegate>
 {
 public:
     virtual ~TextureDelegate() = default;

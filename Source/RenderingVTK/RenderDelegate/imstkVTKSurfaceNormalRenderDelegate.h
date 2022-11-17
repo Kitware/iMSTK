@@ -19,12 +19,13 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class VTKSurfaceNormalRenderDelegate
 ///
-/// \brief Renders normals as vectors from a surface mesh
+/// \brief Delegates rendering of SurfaceMesh to VTK as normals per triangle
+/// center from VisualModel
 ///
 class VTKSurfaceNormalRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKSurfaceNormalRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKSurfaceNormalRenderDelegate();
     ~VTKSurfaceNormalRenderDelegate() override = default;
 
     ///
@@ -33,6 +34,8 @@ public:
     void processEvents() override;
 
 protected:
+    void init() override;
+
     ///
     /// \brief Callback for when vertex data changes
     ///

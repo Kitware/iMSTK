@@ -32,11 +32,12 @@
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
 
+#undef iMSTK_USE_HAPTICS
 #ifdef iMSTK_USE_HAPTICS
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
 #else
-#include "imstkMouseDeviceClient3D.h"
+#include "imstkDummyClient.h"
 #endif
 
 using namespace imstk;
@@ -281,11 +282,17 @@ main()
 
         controller->setTranslationOffset(Vec3d(0.05, -0.05, 0.0));
 #else
-        auto deviceClient = std::make_shared<MouseDeviceClient3D>(viewer->getMouseDevice());
+        auto deviceClient = std::make_shared<DummyClient>();
         deviceClient->setOrientation(Quatd(Rotd(1.57, Vec3d(0.0, 1.0, 0.0))));
         controller->setTranslationScaling(0.13);
         controller->setTranslationOffset(Vec3d(-0.05, -0.1, -0.005));
 
+        auto needleMouseMove = needleObj->addComponent<LambdaBehaviour>("NeedleMouseMove");
+        needleMouseMove->setUpdate([&](const double&)
+            {
+                const Vec2d& pos2d = viewer->getMouseDevice()->getPos();
+                deviceClient->setPosition(Vec3d(pos2d[0], pos2d[1], 0.0));
+            });
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseScroll,
             [&](MouseEvent* e)
             {

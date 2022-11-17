@@ -17,11 +17,17 @@
 
 namespace imstk
 {
-VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKVolumeRenderDelegate(visualModel),
+VTKFluidRenderDelegate::VTKFluidRenderDelegate() :
     m_polydata(vtkSmartPointer<vtkPolyData>::New()),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    auto geometry = std::static_pointer_cast<PointSet>(visualModel->getGeometry());
+}
+
+void
+VTKFluidRenderDelegate::init()
+{
+    auto geometry = std::dynamic_pointer_cast<PointSet>(m_visualModel->getGeometry());
+    CHECK(geometry != nullptr) << "VTKFluidRenderDelegate only works with PointSet geometry";
     m_vertices = geometry->getVertexPositions();
 
     // Map vertices
@@ -35,10 +41,14 @@ VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visu
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(geometry, &Geometry::modified, this, &VTKFluidRenderDelegate::geometryModified);
+    queueConnect<Event>(geometry, &Geometry::modified,
+        std::static_pointer_cast<VTKFluidRenderDelegate>(shared_from_this()),
+        &VTKFluidRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKFluidRenderDelegate::vertexDataModified);
+    queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified,
+        std::static_pointer_cast<VTKFluidRenderDelegate>(shared_from_this()),
+        &VTKFluidRenderDelegate::vertexDataModified);
 
     // Setup mapper
     {

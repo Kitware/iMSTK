@@ -22,7 +22,7 @@ class MouseEvent;
 /// It can be constructed and observed or subclassed and overridden
 /// to implement controls.
 ///
-class MouseControl : public DeviceControl
+class MouseControl : public DeviceControl, public std::enable_shared_from_this<MouseControl>
 {
 public:
     MouseControl(const std::string& name = "MouseControl") : DeviceControl(name) { }

@@ -21,13 +21,12 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class VTKPointSetRenderDelegate
 ///
-/// \brief Render delegate for point set. A 3D glyph of spheres is
-/// created to render each node
+/// \brief Delegates rendering of PointSet to VTK from VisualModel
 ///
 class VTKPointSetRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKPointSetRenderDelegate();
     ~VTKPointSetRenderDelegate() override = default;
 
     ///
@@ -39,6 +38,8 @@ public:
 // to inform that this happened, if the actual buffer on the geometry is swapped then geometry
 // modified would instead be called
 protected:
+    void init() override;
+
     ///
     /// \brief Callback for when vertex data changes
     ///

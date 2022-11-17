@@ -15,16 +15,18 @@ KeyboardControl::setDevice(std::shared_ptr<DeviceClient> device)
     // Remove old observer if it exists
     if (m_deviceClient != nullptr)
     {
-        disconnect(m_deviceClient, this, &KeyboardDeviceClient::keyPress);
-        disconnect(m_deviceClient, this, &KeyboardDeviceClient::keyRelease);
+        disconnect(m_deviceClient, shared_from_this(), &KeyboardDeviceClient::keyPress);
+        disconnect(m_deviceClient, shared_from_this(), &KeyboardDeviceClient::keyRelease);
     }
 
     // Set the new device
     DeviceControl::setDevice(device);
 
     // Subscribe to the device clients events
-    connect(device, &KeyboardDeviceClient::keyPress, this, &KeyboardControl::keyPressEvent);
-    connect(device, &KeyboardDeviceClient::keyRelease, this, &KeyboardControl::keyReleaseEvent);
+    connect(device, &KeyboardDeviceClient::keyPress,
+        shared_from_this(), &KeyboardControl::keyPressEvent);
+    connect(device, &KeyboardDeviceClient::keyRelease,
+        shared_from_this(), &KeyboardControl::keyReleaseEvent);
 }
 
 void

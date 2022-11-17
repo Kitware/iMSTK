@@ -19,26 +19,36 @@
 
 namespace imstk
 {
-VTKImageDataRenderDelegate::VTKImageDataRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKVolumeRenderDelegate(visualModel),
+VTKImageDataRenderDelegate::VTKImageDataRenderDelegate() :
     m_scalarArray(nullptr),
-    imageDataVtk(nullptr)
+    m_imageDataVtk(nullptr)
+{
+}
+
+void
+VTKImageDataRenderDelegate::init()
 {
     auto imageData = std::dynamic_pointer_cast<ImageData>(m_visualModel->getGeometry());
+    CHECK(imageData != nullptr) << "VTKImageDataRenderDelegate only works with ImageData geometry";
     m_scalarArray = imageData->getScalars();
 
     // Couple the imstkImageData with vtkImageData
-    imageDataVtk = GeometryUtils::coupleVtkImageData(imageData);
+    m_imageDataVtk = GeometryUtils::coupleVtkImageData(imageData);
 
     // When the image is modified
-    queueConnect<Event>(imageData, &ImageData::modified, this, &VTKImageDataRenderDelegate::imageDataModified);
+    queueConnect<Event>(imageData, &ImageData::modified,
+        std::static_pointer_cast<VTKImageDataRenderDelegate>(shared_from_this()),
+        &VTKImageDataRenderDelegate::imageDataModified);
 
     // When the image scalars are modified
-    queueConnect<Event>(imageData->getScalars(), &AbstractDataArray::modified, this, &VTKImageDataRenderDelegate::imageScalarsModified);
+    queueConnect<Event>(imageData->getScalars(), &AbstractDataArray::modified,
+        std::static_pointer_cast<VTKImageDataRenderDelegate>(shared_from_this()),
+        &VTKImageDataRenderDelegate::imageScalarsModified);
 
     // Setup mapper
     {
         vtkNew<vtkGPUVolumeRayCastMapper> mapper;
-        mapper->SetInputData(imageDataVtk);
+        mapper->SetInputData(m_imageDataVtk);
         vtkNew<vtkVolume> volume;
         volume->SetMapper(mapper);
         volume->SetUserTransform(m_transform);
@@ -102,16 +112,16 @@ VTKImageDataRenderDelegate::imageDataModified(Event* imstkNotUsed(e))
         m_scalarArray = imageData->getScalars();
 
         // Update vtk data array pointer
-        imageDataVtk->GetPointData()->GetScalars()->SetVoidArray(m_scalarArray->getVoidPointer(), m_scalarArray->size(), 1);
+        m_imageDataVtk->GetPointData()->GetScalars()->SetVoidArray(m_scalarArray->getVoidPointer(), m_scalarArray->size(), 1);
 
         // Update information
         // \todo: Can't handle type changes or number of component changes
         const Vec3i& dim = imageData->getDimensions();
-        imageDataVtk->SetDimensions(dim.data());
-        imageDataVtk->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
+        m_imageDataVtk->SetDimensions(dim.data());
+        m_imageDataVtk->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
         const Vec3d vtkOrigin = imageData->getOrigin() + imageData->getSpacing() * 0.5;
-        imageDataVtk->SetOrigin(vtkOrigin.data());
-        imageDataVtk->SetSpacing(imageData->getSpacing().data());
+        m_imageDataVtk->SetOrigin(vtkOrigin.data());
+        m_imageDataVtk->SetSpacing(imageData->getSpacing().data());
     }
     volumeMapper->GetInput()->Modified();
 }
@@ -124,9 +134,9 @@ VTKImageDataRenderDelegate::imageScalarsModified(Event* imstkNotUsed(e))
     m_scalarArray = geometry->getScalars();
 
     // If pointer changed, update the one vtk is viewing
-    if (m_scalarArray->getVoidPointer() != imageDataVtk->GetPointData()->GetScalars()->GetVoidPointer(0))
+    if (m_scalarArray->getVoidPointer() != m_imageDataVtk->GetPointData()->GetScalars()->GetVoidPointer(0))
     {
-        imageDataVtk->GetPointData()->GetScalars()->SetVoidArray(m_scalarArray->getVoidPointer(), m_scalarArray->size(), 1);
+        m_imageDataVtk->GetPointData()->GetScalars()->SetVoidArray(m_scalarArray->getVoidPointer(), m_scalarArray->size(), 1);
     }
     volumeMapper->GetInput()->Modified();
 }

@@ -18,14 +18,18 @@
 
 namespace imstk
 {
-VTKVertexLabelRenderDelegate::VTKVertexLabelRenderDelegate(
-    std::shared_ptr<VisualModel> visualModel) : VTKRenderDelegate(visualModel),
+VTKVertexLabelRenderDelegate::VTKVertexLabelRenderDelegate() :
     m_polydata(vtkSmartPointer<vtkPolyData>::New()),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    auto vertexLabelVisualModel = std::dynamic_pointer_cast<VertexLabelVisualModel>(visualModel);
-    m_geometry = std::dynamic_pointer_cast<PointSet>(visualModel->getGeometry());
-    CHECK(m_geometry != nullptr) << "VTKvertexLabelRenderDelegate only works with PointSet geometry";
+}
+
+void
+VTKVertexLabelRenderDelegate::init()
+{
+    auto vertexLabelVisualModel = std::dynamic_pointer_cast<VertexLabelVisualModel>(m_visualModel);
+    m_geometry = std::dynamic_pointer_cast<PointSet>(m_visualModel->getGeometry());
+    CHECK(m_geometry != nullptr) << "VTKVertexLabelRenderDelegate only works with PointSet geometry";
 
     // Get our own handles to these in case the geometry changes them
     m_vertices = m_geometry->getVertexPositions();
@@ -41,11 +45,13 @@ VTKVertexLabelRenderDelegate::VTKVertexLabelRenderDelegate(
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(m_geometry, &Geometry::modified, this,
+    queueConnect<Event>(m_geometry, &Geometry::modified,
+        std::static_pointer_cast<VTKVertexLabelRenderDelegate>(shared_from_this()),
         &VTKVertexLabelRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(m_geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this,
+    queueConnect<Event>(m_geometry->getVertexPositions(), &VecDataArray<double, 3>::modified,
+        std::static_pointer_cast<VTKVertexLabelRenderDelegate>(shared_from_this()),
         &VTKVertexLabelRenderDelegate::vertexDataModified);
 
     // Setup mapper
@@ -148,11 +154,14 @@ VTKVertexLabelRenderDelegate::setVertexBuffer(std::shared_ptr<VecDataArray<doubl
         if (m_vertices != nullptr)
         {
             // stop observing its changes
-            disconnect(m_vertices, this, &VecDataArray<double, 3>::modified);
+            disconnect(m_vertices,
+                std::static_pointer_cast<VTKVertexLabelRenderDelegate>(shared_from_this()),
+                &VecDataArray<double, 3>::modified);
         }
         // Set new buffer and observe
         m_vertices = vertices;
-        queueConnect<Event>(m_vertices, &VecDataArray<double, 3>::modified, this,
+        queueConnect<Event>(m_vertices, &VecDataArray<double, 3>::modified,
+            std::static_pointer_cast<VTKVertexLabelRenderDelegate>(shared_from_this()),
             &VTKVertexLabelRenderDelegate::vertexDataModified);
     }
 

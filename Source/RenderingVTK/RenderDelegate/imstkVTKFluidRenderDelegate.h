@@ -18,12 +18,12 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class VTKFluidRenderDelegate
 ///
-/// \brief Render delegate for point set rendered as a fluid surface
+/// \brief Delegates rendering of Fluid to VTK from VisualModel
 ///
 class VTKFluidRenderDelegate : public VTKVolumeRenderDelegate
 {
 public:
-    VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKFluidRenderDelegate();
     ~VTKFluidRenderDelegate() override = default;
 
     ///
@@ -32,6 +32,8 @@ public:
     void processEvents() override;
 
 protected:
+    void init() override;
+
     ///
     /// \brief Callback for when geometry changes
     ///

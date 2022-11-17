@@ -19,12 +19,12 @@ template<typename T, int N> class VecDataArray;
 ///
 /// \class VTKVertexLabelRenderDelegate
 ///
-/// \brief Render delegate for vertex labels.
+/// \brief Delegates rendering of text per PointSet vertex to VTK from VisualModel
 ///
 class VTKVertexLabelRenderDelegate : public VTKRenderDelegate
 {
 public:
-    VTKVertexLabelRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKVertexLabelRenderDelegate();
     ~VTKVertexLabelRenderDelegate() override = default;
 
     ///
@@ -35,6 +35,8 @@ public:
     void updateRenderProperties() override;
 
 protected:
+    void init() override;
+
     ///
     /// \brief Callback for when vertex data changes
     ///

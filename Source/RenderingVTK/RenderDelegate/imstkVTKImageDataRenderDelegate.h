@@ -17,13 +17,15 @@ class AbstractDataArray;
 ///
 /// \class VTKImageDataRenderDelegate
 ///
-/// \brief Render delegate to do to volume rendering using VTK
+/// \brief Delegates rendering of ImageData to VTK (via volume rendering) from VisualModel
 ///
 class VTKImageDataRenderDelegate : public VTKVolumeRenderDelegate
 {
 public:
-    VTKImageDataRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKImageDataRenderDelegate();
     ~VTKImageDataRenderDelegate() override = default;
+
+    void init() override;
 
     ///
     /// \brief Update render delegate source based on the internal data
@@ -42,6 +44,6 @@ protected:
     void imageScalarsModified(Event* e);
 
     std::shared_ptr<AbstractDataArray> m_scalarArray;
-    vtkSmartPointer<vtkImageData>      imageDataVtk;
+    vtkSmartPointer<vtkImageData>      m_imageDataVtk;
 };
 } // namespace imstk

@@ -15,12 +15,12 @@ namespace imstk
 ///
 /// \class VTKCapsuleRenderDelegate
 ///
-/// \brief Render capsule object with vtk backend
+/// \brief Delegates rendering of capsules to VTK from VisualModel
 ///
 class VTKCapsuleRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
-    VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKCapsuleRenderDelegate();
     ~VTKCapsuleRenderDelegate() override = default;
 
     ///
@@ -29,6 +29,8 @@ public:
     void processEvents() override;
 
 protected:
+    void init() override;
+
     vtkSmartPointer<vtkCapsuleSource> m_capsuleSource;
 };
 } // namespace imstk

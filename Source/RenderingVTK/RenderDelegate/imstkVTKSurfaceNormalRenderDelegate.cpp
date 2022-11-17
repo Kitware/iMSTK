@@ -21,10 +21,16 @@
 
 namespace imstk
 {
-VTKSurfaceNormalRenderDelegate::VTKSurfaceNormalRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+VTKSurfaceNormalRenderDelegate::VTKSurfaceNormalRenderDelegate() :
     m_polydata(vtkSmartPointer<vtkPolyData>::New())
 {
-    auto surfMesh = std::static_pointer_cast<SurfaceMesh>(visualModel->getGeometry());
+}
+
+void
+VTKSurfaceNormalRenderDelegate::init()
+{
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    CHECK(surfMesh != nullptr) << "VTKSurfaceNormalRenderDelegate only works with SurfaceMesh geometry";
     m_surfMeshVertices = surfMesh->getVertexPositions();
     m_surfMeshIndices  = surfMesh->getCells();
 
@@ -47,10 +53,14 @@ VTKSurfaceNormalRenderDelegate::VTKSurfaceNormalRenderDelegate(std::shared_ptr<V
     m_polydata->GetPointData()->SetVectors(m_mappedNormalsArray);
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(surfMesh, &Geometry::modified, this, &VTKSurfaceNormalRenderDelegate::geometryModified);
+    queueConnect<Event>(surfMesh, &Geometry::modified,
+        std::static_pointer_cast<VTKSurfaceNormalRenderDelegate>(shared_from_this()),
+        &VTKSurfaceNormalRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(m_surfMeshVertices, &AbstractDataArray::modified, this, &VTKSurfaceNormalRenderDelegate::vertexDataModified);
+    queueConnect<Event>(m_surfMeshVertices, &AbstractDataArray::modified,
+        std::static_pointer_cast<VTKSurfaceNormalRenderDelegate>(shared_from_this()),
+        &VTKSurfaceNormalRenderDelegate::vertexDataModified);
 
     // Setup mapper
     {
@@ -63,7 +73,7 @@ VTKSurfaceNormalRenderDelegate::VTKSurfaceNormalRenderDelegate(std::shared_ptr<V
         mapper->SetSourceData(m_glyphPolyData);
         mapper->SetOrientationArray(m_mappedNormalsArray->GetName());
         mapper->ScalingOn();
-        mapper->SetScaleFactor(visualModel->getRenderMaterial()->getPointSize());
+        mapper->SetScaleFactor(m_visualModel->getRenderMaterial()->getPointSize());
         mapper->Update();
         vtkNew<vtkActor> actor;
         actor->SetMapper(mapper);

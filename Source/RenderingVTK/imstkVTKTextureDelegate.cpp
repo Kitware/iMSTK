@@ -19,7 +19,13 @@
 
 namespace imstk
 {
-VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtkTexture(vtkSmartPointer<vtkTexture>::New())
+VTKTextureDelegate::VTKTextureDelegate() :
+    m_vtkTexture(vtkSmartPointer<vtkTexture>::New())
+{
+}
+
+void
+VTKTextureDelegate::initialize(std::shared_ptr<Texture> texture)
 {
     m_texture = texture;
     const std::string tFileName = texture->getPath();
@@ -131,7 +137,9 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
     }
 
     // Observe changes to the texture
-    connect<Event>(m_texture, &Texture::modified, this, &VTKTextureDelegate::textureModified);
+    connect<Event>(m_texture, &Texture::modified,
+        std::static_pointer_cast<VTKTextureDelegate>(shared_from_this()),
+        &VTKTextureDelegate::textureModified);
 }
 
 void

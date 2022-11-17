@@ -15,10 +15,16 @@
 
 namespace imstk
 {
-VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+VTKSphereRenderDelegate::VTKSphereRenderDelegate() :
     m_sphereSource(vtkSmartPointer<vtkSphereSource>::New())
 {
-    auto geometry = std::dynamic_pointer_cast<Sphere>(visualModel->getGeometry());
+}
+
+void
+VTKSphereRenderDelegate::init()
+{
+    auto geometry = std::dynamic_pointer_cast<Sphere>(m_visualModel->getGeometry());
+    CHECK(geometry != nullptr) << "VTKSphereRenderDelegate only works with Sphere geometry";
 
     m_sphereSource->SetCenter(0.0, 0.0, 0.0);
     m_sphereSource->SetRadius(geometry->getRadius(Geometry::DataType::PreTransform));

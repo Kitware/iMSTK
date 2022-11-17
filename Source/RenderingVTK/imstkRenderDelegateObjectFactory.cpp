@@ -86,6 +86,6 @@ RenderDelegateObjectFactory::makeRenderDelegate(std::shared_ptr<VisualModel> vis
     }
 
     // Still a bug, should be able to copy the visual model ptr as well
-    return create(delegateHint, std::move(visualModel));
+    return create(delegateHint);
 }
 } // namespace imstk

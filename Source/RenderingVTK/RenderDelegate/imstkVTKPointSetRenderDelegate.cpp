@@ -21,12 +21,21 @@
 
 namespace imstk
 {
-VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+VTKPointSetRenderDelegate::VTKPointSetRenderDelegate() :
+    m_geometry(nullptr),
+    m_vertices(nullptr),
+    m_vertexScalars(nullptr),
     m_polydata(vtkSmartPointer<vtkPolyData>::New()),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
     m_mappedVertexScalarArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    m_geometry = std::static_pointer_cast<PointSet>(visualModel->getGeometry());
+}
+
+void
+VTKPointSetRenderDelegate::init()
+{
+    m_geometry = std::dynamic_pointer_cast<PointSet>(m_visualModel->getGeometry());
+    CHECK(m_geometry != nullptr) << "VTKPointSetRenderDelegate only works with PointSet geometry";
 
     // Get our own handles to these in case the geometry changes them
     m_vertices = m_geometry->getVertexPositions();
@@ -53,10 +62,14 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
     glyphFilter->Update();
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(m_geometry, &Geometry::modified, this, &VTKPointSetRenderDelegate::geometryModified);
+    queueConnect<Event>(m_geometry, &Geometry::modified,
+        std::static_pointer_cast<VTKPointSetRenderDelegate>(shared_from_this()),
+        &VTKPointSetRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(m_geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKPointSetRenderDelegate::vertexDataModified);
+    queueConnect<Event>(m_geometry->getVertexPositions(), &VecDataArray<double, 3>::modified,
+        std::static_pointer_cast<VTKPointSetRenderDelegate>(shared_from_this()),
+        &VTKPointSetRenderDelegate::vertexDataModified);
 
     // Setup mapper
     {
@@ -164,11 +177,15 @@ VTKPointSetRenderDelegate::setVertexBuffer(std::shared_ptr<VecDataArray<double, 
         if (m_vertices != nullptr)
         {
             // stop observing its changes
-            disconnect(m_vertices, this, &VecDataArray<double, 3>::modified);
+            disconnect(m_vertices,
+                std::static_pointer_cast<VTKPointSetRenderDelegate>(shared_from_this()),
+                &VecDataArray<double, 3>::modified);
         }
         // Set new buffer and observe
         m_vertices = vertices;
-        queueConnect<Event>(m_vertices, &VecDataArray<double, 3>::modified, this, &VTKPointSetRenderDelegate::vertexDataModified);
+        queueConnect<Event>(m_vertices, &VecDataArray<double, 3>::modified,
+            std::static_pointer_cast<VTKPointSetRenderDelegate>(shared_from_this()),
+            &VTKPointSetRenderDelegate::vertexDataModified);
     }
 
     // Couple the buffer
@@ -188,11 +205,15 @@ VTKPointSetRenderDelegate::setVertexScalarBuffer(std::shared_ptr<AbstractDataArr
         if (m_vertexScalars != nullptr)
         {
             // stop observing its changes
-            disconnect(m_vertexScalars, this, &AbstractDataArray::modified);
+            disconnect(m_vertexScalars,
+                std::static_pointer_cast<VTKPointSetRenderDelegate>(shared_from_this()),
+                &AbstractDataArray::modified);
         }
         // Set new buffer and observe
         m_vertexScalars = scalars;
-        queueConnect<Event>(m_vertexScalars, &AbstractDataArray::modified, this, &VTKPointSetRenderDelegate::vertexScalarsModified);
+        queueConnect<Event>(m_vertexScalars, &AbstractDataArray::modified,
+            std::static_pointer_cast<VTKPointSetRenderDelegate>(shared_from_this()),
+            &VTKPointSetRenderDelegate::vertexScalarsModified);
         m_mappedVertexScalarArray = GeometryUtils::coupleVtkDataArray(m_vertexScalars);
         m_polydata->GetPointData()->SetScalars(m_mappedVertexScalarArray);
     }

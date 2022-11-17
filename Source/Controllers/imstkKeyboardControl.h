@@ -21,7 +21,7 @@ class KeyEvent;
 /// You can construct this and observe it or subclass and override
 /// to implement controls.
 ///
-class KeyboardControl : public DeviceControl
+class KeyboardControl : public DeviceControl, public std::enable_shared_from_this<KeyboardControl>
 {
 public:
     KeyboardControl(const std::string& name = "KeyboardControl") : DeviceControl(name) { }
