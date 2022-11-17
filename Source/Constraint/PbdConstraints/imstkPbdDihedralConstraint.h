@@ -51,6 +51,11 @@ public:
     bool computeValueAndGradient(PbdState& bodies,
                                  double& c, std::vector<Vec3d>& dcdx) override;
 
+    ///
+    /// \brief Return the rest configuration for the constraint
+    ///
+    double getRestValue() const { return m_restAngle; }
+
 public:
     double m_restAngle = 0.0; ///< Rest angle
 };

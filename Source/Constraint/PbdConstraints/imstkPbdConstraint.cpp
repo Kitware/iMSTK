@@ -24,6 +24,9 @@ PbdConstraint::projectConstraint(PbdState& bodies,
         return;
     }
 
+    // Save constraint value
+    m_C = c;
+
     // Compute generalized inverse mass sum
     double w = 0.0;
     for (size_t i = 0; i < m_particles.size(); i++)

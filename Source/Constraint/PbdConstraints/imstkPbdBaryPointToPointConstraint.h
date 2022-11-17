@@ -73,6 +73,11 @@ public:
     bool computeValueAndGradient(PbdState& bodies,
                                  double& c, std::vector<Vec3d>& dcdx) override;
 
+    ///
+    /// \brief Return the rest configuration for the constraint
+    ///
+    double getRestValue() const { return m_restLength; }
+
 protected:
     double m_restLength = 0.0;
     // Bary weights A and B ordered in sequence

@@ -49,6 +49,11 @@ public:
     bool computeValueAndGradient(PbdState& bodies,
                                  double& c, std::vector<Vec3d>& dcdx) override;
 
+    ///
+    /// \brief Return the rest configuration for the constraint
+    ///
+    double getRestValue() const { return m_restLength; }
+
 public:
     double m_restLength = 0.; ///< Rest length
 };

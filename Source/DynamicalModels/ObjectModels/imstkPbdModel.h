@@ -170,10 +170,8 @@ protected:
     PbdState m_initialState;
     PbdState m_state;
 
-    std::shared_ptr<PbdSolver> m_pbdSolver = nullptr;          ///< PBD solver
-
-    std::shared_ptr<PbdModelConfig> m_config = nullptr;        ///< Model parameters, must be set before simulation
-
+    std::shared_ptr<PbdSolver>      m_pbdSolver = nullptr;     ///< PBD solver
+    std::shared_ptr<PbdModelConfig> m_config    = nullptr;     ///< Model parameters, must be set before simulation
     std::shared_ptr<PbdConstraintContainer> m_constraints;     ///< The set of constraints to update/use
 
     ///< Computational Nodes

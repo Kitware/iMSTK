@@ -58,6 +58,11 @@ public:
     bool getInverstionHandling() const { return m_handleInversions; }
 ///@}
 
+    ///
+    /// \brief Return the rest configuration for the constraint
+    /// Note: the implementation currently assumes an initial strain energy of 0
+    double getRestValue() const { return 0.0; }
+
 private:
     bool m_handleInversions = true;
 };

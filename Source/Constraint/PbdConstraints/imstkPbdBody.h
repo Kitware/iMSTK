@@ -33,6 +33,7 @@ copyAndAllocate(const std::shared_ptr<T>& src, std::shared_ptr<T>& dest)
 
 namespace imstk
 {
+class PbdConstraint;
 ///
 /// \struct PbdBody
 ///
@@ -59,7 +60,6 @@ struct PbdBody
             RIGID
         };
 
-    public:
         PbdBody() : bodyHandle(-1) { }
         PbdBody(const int handle) : bodyHandle(handle) { }
 
@@ -160,7 +160,7 @@ struct PbdBody
             return orientations->at(0);
         }
 
-    public:
+        // Struct Data
         int bodyHandle; ///< Id in the system
         Type bodyType = Type::DEFORMABLE;
 
@@ -190,6 +190,10 @@ struct PbdBody
 
         /// Map for archiving fixed nodes' mass.
         std::unordered_map<int, double> fixedNodeInvMass;
+
+        /// Map for storing the constraints associated with a given cell
+        /// useful for speeding up cell removal based on cell state
+        std::unordered_map<int, std::vector<std::shared_ptr<PbdConstraint>>> m_cellConstraintMap;
 };
 
 ///

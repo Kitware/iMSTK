@@ -36,6 +36,10 @@ public:
     ///
     bool computeValueAndGradient(PbdState& bodies,
                                  double& c, std::vector<Vec3d>& dcdx) override;
+    ///
+    /// \brief Return the rest configuration for the constraint
+    ///
+    double getRestValue() const { return m_restArea; }
 
 public:
     double m_restArea = 0.0;  ///< Area at the rest position

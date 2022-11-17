@@ -95,6 +95,10 @@ protected:
         if (useTaskGraph)
         {
             m_taskGraph = std::make_shared<TaskGraph>();
+
+            // Set default names
+            m_taskGraph->getSource()->m_name = "Behavior_Source";
+            m_taskGraph->getSink()->m_name   = "Behavior_Sink";
         }
     }
 

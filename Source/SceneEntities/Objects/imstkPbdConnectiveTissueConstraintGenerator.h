@@ -103,7 +103,7 @@ protected:
     std::shared_ptr<PbdObject> m_objA = nullptr;                ///< Organ being connected
     std::shared_ptr<PbdObject> m_objB = nullptr;                ///< Organ being connected
 
-    double m_distStiffness = 5.0;                               ///< Stiffness used for distance constraints
+    double m_distStiffness = 500.0;                             ///< Stiffness used for distance constraints
     double m_tolerance     = 0.00001;                           ///< Tolerance for checking coincidence of surface to line mesh
 };
 

@@ -30,6 +30,9 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj) :
     // Fix dummy vertex
     pbdObj->getPbdBody()->fixedNodeIds.push_back(0);
 
+    // Reinitialize to account for new dummy vertex
+    pbdObj->initialize();
+
     // Note: maps no longer valid after this point
 }
 
@@ -37,6 +40,7 @@ void
 PbdObjectCellRemoval::removeConstraints()
 {
     // Mesh Data
+    int       bodyId       = m_obj->getPbdBody()->bodyHandle;
     const int vertsPerCell = m_mesh->getAbstractCells()->getNumberOfComponents();
     auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells()); // underlying 1D array
 
@@ -55,6 +59,23 @@ PbdObjectCellRemoval::removeConstraints()
             const std::vector<PbdParticleId>& vertexIds = (*j)->getParticles();
             std::unordered_set<int>           constraintVertIds;
             std::unordered_set<int>           cellVertIds;
+
+            // Check that constraint involves this body and get associated vertices
+            bool isBody = false;
+            for (int cVertId = 0; cVertId < vertexIds.size(); cVertId++)
+            {
+                if (vertexIds[cVertId].first == bodyId)
+                {
+                    isBody = true;
+                    break;
+                }
+            }
+
+            if (isBody == false)
+            {
+                j++;
+                continue;
+            }
 
             // Dont remove any constraints that do not involve every node
             // of the cell
