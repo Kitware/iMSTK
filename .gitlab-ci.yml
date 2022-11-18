@@ -2,7 +2,7 @@ include:
     # Metadata shared my many jobs
     - local: .gitlab/rules.yml
     - local: .gitlab/artifacts.yml
-    - local: .gitlab/doxygen.yml
+    - local: .gitlab/documentation.yml
 
     # OS builds.
     - local: .gitlab/os-linux.yml
@@ -31,8 +31,8 @@ stages:
 
 pages:
     extends:
-        - .doxygen_build
-        - .doxygen_on_mirror
+        - .doc_build
+        - .run_on_mirror_default_branch
 
 # Linux
 

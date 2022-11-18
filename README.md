@@ -39,9 +39,9 @@ iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.
 
 ## Resources
 ### Documentation
-Click [here](https://imstk.readthedocs.io/en/latest/) for user documentation.
+Click [here](https://imstk.gitlab.io/) for user documentation.
 
-Click [here](https://imstk.gitlab.io/) for doxygen code documentation.
+Click [here](https://imstk.gitlab.io/doxy/index) for doxygen code documentation.
 
 Click [here](https://gitlab.kitware.com/iMSTK/iMSTK/-/blob/master/Docs/CodingGuide.md) for iMSTK coding style
 
@@ -77,11 +77,15 @@ sudo apt-get install build-essential libgl1-mesa-dev libxt-dev libusb-1.0-0-dev 
 ### 1. Getting the source code
 To be able to contribute back to the iMSTK project, the preferred way is to use [Git] for code version control. You can use the following command in the terminal for Linux/macOS, or in [Git Bash] for Windows.
 ```sh
+git clone https://gitlab.kitware.com/iMSTK/iMSTK.git
+```
+OR
+```sh
 git clone git@gitlab.kitware.com:iMSTK/iMSTK.git
 ```
 
-### 2. Setting up your SSH key
-The build process will check out external dependency sources with the SSH protocol to avoid manually entering credentials during the build process. To allow this, make sure you set up your ssh key in your profile [HERE](https://gitlab.kitware.com/profile/keys). You can find documentation on how to generate and retrieve your public ssh key [HERE](https://gitlab.kitware.com/help/ssh/README).
+### 2. Optional: Setting up your SSH key
+If cloning with HTTPS, skip this step. If cloning with SSH the build process will check out external dependency sources with the SSH protocol to avoid manually entering credentials during the build process. To allow this, make sure you set up your ssh key in your profile [HERE](https://gitlab.kitware.com/profile/keys). You can find documentation on how to generate and retrieve your public ssh key [HERE](https://gitlab.kitware.com/help/ssh/README).
 
 ### 3. Building iMSTK
 We use [CMake] to configure the project on every platform. See how to run it [HERE](https://cmake.org/runningcmake/).
@@ -117,7 +121,7 @@ We use [CMake] to configure the project on every platform. See how to run it [HE
   
 * #### Haply Support
   To support the [Haply Inverse3](https://www.haply.co) haptic device, follow the steps below:
-    1. Acquire the C++ Haply Hardware API from Haply.
+    1. Acquire the C++ Haply Hardware API from [here](https://talk.haply.co/t/release-of-the-version-0-0-5-of-the-c-api/19/4).
     2. Add the Haply Hardware API to your system path with variable name: Haply_SDK_BASE.
     3. Configure your CMake project with the variable `iMSTK_USE_HAPLY` set to `ON`.
 

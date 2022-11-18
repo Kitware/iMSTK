@@ -149,6 +149,7 @@ main()
 
     // Add cutting interaction
     auto cutting = std::make_shared<PbdObjectCutting>(tissueObj, toolObj);
+    cutting->setEpsilon(0.001);
     scene->addInteraction(cutting);
 
     // Add collision interaction (order matters for MeshtoMesh)
