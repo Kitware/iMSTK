@@ -1,0 +1,91 @@
+# Change these to reflect the user and site details.
+site_name: imstk-documentation
+site_url: https://imstk.gitlab.io/
+repo_name: Kitware/iMSTK
+repo_url: https://gitlab.kitware.com/iMSTK/iMSTK
+docs_dir: 'Docs'
+
+theme:
+    name: material
+    logo: media/logo.png
+    favicon: media/favicon.png
+    palette:
+        scheme: slate
+        primary: teal
+        
+use_directory_urls: false
+
+markdown_extensions:
+    - pymdownx.highlight:
+        linenums: true
+        anchor_linenums: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - pymdownx.arithmatex
+    - pymdownx.tasklist:
+        custom_checkbox: true
+    - pymdownx.magiclink
+    - admonition
+    - codehilite:
+        guess_lang: false
+        use_pygments: true
+    - footnotes
+    - toc:
+        permalink: true
+
+plugins:
+    - mkdocs-video
+
+#google_analytics:
+#    -  '?'
+#    -  'auto'
+extra_css:
+    -  'stylesheets/extra.css'
+copyright: '<font color=#666>Content is available under </font><a href="https://creativecommons.org/licenses/by/2.5/" title="Attribution2.5">Attribution2.5</a> <font color=#666>unless otherwise noted.</font>'
+extra_javascript:
+    - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'
+
+nav:
+    - Home: 'index.md'
+    - README: 'ImstkREADME.md'
+    - SimulationManager & Modules: 'SimManager_Modules.md'
+    - Scene & Object Model: 'Scene.md'
+    - Rendering: 'Rendering.md'
+    - Geometry: 'Geometry.md'
+    - Mesh IO: 'Mesh_IO.md'
+    - DynamicalModel:
+        - Position Based Dynamics (PBD): 'Dynamical_Models/PbdModel.md'
+        - Rigid Body Dynamics (RBD): 'Dynamical_Models/RigidBodyModel2.md'
+        - Level Set Model (LSM): 'Dynamical_Models/LevelSetModel.md'
+        - Smooth Particle Hydrodynamics (SPH): 'Dynamical_Models/SphModel.md'
+        - Finite Element Method (FEM): 'Dynamical_Models/FeDeformableModel.md'
+    - Collision:
+        - Collision: 'Collision.md'
+        - Collision Detection: 'Collision/Collision_Detection.md'
+        - Collision Handling: 'Collision/Collision_Handling.md'
+    - Devices: 'Devices.md'
+    - Controllers: 'Controllers.md'
+    - Grasping: 'Grasping.md'
+    - Cutting: 'Cutting.md'
+    - Needles: 'Needles.md'
+    - Connective Tissue: 'Connective_Tissue.md'
+    - Extras:
+        - Port Holes: 'Extras/Port_Holes.md'
+        - Geometric Filtering: 'Extras/Filtering.md'
+        - Parallelism: 'Extras/Parallelism.md'
+        - Event System: 'Extras/Event_System.md'
+    - Examples:
+        - About the Examples: 'Examples.md'
+        # Insertions will happen here by the script
+    # The doxygen generated index.html gets renamed so user documentation is the front page
+    - Developer Guide:
+        - Coding Guide: 'Maintainance/Coding_Guide.md'
+        - Maintainance: 'Maintainance/Maintainance.md'
+        - Continuous Integration: 'Maintainance/Continuous_Integration.md'
+        - Release Process: 'Maintainance/Release_Process.md'
+        - Contributing: 'Maintainance/Contributing.md'
+    - Unity Engine: 'https://gitlab.kitware.com/iMSTK/imstk-unity'
+    - Doxygen: 'https://imstk.gitlab.io/doxy/index.html'
+    - Dicourse: 'https://discourse.kitware.com/c/imstk/9'
+    - Releases: 'releases.md'

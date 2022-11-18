@@ -22,7 +22,7 @@ if (iMSTK_USE_MODEL_REDUCTION AND iMSTK_USE_RENDERING_VTK)
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
-  imstk_add_executable(${PROJECT_NAME} ReducedFEM.cpp)
+  imstk_add_executable(${PROJECT_NAME} ReducedFEMExample.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder

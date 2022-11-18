@@ -1,0 +1,33 @@
+.doc_build:
+    image: python:3.8-buster
+    stage: deploy
+
+    script:
+        # Setup doxygen and build code docs
+        - apt-get update
+        - apt-get install -y doxygen fonts-freefont-ttf graphviz
+        - mkdir Docs/html
+        - doxygen Doxyfile
+
+        # Rename the index.html file to avoid collision with doxygen
+        - mkdir public
+        - mkdir public/doxy
+        - mv -v Docs/html/* public/doxy/
+
+        - pip install mkdocs-material
+        - pip install mkdocs-video
+        - pip install pymdown-extensions
+
+        # Generate markup/.md for example code
+        - mkdir ./Docs/Examples
+        - python .gitlab/ExampleMarkupGenerate.py ./Examples ./Docs/Examples
+        - python .gitlab/MkDocNavGenerator.py ./Docs ./mkdocs.yml ./mkdocs.yml
+        # Copy the iMSTK README.md into the doc directory for generation, README is special to mkdocs, can't use that
+        - cp ./README.md "./Docs/ImstkREADME.md"
+        - mkdocs build --verbose --site-dir build
+        # -mkdocs build --strict --verbose --site-dir build # Fail when there are warnings like missing images
+        - mv build/* public/
+
+    artifacts:
+        paths:
+            - public/
