@@ -8,7 +8,6 @@
 
 #include "imstkGeometryAlgorithm.h"
 #include "imstkDataArray.h"
-#include "imstkVecDataArray.h"
 
 #include <random>
 namespace imstk
