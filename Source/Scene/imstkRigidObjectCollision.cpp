@@ -18,7 +18,7 @@
 
 namespace imstk
 {
-RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1, std::shared_ptr<CollidingObject> obj2,
+RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1, std::shared_ptr<Entity> obj2,
                                            std::string cdType) :
     CollisionInteraction("RigidObjectCollision" + rbdObj1->getName() + "_vs_" + obj2->getName(), rbdObj1, obj2, cdType)
 {
@@ -42,6 +42,8 @@ RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1
         }, "ComputeDisplacements");
     m_taskGraph->addNode(m_computeDisplacementNode);
 
+    auto obj2AsSceneObject = std::dynamic_pointer_cast<SceneObject>(obj2);
+    CHECK(obj2AsSceneObject != nullptr) << "Expected obj2 to be a SceneObject.";
     if (auto rbdObj2 = std::dynamic_pointer_cast<RigidObject2>(obj2))
     {
         std::shared_ptr<RigidBodyModel2> model2 = rbdObj2->getRigidBodyModel2();
@@ -60,10 +62,10 @@ RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1
     {
         // Define where collision interaction happens
         m_taskGraph->addNode(model1->getComputeTentativeVelocitiesNode());
-        m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
+        m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSource());
 
         m_taskGraph->addNode(model1->getSolveNode());
-        m_taskGraph->addNode(obj2->getUpdateNode());
+        m_taskGraph->addNode(obj2AsSceneObject->getUpdateNode());
 
         // Setup the handlers for only A and inform CD it only needs to generate A
         m_colDetect->setGenerateCD(true, false);
@@ -73,8 +75,8 @@ RigidObjectCollision::RigidObjectCollision(std::shared_ptr<RigidObject2> rbdObj1
     m_taskGraph->addNode(rbdObj1->getUpdateGeometryNode());
     m_taskGraph->addNode(rbdObj1->getTaskGraph()->getSource());
     m_taskGraph->addNode(rbdObj1->getTaskGraph()->getSink());
-    m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
-    m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
+    m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSource());
+    m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSink());
 }
 
 void
@@ -135,11 +137,12 @@ RigidObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shar
                Collision Handling         \
                Rbd Solve 1               CollidingObject Update */
         m_taskGraph->addEdge(rbdModel1->getComputeTentativeVelocitiesNode(), m_collisionDetectionNode);
-        m_taskGraph->addEdge(m_objB->getTaskGraph()->getSource(), m_collisionDetectionNode);
+        auto objBSceneObject = std::dynamic_pointer_cast<SceneObject>(m_objB);
+        m_taskGraph->addEdge(objBSceneObject->getTaskGraph()->getSource(), m_collisionDetectionNode);
 
         m_taskGraph->addEdge(m_collisionDetectionNode, handlerABNode);
         m_taskGraph->addEdge(handlerABNode, rbdModel1->getSolveNode());
-        m_taskGraph->addEdge(m_collisionDetectionNode, m_objB->getUpdateNode());
+        m_taskGraph->addEdge(m_collisionDetectionNode, objBSceneObject->getUpdateNode());
     }
 
     // \todo: This should be handled differently (per object, not per interaction)

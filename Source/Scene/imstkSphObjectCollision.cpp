@@ -16,7 +16,7 @@
 namespace imstk
 {
 // Pbd Collision will be tested before any step of pbd, then resolved after the solve steps of the two objects
-SphObjectCollision::SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<CollidingObject> obj2,
+SphObjectCollision::SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<Entity> obj2,
                                        std::string cdType) :
     CollisionInteraction("SphObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, cdType)
 {
@@ -27,12 +27,14 @@ SphObjectCollision::SphObjectCollision(std::shared_ptr<SphObject> obj1, std::sha
     ch->setDetection(m_colDetect);
     setCollisionHandlingA(ch);
 
+    auto obj2AsSceneObject = std::dynamic_pointer_cast<SceneObject>(obj2);
+    CHECK(obj2AsSceneObject != nullptr) << "Expected obj2 to be a SceneObject.";
     // Collision should happen after positions and velocities are computed
     m_taskGraph->addNode(obj1->getUpdateGeometryNode());
-    m_taskGraph->addNode(obj2->getUpdateGeometryNode());
+    m_taskGraph->addNode(obj2AsSceneObject->getUpdateGeometryNode());
 
     m_taskGraph->addNode(obj1->getTaskGraph()->getSink());
-    m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
+    m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSink());
 }
 
 void
@@ -50,11 +52,12 @@ SphObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     //    objA Sink                          objB Sink
     //
     m_taskGraph->addEdge(sphObj1->getUpdateGeometryNode(), m_collisionDetectionNode);
-    m_taskGraph->addEdge(m_objB->getUpdateGeometryNode(), m_collisionDetectionNode);
+    auto objBAsSceneObject = std::dynamic_pointer_cast<SceneObject>(m_objB);
+    m_taskGraph->addEdge(objBAsSceneObject->getUpdateGeometryNode(), m_collisionDetectionNode);
 
     m_taskGraph->addEdge(m_collisionDetectionNode, m_collisionHandleANode);
 
     m_taskGraph->addEdge(m_collisionHandleANode, sphObj1->getTaskGraph()->getSink());
-    m_taskGraph->addEdge(m_collisionHandleANode, m_objB->getTaskGraph()->getSink());
+    m_taskGraph->addEdge(m_collisionHandleANode, objBAsSceneObject->getTaskGraph()->getSink());
 }
 } // namespace imstk

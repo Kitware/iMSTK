@@ -17,12 +17,12 @@ class SphObject;
 /// \class SphObjectCollision
 ///
 /// \brief This class defines where collision should happen between SphObject
-/// and CollidingObject pipelines
+/// and Entity pipelines
 ///
 class SphObjectCollision : public CollisionInteraction
 {
 public:
-    SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<CollidingObject> obj2,
+    SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<Entity> obj2,
                        std::string cdType = "");
     ~SphObjectCollision() override = default;
 

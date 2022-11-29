@@ -4,6 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkCollider.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdContactConstraint.h"
 #include "imstkPbdEdgeEdgeCCDConstraint.h"
@@ -199,7 +200,7 @@ PbdCollisionHandling::~PbdCollisionHandling()
 }
 
 PbdCollisionHandling::CollisionSideData
-PbdCollisionHandling::getDataFromObject(std::shared_ptr<CollidingObject> obj)
+PbdCollisionHandling::getDataFromObject(std::shared_ptr<Entity> obj)
 {
     // Pack info into struct, gives some contextual hints as well
     CollisionSideData side;
@@ -207,7 +208,7 @@ PbdCollisionHandling::getDataFromObject(std::shared_ptr<CollidingObject> obj)
     side.pbdObj  = pbdObj.get();   // Garunteed
     side.colObj  = obj.get();
     side.objType = ObjType::Colliding;
-    std::shared_ptr<Geometry> collidingGeometry = side.colObj->getCollidingGeometry();
+    std::shared_ptr<Geometry> collidingGeometry = Collider::getCollidingGeometryFromEntity(obj.get());
     side.geometry = collidingGeometry.get();
 
     if (side.pbdObj != nullptr)
@@ -237,7 +238,7 @@ PbdCollisionHandling::getDataFromObject(std::shared_ptr<CollidingObject> obj)
     side.vertices = (side.pointSet == nullptr) ? nullptr : side.pointSet->getVertexPositions().get();
     if (side.objType == ObjType::PbdRigid)
     {
-        if (auto pointSet = std::dynamic_pointer_cast<PointSet>(side.colObj->getCollidingGeometry()))
+        if (auto pointSet = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(side.colObj)))
         {
             std::shared_ptr<VecDataArray<double, 3>> vertices = pointSet->getVertexPositions();
             side.vertices = vertices.get();
@@ -245,7 +246,7 @@ PbdCollisionHandling::getDataFromObject(std::shared_ptr<CollidingObject> obj)
         //side.vertices = side.colObj->getCollidingGeometry()
     }
     side.indicesPtr = nullptr;
-    if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(side.colObj->getCollidingGeometry()))
+    if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(Collider::getCollidingGeometryFromEntity(side.colObj)))
     {
         std::shared_ptr<AbstractDataArray> indicesPtr = cellMesh->getAbstractCells();
         side.indicesPtr = indicesPtr.get();

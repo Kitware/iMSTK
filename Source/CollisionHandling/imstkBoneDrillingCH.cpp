@@ -5,8 +5,8 @@
 */
 
 #include "imstkBoneDrillingCH.h"
-#include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
+#include "imstkCollider.h"
 #include "imstkParallelFor.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRigidObject2.h"
@@ -31,7 +31,7 @@ BoneDrillingCH::erodeBone(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getBoneObj()->getCollidingGeometry());
+    auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(Collider::getCollidingGeometryFromEntity(getBoneObj().get()));
 
     // BoneDrillingCH process tetra-pointdirection elements
     ParallelUtils::parallelFor(elementsA.size(),
@@ -91,10 +91,10 @@ BoneDrillingCH::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<CollidingObject> bone  = getBoneObj();
+    std::shared_ptr<Entity> bone  = getBoneObj();
     std::shared_ptr<RigidObject2>    drill = getDrillObj();
 
-    auto boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(bone->getCollidingGeometry());
+    auto boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(Collider::getCollidingGeometryFromEntity(bone.get()));
 
     if (m_nodalDensity.size() != boneMesh->getNumVertices())
     {
@@ -136,7 +136,8 @@ BoneDrillingCH::handle(
     }
 
     // Check if any collisions
-    const auto devicePosition = drill->getCollidingGeometry()->getTranslation();
+    auto drillCollidingGeometry = Collider::getCollidingGeometryFromEntity(drill.get());
+    const auto devicePosition = drillCollidingGeometry->getTranslation();
     if (elementsA.empty() && elementsB.empty())
     {
         // Set the visual object position same as the colliding object position

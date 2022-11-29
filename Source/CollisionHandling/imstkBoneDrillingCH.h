@@ -13,7 +13,7 @@
 namespace imstk
 {
 class CollisionData;
-class CollidingObject;
+class Entity;
 class RigidObject2;
 
 ///
@@ -35,14 +35,14 @@ public:
     ///
     /// \brief Set the input bone
     ///
-    void setInputObjectBone(std::shared_ptr<CollidingObject> boneObject) { setInputObjectA(boneObject); }
+    void setInputObjectBone(std::shared_ptr<Entity> boneObject) { setInputObjectA(boneObject); }
 
     ///
     /// \brief Set the input drill
     ///
     void setInputObjectDrill(std::shared_ptr<RigidObject2> drillObject);
 
-    std::shared_ptr<CollidingObject> getBoneObj() const { return getInputObjectA(); }
+    std::shared_ptr<Entity> getBoneObj() const { return getInputObjectA(); }
     std::shared_ptr<RigidObject2> getDrillObj() const;
 
 public:

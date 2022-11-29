@@ -40,13 +40,6 @@ public:
     ///@}
 
     ///
-    /// \brief
-    ///@{
-    std::shared_ptr<GeometryMap> getCollidingToVisualMap() const { return m_collidingToVisualMap; }
-    void setCollidingToVisualMap(std::shared_ptr<GeometryMap> map) { m_collidingToVisualMap = map; }
-    ///@}
-
-    ///
     /// \brief Get/Set name
     ///@{
     const std::string& getName() const { return m_name; }

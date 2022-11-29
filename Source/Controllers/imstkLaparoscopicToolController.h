@@ -10,8 +10,9 @@
 
 namespace imstk
 {
-class CollidingObject;
+class Entity;
 class Geometry;
+class SceneObject;
 
 ///
 /// \class LaparoscopicToolController
@@ -35,9 +36,9 @@ public:
     ~LaparoscopicToolController() override = default;
 
     void setParts(
-        std::shared_ptr<CollidingObject> shaft,
-        std::shared_ptr<CollidingObject> upperJaw,
-        std::shared_ptr<CollidingObject> lowerJaw,
+        std::shared_ptr<Entity> shaft,
+        std::shared_ptr<Entity> upperJaw,
+        std::shared_ptr<Entity> lowerJaw,
         std::shared_ptr<Geometry>        pickGeom);
 
     void setDevice(std::shared_ptr<DeviceClient> device) override;
@@ -92,9 +93,9 @@ public:
     JawState getJawState() const { return m_jawState; }
 
 protected:
-    std::shared_ptr<CollidingObject> m_shaft;               ///< Tool shaft
-    std::shared_ptr<CollidingObject> m_upperJaw;            ///< Tool upper jaw
-    std::shared_ptr<CollidingObject> m_lowerJaw;            ///< Tool lower jaw
+    std::shared_ptr<SceneObject> m_shaft;               ///< Tool shaft
+    std::shared_ptr<SceneObject> m_upperJaw;            ///< Tool upper jaw
+    std::shared_ptr<SceneObject> m_lowerJaw;            ///< Tool lower jaw
     std::shared_ptr<Geometry> m_pickGeom;
 
     double   m_jawAngle    = PI / 6.0;                      ///< Angle of the jaws

@@ -13,7 +13,7 @@ namespace imstk
 class CollisionData;
 class CollisionDetectionAlgorithm;
 class CollisionHandling;
-class CollidingObject;
+class Entity;
 
 ///
 /// \class CollisionInteraction
@@ -27,8 +27,8 @@ public:
 
 protected:
     CollisionInteraction(std::string                      objName,
-                         std::shared_ptr<CollidingObject> obj1,
-                         std::shared_ptr<CollidingObject> obj2,
+                         std::shared_ptr<Entity> obj1,
+                         std::shared_ptr<Entity> obj2,
                          std::string                      cdType);
 
 public:
@@ -83,8 +83,8 @@ protected:
     ///
     void updateCHB();
 
-    std::shared_ptr<CollidingObject> m_objA = nullptr;
-    std::shared_ptr<CollidingObject> m_objB = nullptr;
+    std::shared_ptr<Entity> m_objA = nullptr;
+    std::shared_ptr<Entity> m_objB = nullptr;
 
     std::shared_ptr<CollisionDetectionAlgorithm> m_colDetect = nullptr; ///< Collision detection algorithm
     std::shared_ptr<CollisionHandling> m_colHandlingA = nullptr;

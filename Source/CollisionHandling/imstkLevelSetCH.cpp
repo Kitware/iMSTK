@@ -5,6 +5,7 @@
 */
 
 #include "imstkLevelSetCH.h"
+#include "imstkCollider.h"
 #include "imstkCollisionData.h"
 #include "imstkImageData.h"
 #include "imstkLevelSetDeformableObject.h"
@@ -200,7 +201,7 @@ LevelSetCH::handle(
 void
 LevelSetCH::maskAllPoints()
 {
-    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(getRigidObj()->getCollidingGeometry());
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(getRigidObj().get()));
     for (int i = 0; i < pointSet->getNumVertices(); i++)
     {
         m_ptIdMask.insert(i);

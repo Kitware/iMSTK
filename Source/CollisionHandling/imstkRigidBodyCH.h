@@ -43,7 +43,8 @@ public:
     ///
     /// \brief Second input colliding object is optional
     ///
-    void setInputCollidingObjectB(std::shared_ptr<CollidingObject> colObjB);
+    // Do we want to rename this as setInputSceneObjectB ?
+    void setInputCollidingObjectB(std::shared_ptr<Entity> colObjB);
 
     std::shared_ptr<RigidObject2> getRigidObjA();
     std::shared_ptr<RigidObject2> getRigidObjB();
@@ -92,7 +93,7 @@ protected:
     ///
     void handleRbdStaticOneWay(
         std::shared_ptr<RigidObject2>        rbdObj,
-        std::shared_ptr<CollidingObject>     colObj,
+        std::shared_ptr<Entity>              colObj,
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB);
 

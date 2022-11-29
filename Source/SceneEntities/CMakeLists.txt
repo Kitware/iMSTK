@@ -21,7 +21,6 @@ set(H_FILES
   Loader/imstkVisualObjectImporter.h
   Objects/imstkAnimationModel.h
   Objects/imstkAnimationObject.h
-  Objects/imstkCollidingObject.h
   Objects/imstkCollisionDataDebugModel.h
   Objects/imstkDebugGeometryModel.h
   Objects/imstkDynamicObject.h
@@ -48,7 +47,6 @@ set(SRC_FILES
   Loader/imstkVisualObjectImporter.cpp
   Objects/imstkAnimationModel.cpp
   Objects/imstkAnimationObject.cpp
-  Objects/imstkCollidingObject.cpp
   Objects/imstkCollisionDataDebugModel.cpp
   Objects/imstkDebugGeometryModel.cpp
   Objects/imstkDynamicObject.cpp

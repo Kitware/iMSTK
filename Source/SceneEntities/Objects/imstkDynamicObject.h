@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkCollidingObject.h"
+#include "imstkSceneObject.h"
 
 namespace imstk
 {
@@ -19,7 +19,7 @@ class AbstractDynamicalModel;
 ///
 /// \brief Base class for scene objects that move and/or deform
 ///
-class DynamicObject : public CollidingObject
+class DynamicObject : public SceneObject // CollidingObject
 {
 public:
     ~DynamicObject() override = default;
@@ -85,7 +85,7 @@ protected:
 
     void postModifiedAll() override;
 
-    DynamicObject(const std::string& name) : CollidingObject(name) { }
+    DynamicObject(const std::string& name) : SceneObject(name) { }
 
     std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel = nullptr; ///< Dynamical model
     std::shared_ptr<Geometry> m_physicsGeometry = nullptr;              ///< Geometry used for Physics

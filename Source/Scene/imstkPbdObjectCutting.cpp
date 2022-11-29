@@ -14,11 +14,11 @@
 #include "imstkPbdSolver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshCut.h"
-#include "imstkLineMeshCut.h"
+#include "imstkCollider.h"
 
 namespace imstk
 {
-PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> cutObj) :
+PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<Entity> cutObj) :
     m_objA(pbdObj), m_objB(cutObj)
 {
     CHECK(std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getPhysicsGeometry()) != nullptr
@@ -26,8 +26,8 @@ PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::share
         "PbdObj is not a SurfaceMesh, could not create cutting pair";
 
     // check whether cut object is valid
-    if (std::dynamic_pointer_cast<SurfaceMesh>(cutObj->getCollidingGeometry()) == nullptr
-        && std::dynamic_pointer_cast<AnalyticalGeometry>(cutObj->getCollidingGeometry()) == nullptr)
+    if (std::dynamic_pointer_cast<SurfaceMesh>(Collider::getCollidingGeometryFromEntity(cutObj.get())) == nullptr
+        && std::dynamic_pointer_cast<AnalyticalGeometry>(Collider::getCollidingGeometryFromEntity(cutObj.get())) == nullptr)
     {
         LOG(WARNING) << "CutObj is neither a SurfaceMesh nor an AnalyticalGeometry, could not create cutting pair";
         return;
@@ -42,12 +42,13 @@ PbdObjectCutting::apply()
     m_addConstraintVertices->clear();
     m_removeConstraintVertices->clear();
 
+    auto objBCollisionGeometry = Collider::getCollidingGeometryFromEntity(m_objB.get());
     // Perform cutting
     if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_objA->getPhysicsGeometry()))
     {
         SurfaceMeshCut cutter;
         cutter.setInputMesh(surfMesh);
-        cutter.setCutGeometry(m_objB->getCollidingGeometry());
+        cutter.setCutGeometry(objBCollisionGeometry);
         cutter.setEpsilon(m_epsilon);
         cutter.update();
 
@@ -66,7 +67,7 @@ PbdObjectCutting::apply()
     {
         LineMeshCut cutter;
         cutter.setInputMesh(lineMesh);
-        cutter.setCutGeometry(m_objB->getCollidingGeometry());
+        cutter.setCutGeometry(objBCollisionGeometry);
         cutter.setEpsilon(m_epsilon);
         cutter.update();
 

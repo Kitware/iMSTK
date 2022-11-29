@@ -7,6 +7,7 @@
 #include "imstkPbdObjectCollision.h"
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
+#include "imstkCollider.h"
 #include "imstkCCDAlgorithm.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkPbdCollisionHandling.h"
@@ -17,7 +18,7 @@
 
 namespace imstk
 {
-PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
+PbdObjectCollision::PbdObjectCollision(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2,
                                        std::string cdType) :
     CollisionInteraction("PbdObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, cdType)
 {
@@ -34,8 +35,6 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
             if (auto pbdCCD = std::dynamic_pointer_cast<CCDAlgorithm>(getCollisionDetection()))
             {
                 // \todo: These inputs could be flipped in the algorithm
-                std::dynamic_pointer_cast<CollidingObject>(m_objA)->updateGeometries();
-                std::dynamic_pointer_cast<CollidingObject>(m_objB)->updateGeometries();
                 pbdCCD->updatePreviousTimestepGeometry(pbdCCD->getInput(0), pbdCCD->getInput(1));
             }
         });
@@ -43,12 +42,17 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
 
     setCollisionHandlingAB(ch);
 
-    m_taskGraph->addNode(obj1->getTaskGraph()->getSource());
-    m_taskGraph->addNode(obj1->getTaskGraph()->getSink());
-    m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
-    m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
+    auto obj1AsPbdObject = std::dynamic_pointer_cast<PbdObject>(obj1);
+    CHECK(obj1AsPbdObject != nullptr) << "Expected obj1 to be a PbdObject.";
+    m_taskGraph->addNode(obj1AsPbdObject->getTaskGraph()->getSource());
+    m_taskGraph->addNode(obj1AsPbdObject->getTaskGraph()->getSink());
 
-    std::shared_ptr<PbdModel> pbdModel = obj1->getPbdModel();
+    auto obj2AsSceneObject = std::dynamic_pointer_cast<SceneObject>(obj2);
+    CHECK(obj2AsSceneObject != nullptr) << "Expected obj2 to be a SceneObject.";
+    m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSource());
+    m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSink());
+
+    std::shared_ptr<PbdModel> pbdModel = obj1AsPbdObject->getPbdModel();
     m_taskGraph->addNode(pbdModel->getSolveNode());
     m_taskGraph->addNode(pbdModel->getIntegratePositionNode());
     m_taskGraph->addNode(pbdModel->getUpdateVelocityNode());
@@ -59,7 +63,7 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
     }
     else
     {
-        m_taskGraph->addNode(obj2->getUpdateGeometryNode());
+        m_taskGraph->addNode(obj2AsSceneObject->getUpdateGeometryNode());
     }
 }
 
@@ -165,7 +169,7 @@ PbdObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     CollisionInteraction::initGraphEdges(source, sink);
 
     auto                         pbdObj1 = std::dynamic_pointer_cast<PbdObject>(m_objA);
-    std::shared_ptr<SceneObject> obj2    = m_objB;
+    std::shared_ptr<SceneObject> obj2    = std::dynamic_pointer_cast<SceneObject>(m_objB);
 
     std::shared_ptr<TaskNode> chNodeAB = m_collisionHandleANode;
 

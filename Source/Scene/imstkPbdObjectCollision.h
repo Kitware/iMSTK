@@ -25,7 +25,7 @@ public:
     ///
     /// \brief Constructor for PbdObject-PbdObject or PbdObject-CollidingObject collisions
     ///
-    PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
+    PbdObjectCollision(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2,
                        std::string cdType = "");
 
     ~PbdObjectCollision() override = default;

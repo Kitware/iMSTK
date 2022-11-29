@@ -4,6 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkCollider.h"
 #include "imstkCollisionUtils.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkLineMesh.h"
@@ -205,7 +206,9 @@ addConnectiveTissueConstraints(
     // Setup the Object
     connectiveStrands->setVisualGeometry(connectiveLineMesh);
     connectiveStrands->setPhysicsGeometry(connectiveLineMesh);
-    connectiveStrands->setCollidingGeometry(connectiveLineMesh);
+    // connectiveStrands->setCollidingGeometry(connectiveLineMesh);
+    auto collider = connectiveStrands->addComponent<Collider>();
+    collider->setGeometry(connectiveLineMesh);
     connectiveStrands->setDynamicalModel(model);
 
     double mass = 1.0;
@@ -236,16 +239,16 @@ makeConnectiveTissue(
     proxSelector = std::make_shared<ProximitySurfaceSelector>();
 
     // Check inputs
-    auto objASurf = std::dynamic_pointer_cast<SurfaceMesh>(objA->getCollidingGeometry());
+    auto objASurf = std::dynamic_pointer_cast<SurfaceMesh>(objA->getComponent<Collider>()->getGeometry());
     CHECK(objASurf != nullptr) << "Object A " << objA->getName() << " Did not contain a surface mesh as colliding geometry in generateConnectiveTissue";
 
-    auto objBSurf = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry());
+    auto objBSurf = std::dynamic_pointer_cast<SurfaceMesh>(objB->getComponent<Collider>()->getGeometry());
     CHECK(objBSurf != nullptr) << "Object B " << objB->getName() << " Did not contain a surface mesh as colliding geometry in generateConnectiveTissue";
 
     CHECK(model != nullptr) << "PbdModel in generateConnectiveTissue is NULL";
 
-    Vec3d objACenter = std::dynamic_pointer_cast<SurfaceMesh>(objA->getCollidingGeometry())->getCenter();
-    Vec3d objBCenter = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry())->getCenter();
+    Vec3d objACenter = std::dynamic_pointer_cast<SurfaceMesh>(objA->getComponent<Collider>()->getGeometry())->getCenter();
+    Vec3d objBCenter = std::dynamic_pointer_cast<SurfaceMesh>(objB->getComponent<Collider>()->getGeometry())->getCenter();
 
     if (fabs(maxDist) < 1.0e-6)
     {
@@ -253,8 +256,8 @@ makeConnectiveTissue(
     }
 
     proxSelector->setInputMeshes(
-        std::dynamic_pointer_cast<SurfaceMesh>(objA->getCollidingGeometry()),
-        std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry()));
+        std::dynamic_pointer_cast<SurfaceMesh>(objA->getComponent<Collider>()->getGeometry()),
+        std::dynamic_pointer_cast<SurfaceMesh>(objB->getComponent<Collider>()->getGeometry()));
 
     proxSelector->setProximity(maxDist);
     proxSelector->update();
