@@ -11,7 +11,7 @@ namespace imstk
 class Camera;
 class CollisionDataDebugModel;
 class CollisionDetectionAlgorithm;
-class CollidingObject;
+class Entity;
 class Geometry;
 } // namespace imstk
 
@@ -41,8 +41,8 @@ public:
                            std::shared_ptr<imstk::Geometry> geom);
 
 public:
-    std::shared_ptr<imstk::CollidingObject> m_cdObj2 = nullptr;
-    std::shared_ptr<imstk::CollidingObject> m_cdObj1 = nullptr;
+    std::shared_ptr<imstk::Entity> m_cdObj2 = nullptr;
+    std::shared_ptr<imstk::Entity> m_cdObj1 = nullptr;
     std::shared_ptr<imstk::Geometry> m_cdGeom1       = nullptr;
     std::shared_ptr<imstk::Geometry> m_cdGeom2       = nullptr;
 

@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -84,7 +85,7 @@ makeSurfaceCubeObj(const std::string& name,
     // Setup the Object
     tissueObj->addVisualModel(visualModel);
     tissueObj->setPhysicsGeometry(surfMesh);
-    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
@@ -131,7 +132,7 @@ makeVolumeCubeObj(const std::string& name,
     // Setup the Object
     tissueObj->addVisualModel(visualModel);
     tissueObj->setPhysicsGeometry(tetMesh);
-    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.01;
 

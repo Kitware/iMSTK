@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
@@ -51,7 +52,7 @@ TEST_F(VisualTest, PointToTetMapTest)
         // Setup the Object
         tissueObj->setPhysicsGeometry(tetMeshCoarse);
         tissueObj->setVisualGeometry(tetMeshFine_sf);
-        tissueObj->setCollidingGeometry(tetMeshCoarse_sf);
+        tissueObj->addComponent<Collider>()->setGeometry(tetMeshCoarse_sf);
         tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMeshCoarse, tetMeshCoarse_sf));
         tissueObj->setPhysicsToCollidingMap(std::make_shared<PointToTetMap>(tetMeshCoarse, tetMeshFine_sf));
         tissueObj->setDynamicalModel(pbdModel);

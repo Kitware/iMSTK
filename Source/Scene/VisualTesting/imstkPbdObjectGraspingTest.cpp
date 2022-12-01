@@ -6,6 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkDummyClient.h"
 #include "imstkGeometryUtilities.h"
@@ -62,13 +63,13 @@ makeTetTissueObj(const std::string& name,
     if (useTetCollisionGeometry)
     {
         tissueObj->setVisualGeometry(tetMesh);
-        tissueObj->setCollidingGeometry(tetMesh);
+        tissueObj->addComponent<Collider>()->setGeometry(tetMesh);
     }
     else
     {
         std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
         tissueObj->setVisualGeometry(surfMesh);
-        tissueObj->setCollidingGeometry(surfMesh);
+        tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
         tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     }
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
@@ -129,7 +130,7 @@ makeTriTissueObj(const std::string& name,
     tissueObj->setVisualGeometry(triMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(triMesh);
-    tissueObj->setCollidingGeometry(triMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(triMesh);
     tissueObj->setDynamicalModel(model);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
@@ -185,7 +186,7 @@ makeLineThreadObj(const std::string& name,
     tissueObj->setVisualGeometry(lineMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(lineMesh);
-    tissueObj->setCollidingGeometry(lineMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(lineMesh);
     tissueObj->setDynamicalModel(model);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
@@ -201,7 +202,7 @@ makeLineThreadObj(const std::string& name,
 /// it will create a pbd object, otherwise creates a colliding/non-simulated
 /// grasper
 ///
-static std::shared_ptr<CollidingObject>
+static std::shared_ptr<Entity>
 makeGrasperObj(
     const std::string&        name,
     const Vec3d               position,
@@ -213,7 +214,7 @@ makeGrasperObj(
         auto grasperObj = std::make_shared<PbdObject>(name);
         auto capsule    = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.01, 0.1);
         grasperObj->setPhysicsGeometry(capsule);
-        grasperObj->setCollidingGeometry(capsule);
+        grasperObj->addComponent<Collider>()->setGeometry(capsule);
         grasperObj->setVisualGeometry(capsule);
         grasperObj->setDynamicalModel(model);
         grasperObj->getPbdBody()->setRigid(
@@ -229,10 +230,10 @@ makeGrasperObj(
     else
     {
         // Grasp with a capsule
-        auto grasperObj = std::make_shared<CollidingObject>(name);
+        auto grasperObj = std::make_shared<SceneObject>(name);
         auto capsule    = std::make_shared<Capsule>(position, 0.01, 0.1);
-        grasperObj->setCollidingGeometry(capsule);
-        grasperObj->setVisualGeometry(capsule);
+        grasperObj->addComponent<Collider>()->setGeometry(capsule);
+        grasperObj->addComponent<VisualModel>()->setGeometry(capsule);
         return grasperObj;
     }
 }
@@ -367,7 +368,7 @@ public:
 public:
     std::shared_ptr<PbdModel>        m_pbdModel   = nullptr;
     std::shared_ptr<PbdObject>       m_graspedObj = nullptr;
-    std::shared_ptr<CollidingObject> m_grasperObj = nullptr;
+    std::shared_ptr<Entity> m_grasperObj = nullptr;
 
     std::shared_ptr<PbdObjectGrasping> m_pbdGrasping = nullptr;
     double m_graspStiffness  = 0.5;
@@ -403,7 +404,7 @@ TEST_F(PbdObjectGraspingTest, PbdRigid_MultiGrasp)
     {
         auto sphere = std::make_shared<Sphere>(Vec3d::Zero(), 0.025);
         m_graspedObj->setPhysicsGeometry(sphere);
-        m_graspedObj->setCollidingGeometry(sphere);
+        m_graspedObj->addComponent<Collider>()->setGeometry(sphere);
         m_graspedObj->setVisualGeometry(sphere);
         m_graspedObj->setDynamicalModel(m_pbdModel);
         m_graspedObj->getPbdBody()->setRigid(
@@ -414,7 +415,7 @@ TEST_F(PbdObjectGraspingTest, PbdRigid_MultiGrasp)
     // grasper0 positioned over the sphere
         m_grasperObj = makeGrasperObj("grasper0", Vec3d(0.0, 0.08, 0.0), m_pbdModel);
         auto pbdGrasperObj = std::dynamic_pointer_cast<PbdObject>(m_grasperObj);
-        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -439,9 +440,9 @@ TEST_F(PbdObjectGraspingTest, PbdRigid_MultiGrasp)
         createScene();
 
     // Setup a second grasper below the sphere now that the scene is setup
-        std::shared_ptr<CollidingObject> grasperObj1    = makeGrasperObj("grasper1", Vec3d(0.0, -0.08, 0.0), m_pbdModel);
+        std::shared_ptr<Entity> grasperObj1             = makeGrasperObj("grasper1", Vec3d(0.0, -0.08, 0.0), m_pbdModel);
         auto                             pbdGrasperObj1 = std::dynamic_pointer_cast<PbdObject>(grasperObj1);
-        auto                             capsule1       = std::dynamic_pointer_cast<Capsule>(grasperObj1->getCollidingGeometry());
+        auto                             capsule1       = std::dynamic_pointer_cast<Capsule>(grasperObj1->getComponent<Collider>()->getGeometry());
         auto                             controller1    = grasperObj1->getComponent<PbdObjectController>();
         auto                             client1 = std::make_shared<DummyClient>();
         client1->setPosition((*pbdGrasperObj1->getPbdBody()->vertices)[0]);
@@ -480,7 +481,7 @@ TEST_F(PbdObjectGraspingTest, PbdRigid_PointSet_CellGrasp)
         auto                         sphere = std::make_shared<Sphere>(Vec3d::Zero(), 0.025);
         std::shared_ptr<SurfaceMesh> surfMeshSphere = GeometryUtils::toUVSphereSurfaceMesh(sphere, 10, 10);
         m_graspedObj->setPhysicsGeometry(surfMeshSphere);
-        m_graspedObj->setCollidingGeometry(surfMeshSphere);
+        m_graspedObj->addComponent<Collider>()->setGeometry(surfMeshSphere);
         m_graspedObj->setVisualGeometry(surfMeshSphere);
         m_graspedObj->setDynamicalModel(m_pbdModel);
         m_graspedObj->getPbdBody()->setRigid(
@@ -491,7 +492,7 @@ TEST_F(PbdObjectGraspingTest, PbdRigid_PointSet_CellGrasp)
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.08, 0.0), m_pbdModel);
         auto pbdGrasperObj = std::dynamic_pointer_cast<PbdObject>(m_grasperObj);
-        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -535,7 +536,7 @@ TEST_F(PbdObjectGraspingTest, PbdRigid_Sphere_CellGrasp)
     {
         auto sphere = std::make_shared<Sphere>(Vec3d::Zero(), 0.025);
         m_graspedObj->setPhysicsGeometry(sphere);
-        m_graspedObj->setCollidingGeometry(sphere);
+        m_graspedObj->addComponent<Collider>()->setGeometry(sphere);
         m_graspedObj->setVisualGeometry(sphere);
         m_graspedObj->setDynamicalModel(m_pbdModel);
         m_graspedObj->getPbdBody()->setRigid(
@@ -546,7 +547,7 @@ TEST_F(PbdObjectGraspingTest, PbdRigid_Sphere_CellGrasp)
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.08, 0.0), m_pbdModel);
         auto pbdGrasperObj = std::dynamic_pointer_cast<PbdObject>(m_grasperObj);
-        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -592,7 +593,7 @@ TEST_F(PbdObjectGraspingTest, PbdThinTissue_PbdTwoWay_CellGrasp)
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0), m_pbdModel);
         auto pbdGrasperObj = std::dynamic_pointer_cast<PbdObject>(m_grasperObj);
-        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -634,7 +635,7 @@ TEST_F(PbdObjectGraspingTest, PbdTissue_PbdTwoWay_CellGrasp)
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0), m_pbdModel);
         auto pbdGrasperObj = std::dynamic_pointer_cast<PbdObject>(m_grasperObj);
-        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -675,7 +676,7 @@ TEST_F(PbdObjectGraspingTest, PbdThread_PbdTwoWay_CellGrasp)
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0), m_pbdModel);
         auto pbdGrasperObj = std::dynamic_pointer_cast<PbdObject>(m_grasperObj);
-        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule       = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -715,7 +716,7 @@ TEST_F(PbdObjectGraspingTest, PbdThread_CollidingObject_CellGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -749,7 +750,7 @@ TEST_F(PbdObjectGraspingTest, PbdThread_CollidingObject_VertexGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -784,9 +785,9 @@ TEST_F(PbdObjectGraspingTest, PbdTissue_Mapped_CollidingObject_RayGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
-        m_geomToGrasp    = m_graspedObj->getCollidingGeometry();
+        m_geomToGrasp    = m_graspedObj->getComponent<Collider>()->getGeometry();
         m_geomToGraspMap = std::dynamic_pointer_cast<PointwiseMap>(m_graspedObj->getPhysicsToCollidingMap());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
@@ -822,7 +823,7 @@ TEST_F(PbdObjectGraspingTest, PbdThinTissue_CollidingObject_RayGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -857,7 +858,7 @@ TEST_F(PbdObjectGraspingTest, PbdThinTissue_CollidingObject_CellGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -892,7 +893,7 @@ TEST_F(PbdObjectGraspingTest, PbdThinTissue_CollidingObject_VertexGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -927,7 +928,7 @@ TEST_F(PbdObjectGraspingTest, PbdTissue_CollidingObject_VertexGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -962,7 +963,7 @@ TEST_F(PbdObjectGraspingTest, PbdTissue_CollidingObject_CellGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
         m_assertionBoundsMax = Vec3d(1.0, 1.0, 1.0);
@@ -997,9 +998,9 @@ TEST_F(PbdObjectGraspingTest, PbdTissue_Mapped_CollidingObject_VertexGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
-        m_geomToGrasp    = m_graspedObj->getCollidingGeometry();
+        m_geomToGrasp    = m_graspedObj->getComponent<Collider>()->getGeometry();
         m_geomToGraspMap = std::dynamic_pointer_cast<PointwiseMap>(m_graspedObj->getPhysicsToCollidingMap());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
@@ -1035,9 +1036,9 @@ TEST_F(PbdObjectGraspingTest, PbdTissue_Mapped_CollidingObject_CellGrasp)
 
     // Grasp with a capsule
         m_grasperObj = makeGrasperObj("grasper", Vec3d(0.0, 0.05, 0.0));
-        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getCollidingGeometry());
+        auto capsule = std::dynamic_pointer_cast<Capsule>(m_grasperObj->getComponent<Collider>()->getGeometry());
 
-        m_geomToGrasp    = m_graspedObj->getCollidingGeometry();
+        m_geomToGrasp    = m_graspedObj->getComponent<Collider>()->getGeometry();
         m_geomToGraspMap = std::dynamic_pointer_cast<PointwiseMap>(m_graspedObj->getPhysicsToCollidingMap());
 
         m_assertionBoundsMin = Vec3d(-1.0, -0.5, -1.0);
