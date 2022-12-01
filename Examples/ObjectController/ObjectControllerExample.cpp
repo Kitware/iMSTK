@@ -6,7 +6,6 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
-#include "imstkCollidingObject.h"
 #include "imstkCylinder.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
@@ -20,6 +19,7 @@
 #include "imstkPlane.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"

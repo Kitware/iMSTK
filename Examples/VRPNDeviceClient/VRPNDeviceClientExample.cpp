@@ -5,7 +5,6 @@
 */
 
 #include "imstkCamera.h"
-#include "imstkCollidingObject.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -17,9 +16,11 @@
 #include "imstkOrientedBox.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
+#include "imstkVisualModel.h"
 #include "imstkVRPNDeviceClient.h"
 #include "imstkVRPNDeviceManager.h"
 #include "imstkVTKViewer.h"
@@ -60,7 +61,7 @@ main()
     };
 
     imstkNew<SceneObject> object("VirtualObject");
-    object->setVisualGeometry(geometries[0]);
+    object->addComponent<VisualModel>()->setGeometry(geometries[0]);
     scene->addSceneObject(object);
 
     imstkNew<SceneObjectController> controller;

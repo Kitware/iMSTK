@@ -6,6 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkControllerForceText.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -76,7 +77,7 @@ main()
         tissueObj->setVisualGeometry(surfMesh);
         tissueObj->getVisualModel(0)->setRenderMaterial(material);
         tissueObj->setPhysicsGeometry(surfMesh);
-        tissueObj->setCollidingGeometry(surfMesh);
+        tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
         tissueObj->setDynamicalModel(pbdModel);
 
         tissueObj->getPbdBody()->uniformMassValue = 1.0;
@@ -88,7 +89,7 @@ main()
         //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.0018);
         auto rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.004, 0.01);
         capsule0Obj->setVisualGeometry(rigidGeom);
-        capsule0Obj->setCollidingGeometry(rigidGeom);
+        capsule0Obj->addComponent<Collider>()->setGeometry(rigidGeom);
         capsule0Obj->setPhysicsGeometry(rigidGeom);
 
         // Setup material
@@ -122,7 +123,7 @@ main()
 
         lapTool->setDynamicalModel(pbdModel);
         lapTool->setPhysicsGeometry(toolGeom);
-        lapTool->setCollidingGeometry(toolGeom);
+        lapTool->addComponent<Collider>()->setGeometry(toolGeom);
         lapTool->setVisualGeometry(toolGeom);
 
         std::shared_ptr<RenderMaterial> material = lapTool->getVisualModel(0)->getRenderMaterial();
@@ -197,7 +198,7 @@ main()
                 if (e->m_button == 1 && e->m_buttonState == BUTTON_PRESSED)
                 {
                     LOG(INFO) << "Grasp!";
-                    grasping->beginVertexGrasp(std::dynamic_pointer_cast<AnalyticalGeometry>(lapTool->getCollidingGeometry()));
+                    grasping->beginVertexGrasp(std::dynamic_pointer_cast<AnalyticalGeometry>(lapTool->getComponent<Collider>()->getGeometry()));
                 }
             });
         connect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged,
@@ -224,7 +225,7 @@ main()
                 if (e->m_buttonId == 0)
                 {
                     LOG(INFO) << "Grasp!";
-                    grasping->beginVertexGrasp(std::dynamic_pointer_cast<AnalyticalGeometry>(lapTool->getCollidingGeometry()));
+                    grasping->beginVertexGrasp(std::dynamic_pointer_cast<AnalyticalGeometry>(lapTool->getComponent<Collider>()->getGeometry()));
                 }
             });
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,

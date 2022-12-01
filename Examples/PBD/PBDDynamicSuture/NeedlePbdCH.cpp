@@ -7,6 +7,7 @@
 #pragma once
 
 #include "NeedlePbdCH.h"
+#include "imstkCollider.h"
 #include "imstkCollisionUtils.h"
 #include "imstkLineMesh.h"
 #include "imstkNeedle.h"
@@ -33,11 +34,11 @@ NeedlePbdCH::init(std::shared_ptr<PbdObject> threadObj)
     m_pbdTissueObj = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
 
     // Get surface mesh
-    m_tissueSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_pbdTissueObj->getCollidingGeometry());
+    m_tissueSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_pbdTissueObj->getComponent<Collider>()->getGeometry());
 
     // set up thread mesh
     m_threadObj  = threadObj;
-    m_threadMesh = std::dynamic_pointer_cast<LineMesh>(m_threadObj->getCollidingGeometry());
+    m_threadMesh = std::dynamic_pointer_cast<LineMesh>(m_threadObj->getComponent<Collider>()->getGeometry());
 
     // Create storage for puncture states
     m_isThreadPunctured.resize(m_tissueSurfMesh->getNumCells());
@@ -66,7 +67,7 @@ NeedlePbdCH::handle(
     auto                                     needleObj         = std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
     auto                                     needle            = needleObj->getComponent<Needle>();
     const int                                needleId          = needleObj->getID();
-    auto                                     needleMesh        = std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry());
+    auto                                     needleMesh        = std::dynamic_pointer_cast<LineMesh>(needleObj->getComponent<Collider>()->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleMesh->getVertexPositions();
     VecDataArray<double, 3>&                 needleVertices    = *needleVerticesPtr;
     std::shared_ptr<VecDataArray<int, 2>>    needleIndicesPtr  = needleMesh->getCells();
@@ -468,10 +469,10 @@ NeedlePbdCH::addConstraint_V_T(
     const ColElemSide& sideA,
     const ColElemSide& sideB)
 {
-    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectA();
-    auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    std::shared_ptr<CollidingObject> needleObj   = getInputObjectB();
-    auto                             needle      = needleObj->getComponent<Needle>();
+    std::shared_ptr<Entity> tissueObj   = getInputObjectA();
+    auto                    puncturable = tissueObj->getComponent<Puncturable>();
+    std::shared_ptr<Entity> needleObj   = getInputObjectB();
+    auto                    needle      = needleObj->getComponent<Needle>();
 
     CHECK(sideB.elem->m_type == CollisionElementType::CellIndex)
         << "Suturing only works with CDs that report CellIndex contact";
@@ -486,7 +487,7 @@ NeedlePbdCH::addConstraint_V_T(
         puncturable->setPuncture(punctureId, needle->getPuncture(punctureId));
     }
 
-    auto                                     needleMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry());
+    auto                                     needleMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getComponent<Collider>()->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleMesh->getVertexPositions();
     VecDataArray<double, 3>&                 needleVertices    = *needleVerticesPtr;
     // Save the direction of the tip of the needle. NOTE: Needle indices are backwards

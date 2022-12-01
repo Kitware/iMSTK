@@ -27,11 +27,11 @@ NeedleRigidBodyCH::handle(
 
     // If no collision, needle must be removed
     // If using point based collision in an SDF you may want a differing unpuncturing constraint
-    std::shared_ptr<CollidingObject> needleObj   = getInputObjectA();
-    auto                             needle      = needleObj->getComponent<Needle>();
-    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
-    auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
+    std::shared_ptr<Entity> needleObj   = getInputObjectA();
+    auto                    needle      = needleObj->getComponent<Needle>();
+    std::shared_ptr<Entity> tissueObj   = getInputObjectB();
+    auto                    puncturable = tissueObj->getComponent<Puncturable>();
+    const PunctureId        punctureId  = getPunctureId(needle, puncturable);
 
     Puncture::State state = needle->getState(punctureId);
     if (elementsA.size() == 0)
@@ -55,7 +55,7 @@ NeedleRigidBodyCH::addConstraint(
     const double contactDepth)
 {
     auto                             needle      = rbdObj->getComponent<Needle>();
-    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
+    std::shared_ptr<Entity>          tissueObj   = getInputObjectB();
     auto                             puncturable = tissueObj->getComponent<Puncturable>();
     const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
 

@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkCapsule.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
@@ -78,7 +79,7 @@ makeTissueObj(const std::string& name,
     tissueObj->setVisualGeometry(mesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(mesh);
-    tissueObj->setCollidingGeometry(mesh);
+    tissueObj->addComponent<Collider>()->setGeometry(mesh);
     tissueObj->setDynamicalModel(pbdModel);
     for (int x = 0; x < rowCount; x++)
     {
@@ -115,9 +116,9 @@ main()
     geomShaft->setRadius(0.005);
     geomShaft->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 0.5));
-    auto objShaft = std::make_shared<CollidingObject>("ShaftObject");
-    objShaft->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/pivot.obj"));
-    objShaft->setCollidingGeometry(geomShaft);
+    auto objShaft = std::make_shared<Entity>("ShaftObject");
+    objShaft->addComponent<VisualModel>()->setGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/pivot.obj"));
+    objShaft->addComponent<Collider>()->setGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
     auto geomUpperJaw = std::make_shared<Capsule>();
@@ -125,9 +126,9 @@ main()
     geomUpperJaw->setTranslation(Vec3d(0.0, 0.0013, -0.016));
     geomUpperJaw->setRadius(0.004);
     geomUpperJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
-    auto objUpperJaw = std::make_shared<CollidingObject>("UpperJawObject");
-    objUpperJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/upper.obj"));
-    objUpperJaw->setCollidingGeometry(geomUpperJaw);
+    auto objUpperJaw = std::make_shared<SceneObject>("UpperJawObject");
+    objUpperJaw->addComponent<VisualModel>()->setGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/upper.obj"));
+    objUpperJaw->addComponent<Collider>()->setGeometry(geomUpperJaw);
     scene->addSceneObject(objUpperJaw);
 
     auto geomLowerJaw = std::make_shared<Capsule>();
@@ -135,9 +136,9 @@ main()
     geomLowerJaw->setTranslation(Vec3d(0.0, -0.0013, -0.016));
     geomLowerJaw->setRadius(0.004);
     geomLowerJaw->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
-    auto objLowerJaw = std::make_shared<CollidingObject>("LowerJawObject");
-    objLowerJaw->setVisualGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/lower.obj"));
-    objLowerJaw->setCollidingGeometry(geomLowerJaw);
+    auto objLowerJaw = std::make_shared<SceneObject>("LowerJawObject");
+    objLowerJaw->addComponent<VisualModel>()->setGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/lower.obj"));
+    objLowerJaw->addComponent<Collider>()->setGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
     auto pickGeom = std::make_shared<Capsule>();

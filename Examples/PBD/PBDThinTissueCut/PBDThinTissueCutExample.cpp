@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
@@ -67,7 +68,7 @@ makeTissueObj(const std::string&        name,
     tissueObj->addVisualModel(visualModel);
     tissueObj->addVisualModel(vertexLabelModel);
     tissueObj->setPhysicsGeometry(clothMesh);
-    tissueObj->setCollidingGeometry(clothMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(clothMesh);
     tissueObj->setDynamicalModel(model);
     tissueObj->getPbdBody()->fixedNodeIds     = { 0, nCols - 1 };
     tissueObj->getPbdBody()->uniformMassValue = 0.01;
@@ -91,7 +92,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
 
     auto toolObj = std::make_shared<PbdObject>("CuttingObject");
     toolObj->setVisualGeometry(cutGeom);
-    toolObj->setCollidingGeometry(cutGeom);
+    toolObj->addComponent<Collider>()->setGeometry(cutGeom);
     toolObj->setPhysicsGeometry(cutGeom);
     toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     toolObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);

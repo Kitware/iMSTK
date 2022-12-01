@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -95,13 +96,13 @@ main()
     rbdModel->getConfig()->m_maxNumIterations = 10;
 
     // Create the first rbd, plane floor
-    imstkNew<CollidingObject> floorObj("Plane");
+    imstkNew<SceneObject> floorObj("Plane");
     {
         std::shared_ptr<SurfaceMesh> bowlMesh = createBowlMesh();
 
         // Create the object
-        floorObj->setVisualGeometry(bowlMesh);
-        floorObj->setCollidingGeometry(bowlMesh);
+        floorObj->addComponent<VisualModel>()->setGeometry(bowlMesh);
+        floorObj->addComponent<Collider>()->setGeometry(bowlMesh);
 
         auto material = std::make_shared<RenderMaterial>();
         material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
@@ -109,7 +110,7 @@ main()
         material->setDiffuseColor(Color(1.0, 0.8, 0.74));
         material->setRoughness(0.5);
         material->setMetalness(0.1);
-        floorObj->getVisualModel(0)->setRenderMaterial(material);
+        floorObj->getComponent<VisualModel>()->setRenderMaterial(material);
 
         scene->addSceneObject(floorObj);
     }
@@ -125,7 +126,7 @@ main()
         // Create the cube rigid object
         rigidObjects[i]->setDynamicalModel(rbdModel);
         rigidObjects[i]->setPhysicsGeometry(sphere);
-        rigidObjects[i]->setCollidingGeometry(sphere);
+        rigidObjects[i]->addComponent<Collider>()->setGeometry(sphere);
         rigidObjects[i]->setVisualGeometry(sphere);
         rigidObjects[i]->getRigidBody()->m_mass = 1.0;
         const double t = static_cast<double>(i) / (rbdObjCount - 1);

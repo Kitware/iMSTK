@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkControllerForceText.h"
 #include "imstkDebugGeometryModel.h"
 #include "imstkDirectionalLight.h"
@@ -92,7 +93,7 @@ makeTissueObj(const std::string&               name,
     tissueObj->setVisualGeometry(surfMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     tissueObj->setDynamicalModel(model);
     tissueObj->getPbdBody()->uniformMassValue = 0.04;
@@ -135,7 +136,7 @@ makeNeedleObj(const std::string&        name,
     auto trocarMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/trocar.obj");
 
     toolObj->setVisualGeometry(trocarMesh);
-    toolObj->setCollidingGeometry(toolGeometry);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
     toolObj->setPhysicsGeometry(toolGeometry);
     toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeometry, trocarMesh));
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));

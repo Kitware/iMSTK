@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
@@ -73,7 +74,7 @@ makePbdString(const std::string& name, const std::string& filename)
     auto stringObj = std::make_shared<PbdObject>(name);
     stringObj->addVisualModel(visualModel);
     stringObj->setPhysicsGeometry(stringMesh);
-    stringObj->setCollidingGeometry(stringMesh);
+    stringObj->addComponent<Collider>()->setGeometry(stringMesh);
     stringObj->setDynamicalModel(pbdModel);
 
     stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // grams
@@ -98,7 +99,7 @@ makeNeedleObj()
     sutureMesh->transform(rot, Geometry::TransformType::ApplyToData);
 
     needleObj->setVisualGeometry(sutureMesh);
-    needleObj->setCollidingGeometry(sutureMesh);
+    needleObj->addComponent<Collider>()->setGeometry(sutureMesh);
     needleObj->setPhysicsGeometry(sutureMesh);
     needleObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
     needleObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);

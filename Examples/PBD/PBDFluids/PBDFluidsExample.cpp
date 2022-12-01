@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMeshIO.h"
@@ -52,7 +53,7 @@ createPbdFluid(const std::string& tetMeshName)
 
     imstkNew<PbdObject> deformableObj("Dragon");
     deformableObj->addVisualModel(fluidVisualModel);
-    deformableObj->setCollidingGeometry(fluidMesh);
+    deformableObj->addComponent<Collider>()->setGeometry(fluidMesh);
     deformableObj->setPhysicsGeometry(fluidMesh);
 
     imstkNew<PbdModel> pbdModel;
@@ -195,10 +196,10 @@ main()
         std::shared_ptr<PbdObject> fluidObj = createPbdFluid(tetMeshFileName);
         scene->addSceneObject(fluidObj);
 
-        imstkNew<CollidingObject>    floorObj("Floor");
+        imstkNew<SceneObject> floorObj("Floor");
         std::shared_ptr<SurfaceMesh> floorGeom = createCollidingSurfaceMesh();
-        floorObj->setVisualGeometry(floorGeom);
-        floorObj->setCollidingGeometry(floorGeom);
+        floorObj->addComponent<VisualModel>()->setGeometry(floorGeom);
+        floorObj->addComponent<Collider>()->setGeometry(floorGeom);
         scene->addSceneObject(floorObj);
 
         // Collisions

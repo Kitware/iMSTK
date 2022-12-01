@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
@@ -56,27 +57,27 @@ main()
     scene->getActiveCamera()->setFocalPoint(Vec3d(0.0, 0.0, 0.0));
     scene->getActiveCamera()->setViewUp(Vec3d(0.0, 1.0, 0.0));
 
-    std::shared_ptr<CollidingObject> obstacleObjs[] =
+    std::shared_ptr<Entity> obstacleObjs[] =
     {
-        std::make_shared<CollidingObject>("Plane"),
-        std::make_shared<CollidingObject>("Cube")
+        std::make_shared<SceneObject>("Plane"),
+        std::make_shared<SceneObject>("Cube")
     };
 
     // Create a plane and cube for collision with scissors
     auto plane = std::make_shared<Plane>();
     plane->setWidth(0.4);
-    obstacleObjs[0]->setVisualGeometry(plane);
-    obstacleObjs[0]->setCollidingGeometry(plane);
+    obstacleObjs[0]->addComponent<VisualModel>()->setGeometry(plane);
+    obstacleObjs[0]->addComponent<Collider>()->setGeometry(plane);
 
     // 0.1m size cube, slight rotation
     auto cube = std::make_shared<OrientedBox>(Vec3d(0.0, 0.0, 0.0),
         Vec3d(0.05, 0.05, 0.05), Quatd(Rotd(1.0, Vec3d(0.0, 1.0, 0.0))));
-    obstacleObjs[1]->setVisualGeometry(cube);
-    obstacleObjs[1]->setCollidingGeometry(cube);
+    obstacleObjs[1]->addComponent<VisualModel>()->setGeometry(cube);
+    obstacleObjs[1]->addComponent<Collider>()->setGeometry(cube);
 
     for (int i = 0; i < 2; i++)
     {
-        obstacleObjs[i]->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
+        obstacleObjs[i]->getComponent<VisualModel>()->getRenderMaterial()->setIsDynamicMesh(false);
         scene->addSceneObject(obstacleObjs[i]);
     }
 
@@ -94,8 +95,8 @@ main()
             Mat3d::Identity() * 100000000.0); // Inertia
 
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
-        rbdObj->setCollidingGeometry(surfMesh);
-        rbdObj->setVisualGeometry(surfMesh);
+        rbdObj->addComponent<Collider>()->setGeometry(surfMesh);
+        rbdObj->addComponent<VisualModel>()->setGeometry(surfMesh);
         rbdObj->setPhysicsGeometry(surfMesh);
 
         std::shared_ptr<RenderMaterial> mat = rbdObj->getVisualModel(0)->getRenderMaterial();

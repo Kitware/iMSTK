@@ -6,6 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
@@ -63,7 +64,7 @@ makeLapToolObj(const std::string&        name,
 
     lapTool->setDynamicalModel(model);
     lapTool->setPhysicsGeometry(toolGeom);
-    lapTool->setCollidingGeometry(toolGeom);
+    lapTool->addComponent<Collider>()->setGeometry(toolGeom);
     lapTool->setVisualGeometry(lapToolVisualGeom);
     lapTool->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, lapToolVisualGeom));
 
@@ -111,7 +112,7 @@ makeHandObj(const std::string&        name,
 
     handSphereObj->setDynamicalModel(model);
     handSphereObj->setPhysicsGeometry(sphere);
-    handSphereObj->setCollidingGeometry(sphere);
+    handSphereObj->addComponent<Collider>()->setGeometry(sphere);
     handSphereObj->setVisualGeometry(sphere);
 
     std::shared_ptr<RenderMaterial> material = handSphereObj->getVisualModel(0)->getRenderMaterial();
@@ -166,7 +167,7 @@ makePbdString(
     stringObj->setVisualGeometry(stringMesh);
     stringObj->getVisualModel(0)->setRenderMaterial(material);
     stringObj->setPhysicsGeometry(stringMesh);
-    stringObj->setCollidingGeometry(stringMesh);
+    stringObj->addComponent<Collider>()->setGeometry(stringMesh);
     std::shared_ptr<PbdModel> model = needleObj->getPbdModel();
     stringObj->setDynamicalModel(model);
     //stringObj->getPbdBody()->fixedNodeIds = { 0, 1, 19, 20 };
@@ -218,16 +219,17 @@ main()
     model->getConfig()->m_dt      = 0.001;
     model->getConfig()->m_doPartitioning = false;
 
-    auto bodyObject = std::make_shared<CollidingObject>("body");
+    auto bodyObject = std::make_shared<Entity>("body");
     {
         auto surfMesh  = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/human/full_body/body.obj");
         auto bodyPlane = std::make_shared<Plane>(Vec3d(0.0, -0.04, -1.0), Vec3d(0.0, 1.0, 0.0));
-        bodyObject->setCollidingGeometry(bodyPlane);
-        bodyObject->setVisualGeometry(surfMesh);
-        bodyObject->getVisualModel(0)->getRenderMaterial()->setShadingModel(
+        bodyObject->addComponent<Collider>()->setGeometry(bodyPlane);
+        auto visualModel = bodyObject->addComponent<VisualModel>();
+        visualModel->setGeometry(surfMesh);
+        visualModel->getRenderMaterial()->setShadingModel(
             RenderMaterial::ShadingModel::PBR);
         std::shared_ptr<RenderMaterial> material =
-            bodyObject->getVisualModel(0)->getRenderMaterial();
+            visualModel->getRenderMaterial();
         material->setRoughness(0.8);
         material->setMetalness(0.1);
         material->setOpacity(0.5);
@@ -255,7 +257,7 @@ main()
         needleMesh->translate(Vec3d(0.0, -0.0047, -0.0087), Geometry::TransformType::ApplyToData);
         needleLineMesh->translate(Vec3d(0.0, -0.0047, -0.0087), Geometry::TransformType::ApplyToData);
         needleObj->setVisualGeometry(needleMesh);
-        needleObj->setCollidingGeometry(needleLineMesh);
+        needleObj->addComponent<Collider>()->setGeometry(needleLineMesh);
         needleObj->setPhysicsGeometry(needleLineMesh);
         needleObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(needleLineMesh, needleMesh));
         needleObj->setDynamicalModel(model);
@@ -330,7 +332,7 @@ main()
     auto sphere = std::make_shared<Sphere>(Vec3d(0.015, 0.092, -1.117), 0.01);
     auto rightPortVisuals = rightToolObj->addComponent<VisualModel>();
     rightPortVisuals->setGeometry(sphere);
-    portHoleInteraction->setToolGeometry(rightToolObj->getCollidingGeometry());
+    portHoleInteraction->setToolGeometry(rightToolObj->getComponent<Collider>()->getGeometry());
     portHoleInteraction->setCompliance(0.000001);
 
     auto portHoleInteraction2 = leftToolObj->addComponent<PortHoleInteraction>();
@@ -339,7 +341,7 @@ main()
     auto sphere2 = std::make_shared<Sphere>(Vec3d(-0.065, 0.078, -1.127), 0.01);
     auto leftPortVisuals = leftToolObj->addComponent<VisualModel>();
     leftPortVisuals->setGeometry(sphere2);
-    portHoleInteraction2->setToolGeometry(leftToolObj->getCollidingGeometry());
+    portHoleInteraction2->setToolGeometry(leftToolObj->getComponent<Collider>()->getGeometry());
     portHoleInteraction2->setCompliance(0.000001);
 
     // Run the simulation
@@ -381,7 +383,7 @@ main()
                         else
                         {
                             rightToolGrasping->beginCellGrasp(
-                                std::dynamic_pointer_cast<Sphere>(rightHandObj->getCollidingGeometry()));
+                                std::dynamic_pointer_cast<Sphere>(rightHandObj->getComponent<Collider>()->getGeometry()));
                         }
                     }
                 }
@@ -418,7 +420,7 @@ main()
                         else
                         {
                             leftToolGrasping->beginCellGrasp(
-                                std::dynamic_pointer_cast<Sphere>(leftHandObj->getCollidingGeometry()));
+                                std::dynamic_pointer_cast<Sphere>(leftHandObj->getComponent<Collider>()->getGeometry()));
                         }
                     }
                 }

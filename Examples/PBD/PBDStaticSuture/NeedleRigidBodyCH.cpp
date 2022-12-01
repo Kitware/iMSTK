@@ -6,6 +6,7 @@
 
 #include "NeedleRigidBodyCH.h"
 #include "imstkArcNeedle.h"
+#include "imstkCollider.h"
 #include "imstkPuncturable.h"
 #include "imstkRbdContactConstraint.h"
 #include "imstkRigidBodyModel2.h"
@@ -22,10 +23,11 @@ NeedleRigidBodyCH::handle(
 
     // If no collision, needle must be removed
     auto needleObj = std::dynamic_pointer_cast<RigidObject2>(getInputObjectA());
+    CHECK(needleObj != nullptr) << "Expected needleObj to be RigidObject2.";
     auto needle    = needleObj->getComponent<ArcNeedle>();
 
-    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
-    auto                             puncturable = tissueObj->getComponent<Puncturable>();
+    std::shared_ptr<Entity> tissueObj   = getInputObjectB();
+    auto                    puncturable = tissueObj->getComponent<Puncturable>();
 
     const PunctureId      punctureId = getPunctureId(needle, puncturable);
     const Puncture::State state      = needle->getState(punctureId);
@@ -77,9 +79,10 @@ NeedleRigidBodyCH::addConstraint(
 {
     // If no collision, needle must be removed
     auto needleObj = std::dynamic_pointer_cast<RigidObject2>(getInputObjectA());
+    CHECK(needleObj != nullptr) << "Expected needleObj to be RigidObject2.";
     auto needle    = needleObj->getComponent<ArcNeedle>();
 
-    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
+    std::shared_ptr<Entity>          tissueObj   = getInputObjectB();
     auto                             puncturable = tissueObj->getComponent<Puncturable>();
     const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
 
@@ -104,7 +107,7 @@ NeedleRigidBodyCH::addConstraint(
             puncturable->setPuncture(punctureId, needle->getPuncture(punctureId));
 
             // Record the initial contact point
-            m_initOrientation = Quatd(rbdObj->getCollidingGeometry()->getRotation());
+            m_initOrientation = Quatd(rbdObj->getComponent<Collider>()->getGeometry()->getRotation());
             m_initContactPt   = contactPt;
         }
     }

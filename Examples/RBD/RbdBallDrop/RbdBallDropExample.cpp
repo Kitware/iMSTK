@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -82,7 +83,7 @@ main()
     sphereVisualModel->setRenderMaterial(sphereMaterial);
 
     // This is the geometry used for collision detection
-    sphereObject->setCollidingGeometry(sphere);
+    sphereObject->addComponent<Collider>()->setGeometry(sphere);
 
     // Forces and physical effects are applied to the physics geometry
     sphereObject->setPhysicsGeometry(sphere);
@@ -104,9 +105,9 @@ main()
     plane->setWidth(10.0);
 
     // A CollidingObject is static and will not react to forces
-    auto planeObject = std::make_shared<CollidingObject>("Plane");
-    planeObject->setVisualGeometry(plane);
-    planeObject->setCollidingGeometry(plane);
+    auto planeObject = std::make_shared<SceneObject>("Plane");
+    planeObject->addComponent<VisualModel>()->setGeometry(plane);
+    planeObject->addComponent<Collider>()->setGeometry(plane);
     scene->addSceneObject(planeObject);
 
     // To affect collision detection and response the appropriate interaction has to be instantiated

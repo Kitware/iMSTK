@@ -6,6 +6,7 @@
 
 #include "InflatableObject.h"
 #include "imstkCollisionUtils.h"
+#include "imstkCollider.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
 #include "imstkMeshIO.h"
@@ -19,8 +20,8 @@
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
 
-InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueSize,
-                                   const Vec3i& tissueDim, const Vec3d& tissueCenter) : PbdObject(name)
+void InflatableObject::Setup(const Vec3d& tissueSize,
+                                   const Vec3i& tissueDim, const Vec3d& tissueCenter)
 {
     // Setup the Geometry
     m_objectTetMesh  = GeometryUtils::toTetGrid(tissueCenter, tissueSize, tissueDim);
@@ -66,7 +67,7 @@ InflatableObject::InflatableObject(const std::string& name, const Vec3d& tissueS
 
     // Setup the Object
     setPhysicsGeometry(m_objectTetMesh);
-    setCollidingGeometry(m_objectSurfMesh);
+    addComponent<Collider>()->setGeometry(m_objectSurfMesh);
     setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(m_objectTetMesh, m_objectSurfMesh));
     setDynamicalModel(pbdModel);
 

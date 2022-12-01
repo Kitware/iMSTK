@@ -5,7 +5,7 @@
 */
 
 #include "NeedleInteraction.h"
-#include "imstkCollidingObject.h"
+#include "imstkCollider.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkLineMesh.h"
 #include "imstkPuncturable.h"
@@ -17,7 +17,7 @@
 
 using namespace imstk;
 
-NeedleInteraction::NeedleInteraction(std::shared_ptr<CollidingObject> tissueObj,
+NeedleInteraction::NeedleInteraction(std::shared_ptr<Entity>          tissueObj,
                                      std::shared_ptr<RigidObject2>    needleObj,
                                      const std::string&               collisionName) :
     RigidObjectCollision(needleObj, tissueObj, collisionName)
@@ -26,7 +26,7 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<CollidingObject> tissueObj,
         << "NeedleInteraction only works with StraightNeedle component";
     CHECK(tissueObj->containsComponent<Puncturable>())
         << "NeedleInteraction only works with Puncturable component";
-    CHECK(std::dynamic_pointer_cast<ImplicitGeometry>(tissueObj->getCollidingGeometry()) != nullptr)
+    CHECK(std::dynamic_pointer_cast<ImplicitGeometry>(tissueObj->getComponent<Collider>()->getGeometry()) != nullptr)
         << "NeedleInteraction only works with SDF colliding geometry on colliding tissueObj";
 
     // First replace the handlers with our needle subclasses

@@ -4,6 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkCollider.h"
 #include "imstkPointSet.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
@@ -213,7 +214,7 @@ generateFluid(const double particleRadius)
 
     // Add the component models
     fluidObj->addVisualModel(visualModel);
-    fluidObj->setCollidingGeometry(geometry);
+    fluidObj->getComponent<Collider>()->setGeometry(geometry);
     fluidObj->setDynamicalModel(sphModel);
     fluidObj->setPhysicsGeometry(geometry);
 

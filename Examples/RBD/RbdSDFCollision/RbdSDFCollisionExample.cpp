@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkCompositeImplicitGeometry.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -52,7 +53,7 @@ main()
         rbdModel->getConfig()->m_maxNumIterations = 10;
 
         // Create the first rbd, plane floor
-        auto planeObj = std::make_shared<CollidingObject>("Plane");
+        auto planeObj = std::make_shared<SceneObject>("Plane");
         {
             // Subtract the sphere from the plane to make a crater
             auto planeGeom = std::make_shared<Plane>();
@@ -85,8 +86,8 @@ main()
             toSurfMesh.getOutputMesh()->flipNormals();
 
             // Create the object
-            planeObj->setVisualGeometry(toSurfMesh.getOutputMesh());
-            planeObj->setCollidingGeometry(compGeom);
+            planeObj->addComponent<VisualModel>()->setGeometry(toSurfMesh.getOutputMesh());
+            planeObj->addComponent<Collider>()->setGeometry(compGeom);
 
             scene->addSceneObject(planeObj);
         }
@@ -113,7 +114,7 @@ main()
             // Create the cube rigid object
             cubeObj->setDynamicalModel(rbdModel);
             cubeObj->setPhysicsGeometry(subdivide.getOutputMesh());
-            cubeObj->setCollidingGeometry(subdivide.getOutputMesh());
+            cubeObj->addComponent<Collider>()->setGeometry(subdivide.getOutputMesh());
             cubeObj->addVisualModel(visualModel);
             cubeObj->getRigidBody()->m_mass    = 100.0;
             cubeObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.2, 0.0);

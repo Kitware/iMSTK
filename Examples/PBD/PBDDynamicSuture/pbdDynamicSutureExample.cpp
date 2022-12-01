@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
@@ -73,7 +74,7 @@ createTissue(std::shared_ptr<PbdModel> model)
     pbdObject->setVisualGeometry(surfMesh);
     pbdObject->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);;
     pbdObject->setPhysicsGeometry(tetMesh);
-    pbdObject->setCollidingGeometry(surfMesh);
+    pbdObject->addComponent<Collider>()->setGeometry(surfMesh);
     pbdObject->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     pbdObject->setDynamicalModel(model);
     pbdObject->getPbdBody()->uniformMassValue = 0.01;
@@ -136,7 +137,7 @@ makePbdString(
     auto stringObj = std::make_shared<PbdObject>(name);
     stringObj->addVisualModel(visualModel);
     stringObj->setPhysicsGeometry(stringMesh);
-    stringObj->setCollidingGeometry(stringMesh);
+    stringObj->addComponent<Collider>()->setGeometry(stringMesh);
     stringObj->setDynamicalModel(model);
     stringObj->getPbdBody()->fixedNodeIds     = { 0, 1 };
     stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // 0.002 / numVerts; // grams
@@ -162,7 +163,7 @@ makeToolObj()
 
     needleObj->setVisualGeometry(sutureMesh);
     // setVisualGeometry(sutureLineMesh);
-    needleObj->setCollidingGeometry(sutureLineMesh);
+    needleObj->addComponent<Collider>()->setGeometry(sutureLineMesh);
     needleObj->setPhysicsGeometry(sutureLineMesh);
     needleObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(sutureLineMesh, sutureMesh));
 

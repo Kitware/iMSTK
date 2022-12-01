@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -50,7 +51,7 @@ makeToolObj(const std::string& name)
 
     auto toolObj = std::make_shared<RigidObject2>(name);
     toolObj->setVisualGeometry(toolGeom);
-    toolObj->setCollidingGeometry(toolGeom);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Blue);
     toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
@@ -85,7 +86,7 @@ inject(std::shared_ptr<InflatableObject> tissueObj, std::shared_ptr<RigidObject2
        Vec3d& toolTip, const double radius, const double rate)
 {
     // The LineMesh used for collision with the PBD tissue
-    std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+    std::shared_ptr<LineMesh> lineMesh = std::dynamic_pointer_cast<LineMesh>(toolObj->getComponent<Collider>()->getGeometry());
     const Vec3d               vertex   = lineMesh->getVertexPosition(0);
 
     if ((toolTip - vertex).norm() > 0.01)
@@ -118,8 +119,8 @@ main()
     const Vec3i  tissueDim    = Vec3i(20, 5, 20);
     const Vec3d  tissueCenter = Vec3d(0.1, -1.0, 0.0);
     const double radius       = tissueSize[0] / 5.0;
-    auto         tissueObj    = std::make_shared<InflatableObject>("PbdTissue",
-        tissueSize, tissueDim, tissueCenter);
+    auto         tissueObj    = std::make_shared<InflatableObject>("PbdTissue");
+    tissueObj->Setup(tissueSize, tissueDim, tissueCenter);
     scene->addSceneObject(tissueObj);
 
     // Setup a tool

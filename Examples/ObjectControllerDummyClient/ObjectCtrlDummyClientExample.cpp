@@ -4,8 +4,9 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkEntity.h"
 #include "imstkCamera.h"
-#include "imstkCollidingObject.h"
+#include "imstkCollider.h"
 #include "imstkDummyClient.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -16,9 +17,11 @@
 #include "imstkOrientedBox.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
+#include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -36,9 +39,9 @@ main()
 
     imstkNew<OrientedBox> geom(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 1.0, 1.0));
 
-    imstkNew<CollidingObject> object("VirtualObject");
-    object->setVisualGeometry(geom);
-    object->setCollidingGeometry(geom);
+    imstkNew<SceneObject> object("VirtualObject");
+    object->addComponent<VisualModel>()->setGeometry(geom);
+    object->addComponent<Collider>()->setGeometry(geom);
     scene->addSceneObject(object);
 
     // Update Camera position

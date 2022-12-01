@@ -8,6 +8,7 @@
 #include "imstkBurner.h"
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkCollisionUtils.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -76,7 +77,7 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdModel> model)
     tissueObj->addVisualModel(visualModel);
     //tissueObj->addVisualModel(labelModel);
     tissueObj->setPhysicsGeometry(surfMesh);
-    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     tissueObj->setDynamicalModel(model);
     // Gallblader is about 60g
     tissueObj->getPbdBody()->uniformMassValue = 60.0 / tissueMesh->getNumVertices();
@@ -130,7 +131,7 @@ makeKidney(const std::string& name, std::shared_ptr<PbdModel> model)
     //tissueObj->addVisualModel(labelModel);
     tissueObj->setPhysicsGeometry(tissueMesh);
     tissueObj->setDynamicalModel(model);
-    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
 
     // Gallblader is about 60g
     tissueObj->getPbdBody()->uniformMassValue = 60.0 / tissueMesh->getNumVertices();
@@ -160,7 +161,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     // Create the object
     toolObj->setVisualGeometry(toolGeometry);
     toolObj->setPhysicsGeometry(toolGeometry);
-    toolObj->setCollidingGeometry(toolGeometry);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
     toolObj->setDynamicalModel(model);
     toolObj->getPbdBody()->setRigid(
         Vec3d(0.0, 2.0, 2.0),
@@ -293,7 +294,7 @@ main()
                     if (e->m_button == 1)
                     {
                         // Use a slightly larger capsule since collision prevents intersection
-                        auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
+                        auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getComponent<Collider>()->getGeometry());
                         auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                         dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                         grasper->beginCellGrasp(dilatedCapsule);
@@ -322,7 +323,7 @@ main()
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
             [&](Event*)
             {
-                grasper->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
+                grasper->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getComponent<Collider>()->getGeometry()));
                 //pbdToolCollision->setEnabled(false);
             });
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,

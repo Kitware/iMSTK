@@ -5,6 +5,7 @@
 */
 
 #include "FemurObject.h"
+#include "imstkCollider.h"
 #include "imstkLevelSetModel.h"
 #include "imstkLocalMarchingCubes.h"
 #include "imstkMeshIO.h"
@@ -49,7 +50,9 @@ FemurObject::FemurObject() : LevelSetDeformableObject("Femur"),
     model->configure(lvlSetConfig);
 
     setPhysicsGeometry(sdf);
-    setCollidingGeometry(sdf);
+    //setCollidingGeometry(sdf);
+    auto collider = this->addComponent<Collider>();
+    collider->setGeometry(sdf);
     setDynamicalModel(model);
 
     // Setup a custom task to forward the modified voxels of the level set model

@@ -6,6 +6,7 @@
 
 #include "CutHelp.h"
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
@@ -68,7 +69,7 @@ makeTissueObj(const std::string& name,
     auto tissueObj = std::make_shared<PbdObject>(name);
     tissueObj->setPhysicsGeometry(tissueMesh);
     tissueObj->setVisualGeometry(tissueMesh);
-    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     auto map = std::make_shared<PointwiseMap>(tissueMesh, surfMesh);
     tissueObj->setPhysicsToCollidingMap(map);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
@@ -101,7 +102,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
 
     auto toolObj = std::make_shared<PbdObject>("Tool");
     toolObj->setVisualGeometry(toolGeom);
-    toolObj->setCollidingGeometry(toolGeom);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
     toolObj->setDynamicalModel(model);
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Blue);
@@ -209,7 +210,7 @@ main()
                 if (deviceClient->getButton(0))
                 {
                     auto tissueMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
-                    auto toolGeom   = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getCollidingGeometry());
+                    auto toolGeom   = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getComponent<Collider>()->getGeometry());
 
                     // Default config of the tool is pointing downwards on y
                     const Mat3d rot     = toolGeom->getRotation();
