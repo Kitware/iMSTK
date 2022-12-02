@@ -54,10 +54,10 @@ NeedleRigidBodyCH::addConstraint(
     const Vec3d& contactPt, const Vec3d& contactNormal,
     const double contactDepth)
 {
-    auto                             needle      = rbdObj->getComponent<Needle>();
-    std::shared_ptr<Entity>          tissueObj   = getInputObjectB();
-    auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
+    auto                    needle      = rbdObj->getComponent<Needle>();
+    std::shared_ptr<Entity> tissueObj   = getInputObjectB();
+    auto                    puncturable = tissueObj->getComponent<Puncturable>();
+    const PunctureId        punctureId  = getPunctureId(needle, puncturable);
 
     // If the normal force exceeds threshold the needle may insert
     if (needle->getState(punctureId) == Puncture::State::REMOVED)

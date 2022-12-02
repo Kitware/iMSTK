@@ -20,8 +20,9 @@
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
 
-void InflatableObject::Setup(const Vec3d& tissueSize,
-                                   const Vec3i& tissueDim, const Vec3d& tissueCenter)
+void
+InflatableObject::Setup(const Vec3d& tissueSize,
+                        const Vec3i& tissueDim, const Vec3d& tissueCenter)
 {
     // Setup the Geometry
     m_objectTetMesh  = GeometryUtils::toTetGrid(tissueCenter, tissueSize, tissueDim);

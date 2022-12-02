@@ -53,9 +53,9 @@ RigidBodyCH::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<RigidObject2>    rbdObjA = getRigidObjA();
-    std::shared_ptr<RigidObject2>    rbdObjB = getRigidObjB();
-    std::shared_ptr<Entity> colObjB = getInputObjectB();
+    std::shared_ptr<RigidObject2> rbdObjA = getRigidObjA();
+    std::shared_ptr<RigidObject2> rbdObjB = getRigidObjB();
+    std::shared_ptr<Entity>       colObjB = getInputObjectB();
 
     // If both objects are rigid objects
     if (rbdObjA != nullptr && rbdObjB != nullptr)
@@ -160,7 +160,7 @@ RigidBodyCH::handleRbdStaticOneWay(
         else if (colElem.m_type == CollisionElementType::PointIndexDirection)
         {
             // Doesn't support mapping yet
-          auto         geom = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(rbdObj.get()));
+            auto         geom      = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(rbdObj.get()));
             const Vec3d& dir       = colElem.m_element.m_PointIndexDirectionElement.dir;
             const double depth     = colElem.m_element.m_PointIndexDirectionElement.penetrationDepth;
             const Vec3d& contactPt = (*geom->getVertexPositions())[colElem.m_element.m_PointIndexDirectionElement.ptIndex];

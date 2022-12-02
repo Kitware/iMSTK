@@ -26,10 +26,10 @@ public:
     ~CollisionInteraction() override = default;
 
 protected:
-    CollisionInteraction(std::string                      objName,
+    CollisionInteraction(std::string             objName,
                          std::shared_ptr<Entity> obj1,
                          std::shared_ptr<Entity> obj2,
-                         std::string                      cdType);
+                         std::string             cdType);
 
 public:
     void setCollisionDetection(std::shared_ptr<CollisionDetectionAlgorithm> colDetect);

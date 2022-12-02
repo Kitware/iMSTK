@@ -126,7 +126,7 @@ main()
         std::make_shared<VecDataArray<double, 3>>(vertices),
         std::make_shared<VecDataArray<int, 2>>(cells));
 
-    auto toolObj = std::make_shared<SceneObject>("Tool");
+    auto toolObj     = std::make_shared<SceneObject>("Tool");
     auto visualModel = toolObj->addComponent<VisualModel>();
     visualModel->setGeometry(toolGeom);
     toolObj->addComponent<Collider>()->setGeometry(toolGeom);

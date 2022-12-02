@@ -26,7 +26,7 @@ class Collider : public Component
 {
 public:
     Collider(const std::string& name = "Collider")
-      : Component(name)
+        : Component(name)
     {
     }
 

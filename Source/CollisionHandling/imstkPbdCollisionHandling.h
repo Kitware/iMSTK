@@ -129,9 +129,9 @@ public:
 
         // Objects
         // Why do we have raw pointers here, and not shared_ptr?
-        PbdObject* pbdObj       = nullptr;
-        Entity* colObj = nullptr;
-        ObjType objType = ObjType::Colliding;
+        PbdObject* pbdObj = nullptr;
+        Entity* colObj    = nullptr;
+        ObjType objType   = ObjType::Colliding;
 
         PbdModel* model    = nullptr;
         double compliance  = 0.0;

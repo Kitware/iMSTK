@@ -196,7 +196,7 @@ main()
         std::shared_ptr<PbdObject> fluidObj = createPbdFluid(tetMeshFileName);
         scene->addSceneObject(fluidObj);
 
-        imstkNew<SceneObject> floorObj("Floor");
+        imstkNew<SceneObject>        floorObj("Floor");
         std::shared_ptr<SurfaceMesh> floorGeom = createCollidingSurfaceMesh();
         floorObj->addComponent<VisualModel>()->setGeometry(floorGeom);
         floorObj->addComponent<Collider>()->setGeometry(floorGeom);

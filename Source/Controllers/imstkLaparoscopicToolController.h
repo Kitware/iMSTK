@@ -36,10 +36,10 @@ public:
     ~LaparoscopicToolController() override = default;
 
     void setParts(
-        std::shared_ptr<Entity> shaft,
-        std::shared_ptr<Entity> upperJaw,
-        std::shared_ptr<Entity> lowerJaw,
-        std::shared_ptr<Geometry>        pickGeom);
+        std::shared_ptr<Entity>   shaft,
+        std::shared_ptr<Entity>   upperJaw,
+        std::shared_ptr<Entity>   lowerJaw,
+        std::shared_ptr<Geometry> pickGeom);
 
     void setDevice(std::shared_ptr<DeviceClient> device) override;
 
@@ -96,7 +96,7 @@ protected:
     std::shared_ptr<SceneObject> m_shaft;               ///< Tool shaft
     std::shared_ptr<SceneObject> m_upperJaw;            ///< Tool upper jaw
     std::shared_ptr<SceneObject> m_lowerJaw;            ///< Tool lower jaw
-    std::shared_ptr<Geometry> m_pickGeom;
+    std::shared_ptr<Geometry>    m_pickGeom;
 
     double   m_jawAngle    = PI / 6.0;                      ///< Angle of the jaws
     double   m_change      = 6.0e-5;                        ///< Amount of change in jaw angle per frame

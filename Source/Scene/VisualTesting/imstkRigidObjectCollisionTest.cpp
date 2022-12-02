@@ -108,9 +108,9 @@ public:
     }
 
 public:
-    std::shared_ptr<RigidObject2>    m_rbdObj     = nullptr;
-    std::shared_ptr<SceneObject>     m_cdObj      = nullptr;
-    std::shared_ptr<Geometry> m_collidingGeometry = nullptr;
+    std::shared_ptr<RigidObject2> m_rbdObj = nullptr;
+    std::shared_ptr<SceneObject>  m_cdObj  = nullptr;
+    std::shared_ptr<Geometry>     m_collidingGeometry = nullptr;
 
     std::shared_ptr<RigidObjectCollision> m_rbdCollision = nullptr;
     std::string m_collisionName = "";

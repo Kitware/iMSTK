@@ -91,8 +91,8 @@ BoneDrillingCH::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<Entity> bone  = getBoneObj();
-    std::shared_ptr<RigidObject2>    drill = getDrillObj();
+    std::shared_ptr<Entity>       bone  = getBoneObj();
+    std::shared_ptr<RigidObject2> drill = getDrillObj();
 
     auto boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(Collider::getCollidingGeometryFromEntity(bone.get()));
 
@@ -136,7 +136,7 @@ BoneDrillingCH::handle(
     }
 
     // Check if any collisions
-    auto drillCollidingGeometry = Collider::getCollidingGeometryFromEntity(drill.get());
+    auto       drillCollidingGeometry = Collider::getCollidingGeometryFromEntity(drill.get());
     const auto devicePosition = drillCollidingGeometry->getTranslation();
     if (elementsA.empty() && elementsB.empty())
     {

@@ -16,10 +16,10 @@
 namespace imstk
 {
 CollisionInteraction::CollisionInteraction(
-    std::string                      objName,
+    std::string             objName,
     std::shared_ptr<Entity> objA,
     std::shared_ptr<Entity> objB,
-    std::string                      cdType = "") : SceneObject(objName),
+    std::string             cdType = "") : SceneObject(objName),
     m_objA(objA), m_objB(objB)
 {
     CHECK(objA != nullptr) << "CollisionInteraction requires an Entity objA";
@@ -59,11 +59,11 @@ CollisionInteraction::CollisionInteraction(
 
         if (!cdType.empty())
         {
-          // Setup the CD
-          m_colDetect = CDObjectFactory::makeCollisionDetection(cdType);
-          m_colDetect->setInput(collidingGeomA, 0);
-          m_colDetect->setInput(collidingGeomB, 1);
-          setCollisionDetection(m_colDetect);
+            // Setup the CD
+            m_colDetect = CDObjectFactory::makeCollisionDetection(cdType);
+            m_colDetect->setInput(collidingGeomA, 0);
+            m_colDetect->setInput(collidingGeomB, 1);
+            setCollisionDetection(m_colDetect);
         }
         else
         {

@@ -366,9 +366,9 @@ public:
     }
 
 public:
-    std::shared_ptr<PbdModel>        m_pbdModel   = nullptr;
-    std::shared_ptr<PbdObject>       m_graspedObj = nullptr;
-    std::shared_ptr<Entity> m_grasperObj = nullptr;
+    std::shared_ptr<PbdModel>  m_pbdModel   = nullptr;
+    std::shared_ptr<PbdObject> m_graspedObj = nullptr;
+    std::shared_ptr<Entity>    m_grasperObj = nullptr;
 
     std::shared_ptr<PbdObjectGrasping> m_pbdGrasping = nullptr;
     double m_graspStiffness  = 0.5;
@@ -440,11 +440,11 @@ TEST_F(PbdObjectGraspingTest, PbdRigid_MultiGrasp)
         createScene();
 
     // Setup a second grasper below the sphere now that the scene is setup
-        std::shared_ptr<Entity> grasperObj1             = makeGrasperObj("grasper1", Vec3d(0.0, -0.08, 0.0), m_pbdModel);
-        auto                             pbdGrasperObj1 = std::dynamic_pointer_cast<PbdObject>(grasperObj1);
-        auto                             capsule1       = std::dynamic_pointer_cast<Capsule>(grasperObj1->getComponent<Collider>()->getGeometry());
-        auto                             controller1    = grasperObj1->getComponent<PbdObjectController>();
-        auto                             client1 = std::make_shared<DummyClient>();
+        std::shared_ptr<Entity> grasperObj1    = makeGrasperObj("grasper1", Vec3d(0.0, -0.08, 0.0), m_pbdModel);
+        auto                    pbdGrasperObj1 = std::dynamic_pointer_cast<PbdObject>(grasperObj1);
+        auto                    capsule1       = std::dynamic_pointer_cast<Capsule>(grasperObj1->getComponent<Collider>()->getGeometry());
+        auto                    controller1    = grasperObj1->getComponent<PbdObjectController>();
+        auto                    client1 = std::make_shared<DummyClient>();
         client1->setPosition((*pbdGrasperObj1->getPbdBody()->vertices)[0]);
         controller1->setDevice(client1);
         m_scene->addSceneObject(pbdGrasperObj1);

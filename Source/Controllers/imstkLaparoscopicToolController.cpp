@@ -16,9 +16,9 @@ namespace imstk
 {
 void
 LaparoscopicToolController::setParts(
-    std::shared_ptr<Entity> shaft,
-    std::shared_ptr<Entity> upperJaw,
-    std::shared_ptr<Entity> lowerJaw,
+    std::shared_ptr<Entity>   shaft,
+    std::shared_ptr<Entity>   upperJaw,
+    std::shared_ptr<Entity>   lowerJaw,
     std::shared_ptr<Geometry> pickGeom)
 {
     m_shaft    = std::dynamic_pointer_cast<SceneObject>(shaft);

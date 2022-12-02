@@ -268,9 +268,9 @@ public:
     }
 
 public:
-    std::shared_ptr<PbdObject>       m_pbdObj     = nullptr;
-    std::shared_ptr<Entity>          m_cdObj      = nullptr;
-    std::shared_ptr<Geometry> m_collidingGeometry = nullptr;
+    std::shared_ptr<PbdObject> m_pbdObj = nullptr;
+    std::shared_ptr<Entity>    m_cdObj  = nullptr;
+    std::shared_ptr<Geometry>  m_collidingGeometry = nullptr;
 
     std::shared_ptr<PbdObjectCollision> m_pbdCollision = nullptr;
     std::string m_collisionName      = "";

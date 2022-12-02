@@ -17,9 +17,9 @@
 
 using namespace imstk;
 
-NeedleInteraction::NeedleInteraction(std::shared_ptr<Entity>          tissueObj,
-                                     std::shared_ptr<RigidObject2>    needleObj,
-                                     const std::string&               collisionName) :
+NeedleInteraction::NeedleInteraction(std::shared_ptr<Entity>       tissueObj,
+                                     std::shared_ptr<RigidObject2> needleObj,
+                                     const std::string&            collisionName) :
     RigidObjectCollision(needleObj, tissueObj, collisionName)
 {
     CHECK(needleObj->containsComponent<StraightNeedle>())

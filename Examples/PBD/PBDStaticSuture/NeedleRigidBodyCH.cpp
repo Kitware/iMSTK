@@ -24,7 +24,7 @@ NeedleRigidBodyCH::handle(
     // If no collision, needle must be removed
     auto needleObj = std::dynamic_pointer_cast<RigidObject2>(getInputObjectA());
     CHECK(needleObj != nullptr) << "Expected needleObj to be RigidObject2.";
-    auto needle    = needleObj->getComponent<ArcNeedle>();
+    auto needle = needleObj->getComponent<ArcNeedle>();
 
     std::shared_ptr<Entity> tissueObj   = getInputObjectB();
     auto                    puncturable = tissueObj->getComponent<Puncturable>();
@@ -80,11 +80,11 @@ NeedleRigidBodyCH::addConstraint(
     // If no collision, needle must be removed
     auto needleObj = std::dynamic_pointer_cast<RigidObject2>(getInputObjectA());
     CHECK(needleObj != nullptr) << "Expected needleObj to be RigidObject2.";
-    auto needle    = needleObj->getComponent<ArcNeedle>();
+    auto needle = needleObj->getComponent<ArcNeedle>();
 
-    std::shared_ptr<Entity>          tissueObj   = getInputObjectB();
-    auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
+    std::shared_ptr<Entity> tissueObj   = getInputObjectB();
+    auto                    puncturable = tissueObj->getComponent<Puncturable>();
+    const PunctureId        punctureId  = getPunctureId(needle, puncturable);
 
     // If removed and we are here, we must now be touching
     if (needle->getState(punctureId) == Puncture::State::REMOVED)
