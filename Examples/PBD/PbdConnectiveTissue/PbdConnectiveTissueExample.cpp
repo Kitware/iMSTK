@@ -4,6 +4,8 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkBurnable.h"
+#include "imstkBurner.h"
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
 #include "imstkCollisionUtils.h"
@@ -19,6 +21,7 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectGrasping.h"
 #include "imstkRenderMaterial.h"
@@ -147,10 +150,10 @@ static std::shared_ptr<PbdObject>
 makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
 {
     auto toolGeometry = std::make_shared<Capsule>();
-    toolGeometry->setRadius(0.1);
-    toolGeometry->setLength(0.2);
+    toolGeometry->setRadius(0.03);
+    toolGeometry->setLength(0.4);
     toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
-    toolGeometry->setOrientation(Quatd(0.707, 0.0, 0.0, 0.707));
+    toolGeometry->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
 
     auto toolObj = std::make_shared<PbdObject>("Tool");
 
@@ -160,8 +163,8 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     toolObj->setCollidingGeometry(toolGeometry);
     toolObj->setDynamicalModel(model);
     toolObj->getPbdBody()->setRigid(
-        Vec3d(0.0, 5.0, 2.0),
-        1.0,
+        Vec3d(0.0, 2.0, 2.0),
+        0.1,
         Quatd::Identity(),
         Mat3d::Identity() * 1.0);
 
@@ -170,11 +173,11 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
     controller->setControlledObject(toolObj);
-    controller->setTranslationScaling(50.0);
-    controller->setLinearKs(5000.0);
-    controller->setAngularKs(1000.0);
+    controller->setTranslationScaling(10.0);
+    controller->setLinearKs(500.0);
+    controller->setAngularKs(200.0);
     controller->setUseCritDamping(true);
-    controller->setForceScaling(0.01);
+    controller->setForceScaling(0.8);
     controller->setSmoothingKernelSize(15);
     controller->setUseForceSmoothening(true);
 
@@ -201,10 +204,10 @@ main()
     auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->getConfig()->m_doPartitioning = false;
     pbdModel->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
-    pbdModel->getConfig()->m_iterations = 4;
+    pbdModel->getConfig()->m_iterations = 5;
     pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -1.0, 0.0);
-    pbdModel->getConfig()->m_linearDampingCoeff  = 0.01; // Removed from velocity
-    pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
+    pbdModel->getConfig()->m_linearDampingCoeff  = 0.005; // Removed from velocity
+    pbdModel->getConfig()->m_angularDampingCoeff = 0.005;
 
     // Setup gallbladder object
     std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdModel);
@@ -217,18 +220,35 @@ main()
     // Create PBD object of connective strands with associated constraints
     double                     maxDist = 0.35;
     std::shared_ptr<PbdObject> connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdModel, maxDist, 2.5, 7);
+    pbdModel->getConfig()->setBodyDamping(connectiveStrands->getPbdBody()->bodyHandle, 0.015, 0.0);
+
     // Add Tearing
     connectiveStrands->addComponent<Tearable>();
+
+    // Add burnable
+    auto burnable = std::make_shared<Burnable>();
+    connectiveStrands->addComponent(burnable);
+
     scene->addSceneObject(connectiveStrands);
 
     // Setup a tool to grasp with
-    std::shared_ptr<PbdObject> graspObj = makeCapsuleToolObj(pbdModel);
-    scene->addSceneObject(graspObj);
+    std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdModel);
+    scene->addSceneObject(toolObj);
+
+    // add collision
+    auto collision = std::make_shared<PbdObjectCollision>(connectiveStrands, toolObj);
+    scene->addInteraction(collision);
 
     // Create new picking with constraints
-    auto grasper = std::make_shared<PbdObjectGrasping>(connectiveStrands, graspObj);
+    auto grasper = std::make_shared<PbdObjectGrasping>(connectiveStrands, toolObj);
     grasper->setStiffness(0.5);
     scene->addInteraction(grasper);
+
+    // Add burner component to tool
+    auto burning = std::make_shared<Burner>();
+    burning->addBurnableObject(connectiveStrands);
+
+    toolObj->addComponent(burning);
 
     // Light
     auto light = std::make_shared<DirectionalLight>();
@@ -254,7 +274,7 @@ main()
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 
-        auto controller = graspObj->getComponent<PbdObjectController>();
+        auto controller = toolObj->getComponent<PbdObjectController>();
 #ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
@@ -273,12 +293,10 @@ main()
                     if (e->m_button == 1)
                     {
                         // Use a slightly larger capsule since collision prevents intersection
-                        auto capsule = std::dynamic_pointer_cast<Capsule>(graspObj->getCollidingGeometry());
+                        auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
                         auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                         dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
-                        grasper->beginVertexGrasp(dilatedCapsule);
-                        // grasper->beginCellGrasp(dilatedCapsule);
-                        //pbdToolCollision->setEnabled(false);
+                        grasper->beginCellGrasp(dilatedCapsule);
                     }
                 }
                 else if (e->m_buttonState == BUTTON_RELEASED)
@@ -286,7 +304,6 @@ main()
                     if (e->m_button == 1)
                     {
                         grasper->endGrasp();
-                        //pbdToolCollision->setEnabled(true);
                     }
                 }
             });
@@ -305,7 +322,7 @@ main()
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
             [&](Event*)
             {
-                grasper->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(graspObj->getCollidingGeometry()));
+                grasper->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
                 //pbdToolCollision->setEnabled(false);
             });
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
@@ -323,6 +340,34 @@ main()
         std::shared_ptr<Entity> mouseAndKeyControls =
             SimulationUtils::createDefaultSceneControl(driver);
         scene->addSceneObject(mouseAndKeyControls);
+
+        // Add keyboard controlls for burning and grasping (Note: only for haptic devices without buttons)
+        std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+            {
+                // If b pressed, burn
+                if (keyDevice->getButton('b') == KEY_PRESS)
+                {
+                    burning->startBurn();
+                }
+                if (keyDevice->getButton('b') == KEY_RELEASE)
+                {
+                    burning->stopBurn();
+                }
+                // If g pressed, grasp
+                if (keyDevice->getButton('g') == KEY_PRESS)
+                {
+                    // Use a slightly larger capsule since collision prevents intersection
+                    auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
+                    auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
+                    dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
+                    grasper->beginCellGrasp(dilatedCapsule);
+                }
+                if (keyDevice->getButton('g') == KEY_RELEASE)
+                {
+                    grasper->endGrasp();
+                }
+            });
 
         driver->start();
     }

@@ -130,6 +130,8 @@
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCellRemoval.h"
 #include "imstkTearable.h"
+#include "imstkBurnable.h"
+#include "imstkBurner.h"
 #include "imstkVisualModel.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
@@ -408,6 +410,8 @@ namespace std
  */
 %include "../../SceneEntities/Components/imstkVisualModel.h";
 %include "../../SceneEntities/Components/imstkTearable.h";
+%include "../../SceneEntities/Components/imstkBurnable.h";
+%include "../../SceneEntities/Components/imstkBurner.h";
 %include "../../SceneEntities/Objects/imstkSceneObject.h";
 %include "../../SceneEntities/Objects/imstkCollidingObject.h";
 %include "../../SceneEntities/Objects/imstkDynamicObject.h";

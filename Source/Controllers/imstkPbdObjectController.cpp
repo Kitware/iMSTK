@@ -61,7 +61,9 @@ PbdObjectController::update(const double& dt)
         {
             const double mass     = (*m_pbdObject->getPbdBody()->masses)[0];
             const double linearKs = m_linearKs.maxCoeff();
-            m_linearKd = 2.0 * std::sqrt(mass * linearKs);
+
+            const double fudge = 1.05; ///< Slightly overdamp to account for numerical error with forward euler integration
+            m_linearKd = 2.0 * std::sqrt(mass * linearKs) * fudge;
 
             const Mat3d inertia = (*m_pbdObject->getPbdBody()->inertias)[0];
             // Currently kd is not a 3d vector though it could be.
@@ -72,7 +74,7 @@ PbdObjectController::update(const double& dt)
             //const double inertiaScale = inertia.eigenvalues().real().maxCoeff();
             const double inertiaScale = std::cbrt(inertia.determinant());
             const double angularKs    = m_angularKs.maxCoeff();
-            m_angularKd = 2.0 * std::sqrt(inertiaScale * angularKs);
+            m_angularKd = 2.0 * std::sqrt(inertiaScale * angularKs) * fudge;
         }
 
         // If kd > 2 * sqrt(mass * ks); The system is overdamped (may be intentional)
