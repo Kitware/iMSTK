@@ -17,7 +17,7 @@ public class RigidBody2
             rbdModel.getConfig().m_maxNumIterations = 10;
 
             // Create the first rbd, plane floor
-            CollidingObject planeObj = new CollidingObject("Plane");
+            SceneObject planeObj = new SceneObject("Plane");
             {
                 // Subtract the sphere from the plane to make a crater
                 Plane planeGeom = new Plane();
@@ -55,7 +55,7 @@ public class RigidBody2
 
                 // Create the object
                 planeObj.addVisualModel(visualModel);
-                planeObj.setCollidingGeometry(compGeom);
+                planeObj.addComponentCollider().setGeometry(compGeom);
                 //planeObj.getRigidBody().m_isStatic = true;
                 //planeObj.getRigidBody().m_mass     = 100.0;
 
@@ -84,7 +84,7 @@ public class RigidBody2
                 // Create the cube rigid object
                 cubeObj.setDynamicalModel(rbdModel);
                 cubeObj.setPhysicsGeometry(subdivide.getOutputMesh());
-                cubeObj.setCollidingGeometry(subdivide.getOutputMesh());
+                cubeObj.addComponentCollider().setGeometry(subdivide.getOutputMesh());
                 cubeObj.addVisualModel(visualModel);
                 cubeObj.getRigidBody().m_mass = 100.0;
                 cubeObj.getRigidBody().m_initPos = new Vec3d(0.0, 8.0, 0.0);

@@ -75,9 +75,11 @@ public class FeDeformable
             Plane planeGeom = new Plane();
             planeGeom.setWidth(40.0);
             planeGeom.setPosition(0.0, -8.0, 0.0);
-            CollidingObject planeObj = new CollidingObject("Plane");
+            SceneObject planeObj = new SceneObject("Plane");
             planeObj.setVisualGeometry(planeGeom);
-            planeObj.setCollidingGeometry(planeGeom);
+            Collider collider = new Collider("Collider");
+            planeObj.addComponent(collider);
+            // setCollidingGeometry(planeGeom);
             scene.addSceneObject(planeObj);
 
             // Light

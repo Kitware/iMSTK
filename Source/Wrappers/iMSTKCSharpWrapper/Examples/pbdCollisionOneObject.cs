@@ -59,7 +59,7 @@ public class PbdCollisionOneObject
                 pbdModel.configure(pbdParams);
 
                 deformableObj.addVisualModel(surfMeshModel);
-                deformableObj.setCollidingGeometry(coarseTetMesh);
+                deformableObj.addComponentCollider().setGeometry(coarseTetMesh);
                 deformableObj.setPhysicsGeometry(coarseTetMesh);
                 deformableObj.setPhysicsToVisualMap(new PointToTetMap(coarseTetMesh, highResSurfMesh));
                 deformableObj.setDynamicalModel(pbdModel);
@@ -68,12 +68,12 @@ public class PbdCollisionOneObject
             scene.addSceneObject(deformableObj);
 
             // Setup the floor for it to fall on
-            CollidingObject floorObj = new CollidingObject("Floor");
+            SceneObject floorObj = new SceneObject("Floor");
             {
                 Plane floorGeom = new Plane(new Vec3d(0.0, 0.0, 0.0), new Vec3d(0.0, 1.0, 0.0));
                 floorGeom.setWidth(100.0);
 
-                floorObj.setCollidingGeometry(floorGeom);
+                floorObj.addComponentCollider().setGeometry(floorGeom);
                 floorObj.setVisualGeometry(floorGeom);
             }
             scene.addSceneObject(floorObj);
