@@ -7,6 +7,8 @@ set(H_FILES
   Components/imstkAxesModel.h
   Components/imstkObjectControllerGhost.h
   Components/imstkPortHoleInteraction.h
+  Components/imstkBurnable.h
+  Components/imstkBurner.h
   Components/imstkTearable.h
   Components/imstkVisualModel.h
   Components/imstkVertexLabelVisualModel.h
@@ -36,6 +38,8 @@ set(SRC_FILES
   Camera/imstkCamera.cpp
   Components/imstkObjectControllerGhost.cpp
   Components/imstkPortHoleInteraction.cpp
+  Components/imstkBurnable.cpp
+  Components/imstkBurner.cpp
   Components/imstkTearable.cpp
   Components/imstkVisualModel.cpp
   Lights/imstkIBLProbe.cpp

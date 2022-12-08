@@ -240,7 +240,7 @@ PbdObjectGrasping::beginVertexGrasp(std::shared_ptr<AnalyticalGeometry> geometry
     m_graspGeom  = geometry;
 
     m_isGrasping = true;
-    LOG(INFO) << "Begin grasp";
+    // LOG(INFO) << "Begin grasp";
 }
 
 void
@@ -265,7 +265,6 @@ PbdObjectGrasping::beginCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry, 
     m_graspGeom  = geometry;
 
     m_isGrasping = true;
-    LOG(INFO) << "Begin grasp";
 }
 
 void
@@ -279,7 +278,6 @@ PbdObjectGrasping::beginRayPointGrasp(std::shared_ptr<AnalyticalGeometry> geomet
     m_graspGeom  = geometry;
 
     m_isGrasping = true;
-    LOG(INFO) << "Begin grasp";
 }
 
 void
@@ -293,14 +291,12 @@ PbdObjectGrasping::beginRayCellGrasp(std::shared_ptr<AnalyticalGeometry> geometr
     m_graspGeom  = geometry;
 
     m_isGrasping = true;
-    LOG(INFO) << "Begin grasp";
 }
 
 void
 PbdObjectGrasping::endGrasp()
 {
     m_isGrasping = false;
-    LOG(INFO) << "End grasp";
 }
 
 void
