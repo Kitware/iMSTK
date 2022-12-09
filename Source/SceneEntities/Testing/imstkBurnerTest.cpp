@@ -6,6 +6,7 @@
 
 #include "imstkBurner.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -37,7 +38,7 @@ TEST(imstkBurningTest, testState)
     // Create the object
     toolObj->setVisualGeometry(toolGeometry);
     toolObj->setPhysicsGeometry(toolGeometry);
-    toolObj->setCollidingGeometry(toolGeometry);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
     toolObj->setDynamicalModel(pbdModel);
     toolObj->getPbdBody()->setRigid(
         Vec3d(0.0, 5.0, 2.0),

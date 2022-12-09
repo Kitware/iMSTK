@@ -359,7 +359,7 @@ main()
                 if (keyDevice->getButton('g') == KEY_PRESS)
                 {
                     // Use a slightly larger capsule since collision prevents intersection
-                    auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
+                    auto capsule = std::dynamic_pointer_cast<Capsule>(Collider::getCollidingGeometryFromEntity(toolObj.get()));
                     auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                     dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                     grasper->beginCellGrasp(dilatedCapsule);
