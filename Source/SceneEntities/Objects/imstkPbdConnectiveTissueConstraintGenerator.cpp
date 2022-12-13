@@ -239,25 +239,23 @@ makeConnectiveTissue(
     proxSelector = std::make_shared<ProximitySurfaceSelector>();
 
     // Check inputs
-    auto objASurf = std::dynamic_pointer_cast<SurfaceMesh>(objA->getComponent<Collider>()->getGeometry());
+    auto objASurf = std::dynamic_pointer_cast<SurfaceMesh>(Collider::getCollidingGeometryFromEntity(objA.get()));
     CHECK(objASurf != nullptr) << "Object A " << objA->getName() << " Did not contain a surface mesh as colliding geometry in generateConnectiveTissue";
 
-    auto objBSurf = std::dynamic_pointer_cast<SurfaceMesh>(objB->getComponent<Collider>()->getGeometry());
+    auto objBSurf = std::dynamic_pointer_cast<SurfaceMesh>(Collider::getCollidingGeometryFromEntity(objB.get()));
     CHECK(objBSurf != nullptr) << "Object B " << objB->getName() << " Did not contain a surface mesh as colliding geometry in generateConnectiveTissue";
 
     CHECK(model != nullptr) << "PbdModel in generateConnectiveTissue is NULL";
 
-    Vec3d objACenter = std::dynamic_pointer_cast<SurfaceMesh>(objA->getComponent<Collider>()->getGeometry())->getCenter();
-    Vec3d objBCenter = std::dynamic_pointer_cast<SurfaceMesh>(objB->getComponent<Collider>()->getGeometry())->getCenter();
+    Vec3d objACenter = objASurf->getCenter();
+    Vec3d objBCenter = objBSurf->getCenter();
 
     if (fabs(maxDist) < 1.0e-6)
     {
         maxDist = (objACenter - objBCenter).norm();
     }
 
-    proxSelector->setInputMeshes(
-        std::dynamic_pointer_cast<SurfaceMesh>(objA->getComponent<Collider>()->getGeometry()),
-        std::dynamic_pointer_cast<SurfaceMesh>(objB->getComponent<Collider>()->getGeometry()));
+    proxSelector->setInputMeshes(objASurf, objBSurf);
 
     proxSelector->setProximity(maxDist);
     proxSelector->update();

@@ -98,6 +98,7 @@ protected:
 
     std::shared_ptr<PbdObject> m_objA = nullptr;
     std::shared_ptr<Entity>    m_objB = nullptr;
+    std::shared_ptr<Geometry>  m_objBCollisionGeometry;
 
     std::shared_ptr<std::unordered_set<size_t>> m_removeConstraintVertices = std::make_shared<std::unordered_set<size_t>>();
     std::shared_ptr<std::unordered_set<size_t>> m_addConstraintVertices    = std::make_shared<std::unordered_set<size_t>>();

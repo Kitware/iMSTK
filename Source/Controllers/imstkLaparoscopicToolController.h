@@ -10,6 +10,7 @@
 
 namespace imstk
 {
+class Collider;
 class Entity;
 class Geometry;
 class SceneObject;
@@ -92,11 +93,18 @@ public:
     ///
     JawState getJawState() const { return m_jawState; }
 
-protected:
-    std::shared_ptr<SceneObject> m_shaft;               ///< Tool shaft
-    std::shared_ptr<SceneObject> m_upperJaw;            ///< Tool upper jaw
-    std::shared_ptr<SceneObject> m_lowerJaw;            ///< Tool lower jaw
-    std::shared_ptr<Geometry>    m_pickGeom;
+private:
+    struct
+    {
+        std::shared_ptr<SceneObject> sceneObject;
+        std::shared_ptr<Collider> collider;
+        std::shared_ptr<Geometry> visualGeometry;
+        Mat4d visualTransform    = Mat4d::Identity(); // Initial local transform of the visual geometry
+        Mat4d collidingTransform = Mat4d::Identity(); // Initial local transform of the collider
+        Mat4d localTransform     = Mat4d::Identity(); // WorldTransform = m_controllerWorldTransform * localTransform * visual/collidingTransform
+    } m_shaft, m_upperJaw, m_lowerJaw;
+
+    std::shared_ptr<Geometry> m_pickGeom;
 
     double   m_jawAngle    = PI / 6.0;                      ///< Angle of the jaws
     double   m_change      = 6.0e-5;                        ///< Amount of change in jaw angle per frame
@@ -107,16 +115,5 @@ protected:
 
     Mat4d m_controllerWorldTransform = Mat4d::Identity();   // Final world transform of the controller
     Mat4d m_pickGeomTransform = Mat4d::Identity();
-
-    Mat4d m_shaftVisualTransform    = Mat4d::Identity();    // Initial local transform of the visual shaft
-    Mat4d m_upperJawVisualTransform = Mat4d::Identity();    // Initial local transform of the visual upper jaw
-    Mat4d m_lowerJawVisualTransform = Mat4d::Identity();    // Initial local transform of the visual lower jaw
-
-    Mat4d m_shaftCollidingTransform    = Mat4d::Identity(); // Initial local transform of the colliding shaft
-    Mat4d m_upperJawCollidingTransform = Mat4d::Identity(); // Initial local transform of the colliding upper jaw
-    Mat4d m_lowerJawCollidingTransform = Mat4d::Identity(); // Initial local transform of the colliding lower jaw
-
-    Mat4d m_upperJawLocalTransform = Mat4d::Identity();     // upperJawWorldTransform = m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawVisual/CollidingTransform
-    Mat4d m_lowerJawLocalTransform = Mat4d::Identity();     // lowerJawWorldTransform = m_controllerWorldTransform * m_lowerJawLocalTransform * m_lowerJawVisual/CollidingTransform
 };
 } // namespace imstk

@@ -201,10 +201,12 @@ LevelSetCH::handle(
 void
 LevelSetCH::maskAllPoints()
 {
-    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(getRigidObj().get()));
-    for (int i = 0; i < pointSet->getNumVertices(); i++)
+    if (auto pointSet = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(getRigidObj().get())))
     {
-        m_ptIdMask.insert(i);
+        for (int i = 0; i < pointSet->getNumVertices(); i++)
+        {
+            m_ptIdMask.insert(i);
+        }
     }
 }
 } // namespace imstk

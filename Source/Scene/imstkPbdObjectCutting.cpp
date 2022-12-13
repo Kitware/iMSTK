@@ -32,6 +32,9 @@ PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::share
         LOG(WARNING) << "CutObj is neither a SurfaceMesh nor an AnalyticalGeometry, could not create cutting pair";
         return;
     }
+
+    m_objBCollisionGeometry = Collider::getCollidingGeometryFromEntity(m_objB.get());
+    CHECK(m_objBCollisionGeometry != nullptr) << "Cannot acquire shared_ptr to objB collision geometry.";
 }
 
 void
@@ -42,13 +45,12 @@ PbdObjectCutting::apply()
     m_addConstraintVertices->clear();
     m_removeConstraintVertices->clear();
 
-    auto objBCollisionGeometry = Collider::getCollidingGeometryFromEntity(m_objB.get());
     // Perform cutting
     if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_objA->getPhysicsGeometry()))
     {
         SurfaceMeshCut cutter;
         cutter.setInputMesh(surfMesh);
-        cutter.setCutGeometry(objBCollisionGeometry);
+        cutter.setCutGeometry(m_objBCollisionGeometry);
         cutter.setEpsilon(m_epsilon);
         cutter.update();
 
@@ -67,7 +69,7 @@ PbdObjectCutting::apply()
     {
         LineMeshCut cutter;
         cutter.setInputMesh(lineMesh);
-        cutter.setCutGeometry(objBCollisionGeometry);
+        cutter.setCutGeometry(m_objBCollisionGeometry);
         cutter.setEpsilon(m_epsilon);
         cutter.update();
 
