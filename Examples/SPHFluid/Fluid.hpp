@@ -214,7 +214,7 @@ generateFluid(const double particleRadius)
 
     // Add the component models
     fluidObj->addVisualModel(visualModel);
-    fluidObj->getComponent<Collider>()->setGeometry(geometry);
+    fluidObj->addComponent<Collider>()->setGeometry(geometry);
     fluidObj->setDynamicalModel(sphModel);
     fluidObj->setPhysicsGeometry(geometry);
 

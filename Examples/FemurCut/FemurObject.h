@@ -32,6 +32,7 @@ public:
     FemurObject();
     ~FemurObject() override = default;
 
+    void setup();
     bool initialize() override;
 
     ///

@@ -42,7 +42,7 @@ main()
     std::shared_ptr<ImageData> sdfImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/stanfordBunny/stanfordBunny_SDF.nii");
     auto                       sdf      = std::make_shared<SignedDistanceField>(sdfImage->cast(IMSTK_DOUBLE));
     {
-        bunnyObj->getComponent<Collider>()->setGeometry(sdf);
+        bunnyObj->addComponent<Collider>()->setGeometry(sdf);
 
         SurfaceMeshFlyingEdges isoExtract;
         isoExtract.setInputImage(sdfImage);

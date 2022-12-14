@@ -116,7 +116,7 @@ main()
     geomShaft->setRadius(0.005);
     geomShaft->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 0.5));
-    auto objShaft = std::make_shared<Entity>("ShaftObject");
+    auto objShaft = std::make_shared<SceneObject>("ShaftObject");
     objShaft->addComponent<VisualModel>()->setGeometry(MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/pivot.obj"));
     objShaft->addComponent<Collider>()->setGeometry(geomShaft);
     scene->addSceneObject(objShaft);

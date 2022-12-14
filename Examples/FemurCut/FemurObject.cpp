@@ -17,6 +17,11 @@
 FemurObject::FemurObject() : LevelSetDeformableObject("Femur"),
     m_isoExtract(std::make_shared<LocalMarchingCubes>())
 {
+}
+
+void
+FemurObject::setup()
+{
     std::shared_ptr<ImageData> initLvlSetImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/legs/femurBoneSolid_SDF.nii")->cast(IMSTK_DOUBLE);
     //const Vec3d& currSpacing = initLvlSetImage->getSpacing();
 

@@ -112,6 +112,7 @@ main()
 
     // Setup the Femur
     auto femurObj = std::make_shared<FemurObject>();
+    femurObj->setup();
     scene->addSceneObject(femurObj);
 
     // Setup the tool that cuts the femur

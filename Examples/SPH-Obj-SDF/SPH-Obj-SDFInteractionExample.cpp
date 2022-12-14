@@ -107,7 +107,7 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
 
     // Setup the Object
     fluidObj->addVisualModel(fluidVisualModel);
-    fluidObj->getComponent<Collider>()->setGeometry(fluidGeometry);
+    fluidObj->addComponent<Collider>()->setGeometry(fluidGeometry);
     fluidObj->setDynamicalModel(sphModel);
     fluidObj->setPhysicsGeometry(fluidGeometry);
 
