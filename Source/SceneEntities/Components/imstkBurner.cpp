@@ -23,8 +23,8 @@ Burner::Burner(const std::string& name) : SceneBehaviour(true, name)
 {
     m_burningHandleNode = std::make_shared<TaskNode>([this]()
         {
-            handleBurner();
-    }, "BurnerHandle");
+            handle();
+    }, "Handle_" + m_name);
 }
 
 void
@@ -43,14 +43,15 @@ Burner::init()
         LOG(INFO) << "There are no bunrable objects for the burning tool to burn \n";
     }
 
-    for (int burnableId = 0; burnableId < m_burnableObjects.size(); burnableId++)
+    // for (int burnableId = 0; burnableId < m_burnableObjects.size(); burnableId++)
+    for (auto burnableObject : m_burnableObjects)
     {
         // Create Picking Algorithms
         auto cellPicker = std::make_shared<CellPicker>();
         cellPicker->setPickingGeometry(m_burnGeometry);
 
-        std::shared_ptr<Geometry> pbdPhysicsGeom = m_burnableObjects[burnableId]->getPhysicsGeometry();
-        CHECK(pbdPhysicsGeom != nullptr) << "Physics geometry of burnable object: " << m_burnableObjects[burnableId]->getName() << " is null in Burner";
+        std::shared_ptr<Geometry> pbdPhysicsGeom = burnableObject->getPhysicsGeometry();
+        CHECK(pbdPhysicsGeom != nullptr) << "Physics geometry of burnable object: " << burnableObject->getName() << " is null in Burner";
 
         auto cdType = CDObjectFactory::getCDType(*m_burnGeometry, *pbdPhysicsGeom);
 
@@ -67,7 +68,7 @@ Burner::init()
 }
 
 void
-Burner::handleBurner()
+Burner::handle()
 {
     // Check tool state
     if (m_onState == true)
@@ -95,14 +96,14 @@ Burner::handleBurner()
                 }
 
                 // Integrate the burn state with time
-                ApplyBurn(burnableId, data.cellId);
+                applyBurn(burnableId, data.cellId);
             }
         }
     }
 }
 
 void
-Burner::ApplyBurn(int burnableId, int cellId)
+Burner::applyBurn(int burnableId, int cellId)
 {
     // Get model data
     double dt = m_burnableObjects[burnableId]->getPbdModel()->getConfig()->m_dt;
@@ -115,11 +116,11 @@ Burner::ApplyBurn(int burnableId, int cellId)
     auto               burnVisualPtr = std::dynamic_pointer_cast<DataArray<double>>(cellMesh->getCellAttribute("BurnVisual"));
     DataArray<double>& burnVisual    = *burnVisualPtr;
 
-    MonopolarToolBurnModel(burnDamage[cellId], burnVisual[cellId], dt);
+    monopolarToolModel(burnDamage[cellId], burnVisual[cellId], dt);
 }
 
 void
-Burner::MonopolarToolBurnModel(double& burnDmg, double& burnVis, double dt)
+Burner::monopolarToolModel(double& burnDmg, double& burnVis, double dt)
 {
     burnDmg += m_onTime * m_q * m_normWattage * dt;
     burnVis += (1.0 - m_onTime) * m_q * m_normWattage * dt;

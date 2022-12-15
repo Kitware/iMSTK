@@ -246,7 +246,7 @@ main()
 
     // Add burner component to tool
     auto burning = std::make_shared<Burner>();
-    burning->addBurnableObject(connectiveStrands);
+    burning->addObject(connectiveStrands);
 
     toolObj->addComponent(burning);
 
@@ -348,11 +348,11 @@ main()
                 // If b pressed, burn
                 if (keyDevice->getButton('b') == KEY_PRESS)
                 {
-                    burning->startBurn();
+                    burning->start();
                 }
                 if (keyDevice->getButton('b') == KEY_RELEASE)
                 {
-                    burning->stopBurn();
+                    burning->stop();
                 }
                 // If g pressed, grasp
                 if (keyDevice->getButton('g') == KEY_PRESS)

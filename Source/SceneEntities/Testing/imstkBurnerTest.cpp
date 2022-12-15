@@ -53,8 +53,8 @@ TEST(imstkBurningTest, testState)
 
     burner->initialize();
 
-    EXPECT_EQ(false, burner->getBurnerState());
+    EXPECT_EQ(false, burner->getState());
 
-    burner->startBurn();
-    EXPECT_EQ(true, burner->getBurnerState());
+    burner->start();
+    EXPECT_EQ(true, burner->getState());
 }
