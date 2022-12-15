@@ -70,14 +70,14 @@ public:
     ///
     /// \brief Start/Stop the burn by changing the onState flag
     ///@{
-    void startBurn() { m_onState = true; }
-    void stopBurn() { m_onState = false; }
+    void start() { m_onState = true; }
+    void stop() { m_onState = false; }
     ///@}
 
     ///
     /// \brief Add burnable object to list of things that can be burned
     ///@{
-    void addBurnableObject(std::shared_ptr<PbdObject> obj)
+    void addObject(std::shared_ptr<PbdObject> obj)
     {
         m_burnableObjects.push_back(obj);
     }
@@ -85,20 +85,20 @@ public:
     ///@}
 
     /// Get state of burner (on/off ~ true/false)
-    bool getBurnerState() const { return m_onState; }
+    bool getState() const { return m_onState; }
 
 protected:
 
     // The handle does the picking to choose which cells are burned.
-    void handleBurner();
+    void handle();
 
     // Applies the burn using the burn model
-    void ApplyBurn(int burnableId, int cellId);
+    void applyBurn(int burnableId, int cellId);
 
     // Burner model for the monopolar tool (variables defined below)
     // Damage evolution:   damage^{n+1} = damage^{n} + onTime*q*normWattage*dt
     // Visual evolution:   visual^{n+1} = visual^{n} + (1-onTime)*q*normWattage*dt
-    void MonopolarToolBurnModel(double& burnDmg, double& burnVis, double dt);
+    void monopolarToolModel(double& burnDmg, double& burnVis, double dt);
 
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
