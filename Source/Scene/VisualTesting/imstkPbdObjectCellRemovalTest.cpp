@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkPbdModel.h"
@@ -113,7 +114,7 @@ makeTriTissueObj(const std::string& name,
     tissueObj->setVisualGeometry(triMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(triMesh);
-    tissueObj->setCollidingGeometry(triMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(triMesh);
     tissueObj->setDynamicalModel(model);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
@@ -169,7 +170,7 @@ makeLineThreadObj(const std::string& name,
     tissueObj->setVisualGeometry(lineMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(lineMesh);
-    tissueObj->setCollidingGeometry(lineMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(lineMesh);
     tissueObj->setDynamicalModel(model);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 

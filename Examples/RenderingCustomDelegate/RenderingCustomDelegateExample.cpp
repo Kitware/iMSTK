@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDataArray.h"
 #include "imstkDirectionalLight.h"
 #include "imstkDummyClient.h"
@@ -95,7 +96,7 @@ main()
             rbdObjs[i]->getRigidBody()->m_initPos = Vec3d(1.0, 0.0, 0.0); // Start the tool a unit off from controller
 
             auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
-            rbdObjs[i]->setCollidingGeometry(surfMesh);
+            rbdObjs[i]->addComponent<Collider>()->setGeometry(surfMesh);
             rbdObjs[i]->setVisualGeometry(surfMesh);
             rbdObjs[i]->setPhysicsGeometry(surfMesh);
 

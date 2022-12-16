@@ -6,8 +6,8 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
-#include "imstkCollidingObject.h"
 #include "imstkCollisionDetectionVisualTest.h"
+#include "imstkEntity.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSurfaceMesh.h"
@@ -43,7 +43,7 @@ TEST_F(CollisionDetectionVisualTest, CapsuleVsSurfaceMesh)
     m_cdGeom1 = triangleMesh;
 
     m_cdGeom2 = std::make_shared<Capsule>(Vec3d(0.0, 0.1, 0.0), 0.1, 0.5);
-    m_cdObj2->getVisualModel(0)->getRenderMaterial()->setDisplayMode(
+    m_cdObj2->getComponent<VisualModel>()->getRenderMaterial()->setDisplayMode(
         RenderMaterial::DisplayMode::Surface);
 
     m_collisionMethod = std::make_shared<SurfaceMeshToCapsuleCD>();

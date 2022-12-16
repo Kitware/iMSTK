@@ -6,6 +6,7 @@
 
 #include "imstkArcNeedle.h"
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkIsometricMap.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -86,7 +87,7 @@ makePbdString(
     stringObj->setVisualGeometry(stringMesh);
     stringObj->getVisualModel(0)->setRenderMaterial(material);
     stringObj->setPhysicsGeometry(stringMesh);
-    stringObj->setCollidingGeometry(stringMesh);
+    stringObj->addComponent<Collider>()->setGeometry(stringMesh);
     stringObj->setDynamicalModel(pbdModel);
     stringObj->getPbdBody()->fixedNodeIds     = { 0, 1, 19, 20 };
     stringObj->getPbdBody()->uniformMassValue = 0.002 / numVerts; // grams
@@ -97,26 +98,26 @@ makePbdString(
 ///
 /// \brief Generate a static/immovable tissue for static suturing
 ///
-static std::shared_ptr<CollidingObject>
+static std::shared_ptr<Entity>
 makeTissueObj()
 {
-    auto tissueObj = std::make_shared<CollidingObject>("tissue");
+    auto tissueObj = std::make_shared<SceneObject>("tissue");
 
     auto box1      = std::make_shared<OrientedBox>(Vec3d(0.0, -0.1, -0.1), Vec3d(0.1, 0.025, 0.1));
     auto box1Model = std::make_shared<VisualModel>();
     box1Model->setGeometry(box1);
     box1Model->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::Gouraud);
     box1Model->getRenderMaterial()->setColor(Color::LightSkin);
-    tissueObj->addVisualModel(box1Model);
+    tissueObj->addComponent(box1Model);
 
-    tissueObj->setCollidingGeometry(box1);
+    tissueObj->addComponent<Collider>()->setGeometry(box1);
 
     auto box2      = std::make_shared<OrientedBox>(Vec3d(0.0, -0.105, -0.1), Vec3d(0.1001, 0.025, 0.1001));
     auto box2Model = std::make_shared<VisualModel>();
     box2Model->setGeometry(box2);
     box2Model->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::Gouraud);
     box2Model->getRenderMaterial()->setColor(Color::darken(Color::Yellow, 0.2));
-    tissueObj->addVisualModel(box2Model);
+    tissueObj->addComponent(box2Model);
 
     tissueObj->addComponent<Puncturable>();
 
@@ -155,7 +156,7 @@ makeNeedleObj()
     sutureLineMesh->transform(rot, Geometry::TransformType::ApplyToData);
 
     needleObj->setVisualGeometry(sutureMesh);
-    needleObj->setCollidingGeometry(sutureLineMesh);
+    needleObj->addComponent<Collider>()->setGeometry(sutureLineMesh);
     needleObj->setPhysicsGeometry(sutureLineMesh);
     needleObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(sutureLineMesh, sutureMesh));
     needleObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
@@ -229,7 +230,7 @@ main()
     scene->addSceneObject(sutureThreadObj);
 
     // Create a static box for tissue
-    std::shared_ptr<CollidingObject> tissueObj = makeTissueObj();
+    std::shared_ptr<Entity> tissueObj = makeTissueObj();
     scene->addSceneObject(tissueObj);
 
     // Create clamps that follow the needle around

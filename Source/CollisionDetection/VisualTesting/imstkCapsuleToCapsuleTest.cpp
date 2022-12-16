@@ -7,8 +7,8 @@
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
 #include "imstkCapsuleToCapsuleCD.h"
-#include "imstkCollidingObject.h"
 #include "imstkCollisionDetectionVisualTest.h"
+#include "imstkEntity.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
@@ -33,11 +33,11 @@ TEST_F(CollisionDetectionVisualTest, CapsuleVsCapsule)
     test(0, 0) = 0.99394; test(0, 1) = 0.109921; test(0, 2) = 0.0; test(0, 3) = -0.000264567;
     test(1, 0) = -0.109921; test(1, 1) = 0.99394; test(1, 2) = 0.0; test(1, 3) = -0.252737;
     m_cdGeom1->setTransform(test);
-    m_cdObj1->getVisualModel(0)->getRenderMaterial()->setDisplayMode(
+    m_cdObj1->getComponent<VisualModel>()->getRenderMaterial()->setDisplayMode(
         RenderMaterial::DisplayMode::Surface);
 
     m_cdGeom2 = std::make_shared<Capsule>(Vec3d(0.01, -0.8, 0.0), 0.2, 0.5);
-    m_cdObj2->getVisualModel(0)->getRenderMaterial()->setDisplayMode(
+    m_cdObj2->getComponent<VisualModel>()->getRenderMaterial()->setDisplayMode(
         RenderMaterial::DisplayMode::Surface);
 
     m_collisionMethod = std::make_shared<CapsuleToCapsuleCD>();

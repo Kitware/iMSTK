@@ -6,6 +6,7 @@
 
 #include "FemurObject.h"
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
@@ -67,7 +68,11 @@ makeRigidObj(const std::string& name)
     // Create the object
     rigidObj->setVisualGeometry(toolMesh);
     rigidObj->setPhysicsGeometry(toolMesh);
-    rigidObj->setCollidingGeometry(toolMesh);
+
+    //rigidObj->setCollidingGeometry(toolMesh);
+    auto collider = rigidObj->addComponent<Collider>();
+    collider->setGeometry(toolMesh);
+
     rigidObj->setDynamicalModel(rbdModel);
     rigidObj->getVisualModel(0)->setRenderMaterial(material);
     rigidObj->getRigidBody()->m_mass = 10.0;
@@ -107,6 +112,7 @@ main()
 
     // Setup the Femur
     auto femurObj = std::make_shared<FemurObject>();
+    femurObj->setup();
     scene->addSceneObject(femurObj);
 
     // Setup the tool that cuts the femur

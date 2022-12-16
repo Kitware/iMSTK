@@ -5,34 +5,44 @@
 */
 
 #include "imstkLaparoscopicToolController.h"
-#include "imstkCollidingObject.h"
+#include "imstkCollider.h"
+#include "imstkEntity.h"
 #include "imstkDeviceClient.h"
 #include "imstkGeometry.h"
 #include "imstkLogger.h"
+#include "imstkSceneObject.h"
 
 namespace imstk
 {
 void
 LaparoscopicToolController::setParts(
-    std::shared_ptr<CollidingObject> shaft,
-    std::shared_ptr<CollidingObject> upperJaw,
-    std::shared_ptr<CollidingObject> lowerJaw,
-    std::shared_ptr<Geometry>        pickGeom)
+    std::shared_ptr<Entity>   shaft,
+    std::shared_ptr<Entity>   upperJaw,
+    std::shared_ptr<Entity>   lowerJaw,
+    std::shared_ptr<Geometry> pickGeom)
 {
-    m_shaft    = shaft;
-    m_upperJaw = upperJaw;
-    m_lowerJaw = lowerJaw;
+    m_shaft.sceneObject    = std::dynamic_pointer_cast<SceneObject>(shaft);
+    m_upperJaw.sceneObject = std::dynamic_pointer_cast<SceneObject>(upperJaw);
+    m_lowerJaw.sceneObject = std::dynamic_pointer_cast<SceneObject>(lowerJaw);
     m_pickGeom = pickGeom;
     m_jawRotationAxis = Vec3d(1, 0, 0);
 
-    // Record the transforms as 4x4 matrices (this should capture initial displacement/rotation of the jaws/shaft from controller)
-    m_shaftVisualTransform    = m_shaft->getVisualGeometry()->getTransform();
-    m_upperJawVisualTransform = m_upperJaw->getVisualGeometry()->getTransform();
-    m_lowerJawVisualTransform = m_lowerJaw->getVisualGeometry()->getTransform();
+    m_shaft.visualGeometry    = m_shaft.sceneObject->getVisualGeometry();
+    m_upperJaw.visualGeometry = m_upperJaw.sceneObject->getVisualGeometry();
+    m_lowerJaw.visualGeometry = m_lowerJaw.sceneObject->getVisualGeometry();
 
-    m_shaftCollidingTransform    = m_shaft->getCollidingGeometry()->getTransform();
-    m_upperJawCollidingTransform = m_upperJaw->getCollidingGeometry()->getTransform();
-    m_lowerJawCollidingTransform = m_lowerJaw->getCollidingGeometry()->getTransform();
+    m_shaft.collider    = m_shaft.sceneObject->getComponent<Collider>();
+    m_upperJaw.collider = m_upperJaw.sceneObject->getComponent<Collider>();
+    m_lowerJaw.collider = m_lowerJaw.sceneObject->getComponent<Collider>();
+
+    // Record the transforms as 4x4 matrices (this should capture initial displacement/rotation of the jaws/shaft from controller)
+    m_shaft.visualTransform    = m_shaft.visualGeometry->getTransform();
+    m_upperJaw.visualTransform = m_upperJaw.visualGeometry->getTransform();
+    m_lowerJaw.visualTransform = m_lowerJaw.visualGeometry->getTransform();
+
+    m_shaft.collidingTransform    = m_shaft.collider->getGeometry()->getTransform();
+    m_upperJaw.collidingTransform = m_upperJaw.collider->getGeometry()->getTransform();
+    m_lowerJaw.collidingTransform = m_lowerJaw.collider->getGeometry()->getTransform();
 
     m_pickGeomTransform = m_pickGeom->getTransform();
 }
@@ -61,8 +71,8 @@ LaparoscopicToolController::update(const double& dt)
 
     // Set shaft geometries
     {
-        m_shaft->getVisualGeometry()->setTransform(m_controllerWorldTransform * m_shaftVisualTransform);
-        m_shaft->getCollidingGeometry()->setTransform(m_controllerWorldTransform * m_shaftCollidingTransform);
+        m_shaft.visualGeometry->setTransform(m_controllerWorldTransform * m_shaft.visualTransform);
+        m_shaft.collider->getGeometry()->setTransform(m_controllerWorldTransform * m_shaft.collidingTransform);
         m_pickGeom->setTransform(m_controllerWorldTransform * m_pickGeomTransform);
     }
 
@@ -80,21 +90,21 @@ LaparoscopicToolController::update(const double& dt)
     m_jawAngle = std::max(std::min(m_jawAngle, m_maxJawAngle), 0.0);
 
     // Update transforms
-    m_upperJawLocalTransform = mat4dRotation(Rotd(m_jawAngle, m_jawRotationAxis));
-    m_lowerJawLocalTransform = mat4dRotation(Rotd(-m_jawAngle, m_jawRotationAxis));
+    m_upperJaw.localTransform = mat4dRotation(Rotd(m_jawAngle, m_jawRotationAxis));
+    m_lowerJaw.localTransform = mat4dRotation(Rotd(-m_jawAngle, m_jawRotationAxis));
     {
-        const Mat4d upperWorldTransform = m_controllerWorldTransform * m_upperJawLocalTransform;
-        m_upperJaw->getVisualGeometry()->setTransform(upperWorldTransform * m_upperJawVisualTransform);
-        m_upperJaw->getCollidingGeometry()->setTransform(upperWorldTransform * m_upperJawCollidingTransform);
+        const Mat4d upperWorldTransform = m_controllerWorldTransform * m_upperJaw.localTransform;
+        m_upperJaw.visualGeometry->setTransform(upperWorldTransform * m_upperJaw.visualTransform);
+        m_upperJaw.collider->getGeometry()->setTransform(upperWorldTransform * m_upperJaw.collidingTransform);
     }
     {
-        const Mat4d lowerWorldTransform = m_controllerWorldTransform * m_lowerJawLocalTransform;
-        m_lowerJaw->getVisualGeometry()->setTransform(lowerWorldTransform * m_upperJawVisualTransform);
-        m_lowerJaw->getCollidingGeometry()->setTransform(lowerWorldTransform * m_lowerJawCollidingTransform);
+        const Mat4d lowerWorldTransform = m_controllerWorldTransform * m_lowerJaw.localTransform;
+        m_lowerJaw.visualGeometry->setTransform(lowerWorldTransform * m_upperJaw.visualTransform);
+        m_lowerJaw.collider->getGeometry()->setTransform(lowerWorldTransform * m_lowerJaw.collidingTransform);
     }
-    m_shaft->getVisualGeometry()->postModified();
-    m_lowerJaw->getVisualGeometry()->postModified();
-    m_upperJaw->getVisualGeometry()->postModified();
+    m_shaft.visualGeometry->postModified();
+    m_lowerJaw.visualGeometry->postModified();
+    m_upperJaw.visualGeometry->postModified();
 
     // Check for transition closed/open
     if (m_jawState == JawState::Opened && m_jawAngle <= 0.0)

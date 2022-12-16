@@ -6,7 +6,7 @@
 
 #include "imstkAxesModel.h"
 #include "imstkCamera.h"
-#include "imstkCollidingObject.h"
+#include "imstkCollider.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
@@ -14,6 +14,7 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkMeshIO.h"
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
@@ -37,11 +38,11 @@ main()
     scene->getActiveCamera()->setPosition(-2.3, 23.81, 45.65);
     scene->getActiveCamera()->setFocalPoint(9.41, 8.45, 5.76);
 
-    auto                       bunnyObj = std::make_shared<CollidingObject>("Bunny");
+    auto                       bunnyObj = std::make_shared<SceneObject>("Bunny");
     std::shared_ptr<ImageData> sdfImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/stanfordBunny/stanfordBunny_SDF.nii");
     auto                       sdf      = std::make_shared<SignedDistanceField>(sdfImage->cast(IMSTK_DOUBLE));
     {
-        bunnyObj->setCollidingGeometry(sdf);
+        bunnyObj->addComponent<Collider>()->setGeometry(sdf);
 
         SurfaceMeshFlyingEdges isoExtract;
         isoExtract.setInputImage(sdfImage);

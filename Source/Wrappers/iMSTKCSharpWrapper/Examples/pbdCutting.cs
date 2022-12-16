@@ -18,9 +18,9 @@ public class PbdCutting
         SurfaceMesh cutGeom = Utils.toTriangleGrid(new Vec3d(0.0, 0.0, 0.0), new Vec2d(40, 40), new Vec2i(2, 2));
         cutGeom.setTranslation(new Vec3d(-10.0, -20.0, 0.0));
         cutGeom.updatePostTransformData();
-        CollidingObject cutObj = new CollidingObject("CuttingObject");
+        SceneObject cutObj = new SceneObject("CuttingObject");
         cutObj.setVisualGeometry(cutGeom);
-        cutObj.setCollidingGeometry(cutGeom);
+        cutObj.addComponentCollider().setGeometry(cutGeom);
         cutObj.getVisualModel(0).getRenderMaterial().setDisplayMode(RenderMaterial.DisplayMode.WireframeSurface);
         scene.addSceneObject(cutObj);
 
@@ -128,7 +128,7 @@ public class PbdCutting
         // Setup the Object
         clothObj.addVisualModel(visualModel);
         clothObj.setPhysicsGeometry(clothMesh);
-        clothObj.setCollidingGeometry(clothMesh);
+        clothObj.addComponentCollider().setGeometry(clothMesh);
         clothObj.setDynamicalModel(pbdModel);
 
         clothObj.getPbdBody().fixedNodeIds = new VectorInt(2);

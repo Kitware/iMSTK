@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -106,18 +107,18 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
 
     // Setup the Object
     fluidObj->addVisualModel(fluidVisualModel);
-    fluidObj->setCollidingGeometry(fluidGeometry);
+    fluidObj->addComponent<Collider>()->setGeometry(fluidGeometry);
     fluidObj->setDynamicalModel(sphModel);
     fluidObj->setPhysicsGeometry(fluidGeometry);
 
     return fluidObj;
 }
 
-static std::shared_ptr<CollidingObject>
+static std::shared_ptr<SceneObject>
 makeDragonCollidingObject(const std::string& name, const Vec3d& position)
 {
     // Create the pbd object
-    imstkNew<CollidingObject> collidingObj(name);
+    imstkNew<SceneObject> collidingObj(name);
 
     // Setup the Geometry (read dragon mesh)
     auto dragonSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
@@ -131,13 +132,13 @@ makeDragonCollidingObject(const std::string& name, const Vec3d& position)
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    imstkNew<VisualModel> surfMeshModel;
+    auto surfMeshModel = collidingObj->addComponent<VisualModel>();
     surfMeshModel->setGeometry(dragonSurfMesh);
     surfMeshModel->setRenderMaterial(material);
 
     // Setup the Object
-    collidingObj->addVisualModel(surfMeshModel);
-    collidingObj->setCollidingGeometry(std::make_shared<SignedDistanceField>(computeSdf->getOutputImage()));
+    auto collider = collidingObj->addComponent<Collider>();
+    collider->setGeometry(std::make_shared<SignedDistanceField>(computeSdf->getOutputImage()));
 
     return collidingObj;
 }
@@ -159,7 +160,7 @@ main()
         scene->getActiveCamera()->setPosition(0, 2.0, 15.0);
 
         // Static Dragon object
-        std::shared_ptr<CollidingObject> dragonObj = makeDragonCollidingObject("Dragon", Vec3d(0.0, 0.0, 0.0));
+        std::shared_ptr<SceneObject> dragonObj = makeDragonCollidingObject("Dragon", Vec3d(0.0, 0.0, 0.0));
         scene->addSceneObject(dragonObj);
 
         // SPH fluid box overtop the dragon

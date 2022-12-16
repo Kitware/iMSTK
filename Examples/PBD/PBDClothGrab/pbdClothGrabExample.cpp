@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkCollisionUtils.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
@@ -23,6 +24,7 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkSphere.h"
@@ -85,7 +87,7 @@ makeThinTissueObj(const std::string& name,
     // Setup the Object
     tissueObj->addVisualModel(visualModel);
     tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->setCollidingGeometry(tissueMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(tissueMesh);
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = size[0] * size[1] / (dim[0] * dim[1]) * 0.01;
 
@@ -108,12 +110,12 @@ main()
         makeThinTissueObj("Tissue", Vec2d(5.0, 5.0), Vec2i(4, 4), Vec3d(0.0, 6.0, 0.0));
     scene->addSceneObject(tissueObj);
 
-    auto            planeObj =  std::make_shared<CollidingObject>("Plane");
+    auto            planeObj =  std::make_shared<SceneObject>("Plane");
     imstkNew<Plane> plane(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 1.0, 0.0));
     plane->setWidth(10.0);
-    planeObj->setVisualGeometry(plane);
-    planeObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    planeObj->setCollidingGeometry(plane);
+    planeObj->addComponent<VisualModel>()->setGeometry(plane);
+    planeObj->getComponent<VisualModel>()->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    planeObj->addComponent<Collider>()->setGeometry(plane);
     scene->addSceneObject(planeObj);
 
     // Adjust camera

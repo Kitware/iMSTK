@@ -128,9 +128,10 @@ public:
         CollisionSideData() = default;
 
         // Objects
-        PbdObject* pbdObj       = nullptr;
-        CollidingObject* colObj = nullptr;
-        ObjType objType = ObjType::Colliding;
+        // Why do we have raw pointers here, and not shared_ptr?
+        PbdObject* pbdObj = nullptr;
+        Entity* colObj    = nullptr;
+        ObjType objType   = ObjType::Colliding;
 
         PbdModel* model    = nullptr;
         double compliance  = 0.0;
@@ -249,7 +250,7 @@ protected:
     /// \brief Creates a CollisionSideData struct from the provided object, this
     /// gives all the info needed to response to collision
     ///
-    CollisionSideData getDataFromObject(std::shared_ptr<CollidingObject> obj);
+    CollisionSideData getDataFromObject(std::shared_ptr<Entity> obj);
 
     ///
     /// \brief Get the contact case from the collision element and data as

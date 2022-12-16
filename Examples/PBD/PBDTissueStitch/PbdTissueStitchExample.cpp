@@ -6,6 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -91,7 +92,7 @@ makeTetTissueObj(const std::string& name,
     tissueObj->setVisualGeometry(surfMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
@@ -151,7 +152,7 @@ makeTriTissueObj(const std::string& name,
     tissueObj->setVisualGeometry(triMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(triMesh);
-    tissueObj->setCollidingGeometry(triMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(triMesh);
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
     // Fix the borders
@@ -182,7 +183,7 @@ makeToolObj()
 
     auto toolObj = std::make_shared<RigidObject2>("ToolObj");
     toolObj->setVisualGeometry(toolGeom);
-    toolObj->setCollidingGeometry(toolGeom);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
     toolObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
@@ -243,16 +244,17 @@ main()
     scene->addSceneObject(tissueObj);
 
     // Setup a capsule to wrap around
-    auto cdObj       = std::make_shared<CollidingObject>("collisionObject");
+    auto cdObj       = std::make_shared<SceneObject>("collisionObject");
     auto capsuleGeom = std::make_shared<Capsule>();
     capsuleGeom->setPosition(0.0, 0.0, 0.0);
     capsuleGeom->setRadius(capsuleRadius);
     capsuleGeom->setLength(0.08);
     capsuleGeom->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
-    cdObj->setVisualGeometry(capsuleGeom);
-    cdObj->getVisualModel(0)->getRenderMaterial()->setColor(
+    auto cdObjVisualModel = cdObj->addComponent<VisualModel>();
+    cdObjVisualModel->setGeometry(capsuleGeom);
+    cdObjVisualModel->getRenderMaterial()->setColor(
         Color(246.0 / 255.0, 127.0 / 255.0, 123.0 / 255.0));
-    cdObj->setCollidingGeometry(capsuleGeom);
+    cdObj->addComponent<Collider>()->setGeometry(capsuleGeom);
     scene->addSceneObject(cdObj);
 
     std::shared_ptr<RigidObject2> toolObj = makeToolObj();
@@ -325,7 +327,7 @@ main()
             {
                 if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
                 {
-                    auto toolGeom   = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                    auto toolGeom   = std::dynamic_pointer_cast<LineMesh>(toolObj->getComponent<Collider>()->getGeometry());
                     const Vec3d& v1 = toolGeom->getVertexPosition(0);
                     const Vec3d& v2 = toolGeom->getVertexPosition(1);
                     stitching->beginStitch(v1, (v2 - v1).normalized());
@@ -346,7 +348,7 @@ main()
                 // Perform stitch
                 else if (e->m_key == 's')
                 {
-                    auto toolGeom   = std::dynamic_pointer_cast<LineMesh>(toolObj->getCollidingGeometry());
+                    auto toolGeom   = std::dynamic_pointer_cast<LineMesh>(toolObj->getComponent<Collider>()->getGeometry());
                     const Vec3d& v1 = toolGeom->getVertexPosition(0);
                     const Vec3d& v2 = toolGeom->getVertexPosition(1);
                     stitching->beginStitch(v1, (v2 - v1).normalized());

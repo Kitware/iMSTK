@@ -5,6 +5,7 @@
 */
 
 #include "imstkRigidBodyCH.h"
+#include "imstkCollider.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionUtils.h"
 #include "imstkLineMesh.h"
@@ -30,7 +31,7 @@ RigidBodyCH::setInputRigidObjectB(std::shared_ptr<RigidObject2> rbdObjB)
 }
 
 void
-RigidBodyCH::setInputCollidingObjectB(std::shared_ptr<CollidingObject> colObjB)
+RigidBodyCH::setInputCollidingObjectB(std::shared_ptr<Entity> colObjB)
 {
     setInputObjectB(colObjB);
 }
@@ -52,9 +53,9 @@ RigidBodyCH::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<RigidObject2>    rbdObjA = getRigidObjA();
-    std::shared_ptr<RigidObject2>    rbdObjB = getRigidObjB();
-    std::shared_ptr<CollidingObject> colObjB = getInputObjectB();
+    std::shared_ptr<RigidObject2> rbdObjA = getRigidObjA();
+    std::shared_ptr<RigidObject2> rbdObjB = getRigidObjB();
+    std::shared_ptr<Entity>       colObjB = getInputObjectB();
 
     // If both objects are rigid objects
     if (rbdObjA != nullptr && rbdObjB != nullptr)
@@ -110,7 +111,7 @@ RigidBodyCH::handleRbdRbdTwoWay(
         return;
     }
 
-    auto geom = std::dynamic_pointer_cast<PointSet>(rbdObjA->getCollidingGeometry());
+    auto geom = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(rbdObjA.get()));
 
     // Generate one two-way constraint
     std::shared_ptr<RigidBodyModel2> rbdModelAB = rbdObjA->getRigidBodyModel2();
@@ -140,7 +141,7 @@ RigidBodyCH::handleRbdRbdTwoWay(
 void
 RigidBodyCH::handleRbdStaticOneWay(
     std::shared_ptr<RigidObject2>        rbdObj,
-    std::shared_ptr<CollidingObject>     colObj,
+    std::shared_ptr<Entity>              colObj,
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
@@ -159,7 +160,7 @@ RigidBodyCH::handleRbdStaticOneWay(
         else if (colElem.m_type == CollisionElementType::PointIndexDirection)
         {
             // Doesn't support mapping yet
-            auto         geom      = std::dynamic_pointer_cast<PointSet>(rbdObj->getCollidingGeometry());
+            auto         geom      = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(rbdObj.get()));
             const Vec3d& dir       = colElem.m_element.m_PointIndexDirectionElement.dir;
             const double depth     = colElem.m_element.m_PointIndexDirectionElement.penetrationDepth;
             const Vec3d& contactPt = (*geom->getVertexPositions())[colElem.m_element.m_PointIndexDirectionElement.ptIndex];
@@ -175,8 +176,8 @@ RigidBodyCH::handleRbdStaticOneWay(
     }
 
     // Two-way is only supported through mesh-mesh
-    auto geomA = std::dynamic_pointer_cast<PointSet>(rbdObj->getCollidingGeometry());
-    auto geomB = std::dynamic_pointer_cast<PointSet>(colObj->getCollidingGeometry());
+    auto geomA = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(rbdObj.get()));
+    auto geomB = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(colObj.get()));
     if (geomA == nullptr || geomB == nullptr)
     {
         return;

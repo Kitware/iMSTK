@@ -6,6 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -53,7 +54,7 @@ makePbdObjSurface(
 
     // Setup the Object
     prismObj->setPhysicsGeometry(surfMesh);
-    prismObj->setCollidingGeometry(surfMesh);
+    prismObj->addComponent<Collider>()->setGeometry(surfMesh);
     prismObj->setVisualGeometry(surfMesh);
     prismObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     prismObj->setDynamicalModel(model);
@@ -91,7 +92,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     // Create the object
     toolObj->setVisualGeometry(toolGeometry);
     toolObj->setPhysicsGeometry(toolGeometry);
-    toolObj->setCollidingGeometry(toolGeometry);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
     toolObj->setDynamicalModel(model);
     toolObj->getPbdBody()->setRigid(
                 Vec3d(0.0, 5.0, 2.0),
@@ -206,7 +207,7 @@ main()
                     if (e->m_button == 1)
                     {
                         // Use a slightly larger capsule since collision prevents intersection
-                        auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
+                        auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getComponent<Collider>()->getGeometry());
                         auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                         dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                         toolPicking->beginVertexGrasp(dilatedCapsule);
@@ -237,7 +238,7 @@ main()
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
             [&](Event*)
             {
-                toolPicking->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
+                toolPicking->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getComponent<Collider>()->getGeometry()));
                 //pbdToolCollision->setEnabled(false);
                         });
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
@@ -253,7 +254,7 @@ main()
             {
                 if (e->m_key == 'g')
                 {
-                    auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
+                    auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getComponent<Collider>()->getGeometry());
                     auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                     dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                     toolPicking->beginVertexGrasp(dilatedCapsule);

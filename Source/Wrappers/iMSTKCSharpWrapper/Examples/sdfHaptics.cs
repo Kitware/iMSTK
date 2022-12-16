@@ -15,9 +15,9 @@ public class SdfHaptics
             scene.getActiveCamera().setPosition(-2.3, 23.81, 45.65);
             scene.getActiveCamera().setFocalPoint(9.41, 8.45, 5.76);
 
-            CollidingObject bunnyObj = new CollidingObject("Bunny");
+            SceneObject bunnyObj = new SceneObject("Bunny");
             {
-                bunnyObj.setCollidingGeometry(sdf);
+                bunnyObj.addComponentCollider().setGeometry(sdf);
 
                 SurfaceMeshFlyingEdges isoExtract = new SurfaceMeshFlyingEdges();
                 isoExtract.setInputImage(sdfImage);

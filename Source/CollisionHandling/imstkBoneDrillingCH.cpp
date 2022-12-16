@@ -5,8 +5,8 @@
 */
 
 #include "imstkBoneDrillingCH.h"
-#include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
+#include "imstkCollider.h"
 #include "imstkParallelFor.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRigidObject2.h"
@@ -28,11 +28,10 @@ BoneDrillingCH::getDrillObj() const
 
 void
 BoneDrillingCH::erodeBone(
+    std::shared_ptr<TetrahedralMesh>     boneMesh,
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(getBoneObj()->getCollidingGeometry());
-
     // BoneDrillingCH process tetra-pointdirection elements
     ParallelUtils::parallelFor(elementsA.size(),
         [&](const size_t idx)
@@ -80,7 +79,7 @@ BoneDrillingCH::erodeBone(
                 // tag the tetra that will be removed
                 for (auto& tetId : m_nodalCardinalSet[tetIndex])
                 {
-                    boneTetMesh->setTetrahedraAsRemoved(static_cast<unsigned int>(tetId));
+                    boneMesh->setTetrahedraAsRemoved(static_cast<unsigned int>(tetId));
                 }
             }
         });
@@ -91,37 +90,42 @@ BoneDrillingCH::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<CollidingObject> bone  = getBoneObj();
-    std::shared_ptr<RigidObject2>    drill = getDrillObj();
+    std::shared_ptr<RigidObject2> drill = getDrillObj();
 
-    auto boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(bone->getCollidingGeometry());
+    // Cache the tet mesh geometry pointer of the boneObj on the first call,
+    // re-use the cached pointer in later iterations.
+    if (!m_boneMesh)
+    {
+        m_boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(Collider::getCollidingGeometryFromEntity(getBoneObj().get()));
+    }
+    CHECK(m_boneMesh != nullptr) << "Cannot acquire shared_ptr to boneMesh.";
 
-    if (m_nodalDensity.size() != boneMesh->getNumVertices())
+    if (m_nodalDensity.size() != m_boneMesh->getNumVertices())
     {
         // Initialize bone density values
-        m_nodalDensity.reserve(boneMesh->getNumVertices());
-        for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
+        m_nodalDensity.reserve(m_boneMesh->getNumVertices());
+        for (size_t i = 0; i < m_boneMesh->getNumVertices(); ++i)
         {
             m_nodalDensity.push_back(m_initialBoneDensity);
         }
 
-        m_nodeRemovalStatus.reserve(boneMesh->getNumVertices());
-        for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
+        m_nodeRemovalStatus.reserve(m_boneMesh->getNumVertices());
+        for (size_t i = 0; i < m_boneMesh->getNumVertices(); ++i)
         {
             m_nodeRemovalStatus.push_back(false);
         }
 
-        m_nodalCardinalSet.reserve(boneMesh->getNumVertices());
-        for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
+        m_nodalCardinalSet.reserve(m_boneMesh->getNumVertices());
+        for (size_t i = 0; i < m_boneMesh->getNumVertices(); ++i)
         {
             std::vector<size_t> row;
             m_nodalCardinalSet.push_back(row);
         }
 
         // Pre-compute the nodal cardinality set
-        for (size_t tetId = 0; tetId < boneMesh->getNumCells(); ++tetId)
+        for (size_t tetId = 0; tetId < m_boneMesh->getNumCells(); ++tetId)
         {
-            const Vec4i& indices = (*boneMesh->getCells())[tetId];
+            const Vec4i& indices = (*m_boneMesh->getCells())[tetId];
             for (int i = 0; i < 4; i++)
             {
                 m_nodalCardinalSet[indices[i]].push_back(tetId);
@@ -136,7 +140,14 @@ BoneDrillingCH::handle(
     }
 
     // Check if any collisions
-    const auto devicePosition = drill->getCollidingGeometry()->getTranslation();
+    // Cache the collider geometry pointer of the drill object on the first call,
+    // re-use the cached pointer in later iterations.
+    if (!m_drillCollidingGeometry)
+    {
+        m_drillCollidingGeometry = Collider::getCollidingGeometryFromEntity(drill.get());
+    }
+    CHECK(m_drillCollidingGeometry != nullptr) << "Cannot acquire shared_ptr to drill colliding geometry.";
+    const auto devicePosition = m_drillCollidingGeometry->getTranslation();
     if (elementsA.empty() && elementsB.empty())
     {
         // Set the visual object position same as the colliding object position
@@ -204,7 +215,7 @@ BoneDrillingCH::handle(
     (*drill->getRigidBody()->m_force) = force;
 
     // Decrease the density at the nodal points and remove if the density goes below 0
-    this->erodeBone(elementsA, elementsB);
+    this->erodeBone(m_boneMesh, elementsA, elementsB);
 
     // Housekeeping
     m_initialStep = false;

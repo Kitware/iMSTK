@@ -6,6 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkCompositeImplicitGeometry.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -70,7 +71,7 @@ makeTissueObj(const std::string& name,
     auto pbdObject = std::make_shared<PbdObject>(name);
     pbdObject->addVisualModel(visualModel);
     pbdObject->setPhysicsGeometry(tissueMesh);
-    pbdObject->setCollidingGeometry(tissueMesh);
+    pbdObject->addComponent<Collider>()->setGeometry(tissueMesh);
     pbdObject->setDynamicalModel(model);
 
     pbdObject->getPbdBody()->uniformMassValue = particleMassValue;
@@ -111,11 +112,11 @@ planeContactScene()
     pbdConfig->m_doPartitioning      = false;
     pbdModel->configure(pbdConfig);
 
-    auto planeObj  = std::make_shared<CollidingObject>("plane");
+    auto planeObj  = std::make_shared<SceneObject>("plane");
     auto planeGeom = std::make_shared<Plane>(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 1.0, 0.0));
     planeGeom->setWidth(1.0);
-    planeObj->setVisualGeometry(planeGeom);
-    planeObj->setCollidingGeometry(planeGeom);
+    planeObj->addComponent<VisualModel>()->setGeometry(planeGeom);
+    planeObj->addComponent<Collider>()->setGeometry(planeGeom);
     scene->addSceneObject(planeObj);
 
     // Setup a capsule
@@ -126,7 +127,7 @@ planeContactScene()
         auto                         rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.05, 0.25);
         std::shared_ptr<SurfaceMesh> surfMesh  = GeometryUtils::toSurfaceMesh(rigidGeom);
         rigidPbdObj->setVisualGeometry(surfMesh);
-        rigidPbdObj->setCollidingGeometry(surfMesh);
+        rigidPbdObj->addComponent<Collider>()->setGeometry(surfMesh);
         rigidPbdObj->setPhysicsGeometry(surfMesh);
 
         // Setup material
@@ -258,7 +259,7 @@ bowlScene()
         pbdModel->configure(pbdConfig);
 
         // Create the first rbd, plane floor
-        auto planeObj = std::make_shared<CollidingObject>("Plane");
+        auto planeObj = std::make_shared<SceneObject>("Plane");
         {
             // Subtract the sphere from the plane to make a crater
             auto planeGeom = std::make_shared<Plane>();
@@ -291,8 +292,8 @@ bowlScene()
             toSurfMesh.getOutputMesh()->flipNormals();
 
             // Create the object
-            planeObj->setVisualGeometry(toSurfMesh.getOutputMesh());
-            planeObj->setCollidingGeometry(compGeom);
+            planeObj->addComponent<VisualModel>()->setGeometry(toSurfMesh.getOutputMesh());
+            planeObj->addComponent<Collider>()->setGeometry(compGeom);
 
             scene->addSceneObject(planeObj);
         }
@@ -319,7 +320,7 @@ bowlScene()
             // Create the cube rigid object
             cubeObj->setDynamicalModel(pbdModel);
             cubeObj->setPhysicsGeometry(subdivide.getOutputMesh());
-            cubeObj->setCollidingGeometry(subdivide.getOutputMesh());
+            cubeObj->addComponent<Collider>()->setGeometry(subdivide.getOutputMesh());
             cubeObj->addVisualModel(visualModel);
             cubeObj->getPbdBody()->setRigid(Vec3d(0.0, 0.2, 0.0), 1.0,
                 Quatd(Rotd(0.4, Vec3d(1.0, 0.0, 0.0))), Mat3d::Identity() * 0.01);
@@ -457,7 +458,7 @@ tissueCapsuleDrop()
         //auto rigidGeom = std::make_shared<Sphere>(Vec3d(-0.005, 0.0, 0.0), 0.005);
         auto rigidGeom = std::make_shared<Capsule>(Vec3d(-0.005, 0.0, 0.0), 0.005, 0.015);
         capsuleObj->setVisualGeometry(rigidGeom);
-        capsuleObj->setCollidingGeometry(rigidGeom);
+        capsuleObj->addComponent<Collider>()->setGeometry(rigidGeom);
         capsuleObj->setPhysicsGeometry(rigidGeom);
 
         // Setup material
@@ -549,7 +550,7 @@ hingeScene()
         auto                         rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.5, 2.0);
         std::shared_ptr<SurfaceMesh> surfMesh  = GeometryUtils::toSurfaceMesh(rigidGeom);
         rigidPbdObj->setVisualGeometry(surfMesh);
-        rigidPbdObj->setCollidingGeometry(surfMesh);
+        rigidPbdObj->addComponent<Collider>()->setGeometry(surfMesh);
         rigidPbdObj->setPhysicsGeometry(surfMesh);
 
         // Setup material

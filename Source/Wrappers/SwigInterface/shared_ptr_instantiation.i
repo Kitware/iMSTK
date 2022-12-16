@@ -128,7 +128,6 @@
  * SceneEntities
  */
 %shared_ptr(imstk::SceneObject)
-%shared_ptr(imstk::CollidingObject)
 %shared_ptr(imstk::DynamicObject)
 %shared_ptr(imstk::PbdConnectiveTissueConstraintGenerator)
 %shared_ptr(imstk::PbdObject)
@@ -144,6 +143,7 @@
 %shared_ptr(imstk::Burnable)
 %shared_ptr(imstk::Burner)
 %shared_ptr(imstk::SpotLight)
+%shared_ptr(imstk::Collider)
 
 /*
  * CollisionDetection

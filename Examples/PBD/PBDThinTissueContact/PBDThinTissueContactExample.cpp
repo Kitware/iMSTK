@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
@@ -80,7 +81,7 @@ makeTissueObj(const std::string& name,
     auto pbdObject = std::make_shared<PbdObject>(name);
     pbdObject->addVisualModel(visualModel);
     pbdObject->setPhysicsGeometry(clothMesh);
-    pbdObject->setCollidingGeometry(clothMesh);
+    pbdObject->addComponent<Collider>()->setGeometry(clothMesh);
     pbdObject->setDynamicalModel(pbdModel);
     pbdObject->getPbdBody()->uniformMassValue = width * height / (rowCount * colCount);
     for (int x = 0; x < rowCount; x++)
@@ -125,13 +126,15 @@ main()
         std::make_shared<VecDataArray<double, 3>>(vertices),
         std::make_shared<VecDataArray<int, 2>>(cells));
 
-    auto toolObj = std::make_shared<CollidingObject>("Tool");
-    toolObj->setVisualGeometry(toolGeom);
-    toolObj->setCollidingGeometry(toolGeom);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(5.0);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setRecomputeVertexNormals(false);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
+    auto toolObj     = std::make_shared<SceneObject>("Tool");
+    auto visualModel = toolObj->addComponent<VisualModel>();
+    visualModel->setGeometry(toolGeom);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeom);
+    auto material = visualModel->getRenderMaterial();
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    material->setLineWidth(5.0);
+    material->setRecomputeVertexNormals(false);
+    material->setBackFaceCulling(false);
     scene->addSceneObject(toolObj);
 
     // Add a collision interaction between the tools

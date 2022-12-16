@@ -20,7 +20,7 @@ public class PbdCloth
         Scene scene = new Scene("SPH Fluid");
 
         SphObject fluidObj = generateFluid(particleRadius);
-        CollidingObject[] solids = generateSolids(scene);
+        Entity[] solids = generateSolids(scene);
         scene.addSceneObject(fluidObj);
         for (int i = 0; i < solids.Length; i++)
         {
@@ -145,7 +145,7 @@ public class PbdCloth
 
         // Add the component models
         fluidObj.addVisualModel(visualModel);
-        fluidObj.setCollidingGeometry(geometry);
+        fluidObj.addComponentCollider().setGeometry(geometry);
         fluidObj.setDynamicalModel(sphModel);
         fluidObj.setPhysicsGeometry(geometry);
 
@@ -217,7 +217,7 @@ public class PbdCloth
         return particles;
     }
 
-    public static CollidingObject[] generateSolids(Scene scene)
+    public static Entity[] generateSolids(Scene scene)
     {
         switch (SCENE_ID)
         {
@@ -240,9 +240,9 @@ public class PbdCloth
     ///
     /// \brief Generate two planes and a solid sphere
     ///
-    public static CollidingObject[] generateSolidsScene1()
+    public static Entity[] generateSolidsScene1()
     {
-        CollidingObject[] solids = new CollidingObject[3];
+        Entity[] solids = new Entity[3];
 
         {
             Plane geometry = new Plane();
@@ -256,9 +256,9 @@ public class PbdCloth
             material.setColor(Color.DarkGray);
             visualModel.setRenderMaterial(material);
 
-            CollidingObject obj = new CollidingObject("Floor");
+            SceneObject obj = new SceneObject("Floor");
             obj.addVisualModel(visualModel);
-            obj.setCollidingGeometry(geometry);
+            obj.addComponentCollider().setGeometry(geometry);
             solids[0] = obj;
         }
         {
@@ -273,9 +273,9 @@ public class PbdCloth
             material.setColor(Color.LightGray);
             visualModel.setRenderMaterial(material);
 
-            CollidingObject obj = new CollidingObject("Back Plane");
+            SceneObject obj = new SceneObject("Back Plane");
             obj.addVisualModel(visualModel);
-            obj.setCollidingGeometry(geometry);
+            obj.addComponentCollider().setGeometry(geometry);
             solids[1] = obj;
         }
         {
@@ -289,9 +289,9 @@ public class PbdCloth
             material.setColor(Color.Red);
             visualModel.setRenderMaterial(material);
 
-            CollidingObject obj = new CollidingObject("Sphere on Floor");
+            SceneObject obj = new SceneObject("Sphere on Floor");
             obj.addVisualModel(visualModel);
-            obj.setCollidingGeometry(geometry);
+            obj.addComponentCollider().setGeometry(geometry);
             solids[2] = obj;
         }
 

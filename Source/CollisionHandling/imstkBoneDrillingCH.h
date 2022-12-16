@@ -13,8 +13,9 @@
 namespace imstk
 {
 class CollisionData;
-class CollidingObject;
+class Entity;
 class RigidObject2;
+class TetrahedralMesh;
 
 ///
 /// \class BoneDrillingCH
@@ -31,21 +32,19 @@ public:
 
     IMSTK_TYPE_NAME(BoneDrillingCH)
 
-public:
     ///
     /// \brief Set the input bone
     ///
-    void setInputObjectBone(std::shared_ptr<CollidingObject> boneObject) { setInputObjectA(boneObject); }
+    void setInputObjectBone(std::shared_ptr<Entity> boneObject) { setInputObjectA(boneObject); }
 
     ///
     /// \brief Set the input drill
     ///
     void setInputObjectDrill(std::shared_ptr<RigidObject2> drillObject);
 
-    std::shared_ptr<CollidingObject> getBoneObj() const { return getInputObjectA(); }
+    std::shared_ptr<Entity> getBoneObj() const { return getInputObjectA(); }
     std::shared_ptr<RigidObject2> getDrillObj() const;
 
-public:
     ///
     /// \brief Get stiffness
     ///
@@ -76,6 +75,7 @@ protected:
     /// \brief Decrease the density at the nodal points and remove if the density goes below 0
     ///
     void erodeBone(
+        std::shared_ptr<TetrahedralMesh>     boneMesh,
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB);
 
@@ -95,5 +95,9 @@ private:
 
     bool  m_initialStep = true;                          ///< Number of times steps
     Vec3d m_prevPos;                                     ///< Previous position of the colliding object
+
+    // Cache variables to hold Component level information.
+    std::shared_ptr<TetrahedralMesh> m_boneMesh;
+    std::shared_ptr<Geometry> m_drillCollidingGeometry;
 };
 } // namespace imstk

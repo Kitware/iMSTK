@@ -7,6 +7,7 @@
 #include "imstkAxesModel.h"
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkControllerForceText.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
@@ -25,6 +26,7 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkSphere.h"
@@ -54,7 +56,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model, bool isLeft)
     // Create the object
     toolObj->setVisualGeometry(toolGeometry);
     toolObj->setPhysicsGeometry(toolGeometry);
-    toolObj->setCollidingGeometry(toolGeometry);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
     toolObj->setDynamicalModel(model);
     toolObj->getPbdBody()->setRigid(
         Vec3d(0.0, 0.1, 0.0),
@@ -125,11 +127,11 @@ main()
     pbdParams->m_angularDampingCoeff = 0.01;
 
     // Make a plane
-    auto planeObj = std::make_shared<CollidingObject>("PlaneObj");
+    auto planeObj = std::make_shared<SceneObject>("PlaneObj");
     auto plane    = std::make_shared<Plane>(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 1.0, 0.0));
     plane->setWidth(1.0);
-    planeObj->setCollidingGeometry(plane);
-    planeObj->setVisualGeometry(plane);
+    planeObj->addComponent<Collider>()->setGeometry(plane);
+    planeObj->addComponent<VisualModel>()->setGeometry(plane);
     scene->addSceneObject(planeObj);
 
     // Make a pbd rigid body needle
@@ -143,7 +145,7 @@ main()
         needleMesh->scale(2.0, Geometry::TransformType::ApplyToData);
         needleLineMesh->scale(2.0, Geometry::TransformType::ApplyToData);
         needleObj->setVisualGeometry(needleMesh);
-        needleObj->setCollidingGeometry(needleLineMesh);
+        needleObj->addComponent<Collider>()->setGeometry(needleLineMesh);
         needleObj->setPhysicsGeometry(needleLineMesh);
         needleObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(needleLineMesh, needleMesh));
         needleObj->setDynamicalModel(pbdModel);
@@ -161,7 +163,7 @@ main()
     {
         auto sphereGeom = std::make_shared<Sphere>(Vec3d::Zero(), 0.01);
         sphereObj->setVisualGeometry(sphereGeom);
-        sphereObj->setCollidingGeometry(sphereGeom);
+        sphereObj->addComponent<Collider>()->setGeometry(sphereGeom);
         sphereObj->setPhysicsGeometry(sphereGeom);
         sphereObj->setDynamicalModel(pbdModel);
         sphereObj->getPbdBody()->setRigid(
@@ -251,7 +253,7 @@ main()
                     if (e->m_buttonState == BUTTON_PRESSED)
                     {
                         // Use a slightly larger capsule since collision prevents intersection
-                        auto capsule = std::dynamic_pointer_cast<Capsule>(leftToolObj->getCollidingGeometry());
+                        auto capsule = std::dynamic_pointer_cast<Capsule>(leftToolObj->getComponent<Collider>()->getGeometry());
                         auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                         dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                         leftGrasping0->beginCellGrasp(dilatedCapsule);
@@ -277,7 +279,7 @@ main()
                     if (e->m_buttonState == BUTTON_PRESSED)
                     {
                         // Use a slightly larger capsule since collision prevents intersection
-                        auto capsule = std::dynamic_pointer_cast<Capsule>(rightToolObj->getCollidingGeometry());
+                        auto capsule = std::dynamic_pointer_cast<Capsule>(rightToolObj->getComponent<Collider>()->getGeometry());
                         auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                         dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                         rightGrasping0->beginCellGrasp(dilatedCapsule);
@@ -307,7 +309,7 @@ main()
             [&](MouseEvent* e)
             {
                 // Use a slightly larger capsule since collision prevents intersection
-                auto capsule = std::dynamic_pointer_cast<Capsule>(rightToolObj->getCollidingGeometry());
+                auto capsule = std::dynamic_pointer_cast<Capsule>(rightToolObj->getComponent<Collider>()->getGeometry());
                 auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                 dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                 rightGrasping0->beginCellGrasp(dilatedCapsule);

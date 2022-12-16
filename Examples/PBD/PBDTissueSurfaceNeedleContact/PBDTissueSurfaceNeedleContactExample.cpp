@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -126,7 +127,7 @@ makeTissueObj(const std::string& name,
     auto tissueObj = std::make_shared<PbdObject>(name);
     tissueObj->addVisualModel(visualModel);
     tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.1;
@@ -166,7 +167,7 @@ makeToolObj()
 
     auto toolObj = std::make_shared<RigidObject2>("NeedleRbdTool");
     toolObj->setVisualGeometry(syringeMesh);
-    toolObj->setCollidingGeometry(toolGeom);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
     toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, syringeMesh));
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));

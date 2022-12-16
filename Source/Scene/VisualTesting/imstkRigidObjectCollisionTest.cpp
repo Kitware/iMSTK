@@ -6,6 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkCollisionDataDebugModel.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
@@ -17,6 +18,7 @@
 #include "imstkRigidObject2.h"
 #include "imstkRigidObjectCollision.h"
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
 #include "imstkSceneManager.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
@@ -50,9 +52,9 @@ public:
         m_scene->addSceneObject(m_rbdObj);
 
         ASSERT_NE(m_collidingGeometry, nullptr);
-        m_cdObj = std::make_shared<CollidingObject>("obj2");
+        m_cdObj = std::make_shared<SceneObject>("obj2");
         m_cdObj->setVisualGeometry(m_collidingGeometry);
-        m_cdObj->setCollidingGeometry(m_collidingGeometry);
+        m_cdObj->addComponent<Collider>()->setGeometry(m_collidingGeometry);
         m_cdObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
         m_cdObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.5);
         m_scene->addSceneObject(m_cdObj);
@@ -106,9 +108,9 @@ public:
     }
 
 public:
-    std::shared_ptr<RigidObject2>    m_rbdObj     = nullptr;
-    std::shared_ptr<CollidingObject> m_cdObj      = nullptr;
-    std::shared_ptr<Geometry> m_collidingGeometry = nullptr;
+    std::shared_ptr<RigidObject2> m_rbdObj = nullptr;
+    std::shared_ptr<SceneObject>  m_cdObj  = nullptr;
+    std::shared_ptr<Geometry>     m_collidingGeometry = nullptr;
 
     std::shared_ptr<RigidObjectCollision> m_rbdCollision = nullptr;
     std::string m_collisionName = "";
@@ -151,7 +153,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_CapsuleToCapsuleCD)
         m_rbdObj->setVisualGeometry(colGeom);
         m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
         m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->setCollidingGeometry(colGeom);
+        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
         m_rbdObj->setDynamicalModel(rbdModel);
         m_rbdObj->getRigidBody()->m_mass = 0.1;
         m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.00005;
@@ -171,7 +173,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_CapsuleToCapsuleCD)
     connect<KeyEvent>(m_viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
         [this](KeyEvent*)
         {
-            m_rbdObj->getCollidingGeometry()->print();
+            m_rbdObj->getComponent<Collider>()->getGeometry()->print();
             m_collidingGeometry->print();
         });
 
@@ -213,7 +215,7 @@ TEST_F(RigidObjectCollisionTest, DISABLED_RbdObj_SurfaceMeshToCapsuleCD)
         m_rbdObj->setVisualGeometry(colGeom);
         m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
         m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->setCollidingGeometry(colGeom);
+        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
         m_rbdObj->setDynamicalModel(rbdModel);
         m_rbdObj->getRigidBody()->m_mass = 0.1;
         m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
@@ -260,7 +262,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_SphereToSphereCD)
         m_rbdObj->setVisualGeometry(colGeom);
         m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
         m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->setCollidingGeometry(colGeom);
+        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
         m_rbdObj->setDynamicalModel(rbdModel);
         m_rbdObj->getRigidBody()->m_mass = 0.1;
         m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
@@ -306,7 +308,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_UnidirectionalPlaneToSphereCD)
         m_rbdObj->setVisualGeometry(colGeom);
         m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
         m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->setCollidingGeometry(colGeom);
+        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
         m_rbdObj->setDynamicalModel(rbdModel);
         m_rbdObj->getRigidBody()->m_mass = 0.1;
         m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
@@ -356,7 +358,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_BidirectionalPlaneToSphereCD)
         m_rbdObj->setVisualGeometry(colGeom);
         m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
         m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->setCollidingGeometry(colGeom);
+        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
         m_rbdObj->setDynamicalModel(rbdModel);
         m_rbdObj->getRigidBody()->m_mass = 0.1;
         m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
@@ -422,7 +424,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToCapsuleCD)
         m_rbdObj->setVisualGeometry(colGeom);
         m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
         m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->setCollidingGeometry(colGeom);
+        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
         m_rbdObj->setDynamicalModel(rbdModel);
         m_rbdObj->getRigidBody()->m_mass = 0.1;
         m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
@@ -483,7 +485,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToSphereCD)
         m_rbdObj->setVisualGeometry(colGeom);
         m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
         m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->setCollidingGeometry(colGeom);
+        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
         m_rbdObj->setDynamicalModel(rbdModel);
         m_rbdObj->getRigidBody()->m_mass = 0.1;
         m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
@@ -543,7 +545,7 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToPlaneCD)
         m_rbdObj->setVisualGeometry(colGeom);
         m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
         m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->setCollidingGeometry(colGeom);
+        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
         m_rbdObj->setDynamicalModel(rbdModel);
         m_rbdObj->getRigidBody()->m_mass = 0.1;
         m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;

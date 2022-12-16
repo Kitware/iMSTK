@@ -5,10 +5,10 @@
 */
 
 #include "imstkSceneObjectController.h"
-#include "imstkCollidingObject.h"
 #include "imstkDeviceClient.h"
 #include "imstkGeometry.h"
 #include "imstkLogger.h"
+#include "imstkSceneObject.h"
 
 namespace imstk
 {

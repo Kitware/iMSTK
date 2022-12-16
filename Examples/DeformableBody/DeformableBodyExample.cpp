@@ -6,6 +6,7 @@
 
 #include "imstkBackwardEuler.h"
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkFeDeformableObject.h"
 #include "imstkFemDeformableBodyModel.h"
@@ -88,9 +89,9 @@ main()
         imstkNew<Plane> planeGeom;
         planeGeom->setWidth(40.0);
         planeGeom->setPosition(0.0, -8.0, 0.0);
-        imstkNew<CollidingObject> planeObj("Plane");
-        planeObj->setVisualGeometry(planeGeom);
-        planeObj->setCollidingGeometry(planeGeom);
+        imstkNew<Entity> planeObj("Plane");
+        planeObj->addComponent<VisualModel>()->setGeometry(planeGeom);
+        planeObj->addComponent<Collider>()->setGeometry(planeGeom);
         scene->addSceneObject(planeObj);
 
         // Light

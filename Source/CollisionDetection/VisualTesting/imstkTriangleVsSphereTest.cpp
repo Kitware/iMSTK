@@ -5,8 +5,8 @@
 */
 
 #include "imstkCamera.h"
-#include "imstkCollidingObject.h"
 #include "imstkCollisionDetectionVisualTest.h"
+#include "imstkEntity.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
@@ -29,7 +29,7 @@ TEST_F(CollisionDetectionVisualTest, TriangleVsSphere)
     m_camera->setViewUp(0, 0.71, -0.71);
 
     m_cdGeom1 = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 1.0);
-    m_cdObj1->getVisualModel(0)->getRenderMaterial()->setDisplayMode(
+    m_cdObj1->getComponent<VisualModel>()->getRenderMaterial()->setDisplayMode(
         RenderMaterial::DisplayMode::Surface);
 
     auto triangleMesh = std::make_shared<SurfaceMesh>();

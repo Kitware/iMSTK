@@ -11,7 +11,6 @@
 
 namespace imstk
 {
-class CollidingObject;
 class CollisionData;
 class FeDeformableObject;
 class RigidObject2;

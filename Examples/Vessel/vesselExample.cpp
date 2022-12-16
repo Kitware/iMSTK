@@ -4,7 +4,9 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkEntity.h"
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkImageDistanceTransform.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -122,17 +124,17 @@ makeSPHObject(const std::string& name, const double particleRadius, const double
     // Setup the Object
     fluidObj->setDynamicalModel(sphModel);
     fluidObj->addVisualModel(fluidVisualModel);
-    fluidObj->setCollidingGeometry(fluidGeometry);
+    fluidObj->addComponent<Collider>()->setGeometry(fluidGeometry);
     fluidObj->setPhysicsGeometry(fluidGeometry);
 
     return fluidObj;
 }
 
-static std::shared_ptr<CollidingObject>
+static std::shared_ptr<Entity>
 makeLegs(const std::string& name)
 {
     // Create the pbd object
-    imstkNew<CollidingObject> legsObj(name);
+    imstkNew<SceneObject> legsObj(name);
 
     // Setup the Geometry (read dragon mesh)
     auto legsMesh      = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/legs/legsCutaway.stl");
@@ -167,9 +169,9 @@ makeLegs(const std::string& name)
     femoralMeshModel->setRenderMaterial(femoralMaterial);
 
     // Setup the Object
-    legsObj->addVisualModel(legsMeshModel);
-    legsObj->addVisualModel(bonesMeshModel);
-    legsObj->addVisualModel(femoralMeshModel);
+    legsObj->addComponent(legsMeshModel);
+    legsObj->addComponent(bonesMeshModel);
+    legsObj->addComponent(femoralMeshModel);
 
     LOG(INFO) << "Computing SDF";
     imstkNew<SurfaceMeshDistanceTransform> computeSdf;
@@ -188,7 +190,7 @@ makeLegs(const std::string& name)
     computeSdf->setBounds(bounds);
     computeSdf->update();
     LOG(INFO) << "SDF Complete";
-    legsObj->setCollidingGeometry(std::make_shared<SignedDistanceField>(computeSdf->getOutputImage()));
+    legsObj->addComponent<Collider>()->setGeometry(std::make_shared<SignedDistanceField>(computeSdf->getOutputImage()));
 
     return legsObj;
 }
@@ -208,7 +210,7 @@ main()
     // Setup the scene
     {
         // Static Dragon object
-        std::shared_ptr<CollidingObject> legsObj = makeLegs("Legs");
+        std::shared_ptr<Entity> legsObj = makeLegs("Legs");
         scene->addSceneObject(legsObj);
 
         // Position the camera

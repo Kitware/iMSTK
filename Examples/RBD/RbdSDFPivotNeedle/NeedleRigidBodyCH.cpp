@@ -27,11 +27,11 @@ NeedleRigidBodyCH::handle(
 
     // If no collision, needle must be removed
     // If using point based collision in an SDF you may want a differing unpuncturing constraint
-    std::shared_ptr<CollidingObject> needleObj   = getInputObjectA();
-    auto                             needle      = needleObj->getComponent<Needle>();
-    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
-    auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
+    std::shared_ptr<Entity> needleObj   = getInputObjectA();
+    auto                    needle      = needleObj->getComponent<Needle>();
+    std::shared_ptr<Entity> tissueObj   = getInputObjectB();
+    auto                    puncturable = tissueObj->getComponent<Puncturable>();
+    const PunctureId        punctureId  = getPunctureId(needle, puncturable);
 
     Puncture::State state = needle->getState(punctureId);
     if (elementsA.size() == 0)
@@ -54,10 +54,10 @@ NeedleRigidBodyCH::addConstraint(
     const Vec3d& contactPt, const Vec3d& contactNormal,
     const double contactDepth)
 {
-    auto                             needle      = rbdObj->getComponent<Needle>();
-    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectB();
-    auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    const PunctureId                 punctureId  = getPunctureId(needle, puncturable);
+    auto                    needle      = rbdObj->getComponent<Needle>();
+    std::shared_ptr<Entity> tissueObj   = getInputObjectB();
+    auto                    puncturable = tissueObj->getComponent<Puncturable>();
+    const PunctureId        punctureId  = getPunctureId(needle, puncturable);
 
     // If the normal force exceeds threshold the needle may insert
     if (needle->getState(punctureId) == Puncture::State::REMOVED)

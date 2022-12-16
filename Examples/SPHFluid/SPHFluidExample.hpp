@@ -62,8 +62,8 @@ main(int argc, char* argv[])
     imstkNew<Scene> scene("SPH Fluid");
 
     // Generate fluid and solid objects
-    std::shared_ptr<SphObject> fluidObj                  = generateFluid(particleRadius);
-    std::vector<std::shared_ptr<CollidingObject>> solids = generateSolids(scene);
+    std::shared_ptr<SphObject> fluidObj         = generateFluid(particleRadius);
+    std::vector<std::shared_ptr<Entity>> solids = generateSolids(scene);
 
     scene->addSceneObject(fluidObj);
     for (size_t i = 0; i < solids.size(); i++)

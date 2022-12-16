@@ -5,6 +5,7 @@
 set(H_FILES
   Camera/imstkCamera.h
   Components/imstkAxesModel.h
+  Components/imstkCollider.h
   Components/imstkObjectControllerGhost.h
   Components/imstkPortHoleInteraction.h
   Components/imstkBurnable.h
@@ -20,7 +21,6 @@ set(H_FILES
   Loader/imstkVisualObjectImporter.h
   Objects/imstkAnimationModel.h
   Objects/imstkAnimationObject.h
-  Objects/imstkCollidingObject.h
   Objects/imstkCollisionDataDebugModel.h
   Objects/imstkDebugGeometryModel.h
   Objects/imstkDynamicObject.h
@@ -37,6 +37,7 @@ set(H_FILES
 set(SRC_FILES
   Camera/imstkCamera.cpp
   Components/imstkObjectControllerGhost.cpp
+  Components/imstkCollider.cpp
   Components/imstkPortHoleInteraction.cpp
   Components/imstkBurnable.cpp
   Components/imstkBurner.cpp
@@ -46,7 +47,6 @@ set(SRC_FILES
   Loader/imstkVisualObjectImporter.cpp
   Objects/imstkAnimationModel.cpp
   Objects/imstkAnimationObject.cpp
-  Objects/imstkCollidingObject.cpp
   Objects/imstkCollisionDataDebugModel.cpp
   Objects/imstkDebugGeometryModel.cpp
   Objects/imstkDynamicObject.cpp

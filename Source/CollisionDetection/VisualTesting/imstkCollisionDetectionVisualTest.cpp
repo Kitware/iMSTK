@@ -6,7 +6,7 @@
 
 #include "imstkCollisionDetectionVisualTest.h"
 #include "imstkCamera.h"
-#include "imstkCollidingObject.h"
+#include "imstkCollider.h"
 #include "imstkCollisionDataDebugModel.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
@@ -30,11 +30,11 @@ CollisionDetectionVisualTest::SetUp()
     defaultMaterial->setBackFaceCulling(false);
     defaultMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
-    m_cdObj1 = std::make_shared<CollidingObject>("cdObj1");
+    m_cdObj1 = std::make_shared<Entity>("cdObj1");
     auto model1 = m_cdObj1->addComponent<VisualModel>();
     model1->setRenderMaterial(defaultMaterial);
 
-    m_cdObj2 = std::make_shared<CollidingObject>("cdObj2");
+    m_cdObj2 = std::make_shared<Entity>("cdObj2");
     auto model2 = m_cdObj2->addComponent<VisualModel>();
     model2->setRenderMaterial(defaultMaterial);
 }
@@ -53,16 +53,16 @@ CollisionDetectionVisualTest::createScene()
         "Missing a m_cdGeom1 Geometry for CollisionDetectionVisualTest";
     ASSERT_NE(m_cdObj1, nullptr) <<
         "Missing a m_cdObj1 CollidingObject for CollisionDetectionVisualTest";
-    m_cdObj1->getVisualModel(0)->setGeometry(m_cdGeom1);
-    m_cdObj1->setCollidingGeometry(m_cdGeom1);
+    m_cdObj1->getComponent<VisualModel>()->setGeometry(m_cdGeom1);
+    m_cdObj1->addComponent<Collider>()->setGeometry(m_cdGeom1);
     m_scene->addSceneObject(m_cdObj1);
 
     ASSERT_NE(m_cdGeom2, nullptr) <<
         "Missing a m_cdGeom2 Geometry for CollisionDetectionVisualTest";
     ASSERT_NE(m_cdObj2, nullptr) <<
         "Missing a m_cdObj2 CollidingObject for CollisionDetectionVisualTest";
-    m_cdObj2->getVisualModel(0)->setGeometry(m_cdGeom2);
-    m_cdObj2->setCollidingGeometry(m_cdGeom2);
+    m_cdObj2->getComponent<VisualModel>()->setGeometry(m_cdGeom2);
+    m_cdObj2->addComponent<Collider>()->setGeometry(m_cdGeom2);
     m_scene->addSceneObject(m_cdObj2);
 
     ASSERT_NE(m_collisionMethod, nullptr) <<

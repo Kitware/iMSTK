@@ -38,9 +38,9 @@ protected:
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override
     {
-        std::shared_ptr<CollidingObject> needleObj = getInputObjectA();
+        std::shared_ptr<Entity> needleObj = getInputObjectA();
         m_needle = needleObj->getComponent<Needle>();
-        std::shared_ptr<CollidingObject> tissueObj = getInputObjectB();
+        std::shared_ptr<Entity> tissueObj = getInputObjectB();
         m_puncturable = tissueObj->getComponent<Puncturable>();
 
         // Do it the normal way

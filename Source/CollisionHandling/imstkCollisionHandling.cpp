@@ -5,7 +5,8 @@
 */
 
 #include "imstkCollisionHandling.h"
-#include "imstkCollidingObject.h"
+#include "imstkCollider.h"
+#include "imstkEntity.h"
 
 namespace imstk
 {
@@ -52,12 +53,12 @@ CollisionHandling::update()
 std::shared_ptr<Geometry>
 CollisionHandling::getHandlingGeometryA()
 {
-    return (m_inputObjectA == nullptr) ? nullptr : m_inputObjectA->getCollidingGeometry();
+    return Collider::getCollidingGeometryFromEntity(m_inputObjectA.get());
 }
 
 std::shared_ptr<Geometry>
 CollisionHandling::getHandlingGeometryB()
 {
-    return (m_inputObjectB == nullptr) ? nullptr : m_inputObjectB->getCollidingGeometry();
+    return Collider::getCollidingGeometryFromEntity(m_inputObjectB.get());
 }
 } // namespace imstk

@@ -20,8 +20,10 @@ public class PbdCloth
         Scene scene = new Scene("PBDClothCollision");
         PbdObject clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
         scene.addSceneObject(clothObj);
-        CollidingObject collisionObj = new CollidingObject("CollidingObject");
-        collisionObj.setCollidingGeometry(capsule);
+        SceneObject collisionObj = new SceneObject("SceneObject");
+        Collider collider = new Collider();
+        collider.setGeometry(capsule);
+        collisionObj.addComponent(collider);
 
         for (int i = 0; i < 4; ++i)
         {
@@ -128,9 +130,10 @@ public class PbdCloth
                         // Show the selected one
                         VisualModel visualModel = collisionObj.getVisualModel((int)indexToShow);
                         visualModel.show();
-                        collisionObj.setCollidingGeometry(visualModel.getGeometry());
+                        Collider existingCollider = collisionObj.getComponentCollider();
+                        existingCollider.setGeometry(visualModel.getGeometry());
 
-                        newCDMethod.setInputGeometryA(clothObj.getCollidingGeometry());
+                        newCDMethod.setInputGeometryA(clothObj.getComponentCollider().getGeometry());
                         newCDMethod.setInputGeometryB(visualModel.getGeometry());
                         pbdInteraction.setCollisionDetection(newCDMethod);
                         pbdInteraction.getCollisionHandlingA().setInputCollisionData(newCDMethod.getCollisionData());
@@ -181,7 +184,7 @@ public class PbdCloth
         // Setup the Object
         clothObj.addVisualModel(visualModel);
         clothObj.setPhysicsGeometry(clothMesh);
-        clothObj.setCollidingGeometry(clothMesh);
+        clothObj.addComponentCollider().setGeometry(clothMesh);
         clothObj.setDynamicalModel(pbdModel);
         clothObj.getPbdBody().uniformMassValue = width * height / (rowCount * colCount);
 

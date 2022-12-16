@@ -5,6 +5,7 @@
 */
 
 #include "imstkRigidObjectLevelSetCollision.h"
+#include "imstkCollider.h"
 #include "imstkCollisionData.h"
 #include "imstkImplicitGeometry.h"
 #include "imstkImplicitGeometryToPointSetCCD.h"
@@ -75,7 +76,7 @@ RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<Rigid
     m_taskGraph->addNode(m_computeDisplacementNode);
 
     // Give the point set displacements for CCD, if it doesn't already have them
-    auto pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getCollidingGeometry());
+    auto pointSet = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(obj1.get()));
     if (pointSet != nullptr && !pointSet->hasVertexAttribute("displacements"))
     {
         auto displacementsPtr = std::make_shared<VecDataArray<double, 3>>(pointSet->getNumVertices());

@@ -30,7 +30,7 @@ DynamicObject::updateGeometries()
 {
     updatePhysicsGeometry();
 
-    CollidingObject::updateGeometries();
+    SceneObject::updateGeometries();
     if (m_physicsToCollidingGeomMap)
     {
         m_physicsToCollidingGeomMap->update();
@@ -57,7 +57,7 @@ DynamicObject::updatePhysicsGeometry()
 bool
 DynamicObject::initialize()
 {
-    if (CollidingObject::initialize())
+    if (SceneObject::initialize())
     {
         CHECK(m_physicsGeometry != nullptr) << "DynamicObject \"" << m_name
                                             << "\" expects a physics geometry at start, none was provided";
@@ -112,6 +112,6 @@ DynamicObject::postModifiedAll()
     {
         m_physicsGeometry->postModified();
     }
-    CollidingObject::postModifiedAll();
+    SceneObject::postModifiedAll();
 }
 } // namespace imstk

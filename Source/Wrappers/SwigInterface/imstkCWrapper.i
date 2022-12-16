@@ -123,8 +123,8 @@
 /* 
  * SceneEntities
  */
+#include "imstkCollider.h"
 #include "imstkSceneObject.h"
-#include "imstkCollidingObject.h"
 #include "imstkDynamicObject.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdObject.h"
@@ -404,16 +404,17 @@ namespace std
  */
 %include "../../ComponentModel/imstkEntity.h"
 %include "../../ComponentModel/imstkComponent.h"
-
 /*
  * SceneEntities
  */
-%include "../../SceneEntities/Components/imstkVisualModel.h";
+%include "../../SceneEntities/Components/imstkCollider.h"
+%template(addComponentCollider) imstk::Entity::addComponent<imstk::Collider>;
+%template(getComponentCollider) imstk::Entity::getComponent<imstk::Collider>;
 %include "../../SceneEntities/Components/imstkTearable.h";
 %include "../../SceneEntities/Components/imstkBurnable.h";
 %include "../../SceneEntities/Components/imstkBurner.h";
+%include "../../SceneEntities/Components/imstkVisualModel.h";
 %include "../../SceneEntities/Objects/imstkSceneObject.h";
-%include "../../SceneEntities/Objects/imstkCollidingObject.h";
 %include "../../SceneEntities/Objects/imstkDynamicObject.h";
 %include "../../SceneEntities/Objects/imstkPbdConnectiveTissueConstraintGenerator.h";
 %include "../../SceneEntities/Objects/imstkPbdObject.h";

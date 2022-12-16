@@ -10,7 +10,7 @@
 
 namespace imstk
 {
-class CollidingObject;
+class Entity;
 class InteractionPair;
 
 ///
@@ -33,14 +33,14 @@ public:
     ///
     /// \brief Set the input objects
     ///
-    void setInputObjectA(std::shared_ptr<CollidingObject> objectA) { m_inputObjectA = objectA; }
-    void setInputObjectB(std::shared_ptr<CollidingObject> objectB) { m_inputObjectB = objectB; }
+    void setInputObjectA(std::shared_ptr<Entity> objectA) { m_inputObjectA = objectA; }
+    void setInputObjectB(std::shared_ptr<Entity> objectB) { m_inputObjectB = objectB; }
 
     ///
     /// \brief Get the input objects
     ///
-    std::shared_ptr<CollidingObject> getInputObjectA() const { return m_inputObjectA; }
-    std::shared_ptr<CollidingObject> getInputObjectB() const { return m_inputObjectB; }
+    std::shared_ptr<Entity> getInputObjectA() const { return m_inputObjectA; }
+    std::shared_ptr<Entity> getInputObjectB() const { return m_inputObjectB; }
 
     ///
     /// \brief Get the geometry used for handling
@@ -74,8 +74,8 @@ protected:
         const std::vector<CollisionElement>& elementsB) = 0;
 
 protected:
-    std::shared_ptr<CollidingObject> m_inputObjectA;
-    std::shared_ptr<CollidingObject> m_inputObjectB;
+    std::shared_ptr<Entity> m_inputObjectA;
+    std::shared_ptr<Entity> m_inputObjectB;
 
     std::shared_ptr<const CollisionData> m_colData = nullptr; ///< Collision data
 };

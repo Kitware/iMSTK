@@ -5,6 +5,7 @@
 */
 
 #include "FemurObject.h"
+#include "imstkCollider.h"
 #include "imstkLevelSetModel.h"
 #include "imstkLocalMarchingCubes.h"
 #include "imstkMeshIO.h"
@@ -15,6 +16,11 @@
 
 FemurObject::FemurObject() : LevelSetDeformableObject("Femur"),
     m_isoExtract(std::make_shared<LocalMarchingCubes>())
+{
+}
+
+void
+FemurObject::setup()
 {
     std::shared_ptr<ImageData> initLvlSetImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/legs/femurBoneSolid_SDF.nii")->cast(IMSTK_DOUBLE);
     //const Vec3d& currSpacing = initLvlSetImage->getSpacing();
@@ -49,7 +55,9 @@ FemurObject::FemurObject() : LevelSetDeformableObject("Femur"),
     model->configure(lvlSetConfig);
 
     setPhysicsGeometry(sdf);
-    setCollidingGeometry(sdf);
+    //setCollidingGeometry(sdf);
+    auto collider = this->addComponent<Collider>();
+    collider->setGeometry(sdf);
     setDynamicalModel(model);
 
     // Setup a custom task to forward the modified voxels of the level set model

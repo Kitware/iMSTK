@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkDirectionalLight.h"
 #include "imstkIsometricMap.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -43,23 +44,24 @@ using namespace imstk;
 ///
 /// \brief Returns a colliding object tissue plane that uses an implicit geometry for collision
 ///
-static std::shared_ptr<CollidingObject>
+static std::shared_ptr<SceneObject>
 createTissueObj()
 {
-    auto tissueObj = std::make_shared<CollidingObject>("Tissue");
+    auto tissueObj = std::make_shared<SceneObject>("Tissue");
 
     auto plane = std::make_shared<Plane>();
     plane->setWidth(0.1);
 
-    tissueObj->setVisualGeometry(plane);
-    tissueObj->setCollidingGeometry(plane);
+    auto visualModel = tissueObj->addComponent<VisualModel>();
+    visualModel->setGeometry(plane);
+    tissueObj->addComponent<Collider>()->setGeometry(plane);
 
     auto material = std::make_shared<RenderMaterial>();
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     material->setColor(Color::Bone);
     material->setRoughness(0.5);
     material->setMetalness(0.1);
-    tissueObj->getVisualModel(0)->setRenderMaterial(material);
+    visualModel->setRenderMaterial(material);
 
     tissueObj->addComponent<Puncturable>();
 
@@ -83,7 +85,7 @@ createNeedleObj()
 
     auto toolObj = std::make_shared<RigidObject2>("NeedleRbdTool");
     toolObj->setVisualGeometry(syringeMesh);
-    toolObj->setCollidingGeometry(toolGeom);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
     toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, syringeMesh));
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
@@ -141,7 +143,7 @@ main()
     auto scene = std::make_shared<Scene>("RbdSDFNeedle");
 
     // Create the bone
-    std::shared_ptr<CollidingObject> tissueObj = createTissueObj();
+    std::shared_ptr<SceneObject> tissueObj = createTissueObj();
     scene->addSceneObject(tissueObj);
 
     // Create the needle

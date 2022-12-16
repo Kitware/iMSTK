@@ -5,6 +5,7 @@
 */
 
 #include "imstkCamera.h"
+#include "imstkCollider.h"
 #include "imstkControllerForceText.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
@@ -110,7 +111,7 @@ makeTissueObj(const std::string& name,
     tissueObj->addVisualModel(visualModel);
     tissueObj->addVisualModel(normalsVisualModel);
     tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
     tissueObj->setDynamicalModel(model);
     tissueObj->getPbdBody()->uniformMassValue = 0.05;
@@ -151,7 +152,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
 
     auto toolObj = std::make_shared<PbdObject>("Tool");
     toolObj->setVisualGeometry(toolGeometry);
-    toolObj->setCollidingGeometry(toolGeometry);
+    toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
     toolObj->setPhysicsGeometry(toolGeometry);
     toolObj->setDynamicalModel(model);
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Blue);

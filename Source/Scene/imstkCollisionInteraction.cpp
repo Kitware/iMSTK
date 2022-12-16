@@ -5,23 +5,25 @@
 */
 
 #include "imstkCDObjectFactory.h"
+#include "imstkCollider.h"
 #include "imstkCollisionInteraction.h"
-#include "imstkCollidingObject.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkCollisionHandling.h"
+#include "imstkEntity.h"
+#include "imstkSceneObject.h"
 #include "imstkTaskGraph.h"
 
 namespace imstk
 {
 CollisionInteraction::CollisionInteraction(
-    std::string                      objName,
-    std::shared_ptr<CollidingObject> objA,
-    std::shared_ptr<CollidingObject> objB,
-    std::string                      cdType = "") : SceneObject(objName),
+    std::string             objName,
+    std::shared_ptr<Entity> objA,
+    std::shared_ptr<Entity> objB,
+    std::string             cdType = "") : SceneObject(objName),
     m_objA(objA), m_objB(objB)
 {
-    CHECK(objA != nullptr) << "CollisionInteraction requires a CollidingObject objA";
-    CHECK(objB != nullptr) << "CollisionInteraction requires a CollidingObject objB";
+    CHECK(objA != nullptr) << "CollisionInteraction requires an Entity objA";
+    CHECK(objB != nullptr) << "CollisionInteraction requires an Entity objB";
 
     m_collisionDetectionNode = std::make_shared<TaskNode>(std::bind(&CollisionInteraction::updateCD, this),
         objA->getName() + "_vs_" + objB->getName() + "_CollisionDetection");
@@ -41,16 +43,37 @@ CollisionInteraction::CollisionInteraction(
     m_taskGraph->addNode(m_collisionGeometryUpdateNode);
 
     // Get default cdType if one not provided
-    if (cdType.empty())
-    {
-        cdType = getCDType(*objA, *objB);
-    }
+    auto colliderA = objA->getComponent<Collider>();
+    auto colliderB = objB->getComponent<Collider>();
 
-    // Setup the CD
-    m_colDetect = CDObjectFactory::makeCollisionDetection(cdType);
-    m_colDetect->setInput(objA->getCollidingGeometry(), 0);
-    m_colDetect->setInput(objB->getCollidingGeometry(), 1);
-    setCollisionDetection(m_colDetect);
+    if (colliderA && colliderB)
+    {
+        auto collidingGeomA = objA->getComponent<Collider>()->getGeometry();
+        auto collidingGeomB = objB->getComponent<Collider>()->getGeometry();
+
+        if (cdType.empty() && collidingGeomA && collidingGeomB)
+        {
+            // cdType = getCDType(*objA, *objB);
+            cdType = CDObjectFactory::getCDType(*collidingGeomA, *collidingGeomB);
+        }
+
+        if (!cdType.empty())
+        {
+            // Setup the CD
+            m_colDetect = CDObjectFactory::makeCollisionDetection(cdType);
+            m_colDetect->setInput(collidingGeomA, 0);
+            m_colDetect->setInput(collidingGeomB, 1);
+            setCollisionDetection(m_colDetect);
+        }
+        else
+        {
+            LOG(FATAL) << "Failed to identify collision detection method to use.";
+        }
+    }
+    else
+    {
+        LOG(FATAL) << "Failed to find Colliders.";
+    }
 }
 
 void
@@ -110,14 +133,6 @@ CollisionInteraction::updateCollisionGeometry()
     // Ensure the collision geometry is updatedbefore checking collision
     // this could involve a geometry map or something, ex: simulated
     // tet mesh mapped to a collision surface mesh
-    if (auto colObj1 = std::dynamic_pointer_cast<CollidingObject>(m_objA))
-    {
-        colObj1->updateGeometries();
-    }
-    if (auto colObj2 = std::dynamic_pointer_cast<CollidingObject>(m_objB))
-    {
-        colObj2->updateGeometries();
-    }
 }
 
 void

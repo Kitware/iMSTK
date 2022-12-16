@@ -6,6 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkCollisionDataDebugModel.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkCylinder.h"
@@ -75,13 +76,13 @@ makeTetTissueObj(const std::string& name,
     if (useTetCollisionGeometry)
     {
         tissueObj->setVisualGeometry(tetMesh);
-        tissueObj->setCollidingGeometry(tetMesh);
+        tissueObj->addComponent<Collider>()->setGeometry(tetMesh);
     }
     else
     {
         std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
         tissueObj->setVisualGeometry(surfMesh);
-        tissueObj->setCollidingGeometry(surfMesh);
+        tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
         tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     }
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
@@ -132,7 +133,7 @@ makeTriTissueObj(const std::string& name,
     tissueObj->setVisualGeometry(triMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(triMesh);
-    tissueObj->setCollidingGeometry(triMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(triMesh);
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
@@ -181,7 +182,7 @@ makeLineThreadObj(const std::string& name,
     tissueObj->setVisualGeometry(lineMesh);
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(lineMesh);
-    tissueObj->setCollidingGeometry(lineMesh);
+    tissueObj->addComponent<Collider>()->setGeometry(lineMesh);
     tissueObj->setDynamicalModel(pbdModel);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
@@ -210,10 +211,11 @@ public:
         m_scene->addSceneObject(m_pbdObj);
 
         ASSERT_NE(m_collidingGeometry, nullptr);
-        m_cdObj = std::make_shared<CollidingObject>("obj2");
-        m_cdObj->setVisualGeometry(m_collidingGeometry);
-        m_cdObj->setCollidingGeometry(m_collidingGeometry);
-        m_cdObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
+        m_cdObj = std::make_shared<SceneObject>("obj2");
+        auto visualModel = m_cdObj->addComponent<VisualModel>();
+        visualModel->setGeometry(m_collidingGeometry);
+        m_cdObj->addComponent<Collider>()->setGeometry(m_collidingGeometry);
+        visualModel->getRenderMaterial()->setBackFaceCulling(false);
         m_scene->addSceneObject(m_cdObj);
 
         m_pbdCollision = std::make_shared<PbdObjectCollision>(m_pbdObj, m_cdObj, m_collisionName);
@@ -266,9 +268,9 @@ public:
     }
 
 public:
-    std::shared_ptr<PbdObject>       m_pbdObj     = nullptr;
-    std::shared_ptr<CollidingObject> m_cdObj      = nullptr;
-    std::shared_ptr<Geometry> m_collidingGeometry = nullptr;
+    std::shared_ptr<PbdObject> m_pbdObj = nullptr;
+    std::shared_ptr<Entity>    m_cdObj  = nullptr;
+    std::shared_ptr<Geometry>  m_collidingGeometry = nullptr;
 
     std::shared_ptr<PbdObjectCollision> m_pbdCollision = nullptr;
     std::string m_collisionName      = "";
