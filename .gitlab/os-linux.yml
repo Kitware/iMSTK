@@ -19,13 +19,13 @@
         - build
         - imstk
         - docker
-        - linux
+        - linux-x86_64
 
 .linux_test_tags:
     tags:
         - imstk
         - docker
-        - linux
+        - linux-x86_64
         - x11
 
 ## Linux-specific scripts
