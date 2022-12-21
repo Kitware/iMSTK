@@ -51,6 +51,16 @@ public:
         return registry().find(name) != registry().cend();
     }
 
+    /// \return a list of all registered names in the registry
+    static const std::vector<std::string> getNames() {
+        std::vector<std::string> result;
+        for (const auto& item : registry())
+        {
+            result.push_back(item.first);
+        }
+        return result;
+    }
+
 private:
     using Registry = std::unordered_map<std::string, Creator>;
 

@@ -71,7 +71,7 @@ public:
 
     const std::vector<std::shared_ptr<PbdConstraint>>& getCellConstraints(int cellId)
     {
-        return m_pbdBody->m_cellConstraintMap[cellId];
+        return m_pbdBody->cellConstraintMap[cellId];
     }
 
 protected:

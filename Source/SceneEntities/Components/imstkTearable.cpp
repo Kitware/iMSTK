@@ -47,7 +47,7 @@ void
 Tearable::handleTearable()
 {
     // Check that the cellConstraintMap exists, if not make it
-    if (m_tearableObject->getPbdBody()->m_cellConstraintMap.empty())
+    if (m_tearableObject->getPbdBody()->cellConstraintMap.empty())
     {
         m_tearableObject->computeCellConstraintMap();
     }
@@ -109,7 +109,7 @@ Tearable::handleTearable()
             {
                 lock.lock();
                 m_cellRemover->removeCellOnApply(cellId);
-                pbdBody->m_cellConstraintMap.erase(cellId);
+                pbdBody->cellConstraintMap.erase(cellId);
                 lock.unlock();
             }
         }, cellMesh->getNumCells() > 50);
