@@ -45,7 +45,7 @@ main(int argc, char* argv[])
     {
         auto param = std::string(argv[i]);
         if (param.find("radius") == 0
-                 && param.find_first_of("=") != std::string::npos)
+            && param.find_first_of("=") != std::string::npos)
         {
             particleRadius = std::stod(param.substr(param.find_first_of("=") + 1));
             LOG(INFO) << "Particle radius: " << particleRadius;
@@ -65,8 +65,8 @@ main(int argc, char* argv[])
     imstkNew<Scene> scene("SPH Fluid");
 
     // Generate fluid and solid objects
-    std::shared_ptr<SphObject> fluidObj         = generateFluid(particleRadius);
-    std::vector<std::shared_ptr<Entity>> solids = generateSolids(scene);
+    std::shared_ptr<SphObject>           fluidObj = generateFluid(particleRadius);
+    std::vector<std::shared_ptr<Entity>> solids   = generateSolids(scene);
 
     scene->addSceneObject(fluidObj);
     for (size_t i = 0; i < solids.size(); i++)

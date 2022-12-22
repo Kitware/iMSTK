@@ -9,9 +9,11 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLooseOctree.h"
+#include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkQuadricDecimate.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -29,10 +31,6 @@ using namespace imstk;
 //#define NUM_MESHES 4u
 #define NUM_MESHES 10u
 
-// Load bunny mesh data (vertex positions and triangle faces)
-std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> getBunny();
-static std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> g_BunnyData = getBunny();
-
 ///
 /// \brief Read a mesh, create a visual scene object and add to the scene
 ///
@@ -41,12 +39,12 @@ createMeshObject(const std::string& objectName,
                  const Color&       color)
 {
     // Create a surface mesh for the bunny
-    imstkNew<SurfaceMesh>                    surfMesh;
-    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = std::make_shared<VecDataArray<double, 3>>();
-    *verticesPtr = *g_BunnyData.first;
-    std::shared_ptr<VecDataArray<int, 3>> indicesPtr = std::make_shared<VecDataArray<int, 3>>();
-    *indicesPtr = *g_BunnyData.second;
-    surfMesh->initialize(verticesPtr, indicesPtr);
+    auto            surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/stanfordBunny/stanfordBunny.stl");
+    QuadricDecimate decimator;
+    decimator.setInputMesh(surfMesh);
+    decimator.setTargetReduction(0.9);
+    decimator.update();
+    surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(decimator.getOutput());
 
     // Create a visual model
     imstkNew<VisualModel> visualModel;

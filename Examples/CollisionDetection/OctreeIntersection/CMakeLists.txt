@@ -14,7 +14,6 @@ if (iMSTK_USE_RENDERING_VTK)
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME}
     OctreeIntersectionExample.cpp
-    ../BunnyMesh.cpp
     OctreeDebugModel.h
     OctreeDebugModel.cpp)
 
