@@ -163,7 +163,7 @@ makeTissueObj(const std::string& name,
 /// us to hold onto parts of a tissue or other pbd deformable with a tool
 ///
 int
-main()
+PbdTissueGraspingExample()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();

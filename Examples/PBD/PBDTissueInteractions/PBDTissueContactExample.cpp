@@ -191,7 +191,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
 /// are used. This example is currently not too scale, a force scaling is used.
 ///
 int
-main()
+PBDTissueContactExample()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();

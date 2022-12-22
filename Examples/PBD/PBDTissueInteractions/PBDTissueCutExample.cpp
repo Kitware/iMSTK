@@ -134,7 +134,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
 /// to remove
 ///
 int
-main()
+PBDTissueCutExample()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();

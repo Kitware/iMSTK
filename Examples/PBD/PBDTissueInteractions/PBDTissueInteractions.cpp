@@ -37,11 +37,11 @@ using namespace imstk;
 /// \brief Creates tissue object
 ///
 static std::shared_ptr<PbdObject>
-makeTissueObj(const std::string& name,
-              const double       width,
-              const double       height,
-              const int          rowCount,
-              const int          colCount)
+makeThinTissue(const std::string& name,
+               const double       width,
+               const double       height,
+               const int          rowCount,
+               const int          colCount)
 {
     // Setup the Geometry
     std::shared_ptr<SurfaceMesh> mesh =
@@ -75,25 +75,25 @@ makeTissueObj(const std::string& name,
     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
 
     // Setup the Object
-    auto tissueObj = std::make_shared<PbdObject>(name);
-    tissueObj->setVisualGeometry(mesh);
-    tissueObj->getVisualModel(0)->setRenderMaterial(material);
-    tissueObj->setPhysicsGeometry(mesh);
-    tissueObj->addComponent<Collider>()->setGeometry(mesh);
-    tissueObj->setDynamicalModel(pbdModel);
+    auto thinTissueObj = std::make_shared<PbdObject>(name);
+    thinTissueObj->setVisualGeometry(mesh);
+    thinTissueObj->getVisualModel(0)->setRenderMaterial(material);
+    thinTissueObj->setPhysicsGeometry(mesh);
+    thinTissueObj->addComponent<Collider>()->setGeometry(mesh);
+    thinTissueObj->setDynamicalModel(pbdModel);
     for (int x = 0; x < rowCount; x++)
     {
         for (int y = 0; y < colCount; y++)
         {
             if (x == 0 || y == 0 || x == rowCount - 1 || y == colCount - 1)
             {
-                tissueObj->getPbdBody()->fixedNodeIds.push_back(x * colCount + y);
+                thinTissueObj->getPbdBody()->fixedNodeIds.push_back(x * colCount + y);
             }
         }
     }
-    tissueObj->getPbdBody()->uniformMassValue = 1.0;
+    thinTissueObj->getPbdBody()->uniformMassValue = 1.0;
 
-    return tissueObj;
+    return thinTissueObj;
 }
 
 ///
@@ -148,8 +148,8 @@ main()
     pickGeom->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
 
     // 300mm x 300mm patch of tissue
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue", 0.1, 0.1, 16, 16);
-    scene->addSceneObject(tissueObj);
+    std::shared_ptr<PbdObject> thinTissueObj = makeThinTissue("ThinTissue", 0.1, 0.1, 16, 16);
+    scene->addSceneObject(thinTissueObj);
 
     // Setup default haptics manager
     std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
@@ -163,13 +163,13 @@ main()
     scene->addControl(controller);
 
     // Add collision for both jaws of the tool
-    auto upperJawCollision = std::make_shared<PbdObjectCollision>(tissueObj, objUpperJaw);
-    auto lowerJawCollision = std::make_shared<PbdObjectCollision>(tissueObj, objLowerJaw);
+    auto upperJawCollision = std::make_shared<PbdObjectCollision>(thinTissueObj, objUpperJaw);
+    auto lowerJawCollision = std::make_shared<PbdObjectCollision>(thinTissueObj, objLowerJaw);
     scene->addInteraction(upperJawCollision);
     scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
-    auto jawPicking = std::make_shared<PbdObjectGrasping>(tissueObj);
+    auto jawPicking = std::make_shared<PbdObjectGrasping>(thinTissueObj);
     scene->addInteraction(jawPicking);
 
     // Light
@@ -205,7 +205,7 @@ main()
             [&](Event*)
             {
                 // Simulate the cloth in real time
-                tissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+                thinTissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
             });
 
         connect<Event>(controller, &LaparoscopicToolController::JawClosed,

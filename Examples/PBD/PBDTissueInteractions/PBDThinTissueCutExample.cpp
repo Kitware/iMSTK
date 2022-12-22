@@ -121,7 +121,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
 /// for haptic interaction. NOTE: Requires GeoMagic Touch device
 ///
 int
-main()
+PBDThinTissueCutExample()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();
