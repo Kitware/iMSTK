@@ -26,7 +26,11 @@ public:
     /// \brief Constructor for PbdObject-PbdObject or PbdObject-CollidingObject collisions
     ///
     PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
+        std::string cdType = "");
+    PbdObjectCollision(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2,
                        std::string cdType = "");
+
+
 
     ~PbdObjectCollision() override = default;
 
@@ -83,5 +87,10 @@ public:
 
 protected:
     std::shared_ptr<TaskNode> m_updatePrevGeometryCCDNode = nullptr;
+
+private: 
+    /// Called from the constructor
+    void setupConnections(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
+        std::string cdType = "");
 };
 } // namespace imstk
