@@ -91,8 +91,8 @@ CDObjectFactory::getCDType(
     std::string type2 = obj2.getTypeName();
 
     // Map defining collision detection for different geometry types, default options
-    // NOTE HS 20221221 changed some AnalyticalGeometry to Mesh CD from 
-    // ImplicitGeometryToPointSet to PointSetTo<Geometry> due to issues with 
+    // NOTE HS 20221221 changed some AnalyticalGeometry to Mesh CD from
+    // ImplicitGeometryToPointSet to PointSetTo<Geometry> due to issues with
     // ImplicitGeoemtryToPointSetCD
 
     static std::unordered_map<std::string, std::string> cdTypeMap = {
@@ -143,7 +143,6 @@ CDObjectFactory::getCDType(
         IMSTK_MAP_TYPES(CompositeImplicitGeometry, SurfaceMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(CompositeImplicitGeometry, TetrahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(CompositeImplicitGeometry, HexahedralMesh, ImplicitGeometryToPointSetCD),
-
     };
 
     if (cdTypeMap.find(type1 + type2) == cdTypeMap.end())

@@ -33,7 +33,8 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<CollidingObject> obj1, st
     CHECK(pbdObject1 != nullptr || pbdObject2 != nullptr) << "One of the objects to PBDObjectCollision" <<
         "has to be a PBDObject";
 
-    if (pbdObject1 != nullptr) {
+    if (pbdObject1 != nullptr)
+    {
         setupConnections(pbdObject1, obj2, cdType);
     }
     else
@@ -174,7 +175,8 @@ PbdObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     }
 }
 
-void PbdObjectCollision::setupConnections(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType /*= ""*/)
+void
+PbdObjectCollision::setupConnections(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType /*= ""*/)
 {
     // Setup the handler
     std::shared_ptr<PbdCollisionHandling> ch = std::make_shared<PbdCollisionHandling>();
@@ -217,5 +219,4 @@ void PbdObjectCollision::setupConnections(std::shared_ptr<PbdObject> obj1, std::
         m_taskGraph->addNode(obj2->getUpdateGeometryNode());
     }
 }
-
 } // namespace imstk
