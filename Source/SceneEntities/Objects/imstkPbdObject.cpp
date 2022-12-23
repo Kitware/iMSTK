@@ -201,22 +201,22 @@ PbdObject::setDeformBodyFromGeometry(PbdBody& body, std::shared_ptr<PointSet> ge
         }
 
         // Initialize orientations
+        // Expects Orientation Data to be Quaternions in wxyz order,
+        // initialize with Identity otherwise
         {
-            std::shared_ptr<AbstractDataArray> orientations = geom->getVertexAttribute("Orientations");
-            if (orientations != nullptr && orientations->getNumberOfComponents() == 4 && orientations->getScalarType() == IMSTK_DOUBLE
-                && std::dynamic_pointer_cast<VecDataArray<double, 3>>(orientations)->size() == numParticles)
+            auto orientations = std::dynamic_pointer_cast<VecDataArray<double, 4>>(geom->getVertexAttribute("Orientations"));
+            if (orientations != nullptr && orientations->size() == numParticles)
             {
-                auto vec = std::dynamic_pointer_cast<VecDataArray<double, 4>>(orientations);
                 body.orientations = std::make_shared<StdVectorOfQuatd>(numParticles);
                 for (int i = 0; i < orientations->size(); i++)
                 {
-                    (*body.orientations)[i] = Quatd((*vec)[i][3], (*vec)[i][1], (*vec)[i][2], (*vec)[i][0]);
+                    (*body.orientations)[i] = Quatd((*orientations)[i][0], (*orientations)[i][1],
+                        (*orientations)[i][2], (*orientations)[i][3]);
                 }
             }
             else
             {
-                body.orientations = std::make_shared<StdVectorOfQuatd>(numParticles);
-                std::fill(body.orientations->begin(), body.orientations->end(), Quatd::Identity());
+                body.orientations = std::make_shared<StdVectorOfQuatd>(numParticles, Quatd::Identity());
             }
         }
         body.prevOrientations = std::make_shared<StdVectorOfQuatd>(*body.orientations);
