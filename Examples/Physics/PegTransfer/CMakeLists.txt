@@ -7,24 +7,22 @@
 ###########################################################################
 
 if (iMSTK_USE_RENDERING_VTK)
-  project(Example-TissueInteractions)
+  project(Example-PegTransfer)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME}
-    TissueInteractions.cpp
-    # TODO: refactor and merge with:
-    ThinTissueCutExample.cpp
-    TissueContactExample.cpp
-    TissueCutExample.cpp
-    TissueGraspingExample.cpp
+    pbdRigidBodyExample.cpp
+    PbdRigidBodyGraspingExample.cpp
+    pbdRigidInDeformableGraspingExample.cpp
+    VirtualCouplingExample.cpp
   )
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/Physics)
 
   #-----------------------------------------------------------------------------
   # Link libraries to executable

@@ -6,39 +6,24 @@
 #
 ###########################################################################
 
+
 if (iMSTK_USE_RENDERING_VTK)
-  project(Example-StraightNeedle)
+  project(Example-HapticGrasping)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
-  imstk_add_executable(${PROJECT_NAME}
-    EmbeddingConstraint.cpp
-    EmbeddingConstraint.h
-    NeedleEmbedder.cpp
-    NeedleEmbedder.h
-    NeedleInteraction.cpp
-    NeedleInteraction.h
-    NeedlePbdCH.h
-    NeedleRigidBodyCH.h
-    NeedleSurfaceInteraction.h
-    PBDTissueSurfaceNeedleContactExample.cpp
-    PBDTissueVolumeNeedleContactExample.cpp
-    RbdAngularLockingConstraint.h
-    RbdAxesLockingConstraint.h
-  )
+  imstk_add_executable(${PROJECT_NAME} HapticGraspingExample.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
 
   #-----------------------------------------------------------------------------
   # Link libraries to executable
   #-----------------------------------------------------------------------------
   target_link_libraries(${PROJECT_NAME}
     SimulationManager
-    ViewerVTK
-    Needle
-    )
+    ViewerVTK)
 endif()

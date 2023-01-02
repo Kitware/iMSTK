@@ -30,7 +30,7 @@ if(iMSTK_USE_HAPTICS AND iMSTK_USE_RENDERING_VTK)
     #-----------------------------------------------------------------------------
     # Add the target to Examples folder
     #-----------------------------------------------------------------------------
-    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
+    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Physics)
 
     #-----------------------------------------------------------------------------
     # Link libraries to executable
