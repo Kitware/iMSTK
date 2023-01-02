@@ -15,21 +15,21 @@
 using namespace imstk;
 
 ///
-/// \class NeedleInteraction
+/// \class NeedleSurfaceInteraction
 ///
 /// \brief Defines interaction between NeedleObject and PbdObject
 ///
-class NeedleInteraction : public PbdRigidObjectCollision
+class NeedleSurfaceInteraction : public PbdRigidObjectCollision
 {
 public:
-    NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
-                      std::shared_ptr<RigidObject2> needleObj,
-                      const std::string&            collisionName = "") : PbdRigidObjectCollision(tissueObj, needleObj, collisionName)
+    NeedleSurfaceInteraction(std::shared_ptr<PbdObject>    tissueObj,
+                             std::shared_ptr<RigidObject2> needleObj,
+                             const std::string&            collisionName = "") : PbdRigidObjectCollision(tissueObj, needleObj, collisionName)
     {
         CHECK(needleObj->containsComponent<StraightNeedle>())
-            << "NeedleInteraction only works with objects that have a StraightNeedle component";
+            << "NeedleSurfaceInteraction only works with objects that have a StraightNeedle component";
         CHECK(tissueObj->containsComponent<Puncturable>())
-            << "NeedleInteraction only works with objects that have a Puncturable component";
+            << "NeedleSurfaceInteraction only works with objects that have a Puncturable component";
 
         auto needleRbdCH = std::make_shared<NeedleRigidBodyCH>();
         needleRbdCH->setInputRigidObjectA(needleObj);
@@ -48,5 +48,5 @@ public:
         setCollisionHandlingA(needlePbdCH);
     }
 
-    ~NeedleInteraction() override = default;
+    ~NeedleSurfaceInteraction() override = default;
 };

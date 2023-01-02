@@ -31,7 +31,7 @@
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "NeedleInteraction.h"
+#include "NeedleSurfaceInteraction.h"
 
 #ifdef iMSTK_USE_HAPTICS
 #include "imstkDeviceManager.h"
@@ -230,7 +230,7 @@ main()
     std::shared_ptr<RigidObject2> toolObj = makeToolObj();
     scene->addSceneObject(toolObj);
 
-    scene->addInteraction(std::make_shared<NeedleInteraction>(tissueObj, toolObj));
+    scene->addInteraction(std::make_shared<NeedleSurfaceInteraction>(tissueObj, toolObj));
 
     // Light
     auto light = std::make_shared<DirectionalLight>();

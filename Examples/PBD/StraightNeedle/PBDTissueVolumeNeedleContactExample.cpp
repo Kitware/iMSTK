@@ -204,7 +204,7 @@ updateDebugGeom(std::shared_ptr<NeedleInteraction>  interaction,
 /// the tetrahedrons faces of intersection.
 ///
 int
-main()
+TissueVolumeNeedleContactExample()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();

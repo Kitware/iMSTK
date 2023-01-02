@@ -7,18 +7,26 @@
 ###########################################################################
 
 if (iMSTK_USE_RENDERING_VTK)
-  project(Example-PBDTissueSurfaceNeedleContact)
+  project(Example-StraightNeedle)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME}
-    PBDTissueSurfaceNeedleContactExample.cpp
-    NeedleRigidBodyCH.h
+    EmbeddingConstraint.cpp
+    EmbeddingConstraint.h
+    NeedleEmbedder.cpp
+    NeedleEmbedder.h
+    NeedleInteraction.cpp
+    NeedleInteraction.h
     NeedlePbdCH.h
+    NeedleRigidBodyCH.h
+    NeedleSurfaceInteraction.h
+    PBDTissueSurfaceNeedleContactExample.cpp
+    PBDTissueVolumeNeedleContactExample.cpp
     RbdAngularLockingConstraint.h
     RbdAxesLockingConstraint.h
-    NeedleInteraction.h)
+  )
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
