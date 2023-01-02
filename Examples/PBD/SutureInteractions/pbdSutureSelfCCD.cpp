@@ -129,7 +129,7 @@ makeNeedleObj()
 ///
 /// \brief This example demonstrates suture on suture collision via CCD
 int
-main()
+SutureSelfCCD()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();

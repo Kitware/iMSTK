@@ -191,7 +191,7 @@ makePbdString(
 /// without two haptic devices.
 ///
 int
-main()
+LapToolSuturingExample()
 {
     // Write log to stdout and file
     Logger::startLogger();

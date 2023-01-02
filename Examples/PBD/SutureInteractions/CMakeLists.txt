@@ -6,14 +6,26 @@
 #
 ###########################################################################
 
-if (iMSTK_USE_RENDERING_VTK)
-    project(Example-PBDSutureSelfCCD)
+# Haptic only example
+if(iMSTK_USE_HAPTICS AND iMSTK_USE_RENDERING_VTK)
+    project(Example-SutureInteractions)
 
     #-----------------------------------------------------------------------------
     # Create executable
     #-----------------------------------------------------------------------------
     imstk_add_executable(${PROJECT_NAME}
-        pbdSutureSelfCCD.cpp)
+        pbdDynamicSutureExample.cpp
+        PbdLapToolSuturingExample.cpp
+        pbdSutureSelfCCD.cpp
+        NeedleInteraction.h
+        NeedleInteraction.cpp
+        NeedlePbdCH.h
+        NeedlePbdCH.cpp
+        SurfaceInsertionConstraint.h
+        SurfaceInsertionConstraint.cpp
+        ThreadInsertionConstraint.h
+        ThreadInsertionConstraint.cpp
+    )
 
     #-----------------------------------------------------------------------------
     # Add the target to Examples folder
@@ -25,5 +37,7 @@ if (iMSTK_USE_RENDERING_VTK)
     #-----------------------------------------------------------------------------
     target_link_libraries(${PROJECT_NAME}
         SimulationManager
-        ViewerVTK)
+        ViewerVTK
+        Needle
+        )
 endif()
