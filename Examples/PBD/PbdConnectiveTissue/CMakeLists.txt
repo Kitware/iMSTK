@@ -7,13 +7,13 @@
 ###########################################################################
 
 if (iMSTK_USE_RENDERING_VTK)
-  project(Example-PbdConnectiveTissue)
+  project(Example-ConnectiveTissue)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME}
-    PbdConnectiveTissueExample.cpp)
+    ConnectiveTissueExample.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder

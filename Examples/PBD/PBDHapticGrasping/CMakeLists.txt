@@ -8,12 +8,12 @@
 
 
 if (iMSTK_USE_RENDERING_VTK)
-  project(Example-PBDHapticGrasping)
+  project(Example-HapticGrasping)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
-  imstk_add_executable(${PROJECT_NAME} PBDHapticGraspingExample.cpp)
+  imstk_add_executable(${PROJECT_NAME} HapticGraspingExample.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder

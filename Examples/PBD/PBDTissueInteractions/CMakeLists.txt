@@ -7,18 +7,18 @@
 ###########################################################################
 
 if (iMSTK_USE_RENDERING_VTK)
-  project(Example-PBDTissueInteractions)
+  project(Example-TissueInteractions)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME}
-    PBDTissueInteractions.cpp
+    TissueInteractions.cpp
     # TODO: refactor and merge with:
-    PBDThinTissueCutExample.cpp
-    PBDTissueContactExample.cpp
-    PBDTissueCutExample.cpp
-    PBDTissueGraspingExample.cpp
+    ThinTissueCutExample.cpp
+    TissueContactExample.cpp
+    TissueCutExample.cpp
+    TissueGraspingExample.cpp
   )
 
   #-----------------------------------------------------------------------------
