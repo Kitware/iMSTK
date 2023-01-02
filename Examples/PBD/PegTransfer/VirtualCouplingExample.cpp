@@ -42,7 +42,7 @@ using namespace imstk;
 /// NOTE: Requires GeoMagic Touch device or Haply Inverse 3
 ///
 int
-main()
+VirtualCouplingExample()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();

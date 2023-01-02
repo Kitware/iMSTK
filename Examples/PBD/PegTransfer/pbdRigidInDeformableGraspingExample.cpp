@@ -37,7 +37,7 @@
 using namespace imstk;
 
 int
-main()
+pbdRigidInDeformableGraspingExample()
 {
     // Write log to stdout and file
     Logger::startLogger();

@@ -6,13 +6,18 @@
 #
 ###########################################################################
 
-if (iMSTK_USE_RENDERING_VTK AND iMSTK_USE_HAPTICS)
-  project(Example-PbdRigidBodyGrasping)
+if (iMSTK_USE_RENDERING_VTK)
+  project(Example-PegTransfer)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
-  imstk_add_executable(${PROJECT_NAME} PbdRigidBodyGraspingExample.cpp)
+  imstk_add_executable(${PROJECT_NAME}
+    pbdRigidBodyExample.cpp
+    PbdRigidBodyGraspingExample.cpp
+    pbdRigidInDeformableGraspingExample.cpp
+    VirtualCouplingExample.cpp
+  )
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder

@@ -106,7 +106,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model, bool isLeft)
 /// rigid objects
 ///
 int
-main()
+PbdRigidBodyGraspingExample()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();
