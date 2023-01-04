@@ -7,25 +7,38 @@
 ###########################################################################
 
 if (iMSTK_USE_RENDERING_VTK)
-  project(Example-OctreeIntersection)
+  project(Example-StraightNeedle)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME}
-    OctreeIntersectionExample.cpp
-    OctreeDebugModel.h
-    OctreeDebugModel.cpp)
+    EmbeddingConstraint.cpp
+    EmbeddingConstraint.h
+    NeedleEmbedder.cpp
+    NeedleEmbedder.h
+    NeedleInteraction.cpp
+    NeedleInteraction.h
+    NeedlePbdCH.h
+    NeedleRigidBodyCH.h
+    NeedleSurfaceInteraction.h
+    PBDTissueSurfaceNeedleContactExample.cpp
+    PBDTissueVolumeNeedleContactExample.cpp
+    RbdAngularLockingConstraint.h
+    RbdAxesLockingConstraint.h
+  )
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/CollisionDetection)
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/Physics)
 
   #-----------------------------------------------------------------------------
   # Link libraries to executable
   #-----------------------------------------------------------------------------
   target_link_libraries(${PROJECT_NAME}
     SimulationManager
-    ViewerVTK)
+    ViewerVTK
+    Needle
+    )
 endif()

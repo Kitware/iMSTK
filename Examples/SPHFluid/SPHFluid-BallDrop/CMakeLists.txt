@@ -15,15 +15,14 @@ if (iMSTK_USE_RENDERING_VTK)
   #-----------------------------------------------------------------------------
   imstk_add_executable(${PROJECT_NAME}
     SPHFluid-BallDrop.cpp
-    ../Fluid.hpp
-    ../Solid.hpp
-    ../SPHFluidExample.hpp
+    Fluid.hpp
+    Solid.hpp
     )
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/SPH)
+  set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER Examples/Physics)
 
   #-----------------------------------------------------------------------------
   # Link libraries to executable
