@@ -324,7 +324,7 @@ PbdObject::computeCellConstraintMap()
     for (int cellId = 0; cellId < cellMesh->getNumCells(); cellId++)
     {
         // Get all the vertex ids for this cell
-        cellVertIds.clear();
+        // The whole range gets overwritten for each iteration
         for (int vertId = 0; vertId < vertsPerCell; vertId++)
         {
             cellVertIds[vertId] = (*cellVerts)[cellId * vertsPerCell + vertId];
