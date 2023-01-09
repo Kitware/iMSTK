@@ -47,7 +47,6 @@ scene->addSceneObject(myObject);
 | Collada                   |      `.dae`       |    read    |  Assimp |            `LineMesh`, `SurfaceMesh`               |
 | Filmbox                   |      `.fbx`       |    read    |  Assimp |            `LineMesh`, `SurfaceMesh`               |
 | Autodesk 3ds              |      `.3ds`       |    read    |  Assimp |            `LineMesh`, `SurfaceMesh`               |
-| Vega                      |      `.veg`       | read/write | VegaFEM |         `TetrahedralMesh`, `HexahedralMesh`        |
 | GMSH                      |      `.msh`       | read/write |  iMSTK  | `LineMesh`, `SurfaceMesh`, `TetrahedralMesh`, `HexahedralMesh` |
 
 * Note `.mhd` is the only format that supports read/write of 3d images with linear offsets.

@@ -26,7 +26,7 @@ public class PbdCollisionOneObject
             PbdObject deformableObj = new PbdObject("DeformableObj");
             {
                 // set up the meshes
-                string tetMeshFileName = dataPath + "asianDragon/asianDragon.veg";
+                string tetMeshFileName = dataPath + "asianDragon/asianDragon.vtu";
                 TetrahedralMesh coarseTetMesh = MeshIO.readTetrahedralMesh(tetMeshFileName);
 
                 string surfMeshFileName = dataPath + "asianDragon/asianDragon.obj";

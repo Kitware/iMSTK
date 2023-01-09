@@ -28,7 +28,7 @@
 using namespace imstk;
 
 // mesh file name
-const std::string tetMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
+const std::string tetMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.vtu";
 
 ///
 /// \brief create a PbdObject for fluids

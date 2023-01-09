@@ -31,7 +31,7 @@ createSoftBodyScene(std::string sceneName)
     scene->getActiveCamera()->setPosition(0.0, 2.0, 15.0);
 
     // Load a sample mesh
-    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.vtu");
 
     // Extract the surface mesh
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
