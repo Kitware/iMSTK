@@ -50,7 +50,6 @@
 %ignore imstk::InteractionPair::getTaskNodeOutputs();
 
 %ignore imstk::FeDeformableObject::getFEMModel();
-%ignore imstk::FemDeformableBodyModel::initializeEigenMatrixFromVegaMatrix;
 
 %ignore imstk::RbdConstraint;
 %ignore imstk::PbdConstraintContainer;

@@ -90,7 +90,6 @@
 %shared_ptr(imstk::PbdSolver)
 %shared_ptr(imstk::FeDeformBodyState)
 %shared_ptr(imstk::FemModelConfig)
-%shared_ptr(imstk::FemDeformableBodyModel)
 %shared_ptr(imstk::AbstractDynamicalModel)
 %shared_ptr(imstk::DynamicalModel<imstk::FeDeformBodyState>)
 %shared_ptr(imstk::DynamicalModel<imstk::SphState>)
