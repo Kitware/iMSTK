@@ -34,7 +34,7 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities
     ${CMAKE_INSTALL_PREFIX}
-    ${CMAKE_INSTALL_PREFIX}/lib/cmake # Vega and VTK
+    ${CMAKE_INSTALL_PREFIX}/lib/cmake # VTK
     )
 set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 
@@ -158,7 +158,7 @@ mark_as_superbuild(${PROJECT_NAME}_BUILD_BENCHMARK:BOOL)
 
 
 if (UNIX)
-  option(${PROJECT_NAME}_USE_MODEL_REDUCTION "Build with model reduction, requires a VegaFEM built with Intel MKL and arpack" OFF)
+  option(${PROJECT_NAME}_USE_MODEL_REDUCTION "Build with model reduction" OFF)
   mark_as_superbuild(${PROJECT_NAME}_USE_MODEL_REDUCTION:BOOL)
 
   option(${PROJECT_NAME}_COLOR_OUTPUT "For coloring output in gcc" OFF)
@@ -251,7 +251,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(OpenVR)
   endif()
   imstk_define_dependency(TBB)
-  imstk_define_dependency(VegaFEM)
   imstk_define_dependency(VTK)
   if(${PROJECT_NAME}_USE_OpenHaptics)
     imstk_define_dependency(OpenHaptics)
@@ -351,9 +350,6 @@ endif()
 
 # TBB
 find_package(TBB REQUIRED)
-
-# VegaFEM
-find_package( VegaFEM REQUIRED CONFIG )
 
 # VRPN
 if (${PROJECT_NAME}_USE_VRPN)
@@ -653,7 +649,6 @@ endif()
 
 set(CONFIG_CODE "${CONFIG_CODE}set(TBB_DIR \"${TBB_DIR}\")\n")
 
-set(CONFIG_CODE "${CONFIG_CODE}set(VegaFEM_DIR \"${VegaFEM_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(VTK_DIR \"${VTK_DIR}\")\n")
 if (${PROJECT_NAME}_USE_RENDERING_VTK)
   set(CONFIG_CODE "${CONFIG_CODE}set(vtkRenderingOpenVR_DIR \"${vtkRenderingOpenVR_DIR}\")\n")
@@ -684,7 +679,6 @@ set(CONFIG_CODE "####### Expanded from \@CONFIG_CODE\@ #######\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(Eigen3_DIR \"${Eigen3_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(GTest_DIR \"${GTest_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(TBB_DIR \"${TBB_DIR}\")\n")
-set(CONFIG_CODE "${CONFIG_CODE}set(VegaFEM_DIR \"${VegaFEM_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(VTK_DIR \"${VTK_DIR}\")\n")
 set(CONFIG_CODE "${CONFIG_CODE}set(benchmark_DIR \"${benchmark_DIR}\")\n")
 if (${PROJECT_NAME}_USE_RENDERING_VTK)
