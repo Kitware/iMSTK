@@ -394,3 +394,20 @@ TEST(imstkVecDataArrayTest, Cloning)
     ASSERT_NE(cloned, nullptr);
     EXPECT_TRUE(isEqualTo(a, *cloned));
 }
+
+TEST(imstkVecDataArrayTest, DynamicCast)
+{
+    auto a = std::make_shared<VecDataArray<int, 4>>(10);
+
+    std::shared_ptr<AbstractDataArray> b = a;
+
+    EXPECT_TRUE(b != nullptr);
+
+    auto c = std::dynamic_pointer_cast<VecDataArray<int, 4>>(b);
+
+    EXPECT_TRUE(c != nullptr);
+
+    auto d = std::dynamic_pointer_cast<VecDataArray<int, 3>>(b);
+
+    EXPECT_TRUE(d == nullptr);
+}
