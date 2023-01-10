@@ -84,6 +84,7 @@
 /* 
  * DynamicalModel 
  */
+#include "imstkPbdConstraint.h"
 #include "imstkVectorizedState.h"
 #include "imstkAbstractDynamicalModel.h"
 #include "imstkDynamicalModel.h"
@@ -143,6 +144,7 @@
 /*
  * CollisionDetection
  */
+#include "imstkCDObjectFactory.h"
 #include "imstkClosedSurfaceMeshToMeshCD.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
@@ -163,6 +165,8 @@
 #include "imstkTetraToLineMeshCD.h"
 #include "imstkTetraToPointSetCD.h"
 #include "imstkUnidirectionalPlaneToSphereCD.h"
+
+
 
 /*
  * CollisionHandling
@@ -266,6 +270,7 @@ namespace std
   %template(VectorDouble) vector<double>;
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
   %template(VectorPbdBody) vector<imstk::PbdBody>;
+  %template(VectorString) vector<std::string>;
 }
 
 %include <std_except.i>
@@ -428,6 +433,14 @@ namespace std
 /*
  * CollisionDetection
  */
+%include "../../CollisionDetection/imstkCDObjectFactory.h"
+
+%extend imstk::CDObjectFactory {
+	static std::vector<std::string> getNames() {
+		return imstk::CDObjectFactory::getNames();
+	}
+}
+
 %include "../../CollisionDetection/imstkCollisionData.h"
 %include "../../CollisionDetection/imstkCollisionDetectionAlgorithm.h"
 %include "../../CollisionDetection/imstkCollisionUtils.h"

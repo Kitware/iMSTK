@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include <unordered_map>
 #include <functional>
-#include <string>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace imstk
 {
@@ -49,6 +50,17 @@ public:
     static bool contains(const std::string& name)
     {
         return registry().find(name) != registry().cend();
+    }
+
+    /// \return a list of all registered names in the registry
+    static const std::vector<std::string> getNames()
+    {
+        std::vector<std::string> result;
+        for (const auto& item : registry())
+        {
+            result.push_back(item.first);
+        }
+        return result;
     }
 
 private:

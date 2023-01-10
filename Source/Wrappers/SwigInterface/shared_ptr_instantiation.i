@@ -117,6 +117,8 @@
 %shared_ptr(imstk::PbdBody)
 %shared_ptr(imstk::PbdState)
 %shared_ptr(imstk::RigidBody)
+%shared_ptr(imstk::PbdConstraint)
+%shared_ptr(imstk::PbdFemConstraint)
 
 /*
  * ComponentModel

@@ -297,9 +297,9 @@ PbdObject::computeCellConstraintMap()
                                         << "\" requires physics geometry to compute CellConstraint map";
 
     // If the map already exists, clear it and recalculate
-    if (m_pbdBody->m_cellConstraintMap.empty() == false)
+    if (m_pbdBody->cellConstraintMap.empty() == false)
     {
-        m_pbdBody->m_cellConstraintMap.clear();
+        m_pbdBody->cellConstraintMap.clear();
         LOG(INFO) << "PbdObject \"" << m_name
                   << "\" already has a CellConstraintMap. Cleared and recalculated \n";
     }
@@ -360,9 +360,9 @@ PbdObject::computeCellConstraintMap()
                 {
                     // Make sure constraint has not already been added
                     bool exists = false;
-                    for (int j = 0; j < m_pbdBody->m_cellConstraintMap[cellId].size(); j++)
+                    for (int j = 0; j < m_pbdBody->cellConstraintMap[cellId].size(); j++)
                     {
-                        if (constraint == m_pbdBody->m_cellConstraintMap[cellId][j])
+                        if (constraint == m_pbdBody->cellConstraintMap[cellId][j])
                         {
                             exists = true;
                         }
@@ -370,7 +370,7 @@ PbdObject::computeCellConstraintMap()
                     if (exists == false)
                     {
                         std::shared_ptr<PbdConstraint> cpy = constraint;
-                        m_pbdBody->m_cellConstraintMap[cellId].push_back(std::move(cpy));
+                        m_pbdBody->cellConstraintMap[cellId].push_back(std::move(cpy));
                     }
                 }
             }
