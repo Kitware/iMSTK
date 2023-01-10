@@ -12,7 +12,6 @@ set(iMSTK_ROOT ${PACKAGE_PREFIX_DIR})
 set(iMSTK_DATA_DIR ${PACKAGE_PREFIX_DIR}/data)
 
 # iMSTK settings
-set(iMSTK_AUDIO_ENABLED @iMSTK_AUDIO_ENABLED@)
 set(iMSTK_USE_VTK_OSMESA @iMSTK_USE_VTK_OSMESA@)
 set(iMSTK_USE_RENDERING_VTK @iMSTK_USE_RENDERING_VTK@)
 set(iMSTK_BUILD_BENCHMARK @iMSTK_BUILD_BENCHMARK@)
@@ -68,12 +67,6 @@ endif()
 # OpenVR
 if (iMSTK_USE_RENDERING_VTK)
   find_dependency( OpenVR )
-endif()
-
-# SFML
-if(iMSTK_AUDIO_ENABLED)
-  find_dependency( SFML REQUIRED )
-  add_definitions( -DiMSTK_AUDIO_ENABLED )
 endif()
 
 # TBB
