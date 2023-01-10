@@ -105,13 +105,13 @@ tissueObj->getPbdBody()->uniformMassValue = 1.0;
 
 ## Deformable Volumetric Tissue
 
-For volumetric deformable tissues discretized with tetrahedrons may be used. With the tetrahedrons one may either use (a) **PbdVolumeConstraint** & **PbdDistanceConstraint** constraints Or (b) use **PbdFemConstraint** constraints. The FEM constraints are more accurate than the volume+distance. However, they are much slower in that one may not be able to achieve the target element count or timestep, iteration count, & stiffness. The volume constraints behave well with sign inversion, recovering well from inverted tetrahedrons quickly. **PbdFemConstraint** can recover from inversion even better than the volume ones but it is costly. Best if you only have a couple tetrahedrons inverting for a short period.
+For volumetric deformable tissues discretized with tetrahedrons may be used. With the tetrahedrons one may either use (a) **PbdVolumeConstraint** & **PbdDistanceConstraint** constraints Or (b) use **PbdStrainEnergyConstraint** constraints. The Strain Energy constraints are more accurate than the volume+distance. However, they are much slower in that one may not be able to achieve the target element count or timestep, iteration count, & stiffness. The volume constraints behave well with sign inversion, recovering well from inverted tetrahedrons quickly. **PbdStrainEnergyConstraint** can recover from inversion even better than the volume ones but it is costly. Best if you only have a couple tetrahedrons inverting for a short period.
 
 Tetrahedral Needle Puncture        |  Endoscope Tissue Press
 :-------------------------:|:-------------------------:
 ![](../media/needleTissue.gif)  |  ![](../media/PbdModel/tissue3.gif)
 
-PBD FEM simulation can be setup with NeoHookean, StVK, Linear, or CoRotation models. NeoHookean is recommended for large deformation but slightly more costly than StVK.
+PBD Strain Energy simulation can be setup with NeoHookean, StVK, Linear, or CoRotation models. NeoHookean is recommended for large deformation but slightly more costly than StVK.
 
 ```cpp
 // Setup the Model
@@ -153,9 +153,9 @@ for (int z = 0; z < dim[2]; z++)
         }
     }
 }
-model->getConfig()->m_femParams->m_YoungModulus = 4000.0;
-model->getConfig()->m_femParams->m_PoissonRatio = 0.45;
-model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
+model->getConfig()->m_secParams->m_YoungModulus = 4000.0;
+model->getConfig()->m_secParams->m_PoissonRatio = 0.45;
+model->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::NeoHookean);
 model->getConfig()->setBodyDamping(tissueObj->getPbdBody()->bodyHandle, 0.001);
 ```
 

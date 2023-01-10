@@ -91,7 +91,7 @@
 #include "imstkPbdModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkBackwardEuler.h"
-#include "imstkPbdFemConstraint.h"
+#include "imstkPbdStrainEnergyConstraint.h"
 #include "imstkPbdCollisionConstraint.h"
 #include "imstkSphBoundaryConditions.h"
 #include "imstkRigidBodyState2.h"
@@ -366,7 +366,7 @@ namespace std
 %include "../../Constraint/PbdConstraints/imstkPbdBody.h"
 %include "../../Constraint/PbdConstraints/imstkPbdConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
-%include "../../Constraint/PbdConstraints/imstkPbdFemConstraint.h"
+%include "../../Constraint/PbdConstraints/imstkPbdStrainEnergyConstraint.h"
 %include "../../Constraint/RigidBodyConstraints/imstkRbdConstraint.h"
 
 /*

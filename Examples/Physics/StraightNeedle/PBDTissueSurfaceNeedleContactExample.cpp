@@ -87,10 +87,10 @@ makeTissueObj(const std::string& name,
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
-    // Use FEMTet constraints
-    pbdParams->m_femParams->m_YoungModulus = 5.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.4;
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+    // Use Strain Energy constraints
+    pbdParams->m_secParams->m_YoungModulus = 5.0;
+    pbdParams->m_secParams->m_PoissonRatio = 0.4;
+    pbdParams->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
     pbdParams->m_doPartitioning = true;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.05;

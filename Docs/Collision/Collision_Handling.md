@@ -88,10 +88,6 @@ The PbdPickingCH can be used through the PbdObjectPicking interaction like so:
     imstkNew<PbdObjectPicking> objectPicking(clothObj, toolObj, "PointSetToCapsuleCD");
     scene->getCollisionGraph()->addInteraction(objectPicking);
 
-PenaltyCH
---------------------------------
-
-The PenaltyCH uses a penalty response method between a FEM simulated and rigid body object. It consumes CD data between the geometries and produces forces in both models. It currently only works with PointDirection data, of which only primtive collision detection supports. So it is currently limited to implicit and primitive shapes only.
 
 RigidBodyCH
 --------------------------------

@@ -21,8 +21,8 @@ imstk_add_library( Constraints
     PbdConstraints/imstkPbdDistanceConstraint.h
     PbdConstraints/imstkPbdEdgeEdgeCCDConstraint.h
     PbdConstraints/imstkPbdEdgeEdgeConstraint.h
-    PbdConstraints/imstkPbdFemConstraint.h
-    PbdConstraints/imstkPbdFemTetConstraint.h
+    PbdConstraints/imstkPbdStrainEnergyConstraint.h
+    PbdConstraints/imstkPbdStrainEnergyTetConstraint.h
     PbdConstraints/imstkPbdPointEdgeConstraint.h
     PbdConstraints/imstkPbdPointPointConstraint.h
     PbdConstraints/imstkPbdPointTriangleConstraint.h
@@ -47,7 +47,7 @@ imstk_add_library( Constraints
     PbdConstraints/imstkPbdDistanceConstraint.cpp
     PbdConstraints/imstkPbdEdgeEdgeCCDConstraint.cpp
     PbdConstraints/imstkPbdEdgeEdgeConstraint.cpp
-    PbdConstraints/imstkPbdFemTetConstraint.cpp
+    PbdConstraints/imstkPbdStrainEnergyTetConstraint.cpp
     PbdConstraints/imstkPbdPointEdgeConstraint.cpp
     PbdConstraints/imstkPbdPointPointConstraint.cpp
     PbdConstraints/imstkPbdPointTriangleConstraint.cpp

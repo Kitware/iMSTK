@@ -4,16 +4,16 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkPbdFemTetConstraint.h"
+#include "imstkPbdStrainEnergyTetConstraint.h"
 
 namespace imstk
 {
 bool
-PbdFemTetConstraint::initConstraint(
+PbdStrainEnergyTetConstraint::initConstraint(
     const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
     const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
     const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
-    std::shared_ptr<PbdFemConstraintConfig> config)
+    std::shared_ptr<PbdStrainEnergyConstraintConfig> config)
 {
     m_particles[0] = pIdx0;
     m_particles[1] = pIdx1;
@@ -40,8 +40,8 @@ PbdFemTetConstraint::initConstraint(
 }
 
 bool
-PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
-                                             double& c, std::vector<Vec3d>& dcdx)
+PbdStrainEnergyTetConstraint::computeValueAndGradient(PbdState& bodies,
+                                                      double& c, std::vector<Vec3d>& dcdx)
 {
     const Vec3d& p0 = bodies.getPosition(m_particles[0]);
     const Vec3d& p1 = bodies.getPosition(m_particles[1]);
@@ -169,7 +169,7 @@ PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
 }
 
 void
-PbdFemTetConstraint::handleInversions(
+PbdStrainEnergyTetConstraint::handleInversions(
     Mat3d& F,
     Mat3d& U,
     Mat3d& Fhat,

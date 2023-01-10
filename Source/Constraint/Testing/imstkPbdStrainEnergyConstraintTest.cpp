@@ -5,7 +5,7 @@
 */
 
 #include "imstkPbdConstraintTest.h"
-#include "imstkPbdFemTetConstraint.h"
+#include "imstkPbdStrainEnergyTetConstraint.h"
 
 #include <gtest/gtest.h>
 
@@ -14,7 +14,7 @@ using namespace imstk;
 ///
 /// \brief Test that tet will right itself if inverted using the StVK model
 ///
-TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionStVK)
+TEST_F(PbdConstraintTest, StrainEnergyTetConstraint_TestTetInversionStVK)
 {
     setNumParticles(4);
 
@@ -36,15 +36,15 @@ TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionStVK)
     m.col(1) = m_vertices[1] - m_vertices[3];
     m.col(2) = m_vertices[2] - m_vertices[3];
 
-    // PbdFemConstraintConfig(mu, lambda, youngModulus, poissonRatio)
-    auto femConfig = std::make_shared<PbdFemConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
+    // PbdStrainEnergyConstraintConfig(mu, lambda, youngModulus, poissonRatio)
+    auto secConfig = std::make_shared<PbdStrainEnergyConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
 
     // Set up constraint
-    PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::StVK);
+    PbdStrainEnergyTetConstraint constraint(PbdStrainEnergyConstraint::MaterialType::StVK);
     m_constraint = &constraint;
     constraint.initConstraint(
         m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
-        { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, femConfig);
+        { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, secConfig);
 
     Mat3d refPositionInverse = m.inverse();
 
@@ -70,7 +70,7 @@ TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionStVK)
 ///
 /// \brief Test that tet will right itself if inverted using the NeoHookean model
 ///
-TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionNeoHookean)
+TEST_F(PbdConstraintTest, StrainEnergyTetConstraint_TestTetInversionNeoHookean)
 {
     setNumParticles(4);
 
@@ -95,15 +95,15 @@ TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionNeoHookean)
     VecDataArray<int, 4> indices(1);
     indices[0] = Vec4i(0, 1, 2, 3);
 
-    // PbdFemConstraintConfig(mu, lambda, youngModulus, poissonRatio)
-    auto femConfig = std::make_shared<PbdFemConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
+    // PbdStrainEnergyConstraintConfig(mu, lambda, youngModulus, poissonRatio)
+    auto secConfig = std::make_shared<PbdStrainEnergyConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
 
     // Set up constraint
-    PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::NeoHookean);
+    PbdStrainEnergyTetConstraint constraint(PbdStrainEnergyConstraint::MaterialType::NeoHookean);
     m_constraint = &constraint;
     constraint.initConstraint(
         m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
-        { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, femConfig);
+        { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, secConfig);
 
     Mat3d refPositionInverse = m.inverse();
 
@@ -129,7 +129,7 @@ TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionNeoHookean)
 ///
 /// \brief Test that tet will right itself if inverted using the Corotational model
 ///
-TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionCorotational)
+TEST_F(PbdConstraintTest, StrainEnergyTetConstraint_TestTetInversionCorotational)
 {
     setNumParticles(4);
 
@@ -154,15 +154,15 @@ TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionCorotational)
     VecDataArray<int, 4> indices(1);
     indices[0] = Vec4i(0, 1, 2, 3);
 
-    // PbdFemConstraintConfig(mu, lambda, youngModulus, poissonRatio)
-    auto femConfig = std::make_shared<PbdFemConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
+    // PbdStrainEnergyConstraintConfig(mu, lambda, youngModulus, poissonRatio)
+    auto secConfig = std::make_shared<PbdStrainEnergyConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
 
     // Set up constraint
-    PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::Corotation);
+    PbdStrainEnergyTetConstraint constraint(PbdStrainEnergyConstraint::MaterialType::Corotation);
     m_constraint = &constraint;
     constraint.initConstraint(
         m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
-        { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, femConfig);
+        { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, secConfig);
 
     Mat3d refPositionInverse = m.inverse();
 

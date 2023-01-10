@@ -21,20 +21,20 @@ namespace imstk
 void
 PbdModelConfig::computeElasticConstants()
 {
-    if (std::abs(m_femParams->m_mu) < std::numeric_limits<double>::min()
-        && std::abs(m_femParams->m_lambda) < std::numeric_limits<double>::min())
+    if (std::abs(m_secParams->m_mu) < std::numeric_limits<double>::min()
+        && std::abs(m_secParams->m_lambda) < std::numeric_limits<double>::min())
     {
-        const double E  = m_femParams->m_YoungModulus;
-        const double nu = m_femParams->m_PoissonRatio;
-        m_femParams->m_mu     = E / 2.0 / (1.0 + nu);
-        m_femParams->m_lambda = E * nu / ((1.0 + nu) * (1.0 - 2.0 * nu));
+        const double E  = m_secParams->m_YoungModulus;
+        const double nu = m_secParams->m_PoissonRatio;
+        m_secParams->m_mu     = E / 2.0 / (1.0 + nu);
+        m_secParams->m_lambda = E * nu / ((1.0 + nu) * (1.0 - 2.0 * nu));
     }
     else
     {
-        const double mu     = m_femParams->m_mu;
-        const double lambda = m_femParams->m_lambda;
-        m_femParams->m_YoungModulus = mu * (3.0 * lambda + 2.0 * mu) / (lambda + mu);
-        m_femParams->m_PoissonRatio = lambda / 2.0 / (lambda + mu);
+        const double mu     = m_secParams->m_mu;
+        const double lambda = m_secParams->m_lambda;
+        m_secParams->m_YoungModulus = mu * (3.0 * lambda + 2.0 * mu) / (lambda + mu);
+        m_secParams->m_PoissonRatio = lambda / 2.0 / (lambda + mu);
     }
 }
 
@@ -157,16 +157,16 @@ PbdModelConfig::enableConstantDensityConstraint(const double stiffness,
 }
 
 void
-PbdModelConfig::enableFemConstraint(PbdFemConstraint::MaterialType material, const int bodyId)
+PbdModelConfig::enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType material, const int bodyId)
 {
-    auto& funcs = m_functors[ConstraintGenType::FemTet];
+    auto& funcs = m_functors[ConstraintGenType::SecTet];
     if (funcs.size() == 0)
     {
-        funcs.push_back(std::make_shared<PbdFemTetConstraintFunctor>());
+        funcs.push_back(std::make_shared<PbdStrainEnergyTetConstraintFunctor>());
     }
-    auto functor = std::dynamic_pointer_cast<PbdFemTetConstraintFunctor>(funcs.front());
+    auto functor = std::dynamic_pointer_cast<PbdStrainEnergyTetConstraintFunctor>(funcs.front());
     functor->setBodyIndex(bodyId);
-    functor->setFemConfig(m_femParams);
+    functor->setSecConfig(m_secParams);
     functor->setMaterialType(material);
 }
 

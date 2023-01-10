@@ -41,9 +41,9 @@ createSoftBodyScene(std::string sceneName)
 
     // Configure model
     auto pbdConfig = std::make_shared<PbdModelConfig>();
-    pbdConfig->m_femParams->m_YoungModulus = 1000000.0;
-    pbdConfig->m_femParams->m_PoissonRatio = 0.3;
-    pbdConfig->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+    pbdConfig->m_secParams->m_YoungModulus = 1000000.0;
+    pbdConfig->m_secParams->m_PoissonRatio = 0.3;
+    pbdConfig->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_iterations = 5;
     pbdConfig->m_dt = 0.03;
