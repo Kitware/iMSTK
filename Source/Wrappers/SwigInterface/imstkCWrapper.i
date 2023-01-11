@@ -91,11 +91,9 @@
 #include "imstkPbdModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkBackwardEuler.h"
-#include "imstkPbdFemConstraint.h"
+#include "imstkPbdStrainEnergyConstraint.h"
 #include "imstkPbdCollisionConstraint.h"
 #include "imstkSphBoundaryConditions.h"
-#include "imstkInternalForceModelTypes.h"
-#include "imstkFemDeformableBodyModel.h"
 #include "imstkRigidBodyState2.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkSphState.h"
@@ -136,7 +134,6 @@
 #include "imstkCamera.h"
 #include "imstkLight.h"
 #include "imstkDirectionalLight.h"
-#include "imstkFeDeformableObject.h"
 #include "imstkRigidObject2.h"
 #include "imstkSphObject.h"
 
@@ -369,7 +366,7 @@ namespace std
 %include "../../Constraint/PbdConstraints/imstkPbdBody.h"
 %include "../../Constraint/PbdConstraints/imstkPbdConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
-%include "../../Constraint/PbdConstraints/imstkPbdFemConstraint.h"
+%include "../../Constraint/PbdConstraints/imstkPbdStrainEnergyConstraint.h"
 %include "../../Constraint/RigidBodyConstraints/imstkRbdConstraint.h"
 
 /*
@@ -381,8 +378,6 @@ namespace std
 %include "../../DynamicalModels/ObjectModels/imstkPbdModelConfig.h"
 %include "../../DynamicalModels/ObjectModels/imstkPbdModel.h"
 %template(DynamicalModelFeDeformBodyState) imstk::DynamicalModel<imstk::FeDeformBodyState>;
-%include "../../DynamicalModels/InternalForceModel/imstkInternalForceModelTypes.h"
-%include "../../DynamicalModels/ObjectModels/imstkFemDeformableBodyModel.h"
 %include "../../DynamicalModels/ObjectModels/imstkSphBoundaryConditions.h"
 %include "../../DynamicalModels/TimeIntegrators/imstkTimeIntegrator.h"
 %include "../../DynamicalModels/TimeIntegrators/imstkBackwardEuler.h"
@@ -419,7 +414,6 @@ namespace std
 %include "../../SceneEntities/Objects/imstkPbdConnectiveTissueConstraintGenerator.h";
 %include "../../SceneEntities/Objects/imstkPbdObject.h";
 %include "../../SceneEntities/Objects/imstkPbdObjectCellRemoval.h";
-%include "../../SceneEntities/Objects/imstkFeDeformableObject.h";
 %include "../../SceneEntities/Objects/imstkRigidObject2.h";
 %include "../../SceneEntities/Objects/imstkSphObject.h";
 %include "../../SceneEntities/Camera/imstkCamera.h";

@@ -98,20 +98,20 @@ makeTissueObj(const std::string&               name,
     tissueObj->setDynamicalModel(model);
     tissueObj->getPbdBody()->uniformMassValue = 0.04;
 
-    // \todo: iMSTK doesn't support multiple different materials for FEM tet constraints without
+    // \todo: iMSTK doesn't support multiple different materials for Strain Energy tet constraints without
     // making the functor yourself
-    auto functor = std::make_shared<PbdFemTetConstraintFunctor>();
+    auto functor = std::make_shared<PbdStrainEnergyTetConstraintFunctor>();
     functor->setGeometry(tissueMesh);
     functor->setBodyIndex(tissueObj->getPbdBody()->bodyHandle);
     const double youngsModulus    = 100000.0;
     const double poissonRatio     = 0.48;
-    auto         constraintConfig = std::make_shared<PbdFemConstraintConfig>(
+    auto         constraintConfig = std::make_shared<PbdStrainEnergyConstraintConfig>(
         youngsModulus / 2.0 / (1.0 + poissonRatio),
         youngsModulus * poissonRatio / ((1.0 + poissonRatio) * (1.0 - 2.0 * poissonRatio)),
         youngsModulus,
         poissonRatio);
-    functor->setFemConfig(constraintConfig);
-    functor->setMaterialType(PbdFemConstraint::MaterialType::StVK);
+    functor->setSecConfig(constraintConfig);
+    functor->setMaterialType(PbdStrainEnergyConstraint::MaterialType::StVK);
     model->getConfig()->addPbdConstraintFunctor(functor);
 
     tissueObj->addComponent<Puncturable>();

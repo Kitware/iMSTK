@@ -9,8 +9,7 @@
 #include "imstkDeviceControl.h"
 #include "imstkCameraController.h"
 #include "imstkCollisionDetectionAlgorithm.h"
-#include "imstkFeDeformableObject.h"
-#include "imstkFemDeformableBodyModel.h"
+#include "imstkDynamicObject.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
@@ -535,15 +534,6 @@ Scene::advance(const double dt)
             {
                 dynaObj->getDynamicalModel()->setTimeStep(dt);
             }
-        }
-    }
-
-    // Reset Contact forces to 0
-    for (auto obj : this->getSceneObjects())
-    {
-        if (auto defObj = std::dynamic_pointer_cast<FeDeformableObject>(obj))
-        {
-            defObj->getFEMModel()->getContactForce().setConstant(0.0);
         }
     }
 

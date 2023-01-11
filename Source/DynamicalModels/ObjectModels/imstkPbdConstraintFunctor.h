@@ -15,8 +15,8 @@
 #include "imstkPbdConstraint.h"
 #include "imstkPbdDihedralConstraint.h"
 #include "imstkPbdDistanceConstraint.h"
-#include "imstkPbdFemConstraint.h"
-#include "imstkPbdFemTetConstraint.h"
+#include "imstkPbdStrainEnergyConstraint.h"
+#include "imstkPbdStrainEnergyTetConstraint.h"
 #include "imstkPbdVolumeConstraint.h"
 #include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
@@ -301,21 +301,21 @@ struct PbdDistanceConstraintFunctor : public PbdBodyConstraintFunctor
 };
 
 ///
-/// \struct PbdFemTetConstraintFunctor
+/// \struct PbdStrainEnergyTetConstraintFunctor
 ///
-/// \brief PbdFemTetConstraintFunctor generates constraints per cell of a TetrahedralMesh
+/// \brief PbdStrainEnergyTetConstraintFunctor generates constraints per cell of a TetrahedralMesh
 ///
-struct PbdFemTetConstraintFunctor : public PbdBodyConstraintFunctor
+struct PbdStrainEnergyTetConstraintFunctor : public PbdBodyConstraintFunctor
 {
     public:
-        PbdFemTetConstraintFunctor() = default;
-        ~PbdFemTetConstraintFunctor() override = default;
+        PbdStrainEnergyTetConstraintFunctor() = default;
+        ~PbdStrainEnergyTetConstraintFunctor() override = default;
 
         void operator()(PbdConstraintContainer& constraints) override
         {
             // Check for correct mesh type
             CHECK(std::dynamic_pointer_cast<TetrahedralMesh>(m_geom) != nullptr)
-                << "PbdFemTetConstraint can only be generated with a TetrahedralMesh";
+                << "PbdStrainEnergyTetConstraint can only be generated with a TetrahedralMesh";
 
             // Create constraints
             auto                                     tetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(m_geom);
@@ -328,25 +328,25 @@ struct PbdFemTetConstraintFunctor : public PbdBodyConstraintFunctor
                 [&](const size_t k)
                 {
                     const Vec4i& tet = elements[k];
-                    auto c = std::make_shared<PbdFemTetConstraint>(m_matType);
+                    auto c = std::make_shared<PbdStrainEnergyTetConstraint>(m_matType);
                     c->initConstraint(
                         vertices[tet[0]], vertices[tet[1]], vertices[tet[2]], vertices[tet[3]],
                         { m_bodyIndex, tet[0] }, { m_bodyIndex, tet[1] },
                         { m_bodyIndex, tet[2] }, { m_bodyIndex, tet[3] },
-                        m_femConfig);
+                        m_secConfig);
                     constraints.addConstraint(c);
             }, elements.size() > 100);
         }
 
-        void setMaterialType(const PbdFemTetConstraint::MaterialType materialType) { m_matType = materialType; }
-        PbdFemTetConstraint::MaterialType getMaterialType() const { return m_matType; }
+        void setMaterialType(const PbdStrainEnergyTetConstraint::MaterialType materialType) { m_matType = materialType; }
+        PbdStrainEnergyTetConstraint::MaterialType getMaterialType() const { return m_matType; }
 
-        void setFemConfig(std::shared_ptr<PbdFemConstraintConfig> femConfig) { m_femConfig = femConfig; }
-        std::shared_ptr<PbdFemConstraintConfig> getFemConfig() const { return m_femConfig; }
+        void setSecConfig(std::shared_ptr<PbdStrainEnergyConstraintConfig> secConfig) { m_secConfig = secConfig; }
+        std::shared_ptr<PbdStrainEnergyConstraintConfig> getSecConfig() const { return m_secConfig; }
 
     protected:
-        PbdFemTetConstraint::MaterialType m_matType = PbdFemTetConstraint::MaterialType::StVK;
-        std::shared_ptr<PbdFemConstraintConfig> m_femConfig = nullptr;
+        PbdStrainEnergyTetConstraint::MaterialType m_matType = PbdStrainEnergyTetConstraint::MaterialType::StVK;
+        std::shared_ptr<PbdStrainEnergyConstraintConfig> m_secConfig = nullptr;
 };
 
 ///

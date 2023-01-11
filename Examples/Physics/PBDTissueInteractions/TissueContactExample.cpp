@@ -129,9 +129,9 @@ makeTissueObj(const std::string& name,
             }
         }
     }
-    model->getConfig()->m_femParams->m_YoungModulus = 50.0;
-    model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
-    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
+    model->getConfig()->m_secParams->m_YoungModulus = 50.0;
+    model->getConfig()->m_secParams->m_PoissonRatio = 0.4;
+    model->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::NeoHookean);
     model->getConfig()->setBodyDamping(tissueObj->getPbdBody()->bodyHandle, 0.001);
 
     return tissueObj;

@@ -31,7 +31,7 @@ public class FeDeformable
         input = new Input();
         if (geom == Geom.Dragon)
         {
-            input.meshFileName = "../data/asianDragon/asianDragon.veg";
+            input.meshFileName = "../data/asianDragon/asianDragon.vtu";
             input.fixedNodeIds = new VectorSizet(3);
             input.fixedNodeIds.Add(50);
             input.fixedNodeIds.Add(126);

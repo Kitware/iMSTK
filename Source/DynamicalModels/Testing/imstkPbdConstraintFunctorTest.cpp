@@ -136,9 +136,9 @@ TEST(imstkPbdConstraintFunctorTest, TestDistanceConstraintGeneration)
 }
 
 ///
-/// \brief Test that the correct pbd FEM tetrahedral constraint was generated
+/// \brief Test that the correct pbd strain energy tetrahedral constraint was generated
 ///
-TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGeneration)
+TEST(imstkPbdConstraintFunctorTest, TestStrainEnergyTetConstraintGeneration)
 {
     auto tetMesh  = std::make_shared<TetrahedralMesh>();
     auto vertices = std::make_shared<VecDataArray<double, 3>>(4);
@@ -151,10 +151,10 @@ TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGeneration)
     tetMesh->initialize(vertices, indices);
 
     // Create functor
-    PbdFemTetConstraintFunctor constraintFunctor;
-    constraintFunctor.setMaterialType(PbdFemTetConstraint::MaterialType::Corotation);
-    auto FeConfig = std::make_shared<PbdFemConstraintConfig>(0.0, 0.0, 1000.0, 0.2);
-    constraintFunctor.setFemConfig(FeConfig);
+    PbdStrainEnergyTetConstraintFunctor constraintFunctor;
+    constraintFunctor.setMaterialType(PbdStrainEnergyTetConstraint::MaterialType::Corotation);
+    auto seConfig = std::make_shared<PbdStrainEnergyConstraintConfig>(0.0, 0.0, 1000.0, 0.2);
+    constraintFunctor.setSecConfig(seConfig);
     constraintFunctor.setGeometry(tetMesh);
 
     // Fill container
@@ -165,11 +165,11 @@ TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGeneration)
     EXPECT_EQ(container.getConstraints().size(), 1);
 
     // Check that correct constraint type got generated
-    auto constraint = std::dynamic_pointer_cast<PbdFemTetConstraint>(container.getConstraints()[0]);
+    auto constraint = std::dynamic_pointer_cast<PbdStrainEnergyTetConstraint>(container.getConstraints()[0]);
     EXPECT_NE(constraint, nullptr);
 
     // Check constraint generated between correct elements and with correct values
-    EXPECT_EQ(constraint->m_material, PbdFemTetConstraint::MaterialType::Corotation);
+    EXPECT_EQ(constraint->m_material, PbdStrainEnergyTetConstraint::MaterialType::Corotation);
     EXPECT_EQ(constraint->m_config->m_mu, 0.0);
     EXPECT_EQ(constraint->m_config->m_lambda, 0.0);
     EXPECT_EQ(constraint->m_config->m_YoungModulus, 1000.0);

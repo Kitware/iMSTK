@@ -11,13 +11,13 @@
 namespace imstk
 {
 ///
-/// \struct PbdFemConstraintConfig
+/// \struct PbdStrainEnergyConstraintConfig
 ///
 /// \brief Either mu/lambda used, may be computed from youngs modulus and poissons ratio
 ///
-struct PbdFemConstraintConfig
+struct PbdStrainEnergyConstraintConfig
 {
-    PbdFemConstraintConfig(double mu, double lambda, double youngModulus, double poissonRatio) :
+    PbdStrainEnergyConstraintConfig(double mu, double lambda, double youngModulus, double poissonRatio) :
         m_mu(mu), m_lambda(lambda), m_YoungModulus(youngModulus), m_PoissonRatio(poissonRatio)
     {
     }
@@ -30,14 +30,14 @@ struct PbdFemConstraintConfig
 };
 
 ///
-/// \class PbdFemConstraint
+/// \class PbdStrainEnergyConstraint
 ///
-/// \brief The PbdFemConstraint class for constraint as the elastic energy
+/// \brief The PbdStrainEnergyConstraint class for constraint as the elastic energy
 /// computed by linear shape functions with tetrahedral mesh.
 /// We provide several model for elastic energy including:
 /// Linear, Co-rotation, St Venant-Kirchhof and NeoHookean
 ///
-class PbdFemConstraint : public PbdConstraint
+class PbdStrainEnergyConstraint : public PbdConstraint
 {
 public:
     enum class MaterialType
@@ -48,8 +48,8 @@ public:
         NeoHookean
     };
 
-    PbdFemConstraint(const unsigned int cardinality,
-                     MaterialType       mType = MaterialType::StVK) : PbdConstraint(cardinality),
+    PbdStrainEnergyConstraint(const unsigned int cardinality,
+                              MaterialType       mType = MaterialType::StVK) : PbdConstraint(cardinality),
         m_initialElementVolume(0.0),
         m_material(mType),
         m_invRestMat(Mat3d::Identity())
@@ -61,6 +61,6 @@ public:
     MaterialType m_material;                   ///< Material type
     Mat3d m_invRestMat;
 
-    std::shared_ptr<PbdFemConstraintConfig> m_config = nullptr;
+    std::shared_ptr<PbdStrainEnergyConstraintConfig> m_config = nullptr;
 };
 } // namespace imstk

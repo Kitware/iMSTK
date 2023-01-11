@@ -77,21 +77,21 @@ makeTissueObj(const std::string& name,
     setSphereTexCoords(surfMesh, 6.0);
 
     // Setup the Parameters
-    auto       pbdParams = std::make_shared<PbdModelConfig>();
-    const bool useFem    = true;
-    if (useFem)
+    auto       pbdParams       = std::make_shared<PbdModelConfig>();
+    const bool useStrainEnergy = true;
+    if (useStrainEnergy)
     {
         // Actual skin young's modulus, 0.42MPa to 0.85Mpa, as reported in papers
         // Actual skin possion ratio, 0.48, as reported in papers
-        pbdParams->m_femParams->m_YoungModulus = 40000.0;
-        pbdParams->m_femParams->m_PoissonRatio = 0.48;
+        pbdParams->m_secParams->m_YoungModulus = 40000.0;
+        pbdParams->m_secParams->m_PoissonRatio = 0.48;
         // FYI:
         //  - Poisson ratio gives shear to bulk, with 0.5 being complete shear
         //    where everything is like a fluid and can slide past each other. 0.0
         //    gives complete bulk where its rigid
         //  - Youngs modulus then gives the scaling of the above in pressure
         //    (pascals).
-        pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
+        pbdParams->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::NeoHookean);
     }
     else
     {

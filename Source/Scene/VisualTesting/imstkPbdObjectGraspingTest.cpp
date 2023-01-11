@@ -76,9 +76,9 @@ makeTetTissueObj(const std::string& name,
     tissueObj->setDynamicalModel(model);
     tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
-    model->getConfig()->m_femParams->m_YoungModulus = 1000.0;
-    model->getConfig()->m_femParams->m_PoissonRatio = 0.45;     // 0.48 for tissue
-    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK,
+    model->getConfig()->m_secParams->m_YoungModulus = 1000.0;
+    model->getConfig()->m_secParams->m_PoissonRatio = 0.45;     // 0.48 for tissue
+    model->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
                 tissueObj->getPbdBody()->bodyHandle);
 
     // Fix the borders

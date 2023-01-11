@@ -58,9 +58,9 @@ TEST_F(VisualTest, PointToTetMapTest)
         tissueObj->setDynamicalModel(pbdModel);
         tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
-        pbdModel->getConfig()->m_femParams->m_YoungModulus = 1000.0;
-        pbdModel->getConfig()->m_femParams->m_PoissonRatio = 0.45; // 0.48 for tissue
-        pbdModel->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK,
+        pbdModel->getConfig()->m_secParams->m_YoungModulus = 1000.0;
+        pbdModel->getConfig()->m_secParams->m_PoissonRatio = 0.45; // 0.48 for tissue
+        pbdModel->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
             tissueObj->getPbdBody()->bodyHandle);
 
         // Fix the borders

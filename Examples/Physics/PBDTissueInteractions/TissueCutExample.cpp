@@ -54,10 +54,10 @@ makeTissueObj(const std::string& name,
     referenceCountPtr->fill(0);
     tissueMesh->setVertexAttribute("ReferenceCount", referenceCountPtr);
 
-    // Use FEMTet constraints
-    model->getConfig()->m_femParams->m_YoungModulus = 50.0;
-    model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
-    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+    // Use Strain Energy Tet constraints
+    model->getConfig()->m_secParams->m_YoungModulus = 50.0;
+    model->getConfig()->m_secParams->m_PoissonRatio = 0.4;
+    model->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
 
     // Setup the material
     auto material = std::make_shared<RenderMaterial>();

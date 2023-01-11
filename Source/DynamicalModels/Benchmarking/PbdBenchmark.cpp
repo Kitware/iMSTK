@@ -5,6 +5,7 @@
 */
 
 #include "imstkCapsule.h"
+#include "imstkCollider.h"
 #include "imstkCollisionHandling.h"
 #include "imstkGeometry.h"
 #include "imstkMath.h"
@@ -291,9 +292,9 @@ BM_PbdFemStVK(benchmark::State& state)
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
     // Use FEM Tet constraints
-    pbdParams->m_femParams->m_YoungModulus = 5.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.4;
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+    pbdParams->m_secParams->m_YoungModulus = 5.0;
+    pbdParams->m_secParams->m_PoissonRatio = 0.4;
+    pbdParams->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = dt;
@@ -368,9 +369,9 @@ BM_PbdFemCorotation(benchmark::State& state)
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
     // Use FEM Tet constraints
-    pbdParams->m_femParams->m_YoungModulus = 5.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.4;
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::Corotation);
+    pbdParams->m_secParams->m_YoungModulus = 5.0;
+    pbdParams->m_secParams->m_PoissonRatio = 0.4;
+    pbdParams->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::Corotation);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = dt;
@@ -445,9 +446,9 @@ BM_PbdFemNeoHookean(benchmark::State& state)
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
     // Use FEM Tet constraints
-    pbdParams->m_femParams->m_YoungModulus = 5.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.4;
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
+    pbdParams->m_secParams->m_YoungModulus = 5.0;
+    pbdParams->m_secParams->m_PoissonRatio = 0.4;
+    pbdParams->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::NeoHookean);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = dt;
@@ -522,9 +523,9 @@ BM_PbdFemLinear(benchmark::State& state)
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
     // Use FEM Tet constraints
-    pbdParams->m_femParams->m_YoungModulus = 5.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.4;
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::Linear);
+    pbdParams->m_secParams->m_YoungModulus = 5.0;
+    pbdParams->m_secParams->m_PoissonRatio = 0.4;
+    pbdParams->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::Linear);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = dt;
@@ -601,7 +602,9 @@ BM_PbdContactDistanceVol(benchmark::State& state)
     std::shared_ptr<SurfaceMesh> surfMesh = prismMesh->extractSurfaceMesh();
 
     // Use surface mesh for collision
-    prismObj->setCollidingGeometry(surfMesh);
+    auto prismCollider = std::make_shared<Collider>();
+    prismCollider->setGeometry(surfMesh);
+    prismObj->addComponent(prismCollider);
 
     // Force deformation to match between the surface and volume mesh
     prismObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(prismMesh, surfMesh));
@@ -648,9 +651,11 @@ BM_PbdContactDistanceVol(benchmark::State& state)
     capsule->setOrientation(Quatd(0.707, 0.0, 0.0, 0.707));
 
     // Set up collision
-    std::shared_ptr<CollidingObject> collisionObj = std::make_shared<CollidingObject>("CollidingObject");
-    collisionObj->setCollidingGeometry(capsule);
+    auto collider = std::make_shared<Collider>();
+    collider->setGeometry(capsule);
+    auto collisionObj = std::make_shared<SceneObject>("CollidingObject");
     collisionObj->setVisualGeometry(capsule);
+    collisionObj->addComponent(collider);
     scene->addSceneObject(collisionObj);
 
     std::shared_ptr<PbdObjectCollision> pbdInteraction =
@@ -703,7 +708,9 @@ BM_PbdContactDistanceDihedral(benchmark::State& state)
     std::shared_ptr<SurfaceMesh> surfMesh = prismMesh->extractSurfaceMesh();
 
     // Use surface mesh for collision
-    prismObj->setCollidingGeometry(surfMesh);
+    auto prismCollider = std::make_shared<Collider>();
+    prismCollider->setGeometry(surfMesh);
+    prismObj->addComponent(prismCollider);
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
@@ -744,9 +751,11 @@ BM_PbdContactDistanceDihedral(benchmark::State& state)
     capsule->setOrientation(Quatd(0.707, 0.0, 0.0, 0.707));
 
     // Set up collision
-    std::shared_ptr<CollidingObject> collisionObj = std::make_shared<CollidingObject>("CollidingObject");
-    collisionObj->setCollidingGeometry(capsule);
+    auto collider = std::make_shared<Collider>();
+    collider->setGeometry(capsule);
+    auto collisionObj = std::make_shared<SceneObject>("CollidingObject");
     collisionObj->setVisualGeometry(capsule);
+    collisionObj->addComponent(collider);
     scene->addSceneObject(collisionObj);
 
     std::shared_ptr<PbdObjectCollision> pbdInteraction =
@@ -804,7 +813,9 @@ BM_PbdFemContact(benchmark::State& state)
     std::shared_ptr<SurfaceMesh> surfMesh = prismMesh->extractSurfaceMesh();
 
     // Use surface mesh for collision
-    prismObj->setCollidingGeometry(surfMesh);
+    auto prismCollider = std::make_shared<Collider>();
+    prismCollider->setGeometry(surfMesh);
+    prismObj->addComponent(prismCollider);
 
     // Force deformation to match between the surface and volume mesh
     prismObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(prismMesh, surfMesh));
@@ -812,9 +823,9 @@ BM_PbdFemContact(benchmark::State& state)
     // Setup the Parameters
     auto pbdParams = std::make_shared<PbdModelConfig>();
     // Use FEMTet constraints
-    pbdParams->m_femParams->m_YoungModulus = 5.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.4;
-    pbdParams->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+    pbdParams->m_secParams->m_YoungModulus = 5.0;
+    pbdParams->m_secParams->m_PoissonRatio = 0.4;
+    pbdParams->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = dt;
@@ -852,8 +863,10 @@ BM_PbdFemContact(benchmark::State& state)
     capsule->setOrientation(Quatd(0.707, 0.0, 0.0, 0.707));
 
     // Set up collision
-    std::shared_ptr<CollidingObject> collisionObj = std::make_shared<CollidingObject>("CollidingObject");
-    collisionObj->setCollidingGeometry(capsule);
+    auto collider = std::make_shared<Collider>();
+    collider->setGeometry(capsule);
+    auto collisionObj = std::make_shared<SceneObject>("CollidingObject");
+    collisionObj->addComponent(collider);
     collisionObj->setVisualGeometry(capsule);
     scene->addSceneObject(collisionObj);
 

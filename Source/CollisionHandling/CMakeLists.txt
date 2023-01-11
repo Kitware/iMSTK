@@ -9,7 +9,6 @@ imstk_add_library( CollisionHandling
     imstkCollisionHandling.h
     imstkLevelSetCH.h
     imstkPbdCollisionHandling.h
-    imstkPenaltyCH.h
     imstkRigidBodyCH.h
     imstkSphCollisionHandling.h
   CPP_FILES
@@ -17,7 +16,6 @@ imstk_add_library( CollisionHandling
     imstkCollisionHandling.cpp
     imstkLevelSetCH.cpp
     imstkPbdCollisionHandling.cpp
-    imstkPenaltyCH.cpp
     imstkRigidBodyCH.cpp
     imstkSphCollisionHandling.cpp
   DEPENDS

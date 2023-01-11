@@ -31,7 +31,7 @@ createSoftBodyScene(std::string sceneName)
     scene->getActiveCamera()->setPosition(0.0, 2.0, 15.0);
 
     // Load a sample mesh
-    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.vtu");
 
     // Extract the surface mesh
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
@@ -41,9 +41,9 @@ createSoftBodyScene(std::string sceneName)
 
     // Configure model
     auto pbdConfig = std::make_shared<PbdModelConfig>();
-    pbdConfig->m_femParams->m_YoungModulus = 1000000.0;
-    pbdConfig->m_femParams->m_PoissonRatio = 0.3;
-    pbdConfig->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
+    pbdConfig->m_secParams->m_YoungModulus = 1000000.0;
+    pbdConfig->m_secParams->m_PoissonRatio = 0.3;
+    pbdConfig->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_iterations = 5;
     pbdConfig->m_dt = 0.03;

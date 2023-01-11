@@ -59,7 +59,6 @@ nav:
         - Rigid Body Dynamics (RBD): 'Dynamical_Models/RigidBodyModel2.md'
         - Level Set Model (LSM): 'Dynamical_Models/LevelSetModel.md'
         - Smooth Particle Hydrodynamics (SPH): 'Dynamical_Models/SphModel.md'
-        - Finite Element Method (FEM): 'Dynamical_Models/FeDeformableModel.md'
     - Collision:
         - Collision: 'Collision.md'
         - Collision Detection: 'Collision/Collision_Detection.md'

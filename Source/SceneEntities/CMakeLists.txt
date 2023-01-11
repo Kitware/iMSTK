@@ -24,7 +24,6 @@ set(H_FILES
   Objects/imstkCollisionDataDebugModel.h
   Objects/imstkDebugGeometryModel.h
   Objects/imstkDynamicObject.h
-  Objects/imstkFeDeformableObject.h
   Objects/imstkLevelSetDeformableObject.h
   Objects/imstkPbdConnectiveTissueConstraintGenerator.h
   Objects/imstkPbdObject.h
@@ -50,7 +49,6 @@ set(SRC_FILES
   Objects/imstkCollisionDataDebugModel.cpp
   Objects/imstkDebugGeometryModel.cpp
   Objects/imstkDynamicObject.cpp
-  Objects/imstkFeDeformableObject.cpp
   Objects/imstkLevelSetDeformableObject.cpp
   Objects/imstkPbdConnectiveTissueConstraintGenerator.cpp
   Objects/imstkPbdObject.cpp

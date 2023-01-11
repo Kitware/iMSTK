@@ -86,7 +86,7 @@ public class PbdVolume
         pbdParams.m_femParams.m_YoungModulus = 500.0;
         pbdParams.m_femParams.m_PoissonRatio = 0.3;
        
-        pbdParams.enableFemConstraint(PbdFemConstraint.MaterialType.StVK);
+        pbdParams.enableStrainEnergyConstraint(PbdFemConstraint.MaterialType.StVK);
 
         // Other parameters
         pbdParams.m_gravity    = new Vec3d(0, -9.8, 0);

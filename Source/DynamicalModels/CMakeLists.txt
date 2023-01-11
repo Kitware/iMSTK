@@ -9,25 +9,11 @@ list(APPEND Dependencies
   Geometry
   Solvers
   MeshIO
-  VegaFEM::massSpringSystem
-  VegaFEM::corotationalLinearFEM
-  VegaFEM::isotropicHyperelasticFEM
-  VegaFEM::forceModel
-  VegaFEM::stvk
-  VegaFEM::graph
-  VegaFEM::volumetricMesh
   )
 
 set(H_FILES
-  InternalForceModel/imstkCorotationalFemForceModel.h
-  InternalForceModel/imstkInternalForceModel.h
-  InternalForceModel/imstkInternalForceModelTypes.h
-  InternalForceModel/imstkIsotropicHyperelasticFeForceModel.h
-  InternalForceModel/imstkLinearFemForceModel.h
-  InternalForceModel/imstkStVKForceModel.h
   ObjectModels/imstkAbstractDynamicalModel.h
   ObjectModels/imstkDynamicalModel.h
-  ObjectModels/imstkFemDeformableBodyModel.h
   ObjectModels/imstkLevelSetModel.h
   ObjectModels/imstkPbdConstraintFunctor.h
   ObjectModels/imstkPbdModel.h
@@ -45,13 +31,7 @@ set(H_FILES
   )
 
 set(SRC_FILES
-  InternalForceModel/imstkCorotationalFemForceModel.cpp
-  InternalForceModel/imstkInternalForceModel.cpp
-  InternalForceModel/imstkIsotropicHyperelasticFeForceModel.cpp
-  InternalForceModel/imstkLinearFemForceModel.cpp
-  InternalForceModel/imstkStVKForceModel.cpp
   ObjectModels/imstkAbstractDynamicalModel.cpp
-  ObjectModels/imstkFemDeformableBodyModel.cpp
   ObjectModels/imstkLevelSetModel.cpp
   ObjectModels/imstkPbdModel.cpp
   ObjectModels/imstkPbdModelConfig.cpp
@@ -62,17 +42,6 @@ set(SRC_FILES
   ObjectStates/imstkVectorizedState.cpp
   TimeIntegrators/imstkBackwardEuler.cpp
   )
-
-# If using model reduction link to these libs
-if (iMSTK_USE_MODEL_REDUCTION)
-  list(APPEND Dependencies
-    VegaFEM::reducedStvk  
-    VegaFEM::reducedElasticForceModel
-    )
-
-  list(APPEND H_FILES ObjectModels/imstkReducedStVKBodyModel.h)
-  list(APPEND SRC_FILES ObjectModels/imstkReducedStVKBodyModel.cpp)
-endif()
 
 include(imstkAddLibrary)
 imstk_add_library(DynamicalModels

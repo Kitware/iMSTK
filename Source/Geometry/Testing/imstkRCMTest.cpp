@@ -233,7 +233,7 @@ TEST(imstkRCMTest, TestRCM)
 
     // 3D mesh
     {
-        auto         tetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+        auto         tetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.vtu");
         const size_t numVerts = tetMesh->getNumVertices();
         //std::cout << "Number of vertices = " << numVerts << std::endl;
         testRCM(*tetMesh->getCells(), numVerts);

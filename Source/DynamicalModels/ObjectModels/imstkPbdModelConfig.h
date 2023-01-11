@@ -7,7 +7,7 @@
 #pragma once
 
 #include "imstkPbdCollisionConstraint.h"
-#include "imstkPbdFemConstraint.h"
+#include "imstkPbdStrainEnergyConstraint.h"
 #include "imstkPbdConstraintFunctor.h"
 
 #include <unordered_map>
@@ -33,7 +33,7 @@ public:
     {
         Custom,
         Distance,
-        FemTet,
+        SecTet,
         Volume,
         Area,
         Bend,
@@ -74,14 +74,14 @@ public:
                                          const double particleRadius, const double restDensity = 6378.0, const int bodyId = 2);
 
     ///
-    /// \brief Enable a Fem constraint with the material provided
-    /// \param material FEM model type
+    /// \brief Enable a strain energy constraint with the material provided
+    /// \param material strain energy model type
     /// \param bodyId Body to add the constraint throughout, -1 applies to all bodies
     ///
-    void enableFemConstraint(PbdFemConstraint::MaterialType material, const int bodyId = 2);
+    void enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType material, const int bodyId = 2);
 
     ///
-    /// \brief If lame parameters (mu+lambda) are given in femParams, then youngs modulus and poissons ratio are computed
+    /// \brief If lame parameters (mu+lambda) are given in SecParams, then youngs modulus and poissons ratio are computed
     /// Conversly if youngs and poissons are given, lame parameters are computed
     ///
     void computeElasticConstants();
@@ -133,8 +133,8 @@ public:
 
     Vec3d m_gravity = Vec3d(0.0, -9.81, 0.0); ///< Gravity acceleration
 
-    std::shared_ptr<PbdFemConstraintConfig> m_femParams =
-        std::make_shared<PbdFemConstraintConfig>(PbdFemConstraintConfig
+    std::shared_ptr<PbdStrainEnergyConstraintConfig> m_secParams =
+        std::make_shared<PbdStrainEnergyConstraintConfig>(PbdStrainEnergyConstraintConfig
         {
             0.0,                // Lame constant, if constraint type is FEM
             0.0,                // Lame constant, if constraint type is FEM

@@ -79,9 +79,6 @@ endif()
 # TBB
 find_dependency(TBB)
 
-# VegaFEM
-find_dependency( VegaFEM )
-
 # VRPN
 if (iMSTK_USE_VRPN)
   find_dependency( VRPN )

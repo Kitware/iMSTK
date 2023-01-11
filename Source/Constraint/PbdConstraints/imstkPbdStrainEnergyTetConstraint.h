@@ -6,21 +6,21 @@
 
 #pragma once
 
-#include "imstkPbdFemConstraint.h"
+#include "imstkPbdStrainEnergyConstraint.h"
 
 namespace imstk
 {
 ///
-/// \class PbdFemTetConstraint
+/// \class PbdStrainEnergyTetConstraint
 ///
-/// \brief The FEMTetConstraint class class for constraint as the elastic energy
+/// \brief The PbdStrainEnergyTetConstraint is a class for constraint as the elastic energy
 /// computed by linear shape functions with tetrahedral mesh.
 ///
-class PbdFemTetConstraint : public PbdFemConstraint
+class PbdStrainEnergyTetConstraint : public PbdStrainEnergyConstraint
 {
 public:
-    PbdFemTetConstraint(MaterialType mType = MaterialType::StVK) :
-        PbdFemConstraint(4, mType) { }
+    PbdStrainEnergyTetConstraint(MaterialType mType = MaterialType::StVK) :
+        PbdStrainEnergyConstraint(4, mType) { }
 
     ///
     /// \brief Initialize the constraint
@@ -29,7 +29,7 @@ public:
         const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
         const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
         const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
-        std::shared_ptr<PbdFemConstraintConfig> config);
+        std::shared_ptr<PbdStrainEnergyConstraintConfig> config);
 
     ///
     /// \brief Compute value and gradient of constraint function

@@ -62,7 +62,7 @@ public class PbdCloth
             Console.WriteLine("conn[0] = [{0}, {1}, {2}, {3}]", new_conn_tet[0], new_conn_tet[1], new_conn_tet[2], new_conn_tet[3]);
         }
 
-        PointSet asianDragonMesh = MeshIO.read("/home/jianfeng/Documents/imstk/build_csharp_shared/install/data/asianDragon/asianDragon.veg");
+        PointSet asianDragonMesh = MeshIO.read("/home/jianfeng/Documents/imstk/build_csharp_shared/install/data/asianDragon/asianDragon.vtu");
         // asianDragonMesh.print();
         Console.WriteLine("asianDragon.getVolume() = {0}", asianDragonMesh.getVolume());
         Console.WriteLine("asianDragon.getNumVertices() = {0}", asianDragonMesh.getNumVertices());
