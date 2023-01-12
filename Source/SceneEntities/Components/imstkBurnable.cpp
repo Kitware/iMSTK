@@ -56,7 +56,7 @@ void
 Burnable::visualUpdate(const double& dt)
 {
     // Check that the cellConstraintMap exists, if not make it
-    if (m_burnableObject->getPbdBody()->m_cellConstraintMap.empty())
+    if (m_burnableObject->getPbdBody()->cellConstraintMap.empty())
     {
         m_burnableObject->computeCellConstraintMap();
     }
@@ -82,7 +82,7 @@ Burnable::visualUpdate(const double& dt)
             {
                 lock.lock();
                 m_cellRemover->removeCellOnApply(cellId);
-                pbdBody->m_cellConstraintMap.erase(cellId);
+                pbdBody->cellConstraintMap.erase(cellId);
                 burnState[cellId] = 0.0;
                 lock.unlock();
             }

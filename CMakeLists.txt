@@ -74,9 +74,6 @@ endif()
 if (WIN32)
   option(${PROJECT_NAME}_BUILD_FOR_UNITY "Build iMSTK libraries for the unity asset" OFF)
   mark_as_superbuild(${PROJECT_NAME}_BUILD_FOR_UNITY:BOOL)
-  if (${PROJECT_NAME}_BUILD_FOR_UNITY)
-    set(${PROJECT_NAME}_ENABLE_AUDIO OFF)
-  endif()
 endif()
 
 # SWIG 
@@ -116,23 +113,6 @@ endif()
 #     set(${PROJECT_NAME}_ENABLE_CUDA_BACKEND OFF)
 #   endif()
 # endif ()
-
-# Audio
-if(WIN32)
-  if(DEFINED ${PROJECT_NAME}_ENABLE_AUDIO)
-    set(_enable_audio ${${PROJECT_NAME}_ENABLE_AUDIO})
-    set(_reason "${PROJECT_NAME}_ENABLE_AUDIO is SET")
-  else()
-    set(_enable_audio ON)
-    set(_reason "default initialization")
-  endif()
-else()
-  set(_enable_audio OFF)
-  set(_reason "not supported")
-endif()
-set(_msg "${PROJECT_NAME} Audio support")
-message(STATUS "${_msg} - ${_enable_audio} (${_reason})")
-set(${PROJECT_NAME}_AUDIO_ENABLED ${_enable_audio})
 
 # General Options
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build iMSTK examples" ON)
@@ -265,10 +245,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(Haply)
   endif()
 
-  if(WIN32 AND ${PROJECT_NAME}_AUDIO_ENABLED)
-    imstk_define_dependency(SFML)
-  endif()
-
   if(${PROJECT_NAME}_BUILD_TESTING)
     imstk_define_dependency(GTest)
 
@@ -338,14 +314,6 @@ endif()
 if (${PROJECT_NAME}_USE_RENDERING_VTK)
   # OpenVR
   find_package( OpenVR REQUIRED )
-endif()
-
-# SFML
-if(NOT iMSTK_AUDIO_ENABLED)
-  remove_definitions( -DiMSTK_AUDIO_ENABLED )
-else()
-  find_package( SFML REQUIRED )
-  add_definitions( -DiMSTK_AUDIO_ENABLED )
 endif()
 
 # TBB

@@ -27,7 +27,6 @@ if (iMSTK_SWIG_PINNED_ARRAY)
     target_compile_options(iMSTKSharp PRIVATE "/unsafe")
 endif()
 
-set_property(TARGET iMSTKSharp PROPERTY VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.1")
 set_property(TARGET iMSTKSharp PROPERTY VS_DOTNET_REFERENCES "System")
 
 install(TARGETS iMSTKSharp EXPORT iMSTKSharpTargets

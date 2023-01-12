@@ -2,7 +2,6 @@
 function(add_example example_name sources)
   set(target "Example-${example_name}-CSharp")
   add_executable(${target} ${sources})
-  set_property(TARGET ${target} PROPERTY VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.1")
   set_property(TARGET ${target} PROPERTY VS_DOTNET_REFERENCES "System;iMSTKSharp")
   set_property(TARGET ${target} PROPERTY FOLDER Examples/CSharp)
 
@@ -25,7 +24,6 @@ function(add_example example_name sources)
 endfunction()
 
 if (iMSTK_USE_RENDERING_VTK)
-  add_example(FemDeformable femDeformable.cs)
   add_example(PBDCloth pbdCloth.cs)
   add_example(PBDClothCollision pbdClothCollision.cs)
   add_example(PBDCollisionOneObject pbdCollisionOneObject.cs)

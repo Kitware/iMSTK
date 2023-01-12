@@ -201,22 +201,22 @@ PbdObject::setDeformBodyFromGeometry(PbdBody& body, std::shared_ptr<PointSet> ge
         }
 
         // Initialize orientations
+        // Expects Orientation Data to be Quaternions in wxyz order,
+        // initialize with Identity otherwise
         {
-            std::shared_ptr<AbstractDataArray> orientations = geom->getVertexAttribute("Orientations");
-            if (orientations != nullptr && orientations->getNumberOfComponents() == 4 && orientations->getScalarType() == IMSTK_DOUBLE
-                && std::dynamic_pointer_cast<VecDataArray<double, 3>>(orientations)->size() == numParticles)
+            auto orientations = std::dynamic_pointer_cast<VecDataArray<double, 4>>(geom->getVertexAttribute("Orientations"));
+            if (orientations != nullptr && orientations->size() == numParticles)
             {
-                auto vec = std::dynamic_pointer_cast<VecDataArray<double, 4>>(orientations);
                 body.orientations = std::make_shared<StdVectorOfQuatd>(numParticles);
                 for (int i = 0; i < orientations->size(); i++)
                 {
-                    (*body.orientations)[i] = Quatd((*vec)[i][3], (*vec)[i][1], (*vec)[i][2], (*vec)[i][0]);
+                    (*body.orientations)[i] = Quatd((*orientations)[i][0], (*orientations)[i][1],
+                        (*orientations)[i][2], (*orientations)[i][3]);
                 }
             }
             else
             {
-                body.orientations = std::make_shared<StdVectorOfQuatd>(numParticles);
-                std::fill(body.orientations->begin(), body.orientations->end(), Quatd::Identity());
+                body.orientations = std::make_shared<StdVectorOfQuatd>(numParticles, Quatd::Identity());
             }
         }
         body.prevOrientations = std::make_shared<StdVectorOfQuatd>(*body.orientations);
@@ -297,9 +297,9 @@ PbdObject::computeCellConstraintMap()
                                         << "\" requires physics geometry to compute CellConstraint map";
 
     // If the map already exists, clear it and recalculate
-    if (m_pbdBody->m_cellConstraintMap.empty() == false)
+    if (m_pbdBody->cellConstraintMap.empty() == false)
     {
-        m_pbdBody->m_cellConstraintMap.clear();
+        m_pbdBody->cellConstraintMap.clear();
         LOG(INFO) << "PbdObject \"" << m_name
                   << "\" already has a CellConstraintMap. Cleared and recalculated \n";
     }
@@ -324,7 +324,7 @@ PbdObject::computeCellConstraintMap()
     for (int cellId = 0; cellId < cellMesh->getNumCells(); cellId++)
     {
         // Get all the vertex ids for this cell
-        cellVertIds.clear();
+        // The whole range gets overwritten for each iteration
         for (int vertId = 0; vertId < vertsPerCell; vertId++)
         {
             cellVertIds[vertId] = (*cellVerts)[cellId * vertsPerCell + vertId];
@@ -360,9 +360,9 @@ PbdObject::computeCellConstraintMap()
                 {
                     // Make sure constraint has not already been added
                     bool exists = false;
-                    for (int j = 0; j < m_pbdBody->m_cellConstraintMap[cellId].size(); j++)
+                    for (int j = 0; j < m_pbdBody->cellConstraintMap[cellId].size(); j++)
                     {
-                        if (constraint == m_pbdBody->m_cellConstraintMap[cellId][j])
+                        if (constraint == m_pbdBody->cellConstraintMap[cellId][j])
                         {
                             exists = true;
                         }
@@ -370,7 +370,7 @@ PbdObject::computeCellConstraintMap()
                     if (exists == false)
                     {
                         std::shared_ptr<PbdConstraint> cpy = constraint;
-                        m_pbdBody->m_cellConstraintMap[cellId].push_back(std::move(cpy));
+                        m_pbdBody->cellConstraintMap[cellId].push_back(std::move(cpy));
                     }
                 }
             }

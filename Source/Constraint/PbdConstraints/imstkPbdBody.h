@@ -193,7 +193,7 @@ struct PbdBody
 
         /// Map for storing the constraints associated with a given cell
         /// useful for speeding up cell removal based on cell state
-        std::unordered_map<int, std::vector<std::shared_ptr<PbdConstraint>>> m_cellConstraintMap;
+        std::unordered_map<int, std::vector<std::shared_ptr<PbdConstraint>>> cellConstraintMap;
 };
 
 ///

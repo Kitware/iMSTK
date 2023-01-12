@@ -83,5 +83,10 @@ public:
 
 protected:
     std::shared_ptr<TaskNode> m_updatePrevGeometryCCDNode = nullptr;
+
+private:
+    /// Called from the constructor
+    void setupConnections(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2,
+                          std::string cdType = "");
 };
 } // namespace imstk

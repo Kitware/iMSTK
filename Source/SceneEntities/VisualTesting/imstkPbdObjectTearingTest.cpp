@@ -204,7 +204,7 @@ public:
             {
                 if (m_scene->getSceneTime() >= 0.5)
                 {
-                    ASSERT_EQ(false, m_pbdObj->getPbdBody()->m_cellConstraintMap.empty());
+                    ASSERT_EQ(false, m_pbdObj->getPbdBody()->cellConstraintMap.empty());
                 }
             });
 
