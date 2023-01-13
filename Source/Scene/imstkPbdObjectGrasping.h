@@ -172,6 +172,11 @@ public:
     ///
     bool hasConstraints() const;
 
+    ///
+    /// \brief Returns true if currently grasping, else false
+    ///
+    bool getGraspState() const { return m_isGrasping; }
+
 protected:
     ///
     /// \brief Update picking state, this should move grasp points

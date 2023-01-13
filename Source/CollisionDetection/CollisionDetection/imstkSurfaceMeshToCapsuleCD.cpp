@@ -93,6 +93,9 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
             const double rSum    = triangleBoundingRadius + sphereRadius;
             if (distSqr <= rSum * rSum)
             {
+                // Create possible contact points
+                // These are set by testSphereToTriangle depending on
+                // what geometry is collided
                 Vec3d triangleContactPt;
                 Vec2i edgeContact;
                 int pointContact;

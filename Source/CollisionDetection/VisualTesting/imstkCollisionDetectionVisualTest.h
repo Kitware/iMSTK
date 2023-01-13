@@ -43,10 +43,10 @@ public:
 public:
     std::shared_ptr<imstk::CollidingObject> m_cdObj2 = nullptr;
     std::shared_ptr<imstk::CollidingObject> m_cdObj1 = nullptr;
+    std::shared_ptr<imstk::CollidingObject> m_cdObj3 = nullptr;
     std::shared_ptr<imstk::Geometry> m_cdGeom1       = nullptr;
     std::shared_ptr<imstk::Geometry> m_cdGeom2       = nullptr;
-
-    std::shared_ptr<imstk::Camera> m_camera = nullptr;
+    std::shared_ptr<imstk::Camera>   m_camera = nullptr;
 
     std::shared_ptr<imstk::CollisionDetectionAlgorithm> m_collisionMethod = nullptr;
     std::shared_ptr<imstk::CollisionDataDebugModel>     m_cdDebugObject   = nullptr;

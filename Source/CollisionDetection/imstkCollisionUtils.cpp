@@ -120,40 +120,10 @@ pointSegmentClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2
 double
 pointTriangleClosestDistance(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, const Vec3d& x3)
 {
-    // first find barycentric coordinates of closest point on infinite plane
-    Vec3d  x13(x1 - x3), x23(x2 - x3), xp3(point - x3);
-    double m13 = x13.squaredNorm(), m23 = x23.squaredNorm(), d = x13.dot(x23);
+    int         unusedType;
+    const Vec3d closestPtOnTri = closestPointOnTriangle(point, x1, x2, x3, unusedType);
 
-    double invdet = 1.0 / std::max(m13 * m23 - d * d, 1e-30);
-    double a = x13.dot(xp3), b = x23.dot(xp3);
-
-    // Barycentric coordinates
-    double w23 = invdet * (m23 * a - d * b);
-    double w31 = invdet * (m13 * b - d * a);
-    double w12 = 1.0 - w23 - w31;
-
-    if (w23 >= 0 && w31 >= 0 && w12 >= 0)  // inside the triangle
-    {
-        return (point - (w23 * x1 + w31 * x2 + w12 * x3)).eval().norm();
-    }
-    else
-    {
-        if (w23 > 0)       //this rules out edge 2-3
-        {
-            return std::min(pointSegmentClosestDistance(point, x1, x2),
-                            pointSegmentClosestDistance(point, x1, x3));
-        }
-        else if (w31 > 0)  //this rules out edge 1-3
-        {
-            return std::min(pointSegmentClosestDistance(point, x1, x2),
-                            pointSegmentClosestDistance(point, x2, x3));
-        }
-        else               //w12 must be >0, ruling out edge 1-2
-        {
-            return std::min(pointSegmentClosestDistance(point, x1, x3),
-                            pointSegmentClosestDistance(point, x2, x3));
-        }
-    }
+    return (point - closestPtOnTri).norm();
 }
 
 Vec3d
@@ -190,34 +160,29 @@ closestPointOnSegment(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, int&
 Vec3d
 closestPointOnTriangle(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c, int& caseType)
 {
+    // Assumes counterclockwise indexed triangle ABC
+
     const Vec3d ab = b - a;
     const Vec3d ac = c - a;
     const Vec3d ap = p - a;
 
     const double d1 = ab.dot(ap);
     const double d2 = ac.dot(ap);
+    caseType = -1;
+
+    // Check if closest point on triangle is point A
     if (d1 <= 0.0 && d2 <= 0.0)
     {
         caseType = 0;
-        return a; // barycentric coordinates (1,0,0)
     }
 
-    // Check if P in vertex region outside B
+    // Check if P in region outside B, so B is closest point
     const Vec3d  bp = p - b;
     const double d3 = ab.dot(bp);
     const double d4 = ac.dot(bp);
     if (d3 >= 0.0 && d4 <= d3)
     {
         caseType = 1;
-        return b; // barycentric coordinates (0,1,0)
-    }
-    // Check if P in edge region of AB, if so return projection of P onto AB
-    const double vc = d1 * d4 - d3 * d2;
-    if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0)
-    {
-        caseType = 3;
-        double v = d1 / (d1 - d3);
-        return a + v * ab; // barycentric coordinates (1-v,v,0)
     }
 
     // Check if P in vertex region outside C
@@ -227,33 +192,62 @@ closestPointOnTriangle(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec
     if (d6 >= 0.0 && d5 <= d6)
     {
         caseType = 2;
-        return c; // barycentric coordinates (0,0,1)
     }
 
-    // Check if P in edge region of AC, if so return projection of P onto AC
-    const double vb = d5 * d2 - d1 * d6;
-    if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0)
+    // Check if P in edge region of AB, if so return projection of P onto AB
+    const double vc = d1 * d4 - d3 * d2;
+    // if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0)
+    if (vc <= 0.0 && d1 > 0.0 && d3 < 0.0)
     {
-        caseType = 5;
-        double w = d2 / (d2 - d6);
-        return a + w * ac; // barycentric coordinates (1-w,0,w)
+        caseType = 3;
     }
 
     // Check if P in edge region of BC, if so return projection of P onto BC
     const double va = d3 * d6 - d5 * d4;
-    if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0)
+    if (va <= 0.0 && (d4 - d3) > 0.0 && (d5 - d6) > 0.0)
     {
         caseType = 4;
-        double w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-        return b + w * (c - b); // barycentric coordinates (0,1-w,w)
     }
 
-    // P inside face region. Compute Q through its barycentric coordinates (u,v,w)
-    const double denom = 1.0 / (va + vb + vc);
-    const double v     = vb * denom;
-    const double w     = vc * denom;
-    caseType = 6;
-    return a + ab * v + ac * w; // = u*a + v*b + w*c, u = va * denom = 1.0f-v-w
+    // Check if P in edge region of AC, if so return projection of P onto AC
+    const double vb = d5 * d2 - d1 * d6;
+    if (vb <= 0.0 && d2 > 0.0 && d6 < 0.0)
+    {
+        caseType = 5;
+    }
+
+    // If neartest point is not a point or edge, then it must be inside of the face
+    if (caseType == -1)
+    {
+        caseType = 6;
+    }
+
+    // Variables for switch
+    double v, w, denom;
+
+    switch (caseType)
+    {
+    case 0: // Neartest point it A
+        return a;
+    case 1: // Neartest point it B
+        return b;
+    case 2: // Neartest point it C
+        return c;
+    case 3: // Neartest point on edge AB
+        v = d1 / (d1 - d3);
+        return a + v * ab;
+    case 4:                     // Neartest point on edge BC
+        w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+        return b + w * (c - b); // barycentric coordinates (0,1-w,w)
+    case 5:                     // Neartest point on edge AC
+        w = d2 / (d2 - d6);
+        return a + w * ac;      // barycentric coordinates (1-w,0,w)
+    case 6:                     // Neartest point on face
+        denom = 1.0 / (va + vb + vc);
+        v     = vb * denom;
+        w     = vc * denom;
+        return a + ab * v + ac * w; // = u*a + v*b + w*c, u = va * denom = 1.0f-v-w
+    }
 }
 
 int

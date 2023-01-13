@@ -27,13 +27,10 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj) :
         m_obj->getPbdBody()->fixedNodeIds[fixedId]++;
     }
 
-    // Fix dummy vertex
-    pbdObj->getPbdBody()->fixedNodeIds.push_back(0);
-
     // Reinitialize to account for new dummy vertex
     pbdObj->initialize();
 
-    // Note: maps no longer valid after this point
+    // Note: maps on the pbdObject are no longer valid after this point
 }
 
 void
