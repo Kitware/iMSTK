@@ -113,7 +113,7 @@ CollisionDetectionVisualTest::moveGeometryByKey(const unsigned char       key,
                                                 std::shared_ptr<Geometry> geom)
 {
     const Mat4d  initTransform = geom->getTransform();
-    const double s = 0.05;
+    const double s = 0.03;
     if (key == 'i')
     {
         geom->translate(Vec3d(0.0, 0.0, 1.0) * s);

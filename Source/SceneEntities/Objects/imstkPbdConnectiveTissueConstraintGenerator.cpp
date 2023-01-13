@@ -208,7 +208,7 @@ addConnectiveTissueConstraints(
     connectiveStrands->setCollidingGeometry(connectiveLineMesh);
     connectiveStrands->setDynamicalModel(model);
 
-    double mass = 1.0;
+    double mass = 0.01;
     connectiveStrands->getPbdBody()->uniformMassValue = mass / connectiveLineMesh->getNumVertices();
 
     // Setup constraints between the gallblader and ligaments
