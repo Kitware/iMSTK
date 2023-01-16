@@ -41,5 +41,7 @@ protected:
     std::weak_ptr<Viewer>       m_viewer;
     std::weak_ptr<SceneManager> m_sceneManager;
     int m_prevInfoLevel = -1;
+    double m_lastUpdate = 0.0;
+    double m_fpsUpdateDelay = 0.5;
 };
 } // namespace imstk
