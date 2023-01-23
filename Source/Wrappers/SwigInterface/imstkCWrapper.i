@@ -85,18 +85,13 @@
  * DynamicalModel 
  */
 #include "imstkPbdConstraint.h"
-#include "imstkVectorizedState.h"
 #include "imstkAbstractDynamicalModel.h"
 #include "imstkDynamicalModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdModel.h"
-#include "imstkTimeIntegrator.h"
-#include "imstkBackwardEuler.h"
 #include "imstkPbdStrainEnergyConstraint.h"
 #include "imstkPbdCollisionConstraint.h"
 #include "imstkSphBoundaryConditions.h"
-#include "imstkRigidBodyState2.h"
-#include "imstkRigidBodyModel2.h"
 #include "imstkSphState.h"
 #include "imstkSphModel.h"
 
@@ -135,7 +130,6 @@
 #include "imstkCamera.h"
 #include "imstkLight.h"
 #include "imstkDirectionalLight.h"
-#include "imstkRigidObject2.h"
 #include "imstkSphObject.h"
 
 /*
@@ -169,7 +163,6 @@
  * CollisionHandling
  */
 #include "imstkCollisionHandling.h"
-#include "imstkRigidBodyCH.h"
 
 /*
  * Controller
@@ -179,7 +172,6 @@
 #include "imstkKeyboardControl.h"
 #include "imstkTrackingDeviceControl.h"
 #include "imstkSceneObjectController.h"
-#include "imstkRigidObjectController.h"
 #include "imstkPbdObjectController.h"
 
 /*
@@ -196,12 +188,9 @@
  */
 #include "imstkScene.h"
 #include "imstkCollisionInteraction.h"
-#include "imstkRigidObjectCollision.h"
 #include "imstkPbdObjectCutting.h"
 #include "imstkPbdObjectGrasping.h"
 #include "imstkPbdObjectCollision.h"
-#include "imstkPbdRigidObjectCollision.h"
-#include "imstkPbdRigidObjectGrasping.h"
 #include "imstkSphObjectCollision.h"
 
 /*
@@ -372,23 +361,16 @@ namespace std
 %include "../../Constraint/PbdConstraints/imstkPbdConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdStrainEnergyConstraint.h"
-%include "../../Constraint/RigidBodyConstraints/imstkRbdConstraint.h"
 
 /*
  * DynamicalModel
  */
-%include "../../DynamicalModels/ObjectStates/imstkVectorizedState.h"
 %include "../../DynamicalModels/ObjectModels/imstkAbstractDynamicalModel.h"
 %include "../../DynamicalModels/ObjectModels/imstkDynamicalModel.h"
 %include "../../DynamicalModels/ObjectModels/imstkPbdModelConfig.h"
 %include "../../DynamicalModels/ObjectModels/imstkPbdModel.h"
-%template(DynamicalModelFeDeformBodyState) imstk::DynamicalModel<imstk::FeDeformBodyState>;
+// %template(DynamicalModelFeDeformBodyState) imstk::DynamicalModel<imstk::FeDeformBodyState>;
 %include "../../DynamicalModels/ObjectModels/imstkSphBoundaryConditions.h"
-%include "../../DynamicalModels/TimeIntegrators/imstkTimeIntegrator.h"
-%include "../../DynamicalModels/TimeIntegrators/imstkBackwardEuler.h"
-%include "../../DynamicalModels/ObjectStates/imstkRigidBodyState2.h"
-%template(DynamicalModelRigidBodyState2) imstk::DynamicalModel<imstk::RigidBodyState2>;
-%include "../../DynamicalModels/ObjectModels/imstkRigidBodyModel2.h"
 %include "../../DynamicalModels/ObjectStates/imstkSphState.h"
 %template(DynamicalModelSphState) imstk::DynamicalModel<imstk::SphState>;
 %include "../../DynamicalModels/ObjectModels/imstkSphModel.h"
@@ -419,7 +401,6 @@ namespace std
 %include "../../SceneEntities/Objects/imstkPbdConnectiveTissueConstraintGenerator.h";
 %include "../../SceneEntities/Objects/imstkPbdObject.h";
 %include "../../SceneEntities/Objects/imstkPbdObjectCellRemoval.h";
-%include "../../SceneEntities/Objects/imstkRigidObject2.h";
 %include "../../SceneEntities/Objects/imstkSphObject.h";
 %include "../../SceneEntities/Camera/imstkCamera.h";
 %include "../../SceneEntities/Lights/imstkLight.h";
@@ -461,7 +442,6 @@ namespace std
  * CollisionHandling
  */ 
 %include "../../CollisionHandling/imstkCollisionHandling.h";
-%include "../../CollisionHandling/imstkRigidBodyCH.h";
 
 /* 
  * Controllers
@@ -471,7 +451,6 @@ namespace std
 %include "../../Controllers/imstkKeyboardControl.h"
 %include "../../Controllers/imstkTrackingDeviceControl.h"
 %include "../../Controllers/imstkSceneObjectController.h"
-%include "../../Controllers/imstkRigidObjectController.h"
 %include "../../Controllers/imstkPbdObjectController.h"
 
 /*
@@ -488,12 +467,9 @@ namespace std
  */
 %include "../../Scene/imstkScene.h";
 %include "../../Scene/imstkCollisionInteraction.h"
-%include "../../Scene/imstkRigidObjectCollision.h"
 %include "../../Scene/imstkPbdObjectCutting.h"
 %include "../../Scene/imstkPbdObjectGrasping.h"
 %include "../../Scene/imstkPbdObjectCollision.h"
-%include "../../Scene/imstkPbdRigidObjectCollision.h"
-%include "../../Scene/imstkPbdRigidObjectGrasping.h"
 %include "../../Scene/imstkSphObjectCollision.h"
 
 /*
