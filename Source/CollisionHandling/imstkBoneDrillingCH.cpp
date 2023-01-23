@@ -8,22 +8,22 @@
 #include "imstkCollisionData.h"
 #include "imstkCollider.h"
 #include "imstkParallelFor.h"
+#include "imstkPbdObject.h"
 #include "imstkRbdConstraint.h"
-#include "imstkRigidObject2.h"
 #include "imstkTetrahedralMesh.h"
 
 namespace imstk
 {
 void
-BoneDrillingCH::setInputObjectDrill(std::shared_ptr<RigidObject2> drillObject)
+BoneDrillingCH::setInputObjectDrill(std::shared_ptr<PbdObject> drillObject)
 {
     setInputObjectB(drillObject);
 }
 
-std::shared_ptr<RigidObject2>
+std::shared_ptr<PbdObject>
 BoneDrillingCH::getDrillObj() const
 {
-    return std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
+    return std::dynamic_pointer_cast<PbdObject>(getInputObjectB());
 }
 
 void
@@ -90,7 +90,7 @@ BoneDrillingCH::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<RigidObject2> drill = getDrillObj();
+    std::shared_ptr<PbdObject> drill = getDrillObj();
 
     // Cache the tet mesh geometry pointer of the boneObj on the first call,
     // re-use the cached pointer in later iterations.
@@ -212,7 +212,7 @@ BoneDrillingCH::handle(
     force += m_initialStep ? Vec3d(0.0, 0.0, 0.0) : m_damping * (devicePosition - m_prevPos) / dt;
 
     // Set external force on body
-    (*drill->getRigidBody()->m_force) = force;
+    drill->getPbdBody()->externalForce = force;
 
     // Decrease the density at the nodal points and remove if the density goes below 0
     this->erodeBone(m_boneMesh, elementsA, elementsB);

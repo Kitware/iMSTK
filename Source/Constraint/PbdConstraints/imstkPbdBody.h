@@ -148,18 +148,65 @@ struct PbdBody
             * angularVelocities = { angularVelocity };
         }
 
-        Vec3d getRigidPosition()
+        Vec3d getRigidVelocity()
         {
             CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            CHECK(velocities->size() == 1) << "Rigid velocity is not set.";
+            return velocities->at(0);
+        }
+
+        Vec3d getRigidAngularVelocity() const
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            CHECK(angularVelocities->size() == 1) << "Rigid angularVelocity is not set.";
+            return angularVelocities->at(0);
+        }
+
+        const Mat3d& getRigidInertia() const
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            CHECK(inertias->size() == 1) << "Rigid inertia is not set.";
+            return inertias->at(0);
+        }
+
+        double getRigidMass() const
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            return uniformMassValue;
+        }
+
+        Vec3d getRigidPosition() const
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            CHECK(vertices->size() == 1) << "Rigid position is not set.";
             return vertices->at(0);
+        }
+
+        void setRigidPosition(const Vec3d& pos)
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            * vertices = { pos };
         }
 
         Quatd getRigidOrientation()
         {
             CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            CHECK(orientations->size() == 1) << "Rigid orientation is not set.";
             return orientations->at(0);
         }
 
+        void setRigidOrientation(const Quatd& orientation)
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            * orientations = { orientation };
+        }
+
+<<<<<<< Updated upstream
+=======
+        bool isRigid() const { return bodyType == Type::RIGID; }
+        bool isDeformable() const { return bodyType == Type::DEFORMABLE; }
+
+>>>>>>> Stashed changes
         // Struct Data
         int bodyHandle; ///< Id in the system
         Type bodyType = Type::DEFORMABLE;

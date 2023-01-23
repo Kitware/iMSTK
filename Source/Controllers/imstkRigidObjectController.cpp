@@ -8,7 +8,8 @@
 #include "imstkDeviceClient.h"
 #include "imstkLogger.h"
 #include "imstkRbdConstraint.h"
-#include "imstkRigidObject2.h"
+#include "imstkPbdBody.h"
+#include "imstkPbdObject.h"
 
 #include <Eigen/Eigenvalues>
 
@@ -18,9 +19,9 @@ void
 RigidObjectController::setControlledObject(std::shared_ptr<SceneObject> obj)
 {
     SceneObjectController::setControlledObject(obj);
-    m_rigidObject = std::dynamic_pointer_cast<RigidObject2>(obj);
-    CHECK(m_rigidObject != nullptr) <<
-        "RigidObjectController controlled object must be type RigidObject2";
+    m_controlledObject = std::dynamic_pointer_cast<PbdObject>(obj);
+    CHECK(m_controlledObject != nullptr) <<
+        "RigidObjectController controlled object must be type PbdObject";
 }
 
 void
@@ -32,7 +33,7 @@ RigidObjectController::update(const double& dt)
         return;
     }
 
-    if (m_rigidObject == nullptr)
+    if (m_controlledObject == nullptr)
     {
         return;
     }
@@ -41,12 +42,16 @@ RigidObjectController::update(const double& dt)
     // "A Modular Haptic Rendering Algorithm for Stable and Transparent 6 - DOF Manipulation"
     if (m_deviceClient->getTrackingEnabled() && m_useSpring)
     {
-        const Vec3d& currPos = m_rigidObject->getRigidBody()->getPosition();
-        const Quatd& currOrientation     = m_rigidObject->getRigidBody()->getOrientation();
-        const Vec3d& currVelocity        = m_rigidObject->getRigidBody()->getVelocity();
-        const Vec3d& currAngularVelocity = m_rigidObject->getRigidBody()->getAngularVelocity();
-        Vec3d&       currForce  = *m_rigidObject->getRigidBody()->m_force;
-        Vec3d&       currTorque = *m_rigidObject->getRigidBody()->m_torque;
+        const Vec3d& currPos = m_controlledObject->getPbdBody()->getRigidPosition();
+        const Quatd& currOrientation     = m_controlledObject->getPbdBody()->getRigidOrientation();
+        const Vec3d& currVelocity        = m_controlledObject->getPbdBody()->getRigidVelocity();
+        const Vec3d& currAngularVelocity = m_controlledObject->getPbdBody()->getRigidAngularVelocity();
+        /*
+        Vec3d&       currForce  = *m_controlledObject->getPbdBody()->m_force;
+        Vec3d&       currTorque = *m_controlledObject->getPbdBody()->m_torque;
+        */
+        Vec3d& currForce  = m_controlledObject->getPbdBody()->externalForce;
+        Vec3d& currTorque = m_controlledObject->getPbdBody()->externalTorque;
 
         const Vec3d& devicePos = getPosition();
         const Quatd& deviceOrientation = getOrientation();
@@ -55,11 +60,12 @@ RigidObjectController::update(const double& dt)
         // If using critical damping automatically compute kd
         if (m_useCriticalDamping)
         {
-            const double mass     = m_rigidObject->getRigidBody()->getMass();
+            //const double mass     = m_controlledObject->getRigidBody()->getMass();
+            const double mass     = m_controlledObject->getPbdBody()->uniformMassValue;
             const double linearKs = m_linearKs.maxCoeff();
             m_linearKd = 2.0 * std::sqrt(mass * linearKs);
 
-            const Mat3d inertia = m_rigidObject->getRigidBody()->getIntertiaTensor();
+            const Mat3d& inertia = m_controlledObject->getPbdBody()->getRigidInertia();
             // Currently kd is not a 3d vector though it could be.
             // So here we make an approximation. Either:
             //  - Use one colums eigenvalue (maxCoeff)
@@ -116,11 +122,11 @@ RigidObjectController::update(const double& dt)
     else
     {
         // Zero out external force/torque
-        *m_rigidObject->getRigidBody()->m_force  = Vec3d(0.0, 0.0, 0.0);
-        *m_rigidObject->getRigidBody()->m_torque = Vec3d(0.0, 0.0, 0.0);
+        m_controlledObject->getPbdBody()->externalForce  = Vec3d::Zero();
+        m_controlledObject->getPbdBody()->externalTorque = Vec3d::Zero(); // (0.0, 0.0, 0.0);
         // Directly set position/rotation
-        (*m_rigidObject->getRigidBody()->m_pos) = getPosition();
-        (*m_rigidObject->getRigidBody()->m_orientation) = getOrientation();
+        m_controlledObject->getPbdBody()->setRigidPosition(getPosition());
+        m_controlledObject->getPbdBody()->setRigidOrientation(getOrientation());
     }
 
     applyForces();
@@ -133,7 +139,7 @@ RigidObjectController::applyForces()
     if (!m_deviceClient->getButton(0))
     {
         // Apply force back to device
-        if (m_rigidObject != nullptr && m_useSpring)
+        if (m_controlledObject != nullptr && m_useSpring)
         {
             const Vec3d force = -getDeviceForce();
             if (m_forceSmoothening)

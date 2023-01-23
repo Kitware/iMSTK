@@ -10,7 +10,7 @@
 
 namespace imstk
 {
-class RigidObject2;
+class PbdObject;
 
 ///
 /// \class RigidObjectController
@@ -141,7 +141,7 @@ public:
     void applyForces() override;
 
 protected:
-    std::shared_ptr<RigidObject2> m_rigidObject;
+    std::shared_ptr<PbdObject> m_controlledObject;
 
     double m_linearKd  = 10000.0;                                ///< Damping coefficient, linear
     double m_angularKd = 300.0;                                  ///< Damping coefficient, rotational

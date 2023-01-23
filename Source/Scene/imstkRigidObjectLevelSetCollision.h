@@ -12,7 +12,7 @@
 namespace imstk
 {
 class LevelSetDeformableObject;
-class RigidObject2;
+class PbdObject;
 template<typename T, int N> class VecDataArray;
 
 ///
@@ -24,7 +24,7 @@ template<typename T, int N> class VecDataArray;
 class RigidObjectLevelSetCollision : public CollisionInteraction
 {
 public:
-    RigidObjectLevelSetCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2);
+    RigidObjectLevelSetCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<LevelSetDeformableObject> obj2);
     ~RigidObjectLevelSetCollision() override = default;
 
     IMSTK_TYPE_NAME(RigidObjectLevelSetCollision)

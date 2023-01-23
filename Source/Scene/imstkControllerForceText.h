@@ -13,7 +13,6 @@ namespace imstk
 {
 class PbdObjectCollision;
 class PbdObjectController;
-class RigidObjectController;
 class TextVisualModel;
 
 ///
@@ -36,8 +35,6 @@ public:
     /// @{
     void setController(std::shared_ptr<PbdObjectController> controller) { m_pbdController = controller; }
     std::shared_ptr<PbdObjectController> getPbdController() const { return m_pbdController; }
-    void setController(std::shared_ptr<RigidObjectController> controller) { m_rbdController = controller; }
-    std::shared_ptr<RigidObjectController> getRbdController() const { return m_rbdController; }
     /// @}
 
     ///
@@ -55,10 +52,9 @@ protected:
     void init() override;
 
 protected:
-    std::shared_ptr<TextVisualModel>       m_textVisualModel = nullptr;
-    std::shared_ptr<PbdObjectCollision>    m_collision       = nullptr;
-    std::shared_ptr<PbdObjectController>   m_pbdController   = nullptr;
-    std::shared_ptr<RigidObjectController> m_rbdController   = nullptr;
+    std::shared_ptr<TextVisualModel>     m_textVisualModel = nullptr;
+    std::shared_ptr<PbdObjectCollision>  m_collision       = nullptr;
+    std::shared_ptr<PbdObjectController> m_pbdController   = nullptr;
     double m_t = 0.0;
 };
 } // namespace imstk

@@ -10,8 +10,7 @@
 #include "imstkImageData.h"
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
-#include "imstkRbdConstraint.h"
-#include "imstkRigidObject2.h"
+#include "imstkPbdObject.h"
 
 namespace imstk
 {
@@ -35,7 +34,7 @@ LevelSetCH::setInputLvlSetObj(std::shared_ptr<LevelSetDeformableObject> lvlSetOb
 }
 
 void
-LevelSetCH::setInputRigidObj(std::shared_ptr<RigidObject2> rbdObj)
+LevelSetCH::setInputRigidObj(std::shared_ptr<PbdObject> rbdObj)
 {
     setInputObjectB(rbdObj);
     maskAllPoints();
@@ -47,10 +46,10 @@ LevelSetCH::getLvlSetObj()
     return std::dynamic_pointer_cast<LevelSetDeformableObject>(getInputObjectA());
 }
 
-std::shared_ptr<RigidObject2>
+std::shared_ptr<PbdObject>
 LevelSetCH::getRigidObj()
 {
-    return std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
+    return std::dynamic_pointer_cast<PbdObject>(getInputObjectB());
 }
 
 void
@@ -91,7 +90,7 @@ LevelSetCH::handle(
     const std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<LevelSetDeformableObject> lvlSetObj = getLvlSetObj();
-    std::shared_ptr<RigidObject2>             rbdObj    = getRigidObj();
+    std::shared_ptr<PbdObject>                rbdObj    = getRigidObj();
 
     if (lvlSetObj == nullptr || rbdObj == nullptr)
     {
@@ -139,7 +138,8 @@ LevelSetCH::handle(
                 const Vec3i  coord  = (pos - origin).cwiseProduct(invSpacing).cast<int>();
 
                 // Scale the applied impulse by the normal force
-                const double fN = normal.normalized().dot(rbdObj->getRigidBody()->getForce()) / rbdObj->getRigidBody()->getForce().norm();
+                //const double fN = normal.normalized().dot(rbdObj->getRigidBody()->getForce()) / rbdObj->getRigidBody()->getForce().norm();
+                const double fN = 0.3;
                 const double S  = std::max(fN, 0.0) * m_velocityScaling;
 
                 const int halfSize = static_cast<int>(m_kernelSize * 0.5);
