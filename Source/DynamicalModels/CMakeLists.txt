@@ -13,21 +13,21 @@ list(APPEND Dependencies
 
 set(H_FILES
   ObjectModels/imstkAbstractDynamicalModel.h
-  ObjectModels/imstkDynamicalModel.h
+  #ObjectModels/imstkDynamicalModel.h
   ObjectModels/imstkLevelSetModel.h
   ObjectModels/imstkPbdConstraintFunctor.h
   ObjectModels/imstkPbdModel.h
   ObjectModels/imstkPbdModelConfig.h
-  ObjectModels/imstkRigidBodyModel2.h
+  #ObjectModels/imstkRigidBodyModel2.h
   ObjectModels/imstkSphBoundaryConditions.h
   ObjectModels/imstkSPHKernels.h
   ObjectModels/imstkSphModel.h
-  ObjectStates/imstkRigidBodyState2.h
+  #ObjectStates/imstkRigidBodyState2.h
   ObjectStates/imstkSphState.h
-  ObjectStates/imstkVectorizedState.h
-  TimeIntegrators/imstkBackwardEuler.h
-  TimeIntegrators/imstkNewmarkBeta.h
-  TimeIntegrators/imstkTimeIntegrator.h
+  #ObjectStates/imstkVectorizedState.h
+  #TimeIntegrators/imstkBackwardEuler.h
+  #TimeIntegrators/imstkNewmarkBeta.h
+  #TimeIntegrators/imstkTimeIntegrator.h
   )
 
 set(SRC_FILES
@@ -35,12 +35,12 @@ set(SRC_FILES
   ObjectModels/imstkLevelSetModel.cpp
   ObjectModels/imstkPbdModel.cpp
   ObjectModels/imstkPbdModelConfig.cpp
-  ObjectModels/imstkRigidBodyModel2.cpp
+  #ObjectModels/imstkRigidBodyModel2.cpp
   ObjectModels/imstkSphBoundaryConditions.cpp
   ObjectModels/imstkSphModel.cpp
   ObjectStates/imstkSphState.cpp
-  ObjectStates/imstkVectorizedState.cpp
-  TimeIntegrators/imstkBackwardEuler.cpp
+  #ObjectStates/imstkVectorizedState.cpp
+  #TimeIntegrators/imstkBackwardEuler.cpp
   )
 
 include(imstkAddLibrary)
