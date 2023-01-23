@@ -82,32 +82,32 @@ VirtualCouplingExample()
     }
 
     // The visual geometry is the scissor mesh read in from file
-    auto rbdObj = std::make_shared<PbdObject>();
+    auto pbdObj = std::make_shared<PbdObject>();
     {
         auto model = std::make_shared<PbdModel>();
         model->getConfig()->m_dt      = 0.001;
         model->getConfig()->m_gravity = Vec3d::Zero();
-        rbdObj->setDynamicalModel(model);
-        rbdObj->getPbdBody()->setRigid(
+        pbdObj->setDynamicalModel(model);
+        pbdObj->getPbdBody()->setRigid(
             Vec3d(0.0, 0.05, 0.0),            // Position
             7.0,                              // Mass
             Quatd::Identity(),                // Orientation
             Mat3d::Identity() * 100000000.0); // Inertia
 
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
-        rbdObj->addComponent<Collider>()->setGeometry(surfMesh);
-        rbdObj->addComponent<VisualModel>()->setGeometry(surfMesh);
-        rbdObj->setPhysicsGeometry(surfMesh);
+        pbdObj->addComponent<Collider>()->setGeometry(surfMesh);
+        pbdObj->addComponent<VisualModel>()->setGeometry(surfMesh);
+        pbdObj->setPhysicsGeometry(surfMesh);
 
-        std::shared_ptr<RenderMaterial> mat = rbdObj->getVisualModel(0)->getRenderMaterial();
+        std::shared_ptr<RenderMaterial> mat = pbdObj->getVisualModel(0)->getRenderMaterial();
         mat->setShadingModel(RenderMaterial::ShadingModel::PBR);
         mat->setRoughness(0.5);
         mat->setMetalness(1.0);
         mat->setIsDynamicMesh(false);
 
         // Add a component for controlling via another device
-        auto controller = rbdObj->addComponent<PbdObjectController>();
-        controller->setControlledObject(rbdObj);
+        auto controller = pbdObj->addComponent<PbdObjectController>();
+        controller->setControlledObject(pbdObj);
         controller->setDevice(deviceClient);
         controller->setTranslationOffset(Vec3d(0.0, 0.05, 0.0));
         controller->setLinearKs(50000.0);
@@ -119,16 +119,16 @@ VirtualCouplingExample()
         controller->setUseCritDamping(true);
 
         // Add extra component to tool for the ghost
-        auto controllerGhost = rbdObj->addComponent<ObjectControllerGhost>();
+        auto controllerGhost = pbdObj->addComponent<ObjectControllerGhost>();
         controllerGhost->setController(controller);
     }
-    scene->addSceneObject(rbdObj);
+    scene->addSceneObject(pbdObj);
 
     // Add interaction between the rigid object sphere and static plane
     scene->addInteraction(
-        std::make_shared<PbdObjectCollision>(rbdObj, obstacleObjs[0]));
+        std::make_shared<PbdObjectCollision>(pbdObj, obstacleObjs[0]));
     scene->addInteraction(
-        std::make_shared<PbdObjectCollision>(rbdObj, obstacleObjs[1]));
+        std::make_shared<PbdObjectCollision>(pbdObj, obstacleObjs[1]));
 
     // Light
     auto light = std::make_shared<DirectionalLight>();
@@ -156,8 +156,8 @@ VirtualCouplingExample()
 
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
-                // Run the rbd model in real time
-                rbdObj->getPbdModel()->getConfig()->m_dt = driver->getDt();
+                // Run the pbd model in real time
+                pbdObj->getPbdModel()->getConfig()->m_dt = driver->getDt();
             });
 
         // Add mouse and keyboard controls to the viewer

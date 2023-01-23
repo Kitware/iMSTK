@@ -17,7 +17,6 @@
 #include "imstkPbdSolver.h"
 #include "imstkPointwiseMap.h"
 #include "imstkPuncturable.h"
-#include "imstkRigidObject2.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 
@@ -63,11 +62,10 @@ NeedlePbdCH::handle(
     }
 
     // Get rigid object needle
-    auto                                     needleRigid       = std::dynamic_pointer_cast<RigidBody>(getInputObjectB());
-    auto                                     needleObj         = std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
-    auto                                     needle            = needleObj->getComponent<Needle>();
-    const int                                needleId          = needleObj->getID();
-    auto                                     needleMesh        = std::dynamic_pointer_cast<LineMesh>(needleObj->getComponent<Collider>()->getGeometry());
+    auto                                     needleObj  = std::dynamic_pointer_cast<PbdObject>(getInputObjectB());
+    auto                                     needle     = needleObj->getComponent<Needle>();
+    const int                                needleId   = needleObj->getID();
+    auto                                     needleMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getComponent<Collider>()->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleMesh->getVertexPositions();
     VecDataArray<double, 3>&                 needleVertices    = *needleVerticesPtr;
     std::shared_ptr<VecDataArray<int, 2>>    needleIndicesPtr  = needleMesh->getCells();

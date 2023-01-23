@@ -23,7 +23,6 @@
 #include "imstkPbdObject.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -151,8 +150,8 @@ makeTissueObj(const std::string& name,
     return tissueObj;
 }
 
-static std::shared_ptr<RigidObject2>
-makeToolObj()
+static std::shared_ptr<PbdObject>
+makeToolObj(std::shared_ptr<PbdModel> pbdModel)
 {
     auto                    toolGeom = std::make_shared<LineMesh>();
     VecDataArray<double, 3> vertices = { Vec3d(0.0, -1.0, 0.0), Vec3d(0.0, 1.0, 0.0) };
@@ -165,7 +164,7 @@ makeToolObj()
     syringeMesh->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2, Geometry::TransformType::ApplyToData);
     syringeMesh->translate(Vec3d(0.0, 4.4, 0.0), Geometry::TransformType::ApplyToData);
 
-    auto toolObj = std::make_shared<RigidObject2>("NeedleRbdTool");
+    auto toolObj = std::make_shared<PbdObject>("NeedleRbdTool");
     toolObj->setVisualGeometry(syringeMesh);
     toolObj->addComponent<Collider>()->setGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
@@ -176,13 +175,8 @@ makeToolObj()
     toolObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
     toolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
-    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
-    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-    toolObj->setDynamicalModel(rbdModel);
-
-    toolObj->getRigidBody()->m_mass = 0.1;
-    toolObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
-    toolObj->getRigidBody()->m_initPos = Vec3d(0.0, 2.0, 0.0);
+    toolObj->setDynamicalModel(pbdModel);
+    toolObj->getPbdBody()->setRigid(Vec3d(0.0, 2.0, 0.0), 0.1, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     // Add a component for needle puncturing
     auto needle = toolObj->addComponent<StraightNeedle>();
@@ -227,7 +221,8 @@ main()
         Vec3d(10.0, 3.0, 10.0), Vec3i(7, 3, 6), Vec3d(0.1, -1.0, 0.0));
     scene->addSceneObject(tissueObj);
 
-    std::shared_ptr<RigidObject2> toolObj = makeToolObj();
+    auto                       pbdModel = std::dynamic_pointer_cast<PbdModel>(tissueObj->getDynamicalModel());
+    std::shared_ptr<PbdObject> toolObj  = makeToolObj(pbdModel);
     scene->addSceneObject(toolObj);
 
     scene->addInteraction(std::make_shared<NeedleSurfaceInteraction>(tissueObj, toolObj));
@@ -280,8 +275,8 @@ main()
             [&](Event*)
             {
                 // Keep the tool moving in real time
-                toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-                //tissueObj->getPbdModel()->getParameters()->m_dt = sceneManager->getDt();
+                // toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+                tissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
             });
 
         // Add default mouse and keyboard controls to the viewer

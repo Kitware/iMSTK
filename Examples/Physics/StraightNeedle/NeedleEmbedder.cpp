@@ -252,7 +252,7 @@ NeedleEmbedder::update()
             }
         }
 
-        // Add constraint to the PBD solver and RBD system
+        // Add constraint to the PBD solver
         m_constraints.resize(0);
         m_constraints.reserve(m_faceConstraints.size());
 

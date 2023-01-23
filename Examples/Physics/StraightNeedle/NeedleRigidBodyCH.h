@@ -9,17 +9,12 @@
 #include "imstkMacros.h"
 #include "imstkNeedle.h"
 #include "imstkPuncturable.h"
-#include "imstkRbdContactConstraint.h"
-#include "imstkRigidBodyCH.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
-
-#include "RbdAxesLockingConstraint.h"
-#include "RbdAngularLockingConstraint.h"
+#include "imstkPbdCollisionHandling.h"
+#include "imstkPbdObject.h"
 
 using namespace imstk;
 
-class NeedleRigidBodyCH : public RigidBodyCH
+class NeedleRigidBodyCH : public PbdCollisionHandling
 {
 public:
     NeedleRigidBodyCH() = default;
@@ -44,7 +39,7 @@ protected:
         m_puncturable = tissueObj->getComponent<Puncturable>();
 
         // Do it the normal way
-        RigidBodyCH::handle(elementsA, elementsB);
+        PbdCollisionHandling::handle(elementsA, elementsB);
 
         // If no collision, needle must be removed
         if (elementsA.size() == 0)
@@ -53,11 +48,15 @@ protected:
         }
     }
 
-    ///
-    /// \brief Add constraint for the rigid body given contact
-    ///
+///
+/// \brief Add constraint for the rigid body given contact
+///
+/*
+    // \todo: transfer the puncturing logic to a behavior or equivalent.
+    // It shouldn't be implemented as a override of a CollisionHandler.
+    // The role of a CollisionHandler should be solely to generate constraints.
     void addConstraint(
-        std::shared_ptr<RigidObject2> rbdObj,
+        std::shared_ptr<PbdObject> rbdObj,
         const Vec3d& contactPt, const Vec3d& contactNormal,
         const double contactDepth) override
     {
@@ -110,6 +109,7 @@ protected:
             rbdObj->getRigidBodyModel2()->addConstraint(needleLockConstraint2);
         }
     }
+    */
 
 protected:
     double m_needleForceThreshold = 250.0; ///< When needle body exceeds this it inserts

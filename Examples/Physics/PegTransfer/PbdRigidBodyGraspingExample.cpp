@@ -21,7 +21,7 @@
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
-#include "imstkPbdRigidObjectGrasping.h"
+#include <imstkPbdObjectGrasping.h>
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
