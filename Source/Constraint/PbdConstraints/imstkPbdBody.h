@@ -169,10 +169,26 @@ struct PbdBody
             return inertias->at(0);
         }
 
+        void setRigidInertia(const Mat3d& inertia)
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            if (inertias == nullptr)
+            {
+                inertias = std::make_shared<StdVectorOfMat3d>();
+            }
+            * inertias = { inertia };
+        }
+
         double getRigidMass() const
         {
             CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
             return uniformMassValue;
+        }
+
+        void setRigidMass(double mass)
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            uniformMassValue = mass;
         }
 
         Vec3d getRigidPosition() const
@@ -201,12 +217,9 @@ struct PbdBody
             * orientations = { orientation };
         }
 
-<<<<<<< Updated upstream
-=======
         bool isRigid() const { return bodyType == Type::RIGID; }
         bool isDeformable() const { return bodyType == Type::DEFORMABLE; }
 
->>>>>>> Stashed changes
         // Struct Data
         int bodyHandle; ///< Id in the system
         Type bodyType = Type::DEFORMABLE;

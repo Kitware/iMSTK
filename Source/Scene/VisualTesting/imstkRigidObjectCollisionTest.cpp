@@ -11,12 +11,12 @@
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
+#include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
+#include "imstkPbdObject.h"
+#include "imstkPbdObjectCollision.h"
 #include "imstkPlane.h"
-#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidObjectCollision.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
 #include "imstkSceneManager.h"
@@ -46,10 +46,10 @@ public:
         m_scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
         m_scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-        ASSERT_NE(m_rbdObj, nullptr) << "Missing a pbdObj for PbdObjectCollisionTest";
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(m_rbdObj->getPhysicsGeometry());
-        m_prevBodyPos = m_rbdObj->getRigidBody()->m_initPos;
-        m_scene->addSceneObject(m_rbdObj);
+        ASSERT_NE(m_pbdObj, nullptr) << "Missing a pbdObj for PbdObjectCollisionTest";
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObj->getPhysicsGeometry());
+        m_prevBodyPos = m_pbdObj->getPbdBody()->getRigidPosition();
+        m_scene->addSceneObject(m_pbdObj);
 
         ASSERT_NE(m_collidingGeometry, nullptr);
         m_cdObj = std::make_shared<SceneObject>("obj2");
@@ -59,14 +59,14 @@ public:
         m_cdObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.5);
         m_scene->addSceneObject(m_cdObj);
 
-        m_rbdCollision = std::make_shared<RigidObjectCollision>(m_rbdObj, m_cdObj, m_collisionName);
-        m_rbdCollision->setFriction(m_friction);
-        m_rbdCollision->setBaumgarteStabilization(m_beta);
-        m_scene->addInteraction(m_rbdCollision);
+        m_pbdCollision = std::make_shared<PbdObjectCollision>(m_pbdObj, m_cdObj, m_collisionName);
+        m_pbdCollision->setFriction(m_friction);
+        m_pbdCollision->setRestitution(m_restitution);
+        m_scene->addInteraction(m_pbdCollision);
 
         // Debug geometry to visualize collision data
-        m_cdDebugObject = m_rbdCollision->addComponent<CollisionDataDebugModel>();
-        m_cdDebugObject->setInputCD(m_rbdCollision->getCollisionDetection()->getCollisionData());
+        m_cdDebugObject = m_pbdCollision->addComponent<CollisionDataDebugModel>();
+        m_cdDebugObject->setInputCD(m_pbdCollision->getCollisionDetection()->getCollisionData());
         m_cdDebugObject->setPrintContacts(m_printContacts);
 
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
@@ -85,19 +85,19 @@ public:
             {
                 // Run in realtime at a slightly slowed down speed
                 // Still fixed, but # of iterations may vary by system
-                m_rbdObj->getRigidBodyModel2()->getConfig()->m_dt =
-                    m_sceneManager->getDt() * 0.25;
+                m_pbdObj->getPbdModel()->getConfig()->m_dt =
+                    m_sceneManager->getDt();
             });
 
         // Assert the vertices stay within bounds and below min displacement
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
             [&](Event*)
             {
-                ASSERT_TRUE(assertBounds({ *m_rbdObj->getRigidBody()->m_pos },
+                ASSERT_TRUE(assertBounds({ m_pbdObj->getPbdBody()->getRigidPosition() },
                     m_assertionBoundsMin, m_assertionBoundsMax));
                 ASSERT_TRUE(assertMinDisplacement({ m_prevBodyPos },
-                    { *m_rbdObj->getRigidBody()->m_pos }, 0.01));
-                m_prevBodyPos = *m_rbdObj->getRigidBody()->m_pos;
+                    { m_pbdObj->getPbdBody()->getRigidPosition() }, 0.01));
+                m_prevBodyPos = m_pbdObj->getPbdBody()->getRigidPosition();
             });
 
         // Light
@@ -108,14 +108,14 @@ public:
     }
 
 public:
-    std::shared_ptr<RigidObject2> m_rbdObj = nullptr;
-    std::shared_ptr<SceneObject>  m_cdObj  = nullptr;
-    std::shared_ptr<Geometry>     m_collidingGeometry = nullptr;
+    std::shared_ptr<PbdObject>   m_pbdObj = nullptr;
+    std::shared_ptr<SceneObject> m_cdObj  = nullptr;
+    std::shared_ptr<Geometry>    m_collidingGeometry = nullptr;
 
-    std::shared_ptr<RigidObjectCollision> m_rbdCollision = nullptr;
+    std::shared_ptr<PbdObjectCollision> m_pbdCollision = nullptr;
     std::string m_collisionName = "";
     double      m_friction      = 0.0;
-    double      m_beta = 0.01;
+    double      m_restitution   = 0.8;
     std::shared_ptr<CollisionDataDebugModel> m_cdDebugObject = nullptr;
 
     // For assertions
@@ -131,32 +131,32 @@ public:
 ///
 /// \brief Test CapsuleToCapsuleCD with RigidObjectCollision
 ///
-TEST_F(RigidObjectCollisionTest, RbdObj_CapsuleToCapsuleCD)
+TEST_F(RigidObjectCollisionTest, RigidObj_CapsuleToCapsuleCD)
 {
     // Setup the rigid object
-    m_rbdObj = std::make_shared<RigidObject2>("obj1");
+    m_pbdObj = std::make_shared<PbdObject>("obj1");
     {
         auto colGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.05, 0.2);
 
         // Setup the Model
-        auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.01;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 1.0;
-        rbdModel->getConfig()->m_angularVelocityDamping = 1.0;
+        auto pbdModel = std::make_shared<PbdModel>();
+        pbdModel->getConfig()->m_dt      = 0.01;
+        pbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.81, 0.0);
+        pbdModel->getConfig()->m_linearDampingCoeff  = 0.01;
+        pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
+        pbdModel->getConfig()->m_doPartitioning      = false;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
         material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
         material->setColor(Color(0.77, 0.53, 0.34));
 
-        m_rbdObj->setVisualGeometry(colGeom);
-        m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
-        m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
-        m_rbdObj->setDynamicalModel(rbdModel);
-        m_rbdObj->getRigidBody()->m_mass = 0.1;
-        m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.00005;
+        m_pbdObj->setVisualGeometry(colGeom);
+        m_pbdObj->getVisualModel(0)->setRenderMaterial(material);
+        m_pbdObj->setPhysicsGeometry(colGeom);
+        m_pbdObj->addComponent<Collider>()->setGeometry(colGeom);
+        m_pbdObj->setDynamicalModel(pbdModel);
+        m_pbdObj->getPbdBody()->setRigid(Vec3d::Zero(), 0.1, Quatd::Identity(), Mat3d::Identity() * 0.01);
     }
 
     // Setup the geometry
@@ -165,7 +165,8 @@ TEST_F(RigidObjectCollisionTest, RbdObj_CapsuleToCapsuleCD)
     m_collidingGeometry = implicitGeom;
 
     m_collisionName = "CapsuleToCapsuleCD";
-    m_friction      = 0.0;
+    m_friction      = 0.01;
+    m_restitution   = 0.9;
 
     m_assertionBoundsMin = Vec3d(-20.0, -20.0, -20.0);
     m_assertionBoundsMax = Vec3d(20.0, 20.0, 20.0);
@@ -173,21 +174,21 @@ TEST_F(RigidObjectCollisionTest, RbdObj_CapsuleToCapsuleCD)
     connect<KeyEvent>(m_viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
         [this](KeyEvent*)
         {
-            m_rbdObj->getComponent<Collider>()->getGeometry()->print();
+            m_pbdObj->getComponent<Collider>()->getGeometry()->print();
             m_collidingGeometry->print();
         });
 
     createScene();
-    runFor(4.0);
+    runFor(5.0);
 }
 
 ///
 /// \brief Test SurfaceMeshToCapsuleCD with RigidObjectCollision
 ///
-TEST_F(RigidObjectCollisionTest, DISABLED_RbdObj_SurfaceMeshToCapsuleCD)
+TEST_F(RigidObjectCollisionTest, DISABLED_RigidObj_SurfaceMeshToCapsuleCD)
 {
     // Setup the rigid object
-    m_rbdObj = std::make_shared<RigidObject2>("obj1");
+    m_pbdObj = std::make_shared<PbdObject>("obj1");
     {
         // Setup the Geometry
         auto                    colGeom = std::make_shared<SurfaceMesh>();
@@ -201,24 +202,23 @@ TEST_F(RigidObjectCollisionTest, DISABLED_RbdObj_SurfaceMeshToCapsuleCD)
             std::make_shared<VecDataArray<int, 3>>(cells));
 
         // Setup the Model
-        auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.001;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.99;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.99;
+        auto pbdModel = std::make_shared<PbdModel>();
+        pbdModel->getConfig()->m_dt      = 0.01;
+        pbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.81, 0.0);
+        pbdModel->getConfig()->m_linearDampingCoeff  = 0.01;
+        pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setColor(Color(0.77, 0.53, 0.34));
 
-        m_rbdObj->setVisualGeometry(colGeom);
-        m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
-        m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
-        m_rbdObj->setDynamicalModel(rbdModel);
-        m_rbdObj->getRigidBody()->m_mass = 0.1;
-        m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
+        m_pbdObj->setVisualGeometry(colGeom);
+        m_pbdObj->getVisualModel(0)->setRenderMaterial(material);
+        m_pbdObj->setPhysicsGeometry(colGeom);
+        m_pbdObj->addComponent<Collider>()->setGeometry(colGeom);
+        m_pbdObj->setDynamicalModel(pbdModel);
+        m_pbdObj->getPbdBody()->setRigid(Vec3d::Zero(), 0.1, Quatd::Identity(), Mat3d::Identity() * 0.00005);
     }
 
     // Setup the geometry
@@ -239,33 +239,32 @@ TEST_F(RigidObjectCollisionTest, DISABLED_RbdObj_SurfaceMeshToCapsuleCD)
 ///
 /// \brief Test SphereToSphereCD with RigidObjectCollision
 ///
-TEST_F(RigidObjectCollisionTest, RbdObj_SphereToSphereCD)
+TEST_F(RigidObjectCollisionTest, RigidObj_SphereToSphereCD)
 {
     // Setup the rigid object
-    m_rbdObj = std::make_shared<RigidObject2>("obj1");
+    m_pbdObj = std::make_shared<PbdObject>("obj1");
     {
         // Setup the Geometry
         auto colGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.05);
 
         // Setup the Model
-        auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.001;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.99;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.99;
+        auto pbdModel = std::make_shared<PbdModel>();
+        pbdModel->getConfig()->m_dt      = 0.001;
+        pbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.81, 0.0);
+        pbdModel->getConfig()->m_linearDampingCoeff  = 0.01;
+        pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setColor(Color(0.77, 0.53, 0.34));
 
-        m_rbdObj->setVisualGeometry(colGeom);
-        m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
-        m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
-        m_rbdObj->setDynamicalModel(rbdModel);
-        m_rbdObj->getRigidBody()->m_mass = 0.1;
-        m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
+        m_pbdObj->setVisualGeometry(colGeom);
+        m_pbdObj->getVisualModel(0)->setRenderMaterial(material);
+        m_pbdObj->setPhysicsGeometry(colGeom);
+        m_pbdObj->addComponent<Collider>()->setGeometry(colGeom);
+        m_pbdObj->setDynamicalModel(pbdModel);
+        m_pbdObj->getPbdBody()->setRigid(Vec3d::Zero(), 0.1, Quatd::Identity(), Mat3d::Identity() * 0.005);
     }
 
     // Setup the geometry (bump it over 0.01 so it slides off)
@@ -285,33 +284,32 @@ TEST_F(RigidObjectCollisionTest, RbdObj_SphereToSphereCD)
 ///
 /// \brief Test UnidirectionalPlaneToSphereCD with RigidObjectCollision
 ///
-TEST_F(RigidObjectCollisionTest, RbdObj_UnidirectionalPlaneToSphereCD)
+TEST_F(RigidObjectCollisionTest, RigidObj_UnidirectionalPlaneToSphereCD)
 {
     // Setup the rigid object
-    m_rbdObj = std::make_shared<RigidObject2>("obj1");
+    m_pbdObj = std::make_shared<PbdObject>("obj1");
     {
         // Setup the Geometry
         auto colGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.05);
 
         // Setup the Model
-        auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.001;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.99;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.99;
+        auto pbdModel = std::make_shared<PbdModel>();
+        pbdModel->getConfig()->m_dt      = 0.001;
+        pbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.81, 0.0);
+        pbdModel->getConfig()->m_linearDampingCoeff  = 0.01;
+        pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setColor(Color(0.77, 0.53, 0.34));
 
-        m_rbdObj->setVisualGeometry(colGeom);
-        m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
-        m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
-        m_rbdObj->setDynamicalModel(rbdModel);
-        m_rbdObj->getRigidBody()->m_mass = 0.1;
-        m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
+        m_pbdObj->setVisualGeometry(colGeom);
+        m_pbdObj->getVisualModel(0)->setRenderMaterial(material);
+        m_pbdObj->setPhysicsGeometry(colGeom);
+        m_pbdObj->addComponent<Collider>()->setGeometry(colGeom);
+        m_pbdObj->setDynamicalModel(pbdModel);
+        m_pbdObj->getPbdBody()->setRigid(Vec3d::Zero(), 0.1, Quatd::Identity(), Mat3d::Identity() * 0.005);
     }
 
     // Setup the geometry
@@ -335,33 +333,32 @@ TEST_F(RigidObjectCollisionTest, RbdObj_UnidirectionalPlaneToSphereCD)
 /// \brief Test BidirectionalPlaneToSphereCD with RigidObjectCollision
 /// Sphere and gravity going up to test bidirectionality
 ///
-TEST_F(RigidObjectCollisionTest, RbdObj_BidirectionalPlaneToSphereCD)
+TEST_F(RigidObjectCollisionTest, RigidObj_BidirectionalPlaneToSphereCD)
 {
     // Setup the rigid object
-    m_rbdObj = std::make_shared<RigidObject2>("obj1");
+    m_pbdObj = std::make_shared<PbdObject>("obj1");
     {
         // Setup the Geometry
         auto colGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.05);
 
         // Setup the Model
-        auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.001;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, 9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.99;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.99;
+        auto pbdModel = std::make_shared<PbdModel>();
+        pbdModel->getConfig()->m_dt      = 0.001;
+        pbdModel->getConfig()->m_gravity = Vec3d(0.0, 9.81, 0.0);
+        pbdModel->getConfig()->m_linearDampingCoeff  = 0.01;
+        pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setColor(Color(0.77, 0.53, 0.34));
 
-        m_rbdObj->setVisualGeometry(colGeom);
-        m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
-        m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
-        m_rbdObj->setDynamicalModel(rbdModel);
-        m_rbdObj->getRigidBody()->m_mass = 0.1;
-        m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
+        m_pbdObj->setVisualGeometry(colGeom);
+        m_pbdObj->getVisualModel(0)->setRenderMaterial(material);
+        m_pbdObj->setPhysicsGeometry(colGeom);
+        m_pbdObj->addComponent<Collider>()->setGeometry(colGeom);
+        m_pbdObj->setDynamicalModel(pbdModel);
+        m_pbdObj->getPbdBody()->setRigid(Vec3d::Zero(), 0.1, Quatd::Identity(), Mat3d::Identity() * 0.005);
     }
 
     // Setup the geometry
@@ -387,10 +384,10 @@ TEST_F(RigidObjectCollisionTest, RbdObj_BidirectionalPlaneToSphereCD)
 ///
 /// \brief Test PointSetToSphereCD with RigidObjectCollision
 ///
-TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToCapsuleCD)
+TEST_F(RigidObjectCollisionTest, RigidObj_PointSetToCapsuleCD)
 {
     // Setup the rigid object
-    m_rbdObj = std::make_shared<RigidObject2>("obj1");
+    m_pbdObj = std::make_shared<PbdObject>("obj1");
     {
         // Setup the Geometry
         auto                    colGeom = std::make_shared<PointSet>();
@@ -407,11 +404,11 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToCapsuleCD)
         colGeom->initialize(std::make_shared<VecDataArray<double, 3>>(verts));
 
         // Setup the Model
-        auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.01;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.999;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.999;
+        auto pbdModel = std::make_shared<PbdModel>();
+        pbdModel->getConfig()->m_dt      = 0.01;
+        pbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.81, 0.0);
+        pbdModel->getConfig()->m_linearDampingCoeff  = 0.01;
+        pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
@@ -421,13 +418,12 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToCapsuleCD)
         material->setEdgeColor(Color(0.87, 0.63, 0.44));
         material->setPointSize(20.0);
 
-        m_rbdObj->setVisualGeometry(colGeom);
-        m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
-        m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
-        m_rbdObj->setDynamicalModel(rbdModel);
-        m_rbdObj->getRigidBody()->m_mass = 0.1;
-        m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
+        m_pbdObj->setVisualGeometry(colGeom);
+        m_pbdObj->getVisualModel(0)->setRenderMaterial(material);
+        m_pbdObj->setPhysicsGeometry(colGeom);
+        m_pbdObj->addComponent<Collider>()->setGeometry(colGeom);
+        m_pbdObj->setDynamicalModel(pbdModel);
+        m_pbdObj->getPbdBody()->setRigid(Vec3d::Zero(), 0.1, Quatd::Identity(), Mat3d::Identity() * 0.005);
     }
 
     // Setup the geometry
@@ -448,10 +444,10 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToCapsuleCD)
 ///
 /// \brief Test PointSetToSphereCD with RigidObjectCollision
 ///
-TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToSphereCD)
+TEST_F(RigidObjectCollisionTest, RigidObj_PointSetToSphereCD)
 {
     // Setup the rigid object
-    m_rbdObj = std::make_shared<RigidObject2>("obj1");
+    m_pbdObj = std::make_shared<PbdObject>("obj1");
     {
         // Setup the Geometry
         auto                    colGeom = std::make_shared<PointSet>();
@@ -468,11 +464,11 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToSphereCD)
         colGeom->initialize(std::make_shared<VecDataArray<double, 3>>(verts));
 
         // Setup the Model
-        auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.01;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.999;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.999;
+        auto pbdModel = std::make_shared<PbdModel>();
+        pbdModel->getConfig()->m_dt      = 0.01;
+        pbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.81, 0.0);
+        pbdModel->getConfig()->m_linearDampingCoeff  = 0.01;
+        pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
@@ -482,17 +478,16 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToSphereCD)
         material->setEdgeColor(Color(0.87, 0.63, 0.44));
         material->setPointSize(20.0);
 
-        m_rbdObj->setVisualGeometry(colGeom);
-        m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
-        m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
-        m_rbdObj->setDynamicalModel(rbdModel);
-        m_rbdObj->getRigidBody()->m_mass = 0.1;
-        m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
+        m_pbdObj->setVisualGeometry(colGeom);
+        m_pbdObj->getVisualModel(0)->setRenderMaterial(material);
+        m_pbdObj->setPhysicsGeometry(colGeom);
+        m_pbdObj->addComponent<Collider>()->setGeometry(colGeom);
+        m_pbdObj->setDynamicalModel(pbdModel);
+        m_pbdObj->getPbdBody()->setRigid(Vec3d::Zero(), 0.1, Quatd::Identity(), Mat3d::Identity() * 0.005);
     }
 
     // Setup the geometry
-    auto implicitGeom = std::make_shared<Sphere>(Vec3d(0.01, -0.4, 0.0), 0.2);
+    auto implicitGeom = std::make_shared<Sphere>(Vec3d(0.01, -0.3, 0.0), 0.2);
     m_collidingGeometry = implicitGeom;
 
     m_collisionName = "PointSetToSphereCD";
@@ -508,10 +503,10 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToSphereCD)
 ///
 /// \brief Test PointSetToPlaneCD with RigidObjectCollision
 ///
-TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToPlaneCD)
+TEST_F(RigidObjectCollisionTest, RigidObj_PointSetToPlaneCD)
 {
     // Setup the rigid object
-    m_rbdObj = std::make_shared<RigidObject2>("obj1");
+    m_pbdObj = std::make_shared<PbdObject>("obj1");
     {
         // Setup the Geometry
         auto                    colGeom = std::make_shared<PointSet>();
@@ -528,11 +523,11 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToPlaneCD)
         colGeom->initialize(std::make_shared<VecDataArray<double, 3>>(verts));
 
         // Setup the Model
-        auto rbdModel = std::make_shared<RigidBodyModel2>();
-        rbdModel->getConfig()->m_dt      = 0.001;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-        rbdModel->getConfig()->m_velocityDamping = 0.99;
-        rbdModel->getConfig()->m_angularVelocityDamping = 0.99;
+        auto pbdModel = std::make_shared<PbdModel>();
+        pbdModel->getConfig()->m_dt      = 0.01;
+        pbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.81, 0.0);
+        pbdModel->getConfig()->m_linearDampingCoeff  = 0.01;
+        pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
@@ -542,13 +537,12 @@ TEST_F(RigidObjectCollisionTest, RbdObj_PointSetToPlaneCD)
         material->setEdgeColor(Color(0.87, 0.63, 0.44));
         material->setPointSize(20.0);
 
-        m_rbdObj->setVisualGeometry(colGeom);
-        m_rbdObj->getVisualModel(0)->setRenderMaterial(material);
-        m_rbdObj->setPhysicsGeometry(colGeom);
-        m_rbdObj->addComponent<Collider>()->setGeometry(colGeom);
-        m_rbdObj->setDynamicalModel(rbdModel);
-        m_rbdObj->getRigidBody()->m_mass = 0.1;
-        m_rbdObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 0.005;
+        m_pbdObj->setVisualGeometry(colGeom);
+        m_pbdObj->getVisualModel(0)->setRenderMaterial(material);
+        m_pbdObj->setPhysicsGeometry(colGeom);
+        m_pbdObj->addComponent<Collider>()->setGeometry(colGeom);
+        m_pbdObj->setDynamicalModel(pbdModel);
+        m_pbdObj->getPbdBody()->setRigid(Vec3d::Zero(), 0.1, Quatd::Identity(), Mat3d::Identity() * 0.005);
     }
 
     // Setup the geometry
