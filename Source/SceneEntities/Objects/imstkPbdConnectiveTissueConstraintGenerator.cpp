@@ -83,10 +83,10 @@ PbdConnectiveTissueConstraintGenerator::connectLineToTetMesh(std::shared_ptr<Pbd
 
         std::vector<double> weightsA = { weights[0], weights[1], weights[2], weights[3] };
 
-        // Ligament vertex end on the gallblader
+        // Ligament vertex end on the mesh
         std::vector<PbdParticleId> ptsB     = { { m_connectiveStrandObj->getPbdBody()->bodyHandle, vertId } };
         std::vector<double>        weightsB = { 1.0 };
-        vertToTetConstraint->initConstraint(ptsA, weightsA, ptsB, weightsB, 0.8, 0.8);
+        vertToTetConstraint->initConstraint(ptsA, weightsA, ptsB, weightsB, 1.0, 1.0);
         constraints.addConstraint(vertToTetConstraint);
     }
 }
@@ -148,7 +148,7 @@ PbdConnectiveTissueConstraintGenerator::connectLineToSurfMesh(
         // Ligament vertex end on the gallblader
         std::vector<PbdParticleId> ptsB     = { { m_connectiveStrandObj->getPbdBody()->bodyHandle, vertId } };
         std::vector<double>        weightsB = { 1.0 };
-        vertToTriConstraint->initConstraint(ptsA, weightsA, ptsB, weightsB, 0.8, 0.8);
+        vertToTriConstraint->initConstraint(ptsA, weightsA, ptsB, weightsB, 1.0, 1.0);
         constraints.addConstraint(vertToTriConstraint);
     }
 }
@@ -193,7 +193,9 @@ addConnectiveTissueConstraints(
     std::shared_ptr<LineMesh>  connectiveLineMesh,
     std::shared_ptr<PbdObject> objA,
     std::shared_ptr<PbdObject> objB,
-    std::shared_ptr<PbdModel>  model)
+    std::shared_ptr<PbdModel>  model,
+    double                     mass,
+    double                     distStiffness)
 {
     // Check inputs
     CHECK(connectiveLineMesh != nullptr) << "NULL line mesh passes to generateConnectiveTissueConstraints";
@@ -208,11 +210,11 @@ addConnectiveTissueConstraints(
     connectiveStrands->setCollidingGeometry(connectiveLineMesh);
     connectiveStrands->setDynamicalModel(model);
 
-    double mass = 0.01;
     connectiveStrands->getPbdBody()->uniformMassValue = mass / connectiveLineMesh->getNumVertices();
 
     // Setup constraints between the gallblader and ligaments
     auto attachmentConstraintFunctor = std::make_shared<PbdConnectiveTissueConstraintGenerator>();
+    attachmentConstraintFunctor->setDistStiffness(distStiffness);
     attachmentConstraintFunctor->setConnectiveStrandObj(connectiveStrands);
     attachmentConstraintFunctor->generateDistanceConstraints();
     attachmentConstraintFunctor->setConnectedObjA(objA);
@@ -231,7 +233,9 @@ makeConnectiveTissue(
     double                                    maxDist,
     double                                    strandsPerFace,
     int                                       segmentsPerStrand,
-    std::shared_ptr<ProximitySurfaceSelector> proxSelector)
+    std::shared_ptr<ProximitySurfaceSelector> proxSelector,
+    double                                    mass,
+    double                                    distStiffness)
 {
     proxSelector = std::make_shared<ProximitySurfaceSelector>();
 
@@ -273,7 +277,7 @@ makeConnectiveTissue(
 
     // Create PBD object of connective strands with associated constraints
     auto connectiveStrands = addConnectiveTissueConstraints(
-        connectiveLineMesh, objA, objB, model);
+        connectiveLineMesh, objA, objB, model, mass);
 
     return connectiveStrands;
 }

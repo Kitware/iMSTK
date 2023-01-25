@@ -116,7 +116,9 @@ std::shared_ptr<PbdObject> addConnectiveTissueConstraints(
     std::shared_ptr<LineMesh>  connectiveLineMesh,
     std::shared_ptr<PbdObject> objA,
     std::shared_ptr<PbdObject> objB,
-    std::shared_ptr<PbdModel>  model);
+    std::shared_ptr<PbdModel>  model,
+    double                     mass = 0.005,
+    double                     distStiffness = 10000000000);
 
 ///
 /// \fn makeConnectiveTissue
@@ -140,5 +142,7 @@ std::shared_ptr<PbdObject> makeConnectiveTissue(
     double                                    maxDist = 0.0,
     double                                    strandsPerFace    = 1,
     int                                       segmentsPerStrand = 3,
-    std::shared_ptr<ProximitySurfaceSelector> selector = nullptr);
+    std::shared_ptr<ProximitySurfaceSelector> selector = nullptr,
+    double                                    mass = 0.005,
+    double                                    distStiffness = 10000000000);
 } // namespace imstk

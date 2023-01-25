@@ -19,7 +19,6 @@
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
-#include "imstkPbdRigidBaryPointToPointConstraint.h"
 #include "imstkPbdRigidObjectGrasping.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
