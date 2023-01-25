@@ -288,9 +288,13 @@ PbdModel::integratePosition(PbdBody& body)
         {
             if (std::abs(invMasses[i]) > 0.0)
             {
-                const Vec3d accel = m_config->m_gravity + body.externalForce * invMasses[i];
-                vel[i]    += accel * dt;
-                vel[i]    *= linearVelocityDamp;
+                const Vec3d accel = static_cast<double>(body.bodyGravity) * m_config->m_gravity + body.externalForce * invMasses[i];
+                vel[i] += accel * dt;
+                vel[i] *= linearVelocityDamp;
+
+                // Cap velocity to increase stability
+                vel[i] = vel[i].cwiseMax(-m_velocityThreshold).cwiseMin(m_velocityThreshold);
+
                 prevPos[i] = pos[i];
                 pos[i]    += vel[i] * dt;
             }
@@ -323,6 +327,9 @@ PbdModel::integratePosition(PbdBody& body)
                     w += dt * accel;
                     w *= angularVelocityDamp;
                     prevOrientations[i] = orientations[i];
+
+                    // Cap angular velocity to increase stability (uses same value as linear in rad/sec)
+                    w.cwiseMax(-m_velocityThreshold).cwiseMin(m_velocityThreshold);
 
                     // Limit on rotation
                     double scale     = dt;

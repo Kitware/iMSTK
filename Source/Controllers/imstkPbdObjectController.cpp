@@ -45,6 +45,19 @@ PbdObjectController::update(const double& dt)
     // "A Modular Haptic Rendering Algorithm for Stable and Transparent 6 - DOF Manipulation"
     if (m_deviceClient->getTrackingEnabled() && m_useSpring)
     {
+        // Move the virtual tool to the physical tool position on the first call
+        if (m_firstRun)
+        {
+            m_firstRun = false;
+            // Zero out external force/torque
+            m_pbdObject->getPbdBody()->externalForce  = Vec3d(0.0, 0.0, 0.0);
+            m_pbdObject->getPbdBody()->externalTorque = Vec3d(0.0, 0.0, 0.0);
+            // Directly set position/rotation
+            (*m_pbdObject->getPbdBody()->vertices)[0]     = getPosition();
+            (*m_pbdObject->getPbdBody()->orientations)[0] = getOrientation();
+            return;
+        }
+
         const Vec3d& currPos = (*m_pbdObject->getPbdBody()->vertices)[0];
         const Quatd& currOrientation     = (*m_pbdObject->getPbdBody()->orientations)[0];
         const Vec3d& currVelocity        = (*m_pbdObject->getPbdBody()->velocities)[0];
