@@ -165,7 +165,6 @@
  */
 %shared_ptr(imstk::CollisionPair)
 %shared_ptr(imstk::CollisionHandling)
-%shared_ptr(imstk::RigidObjectCollidingCollisionPair)
 
 /*
  * Controller
@@ -175,7 +174,6 @@
 %shared_ptr(imstk::KeyboardControl)
 %shared_ptr(imstk::TrackingDeviceControl)
 %shared_ptr(imstk::SceneObjectController)
-%shared_ptr(imstk::RigidObjectController)
 %shared_ptr(imstk::PbdObjectController)
 
 /*

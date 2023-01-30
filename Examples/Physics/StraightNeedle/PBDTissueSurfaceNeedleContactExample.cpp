@@ -21,9 +21,9 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectController.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -164,7 +164,7 @@ makeToolObj(std::shared_ptr<PbdModel> pbdModel)
     syringeMesh->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2, Geometry::TransformType::ApplyToData);
     syringeMesh->translate(Vec3d(0.0, 4.4, 0.0), Geometry::TransformType::ApplyToData);
 
-    auto toolObj = std::make_shared<PbdObject>("NeedleRbdTool");
+    auto toolObj = std::make_shared<PbdObject>("NeedlePbdTool");
     toolObj->setVisualGeometry(syringeMesh);
     toolObj->addComponent<Collider>()->setGeometry(toolGeom);
     toolObj->setPhysicsGeometry(toolGeom);
@@ -183,7 +183,7 @@ makeToolObj(std::shared_ptr<PbdModel> pbdModel)
     needle->setNeedleGeometry(toolGeom);
 
     // Add a component for controlling via another device
-    auto controller = toolObj->addComponent<RigidObjectController>();
+    auto controller = toolObj->addComponent<PbdObjectController>();
     controller->setControlledObject(toolObj);
     controller->setTranslationScaling(50.0);
     controller->setLinearKs(1000.0);
@@ -268,14 +268,13 @@ main()
             });
 #endif
 
-        auto controller = toolObj->getComponent<RigidObjectController>();
+        auto controller = toolObj->getComponent<PbdObjectController>();
         controller->setDevice(deviceClient);
 
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
             {
                 // Keep the tool moving in real time
-                // toolObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
                 tissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
             });
 

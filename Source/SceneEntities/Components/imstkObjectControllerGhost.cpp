@@ -8,7 +8,6 @@
 #include "imstkGeometry.h"
 #include "imstkPbdObjectController.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidObjectController.h"
 #include "imstkSceneObject.h"
 #include "imstkVisualModel.h"
 
@@ -36,22 +35,13 @@ ObjectControllerGhost::init()
         entity->addComponent(m_ghostVisualModel);
     }
 
-    CHECK(m_pbdController != nullptr || m_rbdController != nullptr)
+    CHECK(m_pbdController != nullptr)
         << "ObjectControllerGhost must have a controller";
 
     // Copy the geometry to the ghost visual model
-    std::shared_ptr<SceneObject> controlledObj = nullptr;
-    if (m_pbdController != nullptr)
-    {
-        controlledObj = m_pbdController->getControlledObject();
-    }
-    else
-    {
-        controlledObj = m_rbdController->getControlledObject();
-    }
-    std::shared_ptr<Geometry> ghostGeom = controlledObj->getVisualGeometry()->clone();
+    auto                      controlledObj = m_pbdController->getControlledObject();
+    std::shared_ptr<Geometry> ghostGeom     = controlledObj->getVisualGeometry()->clone();
     CHECK(ghostGeom != nullptr) << "Failed to copy controller geometry";
-
     m_ghostVisualModel->setGeometry(ghostGeom);
 }
 
@@ -66,12 +56,6 @@ ObjectControllerGhost::visualUpdate(const double&)
         orientation = m_pbdController->getOrientation();
         position    = m_pbdController->getPosition();
         force       = m_pbdController->getDeviceForce();
-    }
-    else
-    {
-        orientation = m_rbdController->getOrientation();
-        position    = m_rbdController->getPosition();
-        force       = m_rbdController->getDeviceForce();
     }
 
     // Update the ghost debug geometry

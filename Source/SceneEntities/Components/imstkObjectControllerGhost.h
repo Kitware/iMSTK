@@ -11,7 +11,6 @@
 namespace imstk
 {
 class PbdObjectController;
-class RigidObjectController;
 class VisualModel;
 
 ///
@@ -21,7 +20,7 @@ class VisualModel;
 /// at a lower opacity in the physical position as opposed to the original
 /// rendered at the virtual
 /// \todo: Device render mode to render the actual arm and body of the device
-/// \todo: This should be simplified when PbdObject and RbdObject are removed
+/// \todo: This should be simplified when PbdObject is removed
 ///
 class ObjectControllerGhost : public SceneBehaviour
 {
@@ -30,8 +29,6 @@ public:
 
     void setController(std::shared_ptr<PbdObjectController> controller) { m_pbdController = controller; }
     std::shared_ptr<PbdObjectController> getPbdController() const { return m_pbdController; }
-    void setController(std::shared_ptr<RigidObjectController> controller) { m_rbdController = controller; }
-    std::shared_ptr<RigidObjectController> getRbdController() const { return m_rbdController; }
 
     std::shared_ptr<VisualModel> getGhostModel() const { return m_ghostVisualModel; }
 
@@ -50,9 +47,8 @@ protected:
     void init() override;
 
 protected:
-    std::shared_ptr<PbdObjectController>   m_pbdController = nullptr;
-    std::shared_ptr<RigidObjectController> m_rbdController = nullptr;
-    std::shared_ptr<VisualModel> m_ghostVisualModel = nullptr;
+    std::shared_ptr<PbdObjectController> m_pbdController = nullptr;
+    std::shared_ptr<VisualModel> m_ghostVisualModel      = nullptr;
     bool m_useForceFade = false;
 };
 } // namespace imstk

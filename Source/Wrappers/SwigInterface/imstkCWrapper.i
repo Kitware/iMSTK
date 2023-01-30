@@ -106,7 +106,6 @@
  */
 #include "imstkPbdBody.h"
 #include "imstkPbdConstraint.h"
-#include "imstkRbdConstraint.h"
 
 /*
  * ComponentModel

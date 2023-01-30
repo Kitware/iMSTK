@@ -9,7 +9,6 @@
 #include "imstkCollider.h"
 #include "imstkParallelFor.h"
 #include "imstkPbdObject.h"
-#include "imstkRbdConstraint.h"
 #include "imstkTetrahedralMesh.h"
 
 namespace imstk
