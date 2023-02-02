@@ -14,7 +14,7 @@ namespace imstk
 {
 class CollisionData;
 class Entity;
-class RigidObject2;
+class PbdObject;
 class TetrahedralMesh;
 
 ///
@@ -40,10 +40,10 @@ public:
     ///
     /// \brief Set the input drill
     ///
-    void setInputObjectDrill(std::shared_ptr<RigidObject2> drillObject);
+    void setInputObjectDrill(std::shared_ptr<PbdObject> drillObject);
 
     std::shared_ptr<Entity> getBoneObj() const { return getInputObjectA(); }
-    std::shared_ptr<RigidObject2> getDrillObj() const;
+    std::shared_ptr<PbdObject> getDrillObj() const;
 
     ///
     /// \brief Get stiffness

@@ -18,11 +18,12 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkObjectControllerGhost.h"
-#include "imstkRbdConstraint.h"
-#include "imstkRigidBodyCH.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidObjectController.h"
+#include "imstkPbdBody.h"
+#include "imstkPbdCollisionHandling.h"
+#include "imstkPbdModel.h"
+#include "imstkPbdModelConfig.h"
+#include "imstkPbdObject.h"
+#include "imstkPbdObjectController.h"
 #include "imstkRigidObjectLevelSetCollision.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -40,18 +41,15 @@
 
 using namespace imstk;
 
-std::shared_ptr<RigidObject2>
-makeRigidObj(const std::string& name)
+std::shared_ptr<PbdObject>
+makeCuttingTool(const std::string& name)
 {
-    auto rbdModel = std::make_shared<RigidBodyModel2>();
-    rbdModel->getConfig()->m_maxNumIterations       = 8;
-    rbdModel->getConfig()->m_velocityDamping        = 1.0;
-    rbdModel->getConfig()->m_angularVelocityDamping = 1.0;
-    rbdModel->getConfig()->m_maxNumConstraints      = 40;
-    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->getConfig()->m_iterations = 6;
+    pbdModel->getConfig()->m_gravity    = Vec3d::Zero();
 
-    // Create the first rbd, plane floor
-    auto rigidObj = std::make_shared<RigidObject2>(name);
+    // Create the first pbd, plane floor
+    auto cuttingTool = std::make_shared<PbdObject>(name);
 
     auto toolMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Hull_Subdivided_Shifted.stl");
     toolMesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
@@ -66,22 +64,18 @@ makeRigidObj(const std::string& name)
     material->setDiffuseColor(Color(0.7, 0.7, 0.7));
 
     // Create the object
-    rigidObj->setVisualGeometry(toolMesh);
-    rigidObj->setPhysicsGeometry(toolMesh);
+    cuttingTool->setVisualGeometry(toolMesh);
+    cuttingTool->setPhysicsGeometry(toolMesh);
 
-    //rigidObj->setCollidingGeometry(toolMesh);
-    auto collider = rigidObj->addComponent<Collider>();
-    collider->setGeometry(toolMesh);
+    cuttingTool->addComponent<Collider>()->setGeometry(toolMesh);
 
-    rigidObj->setDynamicalModel(rbdModel);
-    rigidObj->getVisualModel(0)->setRenderMaterial(material);
-    rigidObj->getRigidBody()->m_mass = 10.0;
-    rigidObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
-    rigidObj->getRigidBody()->m_initPos = Vec3d(0.0, 1.0, 2.0);
+    cuttingTool->setDynamicalModel(pbdModel);
+    cuttingTool->getVisualModel(0)->setRenderMaterial(material);
+    cuttingTool->getPbdBody()->setRigid(Vec3d(0.0, 1.0, 2.0), 10.0, Quatd::Identity(), Mat3d::Identity() * 1000.0);
 
     // Add a component for controlling via another device
-    auto controller = rigidObj->addComponent<RigidObjectController>();
-    controller->setControlledObject(rigidObj);
+    auto controller = cuttingTool->addComponent<PbdObjectController>();
+    controller->setControlledObject(cuttingTool);
     controller->setLinearKs(50000.0);
     controller->setAngularKs(300000000.0);
     controller->setUseCritDamping(true);
@@ -90,11 +84,11 @@ makeRigidObj(const std::string& name)
     controller->setSmoothingKernelSize(30);
 
     // Add extra component to tool for the ghost
-    auto controllerGhost = rigidObj->addComponent<ObjectControllerGhost>();
+    auto controllerGhost = cuttingTool->addComponent<ObjectControllerGhost>();
     controllerGhost->setUseForceFade(true);
     controllerGhost->setController(controller);
 
-    return rigidObj;
+    return cuttingTool;
 }
 
 ///
@@ -111,20 +105,18 @@ main()
     auto scene = std::make_shared<Scene>("FemurCut");
 
     // Setup the Femur
-    auto femurObj = std::make_shared<FemurObject>();
-    femurObj->setup();
-    scene->addSceneObject(femurObj);
+    auto femurBone = std::make_shared<FemurObject>();
+    femurBone->setup();
+    scene->addSceneObject(femurBone);
 
     // Setup the tool that cuts the femur
-    std::shared_ptr<RigidObject2> rbdObj = makeRigidObj("ToolObject");
-    scene->addSceneObject(rbdObj);
+    std::shared_ptr<PbdObject> cuttingTool = makeCuttingTool("CuttingTool");
+    scene->addSceneObject(cuttingTool);
 
     // Setup cutting interaction between level set femur and rigid object tool
-    auto cutting = std::make_shared<RigidObjectLevelSetCollision>(rbdObj, femurObj);
+    auto cutting = std::make_shared<RigidObjectLevelSetCollision>(cuttingTool, femurBone);
     {
-        auto colHandlerA = std::dynamic_pointer_cast<RigidBodyCH>(cutting->getCollisionHandlingA());
-        colHandlerA->setUseFriction(false);
-        colHandlerA->setBaumgarteStabilization(0.05); // inelastic collision
+        auto colHandlerA = std::dynamic_pointer_cast<PbdCollisionHandling>(cutting->getCollisionHandlingA());
 
         auto colHandlerB = std::dynamic_pointer_cast<LevelSetCH>(cutting->getCollisionHandlingB());
         colHandlerB->setLevelSetVelocityScaling(0.01);
@@ -174,17 +166,17 @@ main()
             });
 #endif
 
-        auto controller = rbdObj->getComponent<RigidObjectController>();
+        auto controller = cuttingTool->getComponent<PbdObjectController>();
         controller->setDevice(deviceClient);
 
-        std::shared_ptr<ObjectControllerGhost> ghostObj = rbdObj->addComponent<ObjectControllerGhost>();
+        std::shared_ptr<ObjectControllerGhost> ghostObj = cuttingTool->addComponent<ObjectControllerGhost>();
         ghostObj->setController(controller);
 
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
             {
-                rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-                femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
+                cuttingTool->getPbdModel()->getConfig()->m_dt    = sceneManager->getDt();
+                femurBone->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
         });
 
         // Add default mouse and keyboard controls to the viewer

@@ -9,10 +9,7 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectController.h"
-#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidObjectController.h"
 #include "imstkSceneObject.h"
 #include "imstkTextVisualModel.h"
 #include "imstkVisualModel.h"
@@ -43,7 +40,7 @@ ControllerForceText::init()
         entity->addComponent(m_textVisualModel);
     }
 
-    CHECK(m_pbdController != nullptr || m_rbdController != nullptr)
+    CHECK(m_pbdController != nullptr)
         << "ObjectControllerGhost must have a controller";
 }
 
@@ -134,21 +131,6 @@ ControllerForceText::visualUpdate(const double& dt)
                     strStream << "\nContact Force: " << contactForceMag << "N";
                     strStream << "\nContact Torque: " << contactTorqueMag << "Nm";
                 }
-            }
-            else
-            {
-                const Vec3d deviceForce  = m_rbdController->getDeviceForce();
-                const Vec3d deviceTorque = m_rbdController->getDeviceTorque();
-
-                auto        rbdObj     = std::dynamic_pointer_cast<RigidObject2>(m_rbdController->getControlledObject());
-                const Vec3d bodyForce  = rbdObj->getRigidBody()->getForce();
-                const Vec3d bodyTorque = rbdObj->getRigidBody()->getTorque();
-
-                strStream <<
-                    "Device Force: " << deviceForce.norm() << "N"
-                    "\nDevice Torque: " << deviceTorque.norm() << "Nm"
-                    "\nBody Force: " << bodyForce.norm() << "N"
-                    "\nBody Torque: " << bodyTorque.norm() << "Nm";
             }
 
             m_textVisualModel->setText(strStream.str());

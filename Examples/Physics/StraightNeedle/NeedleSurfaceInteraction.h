@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "imstkPbdRigidObjectCollision.h"
-#include "imstkRigidObject2.h"
+#include "imstkPbdObjectCollision.h"
+#include "imstkPbdObject.h"
 #include "imstkStraightNeedle.h"
 #include "NeedlePbdCH.h"
 #include "NeedleRigidBodyCH.h"
@@ -19,24 +19,23 @@ using namespace imstk;
 ///
 /// \brief Defines interaction between NeedleObject and PbdObject
 ///
-class NeedleSurfaceInteraction : public PbdRigidObjectCollision
+class NeedleSurfaceInteraction : public PbdObjectCollision
 {
 public:
-    NeedleSurfaceInteraction(std::shared_ptr<PbdObject>    tissueObj,
-                             std::shared_ptr<RigidObject2> needleObj,
-                             const std::string&            collisionName = "") : PbdRigidObjectCollision(tissueObj, needleObj, collisionName)
+    NeedleSurfaceInteraction(std::shared_ptr<PbdObject> tissueObj,
+                             std::shared_ptr<PbdObject> needleObj,
+                             const std::string&         collisionName = "") : PbdObjectCollision(tissueObj, needleObj, collisionName)
     {
         CHECK(needleObj->containsComponent<StraightNeedle>())
             << "NeedleSurfaceInteraction only works with objects that have a StraightNeedle component";
         CHECK(tissueObj->containsComponent<Puncturable>())
             << "NeedleSurfaceInteraction only works with objects that have a Puncturable component";
 
-        auto needleRbdCH = std::make_shared<NeedleRigidBodyCH>();
-        needleRbdCH->setInputRigidObjectA(needleObj);
-        needleRbdCH->setInputCollidingObjectB(tissueObj);
-        needleRbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
-        needleRbdCH->setBaumgarteStabilization(0.001);
-        setCollisionHandlingB(needleRbdCH);
+        auto needleRigidCH = std::make_shared<NeedleRigidBodyCH>();
+        needleRigidCH->setInputObjectA(needleObj);
+        needleRigidCH->setInputObjectB(tissueObj);
+        needleRigidCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
+        setCollisionHandlingB(needleRigidCH);
 
         auto needlePbdCH = std::make_shared<NeedlePbdCH>();
         needlePbdCH->setInputObjectA(tissueObj);

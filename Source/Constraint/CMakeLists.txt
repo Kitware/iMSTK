@@ -8,7 +8,6 @@ imstk_add_library( Constraints
     PbdConstraints/imstkPbdAngularConstraint.h
     PbdConstraints/imstkPbdContactConstraint.h
     imstkLinearProjectionConstraint.h
-    MultiModelConstraints/imstkPbdRigidBaryPointToPointConstraint.h
     PbdConstraints/imstkPbdAreaConstraint.h
     PbdConstraints/imstkPbdBaryPointToPointConstraint.h
     PbdConstraints/imstkPbdBendConstraint.h
@@ -27,15 +26,10 @@ imstk_add_library( Constraints
     PbdConstraints/imstkPbdPointPointConstraint.h
     PbdConstraints/imstkPbdPointTriangleConstraint.h
     PbdConstraints/imstkPbdVolumeConstraint.h
-    RigidBodyConstraints/imstkRbdConstraint.h
-    RigidBodyConstraints/imstkRbdContactConstraint.h
-    RigidBodyConstraints/imstkRbdDistanceConstraint.h
-    RigidBodyConstraints/imstkRbdFrictionConstraint.h
   CPP_FILES
     PbdConstraints/imstkPbdAngularConstraint.cpp
     PbdConstraints/imstkPbdContactConstraint.cpp
     imstkLinearProjectionConstraint.cpp
-    MultiModelConstraints/imstkPbdRigidBaryPointToPointConstraint.cpp
     PbdConstraints/imstkPbdAreaConstraint.cpp
     PbdConstraints/imstkPbdBaryPointToPointConstraint.cpp
     PbdConstraints/imstkPbdBendConstraint.cpp
@@ -52,10 +46,6 @@ imstk_add_library( Constraints
     PbdConstraints/imstkPbdPointPointConstraint.cpp
     PbdConstraints/imstkPbdPointTriangleConstraint.cpp
     PbdConstraints/imstkPbdVolumeConstraint.cpp
-    RigidBodyConstraints/imstkRbdConstraint.cpp
-    RigidBodyConstraints/imstkRbdContactConstraint.cpp
-    RigidBodyConstraints/imstkRbdDistanceConstraint.cpp
-    RigidBodyConstraints/imstkRbdFrictionConstraint.cpp
   DEPENDS
     CollisionDetection
     Common

@@ -11,9 +11,6 @@ imstk_add_library( Scene
     imstkPbdObjectCutting.h
     imstkPbdObjectGrasping.h
     imstkPbdObjectStitching.h
-    imstkPbdRigidObjectCollision.h
-    imstkPbdRigidObjectGrasping.h
-    imstkRigidObjectCollision.h
     imstkRigidObjectLevelSetCollision.h
     imstkScene.h
     imstkSphObjectCollision.h
@@ -24,9 +21,6 @@ imstk_add_library( Scene
     imstkPbdObjectCutting.cpp
     imstkPbdObjectGrasping.cpp
     imstkPbdObjectStitching.cpp
-    imstkPbdRigidObjectCollision.cpp
-    imstkPbdRigidObjectGrasping.cpp
-    imstkRigidObjectCollision.cpp
     imstkRigidObjectLevelSetCollision.cpp
     imstkScene.cpp
     imstkSphObjectCollision.cpp

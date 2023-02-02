@@ -14,48 +14,49 @@
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
 #include "imstkParallelFor.h"
-#include "imstkRigidBodyCH.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
+#include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
+#include "imstkPbdCollisionHandling.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
 #include "imstkVecDataArray.h"
 
 namespace imstk
 {
-RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2) :
-    CollisionInteraction("RigidObjectLevelSetCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, std::string("ImplicitGeometryToPointSetCCD")),
+RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<LevelSetDeformableObject> obj2) :
+    CollisionInteraction("RigidObjectLevelSetCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, ""),
     m_prevVertices(std::make_shared<VecDataArray<double, 3>>())
 {
-    std::shared_ptr<RigidBodyModel2> rbdModel    = obj1->getRigidBodyModel2();
-    std::shared_ptr<LevelSetModel>   lvlSetModel = obj2->getLevelSetModel();
+    std::shared_ptr<PbdModel>      pbdModel    = obj1->getPbdModel();
+    std::shared_ptr<LevelSetModel> lvlSetModel = obj2->getLevelSetModel();
 
-    if (rbdModel == nullptr || lvlSetModel == nullptr)
+    if (pbdModel == nullptr || lvlSetModel == nullptr)
     {
-        LOG(WARNING) << "RigidObjectCollisionPair, could not create";
+        LOG(WARNING) << "Cannot create collision pair.";
+        return;
+    }
+    if (!obj1->getPbdBody()->isRigid())
+    {
+        LOG(WARNING) << "PBD object should be rigid.";
         return;
     }
 
-    // Graph of explicit interaction
-    // [compute tentative velocities]  [lvlSetSource]
-    //                           [CD]
-    //     [Add rigid constraints]    [Apply impulses]
-    //       [Solve rbd system]       [Evolve levelset]
     // Here the CH's adds constraints to the system on the LHS, and impulses to the levelset RHS
+    m_taskGraph->addNode(pbdModel->getSolveNode());
+    m_taskGraph->addNode(pbdModel->getIntegratePositionNode());
+    m_taskGraph->addNode(pbdModel->getUpdateVelocityNode());
 
-    m_taskGraph->addNode(rbdModel->getComputeTentativeVelocitiesNode());
     m_taskGraph->addNode(lvlSetModel->getGenerateVelocitiesBeginNode());
-
-    m_taskGraph->addNode(rbdModel->getSolveNode());
     m_taskGraph->addNode(lvlSetModel->getGenerateVelocitiesEndNode());
 
     // Setup the rigid body handler to move the rigid body according to collision data
-    auto rbdCH = std::make_shared<RigidBodyCH>();
-    rbdCH->setInputRigidObjectA(obj1);
-    rbdCH->setInputCollidingObjectB(obj2);
-    rbdCH->setInputCollisionData(m_colDetect->getCollisionData());
-    rbdCH->setFriction(0.0);
-    setCollisionHandlingA(rbdCH);
+    auto pbdCH = std::make_shared<PbdCollisionHandling>();
+    pbdCH->setInputObjectA(obj1);
+    pbdCH->setInputObjectB(obj2);
+
+    pbdCH->setInputCollisionData(m_colDetect->getCollisionData());
+    pbdCH->setFriction(0.0);
+    setCollisionHandlingA(pbdCH);
 
     // Setup the levelset handler to erode the levelset according to collision data
     auto lvlSetCH = std::make_shared<LevelSetCH>();
@@ -84,9 +85,13 @@ RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<Rigid
         displacementsPtr->fill(Vec3d::Zero());
     }
 
+    m_taskGraph->addNode(obj1->getUpdateNode());
     m_taskGraph->addNode(obj1->getUpdateGeometryNode());
+
     m_taskGraph->addNode(obj1->getTaskGraph()->getSource());
     m_taskGraph->addNode(obj1->getTaskGraph()->getSink());
+    m_taskGraph->addNode(obj2->getTaskGraph()->getSource());
+    m_taskGraph->addNode(obj2->getTaskGraph()->getSink());
 }
 
 void
@@ -94,31 +99,41 @@ RigidObjectLevelSetCollision::initGraphEdges(std::shared_ptr<TaskNode> source, s
 {
     CollisionInteraction::initGraphEdges(source, sink);
 
-    auto                             rbdObj1  = std::dynamic_pointer_cast<RigidObject2>(m_objA);
-    std::shared_ptr<RigidBodyModel2> rbdModel = rbdObj1->getRigidBodyModel2();
+    auto                      pbdObjA  = std::dynamic_pointer_cast<PbdObject>(m_objA);
+    std::shared_ptr<PbdModel> pbdModel = pbdObjA->getPbdModel();
 
     auto                           lvlSetObj2 = std::dynamic_pointer_cast<LevelSetDeformableObject>(m_objB);
     std::shared_ptr<LevelSetModel> lsmModel   = lvlSetObj2->getLevelSetModel();
 
-    std::shared_ptr<TaskNode> rbdHandlerNode = m_collisionHandleANode;
+    std::shared_ptr<TaskNode> pbdHandlerNode = m_collisionHandleANode;
     std::shared_ptr<TaskNode> lsmHandlerNode = m_collisionHandleBNode;
 
+    // Ensure a complete graph
+    m_taskGraph->addEdge(source, pbdObjA->getTaskGraph()->getSource());
+    m_taskGraph->addEdge(pbdObjA->getTaskGraph()->getSink(), sink);
+    m_taskGraph->addEdge(source, lvlSetObj2->getTaskGraph()->getSource());
+    m_taskGraph->addEdge(lvlSetObj2->getTaskGraph()->getSink(), sink);
+
+    // Add pbd process tasks
+    m_taskGraph->addEdge(pbdModel->getIntegratePositionNode(), m_collisionGeometryUpdateNode);
+    m_taskGraph->addEdge(m_collisionGeometryUpdateNode, m_collisionDetectionNode);
+    m_taskGraph->addEdge(m_collisionDetectionNode, pbdHandlerNode);
+    m_taskGraph->addEdge(pbdHandlerNode, pbdModel->getSolveNode());
+    m_taskGraph->addEdge(pbdModel->getSolveNode(), pbdModel->getUpdateVelocityNode());
+
+    ///                   [pbdObject]                               [lvlSetObject]
+    ///                Integrate Positions                   LSM Begin Compute Velocities
+    ///                                   Collision Detection
+    /// pbd collision handler (add constraints)             LSM Handler (pointset erosion)
+    ///              pbd Solve                                LSM End Compute Velocities
     ///
-    /// Compute Tentative Velocities (pre col vel)         LSM Begin Compute Velocities
-    ///                                Collision Detection
-    /// Rigid Body Handler (add constraints)               LSM Handler (pointset erosion)
-    ///              Rbd Solve                              LSM End Compute Velocities
-    ///
-    m_taskGraph->addEdge(rbdModel->getComputeTentativeVelocitiesNode(), m_collisionDetectionNode);
+
+    // Add levelset process tasks
     m_taskGraph->addEdge(lsmModel->getGenerateVelocitiesBeginNode(), m_collisionDetectionNode);
-
-    m_taskGraph->addEdge(m_collisionDetectionNode, rbdHandlerNode);
     m_taskGraph->addEdge(m_collisionDetectionNode, lsmHandlerNode);
-
-    m_taskGraph->addEdge(rbdHandlerNode, rbdModel->getSolveNode());
     m_taskGraph->addEdge(lsmHandlerNode, lsmModel->getGenerateVelocitiesEndNode());
 
-    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(rbdObj1->getPhysicsGeometry());
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(pbdObjA->getPhysicsGeometry());
     const bool                measureDisplacements = (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"));
 
     // The tentative body is never actually computed, it should be good to catch the contact
@@ -126,22 +141,21 @@ RigidObjectLevelSetCollision::initGraphEdges(std::shared_ptr<TaskNode> source, s
     if (measureDisplacements)
     {
         // 1.) Copy the vertices at the start of the frame
-        m_taskGraph->addEdge(rbdObj1->getTaskGraph()->getSource(), m_copyVertToPrevNode);
-        m_taskGraph->addEdge(m_copyVertToPrevNode,
-            rbdObj1->getRigidBodyModel2()->getComputeTentativeVelocitiesNode());
+        m_taskGraph->addEdge(pbdObjA->getTaskGraph()->getSource(), m_copyVertToPrevNode);
+        m_taskGraph->addEdge(m_copyVertToPrevNode, pbdObjA->getUpdateNode());
 
         // If you were to update to tentative, you'd do it here, then compute displacements
 
         // 2.) Compute the displacements after updating geometry
-        m_taskGraph->addEdge(rbdObj1->getUpdateGeometryNode(), m_computeDisplacementNode);
-        m_taskGraph->addEdge(m_computeDisplacementNode, rbdObj1->getTaskGraph()->getSink());
+        m_taskGraph->addEdge(pbdObjA->getUpdateGeometryNode(), m_computeDisplacementNode);
+        m_taskGraph->addEdge(m_computeDisplacementNode, pbdObjA->getTaskGraph()->getSink());
     }
 }
 
 void
 RigidObjectLevelSetCollision::copyVertsToPrevious()
 {
-    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objA);
+    auto                      obj1     = std::dynamic_pointer_cast<PbdObject>(m_objA);
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
 
     if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))
@@ -161,7 +175,7 @@ RigidObjectLevelSetCollision::copyVertsToPrevious()
 void
 RigidObjectLevelSetCollision::measureDisplacementFromPrevious()
 {
-    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objA);
+    auto                      obj1     = std::dynamic_pointer_cast<PbdObject>(m_objA);
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
 
     if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))

@@ -243,7 +243,7 @@ bowlScene()
     // Write log to stdout and file
     Logger::startLogger();
 
-    auto scene   = std::make_shared<Scene>("RbdSDFCollision");
+    auto scene   = std::make_shared<Scene>("PbdSDFCollision");
     auto cubeObj = std::make_shared<PbdObject>("Cube");
     {
         // This model is shared among interacting rigid bodies
@@ -258,7 +258,7 @@ bowlScene()
         pbdConfig->m_doPartitioning      = false;
         pbdModel->configure(pbdConfig);
 
-        // Create the first rbd, plane floor
+        // Create the first pbd, plane floor
         auto planeObj = std::make_shared<SceneObject>("Plane");
         {
             // Subtract the sphere from the plane to make a crater
@@ -328,11 +328,11 @@ bowlScene()
             scene->addSceneObject(cubeObj);
         }
 
-        auto rbdInteraction = std::make_shared<PbdObjectCollision>(cubeObj, planeObj, "ImplicitGeometryToPointSetCD");
-        rbdInteraction->setRigidBodyCompliance(0.00001);
-        //rbdInteraction->setFriction(0.5);
-        //rbdInteraction->setUseCorrectVelocity(false);
-        scene->addInteraction(rbdInteraction);
+        auto pbdInteraction = std::make_shared<PbdObjectCollision>(cubeObj, planeObj, "ImplicitGeometryToPointSetCD");
+        pbdInteraction->setRigidBodyCompliance(0.00001);
+        pbdInteraction->setFriction(0.5);
+        //pbdInteraction->setUseCorrectVelocity(false);
+        scene->addInteraction(pbdInteraction);
 
         // Camera
         scene->getActiveCamera()->setPosition(0.0, 1.0, 1.0);

@@ -11,14 +11,13 @@
 #include "imstkNeedle.h"
 #include "imstkPbdObject.h"
 #include "imstkPuncturable.h"
-#include "imstkRigidObject2.h"
 #include "NeedlePbdCH.h"
 
 using namespace imstk;
 
-NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
-                                     std::shared_ptr<RigidObject2> needleObj,
-                                     std::shared_ptr<PbdObject>    threadObj)
+NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
+                                     std::shared_ptr<PbdObject> needleObj,
+                                     std::shared_ptr<PbdObject> threadObj)
     : PbdObjectCollision(tissueObj, needleObj)
 {
     // Check inputs

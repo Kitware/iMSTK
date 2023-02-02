@@ -15,11 +15,8 @@
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
-#include "imstkRbdConstraint.h"
+#include "imstkPbdObjectController.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -87,10 +84,10 @@ makePbdString(const std::string& name, const std::string& filename)
     return stringObj;
 }
 
-static std::shared_ptr<RigidObject2>
+static std::shared_ptr<PbdObject>
 makeNeedleObj()
 {
-    auto needleObj = std::make_shared<RigidObject2>();
+    auto needleObj = std::make_shared<PbdObject>();
 
     auto sutureMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
 
@@ -106,16 +103,19 @@ makeNeedleObj()
     needleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
     needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
 
-    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
-    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-    rbdModel->getConfig()->m_maxNumIterations = 5;
-    needleObj->setDynamicalModel(rbdModel);
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->getConfig()->m_gravity    = Vec3d::Zero();
+    pbdModel->getConfig()->m_iterations = 5;
+    needleObj->setDynamicalModel(pbdModel);
 
-    needleObj->getRigidBody()->m_mass = 1.0;
-    needleObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
-    needleObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
+    /*
+    needleObj->getPbdBody()->m_mass = 1.0;
+    needleObj->getPbdBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
+    needleObj->getPbdBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
+    */
+    needleObj->getPbdBody()->setRigid(Vec3d::Zero(), 1.0, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
-    auto controller = needleObj->addComponent<RigidObjectController>();
+    auto controller = needleObj->addComponent<PbdObjectController>();
     controller->setControlledObject(needleObj);
     controller->setTranslationOffset(Vec3d(-0.02, 0.02, 0.0));
     controller->setLinearKs(1000.0);
@@ -148,7 +148,7 @@ SutureSelfCCD()
     scene->addInteraction(interaction);
 
     // Create the arc needle
-    std::shared_ptr<RigidObject2> needleObj = makeNeedleObj();
+    std::shared_ptr<PbdObject> needleObj = makeNeedleObj();
     scene->addSceneObject(needleObj);
 
     // Adjust the camera
@@ -175,7 +175,7 @@ SutureSelfCCD()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.0005); // 1ms, 1000hz //timestep
 
-        auto controller = needleObj->getComponent<RigidObjectController>();
+        auto controller = needleObj->getComponent<PbdObjectController>();
 #ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();

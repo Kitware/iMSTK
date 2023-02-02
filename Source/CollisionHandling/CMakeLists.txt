@@ -9,14 +9,12 @@ imstk_add_library( CollisionHandling
     imstkCollisionHandling.h
     imstkLevelSetCH.h
     imstkPbdCollisionHandling.h
-    imstkRigidBodyCH.h
     imstkSphCollisionHandling.h
   CPP_FILES
     imstkBoneDrillingCH.cpp
     imstkCollisionHandling.cpp
     imstkLevelSetCH.cpp
     imstkPbdCollisionHandling.cpp
-    imstkRigidBodyCH.cpp
     imstkSphCollisionHandling.cpp
   DEPENDS
     CollisionDetection

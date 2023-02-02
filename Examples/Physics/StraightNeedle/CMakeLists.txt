@@ -24,8 +24,6 @@ if (iMSTK_USE_RENDERING_VTK)
     NeedleSurfaceInteraction.h
     PBDTissueSurfaceNeedleContactExample.cpp
     PBDTissueVolumeNeedleContactExample.cpp
-    RbdAngularLockingConstraint.h
-    RbdAxesLockingConstraint.h
   )
 
   #-----------------------------------------------------------------------------

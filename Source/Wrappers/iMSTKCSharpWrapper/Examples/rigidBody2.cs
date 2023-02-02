@@ -9,12 +9,12 @@ public class RigidBody2
         Logger.startLogger();
 
         Scene scene = new Scene("Rigid Body Dynamics");
-        RigidObject2 cubeObj = new RigidObject2("Cube");
+        PbdObject cubeObj = new PbdObject("Cube");
         {
             // This model is shared among interacting rigid bodies
-            RigidBodyModel2 rbdModel = new RigidBodyModel2();
+            PbdModel rbdModel = new PbdModel();
             rbdModel.getConfig().m_gravity = new Vec3d(0.0, -2500.0, 0.0);
-            rbdModel.getConfig().m_maxNumIterations = 10;
+            rbdModel.getConfig().m_iterations = 10;
 
             // Create the first rbd, plane floor
             SceneObject planeObj = new SceneObject("Plane");
@@ -86,18 +86,14 @@ public class RigidBody2
                 cubeObj.setPhysicsGeometry(subdivide.getOutputMesh());
                 cubeObj.addComponentCollider().setGeometry(subdivide.getOutputMesh());
                 cubeObj.addVisualModel(visualModel);
-                cubeObj.getRigidBody().m_mass = 100.0;
-                cubeObj.getRigidBody().m_initPos = new Vec3d(0.0, 8.0, 0.0);
-                Rotd rotd = new Rotd(0.4, new Vec3d(1.0, 0.0, 0.0));
-                cubeObj.getRigidBody().m_initOrientation = new Quatd(new Rotd(0.4, new Vec3d(1.0, 0.0, 0.0)));
-                cubeObj.getRigidBody().m_intertiaTensor = Mat3d.Identity();
+
+                cubeObj.getPbdBody().setRigid(new Vec3d(0.0, 8.0, 0.0), 100.0, new Quatd(new Rotd(0.4, new Vec3d(1.0, 0.0, 0.0))), Mat3d.Identity());
 
                 scene.addSceneObject(cubeObj);
             }
 
-            RigidObjectCollision rbdInteraction = new RigidObjectCollision(cubeObj, planeObj, "ImplicitGeometryToPointSetCD");
+            PbdObjectCollision rbdInteraction = new PbdObjectCollision(cubeObj, planeObj, "ImplicitGeometryToPointSetCD");
             rbdInteraction.setFriction(0.0);
-            rbdInteraction.setBaumgarteStabilization(0.05);
             scene.addInteraction(rbdInteraction);
             scene.getActiveCamera().setPosition(0.0, 40.0, 40.0);
 
@@ -181,11 +177,11 @@ public class RigidBody2
                         extForce = Utils.vec_add_3d(extForce, new Vec3d(0.0, -1.5, 0.0));
                     }
                     // \todo: Add setters to imstk
-                    cubeObj.getRigidBody().m_force = extForce;
-                    cubeObj.getRigidBody().m_torque = extTorque;
-                    scene.getActiveCamera().setFocalPoint(cubeObj.getRigidBody().getPosition());
-                    scene.getActiveCamera().setPosition(Utils.vec_add_3d(cubeObj.getRigidBody().getPosition(), dx));
-                    cubeObj.getRigidBodyModel2().getConfig().m_dt = sceneManager.getDt();
+                    cubeObj.getPbdBody().externalForce = extForce;
+                    cubeObj.getPbdBody().externalTorque = extTorque;
+                    scene.getActiveCamera().setFocalPoint(cubeObj.getPbdBody().getRigidPosition());
+                    scene.getActiveCamera().setPosition(Utils.vec_add_3d(cubeObj.getPbdBody().getRigidPosition(), dx));
+                    cubeObj.getPbdModel().getConfig().m_dt = sceneManager.getDt();
                 });
 
             driver.start();

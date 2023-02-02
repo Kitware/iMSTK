@@ -21,7 +21,7 @@ public:
     ~EmbeddingConstraint() override = default;
 
     ///
-    /// \brief Initializes both PBD and RBD constraint
+    /// \brief Initializes PBD constraints
     /// \param bodies
     /// \param rigid body particle
     /// \param triangle particle b1

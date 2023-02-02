@@ -11,7 +11,6 @@ imstk_add_library( Controllers
     imstkLaparoscopicToolController.h
     imstkMouseControl.h
     imstkPbdObjectController.h
-    imstkRigidObjectController.h
     imstkSceneObjectController.h
     imstkTrackingDeviceControl.h
   CPP_FILES
@@ -20,7 +19,6 @@ imstk_add_library( Controllers
     imstkLaparoscopicToolController.cpp
     imstkMouseControl.cpp
     imstkPbdObjectController.cpp
-    imstkRigidObjectController.cpp
     imstkSceneObjectController.cpp
     imstkTrackingDeviceControl.cpp
   DEPENDS

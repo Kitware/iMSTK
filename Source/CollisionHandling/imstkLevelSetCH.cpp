@@ -10,8 +10,7 @@
 #include "imstkImageData.h"
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
-#include "imstkRbdConstraint.h"
-#include "imstkRigidObject2.h"
+#include "imstkPbdObject.h"
 
 namespace imstk
 {
@@ -35,9 +34,9 @@ LevelSetCH::setInputLvlSetObj(std::shared_ptr<LevelSetDeformableObject> lvlSetOb
 }
 
 void
-LevelSetCH::setInputRigidObj(std::shared_ptr<RigidObject2> rbdObj)
+LevelSetCH::setInputRigidObj(std::shared_ptr<PbdObject> pbdObj)
 {
-    setInputObjectB(rbdObj);
+    setInputObjectB(pbdObj);
     maskAllPoints();
 }
 
@@ -47,10 +46,10 @@ LevelSetCH::getLvlSetObj()
     return std::dynamic_pointer_cast<LevelSetDeformableObject>(getInputObjectA());
 }
 
-std::shared_ptr<RigidObject2>
+std::shared_ptr<PbdObject>
 LevelSetCH::getRigidObj()
 {
-    return std::dynamic_pointer_cast<RigidObject2>(getInputObjectB());
+    return std::dynamic_pointer_cast<PbdObject>(getInputObjectB());
 }
 
 void
@@ -91,9 +90,9 @@ LevelSetCH::handle(
     const std::vector<CollisionElement>& elementsB)
 {
     std::shared_ptr<LevelSetDeformableObject> lvlSetObj = getLvlSetObj();
-    std::shared_ptr<RigidObject2>             rbdObj    = getRigidObj();
+    std::shared_ptr<PbdObject>                pbdObj    = getRigidObj();
 
-    if (lvlSetObj == nullptr || rbdObj == nullptr)
+    if (lvlSetObj == nullptr || pbdObj == nullptr)
     {
         return;
     }
@@ -123,23 +122,23 @@ LevelSetCH::handle(
         for (size_t i = 0; i < elementsA.size(); i++)
         {
             const CollisionElement& lsmContactElement = elementsA[i];
-            const CollisionElement& rbdContactElement = elementsB[i];
+            const CollisionElement& pbdContactElement = elementsB[i];
 
             if (lsmContactElement.m_type != CollisionElementType::PointDirection
-                || rbdContactElement.m_type != CollisionElementType::PointIndexDirection)
+                || pbdContactElement.m_type != CollisionElementType::PointIndexDirection)
             {
                 continue;
             }
 
             // If the point is in the mask, let it apply impulses
-            if (m_ptIdMask.count(rbdContactElement.m_element.m_PointIndexDirectionElement.ptIndex) != 0)
+            if (m_ptIdMask.count(pbdContactElement.m_element.m_PointIndexDirectionElement.ptIndex) != 0)
             {
                 const Vec3d& pos    = lsmContactElement.m_element.m_PointDirectionElement.pt;
                 const Vec3d& normal = lsmContactElement.m_element.m_PointDirectionElement.dir;
                 const Vec3i  coord  = (pos - origin).cwiseProduct(invSpacing).cast<int>();
 
                 // Scale the applied impulse by the normal force
-                const double fN = normal.normalized().dot(rbdObj->getRigidBody()->getForce()) / rbdObj->getRigidBody()->getForce().norm();
+                const double fN = normal.normalized().dot(pbdObj->getPbdBody()->externalForce) / pbdObj->getPbdBody()->externalForce.norm();
                 const double S  = std::max(fN, 0.0) * m_velocityScaling;
 
                 const int halfSize = static_cast<int>(m_kernelSize * 0.5);
@@ -164,16 +163,16 @@ LevelSetCH::handle(
         for (size_t i = 0; i < elementsA.size(); i++)
         {
             const CollisionElement& lsmContactElement = elementsA[i];
-            const CollisionElement& rbdContactElement = elementsB[i];
+            const CollisionElement& pbdContactElement = elementsB[i];
 
             if (lsmContactElement.m_type != CollisionElementType::PointDirection
-                || rbdContactElement.m_type != CollisionElementType::PointIndexDirection)
+                || pbdContactElement.m_type != CollisionElementType::PointIndexDirection)
             {
                 continue;
             }
 
             // If the point is in the mask, let it apply impulses
-            if (m_ptIdMask.count(rbdContactElement.m_element.m_PointIndexDirectionElement.ptIndex) != 0)
+            if (m_ptIdMask.count(pbdContactElement.m_element.m_PointIndexDirectionElement.ptIndex) != 0)
             {
                 const Vec3d& pos = lsmContactElement.m_element.m_PointDirectionElement.pt;
                 //const Vec3d& normal = pdColData[i].dirAtoB;

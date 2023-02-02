@@ -20,13 +20,10 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdObjectController.h"
 #include "imstkPointwiseMap.h"
 #include "imstkPuncturable.h"
-#include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -148,10 +145,10 @@ makePbdString(
     return stringObj;
 }
 
-static std::shared_ptr<RigidObject2>
+static std::shared_ptr<PbdObject>
 makeToolObj()
 {
-    auto needleObj      = std::make_shared<RigidObject2>();
+    auto needleObj      = std::make_shared<PbdObject>();
     auto sutureMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
     auto sutureLineMesh = MeshIO::read<LineMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture_hull.vtk");
 
@@ -172,14 +169,11 @@ makeToolObj()
     needleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
     needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
 
-    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
-    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-    rbdModel->getConfig()->m_maxNumIterations = 5;
-    needleObj->setDynamicalModel(rbdModel);
-
-    needleObj->getRigidBody()->m_mass = 1.0;
-    needleObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
-    needleObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->getConfig()->m_gravity    = Vec3d::Zero();
+    pbdModel->getConfig()->m_iterations = 5;
+    needleObj->setDynamicalModel(pbdModel);
+    needleObj->getPbdBody()->setRigid(Vec3d::Zero(), 1.0, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     needleObj->addComponent<Needle>();
 
@@ -223,7 +217,7 @@ main()
     scene->addSceneObject(tissueHole);
 
     // Create arced needle
-    std::shared_ptr<RigidObject2> needleObj = makeToolObj();
+    std::shared_ptr<PbdObject> needleObj = makeToolObj();
     scene->addSceneObject(needleObj);
 
     // Create the suture pbd-based string
@@ -267,7 +261,7 @@ main()
         std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        auto hapController = std::make_shared<RigidObjectController>();
+        auto hapController = std::make_shared<PbdObjectController>();
         hapController->setControlledObject(needleObj);
         hapController->setDevice(deviceClient);
         hapController->setTranslationScaling(0.5);

@@ -16,7 +16,7 @@ namespace imstk
 {
 class CollisionData;
 class LevelSetDeformableObject;
-class RigidObject2;
+class PbdObject;
 
 ///
 /// \class LevelSetCH
@@ -34,10 +34,10 @@ public:
 
 public:
     void setInputLvlSetObj(std::shared_ptr<LevelSetDeformableObject> lvlSetObj);
-    void setInputRigidObj(std::shared_ptr<RigidObject2> rbdObj);
+    void setInputRigidObj(std::shared_ptr<PbdObject> pbdObj);
 
     std::shared_ptr<LevelSetDeformableObject> getLvlSetObj();
-    std::shared_ptr<RigidObject2> getRigidObj();
+    std::shared_ptr<PbdObject> getRigidObj();
 
 public:
     ///

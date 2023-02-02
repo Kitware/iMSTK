@@ -28,7 +28,6 @@ set(H_FILES
   Objects/imstkPbdConnectiveTissueConstraintGenerator.h
   Objects/imstkPbdObject.h
   Objects/imstkPbdObjectCellRemoval.h
-  Objects/imstkRigidObject2.h
   Objects/imstkSceneObject.h
   Objects/imstkSphObject.h
   )
@@ -53,19 +52,9 @@ set(SRC_FILES
   Objects/imstkPbdConnectiveTissueConstraintGenerator.cpp
   Objects/imstkPbdObject.cpp
   Objects/imstkPbdObjectCellRemoval.cpp
-  Objects/imstkRigidObject2.cpp
   Objects/imstkSceneObject.cpp
   Objects/imstkSphObject.cpp
   )
-
-if (iMSTK_USE_MODEL_REDUCTION)
-  list(APPEND H_FILES
-    Objects/imstkReducedFeDeformableObject.h
-    )
-  list(APPEND SRC_FILES
-    Objects/imstkReducedFeDeformableObject.cpp
-    )
-endif()
 
 include(imstkAddLibrary)
 imstk_add_library(SceneEntities

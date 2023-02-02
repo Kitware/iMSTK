@@ -93,11 +93,7 @@
 %shared_ptr(imstk::DynamicalModel<imstk::FeDeformBodyState>)
 %shared_ptr(imstk::DynamicalModel<imstk::SphState>)
 %shared_ptr(imstk::SphState)
-%shared_ptr(imstk::RigidBodyState2)
-%shared_ptr(imstk::DynamicalModel<imstk::RigidBodyState2>)
 %shared_ptr(imstk::PbdModel)
-%shared_ptr(imstk::RigidBodyModel2Config)
-%shared_ptr(imstk::RigidBodyModel2)
 %shared_ptr(imstk::SphModelConfig)
 %shared_ptr(imstk::SphModel)
 %shared_ptr(imstk::TimeIntegrator)
@@ -114,7 +110,6 @@
  */
 %shared_ptr(imstk::PbdBody)
 %shared_ptr(imstk::PbdState)
-%shared_ptr(imstk::RigidBody)
 %shared_ptr(imstk::PbdConstraint)
 %shared_ptr(imstk::PbdStrainEnergyConstraint)
 
@@ -132,7 +127,6 @@
 %shared_ptr(imstk::PbdConnectiveTissueConstraintGenerator)
 %shared_ptr(imstk::PbdObject)
 %shared_ptr(imstk::SphObject)
-%shared_ptr(imstk::RigidObject2)
 %shared_ptr(imstk::VisualModel)
 %shared_ptr(imstk::Camera)
 %shared_ptr(imstk::Light)
@@ -171,8 +165,6 @@
  */
 %shared_ptr(imstk::CollisionPair)
 %shared_ptr(imstk::CollisionHandling)
-%shared_ptr(imstk::RigidObjectCollidingCollisionPair)
-%shared_ptr(imstk::RigidBodyCH)
 
 /*
  * Controller
@@ -182,7 +174,6 @@
 %shared_ptr(imstk::KeyboardControl)
 %shared_ptr(imstk::TrackingDeviceControl)
 %shared_ptr(imstk::SceneObjectController)
-%shared_ptr(imstk::RigidObjectController)
 %shared_ptr(imstk::PbdObjectController)
 
 /*
@@ -201,12 +192,9 @@
 %shared_ptr(imstk::Scene)
 %shared_ptr(imstk::CollisionInteraction)
 %shared_ptr(imstk::PbdObjectCellRemoval)
-%shared_ptr(imstk::RigidObjectCollision)
 %shared_ptr(imstk::PbdObjectCutting)
 %shared_ptr(imstk::PbdObjectGrasping)
 %shared_ptr(imstk::PbdObjectCollision)
-%shared_ptr(imstk::PbdRigidObjectCollision)
-%shared_ptr(imstk::PbdRigidObjectGrasping)
 %shared_ptr(imstk::SphObjectCollision)
 
 /*
