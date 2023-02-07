@@ -582,7 +582,7 @@ Scene::advance(const double dt)
     // FPS of physics is given by the measured time, not the given time step dt
     const double elapsedTime = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
     m_fps = 1.0 / elapsedTime;
-    m_frameTimes.push_back(elapsedTime);
+    m_frameTimes.pushBack(elapsedTime);
 
     // If benchmarking enabled, produce a time table for each step
     if (m_config->taskTimingEnabled)

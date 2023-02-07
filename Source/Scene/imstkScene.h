@@ -17,7 +17,6 @@
 #include <unordered_set>
 #include <vector>
 
-
 namespace imstk
 {
 class Camera;

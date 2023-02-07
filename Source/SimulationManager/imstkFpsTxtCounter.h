@@ -40,8 +40,8 @@ protected:
     std::shared_ptr<TextVisualModel> m_fpsTextVisualModel;
     std::weak_ptr<Viewer>       m_viewer;
     std::weak_ptr<SceneManager> m_sceneManager;
-    int m_prevInfoLevel = -1;
-    double m_lastUpdate = 0.0;
+    int    m_prevInfoLevel  = -1;
+    double m_lastUpdate     = 0.0;
     double m_fpsUpdateDelay = 0.5;
 };
 } // namespace imstk
