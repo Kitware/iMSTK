@@ -13,7 +13,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
@@ -45,8 +45,8 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
-    pbdModel->configure(pbdParams);
+    imstkNew<PbdSystem> pbdSystem;
+    pbdSystem->configure(pbdParams);
 
     // Setup visual models
     imstkNew<VisualModel> clothModel;
@@ -65,7 +65,7 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     clothObj->addVisualModel(clothModel);
     clothObj->addVisualModel(clothSurfaceNormals);
     clothObj->setPhysicsGeometry(clothMesh);
-    clothObj->setDynamicalModel(pbdModel);
+    clothObj->setDynamicalModel(pbdSystem);
     clothObj->getPbdBody()->fixedNodeIds     = { 0, nCols - 1 };
     clothObj->getPbdBody()->uniformMassValue = width * height / (nRows * nCols);
     return clothObj;

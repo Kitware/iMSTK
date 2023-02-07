@@ -10,7 +10,7 @@
 #include "imstkLineMesh.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
 #include "imstkPbdConstraintFunctor.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkSurfaceMesh.h"
@@ -194,7 +194,7 @@ addConnectiveTissueConstraints(
     std::shared_ptr<LineMesh>  connectiveLineMesh,
     std::shared_ptr<PbdObject> objA,
     std::shared_ptr<PbdObject> objB,
-    std::shared_ptr<PbdModel>  model)
+    std::shared_ptr<PbdSystem> model)
 {
     // Check inputs
     CHECK(connectiveLineMesh != nullptr) << "NULL line mesh passes to generateConnectiveTissueConstraints";
@@ -230,7 +230,7 @@ std::shared_ptr<PbdObject>
 makeConnectiveTissue(
     std::shared_ptr<PbdObject>                objA,
     std::shared_ptr<PbdObject>                objB,
-    std::shared_ptr<PbdModel>                 model,
+    std::shared_ptr<PbdSystem>                model,
     double                                    maxDist,
     double                                    strandsPerFace,
     int                                       segmentsPerStrand,
@@ -245,7 +245,7 @@ makeConnectiveTissue(
     auto objBSurf = std::dynamic_pointer_cast<SurfaceMesh>(Collider::getCollidingGeometryFromEntity(objB.get()));
     CHECK(objBSurf != nullptr) << "Object B " << objB->getName() << " Did not contain a surface mesh as colliding geometry in generateConnectiveTissue";
 
-    CHECK(model != nullptr) << "PbdModel in generateConnectiveTissue is NULL";
+    CHECK(model != nullptr) << "PbdSystem in generateConnectiveTissue is NULL";
 
     Vec3d objACenter = objASurf->getCenter();
     Vec3d objBCenter = objBSurf->getCenter();

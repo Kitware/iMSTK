@@ -13,7 +13,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
@@ -54,8 +54,8 @@ makePbdString(
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
-    pbdModel->configure(pbdParams);
+    imstkNew<PbdSystem> pbdSystem;
+    pbdSystem->configure(pbdParams);
 
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
@@ -71,7 +71,7 @@ makePbdString(
     // Setup the Object
     stringObj->addVisualModel(visualModel);
     stringObj->setPhysicsGeometry(stringMesh);
-    stringObj->setDynamicalModel(pbdModel);
+    stringObj->setDynamicalModel(pbdSystem);
     stringObj->getPbdBody()->fixedNodeIds     = { 0 };
     stringObj->getPbdBody()->uniformMassValue = 5.0;
 
@@ -154,7 +154,7 @@ main()
                 const double dt = sceneManager->getDt();
                 for (size_t i = 0; i < pbdStringObjs.size(); i++)
                 {
-                    std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
+                    std::shared_ptr<PbdSystem> model = pbdStringObjs[i]->getPbdModel();
                     model->getConfig()->m_dt = dt;
                     std::shared_ptr<VecDataArray<double, 3>> positions = pbdStringObjs[i]->getPbdBody()->vertices;
                     (*positions)[0] += Vec3d(

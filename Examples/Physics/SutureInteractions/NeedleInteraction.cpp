@@ -31,7 +31,7 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
     CHECK(std::dynamic_pointer_cast<LineMesh>(needleObj->getComponent<Collider>()->getGeometry()) != nullptr) <<
         "NeedleInteraction only works with LineMesh collision geometry on NeedleObject";
 
-    CHECK(threadObj->getPbdModel() == tissueObj->getPbdModel()) << "Tissue and thread must share a PbdModel";
+    CHECK(threadObj->getPbdModel() == tissueObj->getPbdModel()) << "Tissue and thread must share a PbdSystem";
 
     // Add collision handler for the PBD reaction
     auto needlePbdCH = std::make_shared<NeedlePbdCH>();

@@ -95,7 +95,7 @@ struct hash<imstk::PbdCHTableKey>
 namespace imstk
 {
 class PbdObject;
-class PbdModel;
+class PbdSystem;
 class PointSet;
 class PointwiseMap;
 
@@ -103,7 +103,7 @@ class PointwiseMap;
 /// \class PbdCollisionHandling
 ///
 /// \brief Implements PBD based collision handling. Given an input PbdObject
-/// and CollisionData it creates & adds constraints in the PbdModel to be solved
+/// and CollisionData it creates & adds constraints in the PbdSystem to be solved
 /// in order to resolve the collision.
 ///
 /// This solve happens later together with all other collision constraints in the
@@ -133,7 +133,7 @@ public:
         Entity* colObj    = nullptr;
         ObjType objType   = ObjType::Colliding;
 
-        PbdModel* model    = nullptr;
+        PbdSystem* model   = nullptr;
         double compliance  = 0.0;
         double stiffness   = 0.0;
         Geometry* geometry = nullptr;

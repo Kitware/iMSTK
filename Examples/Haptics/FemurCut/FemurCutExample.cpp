@@ -20,7 +20,7 @@
 #include "imstkObjectControllerGhost.h"
 #include "imstkPbdBody.h"
 #include "imstkPbdCollisionHandling.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectController.h"
@@ -44,9 +44,9 @@ using namespace imstk;
 std::shared_ptr<PbdObject>
 makeCuttingTool(const std::string& name)
 {
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->getConfig()->m_iterations = 6;
-    pbdModel->getConfig()->m_gravity    = Vec3d::Zero();
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->getConfig()->m_iterations = 6;
+    pbdSystem->getConfig()->m_gravity    = Vec3d::Zero();
 
     // Create the first pbd, plane floor
     auto cuttingTool = std::make_shared<PbdObject>(name);
@@ -69,7 +69,7 @@ makeCuttingTool(const std::string& name)
 
     cuttingTool->addComponent<Collider>()->setGeometry(toolMesh);
 
-    cuttingTool->setDynamicalModel(pbdModel);
+    cuttingTool->setDynamicalModel(pbdSystem);
     cuttingTool->getVisualModel(0)->setRenderMaterial(material);
     cuttingTool->getPbdBody()->setRigid(Vec3d(0.0, 1.0, 2.0), 10.0, Quatd::Identity(), Mat3d::Identity() * 1000.0);
 

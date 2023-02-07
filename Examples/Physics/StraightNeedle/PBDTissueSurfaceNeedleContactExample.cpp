@@ -18,7 +18,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNeedle.h"
 #include "imstkObjectControllerGhost.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectController.h"
@@ -97,8 +97,8 @@ makeTissueObj(const std::string& name,
     pbdParams->m_linearDampingCoeff = 0.05;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the material
     auto material = std::make_shared<RenderMaterial>();
@@ -128,7 +128,7 @@ makeTissueObj(const std::string& name,
     tissueObj->setPhysicsGeometry(tissueMesh);
     tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
-    tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->setDynamicalModel(pbdSystem);
     tissueObj->getPbdBody()->uniformMassValue = 0.1;
     // Fix the borders
     for (int z = 0; z < dim[2]; z++)
@@ -151,7 +151,7 @@ makeTissueObj(const std::string& name,
 }
 
 static std::shared_ptr<PbdObject>
-makeToolObj(std::shared_ptr<PbdModel> pbdModel)
+makeToolObj(std::shared_ptr<PbdSystem> pbdSystem)
 {
     auto                    toolGeom = std::make_shared<LineMesh>();
     VecDataArray<double, 3> vertices = { Vec3d(0.0, -1.0, 0.0), Vec3d(0.0, 1.0, 0.0) };
@@ -175,7 +175,7 @@ makeToolObj(std::shared_ptr<PbdModel> pbdModel)
     toolObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
     toolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
-    toolObj->setDynamicalModel(pbdModel);
+    toolObj->setDynamicalModel(pbdSystem);
     toolObj->getPbdBody()->setRigid(Vec3d(0.0, 2.0, 0.0), 0.1, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     // Add a component for needle puncturing
@@ -221,8 +221,8 @@ main()
         Vec3d(10.0, 3.0, 10.0), Vec3i(7, 3, 6), Vec3d(0.1, -1.0, 0.0));
     scene->addSceneObject(tissueObj);
 
-    auto                       pbdModel = std::dynamic_pointer_cast<PbdModel>(tissueObj->getDynamicalModel());
-    std::shared_ptr<PbdObject> toolObj  = makeToolObj(pbdModel);
+    auto                       pbdSystem = std::dynamic_pointer_cast<PbdSystem>(tissueObj->getDynamicalModel());
+    std::shared_ptr<PbdObject> toolObj   = makeToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     scene->addInteraction(std::make_shared<NeedleSurfaceInteraction>(tissueObj, toolObj));

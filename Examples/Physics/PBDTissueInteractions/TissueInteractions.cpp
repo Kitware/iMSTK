@@ -18,7 +18,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -59,8 +59,8 @@ makeThinTissue(const std::string& name,
     pbdParams->m_linearDampingCoeff = 0.01;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
@@ -80,7 +80,7 @@ makeThinTissue(const std::string& name,
     thinTissueObj->getVisualModel(0)->setRenderMaterial(material);
     thinTissueObj->setPhysicsGeometry(mesh);
     thinTissueObj->addComponent<Collider>()->setGeometry(mesh);
-    thinTissueObj->setDynamicalModel(pbdModel);
+    thinTissueObj->setDynamicalModel(pbdSystem);
     for (int x = 0; x < rowCount; x++)
     {
         for (int y = 0; y < colCount; y++)

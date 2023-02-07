@@ -16,7 +16,7 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkMeshIO.h"
 #include "imstkObjectControllerGhost.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -43,7 +43,7 @@
 using namespace imstk;
 
 static std::shared_ptr<PbdObject>
-makeCapsuleToolObj(std::shared_ptr<PbdModel> model, bool isLeft)
+makeCapsuleToolObj(std::shared_ptr<PbdSystem> model, bool isLeft)
 {
     auto toolGeometry = std::make_shared<Capsule>();
     toolGeometry->setRadius(0.005);
@@ -117,8 +117,8 @@ PbdRigidBodyGraspingExample()
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-    auto                            pbdModel  = std::make_shared<PbdModel>();
-    std::shared_ptr<PbdModelConfig> pbdParams = pbdModel->getConfig();
+    auto                            pbdSystem = std::make_shared<PbdSystem>();
+    std::shared_ptr<PbdModelConfig> pbdParams = pbdSystem->getConfig();
     pbdParams->m_gravity = Vec3d(0.0, -9.8, 0.0);
     //pbdParams->m_gravity = Vec3d::Zero();
     pbdParams->m_dt = 0.002;
@@ -148,7 +148,7 @@ PbdRigidBodyGraspingExample()
         needleObj->addComponent<Collider>()->setGeometry(needleLineMesh);
         needleObj->setPhysicsGeometry(needleLineMesh);
         needleObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(needleLineMesh, needleMesh));
-        needleObj->setDynamicalModel(pbdModel);
+        needleObj->setDynamicalModel(pbdSystem);
         needleObj->getPbdBody()->setRigid(
             Vec3d(-0.1, 0.15, 0.0),
             1.0,
@@ -165,7 +165,7 @@ PbdRigidBodyGraspingExample()
         sphereObj->setVisualGeometry(sphereGeom);
         sphereObj->addComponent<Collider>()->setGeometry(sphereGeom);
         sphereObj->setPhysicsGeometry(sphereGeom);
-        sphereObj->setDynamicalModel(pbdModel);
+        sphereObj->setDynamicalModel(pbdSystem);
         sphereObj->getPbdBody()->setRigid(
             Vec3d(0.1, 0.15, 0.0),
             1.0,
@@ -176,9 +176,9 @@ PbdRigidBodyGraspingExample()
     scene->addSceneObject(sphereObj);
 
     // Setup a tool to grasp with
-    std::shared_ptr<PbdObject> leftToolObj = makeCapsuleToolObj(pbdModel, true);
+    std::shared_ptr<PbdObject> leftToolObj = makeCapsuleToolObj(pbdSystem, true);
     scene->addSceneObject(leftToolObj);
-    std::shared_ptr<PbdObject> rightToolObj = makeCapsuleToolObj(pbdModel, false);
+    std::shared_ptr<PbdObject> rightToolObj = makeCapsuleToolObj(pbdSystem, false);
     scene->addSceneObject(rightToolObj);
 
     // Add collision between plane and objects
@@ -334,7 +334,7 @@ PbdRigidBodyGraspingExample()
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Simulate in real time
-                pbdModel->getConfig()->m_dt = sceneManager->getDt();
+                pbdSystem->getConfig()->m_dt = sceneManager->getDt();
             });
 
         driver->start();

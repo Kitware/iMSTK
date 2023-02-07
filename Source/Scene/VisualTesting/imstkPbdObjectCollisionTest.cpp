@@ -15,7 +15,7 @@
 #include "imstkLineMesh.h"
 #include "imstkOrientedBox.h"
 #include "imstkPbdCollisionHandling.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -61,8 +61,8 @@ makeTetTissueObj(const std::string& name,
     pbdParams->m_linearDampingCoeff = 0.025;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the material
     auto material = std::make_shared<RenderMaterial>();
@@ -86,7 +86,7 @@ makeTetTissueObj(const std::string& name,
         tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     }
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
-    tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->setDynamicalModel(pbdSystem);
     tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
     pbdParams->m_secParams->m_YoungModulus = 1000.0;
@@ -119,8 +119,8 @@ makeTriTissueObj(const std::string& name,
     pbdParams->m_linearDampingCoeff = 0.025;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
@@ -134,7 +134,7 @@ makeTriTissueObj(const std::string& name,
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(triMesh);
     tissueObj->addComponent<Collider>()->setGeometry(triMesh);
-    tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->setDynamicalModel(pbdSystem);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
@@ -167,8 +167,8 @@ makeLineThreadObj(const std::string& name,
     pbdParams->m_linearDampingCoeff = 0.025;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
@@ -183,7 +183,7 @@ makeLineThreadObj(const std::string& name,
     tissueObj->getVisualModel(0)->setRenderMaterial(material);
     tissueObj->setPhysicsGeometry(lineMesh);
     tissueObj->addComponent<Collider>()->setGeometry(lineMesh);
-    tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->setDynamicalModel(pbdSystem);
     tissueObj->getPbdBody()->uniformMassValue = 0.00001;
 
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,

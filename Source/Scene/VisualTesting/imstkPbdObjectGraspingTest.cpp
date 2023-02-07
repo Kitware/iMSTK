@@ -10,7 +10,7 @@
 #include "imstkDirectionalLight.h"
 #include "imstkDummyClient.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectController.h"
@@ -36,7 +36,7 @@ using namespace imstk;
 ///
 static std::shared_ptr<PbdObject>
 makeTetTissueObj(const std::string& name,
-                 std::shared_ptr<PbdModel> model,
+                 std::shared_ptr<PbdSystem> model,
                  const Vec3d& size, const Vec3i& dim, const Vec3d& center,
                  const Quatd& orientation,
                  const bool useTetCollisionGeometry)
@@ -109,7 +109,7 @@ makeTetTissueObj(const std::string& name,
 ///
 static std::shared_ptr<PbdObject>
 makeTriTissueObj(const std::string& name,
-                 std::shared_ptr<PbdModel> model,
+                 std::shared_ptr<PbdSystem> model,
                  const Vec2d& size, const Vec2i& dim, const Vec3d& center,
                  const Quatd& orientation)
 {
@@ -164,7 +164,7 @@ makeTriTissueObj(const std::string& name,
 ///
 static std::shared_ptr<PbdObject>
 makeLineThreadObj(const std::string& name,
-                  std::shared_ptr<PbdModel> model,
+                  std::shared_ptr<PbdSystem> model,
                   const double length, const int dim, const Vec3d start,
                   const Vec3d& dir)
 {
@@ -204,9 +204,9 @@ makeLineThreadObj(const std::string& name,
 ///
 static std::shared_ptr<Entity>
 makeGrasperObj(
-    const std::string&        name,
-    const Vec3d               position,
-    std::shared_ptr<PbdModel> model = nullptr)
+    const std::string&         name,
+    const Vec3d                position,
+    std::shared_ptr<PbdSystem> model = nullptr)
 {
     if (model != nullptr)
     {
@@ -244,7 +244,7 @@ public:
     void SetUp() override
     {
         VisualTest::SetUp();
-        m_pbdModel = std::make_shared<PbdModel>();
+        m_pbdModel = std::make_shared<PbdSystem>();
         m_pbdModel->getConfig()->m_doPartitioning = false;
         m_pbdModel->getConfig()->m_dt = 0.001;
         m_pbdModel->getConfig()->m_iterations = 5;
@@ -366,7 +366,7 @@ public:
     }
 
 public:
-    std::shared_ptr<PbdModel>  m_pbdModel   = nullptr;
+    std::shared_ptr<PbdSystem> m_pbdModel   = nullptr;
     std::shared_ptr<PbdObject> m_graspedObj = nullptr;
     std::shared_ptr<Entity>    m_grasperObj = nullptr;
 

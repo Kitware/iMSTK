@@ -14,7 +14,7 @@
 #include "imstkIsometricMap.h"
 #include "imstkMeshIO.h"
 #include "imstkPbdContactConstraint.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -47,8 +47,8 @@ using namespace imstk;
 /// \brief Create a laprascopic tool object
 ///
 std::shared_ptr<PbdObject>
-makeLapToolObj(const std::string&        name,
-               std::shared_ptr<PbdModel> model)
+makeLapToolObj(const std::string&         name,
+               std::shared_ptr<PbdSystem> model)
 {
     auto lapTool = std::make_shared<PbdObject>(name);
 
@@ -151,7 +151,7 @@ makePbdString(
     stringObj->getVisualModel(0)->setRenderMaterial(material);
     stringObj->setPhysicsGeometry(stringMesh);
     stringObj->addComponent<Collider>()->setGeometry(stringMesh);
-    std::shared_ptr<PbdModel> model = needleObj->getPbdModel();
+    std::shared_ptr<PbdSystem> model = needleObj->getPbdModel();
     stringObj->setDynamicalModel(model);
     //stringObj->getPbdBody()->fixedNodeIds = { 0, 1, 19, 20 };
     stringObj->getPbdBody()->uniformMassValue = 0.02;
@@ -201,7 +201,7 @@ LapToolSuturingExample()
     scene->getActiveCamera()->setPosition(-0.000866941, 0.0832288, -1.20377);
     scene->getActiveCamera()->setViewUp(0.0601552, 0.409407, -0.910367);
 
-    auto model = std::make_shared<PbdModel>();
+    auto model = std::make_shared<PbdSystem>();
     model->getConfig()->m_gravity = Vec3d::Zero();
     model->getConfig()->m_dt      = 0.001;
     model->getConfig()->m_doPartitioning = false;

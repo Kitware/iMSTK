@@ -17,7 +17,7 @@ class LevelSetModel;
 /// \class LevelSetDeformableObject
 ///
 /// \brief Base class for scene objects that move and/or deform under position
-/// based dynamics formulation, implements the PbdModel and PbdSolver
+/// based dynamics formulation, implements the PbdSystem and PbdSolver
 ///
 class LevelSetDeformableObject : public DynamicObject
 {

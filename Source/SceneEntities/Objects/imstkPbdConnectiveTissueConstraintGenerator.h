@@ -15,7 +15,7 @@ namespace imstk
 class PbdObject;
 class PbdConstraintContainer;
 class PbdBaryPointToPointConstraint;
-class PbdModel;
+class PbdSystem;
 class ProximitySurfaceSelector;
 
 ///
@@ -116,13 +116,13 @@ std::shared_ptr<PbdObject> addConnectiveTissueConstraints(
     std::shared_ptr<LineMesh>  connectiveLineMesh,
     std::shared_ptr<PbdObject> objA,
     std::shared_ptr<PbdObject> objB,
-    std::shared_ptr<PbdModel>  model);
+    std::shared_ptr<PbdSystem> model);
 
 ///
 /// \fn makeConnectiveTissue
 ///
 /// \brief This function takes in the PbdObjects that represent the organs to be connected, the
-/// associated PbdModel, and the parameters used to control the generation of the connective tissue
+/// associated PbdSystem, and the parameters used to control the generation of the connective tissue
 /// PbdObject that is returned.
 ///
 /// \param objA PbdObject that represents an organ to be connected with connective tissue
@@ -136,7 +136,7 @@ std::shared_ptr<PbdObject> addConnectiveTissueConstraints(
 std::shared_ptr<PbdObject> makeConnectiveTissue(
     std::shared_ptr<PbdObject>                objA,
     std::shared_ptr<PbdObject>                objB,
-    std::shared_ptr<PbdModel>                 model,
+    std::shared_ptr<PbdSystem>                model,
     double                                    maxDist = 0.0,
     double                                    strandsPerFace    = 1,
     int                                       segmentsPerStrand = 3,

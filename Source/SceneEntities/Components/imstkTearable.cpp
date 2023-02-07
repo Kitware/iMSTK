@@ -8,7 +8,7 @@
 #include "imstkParallelUtils.h"
 #include "imstkPbdConstraint.h"
 #include "imstkPbdConstraintContainer.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdSolver.h"

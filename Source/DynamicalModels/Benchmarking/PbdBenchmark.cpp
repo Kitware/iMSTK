@@ -10,7 +10,7 @@
 #include "imstkGeometry.h"
 #include "imstkMath.h"
 #include "imstkMeshIO.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -156,12 +156,12 @@ BM_DistanceVolume(benchmark::State& state)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the Object
     prismObj->setPhysicsGeometry(prismMesh);
-    prismObj->setDynamicalModel(pbdModel);
+    prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders
     for (int z = 0; z < state.range(0); z++)
@@ -231,12 +231,12 @@ BM_DistanceDihedral(benchmark::State& state)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the Object
     prismObj->setPhysicsGeometry(surfMesh);
-    prismObj->setDynamicalModel(pbdModel);
+    prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders
     for (int vert_id = 0; vert_id < surfMesh->getNumVertices(); vert_id++)
@@ -302,12 +302,12 @@ BM_PbdFemStVK(benchmark::State& state)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the Object
     prismObj->setPhysicsGeometry(prismMesh);
-    prismObj->setDynamicalModel(pbdModel);
+    prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
 
     // Fix the borders
@@ -379,12 +379,12 @@ BM_PbdFemCorotation(benchmark::State& state)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the Object
     prismObj->setPhysicsGeometry(prismMesh);
-    prismObj->setDynamicalModel(pbdModel);
+    prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
 
     // Fix the borders
@@ -456,12 +456,12 @@ BM_PbdFemNeoHookean(benchmark::State& state)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the Object
     prismObj->setPhysicsGeometry(prismMesh);
-    prismObj->setDynamicalModel(pbdModel);
+    prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
 
     // Fix the borders
@@ -533,12 +533,12 @@ BM_PbdFemLinear(benchmark::State& state)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the Object
     prismObj->setPhysicsGeometry(prismMesh);
-    prismObj->setDynamicalModel(pbdModel);
+    prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
 
     // Fix the borders
@@ -621,12 +621,12 @@ BM_PbdContactDistanceVol(benchmark::State& state)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the Object
     prismObj->setPhysicsGeometry(prismMesh);
-    prismObj->setDynamicalModel(pbdModel);
+    prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders
     for (int z = 0; z < state.range(0); z++)
@@ -724,12 +724,12 @@ BM_PbdContactDistanceDihedral(benchmark::State& state)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the Object
     prismObj->setPhysicsGeometry(surfMesh);
-    prismObj->setDynamicalModel(pbdModel);
+    prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders
     for (int vert_id = 0; vert_id < surfMesh->getNumVertices(); vert_id++)
@@ -833,12 +833,12 @@ BM_PbdFemContact(benchmark::State& state)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the Object
     prismObj->setPhysicsGeometry(prismMesh);
-    prismObj->setDynamicalModel(pbdModel);
+    prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders
     for (int z = 0; z < state.range(0); z++)

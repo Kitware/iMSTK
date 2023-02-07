@@ -15,7 +15,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectController.h"
@@ -34,7 +34,7 @@ using namespace imstk;
 ///
 /// \brief Create PBD model to be used by all objects
 ///
-static std::shared_ptr<PbdModel>
+static std::shared_ptr<PbdSystem>
 makePbdModel()
 {
     // Setup the Parameters
@@ -46,9 +46,9 @@ makePbdModel()
     pbdParams->m_linearDampingCoeff = 0.001;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
+    auto pbdSystem = std::make_shared<PbdSystem>();
 
-    return pbdModel;
+    return pbdSystem;
 }
 
 ///
@@ -62,7 +62,7 @@ static std::shared_ptr<PbdObject>
 makeSurfaceCubeObj(const std::string& name,
                    const Vec3d& size, const Vec3i& dim, const Vec3d& center,
                    const Quatd& orientation,
-                   const std::shared_ptr<PbdModel> pbdModel)
+                   const std::shared_ptr<PbdSystem> pbdSystem)
 {
     auto tissueObj = std::make_shared<PbdObject>(name);
 
@@ -87,12 +87,12 @@ makeSurfaceCubeObj(const std::string& name,
     tissueObj->addVisualModel(visualModel);
     tissueObj->setPhysicsGeometry(surfMesh);
     tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->setDynamicalModel(pbdSystem);
     tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
-    pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
+    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
         tissueObj->getPbdBody()->bodyHandle);
-    pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 500.0,
+    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 500.0,
         tissueObj->getPbdBody()->bodyHandle);
 
     return tissueObj;
@@ -109,7 +109,7 @@ static std::shared_ptr<PbdObject>
 makeVolumeCubeObj(const std::string& name,
                   const Vec3d& size, const Vec3i& dim, const Vec3d& center,
                   const Quatd& orientation,
-                  const std::shared_ptr<PbdModel> pbdModel)
+                  const std::shared_ptr<PbdSystem> pbdSystem)
 {
     auto tissueObj = std::make_shared<PbdObject>(name);
 
@@ -134,12 +134,12 @@ makeVolumeCubeObj(const std::string& name,
     tissueObj->addVisualModel(visualModel);
     tissueObj->setPhysicsGeometry(tetMesh);
     tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->setDynamicalModel(pbdSystem);
     tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
-    pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
+    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
         tissueObj->getPbdBody()->bodyHandle);
-    pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 500.0,
+    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 500.0,
         tissueObj->getPbdBody()->bodyHandle);
 
     // Fix the borders
@@ -208,7 +208,7 @@ public:
 public:
 
     // Pbd model used for simulation
-    std::shared_ptr<PbdModel> m_pbdModel = nullptr;
+    std::shared_ptr<PbdSystem> m_pbdModel = nullptr;
 
     // Pbd objects to be connected
     std::shared_ptr<PbdObject> m_pbdObjA = nullptr;

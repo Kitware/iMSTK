@@ -12,14 +12,14 @@
 
 namespace imstk
 {
-class PbdModel;
+class PbdSystem;
 class PointSet;
 
 ///
 /// \class PbdObject
 ///
 /// \brief Base class for scene objects that move and/or deform under position
-/// based dynamics formulation, implements the PbdModel and PbdSolver
+/// based dynamics formulation, implements the PbdSystem and PbdSolver
 ///
 class PbdObject : public DynamicObject
 {
@@ -32,7 +32,7 @@ public:
     ///
     /// \biref Get the Pbd model of the object
     ///
-    std::shared_ptr<PbdModel> getPbdModel();
+    std::shared_ptr<PbdSystem> getPbdModel();
 
     ///
     /// \brief Returns body in the model.
@@ -41,7 +41,7 @@ public:
     {
         if (m_pbdBody == nullptr)
         {
-            LOG(FATAL) << "Set the PbdModel on the PbdObject before trying to acquire the body";
+            LOG(FATAL) << "Set the PbdSystem on the PbdObject before trying to acquire the body";
         }
         return m_pbdBody;
     }
@@ -86,7 +86,7 @@ protected:
     void setRigidBody(PbdBody& body);
 
 protected:
-    std::shared_ptr<PbdModel> m_pbdModel = nullptr; ///< Pbd mathematical model
-    std::shared_ptr<PbdBody>  m_pbdBody  = nullptr; ///< Handle to this object in the model/system
+    std::shared_ptr<PbdSystem> m_pbdModel = nullptr; ///< Pbd mathematical model
+    std::shared_ptr<PbdBody>   m_pbdBody  = nullptr; ///< Handle to this object in the model/system
 };
 } // namespace imstk

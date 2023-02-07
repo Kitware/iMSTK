@@ -13,7 +13,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -48,7 +48,7 @@ pbdRigidInDeformableGraspingExample()
     scene->getActiveCamera()->setPosition(0.0, 0.004, 0.1);
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-    auto pbdModel  = std::make_shared<PbdModel>();
+    auto pbdSystem = std::make_shared<PbdSystem>();
     auto pbdConfig = std::make_shared<PbdModelConfig>();
     pbdConfig->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdConfig->m_dt         = 0.001;
@@ -56,15 +56,15 @@ pbdRigidInDeformableGraspingExample()
     pbdConfig->m_linearDampingCoeff  = 0.03;
     pbdConfig->m_angularDampingCoeff = 0.01;
     pbdConfig->m_doPartitioning      = false;
-    pbdModel->configure(pbdConfig);
+    pbdSystem->configure(pbdConfig);
 
     auto tissueObj = std::make_shared<PbdObject>("tissue");
     {
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Organs/Vessels/vessel_test.obj");
 
         // Setup the Parameters
-        pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 10000.0);
-        pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.1);
+        pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 10000.0);
+        pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.1);
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();
@@ -78,7 +78,7 @@ pbdRigidInDeformableGraspingExample()
         tissueObj->getVisualModel(0)->setRenderMaterial(material);
         tissueObj->setPhysicsGeometry(surfMesh);
         tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-        tissueObj->setDynamicalModel(pbdModel);
+        tissueObj->setDynamicalModel(pbdSystem);
 
         tissueObj->getPbdBody()->uniformMassValue = 1.0;
     }
@@ -99,7 +99,7 @@ pbdRigidInDeformableGraspingExample()
         capsule0Obj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
         capsule0Obj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
-        capsule0Obj->setDynamicalModel(pbdModel);
+        capsule0Obj->setDynamicalModel(pbdSystem);
 
         // Setup body
         const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0067, 0.0027, 0.0));
@@ -121,7 +121,7 @@ pbdRigidInDeformableGraspingExample()
         auto         toolGeom      = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0),
             0.002, capsuleLength, Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0, 0.0, 1.0)));
 
-        lapTool->setDynamicalModel(pbdModel);
+        lapTool->setDynamicalModel(pbdSystem);
         lapTool->setPhysicsGeometry(toolGeom);
         lapTool->addComponent<Collider>()->setGeometry(toolGeom);
         lapTool->setVisualGeometry(toolGeom);
@@ -252,13 +252,13 @@ pbdRigidInDeformableGraspingExample()
                 {
                     if (e->m_key == '1')
                     {
-                        if (pbdModel->getConfig()->m_gravity[1] == 0.0)
+                        if (pbdSystem->getConfig()->m_gravity[1] == 0.0)
                         {
-                            pbdModel->getConfig()->m_gravity = Vec3d(0.0, -1.0, 0.0);
+                            pbdSystem->getConfig()->m_gravity = Vec3d(0.0, -1.0, 0.0);
                         }
                         else
                         {
-                            pbdModel->getConfig()->m_gravity = Vec3d::Zero();
+                            pbdSystem->getConfig()->m_gravity = Vec3d::Zero();
                         }
                     }
                     else if (e->m_key == 'u')

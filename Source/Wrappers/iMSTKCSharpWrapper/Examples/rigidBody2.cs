@@ -12,9 +12,9 @@ public class RigidBody2
         PbdObject cubeObj = new PbdObject("Cube");
         {
             // This model is shared among interacting rigid bodies
-            PbdModel rbdModel = new PbdModel();
-            rbdModel.getConfig().m_gravity = new Vec3d(0.0, -2500.0, 0.0);
-            rbdModel.getConfig().m_iterations = 10;
+            PbdSystem dynamicalModel = new PbdSystem();
+            dynamicalModel.getConfig().m_gravity = new Vec3d(0.0, -2500.0, 0.0);
+            dynamicalModel.getConfig().m_iterations = 10;
 
             // Create the first rbd, plane floor
             SceneObject planeObj = new SceneObject("Plane");
@@ -82,7 +82,7 @@ public class RigidBody2
                 visualModel.setRenderMaterial(mat);
 
                 // Create the cube rigid object
-                cubeObj.setDynamicalModel(rbdModel);
+                cubeObj.setDynamicalModel(dynamicalModel);
                 cubeObj.setPhysicsGeometry(subdivide.getOutputMesh());
                 cubeObj.addComponentCollider().setGeometry(subdivide.getOutputMesh());
                 cubeObj.addVisualModel(visualModel);

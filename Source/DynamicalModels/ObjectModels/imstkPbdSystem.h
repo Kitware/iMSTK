@@ -20,14 +20,14 @@ class PbdModelConfig;
 class PbdSolver;
 
 ///
-/// \class PbdModel
+/// \class PbdSystem
 ///
 /// \brief This class implements the position based dynamics model. The
-/// PbdModel is a constraint based model that iteratively solves constraints
-/// to simulate the dynamics of a body. PbdModel supports SurfaceMesh,
+/// PbdSystem is a constraint based model that iteratively solves constraints
+/// to simulate the dynamics of a body. PbdSystem supports SurfaceMesh,
 /// LineMesh, or TetrahedralMesh. PointSet is also supported for PBD fluids.
 ///
-/// One of the distinct properties of the PbdModel is that it is first order.
+/// One of the distinct properties of the PbdSystem is that it is first order.
 /// This means it simulates dynamics by modifying positions directly. Velocities
 /// of the model are computed after positions are solved. Velocities from the
 /// previous iteration are applied at the start of the update.
@@ -38,11 +38,11 @@ class PbdSolver;
 /// Matthias Mullerm, Miles Macklin, Nuttapong Chentanez, Stefan Jeschke, and Tae-Yong Kim. 2020. Detailed Rigid Body Simulation with Extended Position Based Dynamics
 /// Jan Bender, Matthias Muller, Miles Macklin. 2017. A Survey on Position Based Dynamics, 2017.
 ///
-class PbdModel : public AbstractDynamicalModel
+class PbdSystem : public AbstractDynamicalModel
 {
 public:
-    PbdModel();
-    ~PbdModel() override = default;
+    PbdSystem();
+    ~PbdSystem() override = default;
 
     void resetToInitialState() override;
 
@@ -149,7 +149,7 @@ public:
     std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
 
 protected:
-    // Hide this function as PbdModel doesn't require it. It can support multiple bodies
+    // Hide this function as PbdSystem doesn't require it. It can support multiple bodies
     using AbstractDynamicalModel::setModelGeometry;
 
     ///

@@ -7,7 +7,7 @@
 #include "imstkCamera.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkMeshIO.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPointwiseMap.h"
@@ -36,8 +36,8 @@ createSoftBodyScene(std::string sceneName)
     // Extract the surface mesh
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
-    auto pbdObj   = std::make_shared<PbdObject>("PbdObj");
-    auto pbdModel = std::make_shared<PbdModel>();
+    auto pbdObj    = std::make_shared<PbdObject>("PbdObj");
+    auto pbdSystem = std::make_shared<PbdSystem>();
 
     // Configure model
     auto pbdConfig = std::make_shared<PbdModelConfig>();
@@ -47,10 +47,10 @@ createSoftBodyScene(std::string sceneName)
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_iterations = 5;
     pbdConfig->m_dt = 0.03;
-    pbdModel->configure(pbdConfig);
+    pbdSystem->configure(pbdConfig);
 
     // Set the geometries
-    pbdObj->setDynamicalModel(pbdModel);
+    pbdObj->setDynamicalModel(pbdSystem);
     pbdObj->setVisualGeometry(surfMesh);
     pbdObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     pbdObj->setPhysicsGeometry(tetMesh);
@@ -83,15 +83,15 @@ createClothScene(std::string sceneName)
         pbdConfig->m_iterations = 5;
 
         // Setup the Model
-        auto pbdModel = std::make_shared<PbdModel>();
-        pbdModel->configure(pbdConfig);
+        auto pbdSystem = std::make_shared<PbdSystem>();
+        pbdSystem->configure(pbdConfig);
 
         // Setup the Object
         clothObj->setVisualGeometry(clothMesh);
         clothObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
         clothObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
         clothObj->setPhysicsGeometry(clothMesh);
-        clothObj->setDynamicalModel(pbdModel);
+        clothObj->setDynamicalModel(pbdSystem);
         clothObj->getPbdBody()->fixedNodeIds     = { 0, dim[0] - 1 };
         clothObj->getPbdBody()->uniformMassValue = size[0] * size[1] / static_cast<double>(dim[0] * dim[1]);
     }

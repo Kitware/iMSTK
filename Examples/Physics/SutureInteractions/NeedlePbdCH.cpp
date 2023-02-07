@@ -12,7 +12,7 @@
 #include "imstkLineMesh.h"
 #include "imstkNeedle.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkPointwiseMap.h"

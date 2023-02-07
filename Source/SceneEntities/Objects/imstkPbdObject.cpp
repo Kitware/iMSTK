@@ -6,17 +6,17 @@
 
 #include "imstkCellMesh.h"
 #include "imstkLogger.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPointSet.h"
 
 namespace imstk
 {
-std::shared_ptr<PbdModel>
+std::shared_ptr<PbdSystem>
 PbdObject::getPbdModel()
 {
-    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
+    m_pbdModel = std::dynamic_pointer_cast<PbdSystem>(m_dynamicalModel);
     return m_pbdModel;
 }
 
@@ -63,10 +63,10 @@ PbdObject::setBodyFromGeometry()
 bool
 PbdObject::initialize()
 {
-    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
+    m_pbdModel = std::dynamic_pointer_cast<PbdSystem>(m_dynamicalModel);
     if (m_pbdModel == nullptr)
     {
-        LOG(FATAL) << "PbdObject " << m_name << " was not given a PbdModel. Please PbdObject::setDynamicalModel";
+        LOG(FATAL) << "PbdObject " << m_name << " was not given a PbdSystem. Please PbdObject::setDynamicalModel";
         return false;
     }
 
@@ -84,7 +84,7 @@ void
 PbdObject::setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaModel)
 {
     // todo: If already has another model, should remove the corresponding body?
-    m_pbdModel       = std::dynamic_pointer_cast<PbdModel>(dynaModel);
+    m_pbdModel       = std::dynamic_pointer_cast<PbdSystem>(dynaModel);
     m_dynamicalModel = dynaModel;
 
     // If the model already has a pbd body for this PbdObject remove it from
@@ -92,7 +92,7 @@ PbdObject::setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaModel)
     if (m_pbdBody != nullptr)
     {
         CHECK(m_pbdModel != nullptr) <<
-            "PbdObject has a PbdBody but cannot find associated PbdModel?";
+            "PbdObject has a PbdBody but cannot find associated PbdSystem?";
         m_pbdModel->removeBody(m_pbdBody);
     }
     m_pbdBody = m_pbdModel->addBody();

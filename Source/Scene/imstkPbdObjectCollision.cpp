@@ -11,7 +11,7 @@
 #include "imstkCCDAlgorithm.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkPbdCollisionHandling.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkTaskGraph.h"
@@ -203,14 +203,14 @@ PbdObjectCollision::setupConnections(std::shared_ptr<Entity> obj1, std::shared_p
     m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSource());
     m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSink());
 
-    std::shared_ptr<PbdModel> pbdModel = obj1AsPbdObject->getPbdModel();
-    m_taskGraph->addNode(pbdModel->getSolveNode());
-    m_taskGraph->addNode(pbdModel->getIntegratePositionNode());
-    m_taskGraph->addNode(pbdModel->getUpdateVelocityNode());
+    std::shared_ptr<PbdSystem> pbdSystem = obj1AsPbdObject->getPbdModel();
+    m_taskGraph->addNode(pbdSystem->getSolveNode());
+    m_taskGraph->addNode(pbdSystem->getIntegratePositionNode());
+    m_taskGraph->addNode(pbdSystem->getUpdateVelocityNode());
 
     if (auto pbdObj2 = std::dynamic_pointer_cast<PbdObject>(obj2))
     {
-        CHECK(pbdModel == pbdObj2->getPbdModel()) << "PbdObjectCollision may only be used with PbdObjects that share the same PbdModel";
+        CHECK(pbdSystem == pbdObj2->getPbdModel()) << "PbdObjectCollision may only be used with PbdObjects that share the same PbdSystem";
     }
     else
     {

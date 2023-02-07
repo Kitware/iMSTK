@@ -17,7 +17,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -112,8 +112,8 @@ makeTissueObj(const std::string& name,
     pbdParams->m_linearDampingCoeff = 0.03; // Removed from velocity
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the material
     auto material = std::make_shared<RenderMaterial>();
@@ -138,7 +138,7 @@ makeTissueObj(const std::string& name,
     tissueObj->setPhysicsGeometry(tissueMesh);
     tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
-    tissueObj->setDynamicalModel(pbdModel);
+    tissueObj->setDynamicalModel(pbdSystem);
     tissueObj->getPbdBody()->uniformMassValue = 100.0;
     // Fix the borders
     for (int z = 0; z < dim[2]; z++)

@@ -14,7 +14,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkObjectControllerGhost.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -39,11 +39,11 @@ using namespace imstk;
 
 static std::shared_ptr<PbdObject>
 makePbdObjSurface(
-    const std::string&        name,
-    std::shared_ptr<PbdModel> model,
-    const Vec3d&              size,
-    const Vec3i&              dim,
-    const Vec3d&              center)
+    const std::string&         name,
+    std::shared_ptr<PbdSystem> model,
+    const Vec3d&               size,
+    const Vec3i&               dim,
+    const Vec3d&               center)
 {
     auto prismObj = std::make_shared<PbdObject>(name);
 
@@ -78,7 +78,7 @@ makePbdObjSurface(
 }
 
 static std::shared_ptr<PbdObject>
-makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
+makeCapsuleToolObj(std::shared_ptr<PbdSystem> model)
 {
     auto toolGeometry = std::make_shared<Capsule>();
     toolGeometry->setRadius(0.5);
@@ -135,8 +135,8 @@ main()
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
-    auto                            pbdModel  = std::make_shared<PbdModel>();
-    std::shared_ptr<PbdModelConfig> pbdParams = pbdModel->getConfig();
+    auto                            pbdSystem = std::make_shared<PbdSystem>();
+    std::shared_ptr<PbdModelConfig> pbdParams = pbdSystem->getConfig();
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 8;
@@ -144,14 +144,14 @@ main()
 
     // Setup a tissue to grasp
     std::shared_ptr<PbdObject> pbdObj = makePbdObjSurface("Tissue",
-                pbdModel,
+                pbdSystem,
                 Vec3d(4.0, 4.0, 4.0),  // Dimensions
                 Vec3i(5, 5, 5),        // Divisions
                 Vec3d(0.0, 0.0, 0.0)); // Center
     scene->addSceneObject(pbdObj);
 
     // Setup a tool to grasp with
-    std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdModel);
+    std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     // Add collision
@@ -279,7 +279,7 @@ main()
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Simulate in real time
-                pbdModel->getConfig()->m_dt = sceneManager->getDt();
+                pbdSystem->getConfig()->m_dt = sceneManager->getDt();
                         });
 
         driver->start();

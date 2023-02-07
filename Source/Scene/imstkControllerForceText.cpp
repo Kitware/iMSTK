@@ -6,7 +6,7 @@
 
 #include "imstkControllerForceText.h"
 #include "imstkGeometry.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectController.h"
 #include "imstkRenderMaterial.h"
@@ -47,13 +47,13 @@ ControllerForceText::init()
 void
 ControllerForceText::computePbdContactForceAndTorque(Vec3d& contactForce, Vec3d& contactTorque) const
 {
-    // \todo We should be able to do this with the PbdModel itself
+    // \todo We should be able to do this with the PbdSystem itself
     if (m_collision != nullptr)
     {
-        auto                      pbdObj   = std::dynamic_pointer_cast<PbdObject>(m_pbdController->getControlledObject());
-        std::shared_ptr<PbdModel> pbdModel = pbdObj->getPbdModel();
-        const double              dt       = pbdModel->getConfig()->m_dt;
-        const PbdParticleId       bodyId   = { pbdObj->getPbdBody()->bodyHandle, 0 };
+        auto                       pbdObj    = std::dynamic_pointer_cast<PbdObject>(m_pbdController->getControlledObject());
+        std::shared_ptr<PbdSystem> pbdSystem = pbdObj->getPbdModel();
+        const double               dt     = pbdSystem->getConfig()->m_dt;
+        const PbdParticleId        bodyId = { pbdObj->getPbdBody()->bodyHandle, 0 };
 
         contactForce  = Vec3d::Zero();
         contactTorque = Vec3d::Zero();

@@ -6,7 +6,7 @@
 
 #include "NeedleInteraction.h"
 #include "imstkLineMesh.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdObject.h"
 #include "imstkPuncturable.h"
 #include "imstkStraightNeedle.h"

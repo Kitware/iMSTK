@@ -17,7 +17,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkOrientedBox.h"
 #include "imstkPbdAngularConstraint.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -40,7 +40,7 @@ using namespace imstk;
 ///
 static std::shared_ptr<PbdObject>
 makeTissueObj(const std::string& name,
-              std::shared_ptr<PbdModel> model,
+              std::shared_ptr<PbdSystem> model,
               const double width,
               const double height,
               const int rowCount,
@@ -101,7 +101,7 @@ planeContactScene()
     scene->getActiveCamera()->setPosition(-0.0237419, 0.0368787, 0.338374);
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-    auto pbdModel  = std::make_shared<PbdModel>();
+    auto pbdSystem = std::make_shared<PbdSystem>();
     auto pbdConfig = std::make_shared<PbdModelConfig>();
     // Slightly larger gravity to compensate damping
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
@@ -110,7 +110,7 @@ planeContactScene()
     pbdConfig->m_linearDampingCoeff  = 0.001;
     pbdConfig->m_angularDampingCoeff = 0.001;
     pbdConfig->m_doPartitioning      = false;
-    pbdModel->configure(pbdConfig);
+    pbdSystem->configure(pbdConfig);
 
     auto planeObj  = std::make_shared<SceneObject>("plane");
     auto planeGeom = std::make_shared<Plane>(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 1.0, 0.0));
@@ -138,7 +138,7 @@ planeContactScene()
         rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
         rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
-        rigidPbdObj->setDynamicalModel(pbdModel);
+        rigidPbdObj->setDynamicalModel(pbdSystem);
 
         // Setup body
         const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 1.0, 1.0).normalized());
@@ -247,7 +247,7 @@ bowlScene()
     auto cubeObj = std::make_shared<PbdObject>("Cube");
     {
         // This model is shared among interacting rigid bodies
-        auto pbdModel  = std::make_shared<PbdModel>();
+        auto pbdSystem = std::make_shared<PbdSystem>();
         auto pbdConfig = std::make_shared<PbdModelConfig>();
         // Slightly larger gravity to compensate damping
         pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
@@ -256,7 +256,7 @@ bowlScene()
         pbdConfig->m_linearDampingCoeff  = 0.001;
         pbdConfig->m_angularDampingCoeff = 0.001;
         pbdConfig->m_doPartitioning      = false;
-        pbdModel->configure(pbdConfig);
+        pbdSystem->configure(pbdConfig);
 
         // Create the first pbd, plane floor
         auto planeObj = std::make_shared<SceneObject>("Plane");
@@ -318,7 +318,7 @@ bowlScene()
             visualModel->setRenderMaterial(material);
 
             // Create the cube rigid object
-            cubeObj->setDynamicalModel(pbdModel);
+            cubeObj->setDynamicalModel(pbdSystem);
             cubeObj->setPhysicsGeometry(subdivide.getOutputMesh());
             cubeObj->addComponent<Collider>()->setGeometry(subdivide.getOutputMesh());
             cubeObj->addVisualModel(visualModel);
@@ -432,7 +432,7 @@ tissueCapsuleDrop()
     scene->getActiveCamera()->setPosition(-0.0237419, 0.0368787, 0.338374);
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-    auto pbdModel  = std::make_shared<PbdModel>();
+    auto pbdSystem = std::make_shared<PbdSystem>();
     auto pbdConfig = std::make_shared<PbdModelConfig>();
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0); // Slightly larger gravity to compensate viscosity
     pbdConfig->m_dt         = 0.001;
@@ -440,10 +440,10 @@ tissueCapsuleDrop()
     pbdConfig->m_linearDampingCoeff  = 0.0;
     pbdConfig->m_angularDampingCoeff = 0.0;
     pbdConfig->m_doPartitioning      = false;
-    pbdModel->configure(pbdConfig);
+    pbdSystem->configure(pbdConfig);
 
     // Setup a tissue
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue", pbdModel,
+    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue", pbdSystem,
         0.1, 0.1,
         5, 5,
         0.1,       // Per Particle Mass
@@ -468,7 +468,7 @@ tissueCapsuleDrop()
         capsuleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
         capsuleObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
-        capsuleObj->setDynamicalModel(pbdModel);
+        capsuleObj->setDynamicalModel(pbdSystem);
         pbdConfig->setBodyDamping(capsuleObj->getPbdBody()->bodyHandle, 0.04, 0.01);
 
         // Setup body
@@ -503,7 +503,7 @@ tissueCapsuleDrop()
 
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
-                pbdModel->getConfig()->m_dt = sceneManager->getDt();
+                pbdSystem->getConfig()->m_dt = sceneManager->getDt();
             });
 
         auto driver = std::make_shared<SimulationManager>();
@@ -532,7 +532,7 @@ hingeScene()
     scene->getActiveCamera()->setPosition(-0.0237419, 0.0368787, 0.338374);
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-    auto pbdModel  = std::make_shared<PbdModel>();
+    auto pbdSystem = std::make_shared<PbdSystem>();
     auto pbdConfig = std::make_shared<PbdModelConfig>();
     pbdConfig->m_gravity    = Vec3d(0.0, 0.0, 0.0); // Slightly larger gravity to compensate viscosity
     pbdConfig->m_dt         = 0.001;
@@ -540,7 +540,7 @@ hingeScene()
     pbdConfig->m_linearDampingCoeff  = 0.003;
     pbdConfig->m_angularDampingCoeff = 0.003;
     pbdConfig->m_doPartitioning      = false;
-    pbdModel->configure(pbdConfig);
+    pbdSystem->configure(pbdConfig);
 
     // Setup a capsule
     auto rigidPbdObj = std::make_shared<PbdObject>("rigidPbdObj");
@@ -560,7 +560,7 @@ hingeScene()
         rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
         rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
 
-        rigidPbdObj->setDynamicalModel(pbdModel);
+        rigidPbdObj->setDynamicalModel(pbdSystem);
 
         // Setup body such that z is now pointing in -x
         const Quatd orientation = Quatd::FromTwoVectors(Vec3d(1.0, 0.0, 0.0), Vec3d(0.0, 0.0, 1.0).normalized());
@@ -570,7 +570,7 @@ hingeScene()
             1.0, orientation, inertia);
 
         // Custom constaint addition
-        pbdModel->getConfig()->addPbdConstraintFunctor([&](PbdConstraintContainer& container)
+        pbdSystem->getConfig()->addPbdConstraintFunctor([&](PbdConstraintContainer& container)
             {
                 auto hingeConstraint = std::make_shared<PbdAngularHingeConstraint>();
                 hingeConstraint->initConstraint({ rigidPbdObj->getPbdBody()->bodyHandle, 0 }, Vec3d(1.0, 0.0, 0.0), 0.1);

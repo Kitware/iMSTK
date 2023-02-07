@@ -8,7 +8,7 @@
 #include "imstkCapsule.h"
 #include "imstkLineMesh.h"
 #include "imstkPbdContactConstraint.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkTaskGraph.h"
@@ -91,15 +91,15 @@ PortHoleInteraction::handlePortHole()
         q = capsule1Pos + diff1;
     }
 
-    std::shared_ptr<PbdModel> pbdModel = m_toolObject->getPbdModel();
-    const PbdParticleId       vid      = pbdModel->addVirtualParticle(m_portHoleLocation, 0.0);
+    std::shared_ptr<PbdSystem> pbdSystem = m_toolObject->getPbdModel();
+    const PbdParticleId        vid       = pbdSystem->addVirtualParticle(m_portHoleLocation, 0.0);
 
     m_portConstraint->initConstraint(m_toolObject->getPbdModel()->getBodies(),
         { m_toolObject->getPbdBody()->bodyHandle, 0 },
                 p, q, vid,
                 m_compliance);
 
-    pbdModel->getSolver()->addConstraints(&m_constraints);
+    pbdSystem->getSolver()->addConstraints(&m_constraints);
 }
 
 void

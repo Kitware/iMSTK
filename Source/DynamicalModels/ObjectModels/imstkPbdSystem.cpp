@@ -4,7 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkGraph.h"
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
@@ -16,7 +16,7 @@
 
 namespace imstk
 {
-PbdModel::PbdModel() : AbstractDynamicalModel(DynamicalModelType::PositionBasedDynamics),
+PbdSystem::PbdSystem() : AbstractDynamicalModel(DynamicalModelType::PositionBasedDynamics),
     m_config(std::make_shared<PbdModelConfig>())
 {
     // Add a virtual particle buffer, cleared every frame
@@ -42,7 +42,7 @@ PbdModel::PbdModel() : AbstractDynamicalModel(DynamicalModelType::PositionBasedD
 }
 
 void
-PbdModel::resetToInitialState()
+PbdSystem::resetToInitialState()
 {
     m_state.deepCopy(m_initialState);
 
@@ -66,13 +66,13 @@ PbdModel::resetToInitialState()
 }
 
 void
-PbdModel::configure(std::shared_ptr<PbdModelConfig> config)
+PbdSystem::configure(std::shared_ptr<PbdModelConfig> config)
 {
     m_config = config;
 }
 
 std::shared_ptr<PbdBody>
-PbdModel::addBody()
+PbdSystem::addBody()
 {
     m_state.m_bodies.push_back(std::make_shared<PbdBody>(m_iterKey));
     m_modified = true;
@@ -81,7 +81,7 @@ PbdModel::addBody()
 }
 
 void
-PbdModel::removeBody(std::shared_ptr<PbdBody> body)
+PbdSystem::removeBody(std::shared_ptr<PbdBody> body)
 {
     auto iter = std::find(m_state.m_bodies.begin(), m_state.m_bodies.end(), body);
     CHECK(iter != m_state.m_bodies.end()) << "removeBody called but could not find PbdyBody in PbdState";
@@ -90,7 +90,7 @@ PbdModel::removeBody(std::shared_ptr<PbdBody> body)
 }
 
 PbdParticleId
-PbdModel::addVirtualParticle(
+PbdSystem::addVirtualParticle(
     const Vec3d& pos, const Quatd& orientation,
     const double mass, const Mat3d inertia,
     const Vec3d& velocity, const Vec3d& angularVelocity,
@@ -119,7 +119,7 @@ PbdModel::addVirtualParticle(
 }
 
 PbdParticleId
-PbdModel::addVirtualParticle(
+PbdSystem::addVirtualParticle(
     const Vec3d& pos, const double mass,
     const Vec3d& velocity,
     const bool persist)
@@ -130,21 +130,21 @@ PbdModel::addVirtualParticle(
 }
 
 void
-PbdModel::clearVirtualParticles()
+PbdSystem::clearVirtualParticles()
 {
     CHECK(m_state.m_bodies.size() != 0 || m_state.m_bodies[0] != nullptr) << "Missing virtual/dummy body";
     resizeBodyParticles(*m_state.m_bodies[0], 0);
 }
 
 std::shared_ptr<PbdModelConfig>
-PbdModel::getConfig() const
+PbdSystem::getConfig() const
 {
-    CHECK(m_config != nullptr) << "Cannot PbdModel::getConfig, config is nullptr";
+    CHECK(m_config != nullptr) << "Cannot PbdSystem::getConfig, config is nullptr";
     return m_config;
 }
 
 bool
-PbdModel::initialize()
+PbdSystem::initialize()
 {
     // Create a virtual particles buffer for particles that need to be quickly added/removed
     // such as during collision
@@ -214,7 +214,7 @@ PbdModel::initialize()
 }
 
 void
-PbdModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+PbdSystem::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
     m_taskGraph->addEdge(source, m_integrationPositionNode);
@@ -224,7 +224,7 @@ PbdModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
 }
 
 void
-PbdModel::addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices, const int bodyId)
+PbdSystem::addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices, const int bodyId)
 {
     for (const auto& functorVec : m_config->m_functors)
     {
@@ -242,19 +242,19 @@ PbdModel::addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices, c
 }
 
 void
-PbdModel::setTimeStep(const double timeStep)
+PbdSystem::setTimeStep(const double timeStep)
 {
     m_config->m_dt = timeStep;
 }
 
 double
-PbdModel::getTimeStep() const
+PbdSystem::getTimeStep() const
 {
     return m_config->m_dt;
 }
 
 void
-PbdModel::integratePosition()
+PbdSystem::integratePosition()
 {
     // resize 0 virtual particles (avoids reallocation)
     clearVirtualParticles();
@@ -268,7 +268,7 @@ PbdModel::integratePosition()
 }
 
 void
-PbdModel::integratePosition(PbdBody& body)
+PbdSystem::integratePosition(PbdBody& body)
 {
     VecDataArray<double, 3>& pos       = *body.vertices;
     VecDataArray<double, 3>& prevPos   = *body.prevVertices;
@@ -277,9 +277,9 @@ PbdModel::integratePosition(PbdBody& body)
 
     // Check all the arrays are the same
     const int numParticles = pos.size();
-    CHECK(numParticles == prevPos.size()) << "PbdModel data corrupt";
-    CHECK(numParticles == vel.size()) << "PbdModel data corrupt";
-    CHECK(numParticles == invMasses.size()) << "PbdModel data corrupt";
+    CHECK(numParticles == prevPos.size()) << "PbdSystem data corrupt";
+    CHECK(numParticles == vel.size()) << "PbdSystem data corrupt";
+    CHECK(numParticles == invMasses.size()) << "PbdSystem data corrupt";
 
     const double dt = m_config->m_dt;
     const double linearVelocityDamp = 1.0 - m_config->getLinearDamping(body.bodyHandle);
@@ -306,10 +306,10 @@ PbdModel::integratePosition(PbdBody& body)
         const StdVectorOfMat3d&  invInertias = *body.invInertias;
 
         // Check all the arrays are the same
-        CHECK(numParticles == orientations.size()) << "PbdModel data corrupt";
-        CHECK(numParticles == prevOrientations.size()) << "PbdModel data corrupt";
-        CHECK(numParticles == angularVelocities.size()) << "PbdModel data corrupt";
-        CHECK(numParticles == invInertias.size()) << "PbdModel data corrupt";
+        CHECK(numParticles == orientations.size()) << "PbdSystem data corrupt";
+        CHECK(numParticles == prevOrientations.size()) << "PbdSystem data corrupt";
+        CHECK(numParticles == angularVelocities.size()) << "PbdSystem data corrupt";
+        CHECK(numParticles == invInertias.size()) << "PbdSystem data corrupt";
 
         const double angularVelocityDamp = 1.0 - m_config->getAngularDamping(body.bodyHandle);
         ParallelUtils::parallelFor(numParticles,
@@ -343,7 +343,7 @@ PbdModel::integratePosition(PbdBody& body)
 }
 
 void
-PbdModel::updateVelocity()
+PbdSystem::updateVelocity()
 {
     for (auto bodyIter = std::next(std::next(m_state.m_bodies.begin()));
          bodyIter != m_state.m_bodies.end(); bodyIter++)
@@ -364,7 +364,7 @@ PbdModel::updateVelocity()
 }
 
 void
-PbdModel::updateVelocity(PbdBody& body)
+PbdSystem::updateVelocity(PbdBody& body)
 {
     if (m_config->m_dt > 0.0)
     {
@@ -375,9 +375,9 @@ PbdModel::updateVelocity(PbdBody& body)
 
         // Check all the arrays are the same
         const int numParticles = pos.size();
-        CHECK(numParticles == prevPos.size()) << "PbdModel data corrupt";
-        CHECK(numParticles == vel.size()) << "PbdModel data corrupt";
-        CHECK(numParticles == invMasses.size()) << "PbdModel data corrupt";
+        CHECK(numParticles == prevPos.size()) << "PbdSystem data corrupt";
+        CHECK(numParticles == vel.size()) << "PbdSystem data corrupt";
+        CHECK(numParticles == invMasses.size()) << "PbdSystem data corrupt";
 
         const double invDt = 1.0 / m_config->m_dt;
         ParallelUtils::parallelFor(numParticles,
@@ -397,10 +397,10 @@ PbdModel::updateVelocity(PbdBody& body)
             const StdVectorOfMat3d&  invInertias       = *body.invInertias;
 
             // Check all the arrays are the same
-            CHECK(numParticles == orientations.size()) << "PbdModel data corrupt";
-            CHECK(numParticles == prevOrientations.size()) << "PbdModel data corrupt";
-            CHECK(numParticles == angularVelocities.size()) << "PbdModel data corrupt";
-            CHECK(numParticles == invInertias.size()) << "PbdModel data corrupt";
+            CHECK(numParticles == orientations.size()) << "PbdSystem data corrupt";
+            CHECK(numParticles == prevOrientations.size()) << "PbdSystem data corrupt";
+            CHECK(numParticles == angularVelocities.size()) << "PbdSystem data corrupt";
+            CHECK(numParticles == invInertias.size()) << "PbdSystem data corrupt";
 
             ParallelUtils::parallelFor(numParticles,
                 [&](const int i)
@@ -421,7 +421,7 @@ PbdModel::updateVelocity(PbdBody& body)
 }
 
 void
-PbdModel::solveConstraints()
+PbdSystem::solveConstraints()
 {
     m_pbdSolver->setPbdBodies(&m_state);
     m_pbdSolver->setConstraints(getConstraints());
@@ -432,7 +432,7 @@ PbdModel::solveConstraints()
 }
 
 void
-PbdModel::resizeBodyParticles(PbdBody& body, const int particleCount)
+PbdSystem::resizeBodyParticles(PbdBody& body, const int particleCount)
 {
     body.prevVertices->resize(particleCount);
     body.vertices->resize(particleCount);

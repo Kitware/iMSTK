@@ -6,13 +6,13 @@
 
 %ignore imstk::PbdCollisionConstraint;
 /* %ignore imstk::PbdFEMConstraint; */
-%ignore imstk::PbdModel::getIntegratePositionNode();
-%ignore imstk::PbdModel::getUpdateCollisionGeometryNode();
-%ignore imstk::PbdModel::getSolveNode();
-%ignore imstk::PbdModel::getUpdateVelocityNode();
-%ignore imstk::PbdModelConfig::addPbdConstraintFunctor(std::shared_ptr<PbdConstraintFunctor>);
-%ignore imstk::PbdModelConfig::addPbdConstraintFunctor(std::function<void(PbdConstraintContainer&)>);
-%ignore imstk::PbdModelConfig::getFunctors();
+%ignore imstk::PbdSystem::getIntegratePositionNode();
+%ignore imstk::PbdSystem::getUpdateCollisionGeometryNode();
+%ignore imstk::PbdSystem::getSolveNode();
+%ignore imstk::PbdSystem::getUpdateVelocityNode();
+%ignore imstk::PbdSystem::addPbdConstraintFunctor(std::shared_ptr<PbdConstraintFunctor>);
+%ignore imstk::PbdSystem::addPbdConstraintFunctor(std::function<void(PbdConstraintContainer&)>);
+%ignore imstk::PbdSystem::getFunctors();
 
 %ignore imstk::AbstractDataArray::clone(); /* unique_ptrs can't be returned in SWIG right now */
 %ignore imstk::DataArray::iterator; /* fix the multiple-definition problem. */

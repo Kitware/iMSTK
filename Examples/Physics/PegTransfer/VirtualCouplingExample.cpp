@@ -15,7 +15,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkObjectControllerGhost.h"
 #include "imstkOrientedBox.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -84,7 +84,7 @@ VirtualCouplingExample()
     // The visual geometry is the scissor mesh read in from file
     auto pbdObj = std::make_shared<PbdObject>();
     {
-        auto model = std::make_shared<PbdModel>();
+        auto model = std::make_shared<PbdSystem>();
         model->getConfig()->m_dt      = 0.001;
         model->getConfig()->m_gravity = Vec3d::Zero();
         pbdObj->setDynamicalModel(model);

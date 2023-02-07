@@ -8,7 +8,7 @@
 #include "imstkCellPicker.h"
 #include "imstkLineMesh.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkPointPicker.h"
@@ -147,9 +147,9 @@ PbdObjectStitching::removeStitchConstraints()
 void
 PbdObjectStitching::addStitchConstraints()
 {
-    std::shared_ptr<PbdModel> model = m_objectToStitch->getPbdModel();
+    std::shared_ptr<PbdSystem> model = m_objectToStitch->getPbdModel();
 
-    // PbdModel geometry can only be PointSet
+    // PbdSystem geometry can only be PointSet
     std::shared_ptr<PointSet> pbdPhysicsGeom =
         std::dynamic_pointer_cast<PointSet>(m_objectToStitch->getPhysicsGeometry());
 
@@ -355,13 +355,13 @@ PbdObjectStitching::updateStitching()
 void
 PbdObjectStitching::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    std::shared_ptr<PbdModel> pbdModel = m_objectToStitch->getPbdModel();
+    std::shared_ptr<PbdSystem> pbdSystem = m_objectToStitch->getPbdModel();
 
     m_taskGraph->addEdge(source, m_objectToStitch->getTaskGraph()->getSource());
     m_taskGraph->addEdge(m_objectToStitch->getTaskGraph()->getSink(), sink);
 
     // The ideal location is after the internal positional solve, before the collision solve
-    m_taskGraph->addEdge(pbdModel->getIntegratePositionNode(), m_stitchingNode);
-    m_taskGraph->addEdge(m_stitchingNode, pbdModel->getSolveNode());
+    m_taskGraph->addEdge(pbdSystem->getIntegratePositionNode(), m_stitchingNode);
+    m_taskGraph->addEdge(m_stitchingNode, pbdSystem->getSolveNode());
 }
 } // namespace imstk

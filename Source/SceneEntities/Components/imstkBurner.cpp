@@ -11,7 +11,7 @@
 #include "imstkCellPicker.h"
 #include "imstkParallelUtils.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPickingAlgorithm.h"
 #include "imstkTaskGraph.h"

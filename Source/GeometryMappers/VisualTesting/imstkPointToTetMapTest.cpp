@@ -7,7 +7,7 @@
 #include "imstkCamera.h"
 #include "imstkCollider.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPointToTetMap.h"
@@ -42,12 +42,12 @@ TEST_F(VisualTest, PointToTetMapTest)
         std::shared_ptr<SurfaceMesh> tetMeshCoarse_sf = tetMeshCoarse->extractSurfaceMesh();
 
         // Setup the Model
-        auto pbdModel = std::make_shared<PbdModel>();
-        pbdModel->getConfig()->m_doPartitioning = false;
-        pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -9.8, 0.0);
-        pbdModel->getConfig()->m_iterations = 8;
-        pbdModel->getConfig()->m_dt = 0.001;
-        pbdModel->getConfig()->m_linearDampingCoeff = 0.025;
+        auto pbdSystem = std::make_shared<PbdSystem>();
+        pbdSystem->getConfig()->m_doPartitioning = false;
+        pbdSystem->getConfig()->m_gravity    = Vec3d(0.0, -9.8, 0.0);
+        pbdSystem->getConfig()->m_iterations = 8;
+        pbdSystem->getConfig()->m_dt = 0.001;
+        pbdSystem->getConfig()->m_linearDampingCoeff = 0.025;
 
         // Setup the Object
         tissueObj->setPhysicsGeometry(tetMeshCoarse);
@@ -55,12 +55,12 @@ TEST_F(VisualTest, PointToTetMapTest)
         tissueObj->addComponent<Collider>()->setGeometry(tetMeshCoarse_sf);
         tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMeshCoarse, tetMeshCoarse_sf));
         tissueObj->setPhysicsToCollidingMap(std::make_shared<PointToTetMap>(tetMeshCoarse, tetMeshFine_sf));
-        tissueObj->setDynamicalModel(pbdModel);
+        tissueObj->setDynamicalModel(pbdSystem);
         tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
-        pbdModel->getConfig()->m_secParams->m_YoungModulus = 1000.0;
-        pbdModel->getConfig()->m_secParams->m_PoissonRatio = 0.45; // 0.48 for tissue
-        pbdModel->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
+        pbdSystem->getConfig()->m_secParams->m_YoungModulus = 1000.0;
+        pbdSystem->getConfig()->m_secParams->m_PoissonRatio = 0.45; // 0.48 for tissue
+        pbdSystem->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
             tissueObj->getPbdBody()->bodyHandle);
 
         // Fix the borders

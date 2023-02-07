@@ -9,7 +9,7 @@
 #include "imstkPbdContactConstraint.h"
 #include "imstkPbdEdgeEdgeCCDConstraint.h"
 #include "imstkPbdEdgeEdgeConstraint.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdPointEdgeConstraint.h"
@@ -221,7 +221,7 @@ PbdCollisionHandling::getDataFromObject(std::shared_ptr<Entity> obj)
         {
             side.objType = ObjType::PbdDeformable;
         }
-        std::shared_ptr<PbdModel> model = side.pbdObj->getPbdModel();
+        std::shared_ptr<PbdSystem> model = side.pbdObj->getPbdModel();
         side.model = model.get();
         // If a physics geometry is provided always use that because
         // Either:
@@ -326,7 +326,7 @@ PbdCollisionHandling::handle(
 
     // If obj B is also pbd simulated, make sure they share the same model
     CHECK(dataSideB.pbdObj == nullptr || dataSideA.model == dataSideB.model) <<
-        "PbdCollisionHandling input objects must share PbdModel";
+        "PbdCollisionHandling input objects must share PbdSystem";
 
     // For CCD (store if available)
     dataSideA.prevGeometry = m_colData->prevGeomA.get();

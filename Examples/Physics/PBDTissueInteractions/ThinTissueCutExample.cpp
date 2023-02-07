@@ -14,7 +14,7 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -35,12 +35,12 @@ using namespace imstk;
 /// \brief Creates cloth object
 ///
 static std::shared_ptr<PbdObject>
-makeTissueObj(const std::string&        name,
-              const double              width,
-              const double              height,
-              const int                 nRows,
-              const int                 nCols,
-              std::shared_ptr<PbdModel> model)
+makeTissueObj(const std::string&         name,
+              const double               width,
+              const double               height,
+              const int                  nRows,
+              const int                  nCols,
+              std::shared_ptr<PbdSystem> model)
 {
     // Setup the Geometry
     std::shared_ptr<SurfaceMesh> clothMesh =
@@ -82,7 +82,7 @@ makeTissueObj(const std::string&        name,
 }
 
 static std::shared_ptr<PbdObject>
-makeToolObj(std::shared_ptr<PbdModel> model)
+makeToolObj(std::shared_ptr<PbdSystem> model)
 {
     // Create a cutting plane object in the scene
     std::shared_ptr<SurfaceMesh> cutGeom =
@@ -132,20 +132,20 @@ PBDThinTissueCutExample()
     scene->getActiveCamera()->setFocalPoint(Vec3d(0.0, 0.02, 0.05));
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->getConfig()->m_doPartitioning = false;
-    pbdModel->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
-    pbdModel->getConfig()->m_iterations = 5;
-    //pbdModel->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
-    pbdModel->getConfig()->m_gravity = Vec3d(0.0, -7.0, 0.0);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->getConfig()->m_doPartitioning = false;
+    pbdSystem->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
+    pbdSystem->getConfig()->m_iterations = 5;
+    //pbdSystem->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
+    pbdSystem->getConfig()->m_gravity = Vec3d(0.0, -7.0, 0.0);
 
-    std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdModel);
+    std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     // Create a pbd cloth object in the scene
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
         0.1, 0.1, 12, 12,
-        pbdModel);
+        pbdSystem);
     scene->addSceneObject(tissueObj);
 
     // Add cutting interaction

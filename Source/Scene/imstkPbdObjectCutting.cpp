@@ -9,7 +9,7 @@
 #include "imstkLineMesh.h"
 #include "imstkLineMeshCut.h"
 #include "imstkPbdConstraintContainer.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkSurfaceMesh.h"
@@ -40,7 +40,7 @@ PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::share
 void
 PbdObjectCutting::apply()
 {
-    std::shared_ptr<PbdModel> pbdModel = m_objA->getPbdModel();
+    std::shared_ptr<PbdSystem> pbdSystem = m_objA->getPbdModel();
 
     m_addConstraintVertices->clear();
     m_removeConstraintVertices->clear();
@@ -87,9 +87,9 @@ PbdObjectCutting::apply()
 
     // update pbd states, constraints and solver
     m_objA->setBodyFromGeometry();
-    pbdModel->getConstraints()->removeConstraints(m_removeConstraintVertices,
+    pbdSystem->getConstraints()->removeConstraints(m_removeConstraintVertices,
         m_objA->getPbdBody()->bodyHandle);
-    pbdModel->addConstraints(m_addConstraintVertices, m_objA->getPbdBody()->bodyHandle);
+    pbdSystem->addConstraints(m_addConstraintVertices, m_objA->getPbdBody()->bodyHandle);
 
     m_objA->getPhysicsGeometry()->postModified();
 }

@@ -7,6 +7,7 @@ set(H_FILES
   Components/imstkAxesModel.h
   Components/imstkCollider.h
   Components/imstkObjectControllerGhost.h
+  Components/imstkPbdMethod.h
   Components/imstkPortHoleInteraction.h
   Components/imstkBurnable.h
   Components/imstkBurner.h
@@ -36,6 +37,7 @@ set(SRC_FILES
   Camera/imstkCamera.cpp
   Components/imstkObjectControllerGhost.cpp
   Components/imstkCollider.cpp
+  Components/imstkPbdMethod.cpp
   Components/imstkPortHoleInteraction.cpp
   Components/imstkBurnable.cpp
   Components/imstkBurner.cpp

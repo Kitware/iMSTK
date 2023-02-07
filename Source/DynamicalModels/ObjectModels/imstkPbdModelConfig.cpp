@@ -4,7 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkGraph.h"
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"

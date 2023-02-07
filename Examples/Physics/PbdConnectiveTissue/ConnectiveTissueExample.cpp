@@ -19,7 +19,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkObjectControllerGhost.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -47,7 +47,7 @@ using namespace imstk;
 /// \brief Creates pbd simulated gallbladder object
 ///
 std::shared_ptr<PbdObject>
-makeGallBladder(const std::string& name, std::shared_ptr<PbdModel> model)
+makeGallBladder(const std::string& name, std::shared_ptr<PbdSystem> model)
 {
     // Setup the Geometry
     auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Gallblader/gallblader.msh");
@@ -97,7 +97,7 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdModel> model)
 }
 
 static std::shared_ptr<PbdObject>
-makeKidney(const std::string& name, std::shared_ptr<PbdModel> model)
+makeKidney(const std::string& name, std::shared_ptr<PbdSystem> model)
 {
     // Setup the Geometry
     auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Kidney/kidney_vol_low_rez.vtk");
@@ -148,7 +148,7 @@ makeKidney(const std::string& name, std::shared_ptr<PbdModel> model)
 }
 
 static std::shared_ptr<PbdObject>
-makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
+makeCapsuleToolObj(std::shared_ptr<PbdSystem> model)
 {
     auto toolGeometry = std::make_shared<Capsule>();
     toolGeometry->setRadius(0.03);
@@ -202,26 +202,26 @@ main()
     scene->getActiveCamera()->setViewUp(-0.0400007, 0.980577, -0.19201);
 
     // Setup the PBD Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->getConfig()->m_doPartitioning = false;
-    pbdModel->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
-    pbdModel->getConfig()->m_iterations = 5;
-    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -1.0, 0.0);
-    pbdModel->getConfig()->m_linearDampingCoeff  = 0.005; // Removed from velocity
-    pbdModel->getConfig()->m_angularDampingCoeff = 0.005;
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->getConfig()->m_doPartitioning = false;
+    pbdSystem->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
+    pbdSystem->getConfig()->m_iterations = 5;
+    pbdSystem->getConfig()->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdSystem->getConfig()->m_linearDampingCoeff  = 0.005; // Removed from velocity
+    pbdSystem->getConfig()->m_angularDampingCoeff = 0.005;
 
     // Setup gallbladder object
-    std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdModel);
+    std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdSystem);
     scene->addSceneObject(gallbladerObj);
 
     // Setup kidney
-    std::shared_ptr<PbdObject> kidneyObj = makeKidney("Kidney", pbdModel);
+    std::shared_ptr<PbdObject> kidneyObj = makeKidney("Kidney", pbdSystem);
     scene->addSceneObject(kidneyObj);
 
     // Create PBD object of connective strands with associated constraints
     double                     maxDist = 0.35;
-    std::shared_ptr<PbdObject> connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdModel, maxDist, 2.5, 7);
-    pbdModel->getConfig()->setBodyDamping(connectiveStrands->getPbdBody()->bodyHandle, 0.015, 0.0);
+    std::shared_ptr<PbdObject> connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdSystem, maxDist, 2.5, 7);
+    pbdSystem->getConfig()->setBodyDamping(connectiveStrands->getPbdBody()->bodyHandle, 0.015, 0.0);
 
     // Add Tearing
     connectiveStrands->addComponent<Tearable>();
@@ -233,7 +233,7 @@ main()
     scene->addSceneObject(connectiveStrands);
 
     // Setup a tool to grasp with
-    std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdModel);
+    std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     // add collision

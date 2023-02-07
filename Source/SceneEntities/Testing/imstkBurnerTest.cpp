@@ -7,7 +7,7 @@
 #include "imstkBurner.h"
 #include "imstkCapsule.h"
 #include "imstkCollider.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 
@@ -18,13 +18,13 @@ using namespace imstk;
 TEST(imstkBurningTest, testState)
 {
     // Setup the PBD Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->getConfig()->m_doPartitioning = false;
-    pbdModel->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
-    pbdModel->getConfig()->m_iterations = 4;
-    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -1.0, 0.0);
-    pbdModel->getConfig()->m_linearDampingCoeff  = 0.01; // Removed from velocity
-    pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->getConfig()->m_doPartitioning = false;
+    pbdSystem->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
+    pbdSystem->getConfig()->m_iterations = 4;
+    pbdSystem->getConfig()->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdSystem->getConfig()->m_linearDampingCoeff  = 0.01; // Removed from velocity
+    pbdSystem->getConfig()->m_angularDampingCoeff = 0.01;
 
     // Create burning geometry
     auto toolGeometry = std::make_shared<Capsule>();
@@ -39,7 +39,7 @@ TEST(imstkBurningTest, testState)
     toolObj->setVisualGeometry(toolGeometry);
     toolObj->setPhysicsGeometry(toolGeometry);
     toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
-    toolObj->setDynamicalModel(pbdModel);
+    toolObj->setDynamicalModel(pbdSystem);
     toolObj->getPbdBody()->setRigid(
         Vec3d(0.0, 5.0, 2.0),
         1.0,

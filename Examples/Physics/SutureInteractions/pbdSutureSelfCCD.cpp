@@ -11,7 +11,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
@@ -52,8 +52,8 @@ makePbdString(const std::string& name, const std::string& filename)
     pbdParams->m_linearDampingCoeff = 0.03;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
@@ -72,7 +72,7 @@ makePbdString(const std::string& name, const std::string& filename)
     stringObj->addVisualModel(visualModel);
     stringObj->setPhysicsGeometry(stringMesh);
     stringObj->addComponent<Collider>()->setGeometry(stringMesh);
-    stringObj->setDynamicalModel(pbdModel);
+    stringObj->setDynamicalModel(pbdSystem);
 
     stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // grams
     stringObj->getPbdBody()->fixedNodeIds     = { 0, 1,
@@ -103,10 +103,10 @@ makeNeedleObj()
     needleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
     needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
 
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->getConfig()->m_gravity    = Vec3d::Zero();
-    pbdModel->getConfig()->m_iterations = 5;
-    needleObj->setDynamicalModel(pbdModel);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->getConfig()->m_gravity    = Vec3d::Zero();
+    pbdSystem->getConfig()->m_iterations = 5;
+    needleObj->setDynamicalModel(pbdSystem);
 
     /*
     needleObj->getPbdBody()->m_mass = 1.0;

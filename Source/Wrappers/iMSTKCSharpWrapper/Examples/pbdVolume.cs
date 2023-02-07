@@ -76,8 +76,8 @@ public class PbdVolume
         visualModel.setRenderMaterial(material);
 
         PbdObject deformableObj = new PbdObject("DeformableObject");
-        PbdModel pbdModel = new PbdModel();
-        pbdModel.setModelGeometry(tetMesh);
+        PbdSystem dynamicalModel = new PbdSystem();
+        dynamicalModel.setModelGeometry(tetMesh);
 
         // Configure model
         PbdModelConfig pbdParams = new PbdModelConfig();
@@ -94,10 +94,10 @@ public class PbdVolume
         pbdParams.m_dt = 0.02;
 
         // Set the parameters
-        pbdModel.configure(pbdParams);
-        pbdModel.setTimeStepSizeType(TimeSteppingType.Fixed);
+        dynamicalModel.configure(pbdParams);
+        dynamicalModel.setTimeStepSizeType(TimeSteppingType.Fixed);
 
-        deformableObj.setDynamicalModel(pbdModel);
+        deformableObj.setDynamicalModel(dynamicalModel);
         deformableObj.addVisualModel(visualModel);
         deformableObj.setPhysicsGeometry(tetMesh);
         deformableObj.setPhysicsToVisualMap(new PointwiseMap(tetMesh, surfMesh));

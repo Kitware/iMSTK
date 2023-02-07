@@ -6,7 +6,7 @@
 
 #include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdConstraintContainer.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdObject.h"
 #include "imstkCellMesh.h"
 

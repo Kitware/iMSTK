@@ -15,7 +15,7 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCellRemoval.h"
@@ -43,7 +43,7 @@ using namespace imstk;
 static std::shared_ptr<PbdObject>
 makeTissueObj(const std::string& name,
               const Vec3d& size, const Vec3i& dim, const Vec3d& center,
-              std::shared_ptr<PbdModel> model)
+              std::shared_ptr<PbdSystem> model)
 {
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tissueMesh = GeometryUtils::toTetGrid(center, size, dim);
@@ -94,7 +94,7 @@ makeTissueObj(const std::string& name,
 }
 
 static std::shared_ptr<PbdObject>
-makeToolObj(std::shared_ptr<PbdModel> model)
+makeToolObj(std::shared_ptr<PbdSystem> model)
 {
     auto plane = std::make_shared<Plane>();
     plane->setWidth(1.0);
@@ -146,22 +146,22 @@ PBDTissueCutExample()
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
     // Setup the Model/System
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->getConfig()->m_doPartitioning = false;
-    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -0.2, 0.0);
-    pbdModel->getConfig()->m_dt         = 0.05;
-    pbdModel->getConfig()->m_iterations = 5;
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->getConfig()->m_doPartitioning = false;
+    pbdSystem->getConfig()->m_gravity    = Vec3d(0.0, -0.2, 0.0);
+    pbdSystem->getConfig()->m_dt         = 0.05;
+    pbdSystem->getConfig()->m_iterations = 5;
 
     // Setup a tissue
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
         Vec3d(10.0, 3.0, 10.0), Vec3i(10, 3, 10), Vec3d(0.0, -1.0, 0.0),
-        pbdModel);
+        pbdSystem);
     scene->addSceneObject(tissueObj);
 
     auto cellRemoval = std::make_shared<PbdObjectCellRemoval>(tissueObj);
     scene->addInteraction(cellRemoval);
 
-    std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdModel);
+    std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     /*auto interaction = std::make_shared<PbdObjectCollision>(
@@ -202,7 +202,7 @@ PBDTissueCutExample()
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Keep the tool moving in real time
-                pbdModel->getConfig()->m_dt = sceneManager->getDt();
+                pbdSystem->getConfig()->m_dt = sceneManager->getDt();
             });
 
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
