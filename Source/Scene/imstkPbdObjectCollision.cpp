@@ -39,6 +39,7 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<CollidingObject> obj1, st
     }
     else
     {
+        std::swap(m_objA, m_objB);
         setupConnections(pbdObject2, obj1, cdType);
     }
 }
