@@ -194,10 +194,71 @@ TEST(imstkCollisionUtilsTest, ClosestPointOnTriangleTest)
 
     // Test inside triangle
     // Point pAC is closest edge AC
-    const Vec3d& pCenter = Vec3d(0.0, 0.0, 0.0);
+    const Vec3d& pCenter = Vec3d(0.1, 0.0, 0.1);
     const Vec3d  trianglePointCenter = closestPointOnTriangle(pCenter, a, b, c, caseType);
     ASSERT_EQ(6, caseType);
     EXPECT_TRUE(trianglePointCenter.isApprox(pCenter));
+}
+
+TEST(imstkCollisionUtilsTest, ClosestPointOnSegment) {
+    Vec3d x1(-1.0, -1.0, -1.0);
+    Vec3d x2(1.0, 1.0, 1.0);
+
+    {
+        SCOPED_TRACE("p==x1");
+        int  caseType = -1;
+        auto result   = closestPointOnSegment(x1, x1, x2, caseType);
+        EXPECT_EQ(2, caseType);
+        EXPECT_TRUE(result.isApprox(x1));
+    }
+
+    {
+        SCOPED_TRACE("p closest to x1");
+        Vec3d p(-2, -4, -2);
+        int   caseType = -1;
+        auto  result   = closestPointOnSegment(p, x1, x2, caseType);
+        EXPECT_EQ(0, caseType);
+        EXPECT_TRUE(result.isApprox(x1));
+    }
+
+    {
+        SCOPED_TRACE("p==x2");
+        int  caseType = -1;
+        auto result   = closestPointOnSegment(x2, x1, x2, caseType);
+        EXPECT_EQ(2, caseType);
+        EXPECT_TRUE(result.isApprox(x2));
+    }
+
+    {
+        SCOPED_TRACE("p closest to x2");
+        Vec3d p(2, 4, 2);
+        int   caseType = -1;
+        auto  result   = closestPointOnSegment(p, x1, x2, caseType);
+        EXPECT_EQ(1, caseType);
+        EXPECT_TRUE(result.isApprox(x2));
+    }
+
+    {
+        SCOPED_TRACE("p is midpoint");
+        int   caseType = -1;
+        Vec3d midPoint = x1 + (x2 - x1) / 2;
+        auto  result   = closestPointOnSegment(midPoint, x1, x2, caseType);
+        EXPECT_EQ(2, caseType);
+        EXPECT_TRUE(result.isApprox(midPoint));
+    }
+
+    {
+        SCOPED_TRACE("p closest to midpoint");
+        int   caseType = -1;
+        Vec3d midPoint = x1 + (x2 - x1) / 2;
+        Vec3d dir      = x2 - x1;
+        Vec3d norm     = dir.cross(Vec3d(1, 0, 0)).normalized();
+        Vec3d p = norm * 2;
+
+        auto result = closestPointOnSegment(p, x1, x2, caseType);
+        EXPECT_EQ(2, caseType);
+        EXPECT_TRUE(result.isApprox(midPoint)) << result.transpose();
+    }
 }
 } // namespace CollisionUtils
 } // namespace imstk
