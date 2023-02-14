@@ -6,6 +6,8 @@
 
 /*
  * Instantiation of shared_ptr
+ * Classes marked with %shared_ptr will be constructed as shared_ptr
+ * rather than raw pointers
  */
 %include <std_shared_ptr.i>
 
