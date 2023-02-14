@@ -17,11 +17,12 @@
 namespace imstk
 {
 PbdModel::PbdModel() : AbstractDynamicalModel(DynamicalModelType::PositionBasedDynamics),
-    m_config(std::make_shared<PbdModelConfig>())
+    m_config(std::make_shared<PbdModelConfig>()),
+    m_constraints(std::make_shared<PbdConstraintContainer>())
 {
     // Add a virtual particle buffer, cleared every frame
     addBody();
-    // Add a virtual particle buffer, persistant
+    // Add a virtual particle buffer, persistent
     addBody();
 
     m_validGeometryTypes = {
@@ -180,8 +181,6 @@ PbdModel::initialize()
 
     // Initialize constraints
     {
-        m_constraints = std::make_shared<PbdConstraintContainer>();
-
         m_config->computeElasticConstants();
 
         // Run all the functors to generate the constraints

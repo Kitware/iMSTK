@@ -114,6 +114,7 @@
 #include "imstkPbdBody.h"
 #include "imstkPbdConstraint.h"
 #include "imstkRbdConstraint.h"
+#include "imstkPbdDistanceConstraint.h"
 
 /*
  * ComponentModel
@@ -375,6 +376,7 @@ namespace std
 %include "../../Constraint/PbdConstraints/imstkPbdConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdFemConstraint.h"
+%include "../../Constraint/PbdConstraints/imstkPbdDistanceConstraint.h"
 %include "../../Constraint/RigidBodyConstraints/imstkRbdConstraint.h"
 
 /*
