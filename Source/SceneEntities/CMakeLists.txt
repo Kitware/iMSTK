@@ -27,7 +27,6 @@ set(H_FILES
   Objects/imstkDynamicObject.h
   Objects/imstkLevelSetDeformableObject.h
   Objects/imstkPbdConnectiveTissueConstraintGenerator.h
-  Objects/imstkPbdObject.h
   Objects/imstkPbdObjectCellRemoval.h
   Objects/imstkSceneObject.h
   Objects/imstkSphObject.h
@@ -52,7 +51,6 @@ set(SRC_FILES
   Objects/imstkDynamicObject.cpp
   Objects/imstkLevelSetDeformableObject.cpp
   Objects/imstkPbdConnectiveTissueConstraintGenerator.cpp
-  Objects/imstkPbdObject.cpp
   Objects/imstkPbdObjectCellRemoval.cpp
   Objects/imstkSceneObject.cpp
   Objects/imstkSphObject.cpp
