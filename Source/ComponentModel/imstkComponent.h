@@ -32,6 +32,9 @@ protected:
     Component(const std::string& name = "Component") : m_name(name) { }
 
 public:
+    // Get class name
+    virtual const std::string getTypeName() const = 0;
+
     virtual ~Component() = default;
 
     const std::string& getName() const { return m_name; }
@@ -104,6 +107,7 @@ protected:
 
 public:
     ~Behaviour() override = default;
+    IMSTK_TYPE_NAME(Behaviour<UpdateInfo>)
 
     virtual void update(const UpdateInfo& imstkNotUsed(updateData)) { }
     virtual void visualUpdate(const UpdateInfo& imstkNotUsed(updateData)) { }

@@ -16,6 +16,7 @@ namespace
 class TestComponent : public Component
 {
 public:
+    IMSTK_TYPE_NAME(TestComponent)
     TestComponent(const std::string& name = "TestComponent") : Component(name)
     {
     }
@@ -23,6 +24,7 @@ public:
 class TestComponent2 : public Component
 {
 public:
+    IMSTK_TYPE_NAME(TestComponent)
     TestComponent2(const std::string& name = "TestComponent2") : Component(name)
     {
     }

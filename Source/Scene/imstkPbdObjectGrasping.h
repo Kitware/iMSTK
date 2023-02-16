@@ -16,16 +16,16 @@
 namespace imstk
 {
 class AnalyticalGeometry;
-class PbdObject;
+class PbdMethod;
 class PickingAlgorithm;
 class PointwiseMap;
 
 ///
 /// \class PbdObjectGrasping
 ///
-/// \brief This class defines grasping of a PbdObject via different
+/// \brief This class defines grasping of a PbdMethod via different
 /// picking methods. Where grasping is define as grabbing & attaching
-/// of a PbdObject's mesh to points.
+/// of a PbdMethod's mesh to points.
 ///
 /// Given an input PickData the appropriate grasping will be produced.
 ///
@@ -46,8 +46,8 @@ public:
     /// can work with any grasping criteria, if you want a two-way response
     /// you must supply an object to grasp with.
     ///
-    PbdObjectGrasping(std::shared_ptr<PbdObject> graspedObject,
-                      std::shared_ptr<PbdObject> grasperObject = nullptr);
+    PbdObjectGrasping(std::shared_ptr<PbdMethod> graspedObject,
+                      std::shared_ptr<PbdMethod> grasperObject = nullptr);
     ~PbdObjectGrasping() override = default;
 
     IMSTK_TYPE_NAME(PbdObjectGrasping)
@@ -189,8 +189,8 @@ protected:
     std::shared_ptr<Geometry>     m_geomToPick = nullptr;
     std::shared_ptr<PointwiseMap> m_geometryToPickMap = nullptr;
 
-    std::shared_ptr<PbdObject> m_objectToGrasp      = nullptr;
-    std::shared_ptr<PbdObject> m_grasperObject      = nullptr; // Optional
+    std::shared_ptr<PbdMethod> m_objectToGrasp      = nullptr;
+    std::shared_ptr<PbdMethod> m_grasperObject      = nullptr; // Optional
     std::shared_ptr<AnalyticalGeometry> m_graspGeom = nullptr;
 
     std::shared_ptr<PickingAlgorithm> m_pickMethod = nullptr;

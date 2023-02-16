@@ -12,7 +12,7 @@
 
 namespace imstk
 {
-class PbdObject;
+class PbdMethod;
 class PbdConstraintContainer;
 class PbdBaryPointToPointConstraint;
 class PbdSystem;
@@ -39,7 +39,7 @@ public:
     /// \brief Sets PBD object that represents the connective tissue.
     /// This must use a line mesh for the physics mesh
     ///
-    void setConnectiveStrandObj(std::shared_ptr<PbdObject> connectiveStrandObj) { m_connectiveStrandObj = connectiveStrandObj; }
+    void setConnectiveStrandObj(std::shared_ptr<PbdMethod> connectiveStrandObj) { m_connectiveStrandObj = connectiveStrandObj; }
 
     ///
     /// \brief Creates distance constraints for the connective strands
@@ -53,14 +53,14 @@ public:
     /// assumes the surface mesh of ObjA is coincident with the
     /// end points of one side of the strands
     ///
-    void setConnectedObjA(std::shared_ptr<PbdObject> objA) { m_objA = objA; }
+    void setConnectedObjA(std::shared_ptr<PbdMethod> objA) { m_objA = objA; }
 
     ///
     /// \brief Sets PBD object to connect to connective straints
     /// assumes the surface mesh of ObjB is coincident with the
     /// end points of one side of the strands
     ///
-    void setConnectedObjB(std::shared_ptr<PbdObject> objB) { m_objB = objB; }
+    void setConnectedObjB(std::shared_ptr<PbdMethod> objB) { m_objB = objB; }
 
     ///
     /// \brief Appends a set of constraint to the container given a geometry & body
@@ -88,7 +88,7 @@ protected:
     /// the physics mesh.
     ///
     void connectLineToTetMesh(
-        std::shared_ptr<PbdObject> pbdObj,
+        std::shared_ptr<PbdMethod> pbdObj,
         PbdConstraintContainer&    constraints);
 
     ///
@@ -96,12 +96,12 @@ protected:
     /// the physics mesh.
     ///
     void connectLineToSurfMesh(
-        std::shared_ptr<PbdObject> pbdObj,
+        std::shared_ptr<PbdMethod> pbdObj,
         PbdConstraintContainer&    constraints);
 
-    std::shared_ptr<PbdObject> m_connectiveStrandObj = nullptr; ///< Connective tissue that is made
-    std::shared_ptr<PbdObject> m_objA = nullptr;                ///< Organ being connected
-    std::shared_ptr<PbdObject> m_objB = nullptr;                ///< Organ being connected
+    std::shared_ptr<PbdMethod> m_connectiveStrandObj = nullptr; ///< Connective tissue that is made
+    std::shared_ptr<PbdMethod> m_objA = nullptr;                ///< Organ being connected
+    std::shared_ptr<PbdMethod> m_objB = nullptr;                ///< Organ being connected
 
     double m_distStiffness = 50.0;                              ///< Stiffness used for distance constraints
     double m_tolerance     = 0.00001;                           ///< Tolerance for checking coincidence of surface to line mesh
@@ -112,10 +112,10 @@ protected:
 ///
 /// \brief Helper function for creating constraints on the connective tissue
 ///
-std::shared_ptr<PbdObject> addConnectiveTissueConstraints(
+std::shared_ptr<Entity> addConnectiveTissueConstraints(
     std::shared_ptr<LineMesh>  connectiveLineMesh,
-    std::shared_ptr<PbdObject> objA,
-    std::shared_ptr<PbdObject> objB,
+    std::shared_ptr<PbdMethod> objA,
+    std::shared_ptr<PbdMethod> objB,
     std::shared_ptr<PbdSystem> model);
 
 ///
@@ -123,7 +123,7 @@ std::shared_ptr<PbdObject> addConnectiveTissueConstraints(
 ///
 /// \brief This function takes in the PbdObjects that represent the organs to be connected, the
 /// associated PbdSystem, and the parameters used to control the generation of the connective tissue
-/// PbdObject that is returned.
+/// Entity that is returned.
 ///
 /// \param objA PbdObject that represents an organ to be connected with connective tissue
 /// \param objB PbdObject that represents an organ to be connected with connective tissue
@@ -133,9 +133,9 @@ std::shared_ptr<PbdObject> addConnectiveTissueConstraints(
 /// \param segmentsPerStrand  number of segments each strand is made of
 /// \param selector the selector type used to generate the faces, currently only ProximitySurfaceSelector
 ///
-std::shared_ptr<PbdObject> makeConnectiveTissue(
-    std::shared_ptr<PbdObject>                objA,
-    std::shared_ptr<PbdObject>                objB,
+std::shared_ptr<Entity> makeConnectiveTissue(
+    std::shared_ptr<Entity>                   objA,
+    std::shared_ptr<Entity>                   objB,
     std::shared_ptr<PbdSystem>                model,
     double                                    maxDist = 0.0,
     double                                    strandsPerFace    = 1,

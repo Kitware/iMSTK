@@ -10,7 +10,7 @@
 
 namespace imstk
 {
-class PbdObject;
+class PbdMethod;
 
 ///
 /// \class PbdObjectController
@@ -30,7 +30,11 @@ public:
     ~PbdObjectController() override = default;
 
 public:
-    void setControlledObject(std::shared_ptr<SceneObject> obj) override;
+    ///
+    /// \brief Get/Set controlled pbd object
+    ///@{
+    void setControlledObject(std::shared_ptr<PbdMethod> physicsObject, std::shared_ptr<VisualModel> visibleObject);
+    std::shared_ptr<PbdMethod> getControlledObject() const { return m_controlledObject; }
 
     ///
     /// \brief Set/Get the linear damping coefficient. Default 10000.0
@@ -152,7 +156,7 @@ public:
     void applyForces() override;
 
 protected:
-    std::shared_ptr<PbdObject> m_pbdObject;
+    std::shared_ptr<PbdMethod> m_controlledObject;
 
     double m_linearKd  = 10000.0;                                ///< Damping coefficient, linear
     double m_angularKd = 300.0;                                  ///< Damping coefficient, rotational

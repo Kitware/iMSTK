@@ -21,7 +21,7 @@ namespace imstk
 class AbstractCellMesh : public PointSet
 {
 public:
-    ~AbstractCellMesh() override = default;
+    IMSTK_TYPE_NAME(AbstractCellMesh) ~AbstractCellMesh() override = default;
 
     ///
     /// \brief Returns true if the geometry is a mesh, else returns false

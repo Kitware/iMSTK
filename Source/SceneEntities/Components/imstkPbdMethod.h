@@ -8,12 +8,12 @@
 
 #include "imstkMacros.h"
 #include "imstkComponent.h"
+#include "imstkPbdBody.h"
 
 namespace imstk
 {
 class Geometry;
 class GeometryMap;
-struct PbdBody;
 class PbdConstraint;
 class PbdSystem;
 class PointSet;
@@ -23,6 +23,7 @@ class PbdMethod : public SceneBehaviour
 public:
     IMSTK_TYPE_NAME(PbdMethod) PbdMethod(const std::string& name = "PbdMethod");
 
+    bool initialize();
     ///
     /// \brief Initializes the edges of the Behaviour's computational graph
     ///
@@ -73,6 +74,36 @@ public:
 
     const std::vector<std::shared_ptr<PbdConstraint>>& getCellConstraints(int cellId);
 
+    /// \brief Returns the corresponding body handle in the PbdSystem
+    /// \return
+    const int getBodyHandle() const { return m_pbdBody->bodyHandle; }
+
+    /// \brief Set uniform mass value for each vertex of the body.
+    /// \param uniformMass
+    void setUniformMass(double uniformMass) { m_pbdBody->uniformMassValue = uniformMass; }
+
+    /// @brief Set the ids of the nodes that will remain fixed.
+    /// @param fixedNodes Vector of node ids
+    void setFixedNodes(const std::vector<int>& fixedNodes)
+    {
+        m_pbdBody->fixedNodeIds = fixedNodes;
+    }
+
+    /// @brief Set pbdBody as rigid along with the necessary rigid body parameters.
+    /// @param pos Position of rigid body center.
+    /// @param mass Mass of rigid body.
+    /// @param orientation
+    /// @param inertia
+    void setRigid(const Vec3d& pos,
+                  const double mass = 1.0,
+                  const Quatd& orientation = Quatd::Identity(),
+                  const Mat3d& inertia     = Mat3d::Identity())
+    {
+        m_pbdBody->setRigid(pos, mass, orientation, inertia);
+    }
+
+    const Vec3d& getRigidPosition() const { return m_pbdBody->getRigidPosition(); }
+
     ///
     /// \brief Reset the behaviour by reseting the respective DynamicalModel and Geometry
     ///
@@ -84,10 +115,8 @@ public:
 
     void computeCellConstraintMap();
 
-    bool initialize();
-
 private:
-    void update() { };
+    // void update() { };
     void updatePhysicsGeometry();
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
 

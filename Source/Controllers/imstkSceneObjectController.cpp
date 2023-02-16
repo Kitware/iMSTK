@@ -8,7 +8,7 @@
 #include "imstkDeviceClient.h"
 #include "imstkGeometry.h"
 #include "imstkLogger.h"
-#include "imstkSceneObject.h"
+#include "imstkVisualModel.h"
 
 namespace imstk
 {
@@ -40,8 +40,8 @@ SceneObjectController::update(const double& dt)
 
     // Update geometry
     // \todo revisit this; what if we need to move a group of objects
-    m_sceneObject->getVisualGeometry()->setTranslation(getPosition());
-    m_sceneObject->getVisualGeometry()->setRotation(getOrientation());
-    m_sceneObject->getVisualGeometry()->postModified();
+    m_sceneObject->getGeometry()->setTranslation(getPosition());
+    m_sceneObject->getGeometry()->setRotation(getOrientation());
+    m_sceneObject->getGeometry()->postModified();
 }
 } // namespace imstk

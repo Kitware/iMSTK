@@ -11,7 +11,7 @@
 
 namespace imstk
 {
-class PbdObject;
+class PbdMethod;
 class TaskNode;
 class CellPicker;
 class AnalyticalGeometry;
@@ -35,7 +35,7 @@ public:
     ///
     /// \brief Get the geometry doing the burning
     ///@{
-    std::shared_ptr<PbdObject> getBurnerGeometry() const { return m_burningObj; }
+    std::shared_ptr<PbdMethod> getBurnerGeometry() const { return m_burningObj; }
     ///@}
 
     ///
@@ -77,7 +77,7 @@ public:
     ///
     /// \brief Add burnable object to list of things that can be burned
     ///@{
-    void addObject(std::shared_ptr<PbdObject> obj)
+    void addObject(std::shared_ptr<PbdMethod> obj)
     {
         m_burnableObjects.push_back(obj);
     }
@@ -102,12 +102,12 @@ protected:
 
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-    std::shared_ptr<PbdObject> m_burningObj;            ///< PbdObject doing the burning
+    std::shared_ptr<PbdMethod> m_burningObj;            ///< PbdObject doing the burning
     std::shared_ptr<AnalyticalGeometry> m_burnGeometry; ///< Geometry doing the burning
 
     std::shared_ptr<TaskNode> m_burningHandleNode;
 
-    std::vector<std::shared_ptr<PbdObject>> m_burnableObjects;  ///< Set of burnable objects, currently set by user during setup
+    std::vector<std::shared_ptr<PbdMethod>> m_burnableObjects;  ///< Set of burnable objects, currently set by user during setup
 
     std::vector<std::shared_ptr<CellPicker>> m_pickers;
 

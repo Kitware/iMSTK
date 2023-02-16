@@ -8,6 +8,7 @@
 
 #include "imstkEventObject.h"
 #include "imstkLogger.h"
+#include "imstkMacros.h"
 
 #include <atomic>
 
@@ -78,10 +79,11 @@ public:
     std::shared_ptr<Component> getComponent(const unsigned int index) const;
 
     ///
-    /// \brief Get the first component of type T
+    /// \brief Get the first component of type T.
+    /// Returns nullptr if component is not found.
     ///
     template<typename T>
-    std::shared_ptr<T> getComponent() const
+    std::shared_ptr<T> getComponentUnsafe() const
     {
         for (const auto& component : m_components)
         {
@@ -91,6 +93,23 @@ public:
             }
         }
         return nullptr;
+    }
+
+    ///
+    /// \brief Get the first component of type T. Logs a fatal error if no component is found.
+    ///
+    template<typename T>
+    std::shared_ptr<T> getComponent() const
+    {
+        if (auto compT = getComponentUnsafe<T>())
+        {
+            return compT;
+        }
+        else
+        {
+            LOG(FATAL) << "Component not found in Entity.";
+            return nullptr;
+        }
     }
 
     ///

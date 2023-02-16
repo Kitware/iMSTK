@@ -13,6 +13,7 @@ namespace imstk
 {
 class CollisionData;
 class CollisionDetectionAlgorithm;
+class SphModel;
 class SphObject;
 
 ///
@@ -30,8 +31,7 @@ public:
 
     IMSTK_TYPE_NAME(SphCollisionHandling)
 
-public:
-    void setInputSphObject(std::shared_ptr<SphObject> sphObj);
+    void setInputSphObject(std::shared_ptr<SphObject> sphObj) { m_sphObject = sphObj; }
 
     ///
     /// \brief How many times to resolve and correct position. This is useful when colliding
@@ -44,6 +44,8 @@ public:
     ///
     void setDetection(std::shared_ptr<CollisionDetectionAlgorithm> colDetect) { this->m_colDetect = colDetect; }
 
+    bool initialize() override;
+
     ///
     /// \brief Resolve SPH particle positions
     ///
@@ -53,6 +55,12 @@ public:
 
 protected:
     ///
+    /// \brief Get the geometry used for handling
+    /// defaults to the collision geometry
+    ///
+    std::shared_ptr<Geometry> getCollidingGeometryA() override;
+    std::shared_ptr<Geometry> getCollidingGeometryB() override;
+    ///
     /// \brief Solves positiona and corrects velocity of individual particle
     ///
     void solve(Vec3d& pos, Vec3d& velocity, const Vec3d& penetrationVector);
@@ -61,5 +69,8 @@ private:
     std::shared_ptr<CollisionDetectionAlgorithm> m_colDetect = nullptr;
     int    m_iterations       = 1;
     double m_boundaryFriction = 0.0;
+
+    std::shared_ptr<SphObject> m_sphObject;
+    std::shared_ptr<SphModel>  m_sphModel;
 };
 } // end namespace imstk

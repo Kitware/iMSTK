@@ -11,9 +11,10 @@
 #include "imstkCCDAlgorithm.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkPbdCollisionHandling.h"
-#include "imstkPbdSystem.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdSolver.h"
+#include "imstkPbdSystem.h"
+#include "imstkSceneObject.h"
 #include "imstkTaskGraph.h"
 
 namespace imstk
@@ -22,20 +23,63 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<Entity> obj1, std::shared
                                        std::string cdType) :
     CollisionInteraction("PbdObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, cdType)
 {
-    auto pbdObject1 = std::dynamic_pointer_cast<PbdObject>(obj1);
-    auto pbdObject2 = std::dynamic_pointer_cast<PbdObject>(obj2);
+}
 
-    CHECK(pbdObject1 != nullptr || pbdObject2 != nullptr) << "One of the objects to PBDObjectCollision" <<
-        "has to be a PBDObject";
+namespace
+{
+std::shared_ptr<TaskGraph>
+extractTaskGraph(std::shared_ptr<Entity> entity)
+{
+    // \todo: remove later when SceneObject class is no longer used.
+    if (auto sceneObject = std::dynamic_pointer_cast<SceneObject>(entity))
+    {
+        return sceneObject->getTaskGraph();
+    }
+    else if (auto sceneBehaviour = std::dynamic_pointer_cast<SceneBehaviour>(entity->getComponent<PbdMethod>()))
+    {
+        sceneBehaviour->getTaskGraph();
+    }
+    LOG(FATAL) << "Cannot find a corresponding task graph for the provided entity.";
+    return nullptr;
+}
+} // namespace anonymous
 
-    if (pbdObject1 != nullptr)
+bool
+PbdObjectCollision::initialize()
+{
+    CollisionInteraction::initialize();
+
+    m_objectA.method   = m_objA->getComponent<PbdMethod>();
+    m_objectA.collider = m_objA->getComponent<Collider>();
+    m_objectB.method   = m_objB->getComponent<PbdMethod>();
+    m_objectB.collider = m_objB->getComponent<Collider>();
+
+    CHECK(m_objectA.method != nullptr || m_objectB.method != nullptr) << "At least one input object to PbdObjectCollision" <<
+        "should have a PbdMethod.";
+
+    m_objectA.taskGraph = extractTaskGraph(m_objA);
+    m_objectB.taskGraph = extractTaskGraph(m_objB);
+
+    m_objectA.system = m_objectA.method ? m_objectA.method->getPbdSystem() : nullptr;
+    m_objectB.system = m_objectB.method ? m_objectB.method->getPbdSystem() : nullptr;
+
+    // Swap so that objectA is the one that is guaranteed to have a PbdMethod.
+    // ObjectB is always the object which may or may not have a PbdMethod.
+    // Both objects are guaranteed to have a collider if they pass initialize().
+    if (!m_objectA.method)
     {
-        setupConnections(obj1, obj2, cdType);
+        std::swap(m_objectA, m_objectB);
     }
-    else
-    {
-        setupConnections(obj2, obj1, cdType);
-    }
+
+    CHECK(m_objectA.method && m_objectA.system) << "At this point, ObjectA should have a PbdMethod and a PbdSystem.";
+
+    CHECK(m_objectA.collider && m_objectB.collider) << "Both input objects should have a Collider.";
+
+    CHECK(m_objectB.method == nullptr || m_objectA.system == m_objectB.system) <<
+        "PbdObjectCollision may only be used with PbdObjects that share the same PbdSystem";
+
+    setupConnections();
+    return true;
 }
 
 void
@@ -139,44 +183,36 @@ PbdObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
 {
     CollisionInteraction::initGraphEdges(source, sink);
 
-    auto                         pbdObj1 = std::dynamic_pointer_cast<PbdObject>(m_objA);
-    std::shared_ptr<SceneObject> obj2    = std::dynamic_pointer_cast<SceneObject>(m_objB);
-
     std::shared_ptr<TaskNode> chNodeAB = m_collisionHandleANode;
 
     // Ensure a complete graph
-    m_taskGraph->addEdge(source, pbdObj1->getTaskGraph()->getSource());
-    m_taskGraph->addEdge(pbdObj1->getTaskGraph()->getSink(), sink);
-    m_taskGraph->addEdge(source, obj2->getTaskGraph()->getSource());
-    m_taskGraph->addEdge(obj2->getTaskGraph()->getSink(), sink);
+    m_taskGraph->addEdge(source, m_objectA.taskGraph->getSource());
+    m_taskGraph->addEdge(m_objectA.taskGraph->getSink(), sink);
+    m_taskGraph->addEdge(source, m_objectB.taskGraph->getSource());
+    m_taskGraph->addEdge(m_objectB.taskGraph->getSink(), sink);
 
     // -------------------------------------------------------------------------
     // Internal Constraint Solve -> Collision Geometry Update -> Collision Detection ->
     // PbdHandlerAB -> Collision Constraint Solve -> CCD Update Prev Geometry ->
     // Update Pbd Velocity -> Correct Velocities for Collision (restitution+friction)
     // -------------------------------------------------------------------------
-    m_taskGraph->addEdge(pbdObj1->getPbdModel()->getIntegratePositionNode(), m_collisionGeometryUpdateNode);
+    m_taskGraph->addEdge(m_objectA.system->getIntegratePositionNode(), m_collisionGeometryUpdateNode);
     m_taskGraph->addEdge(m_collisionGeometryUpdateNode, m_collisionDetectionNode);
     m_taskGraph->addEdge(m_collisionDetectionNode, chNodeAB); // A=AB=B
-    m_taskGraph->addEdge(chNodeAB, pbdObj1->getPbdModel()->getSolveNode());
+    m_taskGraph->addEdge(chNodeAB, m_objectA.system->getSolveNode());
+    m_taskGraph->addEdge(m_objectA.system->getSolveNode(), m_updatePrevGeometryCCDNode);
+    m_taskGraph->addEdge(m_updatePrevGeometryCCDNode, m_objectA.system->getUpdateVelocityNode());
 
-    m_taskGraph->addEdge(pbdObj1->getPbdModel()->getSolveNode(), m_updatePrevGeometryCCDNode);
-    m_taskGraph->addEdge(m_updatePrevGeometryCCDNode, pbdObj1->getPbdModel()->getUpdateVelocityNode());
-
-    if (std::dynamic_pointer_cast<PbdObject>(obj2) == nullptr)
-    {
-        m_taskGraph->addEdge(obj2->getUpdateGeometryNode(), m_collisionGeometryUpdateNode);
-        m_taskGraph->addEdge(m_collisionDetectionNode, obj2->getTaskGraph()->getSink());
-    }
+    m_taskGraph->addEdge(m_collisionDetectionNode, m_objectB.taskGraph->getSink());
 }
 
 void
-PbdObjectCollision::setupConnections(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2, std::string cdType /*= ""*/)
+PbdObjectCollision::setupConnections()
 {
     // Setup the handler
     std::shared_ptr<PbdCollisionHandling> ch = std::make_shared<PbdCollisionHandling>();
-    ch->setInputObjectA(obj1);
-    ch->setInputObjectB(obj2);
+    ch->setInputObjectA(m_objectA.collider, m_objectA.method);
+    ch->setInputObjectB(m_objectB.collider, m_objectB.method);
     ch->setInputCollisionData(m_colDetect->getCollisionData());
 
     m_updatePrevGeometryCCDNode = std::make_shared<TaskNode>([&]()
@@ -193,28 +229,18 @@ PbdObjectCollision::setupConnections(std::shared_ptr<Entity> obj1, std::shared_p
 
     setCollisionHandlingAB(ch);
 
-    auto obj1AsPbdObject = std::dynamic_pointer_cast<PbdObject>(obj1);
-    CHECK(obj1AsPbdObject != nullptr) << "Expected obj1 to be a PbdObject.";
-    m_taskGraph->addNode(obj1AsPbdObject->getTaskGraph()->getSource());
-    m_taskGraph->addNode(obj1AsPbdObject->getTaskGraph()->getSink());
+    m_taskGraph->addNode(m_objectA.taskGraph->getSource());
+    m_taskGraph->addNode(m_objectA.taskGraph->getSink());
 
-    auto obj2AsSceneObject = std::dynamic_pointer_cast<SceneObject>(obj2);
-    CHECK(obj2AsSceneObject != nullptr) << "Expected obj2 to be a SceneObject.";
-    m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSource());
-    m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSink());
+    m_taskGraph->addNode(m_objectB.taskGraph->getSource());
+    m_taskGraph->addNode(m_objectB.taskGraph->getSink());
 
-    std::shared_ptr<PbdSystem> pbdSystem = obj1AsPbdObject->getPbdModel();
+    std::shared_ptr<PbdSystem> pbdSystem = m_objectA.method->getPbdSystem();
     m_taskGraph->addNode(pbdSystem->getSolveNode());
     m_taskGraph->addNode(pbdSystem->getIntegratePositionNode());
     m_taskGraph->addNode(pbdSystem->getUpdateVelocityNode());
-
-    if (auto pbdObj2 = std::dynamic_pointer_cast<PbdObject>(obj2))
-    {
-        CHECK(pbdSystem == pbdObj2->getPbdModel()) << "PbdObjectCollision may only be used with PbdObjects that share the same PbdSystem";
-    }
-    else
-    {
-        m_taskGraph->addNode(obj2AsSceneObject->getUpdateGeometryNode());
-    }
+    // updateGeometryNode of a SceneObject is empty. We do not expect a bug
+    // to occur by removing the following line:
+    // m_taskGraph->addNode(obj2AsSceneObject->getUpdateGeometryNode());
 }
 } // namespace imstk

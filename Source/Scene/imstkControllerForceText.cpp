@@ -6,17 +6,17 @@
 
 #include "imstkControllerForceText.h"
 #include "imstkGeometry.h"
-#include "imstkPbdSystem.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdCollisionHandling.h"
+#include "imstkPbdContactConstraint.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdModelConfig.h"
+#include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
+#include "imstkPbdSystem.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSceneObject.h"
 #include "imstkTextVisualModel.h"
 #include "imstkVisualModel.h"
-#include "imstkPbdObjectCollision.h"
-#include "imstkPbdCollisionHandling.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdContactConstraint.h"
 
 namespace imstk
 {
@@ -50,10 +50,10 @@ ControllerForceText::computePbdContactForceAndTorque(Vec3d& contactForce, Vec3d&
     // \todo We should be able to do this with the PbdSystem itself
     if (m_collision != nullptr)
     {
-        auto                       pbdObj    = std::dynamic_pointer_cast<PbdObject>(m_pbdController->getControlledObject());
-        std::shared_ptr<PbdSystem> pbdSystem = pbdObj->getPbdModel();
+        auto                       controlledObject = m_pbdController->getControlledObject();
+        std::shared_ptr<PbdSystem> pbdSystem = controlledObject->getPbdSystem();
         const double               dt     = pbdSystem->getConfig()->m_dt;
-        const PbdParticleId        bodyId = { pbdObj->getPbdBody()->bodyHandle, 0 };
+        const PbdParticleId        bodyId = { controlledObject->getPbdBody()->bodyHandle, 0 };
 
         contactForce  = Vec3d::Zero();
         contactTorque = Vec3d::Zero();
@@ -108,8 +108,6 @@ ControllerForceText::visualUpdate(const double& dt)
                 const Vec3d  deviceForce  = m_pbdController->getDeviceForce();
                 const Vec3d  deviceTorque = m_pbdController->getDeviceTorque();
                 const double forceScaling = m_pbdController->getForceScaling();
-
-                auto pbdObj = std::dynamic_pointer_cast<PbdObject>(m_pbdController->getControlledObject());
 
                 // External/body force torque are cleared at the end of the frame so not possible to get here
                 strStream <<

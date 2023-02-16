@@ -22,7 +22,7 @@ SphObjectCollision::SphObjectCollision(std::shared_ptr<SphObject> obj1, std::sha
 {
     // Setup the handler
     std::shared_ptr<SphCollisionHandling> ch = std::make_shared<SphCollisionHandling>();
-    ch->setInputObjectA(obj1);
+    ch->setInputSphObject(obj1);
     ch->setInputCollisionData(m_colDetect->getCollisionData());
     ch->setDetection(m_colDetect);
     setCollisionHandlingA(ch);

@@ -20,6 +20,7 @@ namespace imstk
 class TextVisualModel : public VisualModel
 {
 public:
+    IMSTK_TYPE_NAME(VisualModel)
 
     enum class DisplayPosition
     {

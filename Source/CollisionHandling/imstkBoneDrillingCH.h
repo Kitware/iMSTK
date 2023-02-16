@@ -14,6 +14,7 @@ namespace imstk
 {
 class CollisionData;
 class Entity;
+struct PbdBody;
 class PbdObject;
 class TetrahedralMesh;
 
@@ -33,17 +34,20 @@ public:
     IMSTK_TYPE_NAME(BoneDrillingCH)
 
     ///
+    /// \brief Initialize and pre-fetch all required resources before the start of
+    /// the simulation loop.
+    ///
+    bool initialize() override;
+
+    ///
     /// \brief Set the input bone
     ///
-    void setInputObjectBone(std::shared_ptr<Entity> boneObject) { setInputObjectA(boneObject); }
+    void setInputObjectBone(std::shared_ptr<TetrahedralMesh> boneObject) { m_boneMesh = boneObject; }
 
     ///
     /// \brief Set the input drill
     ///
-    void setInputObjectDrill(std::shared_ptr<PbdObject> drillObject);
-
-    std::shared_ptr<Entity> getBoneObj() const { return getInputObjectA(); }
-    std::shared_ptr<PbdObject> getDrillObj() const;
+    void setInputObjectDrill(std::shared_ptr<Entity> drillObject) { m_drill = drillObject; }
 
     ///
     /// \brief Get stiffness
@@ -98,6 +102,9 @@ private:
 
     // Cache variables to hold Component level information.
     std::shared_ptr<TetrahedralMesh> m_boneMesh;
+    std::shared_ptr<Entity>   m_drill;
     std::shared_ptr<Geometry> m_drillCollidingGeometry;
+    std::shared_ptr<Geometry> m_drillVisualGeometry;
+    std::shared_ptr<PbdBody>  m_drillPbdBody;
 };
 } // namespace imstk

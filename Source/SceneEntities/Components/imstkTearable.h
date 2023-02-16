@@ -12,7 +12,7 @@
 namespace imstk
 {
 class PbdConstraint;
-class PbdObject;
+class PbdMethod;
 class PbdObjectCellRemoval;
 class TaskNode;
 
@@ -28,14 +28,12 @@ class TaskNode;
 class Tearable : public SceneBehaviour
 {
 public:
-    Tearable(const std::string& name = "TearablePbdObjectBehavior");
-
-    void init() override;
+    IMSTK_TYPE_NAME(Tearable) Tearable(const std::string& name = "TearablePbdObjectBehavior");
 
     ///
     /// \brief Get the PBD object to be torn
     ///@{
-    std::shared_ptr<PbdObject> getPbdObject() const { return m_tearableObject; }
+    // std::shared_ptr<PbdMethod> getPbdMethod() const { return m_tearableObject; }
     ///@}
 
     ///
@@ -48,6 +46,7 @@ public:
 ///@}
 
 protected:
+    void init() override;
 
     // The handle checks the constraint value (strain) of each cell, and if it
     // is greater than the max strain removes the cell.
@@ -55,12 +54,12 @@ protected:
 
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-    std::shared_ptr<PbdObject> m_tearableObject;                   ///< Object being torn
+    std::shared_ptr<PbdMethod> m_tearableObject;                   ///< Object being torn
     std::shared_ptr<PbdObjectCellRemoval> m_cellRemover = nullptr; ///< Cell remover for removing cells
 
     std::shared_ptr<TaskNode> m_tearableHandleNode;
 
-    // Failure (strain) of the PbdObject.  Measured by (current constraint value / reference value) where the
+    // Failure (strain) of the PBD object.  Measured by (current constraint value / reference value) where the
     // reference value is not zero.  If the reference value is zero, the constraint value is used.
     double m_maxStrain = 0.5;
 };

@@ -4,49 +4,50 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkPbdObjectCutting.h"
 #include "imstkAnalyticalGeometry.h"
+#include "imstkCollider.h"
 #include "imstkLineMesh.h"
 #include "imstkLineMeshCut.h"
 #include "imstkPbdConstraintContainer.h"
-#include "imstkPbdSystem.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdObjectCutting.h"
 #include "imstkPbdSolver.h"
+#include "imstkPbdSystem.h"
+#include "imstkPbdMethod.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshCut.h"
-#include "imstkCollider.h"
 
 namespace imstk
 {
-PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<Entity> cutObj) :
-    m_objA(pbdObj), m_objB(cutObj)
+PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdMethod> cuttableObject, std::shared_ptr<Collider> cutterObject) :
+    m_cuttable(cuttableObject), m_cutter(cutterObject)
 {
-    CHECK(std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getPhysicsGeometry()) != nullptr
-        || std::dynamic_pointer_cast<LineMesh>(pbdObj->getPhysicsGeometry())) <<
-        "PbdObj is not a SurfaceMesh, could not create cutting pair";
+    // check whether the cutable object is valid
+    CHECK(std::dynamic_pointer_cast<SurfaceMesh>(m_cuttable->getPhysicsGeometry()) != nullptr
+        || std::dynamic_pointer_cast<LineMesh>(m_cuttable->getPhysicsGeometry())) <<
+        "Cutable is not a SurfaceMesh, could not create cutting pair";
 
-    // check whether cut object is valid
-    if (std::dynamic_pointer_cast<SurfaceMesh>(Collider::getCollidingGeometryFromEntity(cutObj.get())) == nullptr
-        && std::dynamic_pointer_cast<AnalyticalGeometry>(Collider::getCollidingGeometryFromEntity(cutObj.get())) == nullptr)
+    // check whether the cutter object is valid
+    if (std::dynamic_pointer_cast<SurfaceMesh>(m_cutter->getGeometry()) == nullptr
+        && std::dynamic_pointer_cast<AnalyticalGeometry>(m_cutter->getGeometry()) == nullptr)
     {
-        LOG(WARNING) << "CutObj is neither a SurfaceMesh nor an AnalyticalGeometry, could not create cutting pair";
+        LOG(WARNING) << "Cutter is neither a SurfaceMesh nor an AnalyticalGeometry, could not create cutting pair";
         return;
     }
 
-    m_objBCollisionGeometry = Collider::getCollidingGeometryFromEntity(m_objB.get());
-    CHECK(m_objBCollisionGeometry != nullptr) << "Cannot acquire shared_ptr to objB collision geometry.";
+    m_objBCollisionGeometry = m_cutter->getGeometry();
+    CHECK(m_objBCollisionGeometry != nullptr) << "Cannot acquire shared_ptr to cutter collision geometry.";
 }
 
 void
 PbdObjectCutting::apply()
 {
-    std::shared_ptr<PbdSystem> pbdSystem = m_objA->getPbdModel();
+    std::shared_ptr<PbdSystem> pbdSystem = m_cuttable->getPbdSystem();
 
     m_addConstraintVertices->clear();
     m_removeConstraintVertices->clear();
 
     // Perform cutting
-    if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_objA->getPhysicsGeometry()))
+    if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_cuttable->getPhysicsGeometry()))
     {
         SurfaceMeshCut cutter;
         cutter.setInputMesh(surfMesh);
@@ -65,7 +66,7 @@ PbdObjectCutting::apply()
         surfMesh->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newMesh->getVertexPositions()));
         surfMesh->setCells(std::make_shared<VecDataArray<int, 3>>(*newMesh->getCells()));
     }
-    else if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_objA->getPhysicsGeometry()))
+    else if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_cuttable->getPhysicsGeometry()))
     {
         LineMeshCut cutter;
         cutter.setInputMesh(lineMesh);
@@ -86,12 +87,12 @@ PbdObjectCutting::apply()
     }
 
     // update pbd states, constraints and solver
-    m_objA->setBodyFromGeometry();
+    m_cuttable->setBodyFromGeometry();
     pbdSystem->getConstraints()->removeConstraints(m_removeConstraintVertices,
-        m_objA->getPbdBody()->bodyHandle);
-    pbdSystem->addConstraints(m_addConstraintVertices, m_objA->getPbdBody()->bodyHandle);
+        m_cuttable->getPbdBody()->bodyHandle);
+    pbdSystem->addConstraints(m_addConstraintVertices, m_cuttable->getPbdBody()->bodyHandle);
 
-    m_objA->getPhysicsGeometry()->postModified();
+    m_cuttable->getPhysicsGeometry()->postModified();
 }
 
 void

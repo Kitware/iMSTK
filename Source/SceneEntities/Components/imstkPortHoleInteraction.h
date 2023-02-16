@@ -13,7 +13,7 @@ namespace imstk
 {
 class Geometry;
 class PbdConstraint;
-class PbdObject;
+class PbdMethod;
 class PbdRigidLineToPointConstraint;
 class TaskNode;
 
@@ -34,10 +34,9 @@ public:
     void init() override;
 
     ///
-    /// \brief Get/Set the tool to be constrained
+    /// \brief Set the tool to be constrained
     ///@{
-    std::shared_ptr<PbdObject> getTool() const { return m_toolObject; }
-    void setTool(std::shared_ptr<PbdObject> toolObject);
+    void setTool(std::shared_ptr<PbdMethod> toolObject);
     ///@}
 
     ///
@@ -67,8 +66,8 @@ protected:
 
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
-    std::shared_ptr<PbdObject> m_toolObject = nullptr;
-    std::shared_ptr<Geometry>  m_toolGeom   = nullptr;
+    std::shared_ptr<PbdMethod> m_toolObject;
+    std::shared_ptr<Geometry>  m_toolGeom = nullptr;
     Vec3d  m_portHoleLocation = Vec3d::Zero();
     double m_compliance       = 0.0001;
 

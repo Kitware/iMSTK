@@ -6,6 +6,7 @@
 
 #include "imstkComponent.h"
 #include "imstkEntity.h"
+#include "imstkMacros.h"
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskNode.h"
 
@@ -18,6 +19,7 @@ namespace
 class TestComponent : public Component
 {
 public:
+    IMSTK_TYPE_NAME(TestComponent)
     TestComponent(const std::string& name = "TestComponent") : Component(name)
     {
     }

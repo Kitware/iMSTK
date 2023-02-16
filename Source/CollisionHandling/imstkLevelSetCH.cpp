@@ -5,12 +5,13 @@
 */
 
 #include "imstkLevelSetCH.h"
+
 #include "imstkCollider.h"
 #include "imstkCollisionData.h"
 #include "imstkImageData.h"
-#include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdBody.h"
+#include "imstkPbdMethod.h"
 
 namespace imstk
 {
@@ -28,29 +29,54 @@ LevelSetCH::~LevelSetCH()
 }
 
 void
-LevelSetCH::setInputLvlSetObj(std::shared_ptr<LevelSetDeformableObject> lvlSetObj)
+LevelSetCH::setInputLvlSetObj(std::shared_ptr<LevelSetModel> levelSetObject, std::shared_ptr<Collider> levelSetCollider)
 {
-    setInputObjectA(lvlSetObj);
+    m_levelSetObject   = levelSetObject;
+    m_levelSetCollider = levelSetCollider;
 }
 
 void
-LevelSetCH::setInputRigidObj(std::shared_ptr<PbdObject> pbdObj)
+LevelSetCH::setInputRigidObj(std::shared_ptr<PbdMethod> rigidPhysics, std::shared_ptr<Collider> rigidCollider)
 {
-    setInputObjectB(pbdObj);
-    maskAllPoints();
+    m_rigidPhysics  = rigidPhysics;
+    m_rigidCollider = rigidCollider;
 }
 
-std::shared_ptr<LevelSetDeformableObject>
+bool
+LevelSetCH::initialize()
+{
+    CHECK(m_rigidPhysics != nullptr) << "PbdMethod for rigid body is required.";
+    CHECK(m_rigidCollider != nullptr) << "Collider for rigid body is required.";
+    m_rigidPbdBody = m_rigidPhysics->getPbdBody();
+    maskAllPoints();
+    return true;
+}
+
+std::shared_ptr<Geometry>
+LevelSetCH::getCollidingGeometryA()
+{
+    return m_levelSetCollider->getGeometry();
+}
+
+std::shared_ptr<Geometry>
+LevelSetCH::getCollidingGeometryB()
+{
+    return m_rigidCollider->getGeometry();
+}
+
+/*
+std::shared_ptr<LevelSetModel>
 LevelSetCH::getLvlSetObj()
 {
-    return std::dynamic_pointer_cast<LevelSetDeformableObject>(getInputObjectA());
+    return m_levelSetObject;
 }
 
-std::shared_ptr<PbdObject>
+std::shared_ptr<PbdMethod>
 LevelSetCH::getRigidObj()
 {
-    return std::dynamic_pointer_cast<PbdObject>(getInputObjectB());
+    m_rigidObject;
 }
+*/
 
 void
 LevelSetCH::setKernel(const int size, const double sigma)
@@ -89,16 +115,12 @@ LevelSetCH::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<LevelSetDeformableObject> lvlSetObj = getLvlSetObj();
-    std::shared_ptr<PbdObject>                pbdObj    = getRigidObj();
-
-    if (lvlSetObj == nullptr || pbdObj == nullptr)
+    if (m_levelSetObject == nullptr || m_rigidPbdBody == nullptr)
     {
         return;
     }
 
-    std::shared_ptr<LevelSetModel> lvlSetModel = lvlSetObj->getLevelSetModel();
-    std::shared_ptr<ImageData>     grid = std::dynamic_pointer_cast<SignedDistanceField>(lvlSetModel->getModelGeometry())->getImage();
+    std::shared_ptr<ImageData> grid = std::dynamic_pointer_cast<SignedDistanceField>(m_levelSetObject->getModelGeometry())->getImage();
 
     if (grid == nullptr)
     {
@@ -138,7 +160,7 @@ LevelSetCH::handle(
                 const Vec3i  coord  = (pos - origin).cwiseProduct(invSpacing).cast<int>();
 
                 // Scale the applied impulse by the normal force
-                const double fN = normal.normalized().dot(pbdObj->getPbdBody()->externalForce) / pbdObj->getPbdBody()->externalForce.norm();
+                const double fN = normal.normalized().dot(m_rigidPbdBody->externalForce) / m_rigidPbdBody->externalForce.norm();
                 const double S  = std::max(fN, 0.0) * m_velocityScaling;
 
                 const int halfSize = static_cast<int>(m_kernelSize * 0.5);
@@ -150,7 +172,7 @@ LevelSetCH::handle(
                         for (int x = -halfSize; x < halfSize + 1; x++)
                         {
                             const Vec3i fCoord = coord + Vec3i(x, y, z);
-                            lvlSetModel->addImpulse(fCoord, S * m_kernelWeights[j++]);
+                            m_levelSetObject->addImpulse(fCoord, S * m_kernelWeights[j++]);
                         }
                     }
                 }
@@ -188,7 +210,7 @@ LevelSetCH::handle(
                         for (int x = -halfSize; x < halfSize + 1; x++)
                         {
                             const Vec3i fCoord = coord + Vec3i(x, y, z);
-                            lvlSetModel->addImpulse(fCoord, S * m_kernelWeights[j++]);
+                            m_levelSetObject->addImpulse(fCoord, S * m_kernelWeights[j++]);
                         }
                     }
                 }
@@ -200,7 +222,7 @@ LevelSetCH::handle(
 void
 LevelSetCH::maskAllPoints()
 {
-    if (auto pointSet = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(getRigidObj().get())))
+    if (auto pointSet = std::dynamic_pointer_cast<PointSet>(m_rigidCollider->getGeometry()))
     {
         for (int i = 0; i < pointSet->getNumVertices(); i++)
         {

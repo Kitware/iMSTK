@@ -16,20 +16,20 @@
 namespace imstk
 {
 class PbdBaryPointToPointConstraint;
-class PbdObject;
+class PbdMethod;
 class PickingAlgorithm;
 class PointwiseMap;
 
 ///
 /// \class PbdObjectStitching
 ///
-/// \brief This class defines stitching of a PbdObject via different
+/// \brief This class defines stitching of a PbdMethod via different
 /// picking methods. Ray based stitching is default.
 ///
 class PbdObjectStitching : public SceneObject
 {
 public:
-    PbdObjectStitching(std::shared_ptr<PbdObject> obj1);
+    PbdObjectStitching(std::shared_ptr<PbdMethod> objectToStitch);
     ~PbdObjectStitching() override = default;
 
     IMSTK_TYPE_NAME(PbdObjectStitching)
@@ -111,7 +111,7 @@ protected:
     std::shared_ptr<Geometry>     m_geomToStitch = nullptr;
     std::shared_ptr<PointwiseMap> m_geometryToStitchMap = nullptr;
 
-    std::shared_ptr<PbdObject> m_objectToStitch = nullptr;
+    std::shared_ptr<PbdMethod> m_objectToStitch = nullptr;
 
     std::shared_ptr<PickingAlgorithm> m_pickMethod = nullptr;
 

@@ -32,6 +32,8 @@ protected:
                          std::string             cdType);
 
 public:
+    bool initialize() override;
+
     void setCollisionDetection(std::shared_ptr<CollisionDetectionAlgorithm> colDetect);
 
     ///
@@ -85,6 +87,7 @@ protected:
 
     std::shared_ptr<Entity> m_objA = nullptr;
     std::shared_ptr<Entity> m_objB = nullptr;
+    std::string m_cdType;
 
     std::shared_ptr<CollisionDetectionAlgorithm> m_colDetect = nullptr; ///< Collision detection algorithm
     std::shared_ptr<CollisionHandling> m_colHandlingA = nullptr;

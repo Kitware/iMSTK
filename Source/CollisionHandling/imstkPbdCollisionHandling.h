@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "imstkCollider.h"
 #include "imstkCollisionHandling.h"
 #include "imstkPbdConstraint.h"
 
@@ -94,7 +95,7 @@ struct hash<imstk::PbdCHTableKey>
 
 namespace imstk
 {
-class PbdObject;
+class PbdMethod;
 class PbdSystem;
 class PointSet;
 class PointwiseMap;
@@ -102,7 +103,7 @@ class PointwiseMap;
 ///
 /// \class PbdCollisionHandling
 ///
-/// \brief Implements PBD based collision handling. Given an input PbdObject
+/// \brief Implements PBD based collision handling. Given an input PbdMethod
 /// and CollisionData it creates & adds constraints in the PbdSystem to be solved
 /// in order to resolve the collision.
 ///
@@ -129,11 +130,11 @@ public:
 
         // Objects
         // Why do we have raw pointers here, and not shared_ptr?
-        PbdObject* pbdObj = nullptr;
-        Entity* colObj    = nullptr;
-        ObjType objType   = ObjType::Colliding;
+        PbdMethod* pbdMethod = nullptr;
+        Collider* collider   = nullptr;
+        ObjType objType      = ObjType::Colliding;
 
-        PbdSystem* model   = nullptr;
+        PbdSystem* system  = nullptr;
         double compliance  = 0.0;
         double stiffness   = 0.0;
         Geometry* geometry = nullptr;
@@ -159,6 +160,24 @@ public:
     ~PbdCollisionHandling() override;
 
     IMSTK_TYPE_NAME(PbdCollisionHandling)
+
+    ///
+    /// Set components corresponding to the two input colliding objects.
+    /// This class supports collision pairs of the following kind:
+    ///   1. {PbdMethod, Collider}, {PbdMethod, Collider}
+    ///   2. {null, Collider}, {PbdMethod, Collider}
+    ///   3. {PbdMethod, Collider}, {null, Collider}
+    /// Setters for both objects are symmetrical as we do not make any assumptions
+    /// whether the first(A) or the second(B) object may be a collider-only object.
+    /// The initialize() method will swap the objects internally for processing consistency.
+    ///
+    void setInputObjectA(std::shared_ptr<Collider> collider, std::shared_ptr<PbdMethod> method = nullptr);
+    void setInputObjectB(std::shared_ptr<Collider> collider, std::shared_ptr<PbdMethod> method = nullptr);
+
+    ///
+    /// Perform input validations and pre-fetch components/behaviours for optimization.
+    ///
+    bool initialize() override;
 
     ///
     /// \brief Get/Set the restitution, which gives how much velocity is
@@ -232,6 +251,13 @@ public:
         const CollisionSideData& data);
 
 protected:
+    ///
+    /// \brief Get the geometry used for handling
+    /// defaults to the collision geometry
+    ///
+    std::shared_ptr<Geometry> getCollidingGeometryA() override { return m_objectA.collider->getGeometry(); }
+    std::shared_ptr<Geometry> getCollidingGeometryB() override { return m_objectB.collider->getGeometry(); }
+
     std::array<PbdParticleId, 2> getEdge(
         const CollisionElement&  elem,
         const CollisionSideData& side);
@@ -247,10 +273,14 @@ protected:
         const CollisionSideData& side);
 
     ///
-    /// \brief Creates a CollisionSideData struct from the provided object, this
-    /// gives all the info needed to response to collision
+    /// \brief Creates a CollisionSideData struct from the provided pbd object,
+    /// this gives all the info needed to response to collision
+    CollisionSideData getDataFromObject(PbdMethod& method, Collider& collider);
+
     ///
-    CollisionSideData getDataFromObject(std::shared_ptr<Entity> obj);
+    /// \brief Creates a CollisionSideData struct from the provided colliding object,
+    /// this gives all the info needed to response to collision
+    CollisionSideData getDataFromObject(Collider& collider);
 
     ///
     /// \brief Get the contact case from the collision element and data as
@@ -314,10 +344,18 @@ private:
     std::array<double, 2> m_stiffness = { 0.3, 0.3 };
     int m_ccdSubsteps = 25;
 
-protected:
     std::vector<PbdConstraint*> m_constraints; ///< Constraints users can add too
 
     std::unordered_map<PbdCHTableKey, std::function<void(
                                                         const ColElemSide& elemA, const ColElemSide& elemB)>> m_funcTable;
+
+    // Colliding components.
+    struct
+    {
+        std::shared_ptr<Collider> collider;
+        std::shared_ptr<PbdMethod> method;
+    } m_objectA, m_objectB;
+
+    CollisionSideData m_dataSideA, m_dataSideB;
 };
 } // namespace imstk

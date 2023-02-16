@@ -76,7 +76,7 @@ PbdMethod::PbdMethod(const std::string& name) : SceneBehaviour(name)
 
     m_updateNode = m_taskGraph->addFunction(
         prefix + "_Update",
-        [this]() { update(); }
+        [this]() {}
         );
 
     m_updateGeometryNode = m_taskGraph->addFunction(

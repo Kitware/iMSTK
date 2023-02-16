@@ -57,10 +57,6 @@ public:
         None
     };
 
-protected:
-    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::None);
-
-public:
     virtual ~AbstractDynamicalModel() = default;
 
     ///
@@ -130,6 +126,8 @@ public:
 ///@}
 
 protected:
+    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::None);
+
     ///
     /// \brief Setup connectivity of the compute graph
     ///

@@ -8,8 +8,8 @@
 #include "imstkCellPicker.h"
 #include "imstkLineMesh.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkPointPicker.h"
 #include "imstkSurfaceMesh.h"
@@ -112,15 +112,15 @@ getWeights(const PbdState& bodies, const std::vector<PbdParticleId>& particles, 
     return weights;
 }
 
-PbdObjectStitching::PbdObjectStitching(std::shared_ptr<PbdObject> obj) :
-    m_objectToStitch(obj), m_pickMethod(std::make_shared<CellPicker>())
+PbdObjectStitching::PbdObjectStitching(std::shared_ptr<PbdMethod> objectToStitch) :
+    m_objectToStitch(objectToStitch), m_pickMethod(std::make_shared<CellPicker>())
 {
     m_stitchingNode = std::make_shared<TaskNode>(std::bind(&PbdObjectStitching::updateStitching, this),
         "PbdStitchingUpdate", true);
     m_taskGraph->addNode(m_stitchingNode);
 
-    m_taskGraph->addNode(m_objectToStitch->getPbdModel()->getIntegratePositionNode());
-    m_taskGraph->addNode(m_objectToStitch->getPbdModel()->getSolveNode());
+    m_taskGraph->addNode(m_objectToStitch->getPbdSystem()->getIntegratePositionNode());
+    m_taskGraph->addNode(m_objectToStitch->getPbdSystem()->getSolveNode());
 
     m_taskGraph->addNode(m_objectToStitch->getTaskGraph()->getSource());
     m_taskGraph->addNode(m_objectToStitch->getTaskGraph()->getSink());
@@ -147,7 +147,7 @@ PbdObjectStitching::removeStitchConstraints()
 void
 PbdObjectStitching::addStitchConstraints()
 {
-    std::shared_ptr<PbdSystem> model = m_objectToStitch->getPbdModel();
+    std::shared_ptr<PbdSystem> model = m_objectToStitch->getPbdSystem();
 
     // PbdSystem geometry can only be PointSet
     std::shared_ptr<PointSet> pbdPhysicsGeom =
@@ -348,14 +348,14 @@ PbdObjectStitching::updateStitching()
 
     if (m_collisionConstraints.size() > 0)
     {
-        m_objectToStitch->getPbdModel()->getSolver()->addConstraints(&m_collisionConstraints);
+        m_objectToStitch->getPbdSystem()->getSolver()->addConstraints(&m_collisionConstraints);
     }
 }
 
 void
 PbdObjectStitching::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    std::shared_ptr<PbdSystem> pbdSystem = m_objectToStitch->getPbdModel();
+    std::shared_ptr<PbdSystem> pbdSystem = m_objectToStitch->getPbdSystem();
 
     m_taskGraph->addEdge(source, m_objectToStitch->getTaskGraph()->getSource());
     m_taskGraph->addEdge(m_objectToStitch->getTaskGraph()->getSink(), sink);

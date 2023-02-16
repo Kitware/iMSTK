@@ -23,6 +23,8 @@ template<int N>
 class CellMesh : public AbstractCellMesh
 {
 public:
+    IMSTK_TYPE_NAME(CellMesh)
+
     static constexpr int CellVertexCount = N;
     using VertexDataType = VecDataArray<double, 3>;
     using CellIndexType  = VecDataArray<int, N>;

@@ -4,21 +4,21 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkPbdObjectCellRemoval.h"
-#include "imstkPbdConstraintContainer.h"
-#include "imstkPbdSystem.h"
-#include "imstkPbdObject.h"
 #include "imstkCellMesh.h"
+#include "imstkPbdConstraintContainer.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdObjectCellRemoval.h"
+#include "imstkPbdSystem.h"
 
 namespace imstk
 {
-PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj) :
+PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdMethod> pbdObj) :
     m_obj(pbdObj)
 {
     // Add checks here as needed
 
     // Get mesh and add dummy vertex for storing removed cell
-    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(pbdObj->getPhysicsGeometry());
+    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getPhysicsGeometry());
     addDummyVertex(m_mesh);
 
     // Update fixed node ids to account for dummy vertex at index zero
@@ -28,10 +28,10 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj) :
     }
 
     // Fix dummy vertex
-    pbdObj->getPbdBody()->fixedNodeIds.push_back(0);
+    m_obj->getPbdBody()->fixedNodeIds.push_back(0);
 
     // Reinitialize to account for new dummy vertex
-    pbdObj->initialize();
+    m_obj->initialize();
 
     // Note: maps no longer valid after this point
 }
@@ -45,7 +45,7 @@ PbdObjectCellRemoval::removeConstraints()
     auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells()); // underlying 1D array
 
     // Constraint Data
-    std::shared_ptr<PbdConstraintContainer>            constraintsPtr = m_obj->getPbdModel()->getConstraints();
+    std::shared_ptr<PbdConstraintContainer>            constraintsPtr = m_obj->getPbdSystem()->getConstraints();
     const std::vector<std::shared_ptr<PbdConstraint>>& constraints    = constraintsPtr->getConstraints();
 
     // First process all removed cells by removing the constraints and setting the cell to the dummy vertex

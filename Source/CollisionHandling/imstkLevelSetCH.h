@@ -14,9 +14,11 @@
 
 namespace imstk
 {
+class Collider;
 class CollisionData;
-class LevelSetDeformableObject;
-class PbdObject;
+struct PbdBody;
+class PbdMethod;
+class LevelSetModel;
 
 ///
 /// \class LevelSetCH
@@ -32,14 +34,16 @@ public:
 
     IMSTK_TYPE_NAME(LevelSetCH)
 
-public:
-    void setInputLvlSetObj(std::shared_ptr<LevelSetDeformableObject> lvlSetObj);
-    void setInputRigidObj(std::shared_ptr<PbdObject> pbdObj);
+    void setInputLvlSetObj(std::shared_ptr<LevelSetModel> lvlSetObj, std::shared_ptr<Collider> lvlSetCollider);
+    void setInputRigidObj(std::shared_ptr<PbdMethod> rigidObject, std::shared_ptr<Collider> rigidCollider);
 
-    std::shared_ptr<LevelSetDeformableObject> getLvlSetObj();
-    std::shared_ptr<PbdObject> getRigidObj();
+    ///
+    /// \brief Get the geometry used for handling
+    /// defaults to the collision geometry
+    ///
+    std::shared_ptr<Geometry> getCollidingGeometryA() override;
+    std::shared_ptr<Geometry> getCollidingGeometryB() override;
 
-public:
     ///
     /// \brief Adds point to the mask allowing it to apply an impulse to the levelset
     ///
@@ -75,6 +79,12 @@ public:
     int getKernelSize() const { return m_kernelSize; }
     double getKernelSigma() const { return m_kernelSigma; }
 
+    ///
+    /// \brief Initialize and pre-fetch all required resources before the start of
+    /// the simulation loop.
+    ///
+    bool initialize() override;
+
 protected:
     ///
     /// \brief Compute forces and velocities based on collision data
@@ -83,12 +93,19 @@ protected:
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override;
 
-protected:
+private:
     std::unordered_set<int> m_ptIdMask;
     double  m_velocityScaling      = 0.1;
     bool    m_useProportionalForce = false;
     int     m_kernelSize    = 3;
     double  m_kernelSigma   = 1.0;
     double* m_kernelWeights = nullptr;
+
+    std::shared_ptr<LevelSetModel> m_levelSetObject;
+    std::shared_ptr<Collider>      m_levelSetCollider;
+
+    std::shared_ptr<PbdMethod> m_rigidPhysics;
+    std::shared_ptr<Collider>  m_rigidCollider;
+    std::shared_ptr<PbdBody>   m_rigidPbdBody;
 };
 } // namespace imstk

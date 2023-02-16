@@ -191,7 +191,7 @@ struct PbdBody
             uniformMassValue = mass;
         }
 
-        Vec3d getRigidPosition() const
+        const Vec3d& getRigidPosition() const
         {
             CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
             CHECK(vertices->size() == 1) << "Rigid position is not set.";

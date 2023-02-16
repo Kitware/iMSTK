@@ -14,7 +14,7 @@ namespace imstk
 {
 class PointSet;
 class AbstractCellMesh;
-class PbdObject;
+class PbdMethod;
 ///
 /// \class PbdObjectCellRemoval
 ///
@@ -24,7 +24,7 @@ class PbdObject;
 class PbdObjectCellRemoval : public SceneObject
 {
 public:
-    PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj);
+    PbdObjectCellRemoval(std::shared_ptr<PbdMethod> pbdObj);
     ~PbdObjectCellRemoval() override = default;
 
     IMSTK_TYPE_NAME(PbdObjectCellRemoval)
@@ -51,7 +51,7 @@ protected:
     void addDummyVertexPointSet(std::shared_ptr<PointSet> pointSet);
     void addDummyVertex(std::shared_ptr<AbstractCellMesh> mesh);
 
-    std::shared_ptr<PbdObject> m_obj;         ///< Object that cells are removed from
+    std::shared_ptr<PbdMethod> m_obj;         ///< Object that cells are removed from
     std::shared_ptr<AbstractCellMesh> m_mesh; ///< Mesh from object cells are removed from
     std::vector<int> m_cellsToRemove;         ///< List of cells to remove, cleared after removal
     std::vector<int> m_removedCells;          ///< Cells that have been removed

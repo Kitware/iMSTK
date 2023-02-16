@@ -8,8 +8,8 @@
 #include "imstkCapsule.h"
 #include "imstkLineMesh.h"
 #include "imstkPbdContactConstraint.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskNode.h"
@@ -42,12 +42,13 @@ PortHoleInteraction::init()
 
     m_taskGraph->addNode(m_portHoleHandleNode);
     m_taskGraph->addNode(m_collisionGeometryUpdateNode);
-    m_taskGraph->addNode(m_toolObject->getPbdModel()->getIntegratePositionNode());
-    m_taskGraph->addNode(m_toolObject->getPbdModel()->getSolveNode());
+    auto dynamicalSystem = m_toolObject->getPbdSystem();
+    m_taskGraph->addNode(dynamicalSystem->getIntegratePositionNode());
+    m_taskGraph->addNode(dynamicalSystem->getSolveNode());
 }
 
 void
-PortHoleInteraction::setTool(std::shared_ptr<PbdObject> toolObject)
+PortHoleInteraction::setTool(std::shared_ptr<PbdMethod> toolObject)
 {
     CHECK(m_toolObject == nullptr) << "PortHoleInteraction does not yet support changing"
         "the tool at runtime, please set before initialization of the scene";
@@ -91,10 +92,10 @@ PortHoleInteraction::handlePortHole()
         q = capsule1Pos + diff1;
     }
 
-    std::shared_ptr<PbdSystem> pbdSystem = m_toolObject->getPbdModel();
-    const PbdParticleId        vid       = pbdSystem->addVirtualParticle(m_portHoleLocation, 0.0);
+    auto                pbdSystem = m_toolObject->getPbdSystem();
+    const PbdParticleId vid       = pbdSystem->addVirtualParticle(m_portHoleLocation, 0.0);
 
-    m_portConstraint->initConstraint(m_toolObject->getPbdModel()->getBodies(),
+    m_portConstraint->initConstraint(m_toolObject->getPbdSystem()->getBodies(),
         { m_toolObject->getPbdBody()->bodyHandle, 0 },
                 p, q, vid,
                 m_compliance);
@@ -107,11 +108,11 @@ PortHoleInteraction::initGraphEdges(std::shared_ptr<TaskNode> source, std::share
 {
     // Add the collision constraint after internal solve but before collision solve
     // Also ensure collision geometry is up to date
-    m_taskGraph->addEdge(source, m_toolObject->getPbdModel()->getSolveNode());
+    m_taskGraph->addEdge(source, m_toolObject->getPbdSystem()->getSolveNode());
 
-    m_taskGraph->addEdge(m_toolObject->getPbdModel()->getIntegratePositionNode(), m_collisionGeometryUpdateNode);
+    m_taskGraph->addEdge(m_toolObject->getPbdSystem()->getIntegratePositionNode(), m_collisionGeometryUpdateNode);
     m_taskGraph->addEdge(m_collisionGeometryUpdateNode, m_portHoleHandleNode);
-    m_taskGraph->addEdge(m_portHoleHandleNode, m_toolObject->getPbdModel()->getSolveNode());
+    m_taskGraph->addEdge(m_portHoleHandleNode, m_toolObject->getPbdSystem()->getSolveNode());
 
     m_taskGraph->addEdge(m_portHoleHandleNode, sink);
 }

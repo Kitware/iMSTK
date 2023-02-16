@@ -27,7 +27,7 @@ class Renderer;
 class VisualModel : public Component, public EventObject
 {
 public:
-    VisualModel(const std::string& name = "VisualModel");
+    IMSTK_TYPE_NAME(VisualModel) VisualModel(const std::string& name = "VisualModel");
     ~VisualModel() override = default;
 
     // *INDENT-OFF*

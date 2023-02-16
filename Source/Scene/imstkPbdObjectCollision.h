@@ -11,26 +11,38 @@
 
 namespace imstk
 {
-class PbdObject;
+class Collider;
+class PbdMethod;
+class PbdSystem;
+class TaskGraph;
 
 ///
 /// \class PbdObjectCollision
 ///
-/// \brief This class defines a collision interaction between two PbdObjects
-/// or PbdObject & CollidingObject
+/// \brief This class defines a collision interaction between two PbdMethods
+/// or PbdMethod & Collider
 ///
 class PbdObjectCollision : public CollisionInteraction
 {
 public:
+    IMSTK_TYPE_NAME(PbdObjectCollision)
     ///
-    /// \brief Constructor for PbdObject-PbdObject or PbdObject-CollidingObject collisions
+    /// \brief Constructor for PbdMethod-PbdMethod or PbdMethod-Collider collisions
     ///
     PbdObjectCollision(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2,
                        std::string cdType = "");
 
     ~PbdObjectCollision() override = default;
 
-    IMSTK_TYPE_NAME(PbdObjectCollision)
+    ///
+    /// \brief Initialize the interaction based on set input before the simulation starts.
+    ///
+    bool initialize() override;
+
+    ///
+    /// \brief Setup connectivity of task graph
+    ///
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
     ///
     /// \brief Get/Set the restitution, which gives how much velocity is
@@ -74,19 +86,22 @@ public:
     double getDeformableStiffnessA() const;
     void setDeformableStiffnessB(const double stiffness);
     double getDeformableStiffnessB() const;
-    /// @}
-
-    ///
-    /// \brief Setup connectivity of task graph
-    ///
-    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+/// @}
 
 protected:
     std::shared_ptr<TaskNode> m_updatePrevGeometryCCDNode = nullptr;
 
 private:
     /// Called from the constructor
-    void setupConnections(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2,
-                          std::string cdType = "");
+    void setupConnections();
+
+    // Colliding components.
+    struct
+    {
+        std::shared_ptr<Collider> collider;
+        std::shared_ptr<PbdMethod> method;
+        std::shared_ptr<TaskGraph> taskGraph;
+        std::shared_ptr<PbdSystem> system;
+    } m_objectA, m_objectB;
 };
 } // namespace imstk

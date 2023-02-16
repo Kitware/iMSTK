@@ -8,10 +8,10 @@
 #include "imstkParallelUtils.h"
 #include "imstkPbdConstraint.h"
 #include "imstkPbdConstraintContainer.h"
-#include "imstkPbdSystem.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdSolver.h"
+#include "imstkPbdSystem.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskNode.h"
 #include "imstkTearable.h"
@@ -29,9 +29,11 @@ Tearable::Tearable(const std::string& name) : SceneBehaviour(true, name)
 void
 Tearable::init()
 {
-    m_tearableObject = std::dynamic_pointer_cast<PbdObject>(getEntity().lock());
+    auto entity = getEntity().lock();
+    CHECK(entity != nullptr) << "Cannot acquire entity";
+    m_tearableObject = entity->getComponent<PbdMethod>();
 
-    CHECK(m_tearableObject != nullptr) << "Tearable requires a input PBD object,"
+    CHECK(m_tearableObject != nullptr) << "Tearable requires an input PbdMethod,"
         "please add it on creation";
 
     // Create cell remover for removing torn cells
@@ -39,8 +41,8 @@ Tearable::init()
 
     // Add task nodes
     m_taskGraph->addNode(m_tearableHandleNode);
-    m_taskGraph->addNode(m_tearableObject->getPbdModel()->getUpdateVelocityNode());
-    m_taskGraph->addNode(m_tearableObject->getPbdModel()->getTaskGraph()->getSink());
+    m_taskGraph->addNode(m_tearableObject->getPbdSystem()->getUpdateVelocityNode());
+    m_taskGraph->addNode(m_tearableObject->getPbdSystem()->getTaskGraph()->getSink());
 }
 
 void
@@ -57,16 +59,16 @@ Tearable::handleTearable()
     int  bodyId  = m_tearableObject->getPbdBody()->bodyHandle;
 
     // Mesh data
-    auto      cellMesh     = std::dynamic_pointer_cast<AbstractCellMesh>(m_tearableObject->getPhysicsGeometry());
-    auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(cellMesh->getAbstractCells()); // underlying 1D array
-    const int vertsPerCell = cellMesh->getAbstractCells()->getNumberOfComponents();
+    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_tearableObject->getPhysicsGeometry());
+    // auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(cellMesh->getAbstractCells()); // underlying 1D array
+    // const int vertsPerCell = cellMesh->getAbstractCells()->getNumberOfComponents();
 
     // Check the strain state of the cell and remove if strain is greater than max strain
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(cellMesh->getNumCells(),
         [&](const int cellId)
         {
-            std::vector<std::shared_ptr<PbdConstraint>> constraints = m_tearableObject->getCellConstraints(cellId);
+            auto& constraints = m_tearableObject->getCellConstraints(cellId);
 
             bool remove = false;
             for (int constraintId = 0; constraintId < constraints.size(); constraintId++)
@@ -121,9 +123,9 @@ void
 Tearable::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Add the cell removal check after the constraints have all been solved
-    m_taskGraph->addEdge(source, m_tearableObject->getPbdModel()->getUpdateVelocityNode());
-    m_taskGraph->addEdge(m_tearableObject->getPbdModel()->getUpdateVelocityNode(), m_tearableHandleNode);
-    m_taskGraph->addEdge(m_tearableHandleNode, m_tearableObject->getPbdModel()->getTaskGraph()->getSink());
-    m_taskGraph->addEdge(m_tearableObject->getPbdModel()->getTaskGraph()->getSink(), sink);
+    m_taskGraph->addEdge(source, m_tearableObject->getPbdSystem()->getUpdateVelocityNode());
+    m_taskGraph->addEdge(m_tearableObject->getPbdSystem()->getUpdateVelocityNode(), m_tearableHandleNode);
+    m_taskGraph->addEdge(m_tearableHandleNode, m_tearableObject->getPbdSystem()->getTaskGraph()->getSink());
+    m_taskGraph->addEdge(m_tearableObject->getPbdSystem()->getTaskGraph()->getSink(), sink);
 }
 } // namespace imstk

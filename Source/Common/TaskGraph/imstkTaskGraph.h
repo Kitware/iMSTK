@@ -169,6 +169,13 @@ public:
     void addEdges(const std::vector<std::pair<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>>>& edges);
 
     ///
+    /// \brief Given a sequence of nodes, adds a chain of edges to the graph.
+    /// Internally, this function simply calls addEdge() on every consecutive pair of nodes
+    /// from the input vector.
+    ///
+    void addChain(const std::vector<std::shared_ptr<TaskNode>>& nodes);
+
+    ///
     /// \brief Attaches another TaskGraph as a subgraph (copies nodes and edges, then connects source->subgraph::source, subgraph::sink->sink),
     /// source and sink must exist in this graph. Also serves as a graph sum between this and subgraph
     ///

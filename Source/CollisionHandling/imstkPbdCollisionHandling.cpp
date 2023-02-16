@@ -4,14 +4,13 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkCollider.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdContactConstraint.h"
 #include "imstkPbdEdgeEdgeCCDConstraint.h"
 #include "imstkPbdEdgeEdgeConstraint.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdPointEdgeConstraint.h"
 #include "imstkPbdPointPointConstraint.h"
 #include "imstkPbdPointTriangleConstraint.h"
@@ -85,7 +84,7 @@ getElementVertIds(const CollisionElement& elem, const PbdCollisionHandling::Coll
             int vid = cell[i];
             if (side.bodyId == 0)
             {
-                vid = side.model->addVirtualParticle((*side.vertices)[vid], 0.0).second;
+                vid = side.system->addVirtualParticle((*side.vertices)[vid], 0.0).second;
             }
             results[i] = { side.bodyId, vid };
         }
@@ -126,7 +125,7 @@ PbdCollisionHandling::getVertex(const CollisionElement& elem, const CollisionSid
         }
         if (side.bodyId == 0)
         {
-            ptId = side.model->addVirtualParticle((*side.vertices)[ptId], 0.0).second;
+            ptId = side.system->addVirtualParticle((*side.vertices)[ptId], 0.0).second;
         }
         results[0] = { side.bodyId, ptId };
     }
@@ -134,7 +133,7 @@ PbdCollisionHandling::getVertex(const CollisionElement& elem, const CollisionSid
     {
         if (elem.m_type == CollisionElementType::PointDirection)
         {
-            results[0] = { side.model->addVirtualParticle(elem.m_element.m_PointDirectionElement.pt, 0.0) };
+            results[0] = { side.system->addVirtualParticle(elem.m_element.m_PointDirectionElement.pt, 0.0) };
         }
     }
     return results;
@@ -199,59 +198,126 @@ PbdCollisionHandling::~PbdCollisionHandling()
     }
 }
 
+void
+PbdCollisionHandling::setInputObjectA(std::shared_ptr<Collider> collider, std::shared_ptr<PbdMethod> method /* = nullptr*/)
+{
+    m_objectA.collider = collider;
+    m_objectA.method   = method;
+}
+
+void
+PbdCollisionHandling::setInputObjectB(std::shared_ptr<Collider> collider, std::shared_ptr<PbdMethod> method /*= nullptr*/)
+{
+    m_objectB.collider = collider;
+    m_objectB.method   = method;
+}
+
+bool
+PbdCollisionHandling::initialize()
+{
+    CHECK(m_objectA.method != nullptr || m_objectB.method != nullptr) << "At least one object in the interaction should have a PbdMethod component.";
+    CHECK(m_objectA.collider && m_objectB.collider) << "Both objects in the interaction should have a Collider component.";
+
+    // Swap so that objectA is the one that is guaranteed to have a PbdMethod.
+    // ObjectB is always the object which may or may not have a PbdMethod.
+    // Both objects are guaranteed to have a collider if they pass initialize().
+    if (!m_objectA.method)
+    {
+        std::swap(m_objectA, m_objectB);
+    }
+
+    // Pack all the data needed for a particular side into a struct so we can
+    // swap it with the contact & pass it around
+    m_dataSideA = getDataFromObject(*m_objectA.method, *m_objectA.collider);
+    m_dataSideB = m_objectB.method ?
+                  getDataFromObject(*m_objectB.method, *m_objectB.collider) :
+                  getDataFromObject(*m_objectB.collider);
+
+    m_dataSideA.compliance = m_dataSideB.compliance = m_compliance;
+    m_dataSideA.stiffness  = m_stiffness[0];
+    m_dataSideB.stiffness  = (m_dataSideB.objType == ObjType::Colliding) ? 0.0 : m_stiffness[1];
+
+    // Share the system with both sides even if B is not pbd, which makes it easier
+    // to acquire the system without knowing which object is pbd
+    if (m_dataSideB.system == nullptr)
+    {
+        m_dataSideB.system = m_dataSideA.system;
+    }
+
+    // If obj B is also pbd simulated, make sure they share the same system
+    CHECK(m_dataSideB.objType == ObjType::Colliding || m_dataSideA.system == m_dataSideB.system) <<
+        "PbdCollisionHandling input objects must share PbdSystem";
+
+    return true;
+}
+
 PbdCollisionHandling::CollisionSideData
-PbdCollisionHandling::getDataFromObject(std::shared_ptr<Entity> obj)
+PbdCollisionHandling::getDataFromObject(PbdMethod& method, Collider& collider)
 {
     // Pack info into struct, gives some contextual hints as well
     CollisionSideData side;
-    auto              pbdObj = std::dynamic_pointer_cast<PbdObject>(obj);
-    side.pbdObj  = pbdObj.get();   // Garunteed
-    side.colObj  = obj.get();
-    side.objType = ObjType::Colliding;
-    std::shared_ptr<Geometry> collidingGeometry = Collider::getCollidingGeometryFromEntity(obj.get());
-    side.geometry = collidingGeometry.get();
-
-    if (side.pbdObj != nullptr)
+    side.pbdMethod = &method;
+    side.collider  = &collider;
+    if (side.pbdMethod->getPbdBody()->bodyType == PbdBody::Type::RIGID)
     {
-        if (side.pbdObj->getPbdBody()->bodyType == PbdBody::Type::RIGID)
-        {
-            side.objType = ObjType::PbdRigid;
-        }
-        else
-        {
-            side.objType = ObjType::PbdDeformable;
-        }
-        std::shared_ptr<PbdSystem> model = side.pbdObj->getPbdModel();
-        side.model = model.get();
-        // If a physics geometry is provided always use that because
-        // Either:
-        //  A.) Physics geometry == Collision Geometry
-        //  B.) A PointwiseMap is used and map should refer us back to physics geometry
-        std::shared_ptr<Geometry> physicsGeometry = side.pbdObj->getPhysicsGeometry();
-        side.geometry = physicsGeometry.get();
-        side.bodyId   = side.pbdObj->getPbdBody()->bodyHandle;
+        side.objType = ObjType::PbdRigid;
+    }
+    else
+    {
+        side.objType = ObjType::PbdDeformable;
+    }
 
-        auto map = std::dynamic_pointer_cast<PointwiseMap>(side.pbdObj->getPhysicsToCollidingMap());
+    side.system = side.pbdMethod->getPbdSystem().get();
+    // If a physics geometry is provided always use that because
+    // Either:
+    //  A.) Physics geometry == Collision Geometry
+    //  B.) A PointwiseMap is used and map should refer us back to physics geometry
+    side.geometry = side.pbdMethod->getPhysicsGeometry().get();
+    side.bodyId   = side.pbdMethod->getPbdBody()->bodyHandle;
+    if (auto map = std::dynamic_pointer_cast<PointwiseMap>(side.pbdMethod->getPhysicsToCollidingMap()))
+    {
         side.mapPtr = map.get();
     }
+    else
+    {
+        LOG(FATAL) << "A PointwiseMap was expected.";
+    }
+
     side.pointSet = dynamic_cast<PointSet*>(side.geometry);
     side.vertices = (side.pointSet == nullptr) ? nullptr : side.pointSet->getVertexPositions().get();
     if (side.objType == ObjType::PbdRigid)
     {
-        if (auto pointSet = std::dynamic_pointer_cast<PointSet>(Collider::getCollidingGeometryFromEntity(side.colObj)))
+        if (auto pointSet = std::dynamic_pointer_cast<PointSet>(collider.getGeometry()))
         {
             std::shared_ptr<VecDataArray<double, 3>> vertices = pointSet->getVertexPositions();
             side.vertices = vertices.get();
         }
-        //side.vertices = side.colObj->getCollidingGeometry()
     }
     side.indicesPtr = nullptr;
-    if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(Collider::getCollidingGeometryFromEntity(side.colObj)))
+    if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(collider.getGeometry()))
     {
         std::shared_ptr<AbstractDataArray> indicesPtr = cellMesh->getAbstractCells();
         side.indicesPtr = indicesPtr.get();
     }
 
+    return side;
+}
+
+PbdCollisionHandling::CollisionSideData
+PbdCollisionHandling::getDataFromObject(Collider& collider)
+{
+    // Pack info into struct, gives some contextual hints as well
+    CollisionSideData side;
+    side.collider = &collider;
+    side.objType  = ObjType::Colliding;
+    side.geometry = collider.getGeometry().get();
+    side.pointSet = dynamic_cast<PointSet*>(side.geometry);
+    side.vertices = (side.pointSet == nullptr) ? nullptr : side.pointSet->getVertexPositions().get();
+    if (auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(collider.getGeometry()))
+    {
+        std::shared_ptr<AbstractDataArray> indicesPtr = cellMesh->getAbstractCells();
+        side.indicesPtr = indicesPtr.get();
+    }
     return side;
 }
 
@@ -293,14 +359,12 @@ PbdCollisionHandling::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    // Remove constraints without actually clearing
-    // There could be a large variance in constraints/contacts count,
-    // 10s to 100s of constraints changing frequently over few frames.
+    // Delete previous constraints
     for (size_t i = 0; i < m_constraints.size(); i++)
     {
         delete m_constraints[i];
     }
-    m_constraints.resize(0);
+    m_constraints.clear();
 
     // Break early if no collision elements
     if (elementsA.size() == 0 && elementsB.size() == 0)
@@ -308,29 +372,9 @@ PbdCollisionHandling::handle(
         return;
     }
 
-    // Pack all the data needed for a particular side into a struct so we can
-    // swap it with the contact & pass it around
-    CollisionSideData dataSideA = getDataFromObject(getInputObjectA());
-    dataSideA.compliance = m_compliance;
-    dataSideA.stiffness  = m_stiffness[0];
-    CollisionSideData dataSideB = getDataFromObject(getInputObjectB());
-    dataSideB.compliance = m_compliance;
-    dataSideB.stiffness  = (dataSideB.pbdObj == nullptr) ? 0.0 : m_stiffness[1];
-
-    // Share the model with both sides even if B is not pbd, which makes it easier
-    // to acquire the model without knowing which object is pbd
-    if (dataSideB.model == nullptr)
-    {
-        dataSideB.model = dataSideA.model;
-    }
-
-    // If obj B is also pbd simulated, make sure they share the same model
-    CHECK(dataSideB.pbdObj == nullptr || dataSideA.model == dataSideB.model) <<
-        "PbdCollisionHandling input objects must share PbdSystem";
-
     // For CCD (store if available)
-    dataSideA.prevGeometry = m_colData->prevGeomA.get();
-    dataSideB.prevGeometry = m_colData->prevGeomB.get();
+    m_dataSideA.prevGeometry = m_colData->prevGeomA.get();
+    m_dataSideB.prevGeometry = m_colData->prevGeomB.get();
 
     if (elementsA.size() == elementsB.size())
     {
@@ -338,8 +382,8 @@ PbdCollisionHandling::handle(
         for (size_t i = 0; i < elementsA.size(); i++)
         {
             handleElementPair(
-                { &elementsA[i], &dataSideA },
-                { &elementsB[i], &dataSideB });
+                { &elementsA[i], &m_dataSideA },
+                { &elementsB[i], &m_dataSideB });
         }
     }
     else
@@ -348,25 +392,21 @@ PbdCollisionHandling::handle(
         for (size_t i = 0; i < elementsA.size(); i++)
         {
             handleElementPair(
-                { &elementsA[i], &dataSideA },
+                { &elementsA[i], &m_dataSideA },
                 { nullptr, nullptr });
         }
         for (size_t i = 0; i < elementsB.size(); i++)
         {
             handleElementPair(
-                { &elementsB[i], &dataSideB },
+                { &elementsB[i], &m_dataSideB },
                 { nullptr, nullptr });
         }
     }
 
-    if (m_constraints.size() == 0)
+    if (!m_constraints.empty())
     {
-        return;
+        m_objectA.method->getPbdSystem()->getSolver()->addConstraints(&m_constraints);
     }
-
-    // ObjA garunteed to be PbdObject
-    auto pbdObjectA = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
-    pbdObjectA->getPbdModel()->getSolver()->addConstraints(&m_constraints);
 }
 
 void
@@ -446,7 +486,7 @@ PbdCollisionHandling::addConstraint_Body_V(const ColElemSide& sideA, const ColEl
         {
             return;
         }
-        ptB = sideA.data->model->addVirtualParticle(resolvePos, 0.0);
+        ptB = sideA.data->system->addVirtualParticle(resolvePos, 0.0);
     }
     else
     {
@@ -454,7 +494,7 @@ PbdCollisionHandling::addConstraint_Body_V(const ColElemSide& sideA, const ColEl
     }
 
     PbdVertexToBodyConstraint* constraint = new PbdVertexToBodyConstraint();
-    constraint->initConstraint(sideA.data->model->getBodies(),
+    constraint->initConstraint(sideA.data->system->getBodies(),
         ptAAndContact.first,
         ptAAndContact.second,
         ptB,
@@ -472,7 +512,7 @@ PbdCollisionHandling::addConstraint_Body_E(const ColElemSide& sideA, const ColEl
     std::array<PbdParticleId, 2>           ptsB = getEdge(*sideB.elem, *sideB.data);
 
     PbdEdgeToBodyConstraint* constraint = new PbdEdgeToBodyConstraint();
-    constraint->initConstraint(sideB.data->model->getBodies(),
+    constraint->initConstraint(sideB.data->system->getBodies(),
         ptAAndContact.first,
         ptAAndContact.second,
         ptsB[0], ptsB[1],
@@ -490,7 +530,7 @@ PbdCollisionHandling::addConstraint_Body_T(const ColElemSide& sideA, const ColEl
     std::array<PbdParticleId, 3>           ptsB = getTriangle(*sideB.elem, *sideB.data);
 
     PbdTriangleToBodyConstraint* constraint = new PbdTriangleToBodyConstraint();
-    constraint->initConstraint(sideB.data->model->getBodies(),
+    constraint->initConstraint(sideB.data->system->getBodies(),
         ptAAndContact.first,
         ptAAndContact.second,
         ptsB[0], ptsB[1], ptsB[2],
@@ -515,7 +555,7 @@ PbdCollisionHandling::addConstraint_Body_Body(const ColElemSide& sideA, const Co
 
     PbdBodyToBodyNormalConstraint* constraint = new PbdBodyToBodyNormalConstraint();
     constraint->initConstraint(
-        sideA.data->model->getBodies(),
+        sideA.data->system->getBodies(),
         ptAAndContact.first,
         ptAAndContact.second,
         ptBAndContact.first,
@@ -615,7 +655,7 @@ PbdCollisionHandling::addConstraint_V_V(const ColElemSide& sideA, const ColElemS
         Vec3d                            resolvePos;
         if (sideA.elem->m_type == CollisionElementType::PointIndexDirection)
         {
-            const Vec3d& pos   = sideA.data->model->getBodies().getPosition(ptA);
+            const Vec3d& pos   = sideA.data->system->getBodies().getPosition(ptA);
             const Vec3d& dir   = elem.m_PointIndexDirectionElement.dir;
             const double depth = elem.m_PointIndexDirectionElement.penetrationDepth;
             resolvePos = pos + dir * depth;
@@ -631,7 +671,7 @@ PbdCollisionHandling::addConstraint_V_V(const ColElemSide& sideA, const ColElemS
         {
             return;
         }
-        ptB = sideA.data->model->addVirtualParticle(resolvePos, 0.0);
+        ptB = sideA.data->system->addVirtualParticle(resolvePos, 0.0);
     }
     else
     {
