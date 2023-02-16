@@ -53,7 +53,6 @@
 %ignore imstk::FemDeformableBodyModel::initializeEigenMatrixFromVegaMatrix;
 
 %ignore imstk::RbdConstraint;
-%ignore imstk::PbdConstraintContainer;
 %ignore imstk::PbdConstraintFunctor;
 %ignore imstk::CollisionHandling::getTaskNode();
 
