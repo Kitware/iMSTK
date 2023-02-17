@@ -17,10 +17,10 @@
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
 #include "imstkPbdObjectController.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneUtils.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
@@ -30,6 +30,18 @@
 #include "imstkVisualTestingUtils.h"
 
 using namespace imstk;
+
+// Setup the material
+static std::shared_ptr<RenderMaterial>
+makeMaterial()
+{
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setColor(Color(0.77, 0.53, 0.34));
+    material->setEdgeColor(Color(0.87, 0.63, 0.44));
+    material->setOpacity(0.5);
+    return material;
+}
 
 ///
 /// \brief Create PBD model to be used by all objects
@@ -58,42 +70,28 @@ makePbdModel()
 /// \param dimensions of tetrahedral grid used for tissue
 /// \param center of tissue block
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeSurfaceCubeObj(const std::string& name,
                    const Vec3d& size, const Vec3i& dim, const Vec3d& center,
                    const Quatd& orientation,
                    const std::shared_ptr<PbdSystem> pbdSystem)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tetMesh =
         GeometryUtils::toTetGrid(center, size, dim, orientation);
 
     auto surfMesh = tetMesh->extractSurfaceMesh();
 
-    // Setup the material
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setColor(Color(0.77, 0.53, 0.34));
-    material->setEdgeColor(Color(0.87, 0.63, 0.44));
-    material->setOpacity(0.5);
-
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(surfMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    tissueObj->addVisualModel(visualModel);
-    tissueObj->setPhysicsGeometry(surfMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    tissueObj->setDynamicalModel(pbdSystem);
-    tissueObj->getPbdBody()->uniformMassValue = 0.01;
+    auto tissueObj = SceneUtils::makePbdEntity(name, surfMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(makeMaterial());
+    auto pbdBody = tissueObj->getComponent<PbdMethod>()->getPbdBody();
+    pbdBody->uniformMassValue = 0.01;
 
     pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
+        pbdBody->bodyHandle);
     pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
+        pbdBody->bodyHandle);
 
     return tissueObj;
 }
@@ -105,42 +103,28 @@ makeSurfaceCubeObj(const std::string& name,
 /// \param dimensions of tetrahedral grid used for tissue
 /// \param center of tissue block
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeVolumeCubeObj(const std::string& name,
                   const Vec3d& size, const Vec3i& dim, const Vec3d& center,
                   const Quatd& orientation,
                   const std::shared_ptr<PbdSystem> pbdSystem)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tetMesh =
         GeometryUtils::toTetGrid(center, size, dim, orientation);
 
     auto surfMesh = tetMesh->extractSurfaceMesh();
 
-    // Setup the material
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setColor(Color(0.77, 0.53, 0.34));
-    material->setEdgeColor(Color(0.87, 0.63, 0.44));
-    material->setOpacity(0.5);
-
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(tetMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    tissueObj->addVisualModel(visualModel);
-    tissueObj->setPhysicsGeometry(tetMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    tissueObj->setDynamicalModel(pbdSystem);
-    tissueObj->getPbdBody()->uniformMassValue = 0.01;
+    auto tissueObj = SceneUtils::makePbdEntity(name, tetMesh, surfMesh, tetMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(makeMaterial());
+    auto pbdBody = tissueObj->getComponent<PbdMethod>()->getPbdBody();
+    pbdBody->uniformMassValue = 0.01;
 
     pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
+        pbdBody->bodyHandle);
     pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
+        pbdBody->bodyHandle);
 
     // Fix the borders
     std::shared_ptr<VecDataArray<double, 3>> vertices = tetMesh->getVertexPositions();
@@ -149,7 +133,7 @@ makeVolumeCubeObj(const std::string& name,
         const Vec3d& pos = (*vertices)[i];
         if (pos[1] <= center[1] - size[1] * 0.5)
         {
-            tissueObj->getPbdBody()->fixedNodeIds.push_back(i);
+            pbdBody->fixedNodeIds.push_back(i);
         }
     }
 
@@ -175,7 +159,7 @@ public:
         m_scene->addSceneObject(m_pbdObjB);
         m_scene->addSceneObject(m_pbdObjCT);
 
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObjB->getPhysicsGeometry());
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObjB->getComponent<PbdMethod>()->getPhysicsGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;
 
@@ -211,11 +195,11 @@ public:
     std::shared_ptr<PbdSystem> m_pbdModel = nullptr;
 
     // Pbd objects to be connected
-    std::shared_ptr<PbdObject> m_pbdObjA = nullptr;
-    std::shared_ptr<PbdObject> m_pbdObjB = nullptr;
+    std::shared_ptr<Entity> m_pbdObjA = nullptr;
+    std::shared_ptr<Entity> m_pbdObjB = nullptr;
 
     // Pbd Simulated connective tissue
-    std::shared_ptr<PbdObject> m_pbdObjCT = nullptr;
+    std::shared_ptr<Entity> m_pbdObjCT = nullptr;
 
     // For assertions
     std::shared_ptr<VecDataArray<double, 3>> m_currVerticesPtr;

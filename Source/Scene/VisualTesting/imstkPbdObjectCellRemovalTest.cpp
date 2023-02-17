@@ -10,16 +10,26 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
 #include "imstkPbdObjectCellRemoval.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneUtils.h"
 #include "imstkSceneManager.h"
 #include "imstkTestingUtils.h"
 #include "imstkVisualModel.h"
 #include "imstkVisualTestingUtils.h"
 
 using namespace imstk;
+
+std::shared_ptr<RenderMaterial>
+makeMaterial()
+{
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setColor(Color(0.77, 0.53, 0.34));
+    material->setEdgeColor(Color(0.87, 0.63, 0.44));
+    return material;
+}
 
 ///
 /// \brief Creates tetrahedral tissue object
@@ -29,14 +39,12 @@ using namespace imstk;
 /// \param center center of tissue block
 /// \param useTetCollisionGeometry Whether to use a SurfaceMesh collision geometry+map
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeTetTissueObj(const std::string& name,
-                 std::shared_ptr<PbdSystem> model,
+                 std::shared_ptr<PbdSystem> pbdSystem,
                  const Vec3d& size, const Vec3i& dim, const Vec3d& center,
                  const Quatd& orientation)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tetMesh =
         GeometryUtils::toTetGrid(center, size, dim, orientation);
@@ -46,24 +54,16 @@ makeTetTissueObj(const std::string& name,
         std::swap((*tetMesh->getCells())[i][2], (*tetMesh->getCells())[i][3]);
     }
 
-    // Setup the material
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setColor(Color(0.77, 0.53, 0.34));
-    material->setEdgeColor(Color(0.87, 0.63, 0.44));
-
     // Setup the Object
-    tissueObj->setPhysicsGeometry(tetMesh);
-    tissueObj->setVisualGeometry(tetMesh);
+    auto tissueObj = SceneUtils::makePbdEntity(name, tetMesh, nullptr, tetMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(makeMaterial());
+    auto pbdBody = tissueObj->getComponent<PbdMethod>()->getPbdBody();
+    pbdBody->uniformMassValue = 0.01;
 
-    tissueObj->getVisualModel(0)->setRenderMaterial(material);
-    tissueObj->setDynamicalModel(model);
-    tissueObj->getPbdBody()->uniformMassValue = 0.01;
-
-    model->getConfig()->m_secParams->m_YoungModulus = 1000.0;
-    model->getConfig()->m_secParams->m_PoissonRatio = 0.45;     // 0.48 for tissue
-    model->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
-                tissueObj->getPbdBody()->bodyHandle);
+    pbdSystem->getConfig()->m_secParams->m_YoungModulus = 1000.0;
+    pbdSystem->getConfig()->m_secParams->m_PoissonRatio = 0.45;     // 0.48 for tissue
+    pbdSystem->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
+                pbdBody->bodyHandle);
 
     // Fix the borders
     for (int z = 0; z < dim[2]; z++)
@@ -74,7 +74,7 @@ makeTetTissueObj(const std::string& name,
             {
                 if (x == 0 || z == 0 || x == dim[0] - 1 || z == dim[2] - 1)
                 {
-                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                    pbdBody->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
                 }
             }
         }
@@ -91,37 +91,31 @@ makeTetTissueObj(const std::string& name,
 /// \param center Center of tissue quad
 /// \param orientation Orientation of tissue plane
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeTriTissueObj(const std::string& name,
-                 std::shared_ptr<PbdSystem> model,
+                 std::shared_ptr<PbdSystem> pbdSystem,
                  const Vec2d& size, const Vec2i& dim, const Vec3d& center,
                  const Quatd& orientation)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<SurfaceMesh> triMesh =
         GeometryUtils::toTriangleGrid(center, size, dim, orientation);
 
     // Setup the VisualModel
-    auto material = std::make_shared<RenderMaterial>();
+    auto material = makeMaterial();
     material->setBackFaceCulling(false);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setColor(Color(0.77, 0.53, 0.34));
-    material->setEdgeColor(Color(0.87, 0.63, 0.44));
 
     // Setup the Object
-    tissueObj->setVisualGeometry(triMesh);
-    tissueObj->getVisualModel(0)->setRenderMaterial(material);
-    tissueObj->setPhysicsGeometry(triMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(triMesh);
-    tissueObj->setDynamicalModel(model);
-    tissueObj->getPbdBody()->uniformMassValue = 0.00001;
+    auto tissueObj = SceneUtils::makePbdEntity(name, triMesh, triMesh, triMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto pbdBody = tissueObj->getComponent<PbdMethod>()->getPbdBody();
 
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
-                tissueObj->getPbdBody()->bodyHandle);
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6,
-                tissueObj->getPbdBody()->bodyHandle);
+    pbdBody->uniformMassValue = 0.00001;
+
+    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+                pbdBody->bodyHandle);
+    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6,
+                pbdBody->bodyHandle);
 
     // Fix the borders
     for (int y = 0; y < dim[1]; y++)
@@ -130,7 +124,7 @@ makeTriTissueObj(const std::string& name,
         {
             if (x == 0 || y == 0 || x == dim[0] - 1 || y == dim[1] - 1)
             {
-                tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * y);
+                pbdBody->fixedNodeIds.push_back(x + dim[0] * y);
             }
         }
     }
@@ -146,37 +140,29 @@ makeTriTissueObj(const std::string& name,
 /// \param start Start position of the line
 /// \param dir Direction the line goes
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeLineThreadObj(const std::string& name,
-                  std::shared_ptr<PbdSystem> model,
+                  std::shared_ptr<PbdSystem> pbdSystem,
                   const double length, const int dim, const Vec3d start,
                   const Vec3d& dir)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<LineMesh> lineMesh =
         GeometryUtils::toLineGrid(start, dir, length, dim);
 
     // Setup the VisualModel
-    auto material = std::make_shared<RenderMaterial>();
+    auto material = makeMaterial();
     material->setBackFaceCulling(false);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setColor(Color(0.77, 0.53, 0.34));
     material->setLineWidth(3.0);
-    material->setEdgeColor(Color(0.87, 0.63, 0.44));
 
     // Setup the Object
-    tissueObj->setVisualGeometry(lineMesh);
-    tissueObj->getVisualModel(0)->setRenderMaterial(material);
-    tissueObj->setPhysicsGeometry(lineMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(lineMesh);
-    tissueObj->setDynamicalModel(model);
-    tissueObj->getPbdBody()->uniformMassValue = 0.00001;
-
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
-                tissueObj->getPbdBody()->bodyHandle);
-    tissueObj->getPbdBody()->fixedNodeIds = { 0, lineMesh->getNumVertices() - 1 };
+    auto tissueObj = SceneUtils::makePbdEntity(name, lineMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto method = tissueObj->getComponent<PbdMethod>();
+    method->setUniformMass(0.00001);
+    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+                method->getBodyHandle());
+    method->setFixedNodes({ 0, lineMesh->getNumVertices() - 1 });
 
     return tissueObj;
 }
@@ -187,11 +173,11 @@ public:
     void SetUp() override
     {
         VisualTest::SetUp();
-        m_pbdModel = std::make_shared<PbdSystem>();
-        m_pbdModel->getConfig()->m_doPartitioning = false;
-        m_pbdModel->getConfig()->m_dt = 0.001;
-        m_pbdModel->getConfig()->m_iterations = 5;
-        m_pbdModel->getConfig()->m_linearDampingCoeff = 0.025;
+        m_pbdSystem = std::make_shared<PbdSystem>();
+        m_pbdSystem->getConfig()->m_doPartitioning = false;
+        m_pbdSystem->getConfig()->m_dt = 0.001;
+        m_pbdSystem->getConfig()->m_iterations = 5;
+        m_pbdSystem->getConfig()->m_linearDampingCoeff = 0.025;
     }
 
     void createScene()
@@ -203,12 +189,13 @@ public:
         m_scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
         ASSERT_NE(m_obj, nullptr) << "Missing object to remove cells from";
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(m_obj->getPhysicsGeometry());
+        auto method   = m_obj->getComponent<PbdMethod>();
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(method->getPhysicsGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;
         m_scene->addSceneObject(m_obj);
 
-        m_cellRemoval = std::make_shared<PbdObjectCellRemoval>(m_obj);
+        m_cellRemoval = std::make_shared<PbdObjectCellRemoval>(method);
         m_scene->addInteraction(m_cellRemoval);
 
         connect<Event>(m_sceneManager, &SceneManager::preUpdate,
@@ -216,8 +203,8 @@ public:
             {
                 // Run in realtime at a slightly slowed down speed
                 // Still fixed, but # of iterations may vary by system
-                m_obj->getPbdModel()->getConfig()->m_dt = m_sceneManager->getDt();
-                        });
+                method->getPbdSystem()->getConfig()->m_dt = m_sceneManager->getDt();
+            });
 
         // Assert the vertices stay within bounds
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
@@ -254,8 +241,8 @@ public:
     }
 
 public:
-    std::shared_ptr<PbdSystem> m_pbdModel    = nullptr;
-    std::shared_ptr<PbdObject> m_obj         = nullptr;
+    std::shared_ptr<PbdSystem> m_pbdSystem   = nullptr;
+    std::shared_ptr<Entity>    m_obj         = nullptr;
     std::shared_ptr<AbstractCellMesh> m_mesh = nullptr;
 
     std::shared_ptr<PbdObjectCellRemoval> m_cellRemoval = nullptr;
@@ -276,14 +263,14 @@ public:
 ///
 TEST_F(PbdObjectCellRemovalTest, TetMeshTest)
 {
-    m_pbdModel->getConfig()->m_gravity = Vec3d::Zero();
+    m_pbdSystem->getConfig()->m_gravity = Vec3d::Zero();
 
     // Setup the tissue without mapping
-    m_obj = makeTetTissueObj("TetTissue", m_pbdModel,
+    m_obj = makeTetTissueObj("TetTissue", m_pbdSystem,
             Vec3d(0.1, 0.1, 0.1), Vec3i(4, 4, 4), Vec3d::Zero(),
             Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))));
 
-    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getPhysicsGeometry());
+    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getComponent<PbdMethod>()->getPhysicsGeometry());
     createScene();
 
     // Run for 3s at 0.01 fixed timestep
@@ -295,16 +282,17 @@ TEST_F(PbdObjectCellRemovalTest, TetMeshTest)
 ///
 TEST_F(PbdObjectCellRemovalTest, SurfMeshTest)
 {
-    m_pbdModel->getConfig()->m_gravity = Vec3d::Zero();
+    m_pbdSystem->getConfig()->m_gravity = Vec3d::Zero();
 
     // Setup the tissue without mapping
-    m_obj = makeTriTissueObj("SurfTissue", m_pbdModel,
+    m_obj = makeTriTissueObj("SurfTissue", m_pbdSystem,
         Vec2d(0.1, 0.1), Vec2i(8, 8), Vec3d::Zero(),
         Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))));
 
-    m_obj->initialize();
+    auto method = m_obj->getComponent<PbdMethod>();
+    method->initialize();
 
-    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getPhysicsGeometry());
+    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(method->getPhysicsGeometry());
 
     createScene();
 
@@ -317,13 +305,13 @@ TEST_F(PbdObjectCellRemovalTest, SurfMeshTest)
 ///
 TEST_F(PbdObjectCellRemovalTest, LineMeshTest)
 {
-    m_pbdModel->getConfig()->m_gravity = Vec3d::Zero();
+    m_pbdSystem->getConfig()->m_gravity = Vec3d::Zero();
 
     // Setup the tissue without mapping
-    m_obj = makeLineThreadObj("String", m_pbdModel,
+    m_obj = makeLineThreadObj("String", m_pbdSystem,
         0.3, 100, Vec3d(-0.15, 0.0, 0.0), Vec3d(1.0, 0.0, 0.0));
 
-    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getPhysicsGeometry());
+    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getComponent<PbdMethod>()->getPhysicsGeometry());
     createScene();
 
     // Run for 3s at 0.01 fixed timestep

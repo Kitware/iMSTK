@@ -9,10 +9,10 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
 #include "imstkPointToTetMap.h"
 #include "imstkPointwiseMap.h"
 #include "imstkScene.h"
+#include "imstkSceneUtils.h"
 #include "imstkVisualTestingUtils.h"
 
 using namespace imstk;
@@ -29,7 +29,7 @@ TEST_F(VisualTest, PointToTetMapTest)
     m_scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
     // Setup a physics geometry
-    auto tissueObj = std::make_shared<PbdObject>();
+    std::shared_ptr<Entity> tissueObj;
     {
         // Setup the Geometry
         std::shared_ptr<TetrahedralMesh> tetMeshFine =
@@ -50,18 +50,16 @@ TEST_F(VisualTest, PointToTetMapTest)
         pbdSystem->getConfig()->m_linearDampingCoeff = 0.025;
 
         // Setup the Object
-        tissueObj->setPhysicsGeometry(tetMeshCoarse);
-        tissueObj->setVisualGeometry(tetMeshFine_sf);
-        tissueObj->addComponent<Collider>()->setGeometry(tetMeshCoarse_sf);
-        tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMeshCoarse, tetMeshCoarse_sf));
-        tissueObj->setPhysicsToCollidingMap(std::make_shared<PointToTetMap>(tetMeshCoarse, tetMeshFine_sf));
-        tissueObj->setDynamicalModel(pbdSystem);
-        tissueObj->getPbdBody()->uniformMassValue = 0.01;
+        tissueObj = imstk::SceneUtils::makePbdEntity("tissueObj", tetMeshFine_sf, tetMeshCoarse_sf, tetMeshCoarse, pbdSystem);
+        auto tissueMethod = tissueObj->getComponent<PbdMethod>();
+        tissueMethod->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMeshCoarse, tetMeshCoarse_sf));
+        tissueMethod->setPhysicsToCollidingMap(std::make_shared<PointToTetMap>(tetMeshCoarse, tetMeshFine_sf));
+        tissueMethod->getPbdBody()->uniformMassValue = 0.01;
 
         pbdSystem->getConfig()->m_secParams->m_YoungModulus = 1000.0;
         pbdSystem->getConfig()->m_secParams->m_PoissonRatio = 0.45; // 0.48 for tissue
         pbdSystem->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
-            tissueObj->getPbdBody()->bodyHandle);
+            tissueMethod->getPbdBody()->bodyHandle);
 
         // Fix the borders
         for (int z = 0; z < coarseDim[2]; z++)
@@ -72,7 +70,7 @@ TEST_F(VisualTest, PointToTetMapTest)
                 {
                     if (x == 0 || z == 0 || x == coarseDim[0] - 1 || z == coarseDim[2] - 1)
                     {
-                        tissueObj->getPbdBody()->fixedNodeIds.push_back(x + coarseDim[0] * (y + coarseDim[1] * z));
+                        tissueMethod->getPbdBody()->fixedNodeIds.push_back(x + coarseDim[0] * (y + coarseDim[1] * z));
                     }
                 }
             }

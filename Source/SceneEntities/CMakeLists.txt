@@ -11,6 +11,7 @@ set(H_FILES
   Components/imstkPortHoleInteraction.h
   Components/imstkBurnable.h
   Components/imstkBurner.h
+  Components/imstkSceneUtils.h
   Components/imstkTearable.h
   Components/imstkVisualModel.h
   Components/imstkVertexLabelVisualModel.h
@@ -41,6 +42,7 @@ set(SRC_FILES
   Components/imstkBurnable.cpp
   Components/imstkBurner.cpp
   Components/imstkTearable.cpp
+  Components/imstkSceneUtils.cpp
   Components/imstkVisualModel.cpp
   Lights/imstkIBLProbe.cpp
   Loader/imstkVisualObjectImporter.cpp

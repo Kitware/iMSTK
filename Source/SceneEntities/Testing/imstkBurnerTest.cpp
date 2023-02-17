@@ -7,9 +7,11 @@
 #include "imstkBurner.h"
 #include "imstkCapsule.h"
 #include "imstkCollider.h"
+#include "imstkEntity.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkVisualModel.h"
 
 #include <gtest/gtest.h>
 
@@ -33,14 +35,15 @@ TEST(imstkBurningTest, testState)
     toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
     toolGeometry->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
 
-    auto toolObj = std::make_shared<PbdObject>("Tool");
+    auto toolObj = std::make_shared<Entity>("Tool");
 
     // Create the object
-    toolObj->setVisualGeometry(toolGeometry);
-    toolObj->setPhysicsGeometry(toolGeometry);
+    toolObj->addComponent<VisualModel>()->setGeometry(toolGeometry);
     toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
-    toolObj->setDynamicalModel(pbdSystem);
-    toolObj->getPbdBody()->setRigid(
+    auto method = toolObj->addComponent<PbdMethod>();
+    method->setPhysicsGeometry(toolGeometry);
+    method->setPbdSystem(pbdSystem);
+    method->getPbdBody()->setRigid(
         Vec3d(0.0, 5.0, 2.0),
         1.0,
         Quatd::Identity(),

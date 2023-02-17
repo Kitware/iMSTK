@@ -17,12 +17,12 @@
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPlane.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneUtils.h"
 #include "imstkSceneManager.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
@@ -40,14 +40,12 @@ using namespace imstk;
 /// \param dimensions of tetrahedral grid used for tissue
 /// \param center of tissue block
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeTetTissueObj(const std::string& name,
                  const Vec3d& size, const Vec3i& dim, const Vec3d& center,
                  const Quatd& orientation,
                  bool useTetCollisionGeometry)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tetMesh =
         GeometryUtils::toTetGrid(center, size, dim, orientation);
@@ -72,27 +70,26 @@ makeTetTissueObj(const std::string& name,
     material->setOpacity(0.5);
 
     // Setup the Object
-    tissueObj->setPhysicsGeometry(tetMesh);
+    std::shared_ptr<Entity> tissueObj;
+    tissueObj = SceneUtils::makePbdEntity(name, tetMesh, tetMesh, tetMesh, pbdSystem);
+
     if (useTetCollisionGeometry)
     {
-        tissueObj->setVisualGeometry(tetMesh);
-        tissueObj->addComponent<Collider>()->setGeometry(tetMesh);
+        tissueObj = SceneUtils::makePbdEntity(name, tetMesh, pbdSystem);
     }
     else
     {
         std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
-        tissueObj->setVisualGeometry(surfMesh);
-        tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-        tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
+        tissueObj = SceneUtils::makePbdEntity(name, surfMesh, surfMesh, tetMesh, pbdSystem);
+        tissueObj->getComponent<PbdMethod>()->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     }
-    tissueObj->getVisualModel(0)->setRenderMaterial(material);
-    tissueObj->setDynamicalModel(pbdSystem);
-    tissueObj->getPbdBody()->uniformMassValue = 0.01;
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto method = tissueObj->getComponent<PbdMethod>();
+    method->setUniformMass(0.01);
 
     pbdParams->m_secParams->m_YoungModulus = 1000.0;
     pbdParams->m_secParams->m_PoissonRatio = 0.45; // 0.48 for tissue
-    pbdParams->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
-        tissueObj->getPbdBody()->bodyHandle);
+    pbdParams->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK, method->getBodyHandle());
 
     return tissueObj;
 }
@@ -100,13 +97,11 @@ makeTetTissueObj(const std::string& name,
 ///
 /// \brief Creates thin tissue object
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeTriTissueObj(const std::string& name,
                  const Vec2d& size, const Vec2i& dim, const Vec3d& center,
                  const Quatd& orientation)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<SurfaceMesh> triMesh =
         GeometryUtils::toTriangleGrid(center, size, dim, orientation);
@@ -130,17 +125,15 @@ makeTriTissueObj(const std::string& name,
     material->setEdgeColor(Color(0.87, 0.63, 0.44));
 
     // Setup the Object
-    tissueObj->setVisualGeometry(triMesh);
-    tissueObj->getVisualModel(0)->setRenderMaterial(material);
-    tissueObj->setPhysicsGeometry(triMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(triMesh);
-    tissueObj->setDynamicalModel(pbdSystem);
-    tissueObj->getPbdBody()->uniformMassValue = 0.00001;
+    auto tissueObj = SceneUtils::makePbdEntity(name, triMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto method = tissueObj->getComponent<PbdMethod>();
+    method->setUniformMass(0.00001);
 
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
-        tissueObj->getPbdBody()->bodyHandle);
+        method->getBodyHandle());
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6,
-        tissueObj->getPbdBody()->bodyHandle);
+        method->getBodyHandle());
 
     return tissueObj;
 }
@@ -148,13 +141,11 @@ makeTriTissueObj(const std::string& name,
 ///
 /// \brief Creates a line thread object
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeLineThreadObj(const std::string& name,
                   const double length, const int dim, const Vec3d start,
                   const Vec3d& dir)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<LineMesh> lineMesh =
         GeometryUtils::toLineGrid(start, dir, length, dim);
@@ -179,15 +170,13 @@ makeLineThreadObj(const std::string& name,
     material->setEdgeColor(Color(0.87, 0.63, 0.44));
 
     // Setup the Object
-    tissueObj->setVisualGeometry(lineMesh);
-    tissueObj->getVisualModel(0)->setRenderMaterial(material);
-    tissueObj->setPhysicsGeometry(lineMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(lineMesh);
-    tissueObj->setDynamicalModel(pbdSystem);
-    tissueObj->getPbdBody()->uniformMassValue = 0.00001;
+    auto tissueObj = SceneUtils::makePbdEntity(name, lineMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto method = tissueObj->getComponent<PbdMethod>();
+    method->setUniformMass(0.00001);
 
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
-        tissueObj->getPbdBody()->bodyHandle);
+        method->getBodyHandle());
 
     return tissueObj;
 }
@@ -204,8 +193,9 @@ public:
         m_scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
         ASSERT_NE(m_pbdObj, nullptr) << "Missing a pbdObj for PbdObjectCollisionTest";
-        m_pbdObj->getPbdModel()->getConfig()->m_doPartitioning = false;
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObj->getPhysicsGeometry());
+        auto method = m_pbdObj->getComponent<PbdMethod>();
+        method->getPbdSystem()->getConfig()->m_doPartitioning = false;
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(method->getPhysicsGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;
         m_scene->addSceneObject(m_pbdObj);
@@ -245,7 +235,7 @@ public:
             {
                 // Run in realtime at a slightly slowed down speed
                 // Still fixed, but # of iterations may vary by system
-                m_pbdObj->getPbdModel()->getConfig()->m_dt =
+                method->getPbdSystem()->getConfig()->m_dt =
                     m_sceneManager->getDt() * 0.5;
             });
 
@@ -268,9 +258,9 @@ public:
     }
 
 public:
-    std::shared_ptr<PbdObject> m_pbdObj = nullptr;
-    std::shared_ptr<Entity>    m_cdObj  = nullptr;
-    std::shared_ptr<Geometry>  m_collidingGeometry = nullptr;
+    std::shared_ptr<Entity>   m_pbdObj = nullptr;
+    std::shared_ptr<Entity>   m_cdObj  = nullptr;
+    std::shared_ptr<Geometry> m_collidingGeometry = nullptr;
 
     std::shared_ptr<PbdObjectCollision> m_pbdCollision = nullptr;
     std::string m_collisionName      = "";

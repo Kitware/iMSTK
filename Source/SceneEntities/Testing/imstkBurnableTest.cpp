@@ -6,8 +6,9 @@
 
 #include "imstkBurnable.h"
 #include "imstkCellMesh.h"
+#include "imstkEntity.h"
 #include "imstkLineMesh.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
 
@@ -35,17 +36,18 @@ TEST(imstkBurnableTest, testMemory)
     pbdSystem->getConfig()->m_angularDampingCoeff = 0.01;
 
     // Create Pbd object
-    auto pbdObj = std::make_shared<PbdObject>();
-    pbdObj->setPhysicsGeometry(lineMesh);
-    pbdObj->setDynamicalModel(pbdSystem);
-    pbdObj->initialize();
+    auto pbdObj = std::make_shared<Entity>();
+    auto method = pbdObj->addComponent<PbdMethod>();
+    method->setPhysicsGeometry(lineMesh);
+    method->setPbdSystem(pbdSystem);
+    method->initialize();
 
     // Create burnable component
-        auto burnable = std::make_shared<Burnable>();
+    auto burnable = std::make_shared<Burnable>();
 
     // Add component to pbd object
     pbdObj->addComponent(burnable);
-    pbdObj->initialize();
+    method->initialize();
 
     burnable->initialize();
 
