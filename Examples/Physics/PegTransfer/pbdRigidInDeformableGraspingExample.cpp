@@ -280,4 +280,5 @@ pbdRigidInDeformableGraspingExample()
 
         driver->start();
     }
+    return 0;
 }
