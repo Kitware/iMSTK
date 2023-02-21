@@ -21,6 +21,10 @@ namespace imstk
 #define imstkGetMacro(name, dataType) \
     virtual dataType get ## name() { return this->m_ ## name; }
 
+#define imstkSetGetMacro(funcName, varName, dataType)              \
+    void set ## funcName(const dataType& _arg) { varName = _arg; } \
+    const dataType& get ## funcName() const { return varName; }
+
 #define IMSTK_TYPE_NAME(name)                                      \
     static const std::string getStaticTypeName() { return #name; } \
     const std::string getTypeName() const override { return #name; }

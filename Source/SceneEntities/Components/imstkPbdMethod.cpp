@@ -125,7 +125,6 @@ PbdMethod::updatePhysicsGeometry()
     CHECK(m_physicsGeometry != nullptr) << "DynamicObject \"" << m_name
                                         << "\" expects a physics geometry, none was provided";
 
-    // DynamicObject::updatePhysicsGeometry();
     // m_pbdSystem->updatePhysicsGeometry(); this doesn't do anything
     if (m_physicsGeometry != nullptr)
     {
@@ -146,8 +145,8 @@ PbdMethod::updatePhysicsGeometry()
     }
 }
 
-bool
-PbdMethod::initialize()
+void
+PbdMethod::init()
 {
     CHECK(m_physicsGeometry != nullptr) << "PbdMethod \"" << m_name
                                         << "\" expects a physics geometry at start, none was provided";
@@ -168,15 +167,6 @@ PbdMethod::initialize()
     }
 
     updateGeometries();
-
-    return true;
-}
-
-void
-PbdMethod::initGraphEdges()
-{
-    m_taskGraph->clearEdges();
-    initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
 }
 
 void

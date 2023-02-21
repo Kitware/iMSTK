@@ -52,8 +52,8 @@ TEST_F(VisualTest, PointToTetMapTest)
         // Setup the Object
         tissueObj = imstk::SceneUtils::makePbdEntity("tissueObj", tetMeshFine_sf, tetMeshCoarse_sf, tetMeshCoarse, pbdSystem);
         auto tissueMethod = tissueObj->getComponent<PbdMethod>();
+        tissueMethod->setPhysicsToVisualMap(std::make_shared<PointToTetMap>(tetMeshCoarse, tetMeshFine_sf));
         tissueMethod->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMeshCoarse, tetMeshCoarse_sf));
-        tissueMethod->setPhysicsToCollidingMap(std::make_shared<PointToTetMap>(tetMeshCoarse, tetMeshFine_sf));
         tissueMethod->getPbdBody()->uniformMassValue = 0.01;
 
         pbdSystem->getConfig()->m_secParams->m_YoungModulus = 1000.0;

@@ -62,8 +62,7 @@ makeTetTissueObj(const std::string& name,
     }
 
     // Setup the Object
-    std::shared_ptr<Entity>    tissueObj;
-    std::shared_ptr<PbdMethod> method;
+    std::shared_ptr<Entity> tissueObj;
     if (useTetCollisionGeometry)
     {
         tissueObj = SceneUtils::makePbdEntity(name, tetMesh, pbdSystem);
@@ -72,10 +71,11 @@ makeTetTissueObj(const std::string& name,
     {
         std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
         tissueObj = SceneUtils::makePbdEntity(name, surfMesh, surfMesh, tetMesh, pbdSystem);
-        method    = tissueObj->getComponent<PbdMethod>();
+        auto method = tissueObj->getComponent<PbdMethod>();
         method->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     }
     tissueObj->getComponent<VisualModel>()->setRenderMaterial(makeMaterial());
+    auto method = tissueObj->getComponent<PbdMethod>();
     method->setUniformMass(0.01);
 
     pbdSystem->getConfig()->m_secParams->m_YoungModulus = 1000.0;
@@ -302,16 +302,16 @@ public:
         m_scene->addInteraction(m_pbdGrasping);
 
         connect<Event>(m_sceneManager, &SceneManager::preUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
                 // Run in realtime at a slightly slowed down speed
                 // Still fixed, but # of iterations may vary by system
                 graspedMethod->getPbdSystem()->getConfig()->m_dt = m_sceneManager->getDt();
-                        });
+            });
 
         // Assert the vertices stay within bounds and below min displacement
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
                 // Initialize
                 if (m_prevGraspedVertices.size() == 0)

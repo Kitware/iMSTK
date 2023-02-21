@@ -199,7 +199,7 @@ public:
         m_scene->addInteraction(m_cellRemoval);
 
         connect<Event>(m_sceneManager, &SceneManager::preUpdate,
-            [&](Event*)
+            [method, this](Event*)
             {
                 // Run in realtime at a slightly slowed down speed
                 // Still fixed, but # of iterations may vary by system

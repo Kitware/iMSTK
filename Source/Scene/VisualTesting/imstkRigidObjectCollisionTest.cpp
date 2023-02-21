@@ -68,7 +68,6 @@ public:
 
         // Debug geometry to visualize collision data
         m_cdDebugObject = m_pbdCollision->addComponent<CollisionDataDebugModel>();
-        m_cdDebugObject->setInputCD(m_pbdCollision->getCollisionDetection()->getCollisionData());
         m_cdDebugObject->setPrintContacts(m_printContacts);
 
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
@@ -83,7 +82,7 @@ public:
                 }
             });
         connect<Event>(m_sceneManager, &SceneManager::preUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
                 // Run in realtime at a slightly slowed down speed
                 // Still fixed, but # of iterations may vary by system
@@ -93,7 +92,7 @@ public:
 
         // Assert the vertices stay within bounds and below min displacement
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
                 ASSERT_TRUE(assertBounds({ method->getRigidPosition() },
                     m_assertionBoundsMin, m_assertionBoundsMax));

@@ -13,6 +13,9 @@
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
+// Temporary: Ideally, Scene shouldn't be aware of PbdMethod, PbdSystem.
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystem.h"
 
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskGraph.h"
@@ -56,6 +59,10 @@ Scene::initialize()
         if (auto dynObj = std::dynamic_pointer_cast<DynamicObject>(ent))
         {
             systems.insert(dynObj->getDynamicalModel());
+        }
+        else if (auto method = ent->getComponentUnsafe<PbdMethod>())
+        {
+            systems.insert(std::static_pointer_cast<AbstractDynamicalModel>(method->getPbdSystem()));
         }
     }
 
@@ -192,7 +199,7 @@ Scene::buildTaskGraph()
             auto behaviour = std::dynamic_pointer_cast<SceneBehaviour>(comp);
             if (behaviour != nullptr && behaviour->getTaskGraph() != nullptr)
             {
-                behaviour->initTaskGraphEdges();
+                behaviour->initGraphEdges();
             }
         }
     }

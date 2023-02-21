@@ -16,6 +16,7 @@
 #include "imstkPbdSystem.h"
 #include "imstkSceneObject.h"
 #include "imstkTaskGraph.h"
+#include "imstkCollisionDataDebugModel.h"
 
 namespace imstk
 {
@@ -35,9 +36,9 @@ extractTaskGraph(std::shared_ptr<Entity> entity)
     {
         return sceneObject->getTaskGraph();
     }
-    else if (auto sceneBehaviour = std::dynamic_pointer_cast<SceneBehaviour>(entity->getComponent<PbdMethod>()))
+    else if (auto sceneBehaviour = std::dynamic_pointer_cast<SceneBehaviour>(entity->getComponentUnsafe<PbdMethod>()))
     {
-        sceneBehaviour->getTaskGraph();
+        return sceneBehaviour->getTaskGraph();
     }
     LOG(FATAL) << "Cannot find a corresponding task graph for the provided entity.";
     return nullptr;
@@ -49,10 +50,10 @@ PbdObjectCollision::initialize()
 {
     CollisionInteraction::initialize();
 
-    m_objectA.method   = m_objA->getComponent<PbdMethod>();
-    m_objectA.collider = m_objA->getComponent<Collider>();
-    m_objectB.method   = m_objB->getComponent<PbdMethod>();
-    m_objectB.collider = m_objB->getComponent<Collider>();
+    m_objectA.method   = m_objA->getComponentUnsafe<PbdMethod>();
+    m_objectA.collider = m_objA->getComponentUnsafe<Collider>();
+    m_objectB.method   = m_objB->getComponentUnsafe<PbdMethod>();
+    m_objectB.collider = m_objB->getComponentUnsafe<Collider>();
 
     CHECK(m_objectA.method != nullptr || m_objectB.method != nullptr) << "At least one input object to PbdObjectCollision" <<
         "should have a PbdMethod.";
@@ -79,103 +80,33 @@ PbdObjectCollision::initialize()
         "PbdObjectCollision may only be used with PbdObjects that share the same PbdSystem";
 
     setupConnections();
+
+    // setup collision handling parameters after initialization:
+    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
+    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
+    pbdCH->setFriction(getFriction());
+    pbdCH->setRestitution(getRestitution());
+    pbdCH->setRestitution(getRestitution());
+    pbdCH->setUseCorrectVelocity(getUseCorrectVelocity());
+    pbdCH->setRigidBodyCompliance(getRigidBodyCompliance());
+    pbdCH->setDeformableStiffnessA(getDeformableStiffnessA());
+    pbdCH->setDeformableStiffnessB(getDeformableStiffnessB());
+    pbdCH->setEnableBoundaryCollisions(getEnableBoundaryCollisions());
+
+    // Since CollisingHandling classes are currently neither of Component, Behaviour, or SceneObject types,
+    // they will require explicit initialization with their respective Interaction classes.
+    pbdCH->initialize();
+
+    // Check for debug components here (post-initialize).
+    // There are certain members like CH and CD objects that
+    // are only available after initialization, which need to be
+    // set into the debug components.
+    if (auto cdDebugModel = this->getComponentUnsafe<CollisionDataDebugModel>())
+    {
+        cdDebugModel->setInputCD(this->getCollisionDetection()->getCollisionData());
+    }
+
     return true;
-}
-
-void
-PbdObjectCollision::setRestitution(const double restitution)
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    pbdCH->setRestitution(restitution);
-}
-
-double
-PbdObjectCollision::getRestitution() const
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    return pbdCH->getRestitution();
-}
-
-void
-PbdObjectCollision::setFriction(const double friction)
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    pbdCH->setFriction(friction);
-}
-
-double
-PbdObjectCollision::getFriction() const
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    return pbdCH->getFriction();
-}
-
-bool
-PbdObjectCollision::getUseCorrectVelocity() const
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    return pbdCH->getUseCorrectVelocity();
-}
-
-void
-PbdObjectCollision::setUseCorrectVelocity(const bool useCorrectVelocity)
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    pbdCH->setUseCorrectVelocity(useCorrectVelocity);
-}
-
-void
-PbdObjectCollision::setRigidBodyCompliance(const double compliance)
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    pbdCH->setRigidBodyCompliance(compliance);
-}
-
-double
-PbdObjectCollision::getRigidBodyCompliance() const
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    return pbdCH->getRigidBodyCompliance();
-}
-
-void
-PbdObjectCollision::setDeformableStiffnessA(const double stiffness)
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    pbdCH->setDeformableStiffnessA(stiffness);
-}
-
-double
-PbdObjectCollision::getDeformableStiffnessA() const
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    return pbdCH->getDeformableStiffnessA();
-}
-
-void
-PbdObjectCollision::setDeformableStiffnessB(const double stiffness)
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    pbdCH->setDeformableStiffnessB(stiffness);
-}
-
-double
-PbdObjectCollision::getDeformableStiffnessB() const
-{
-    auto pbdCH = std::dynamic_pointer_cast<PbdCollisionHandling>(getCollisionHandlingA());
-    CHECK(pbdCH != nullptr) << "No PbdCollisionHandling set";
-    return pbdCH->getDeformableStiffnessB();
 }
 
 void

@@ -10,6 +10,7 @@
 
 namespace imstk
 {
+class PbdMethod;
 class Scene;
 class SceneManager;
 class SimulationManager;
@@ -36,8 +37,8 @@ protected:
     bool   m_timerPaused = false; ///< Pauses the test timer
     bool   m_useStdOut   = false; ///< Enables std out in the logger, default off for testing
 
-    std::shared_ptr<imstk::VTKViewer>         m_viewer       = nullptr;
-    std::shared_ptr<imstk::SceneManager>      m_sceneManager = nullptr;
-    std::shared_ptr<imstk::SimulationManager> m_driver       = nullptr;
-    std::shared_ptr<imstk::Scene> m_scene = nullptr;
+    std::shared_ptr<imstk::VTKViewer>         m_viewer;
+    std::shared_ptr<imstk::SceneManager>      m_sceneManager;
+    std::shared_ptr<imstk::SimulationManager> m_driver;
+    std::shared_ptr<imstk::Scene> m_scene;
 };

@@ -9,6 +9,8 @@
 #include "imstkCollisionInteraction.h"
 #include "imstkMacros.h"
 
+#include <array>
+
 namespace imstk
 {
 class Collider;
@@ -48,33 +50,35 @@ public:
     /// \brief Get/Set the restitution, which gives how much velocity is
     /// removed along the contact normals during contact
     /// @{
-    void setRestitution(const double restitution);
-    double getRestitution() const;
+    imstkSetGetMacro(Restitution, m_restitution, double)
     /// @}
 
     ///
     /// \brief Get/Set the friction, which gives how much velocity is
     /// removed along the tangents during contact
     /// @{
-    void setFriction(const double friction);
-    double getFriction() const;
+    imstkSetGetMacro(Friction, m_friction, double)
     /// @}
 
     ///
     /// \brief Get/Set whether velocity is corrected (in some cases this could
     /// cause instabilities)
     /// @{
-    bool getUseCorrectVelocity() const;
-    void setUseCorrectVelocity(const bool useCorrectVelocity);
+    imstkSetGetMacro(UseCorrectVelocity, m_useCorrectVelocity, bool)
     /// @}
+
+    ///
+    /// \brief Get enableBoundaryCollision
+    ///@{
+    imstkSetGetMacro(EnableBoundaryCollisions, m_enableBoundaryCollisions, bool)
+    ///@}
 
     ///
     /// \brief Get/Set compliance of rigid body contacts. Defaults to 0
     /// compliance/infinitely stiff. This is what is needed most of the time
     /// but sometimes making a contact a bit softer can be helpful.
     /// @{
-    void setRigidBodyCompliance(const double compliance);
-    double getRigidBodyCompliance() const;
+    imstkSetGetMacro(RigidBodyCompliance, m_rigidBodyCompliance, double)
     /// @}
 
     ///
@@ -82,10 +86,8 @@ public:
     /// This is what is needed most of the time but sometimes making a
     /// contact a bit softer can be helpful.
     /// @{
-    void setDeformableStiffnessA(const double stiffness);
-    double getDeformableStiffnessA() const;
-    void setDeformableStiffnessB(const double stiffness);
-    double getDeformableStiffnessB() const;
+    imstkSetGetMacro(DeformableStiffnessA, m_deformableStiffness[0], double)
+    imstkSetGetMacro(DeformableStiffnessB, m_deformableStiffness[1], double)
 /// @}
 
 protected:
@@ -103,5 +105,14 @@ private:
         std::shared_ptr<TaskGraph> taskGraph;
         std::shared_ptr<PbdSystem> system;
     } m_objectA, m_objectB;
+
+    // Collision Handler configuration (default values copied from PbdCollisionHandling).
+    // In the future, refactor these parameters as a config struct to maintain consistent set of parameters
+    // and default values across classes.
+    double m_friction    = 0.0,
+           m_restitution = 0.0,
+           m_rigidBodyCompliance = 0.000001;
+    std::array<double, 2> m_deformableStiffness = { 0.3, 0.3 };
+    bool m_useCorrectVelocity = true, m_enableBoundaryCollisions = false;
 };
 } // namespace imstk

@@ -115,7 +115,7 @@ public:
     ///
     /// \brief Setup the edges/connections of the TaskGraph
     ///
-    void initTaskGraphEdges()
+    void initGraphEdges()
     {
         CHECK(m_taskGraph != nullptr) << "Tried to setup task graph edges but no TaskGraph exists";
         m_taskGraph->clearEdges();

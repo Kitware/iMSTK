@@ -33,11 +33,11 @@ PbdSystem::PbdSystem() : AbstractDynamicalModel(DynamicalModelType::PositionBase
     };
 
     // Setup PBD compute nodes
-    m_integrationPositionNode = m_taskGraph->addFunction("PbdModel_IntegratePosition",
+    m_integrationPositionNode = m_taskGraph->addFunction("PbdSystem_IntegratePosition",
         [&]() { integratePosition(); });
-    m_solveConstraintsNode = m_taskGraph->addFunction("PbdModel_SolveConstraints",
+    m_solveConstraintsNode = m_taskGraph->addFunction("PbdSystem_SolveConstraints",
         [&]() { solveConstraints(); });
-    m_updateVelocityNode = m_taskGraph->addFunction("PbdModel_UpdateVelocity",
+    m_updateVelocityNode = m_taskGraph->addFunction("PbdSystem_UpdateVelocity",
         [&]() { updateVelocity(); });
 }
 

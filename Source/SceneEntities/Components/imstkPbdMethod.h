@@ -23,12 +23,6 @@ class PbdMethod : public SceneBehaviour
 public:
     IMSTK_TYPE_NAME(PbdMethod) PbdMethod(const std::string& name = "PbdMethod");
 
-    bool initialize();
-    ///
-    /// \brief Initializes the edges of the Behaviour's computational graph
-    ///
-    void initGraphEdges();
-
     ///
     /// \brief Set/Get the geometry used for Physics computations
     ///@{
@@ -116,12 +110,15 @@ public:
     void computeCellConstraintMap();
 
 private:
-    // void update() { };
-    void updatePhysicsGeometry();
-    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
+    void init() override;
+
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
     void setDeformBodyFromGeometry(PbdBody& body, std::shared_ptr<PointSet> geom);
+
     void setRigidBody(PbdBody& body);
+
+    void updatePhysicsGeometry();
 
     // Physics related geometry and maps
     std::shared_ptr<Geometry>    m_physicsGeometry;                     ///< Geometry used for Physics

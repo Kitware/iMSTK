@@ -71,8 +71,6 @@ makeTetTissueObj(const std::string& name,
 
     // Setup the Object
     std::shared_ptr<Entity> tissueObj;
-    tissueObj = SceneUtils::makePbdEntity(name, tetMesh, tetMesh, tetMesh, pbdSystem);
-
     if (useTetCollisionGeometry)
     {
         tissueObj = SceneUtils::makePbdEntity(name, tetMesh, pbdSystem);
@@ -212,10 +210,9 @@ public:
         m_pbdCollision->setFriction(m_friction);
         m_pbdCollision->setRestitution(m_restitution);
         m_pbdCollision->setDeformableStiffnessA(m_collisionStiffness);
-        std::dynamic_pointer_cast<PbdCollisionHandling>(m_pbdCollision->getCollisionHandlingA())->setEnableBoundaryCollisions(true);
+        m_pbdCollision->setEnableBoundaryCollisions(true);
         // Debug geometry to visualize collision data
         m_cdDebugModel = m_pbdCollision->addComponent<CollisionDataDebugModel>();
-        m_cdDebugModel->setInputCD(m_pbdCollision->getCollisionDetection()->getCollisionData());
         m_cdDebugModel->setPrintContacts(m_printContacts);
         m_scene->addInteraction(m_pbdCollision);
 
@@ -231,7 +228,7 @@ public:
                 }
             });
         connect<Event>(m_sceneManager, &SceneManager::preUpdate,
-            [&](Event*)
+            [method, this](Event*)
             {
                 // Run in realtime at a slightly slowed down speed
                 // Still fixed, but # of iterations may vary by system

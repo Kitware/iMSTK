@@ -36,11 +36,11 @@ public:
     bool isInitd = false;
 };
 
-class TestBehaviour : public Behaviour<double>
+class TestBehaviour : public SceneBehaviour
 {
 public:
-    TestBehaviour() : Behaviour<double>("TestBehaviour") { }
-    TestBehaviour(const bool useTaskGraph) : Behaviour<double>(useTaskGraph, "TestBehaviour"),
+    TestBehaviour() : SceneBehaviour("TestBehaviour") { }
+    TestBehaviour(const bool useTaskGraph) : SceneBehaviour(useTaskGraph, "TestBehaviour"),
         testNode(std::make_shared<TaskNode>(std::bind(&TestBehaviour::updateFunc, this), "TestNode"))
     {
         m_taskGraph->addNode(testNode);
@@ -111,8 +111,9 @@ TEST(BehaviourTest, TestUpdate)
 
 TEST(BehaviourTest, TestTaskGraphUpdate)
 {
-    TestBehaviour behaviour(true);
-    behaviour.initTaskGraphEdges();
+    TestBehaviour   behaviour(true);
+    SceneBehaviour* comp = &behaviour;
+    comp->initGraphEdges();
 
     SequentialTaskGraphController taskGraphExecutor;
     taskGraphExecutor.setTaskGraph(behaviour.getTaskGraph());

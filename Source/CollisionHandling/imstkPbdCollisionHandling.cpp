@@ -278,10 +278,6 @@ PbdCollisionHandling::getDataFromObject(PbdMethod& method, Collider& collider)
     {
         side.mapPtr = map.get();
     }
-    else
-    {
-        LOG(FATAL) << "A PointwiseMap was expected.";
-    }
 
     side.pointSet = dynamic_cast<PointSet*>(side.geometry);
     side.vertices = (side.pointSet == nullptr) ? nullptr : side.pointSet->getVertexPositions().get();
