@@ -20,6 +20,8 @@ namespace imstk
 class Needle : public Component
 {
 public:
+    IMSTK_TYPE_NAME(Needle)
+
     Needle(const std::string& name = "Needle") : Component(name) { }
     ~Needle() override = default;
 

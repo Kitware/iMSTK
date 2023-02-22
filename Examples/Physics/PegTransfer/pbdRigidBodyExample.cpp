@@ -19,12 +19,13 @@
 #include "imstkPbdAngularConstraint.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkSphere.h"
@@ -38,9 +39,9 @@ using namespace imstk;
 ///
 /// \brief Creates tissue object
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeTissueObj(const std::string& name,
-              std::shared_ptr<PbdSystem> model,
+              std::shared_ptr<PbdSystem> system,
               const double width,
               const double height,
               const int rowCount,
@@ -54,8 +55,8 @@ makeTissueObj(const std::string& name,
             Vec2d(width, height), Vec2i(rowCount, colCount));
 
     // Setup the Parameters
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, distStiffness);
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, bendStiffness);
+    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, distStiffness);
+    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, bendStiffness);
 
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
@@ -63,28 +64,23 @@ makeTissueObj(const std::string& name,
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
 
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(tissueMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    auto pbdObject = std::make_shared<PbdObject>(name);
-    pbdObject->addVisualModel(visualModel);
-    pbdObject->setPhysicsGeometry(tissueMesh);
-    pbdObject->addComponent<Collider>()->setGeometry(tissueMesh);
-    pbdObject->setDynamicalModel(model);
-
-    pbdObject->getPbdBody()->uniformMassValue = particleMassValue;
+    auto pbdObject = SceneUtils::makePbdEntity(name, tissueMesh, system);
+    pbdObject->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto method = pbdObject->getComponent<PbdMethod>();
+    method->setUniformMass(particleMassValue);
+    std::vector<int> fixedNodeIds;
     for (int x = 0; x < rowCount; x++)
     {
         for (int y = 0; y < colCount; y++)
         {
             if (x == 0 || y == 0 || x == rowCount - 1 || y == colCount - 1)
             {
-                pbdObject->getPbdBody()->fixedNodeIds.push_back(x * colCount + y);
+                fixedNodeIds.push_back(x * colCount + y);
             }
         }
     }
+    method->setFixedNodes(fixedNodeIds);
 
     return pbdObject;
 }
@@ -120,34 +116,32 @@ planeContactScene()
     scene->addSceneObject(planeObj);
 
     // Setup a capsule
-    auto rigidPbdObj = std::make_shared<PbdObject>("rigidPbdObj");
+    EntityPtr rigidCapsule;
     {
         // Setup line geometry
         //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.5);
         auto                         rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.05, 0.25);
         std::shared_ptr<SurfaceMesh> surfMesh  = GeometryUtils::toSurfaceMesh(rigidGeom);
-        rigidPbdObj->setVisualGeometry(surfMesh);
-        rigidPbdObj->addComponent<Collider>()->setGeometry(surfMesh);
-        rigidPbdObj->setPhysicsGeometry(surfMesh);
+        rigidCapsule = SceneUtils::makePbdEntity("rigidCapsule", surfMesh, pbdSystem);
+        auto renderMaterial = rigidCapsule->getComponent<VisualModel>()->getRenderMaterial();
 
         // Setup material
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.0, 0.0));
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
-
-        rigidPbdObj->setDynamicalModel(pbdSystem);
+        renderMaterial->setColor(Color(0.9, 0.0, 0.0));
+        renderMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        renderMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+        renderMaterial->setRoughness(0.5);
+        renderMaterial->setMetalness(1.0);
+        renderMaterial->setIsDynamicMesh(false);
 
         // Setup body
+        auto        method      = rigidCapsule->getComponent<PbdMethod>();
         const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 1.0, 1.0).normalized());
-        rigidPbdObj->getPbdBody()->setRigid(Vec3d(0.0, 0.2, 0.0),
+        method->setRigid(Vec3d(0.0, 0.2, 0.0),
             1.0, orientation, Mat3d::Identity() * 0.01);
     }
-    scene->addSceneObject(rigidPbdObj);
+    scene->addSceneObject(rigidCapsule);
 
-    auto collision = std::make_shared<PbdObjectCollision>(rigidPbdObj, planeObj);
+    auto collision = std::make_shared<PbdObjectCollision>(rigidCapsule, planeObj);
     collision->setRigidBodyCompliance(0.000001);
     scene->addSceneObject(collision);
 
@@ -228,8 +222,8 @@ planeContactScene()
                     {
                         extTorque += Vec3d(0.0, 0.1, 0.0);
                     }
-                    rigidPbdObj->getPbdBody()->externalForce  = extForce;
-                    rigidPbdObj->getPbdBody()->externalTorque = extTorque;
+                    rigidCapsule->getComponent<PbdMethod>()->getPbdBody()->externalForce  = extForce;
+                    rigidCapsule->getComponent<PbdMethod>()->getPbdBody()->externalTorque = extTorque;
                 });
         }
 
@@ -243,8 +237,8 @@ bowlScene()
     // Write log to stdout and file
     Logger::startLogger();
 
-    auto scene   = std::make_shared<Scene>("PbdSDFCollision");
-    auto cubeObj = std::make_shared<PbdObject>("Cube");
+    auto      scene = std::make_shared<Scene>("PbdSDFCollision");
+    EntityPtr cubeObj;
     {
         // This model is shared among interacting rigid bodies
         auto pbdSystem = std::make_shared<PbdSystem>();
@@ -309,20 +303,17 @@ bowlScene()
             subdivide.update();
 
             // Create the visual model
-            auto visualModel = std::make_shared<VisualModel>();
-            visualModel->setGeometry(subdivide.getOutputMesh());
             auto material = std::make_shared<RenderMaterial>();
             material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
             material->setLineWidth(2.0);
             material->setColor(Color::Orange);
-            visualModel->setRenderMaterial(material);
 
             // Create the cube rigid object
-            cubeObj->setDynamicalModel(pbdSystem);
-            cubeObj->setPhysicsGeometry(subdivide.getOutputMesh());
-            cubeObj->addComponent<Collider>()->setGeometry(subdivide.getOutputMesh());
-            cubeObj->addVisualModel(visualModel);
-            cubeObj->getPbdBody()->setRigid(Vec3d(0.0, 0.2, 0.0), 1.0,
+            cubeObj = SceneUtils::makePbdEntity("cube", subdivide.getOutputMesh(), pbdSystem);
+            cubeObj->getComponent<VisualModel>()->setRenderMaterial(material);
+            auto cubeObjMethod = cubeObj->addComponent<PbdMethod>();
+            cubeObjMethod->setPhysicsGeometry(subdivide.getOutputMesh());
+            cubeObjMethod->setRigid(Vec3d(0.0, 0.2, 0.0), 1.0,
                 Quatd(Rotd(0.4, Vec3d(1.0, 0.0, 0.0))), Mat3d::Identity() * 0.01);
 
             scene->addSceneObject(cubeObj);
@@ -406,10 +397,11 @@ bowlScene()
                 {
                     extTorque += Vec3d(0.0, -1.5, 0.0);
                 }
-                cubeObj->getPbdBody()->externalForce  = extForce;
-                cubeObj->getPbdBody()->externalTorque = extTorque;
-                scene->getActiveCamera()->setFocalPoint((*cubeObj->getPbdBody()->vertices)[0]);
-                scene->getActiveCamera()->setPosition((*cubeObj->getPbdBody()->vertices)[0] + dx);
+                auto cubeObjMethod = cubeObj->addComponent<PbdMethod>();
+                cubeObjMethod->getPbdBody()->externalForce  = extForce;
+                cubeObjMethod->getPbdBody()->externalTorque = extTorque;
+                scene->getActiveCamera()->setFocalPoint((*cubeObjMethod->getPbdBody()->vertices)[0]);
+                scene->getActiveCamera()->setPosition((*cubeObjMethod->getPbdBody()->vertices)[0] + dx);
             });
         /*connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
             {
@@ -443,37 +435,35 @@ tissueCapsuleDrop()
     pbdSystem->configure(pbdConfig);
 
     // Setup a tissue
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue", pbdSystem,
+    auto tissueObj = makeTissueObj("Tissue", pbdSystem,
         0.1, 0.1,
         5, 5,
         0.1,       // Per Particle Mass
         1.0, 0.2); // Distance & Bend Stiffness
     scene->addSceneObject(tissueObj);
-    pbdConfig->setBodyDamping(tissueObj->getPbdBody()->bodyHandle, 0.1);
+    pbdConfig->setBodyDamping(tissueObj->getComponent<PbdMethod>()->getBodyHandle(), 0.1);
 
     // Setup capsule to drop on tissue
-    auto capsuleObj = std::make_shared<PbdObject>("capsule0");
+    EntityPtr capsuleObj;
     {
         // Setup line geometry
-        //auto rigidGeom = std::make_shared<Sphere>(Vec3d(-0.005, 0.0, 0.0), 0.005);
         auto rigidGeom = std::make_shared<Capsule>(Vec3d(-0.005, 0.0, 0.0), 0.005, 0.015);
-        capsuleObj->setVisualGeometry(rigidGeom);
-        capsuleObj->addComponent<Collider>()->setGeometry(rigidGeom);
-        capsuleObj->setPhysicsGeometry(rigidGeom);
+        capsuleObj = SceneUtils::makePbdEntity("capsule0", rigidGeom, pbdSystem);
 
         // Setup material
-        capsuleObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.0, 0.0));
-        capsuleObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-        capsuleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-        capsuleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-        capsuleObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
+        auto renderMaterial = capsuleObj->getComponent<VisualModel>()->getRenderMaterial();
+        renderMaterial->setColor(Color(0.9, 0.0, 0.0));
+        renderMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        renderMaterial->setRoughness(0.5);
+        renderMaterial->setMetalness(1.0);
+        renderMaterial->setIsDynamicMesh(false);
 
-        capsuleObj->setDynamicalModel(pbdSystem);
-        pbdConfig->setBodyDamping(capsuleObj->getPbdBody()->bodyHandle, 0.04, 0.01);
+        auto capsuleObjMethod = capsuleObj->getComponent<PbdMethod>();
+        pbdConfig->setBodyDamping(capsuleObjMethod->getBodyHandle(), 0.04, 0.01);
 
         // Setup body
         const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 1.0, 0.0).normalized());
-        capsuleObj->getPbdBody()->setRigid(Vec3d(0.0, 0.05, 0.0), 1.0,
+        capsuleObjMethod->setRigid(Vec3d(0.0, 0.05, 0.0), 1.0,
             orientation, Mat3d::Identity() * 0.01);//Vec3d(1.0, 5.0, 1.0).asDiagonal());
     }
     scene->addSceneObject(capsuleObj);
@@ -543,41 +533,39 @@ hingeScene()
     pbdSystem->configure(pbdConfig);
 
     // Setup a capsule
-    auto rigidPbdObj = std::make_shared<PbdObject>("rigidPbdObj");
+    EntityPtr rigidCapsule;
     {
         // Setup line geometry
         //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.5);
         auto                         rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.5, 2.0);
         std::shared_ptr<SurfaceMesh> surfMesh  = GeometryUtils::toSurfaceMesh(rigidGeom);
-        rigidPbdObj->setVisualGeometry(surfMesh);
-        rigidPbdObj->addComponent<Collider>()->setGeometry(surfMesh);
-        rigidPbdObj->setPhysicsGeometry(surfMesh);
+        rigidCapsule = SceneUtils::makePbdEntity("rigidCapsule", surfMesh, pbdSystem);
 
         // Setup material
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.0, 0.0));
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-        rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
-
-        rigidPbdObj->setDynamicalModel(pbdSystem);
+        auto renderMaterial = rigidCapsule->getComponent<VisualModel>()->getRenderMaterial();
+        renderMaterial->setColor(Color(0.9, 0.0, 0.0));
+        renderMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        renderMaterial->setRoughness(0.5);
+        renderMaterial->setMetalness(1.0);
+        renderMaterial->setIsDynamicMesh(false);
 
         // Setup body such that z is now pointing in -x
         const Quatd orientation = Quatd::FromTwoVectors(Vec3d(1.0, 0.0, 0.0), Vec3d(0.0, 0.0, 1.0).normalized());
         //const Quatd orientation = Quatd::Identity();
         const Mat3d inertia = Vec3d(1.0, 1.0, 100.0).asDiagonal(); // Resistance on z
-        rigidPbdObj->getPbdBody()->setRigid(Vec3d(0.0, 0.0, 0.0),
+        auto        rigidCapsuleMethod = rigidCapsule->getComponent<PbdMethod>();
+        rigidCapsuleMethod->setRigid(Vec3d(0.0, 0.0, 0.0),
             1.0, orientation, inertia);
 
         // Custom constaint addition
         pbdSystem->getConfig()->addPbdConstraintFunctor([&](PbdConstraintContainer& container)
             {
                 auto hingeConstraint = std::make_shared<PbdAngularHingeConstraint>();
-                hingeConstraint->initConstraint({ rigidPbdObj->getPbdBody()->bodyHandle, 0 }, Vec3d(1.0, 0.0, 0.0), 0.1);
+                hingeConstraint->initConstraint({ rigidCapsuleMethod->getBodyHandle(), 0 }, Vec3d(1.0, 0.0, 0.0), 0.1);
                 container.addConstraint(hingeConstraint);
             });
     }
-    scene->addSceneObject(rigidPbdObj);
+    scene->addSceneObject(rigidCapsule);
 
     // Light
     auto light = std::make_shared<DirectionalLight>();

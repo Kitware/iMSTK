@@ -15,7 +15,6 @@ class NeedleEmbedder;
 
 namespace imstk
 {
-class PbdObject;
 class TetraToLineMeshCD;
 } // namespace imstk
 
@@ -27,9 +26,9 @@ class TetraToLineMeshCD;
 class NeedleInteraction : public PbdObjectCollision
 {
 public:
-    NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
-                      std::shared_ptr<PbdObject> needleObj,
-                      const std::string&         collisionName = "");
+    NeedleInteraction(std::shared_ptr<Entity> tissueObj,
+                      std::shared_ptr<Entity> needleObj,
+                      const std::string&      collisionName = "");
     ~NeedleInteraction() override = default;
 
     IMSTK_TYPE_NAME(NeedleInteraction)
@@ -47,6 +46,8 @@ public:
 
     void setPunctureForceThreshold(const double forceThreshold);
     const double getPunctureForceThreshold() const;
+
+    bool initialize() override;
 
     ///
     /// \brief Setup connectivity of task graph

@@ -6,8 +6,8 @@
 
 #include "NeedleInteraction.h"
 #include "imstkLineMesh.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdObject.h"
 #include "imstkPuncturable.h"
 #include "imstkStraightNeedle.h"
 #include "imstkTaskGraph.h"
@@ -17,16 +17,32 @@
 
 using namespace imstk;
 
-NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
-                                     std::shared_ptr<PbdObject> needleObj,
-                                     const std::string&         collisionName) :
+NeedleInteraction::NeedleInteraction(std::shared_ptr<Entity> tissueObj,
+                                     std::shared_ptr<Entity> needleObj,
+                                     const std::string&      collisionName) :
     PbdObjectCollision(tissueObj, needleObj, collisionName)
 {
+}
+
+bool
+NeedleInteraction::initialize()
+{
+    PbdObjectCollision::initialize();
+
+    auto tissueObj = m_objA;
+    auto needleObj = m_objB;
+    if (tissueObj->containsComponent<StraightNeedle>())
+    {
+        std::swap(tissueObj, needleObj);
+    }
+
     CHECK(needleObj->containsComponent<StraightNeedle>())
         << "NeedleInteraction only works with objects that have a StraightNeedle component";
     CHECK(tissueObj->containsComponent<Puncturable>())
         << "NeedleInteraction only works with objects that have a Puncturable component";
-    CHECK(std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry()) != nullptr)
+    CHECK(tissueObj->getComponent<PbdMethod>() != nullptr
+        && std::dynamic_pointer_cast<TetrahedralMesh>(
+        tissueObj->getComponent<PbdMethod>()->getPhysicsGeometry()) != nullptr)
         << "NeedleInteraction only works with TetrahedralMesh physics geometry on pbd tissueObj";
 
     // Assumes usage of physics geometry for this
@@ -40,6 +56,8 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
     m_embedderNode =
         std::make_shared<TaskNode>([&]() { m_embedder->update(); }, "NeedleEmbedding", true);
     m_taskGraph->addNode(m_embedderNode);
+
+    return true;
 }
 
 void
@@ -96,9 +114,6 @@ NeedleInteraction::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_
     // Setup the usual collision interaction in the graph
     // which adds contact constraints before the end of the pbd solve
     PbdObjectCollision::initGraphEdges(source, sink);
-
-    auto                               pbdObj = std::dynamic_pointer_cast<PbdObject>(m_objA);
-    std::shared_ptr<CollisionHandling> pbdCH  = m_colHandlingA;
 
     // Collision detection should be done before so we can tell if touching or not
     // This way state can transition Removed -> Touching -> Punctured in one step

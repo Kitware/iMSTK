@@ -21,13 +21,14 @@
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectGrasping.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkTearable.h"
@@ -46,8 +47,8 @@ using namespace imstk;
 ///
 /// \brief Creates pbd simulated gallbladder object
 ///
-std::shared_ptr<PbdObject>
-makeGallBladder(const std::string& name, std::shared_ptr<PbdSystem> model)
+std::shared_ptr<Entity>
+makeGallBladder(const std::string& name, std::shared_ptr<PbdSystem> system)
 {
     // Setup the Geometry
     auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Gallblader/gallblader.msh");
@@ -67,37 +68,30 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdSystem> model)
     material->setBackFaceCulling(false);
     material->setOpacity(0.5);
 
-    // Add a visual model to render the tet mesh
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(surfMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    auto tissueObj = std::make_shared<PbdObject>(name);
-    tissueObj->addVisualModel(visualModel);
-    //tissueObj->addVisualModel(labelModel);
-    tissueObj->setPhysicsGeometry(surfMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    tissueObj->setDynamicalModel(model);
+    auto tissueObj   = SceneUtils::makePbdEntity(name, surfMesh, system);
+    auto visualModel = tissueObj->getComponent<VisualModel>();
+    visualModel->setRenderMaterial(material);
     // Gallblader is about 60g
-    tissueObj->getPbdBody()->uniformMassValue = 60.0 / tissueMesh->getNumVertices();
+    auto tissueMethod = tissueObj->getComponent<PbdMethod>();
+    tissueMethod->setUniformMass(60.0 / tissueMesh->getNumVertices());
 
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 700.0,
-        tissueObj->getPbdBody()->bodyHandle);
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 700.0,
-        tissueObj->getPbdBody()->bodyHandle);
+    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 700.0,
+        tissueMethod->getBodyHandle());
+    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 700.0,
+        tissueMethod->getBodyHandle());
 
-    tissueObj->getPbdBody()->fixedNodeIds = { 57, 131, 132 }; // { 72, , 131, 132 };
+    tissueMethod->setFixedNodes({ 57, 131, 132 }); // { 72, , 131, 132 };
 
-    LOG(INFO) << "Per particle mass: " << tissueObj->getPbdBody()->uniformMassValue;
+    LOG(INFO) << "Per particle mass: " << tissueMethod->getPbdBody()->uniformMassValue;
 
-    tissueObj->initialize();
+    // tissueObj->initialize();
 
     return tissueObj;
 }
 
-static std::shared_ptr<PbdObject>
-makeKidney(const std::string& name, std::shared_ptr<PbdSystem> model)
+static std::shared_ptr<Entity>
+makeKidney(const std::string& name, std::shared_ptr<PbdSystem> system)
 {
     // Setup the Geometry
     auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Kidney/kidney_vol_low_rez.vtk");
@@ -119,36 +113,27 @@ makeKidney(const std::string& name, std::shared_ptr<PbdSystem> model)
     material->setBackFaceCulling(false);
     material->setOpacity(0.5);
 
-    // Add a visual model to render the tet mesh
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(tissueMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
-    tissueObj->addVisualModel(visualModel);
-    //tissueObj->addVisualModel(labelModel);
-    tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->setDynamicalModel(model);
-    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
+    auto tissueObj = SceneUtils::makePbdEntity(name, tissueMesh, surfMesh, tissueMesh, system);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
 
     // Gallblader is about 60g
-    tissueObj->getPbdBody()->uniformMassValue = 60.0 / tissueMesh->getNumVertices();
-    tissueObj->getPbdBody()->fixedNodeIds     = { 72, 57, 131, 132 };
+    auto method = tissueObj->getComponent<PbdMethod>();
+    method->setUniformMass(60.0 / tissueMesh->getNumVertices());
+    method->setFixedNodes({ 72, 57, 131, 132 });
 
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
+    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
+        method->getBodyHandle());
+    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 500.0,
+        method->getBodyHandle());
 
-    LOG(INFO) << "Per particle mass: " << tissueObj->getPbdBody()->uniformMassValue;
+    LOG(INFO) << "Per particle mass: " << method->getPbdBody()->uniformMassValue;
 
     return tissueObj;
 }
 
-static std::shared_ptr<PbdObject>
-makeCapsuleToolObj(std::shared_ptr<PbdSystem> model)
+static std::shared_ptr<Entity>
+makeCapsuleToolObj(std::shared_ptr<PbdSystem> system)
 {
     auto toolGeometry = std::make_shared<Capsule>();
     toolGeometry->setRadius(0.03);
@@ -156,24 +141,21 @@ makeCapsuleToolObj(std::shared_ptr<PbdSystem> model)
     toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
     toolGeometry->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
 
-    auto toolObj = std::make_shared<PbdObject>("Tool");
-
+    auto toolObj    = SceneUtils::makePbdEntity("Tool", toolGeometry, system);
+    auto toolVisual = toolObj->getComponent<VisualModel>();
+    auto toolMethod = toolObj->getComponent<PbdMethod>();
     // Create the object
-    toolObj->setVisualGeometry(toolGeometry);
-    toolObj->setPhysicsGeometry(toolGeometry);
-    toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
-    toolObj->setDynamicalModel(model);
-    toolObj->getPbdBody()->setRigid(
+    toolMethod->setRigid(
         Vec3d(0.0, 2.0, 2.0),
         0.1,
         Quatd::Identity(),
         Mat3d::Identity() * 1.0);
 
-    toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(1.0);
+    toolVisual->getRenderMaterial()->setOpacity(1.0);
 
     // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
-    controller->setControlledObject(toolObj);
+    controller->setControlledObject(toolMethod, toolVisual);
     controller->setTranslationScaling(10.0);
     controller->setLinearKs(500.0);
     controller->setAngularKs(200.0);
@@ -211,17 +193,18 @@ main()
     pbdSystem->getConfig()->m_angularDampingCoeff = 0.005;
 
     // Setup gallbladder object
-    std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdSystem);
+    auto gallbladerObj = makeGallBladder("Gallbladder", pbdSystem);
     scene->addSceneObject(gallbladerObj);
 
     // Setup kidney
-    std::shared_ptr<PbdObject> kidneyObj = makeKidney("Kidney", pbdSystem);
+    auto kidneyObj = makeKidney("Kidney", pbdSystem);
     scene->addSceneObject(kidneyObj);
 
     // Create PBD object of connective strands with associated constraints
-    double                     maxDist = 0.35;
-    std::shared_ptr<PbdObject> connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdSystem, maxDist, 2.5, 7);
-    pbdSystem->getConfig()->setBodyDamping(connectiveStrands->getPbdBody()->bodyHandle, 0.015, 0.0);
+    double maxDist = 0.35;
+    auto   connectiveStrands       = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdSystem, maxDist, 2.5, 7);
+    auto   connectiveStrandsMethod = connectiveStrands->getComponent<PbdMethod>();
+    pbdSystem->getConfig()->setBodyDamping(connectiveStrandsMethod->getBodyHandle(), 0.015, 0.0);
 
     // Add Tearing
     connectiveStrands->addComponent<Tearable>();
@@ -233,7 +216,7 @@ main()
     scene->addSceneObject(connectiveStrands);
 
     // Setup a tool to grasp with
-    std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdSystem);
+    auto toolObj = makeCapsuleToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     // add collision
@@ -241,13 +224,13 @@ main()
     scene->addInteraction(collision);
 
     // Create new picking with constraints
-    auto grasper = std::make_shared<PbdObjectGrasping>(connectiveStrands, toolObj);
+    auto grasper = std::make_shared<PbdObjectGrasping>(connectiveStrands->getComponent<PbdMethod>(), toolObj->getComponent<PbdMethod>());
     grasper->setStiffness(0.5);
     scene->addInteraction(grasper);
 
     // Add burner component to tool
     auto burning = std::make_shared<Burner>();
-    burning->addObject(connectiveStrands);
+    burning->addObject(connectiveStrandsMethod);
 
     toolObj->addComponent(burning);
 

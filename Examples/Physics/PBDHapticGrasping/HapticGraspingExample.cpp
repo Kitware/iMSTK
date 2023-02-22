@@ -7,6 +7,7 @@
 #include "imstkCamera.h"
 #include "imstkCapsule.h"
 #include "imstkCollider.h"
+#include "imstkEntity.h"
 #include "imstkDirectionalLight.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
@@ -14,15 +15,16 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkObjectControllerGhost.h"
-#include "imstkPbdSystem.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectGrasping.h"
+#include "imstkPbdSystem.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
@@ -37,7 +39,7 @@
 
 using namespace imstk;
 
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makePbdObjSurface(
     const std::string&         name,
     std::shared_ptr<PbdSystem> model,
@@ -45,39 +47,37 @@ makePbdObjSurface(
     const Vec3i&               dim,
     const Vec3d&               center)
 {
-    auto prismObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> prismMesh = GeometryUtils::toTetGrid(center, size, dim);
     std::shared_ptr<SurfaceMesh>     surfMesh  = prismMesh->extractSurfaceMesh();
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(surfMesh);
-    prismObj->addComponent<Collider>()->setGeometry(surfMesh);
-    prismObj->setVisualGeometry(surfMesh);
-    prismObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    prismObj->setDynamicalModel(model);
-    prismObj->getPbdBody()->uniformMassValue = 0.05;
+    auto prismObj = SceneUtils::makePbdEntity(name, surfMesh, model);
+    prismObj->getComponent<VisualModel>()->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    auto method = prismObj->getComponent<PbdMethod>();
+    method->setUniformMass(0.05);
     // Use volume+distance constraints, worse results. More performant (can use larger mesh)
     model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1000.0,
-                prismObj->getPbdBody()->bodyHandle);
+        method->getBodyHandle());
     model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
-                prismObj->getPbdBody()->bodyHandle);
+        method->getBodyHandle());
     // Fix the borders
-    std::shared_ptr<VecDataArray<double, 3>> vertices = surfMesh->getVertexPositions();
+    auto             vertices = surfMesh->getVertexPositions();
+    std::vector<int> fixedNodeIds;
     for (int i = 0; i < surfMesh->getNumVertices(); i++)
     {
         const Vec3d& pos = (*vertices)[i];
         if (pos[1] <= center[1] - size[1] * 0.5)
         {
-            prismObj->getPbdBody()->fixedNodeIds.push_back(i);
+            fixedNodeIds.push_back(i);
         }
     }
+    method->setFixedNodes(fixedNodeIds);
 
     return prismObj;
 }
 
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeCapsuleToolObj(std::shared_ptr<PbdSystem> model)
 {
     auto toolGeometry = std::make_shared<Capsule>();
@@ -86,24 +86,21 @@ makeCapsuleToolObj(std::shared_ptr<PbdSystem> model)
     toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
     toolGeometry->setOrientation(Quatd(0.707, 0.0, 0.0, 0.707));
 
-    auto toolObj = std::make_shared<PbdObject>("Tool");
-
     // Create the object
-    toolObj->setVisualGeometry(toolGeometry);
-    toolObj->setPhysicsGeometry(toolGeometry);
-    toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
-    toolObj->setDynamicalModel(model);
-    toolObj->getPbdBody()->setRigid(
-                Vec3d(0.0, 5.0, 2.0),
-                1.0,
-                Quatd::Identity(),
-                Mat3d::Identity() * 1.0);
+    auto toolObj = SceneUtils::makePbdEntity("Tool", toolGeometry, model);
+    auto method  = toolObj->getComponent<PbdMethod>();
+    method->setRigid(
+        Vec3d(0.0, 5.0, 2.0),
+        1.0,
+        Quatd::Identity(),
+        Mat3d::Identity() * 1.0);
 
-    toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.9);
+    auto visualModel = toolObj->getComponent<VisualModel>();
+    visualModel->getRenderMaterial()->setOpacity(0.9);
 
     // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
-    controller->setControlledObject(toolObj);
+    controller->setControlledObject(method, visualModel);
     controller->setTranslationScaling(50.0);
     controller->setLinearKs(5000.0);
     controller->setAngularKs(1000.0);
@@ -143,7 +140,7 @@ main()
     pbdParams->m_linearDampingCoeff = 0.003;
 
     // Setup a tissue to grasp
-    std::shared_ptr<PbdObject> pbdObj = makePbdObjSurface("Tissue",
+    auto pbdObj = makePbdObjSurface("Tissue",
                 pbdSystem,
                 Vec3d(4.0, 4.0, 4.0),  // Dimensions
                 Vec3i(5, 5, 5),        // Divisions
@@ -151,7 +148,7 @@ main()
     scene->addSceneObject(pbdObj);
 
     // Setup a tool to grasp with
-    std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdSystem);
+    auto toolObj = makeCapsuleToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     // Add collision
@@ -160,7 +157,7 @@ main()
     scene->addInteraction(pbdToolCollision);
 
     // Create new picking with constraints
-    auto toolPicking = std::make_shared<PbdObjectGrasping>(pbdObj, toolObj);
+    auto toolPicking = std::make_shared<PbdObjectGrasping>(pbdObj->getComponent<PbdMethod>(), toolObj->getComponent<PbdMethod>());
     toolPicking->setStiffness(0.3);
     scene->addInteraction(toolPicking);
 

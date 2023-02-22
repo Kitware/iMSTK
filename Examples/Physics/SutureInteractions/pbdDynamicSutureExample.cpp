@@ -19,13 +19,14 @@
 #include "imstkNeedle.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPointwiseMap.h"
 #include "imstkPuncturable.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
@@ -35,7 +36,7 @@
 using namespace imstk;
 
 // Create tissue object to stitch
-std::shared_ptr<PbdObject>
+std::shared_ptr<Entity>
 createTissue(std::shared_ptr<PbdSystem> model)
 {
     // Load a tetrahedral mesh
@@ -67,17 +68,14 @@ createTissue(std::shared_ptr<PbdSystem> model)
     surfMesh->computeTrianglesNormals();
 
     // Setup the Object
-    auto pbdObject = std::make_shared<PbdObject>("meshHole");
-    pbdObject->setVisualGeometry(surfMesh);
-    pbdObject->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);;
-    pbdObject->setPhysicsGeometry(tetMesh);
-    pbdObject->addComponent<Collider>()->setGeometry(surfMesh);
-    pbdObject->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
-    pbdObject->setDynamicalModel(model);
-    pbdObject->getPbdBody()->uniformMassValue = 0.01;
+    auto pbdObject = SceneUtils::makePbdEntity("meshHole", surfMesh, surfMesh, tetMesh, model);
+    pbdObject->getComponent<VisualModel>()->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);;
+    auto method = pbdObject->getComponent<PbdMethod>();
+    method->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
+    method->setUniformMass(0.01);
     // Fix the borders
-    pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
-    model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.3);
+    method->setFixedNodes(fixedNodes);
+    model->getConfig()->setBodyDamping(method->getBodyHandle(), 0.3);
 
     pbdObject->addComponent<Puncturable>();
 
@@ -107,7 +105,7 @@ makeClampObj(std::string name)
 ///
 /// \brief Create pbd string object
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makePbdString(
     const std::string& name,
     const Vec3d& pos, const Vec3d& dir, const int numVerts,
@@ -131,24 +129,22 @@ makePbdString(
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
-    auto stringObj = std::make_shared<PbdObject>(name);
-    stringObj->addVisualModel(visualModel);
-    stringObj->setPhysicsGeometry(stringMesh);
-    stringObj->addComponent<Collider>()->setGeometry(stringMesh);
-    stringObj->setDynamicalModel(model);
-    stringObj->getPbdBody()->fixedNodeIds     = { 0, 1 };
-    stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // 0.002 / numVerts; // grams
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50.0, stringObj->getPbdBody()->bodyHandle);
-    model->getConfig()->enableBendConstraint(0.2, 1, true, stringObj->getPbdBody()->bodyHandle);
-    model->getConfig()->setBodyDamping(stringObj->getPbdBody()->bodyHandle, 0.03);
+    auto stringObj = SceneUtils::makePbdEntity(name, stringMesh, model);
+    stringObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto stringMethod = stringObj->getComponent<PbdMethod>();
+    stringMethod->setFixedNodes({ 0, 1 });
+    stringMethod->setUniformMass(0.0001 / numVerts); // 0.002 / numVerts; // grams
+    const int bodyHandle = stringMethod->getBodyHandle();
+    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50.0, bodyHandle);
+    model->getConfig()->enableBendConstraint(0.2, 1, true, bodyHandle);
+    model->getConfig()->setBodyDamping(bodyHandle, 0.03);
 
     return stringObj;
 }
 
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeToolObj()
 {
-    auto needleObj      = std::make_shared<PbdObject>();
     auto sutureMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
     auto sutureLineMesh = MeshIO::read<LineMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture_hull.vtk");
 
@@ -158,22 +154,20 @@ makeToolObj()
     sutureMesh->transform(rot, Geometry::TransformType::ApplyToData);
     sutureLineMesh->transform(rot, Geometry::TransformType::ApplyToData);
 
-    needleObj->setVisualGeometry(sutureMesh);
-    // setVisualGeometry(sutureLineMesh);
-    needleObj->addComponent<Collider>()->setGeometry(sutureLineMesh);
-    needleObj->setPhysicsGeometry(sutureLineMesh);
-    needleObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(sutureLineMesh, sutureMesh));
-
-    needleObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
-    needleObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    needleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-    needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-
     auto pbdSystem = std::make_shared<PbdSystem>();
     pbdSystem->getConfig()->m_gravity    = Vec3d::Zero();
     pbdSystem->getConfig()->m_iterations = 5;
-    needleObj->setDynamicalModel(pbdSystem);
-    needleObj->getPbdBody()->setRigid(Vec3d::Zero(), 1.0, Quatd::Identity(), Mat3d::Identity() * 10000.0);
+
+    auto needleObj = SceneUtils::makePbdEntity("Needle", sutureMesh, sutureLineMesh, sutureLineMesh, pbdSystem);
+    needleObj->getComponent<PbdMethod>()->setPhysicsToVisualMap(std::make_shared<IsometricMap>(sutureLineMesh, sutureMesh));
+
+    auto material = needleObj->getComponent<VisualModel>()->getRenderMaterial();
+    material->setColor(Color(0.9, 0.9, 0.9));
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    material->setRoughness(0.5);
+    material->setMetalness(1.0);
+
+    needleObj->getComponent<PbdMethod>()->setRigid(Vec3d::Zero(), 1.0, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     needleObj->addComponent<Needle>();
 
@@ -213,17 +207,17 @@ main()
     pbdSystem->configure(pbdParams);
 
     // Mesh with hole for suturing
-    std::shared_ptr<PbdObject> tissueHole = createTissue(pbdSystem);
+    auto tissueHole = createTissue(pbdSystem);
     scene->addSceneObject(tissueHole);
 
     // Create arced needle
-    std::shared_ptr<PbdObject> needleObj = makeToolObj();
+    auto needleObj = makeToolObj();
     scene->addSceneObject(needleObj);
 
     // Create the suture pbd-based string
-    const double               stringLength      = 0.12;
-    const int                  stringVertexCount = 70;
-    std::shared_ptr<PbdObject> sutureThreadObj   =
+    const double stringLength      = 0.12;
+    const int    stringVertexCount = 70;
+    auto         sutureThreadObj   =
         makePbdString("SutureThread", Vec3d(0.0, 0.0, 0.018), Vec3d(0.0, 0.0, 1.0),
             stringVertexCount, stringLength, pbdSystem);
     scene->addSceneObject(sutureThreadObj);
@@ -262,7 +256,7 @@ main()
         driver->addModule(hapticManager);
 
         auto hapController = std::make_shared<PbdObjectController>();
-        hapController->setControlledObject(needleObj);
+        hapController->setControlledObject(needleObj->getComponent<PbdMethod>(), needleObj->getComponent<VisualModel>());
         hapController->setDevice(deviceClient);
         hapController->setTranslationScaling(0.5);
         hapController->setLinearKs(20000.0);
@@ -274,18 +268,21 @@ main()
         scene->addControl(hapController);
 
         // Update the needle opbject for real time
+        auto sutureThreadSystem = sutureThreadObj->getComponent<PbdMethod>()->getPbdSystem();
         connect<Event>(sceneManager, &SceneManager::preUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
-                sutureThreadObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+                sutureThreadSystem->getConfig()->m_dt = sceneManager->getDt();
             });
 
         // Constrain the first two vertices of the string to the needle
+        auto needleMethod       = needleObj->getComponent<PbdMethod>();
+        auto sutureThreadMethod = sutureThreadObj->getComponent<PbdMethod>();
         connect<Event>(sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
-                auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getPhysicsGeometry());
-                auto sutureLineMesh = std::dynamic_pointer_cast<LineMesh>(sutureThreadObj->getPhysicsGeometry());
+                auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleMethod->getPhysicsGeometry());
+                auto sutureLineMesh = std::dynamic_pointer_cast<LineMesh>(sutureThreadMethod->getPhysicsGeometry());
                 (*sutureLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
                 (*sutureLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
             });

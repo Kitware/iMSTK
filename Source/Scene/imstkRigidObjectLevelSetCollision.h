@@ -42,12 +42,21 @@ public:
     ///
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
+    imstkSetGetMacro(LevelSetKernelSize, m_levelSetKernelSize, int)
+
+    imstkSetGetMacro(LevelSetKernelSigma, m_levelSetKernelSigma, double)
+
+    imstkSetGetMacro(LevelSetVelocityScaling, m_levelSetVelocityScaling, double)
+
+    imstkSetGetMacro(UseProportionalVelocity, m_useProportionalVelocity, double)
+
     void copyVertsToPrevious();
+
     void measureDisplacementFromPrevious();
 
+protected:
     std::shared_ptr<VecDataArray<double, 3>> m_prevVertices;
 
-protected:
     std::shared_ptr<TaskNode> m_copyVertToPrevNode      = nullptr;
     std::shared_ptr<TaskNode> m_computeDisplacementNode = nullptr;
 
@@ -70,5 +79,10 @@ protected:
         std::shared_ptr<Collider> collider;
         std::shared_ptr<TaskGraph> taskGraph;
     } m_objectB;
+
+    // LevelSetCH parameters to be set before initialization:
+    int    m_levelSetKernelSize = 3;
+    double m_levelSetKernelSigma = 1.0, m_levelSetVelocityScaling = 0.01;
+    bool   m_useProportionalVelocity = true;
 };
 } // namespace imstk

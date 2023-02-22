@@ -8,6 +8,7 @@
 #include "imstkCapsule.h"
 #include "imstkCollider.h"
 #include "imstkControllerForceText.h"
+#include "imstkEntity.h"
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkMeshIO.h"
@@ -15,13 +16,14 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectGrasping.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkTextVisualModel.h"
@@ -58,7 +60,7 @@ pbdRigidInDeformableGraspingExample()
     pbdConfig->m_doPartitioning      = false;
     pbdSystem->configure(pbdConfig);
 
-    auto tissueObj = std::make_shared<PbdObject>("tissue");
+    EntityPtr tissueObj;
     {
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Organs/Vessels/vessel_test.obj");
 
@@ -74,36 +76,30 @@ pbdRigidInDeformableGraspingExample()
         material->setOpacity(0.5);
 
         // Setup the Object
-        tissueObj->setVisualGeometry(surfMesh);
-        tissueObj->getVisualModel(0)->setRenderMaterial(material);
-        tissueObj->setPhysicsGeometry(surfMesh);
-        tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-        tissueObj->setDynamicalModel(pbdSystem);
-
-        tissueObj->getPbdBody()->uniformMassValue = 1.0;
+        SceneUtils::makePbdEntity("tissue", surfMesh, pbdSystem);
+        tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+        tissueObj->getComponent<PbdMethod>()->setUniformMass(1.0);
     }
     scene->addSceneObject(tissueObj);
 
-    auto capsule0Obj = std::make_shared<PbdObject>("capsule0");
+    // auto capsule0Obj = std::make_shared<Entity>("capsule0");
+    EntityPtr capsule0Obj;
     {
         //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.0018);
         auto rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.004, 0.01);
-        capsule0Obj->setVisualGeometry(rigidGeom);
-        capsule0Obj->addComponent<Collider>()->setGeometry(rigidGeom);
-        capsule0Obj->setPhysicsGeometry(rigidGeom);
+        capsule0Obj = SceneUtils::makePbdEntity("capsule0", rigidGeom, pbdSystem);
 
         // Setup material
-        capsule0Obj->getVisualModel(0)->getRenderMaterial()->setColor(Color(1.0, 0.0, 0.0));
-        capsule0Obj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-        capsule0Obj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-        capsule0Obj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-        capsule0Obj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
-
-        capsule0Obj->setDynamicalModel(pbdSystem);
+        auto material = capsule0Obj->getComponent<VisualModel>()->getRenderMaterial();
+        material->setColor(Color(1.0, 0.0, 0.0));
+        material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        material->setRoughness(0.5);
+        material->setMetalness(1.0);
+        material->setIsDynamicMesh(false);
 
         // Setup body
         const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0067, 0.0027, 0.0));
-        capsule0Obj->getPbdBody()->setRigid(
+        capsule0Obj->getComponent<PbdMethod>()->setRigid(
             Vec3d(0.0085, 0.0037, 0.0),
             100.0,
             orientation,
@@ -115,30 +111,29 @@ pbdRigidInDeformableGraspingExample()
     collision0->setRigidBodyCompliance(0.00001);
     scene->addInteraction(collision0);
 
-    auto lapTool = std::make_shared<PbdObject>("lapTool");
+    EntityPtr                  lapTool;
+    std::shared_ptr<PbdMethod> lapToolMethod;
     {
         const double capsuleLength = 0.3;
         auto         toolGeom      = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0),
             0.002, capsuleLength, Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0, 0.0, 1.0)));
 
-        lapTool->setDynamicalModel(pbdSystem);
-        lapTool->setPhysicsGeometry(toolGeom);
-        lapTool->addComponent<Collider>()->setGeometry(toolGeom);
-        lapTool->setVisualGeometry(toolGeom);
-
-        std::shared_ptr<RenderMaterial> material = lapTool->getVisualModel(0)->getRenderMaterial();
+        lapTool = SceneUtils::makePbdEntity("lapTool", toolGeom, pbdSystem);
+        auto                            lapToolVisualModel = lapTool->getComponent<VisualModel>();
+        std::shared_ptr<RenderMaterial> material = lapToolVisualModel->getRenderMaterial();
         material->setIsDynamicMesh(false);
         material->setMetalness(1.0);
         material->setRoughness(0.2);
         material->setShadingModel(RenderMaterial::ShadingModel::PBR);
 
-        lapTool->getPbdBody()->setRigid(
+        lapToolMethod = lapTool->getComponent<PbdMethod>();
+        lapToolMethod->setRigid(
             Vec3d(0.0, 0.0, capsuleLength * 0.5), // Position
             6.0,                                  // Mass
             Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
         auto controller = lapTool->addComponent<PbdObjectController>();
-        controller->setControlledObject(lapTool);
+        controller->setControlledObject(lapToolMethod, lapToolVisualModel);
         controller->setLinearKs(1000000.0);
         controller->setAngularKs(100000000.0);
         controller->setForceScaling(0.003);
@@ -152,7 +147,7 @@ pbdRigidInDeformableGraspingExample()
     scene->addSceneObject(lapTool);
 
     // Add picking interaction for both jaws of the tool
-    auto grasping = std::make_shared<PbdObjectGrasping>(tissueObj, lapTool);
+    auto grasping = std::make_shared<PbdObjectGrasping>(tissueObj->getComponent<PbdMethod>(), lapTool->getComponent<PbdMethod>());
     grasping->setStiffness(0.05);
     scene->addInteraction(grasping);
 
@@ -186,7 +181,7 @@ pbdRigidInDeformableGraspingExample()
         if (hapticManager->getTypeName() == "HaplyDeviceManager")
         {
             auto rightController = lapTool->getComponent<PbdObjectController>();
-            rightController->setTranslationOffset((*lapTool->getPbdBody()->vertices)[0] +
+            rightController->setTranslationOffset((*lapTool->getComponent<PbdMethod>()->getPbdBody()->vertices)[0] +
                 Vec3d(0.1, 0.0, -0.1));
         }
 
@@ -240,7 +235,7 @@ pbdRigidInDeformableGraspingExample()
 #endif
         auto rightController = lapTool->getComponent<PbdObjectController>();
         rightController->setDevice(deviceClient);
-        rightController->setTranslationOffset((*lapTool->getPbdBody()->vertices)[0]);
+        rightController->setTranslationOffset((*lapToolMethod->getPbdBody()->vertices)[0]);
 
         // Add mouse and keyboard controls to the viewer
         {

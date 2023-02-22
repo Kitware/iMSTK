@@ -137,7 +137,7 @@ public:
     /// \brief Check if contains component of type T
     ///
     template<class T>
-    bool containsComponent() const { return getComponent<T>() != nullptr; }
+    bool containsComponent() const { return getComponentUnsafe<T>() != nullptr; }
     ///
     /// \brief Check if contains given component
     ///

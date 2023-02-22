@@ -112,7 +112,15 @@ RigidObjectLevelSetCollision::initialize()
     lvlSetCH->setInputLvlSetObj(m_objectB.method, m_objectB.collider);
     lvlSetCH->setInputRigidObj(m_objectA.method, m_objectA.collider);
     lvlSetCH->setInputCollisionData(m_colDetect->getCollisionData());
+    lvlSetCH->setLevelSetVelocityScaling(getLevelSetVelocityScaling());
+    lvlSetCH->setKernel(getLevelSetKernelSize(), getLevelSetKernelSigma());
+    lvlSetCH->setUseProportionalVelocity(getUseProportionalVelocity());
     setCollisionHandlingB(lvlSetCH);
+
+    // Since CollisingHandling classes are currently neither of Component, Behaviour, or SceneObject types,
+    // they will require explicit initialization inside the Interaction classes where they are instantiated.
+    pbdCH->initialize();
+    lvlSetCH->initialize();
 
     m_copyVertToPrevNode = std::make_shared<TaskNode>([ = ]()
         {

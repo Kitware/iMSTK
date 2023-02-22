@@ -14,9 +14,10 @@ namespace imstk
 {
 class CollisionData;
 class EmbeddingConstraint;
+class Entity;
 class LineMesh;
 class PbdConstraint;
-class PbdObject;
+class PbdMethod;
 class Puncturable;
 class StraightNeedle;
 class TaskNode;
@@ -30,9 +31,9 @@ using namespace imstk;
 ///
 struct TissueData
 {
-    std::shared_ptr<PbdObject> obj;
+    std::shared_ptr<PbdMethod> method;
 
-    TissueData(std::shared_ptr<PbdObject> obj);
+    TissueData(std::shared_ptr<PbdMethod> method);
 
     std::shared_ptr<TetrahedralMesh> geom;
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr;
@@ -42,9 +43,9 @@ struct TissueData
 };
 struct NeedleData
 {
-    std::shared_ptr<PbdObject> obj;
+    std::shared_ptr<PbdMethod> method;
 
-    NeedleData(std::shared_ptr<PbdObject> obj);
+    NeedleData(std::shared_ptr<Entity> obj);
 
     std::shared_ptr<StraightNeedle> needle;
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr;
@@ -62,10 +63,10 @@ struct NeedleData
 class NeedleEmbedder
 {
 public:
-    void setTissueObject(std::shared_ptr<PbdObject> tissueObject) { m_tissueObject = tissueObject; }
-    std::shared_ptr<PbdObject> getTissueObject() const { return m_tissueObject; }
-    void setNeedleObject(std::shared_ptr<PbdObject> needleObject) { m_needleObject = needleObject; }
-    std::shared_ptr<PbdObject> getNeedleObject() const { return m_needleObject; }
+    void setTissueObject(std::shared_ptr<Entity> tissueObject) { m_tissueObject = tissueObject; }
+    std::shared_ptr<Entity> getTissueObject() const { return m_tissueObject; }
+    void setNeedleObject(std::shared_ptr<Entity> needleObject) { m_needleObject = needleObject; }
+    std::shared_ptr<Entity> getNeedleObject() const { return m_needleObject; }
 
     void setCollisionData(std::shared_ptr<CollisionData> cdData) { m_cdData = cdData; }
     void setCollisionHandleNode(std::shared_ptr<TaskNode> pbdCHNode) { m_pbdCHNode = pbdCHNode; }
@@ -99,8 +100,8 @@ protected:
         const Vec3d& iPt);
 
 protected:
-    std::shared_ptr<PbdObject> m_tissueObject = nullptr;
-    std::shared_ptr<PbdObject> m_needleObject = nullptr;
+    std::shared_ptr<Entity> m_tissueObject;
+    std::shared_ptr<Entity> m_needleObject;
 
     std::shared_ptr<TaskNode>      m_pbdCHNode = nullptr;
     std::shared_ptr<CollisionData> m_cdData    = nullptr;

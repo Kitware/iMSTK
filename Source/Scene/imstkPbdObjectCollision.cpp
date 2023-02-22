@@ -94,7 +94,7 @@ PbdObjectCollision::initialize()
     pbdCH->setEnableBoundaryCollisions(getEnableBoundaryCollisions());
 
     // Since CollisingHandling classes are currently neither of Component, Behaviour, or SceneObject types,
-    // they will require explicit initialization with their respective Interaction classes.
+    // they will require explicit initialization inside the Interaction classes where they are instantiated.
     pbdCH->initialize();
 
     // Check for debug components here (post-initialize).

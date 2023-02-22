@@ -19,13 +19,14 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectGrasping.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
@@ -67,7 +68,7 @@ setSphereTexCoords(std::shared_ptr<SurfaceMesh> surfMesh, const double uvScale)
 /// \param dimensions of tetrahedral grid used for tissue
 /// \param center of tissue block
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeTissueObj(const std::string& name,
               const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
@@ -128,19 +129,15 @@ makeTissueObj(const std::string& name,
     material->setNormalStrength(0.3);
 
     // Add a visual model to render the surface of the tet mesh
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(surfMesh);
-    visualModel->setRenderMaterial(material);
 
     // Setup the Object
-    auto tissueObj = std::make_shared<PbdObject>(name);
-    tissueObj->addVisualModel(visualModel);
-    tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
-    tissueObj->setDynamicalModel(pbdSystem);
-    tissueObj->getPbdBody()->uniformMassValue = 100.0;
+    auto tissueObj = SceneUtils::makePbdEntity(name, surfMesh, surfMesh, tissueMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto tissueMethod = tissueObj->getComponent<PbdMethod>();
+    tissueMethod->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
+    tissueMethod->setUniformMass(100.0);
     // Fix the borders
+    std::vector<int> fixedNodeIds;
     for (int z = 0; z < dim[2]; z++)
     {
         for (int y = 0; y < dim[1]; y++)
@@ -149,11 +146,12 @@ makeTissueObj(const std::string& name,
             {
                 if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
                 {
-                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                    fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
                 }
             }
         }
     }
+    tissueMethod->setFixedNodes(fixedNodeIds);
 
     return tissueObj;
 }
@@ -211,7 +209,7 @@ PbdTissueGraspingExample()
     pickGeom->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
 
     // ~4in x 4in patch of tissue
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("PbdTissue",
+    auto tissueObj = makeTissueObj("PbdTissue",
         Vec3d(0.1, 0.025, 0.1), Vec3i(6, 3, 6), Vec3d(0.0, -0.03, 0.0));
     scene->addSceneObject(tissueObj);
 
@@ -233,10 +231,10 @@ PbdTissueGraspingExample()
     scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
-    auto jawPicking = std::make_shared<PbdObjectGrasping>(tissueObj);
+    auto jawPicking = std::make_shared<PbdObjectGrasping>(tissueObj->getComponent<PbdMethod>());
     // Pick the surface instead of the tetrahedral mesh
-    jawPicking->setGeometryToPick(tissueObj->getVisualGeometry(),
-        std::dynamic_pointer_cast<PointwiseMap>(tissueObj->getPhysicsToCollidingMap()));
+    jawPicking->setGeometryToPick(tissueObj->getComponent<VisualModel>()->getGeometry(),
+        std::dynamic_pointer_cast<PointwiseMap>(tissueObj->getComponent<PbdMethod>()->getPhysicsToCollidingMap()));
     scene->addInteraction(jawPicking);
 
     // Light
@@ -268,11 +266,12 @@ PbdTissueGraspingExample()
             SimulationUtils::createDefaultSceneControl(driver);
         scene->addSceneObject(mouseAndKeyControls);
 
+        auto pbdSystem = tissueObj->getComponent<PbdMethod>()->getPbdSystem();
         connect<Event>(sceneManager, &SceneManager::preUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
                 // Simulate the cloth in real time
-                tissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+                pbdSystem->getConfig()->m_dt = sceneManager->getDt();
             });
 
         connect<Event>(controller, &LaparoscopicToolController::JawClosed,

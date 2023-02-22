@@ -20,6 +20,8 @@ class LineMesh;
 class StraightNeedle : public Needle
 {
 public:
+    IMSTK_TYPE_NAME(StraightNeedle)
+
     StraightNeedle(const std::string& name = "StraightNeedle") : Needle(name) { }
     ~StraightNeedle() override = default;
 

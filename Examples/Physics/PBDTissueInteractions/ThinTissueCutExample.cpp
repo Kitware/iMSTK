@@ -16,13 +16,14 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectCutting.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSceneObjectController.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
@@ -34,13 +35,13 @@ using namespace imstk;
 ///
 /// \brief Creates cloth object
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeTissueObj(const std::string&         name,
               const double               width,
               const double               height,
               const int                  nRows,
               const int                  nCols,
-              std::shared_ptr<PbdSystem> model)
+              std::shared_ptr<PbdSystem> system)
 {
     // Setup the Geometry
     std::shared_ptr<SurfaceMesh> clothMesh =
@@ -54,35 +55,30 @@ makeTissueObj(const std::string&         name,
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(clothMesh);
-    visualModel->setRenderMaterial(material);
-
     auto vertexLabelModel = std::make_shared<VertexLabelVisualModel>();
     vertexLabelModel->setGeometry(clothMesh);
     vertexLabelModel->setFontSize(20.0);
     vertexLabelModel->setTextColor(Color::Red);
 
     // Setup the Object
-    auto tissueObj = std::make_shared<PbdObject>();
-    tissueObj->addVisualModel(visualModel);
-    tissueObj->addVisualModel(vertexLabelModel);
-    tissueObj->setPhysicsGeometry(clothMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(clothMesh);
-    tissueObj->setDynamicalModel(model);
-    tissueObj->getPbdBody()->fixedNodeIds     = { 0, nCols - 1 };
-    tissueObj->getPbdBody()->uniformMassValue = 0.01;
+    auto tissueObj   = SceneUtils::makePbdEntity(name, clothMesh, system);
+    auto visualModel = tissueObj->getComponent<VisualModel>();
+    visualModel->setRenderMaterial(material);
+    tissueObj->addComponent(vertexLabelModel);
+    auto method = tissueObj->getComponent<PbdMethod>();
+    method->setFixedNodes({ 0, nCols - 1 });
+    method->setUniformMass(0.01);
 
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance,
-        1e4, tissueObj->getPbdBody()->bodyHandle);
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral,
-        0.1, tissueObj->getPbdBody()->bodyHandle);
+    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance,
+        1e4, method->getBodyHandle());
+    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral,
+        0.1, method->getBodyHandle());
 
     return tissueObj;
 }
 
-static std::shared_ptr<PbdObject>
-makeToolObj(std::shared_ptr<PbdSystem> model)
+static std::shared_ptr<Entity>
+makeToolObj(std::shared_ptr<PbdSystem> system)
 {
     // Create a cutting plane object in the scene
     std::shared_ptr<SurfaceMesh> cutGeom =
@@ -90,22 +86,21 @@ makeToolObj(std::shared_ptr<PbdSystem> model)
             Vec2d(0.03, 0.03), Vec2i(2, 2));
     cutGeom->updatePostTransformData();
 
-    auto toolObj = std::make_shared<PbdObject>("CuttingObject");
-    toolObj->setVisualGeometry(cutGeom);
-    toolObj->addComponent<Collider>()->setGeometry(cutGeom);
-    toolObj->setPhysicsGeometry(cutGeom);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
+    auto toolObj  = SceneUtils::makePbdEntity("CuttingObject", cutGeom, system);
+    auto material = toolObj->getComponent<VisualModel>()->getRenderMaterial();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setBackFaceCulling(false);
 
-    toolObj->setDynamicalModel(model);
-    toolObj->getPbdBody()->setRigid(
+    auto toolObjMethod = toolObj->getComponent<PbdMethod>();
+    toolObjMethod->setPbdSystem(system);
+    toolObjMethod->setRigid(
         Vec3d(0.0, 0.0, 0.0),         // Position
         1.0,                          // Mass
         Quatd::Identity(),            // Orientation
         Mat3d::Identity() * 10000.0); // Inertia
 
     auto controller = toolObj->addComponent<PbdObjectController>();
-    controller->setControlledObject(toolObj);
+    controller->setControlledObject(toolObjMethod, toolObj->getComponent<VisualModel>());
     controller->setLinearKs(20000.0);
     controller->setAngularKs(8000000.0);
     controller->setUseCritDamping(true);
@@ -139,17 +134,17 @@ PBDThinTissueCutExample()
     //pbdSystem->getConfig()->m_gravity = Vec3d(0.0, -9.8, 0.0);
     pbdSystem->getConfig()->m_gravity = Vec3d(0.0, -7.0, 0.0);
 
-    std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdSystem);
+    auto toolObj = makeToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     // Create a pbd cloth object in the scene
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
+    auto tissueObj = makeTissueObj("Tissue",
         0.1, 0.1, 12, 12,
         pbdSystem);
     scene->addSceneObject(tissueObj);
 
     // Add cutting interaction
-    auto cutting = std::make_shared<PbdObjectCutting>(tissueObj, toolObj);
+    auto cutting = std::make_shared<PbdObjectCutting>(tissueObj->getComponent<PbdMethod>(), toolObj->getComponent<Collider>());
     cutting->setEpsilon(0.001);
     scene->addInteraction(cutting);
 

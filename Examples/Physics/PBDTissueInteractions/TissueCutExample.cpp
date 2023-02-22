@@ -7,6 +7,7 @@
 #include "CutHelp.h"
 #include "imstkCamera.h"
 #include "imstkCollider.h"
+#include "imstkEntity.h"
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
 #include "imstkDirectionalLight.h"
@@ -15,17 +16,18 @@
 #include "imstkKeyboardSceneControl.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdSystem.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
 #include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
+#include "imstkPbdSystem.h"
 #include "imstkPlane.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
@@ -40,10 +42,10 @@ using namespace imstk;
 /// \param dimensions of tetrahedral grid used for tissue
 /// \param center of tissue block
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeTissueObj(const std::string& name,
               const Vec3d& size, const Vec3i& dim, const Vec3d& center,
-              std::shared_ptr<PbdSystem> model)
+              std::shared_ptr<PbdSystem> system)
 {
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tissueMesh = GeometryUtils::toTetGrid(center, size, dim);
@@ -55,9 +57,9 @@ makeTissueObj(const std::string& name,
     tissueMesh->setVertexAttribute("ReferenceCount", referenceCountPtr);
 
     // Use Strain Energy Tet constraints
-    model->getConfig()->m_secParams->m_YoungModulus = 50.0;
-    model->getConfig()->m_secParams->m_PoissonRatio = 0.4;
-    model->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
+    system->getConfig()->m_secParams->m_YoungModulus = 50.0;
+    system->getConfig()->m_secParams->m_PoissonRatio = 0.4;
+    system->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
 
     // Setup the material
     auto material = std::make_shared<RenderMaterial>();
@@ -66,16 +68,13 @@ makeTissueObj(const std::string& name,
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
 
     // Setup the Object
-    auto tissueObj = std::make_shared<PbdObject>(name);
-    tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->setVisualGeometry(tissueMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    auto map = std::make_shared<PointwiseMap>(tissueMesh, surfMesh);
-    tissueObj->setPhysicsToCollidingMap(map);
-    tissueObj->getVisualModel(0)->setRenderMaterial(material);
-    tissueObj->setDynamicalModel(model);
-    tissueObj->getPbdBody()->uniformMassValue = 0.1;
+    auto tissueObj = SceneUtils::makePbdEntity(name, tissueMesh, surfMesh, tissueMesh, system);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto method = tissueObj->getComponent<PbdMethod>();
+    method->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
+    method->setUniformMass(0.1);
     // Fix the borders
+    std::vector<int> fixedNodeIds;
     for (int z = 0; z < dim[2]; z++)
     {
         for (int y = 0; y < dim[1]; y++)
@@ -84,40 +83,40 @@ makeTissueObj(const std::string& name,
             {
                 if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
                 {
-                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z)); // +1 for dummy vertex
+                    fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z)); // +1 for dummy vertex
                 }
             }
         }
     }
+    method->setFixedNodes(fixedNodeIds);
 
     return tissueObj;
 }
 
-static std::shared_ptr<PbdObject>
-makeToolObj(std::shared_ptr<PbdSystem> model)
+static std::shared_ptr<Entity>
+makeToolObj(std::shared_ptr<PbdSystem> system)
 {
     auto plane = std::make_shared<Plane>();
     plane->setWidth(1.0);
     std::shared_ptr<SurfaceMesh> toolGeom = GeometryUtils::toSurfaceMesh(plane);
 
-    auto toolObj = std::make_shared<PbdObject>("Tool");
-    toolObj->setVisualGeometry(toolGeom);
-    toolObj->addComponent<Collider>()->setGeometry(toolGeom);
-    toolObj->setPhysicsGeometry(toolGeom);
-    toolObj->setDynamicalModel(model);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Blue);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(1.0);
+    auto toolObj = SceneUtils::makePbdEntity("Tool", toolGeom, system);
+    auto toolVisualModel = toolObj->getComponent<VisualModel>();
+    auto toolMethod      = toolObj->getComponent<PbdMethod>();
+    auto renderMaterial  = toolVisualModel->getRenderMaterial();
+    renderMaterial->setColor(Color::Blue);
+    renderMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    renderMaterial->setBackFaceCulling(false);
+    renderMaterial->setLineWidth(1.0);
 
-    toolObj->getPbdBody()->setRigid(
+    toolMethod->setRigid(
         Vec3d(0.0, 0.8, 0.0),         // Position
         0.2,                          // Mass
         Quatd::Identity(),            // Orientation
         Mat3d::Identity() * 10000.0); // Inertia
 
     auto controller = toolObj->addComponent<PbdObjectController>();
-    controller->setControlledObject(toolObj);
+    controller->setControlledObject(toolMethod, toolVisualModel);
     controller->setTranslationScaling(60.0);
     controller->setLinearKs(1000.0);
     controller->setLinearKd(50.0);
@@ -153,15 +152,15 @@ PBDTissueCutExample()
     pbdSystem->getConfig()->m_iterations = 5;
 
     // Setup a tissue
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
+    auto tissueObj = makeTissueObj("Tissue",
         Vec3d(10.0, 3.0, 10.0), Vec3i(10, 3, 10), Vec3d(0.0, -1.0, 0.0),
         pbdSystem);
     scene->addSceneObject(tissueObj);
 
-    auto cellRemoval = std::make_shared<PbdObjectCellRemoval>(tissueObj);
+    auto cellRemoval = std::make_shared<PbdObjectCellRemoval>(tissueObj->getComponent<PbdMethod>());
     scene->addInteraction(cellRemoval);
 
-    std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdSystem);
+    auto toolObj = makeToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     /*auto interaction = std::make_shared<PbdObjectCollision>(
@@ -209,7 +208,7 @@ PBDTissueCutExample()
             {
                 if (deviceClient->getButton(0))
                 {
-                    auto tissueMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getPhysicsGeometry());
+                    auto tissueMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getComponent<PbdMethod>()->getPhysicsGeometry());
                     auto toolGeom   = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getComponent<Collider>()->getGeometry());
 
                     // Default config of the tool is pointing downwards on y

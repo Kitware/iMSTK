@@ -11,14 +11,15 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdSystem.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
+#include "imstkPbdSystem.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
@@ -36,7 +37,7 @@ using namespace imstk;
 ///
 /// \brief Create pbd string object
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makePbdString(const std::string& name, const std::string& filename)
 {
     // Setup the Geometry
@@ -63,20 +64,13 @@ makePbdString(const std::string& name, const std::string& filename)
     material->setPointSize(6.0);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(stringMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    auto stringObj = std::make_shared<PbdObject>(name);
-    stringObj->addVisualModel(visualModel);
-    stringObj->setPhysicsGeometry(stringMesh);
-    stringObj->addComponent<Collider>()->setGeometry(stringMesh);
-    stringObj->setDynamicalModel(pbdSystem);
+    auto stringObj = SceneUtils::makePbdEntity(name, stringMesh, pbdSystem);
+    stringObj->getComponent<VisualModel>()->setRenderMaterial(material);
 
-    stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // grams
-    stringObj->getPbdBody()->fixedNodeIds     = { 0, 1,
-                                                  stringMesh->getNumVertices() - 2, stringMesh->getNumVertices() - 1 };
+    stringObj->getComponent<PbdMethod>()->setUniformMass(0.0001 / numVerts); // grams
+    stringObj->getComponent<PbdMethod>()->setFixedNodes({ 0, 1,
+                                                          stringMesh->getNumVertices() - 2, stringMesh->getNumVertices() - 1 });
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
     pbdParams->enableBendConstraint(0.01, 1);
     //pbdParams->enableBendConstraint(.5, 2);
@@ -84,39 +78,37 @@ makePbdString(const std::string& name, const std::string& filename)
     return stringObj;
 }
 
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeNeedleObj()
 {
-    auto needleObj = std::make_shared<PbdObject>();
-
     auto sutureMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
 
     const Mat4d rot = mat4dRotation(Rotd(-PI_2, Vec3d(0.0, 1.0, 0.0))) *
                       mat4dRotation(Rotd(-0.6, Vec3d(1.0, 0.0, 0.0)));
     sutureMesh->transform(rot, Geometry::TransformType::ApplyToData);
 
-    needleObj->setVisualGeometry(sutureMesh);
-    needleObj->addComponent<Collider>()->setGeometry(sutureMesh);
-    needleObj->setPhysicsGeometry(sutureMesh);
-    needleObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
-    needleObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    needleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-    needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-
     auto pbdSystem = std::make_shared<PbdSystem>();
     pbdSystem->getConfig()->m_gravity    = Vec3d::Zero();
     pbdSystem->getConfig()->m_iterations = 5;
-    needleObj->setDynamicalModel(pbdSystem);
+
+    auto needleObj    = SceneUtils::makePbdEntity("Needle", sutureMesh, pbdSystem);
+    auto needleVisual = needleObj->getComponent<VisualModel>();
+    auto material     = needleVisual->getRenderMaterial();
+    material->setColor(Color(0.9, 0.9, 0.9));
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    material->setRoughness(0.5);
+    material->setMetalness(1.0);
 
     /*
     needleObj->getPbdBody()->m_mass = 1.0;
     needleObj->getPbdBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
     needleObj->getPbdBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
     */
-    needleObj->getPbdBody()->setRigid(Vec3d::Zero(), 1.0, Quatd::Identity(), Mat3d::Identity() * 10000.0);
+    auto needleMethod = needleObj->getComponent<PbdMethod>();
+    needleMethod->setRigid(Vec3d::Zero(), 1.0, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     auto controller = needleObj->addComponent<PbdObjectController>();
-    controller->setControlledObject(needleObj);
+    controller->setControlledObject(needleMethod, needleVisual);
     controller->setTranslationOffset(Vec3d(-0.02, 0.02, 0.0));
     controller->setLinearKs(1000.0);
     controller->setAngularKs(10000000.0);
@@ -136,7 +128,7 @@ SutureSelfCCD()
 
     auto scene = std::make_shared<Scene>("PbdSutureSelfCCD");
 
-    std::shared_ptr<PbdObject> threadObj =
+    auto threadObj =
         // makePbdString("selfCCDLine", "");
         makePbdString("granny_knot", iMSTK_DATA_ROOT "/LineMesh/granny_knot.obj");
     scene->addSceneObject(threadObj);
@@ -148,7 +140,7 @@ SutureSelfCCD()
     scene->addInteraction(interaction);
 
     // Create the arc needle
-    std::shared_ptr<PbdObject> needleObj = makeNeedleObj();
+    auto needleObj = makeNeedleObj();
     scene->addSceneObject(needleObj);
 
     // Adjust the camera
@@ -196,11 +188,13 @@ SutureSelfCCD()
         controller->setDevice(deviceClient);
 
         // Update the thread fixed points to the controlled needle
+        auto threadMethod = threadObj->getComponent<PbdMethod>();
+        auto needleMethod = needleObj->getComponent<PbdMethod>();
         connect<Event>(sceneManager, &SceneManager::preUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
-                auto threadLineMesh = std::dynamic_pointer_cast<LineMesh>(threadObj->getPhysicsGeometry());
-                std::shared_ptr<Geometry> geom = needleObj->getPhysicsGeometry();
+                auto threadLineMesh = std::dynamic_pointer_cast<LineMesh>(threadMethod->getPhysicsGeometry());
+                std::shared_ptr<Geometry> geom = needleMethod->getPhysicsGeometry();
                 const Vec3d pos = geom->getTranslation();
                 const Mat3d rot = geom->getRotation();
                 (*threadLineMesh->getVertexPositions())[1] = pos;

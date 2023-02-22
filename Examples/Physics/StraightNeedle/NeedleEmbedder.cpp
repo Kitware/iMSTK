@@ -7,10 +7,11 @@
 #include "NeedleEmbedder.h"
 #include "EmbeddingConstraint.h"
 #include "imstkCollisionData.h"
+#include "imstkEntity.h"
 #include "imstkLineMesh.h"
-#include "imstkPbdSystem.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdSolver.h"
+#include "imstkPbdSystem.h"
 #include "imstkPuncturable.h"
 #include "imstkStraightNeedle.h"
 #include "imstkTaskNode.h"
@@ -62,9 +63,9 @@ testSegmentTriangle2(const Vec3d& p, const Vec3d& q,
     return false;
 }
 
-TissueData::TissueData(std::shared_ptr<PbdObject> obj) :
-    obj(obj),
-    geom(std::dynamic_pointer_cast<TetrahedralMesh>(obj->getPhysicsGeometry())),
+TissueData::TissueData(std::shared_ptr<PbdMethod> inputMethod) :
+    method(inputMethod),
+    geom(std::dynamic_pointer_cast<TetrahedralMesh>(method->getPhysicsGeometry())),
     verticesPtr(geom->getVertexPositions()),
     vertices(*verticesPtr),
     indicesPtr(geom->getCells()),
@@ -72,9 +73,9 @@ TissueData::TissueData(std::shared_ptr<PbdObject> obj) :
 {
 }
 
-NeedleData::NeedleData(std::shared_ptr<PbdObject> obj) :
-    obj(obj),
-    needle(obj->getComponent<StraightNeedle>()),
+NeedleData::NeedleData(std::shared_ptr<Entity> entity) :
+    method(entity->getComponent<PbdMethod>()),
+    needle(entity->getComponent<StraightNeedle>()),
     verticesPtr(needle->getNeedleGeometry()->getVertexPositions()),
     vertices(*verticesPtr),
     cellsPtr(needle->getNeedleGeometry()->getCells()),
@@ -94,13 +95,13 @@ NeedleEmbedder::addFaceEmbeddingConstraint(
     // If constraint doesn't already exist for this triangle
     if (m_faceConstraints.count(triCell) == 0)
     {
-        const int bodyId = tissueData.obj->getPbdBody()->bodyHandle;
+        const int bodyId = tissueData.method->getBodyHandle();
 
         auto constraint = std::make_shared<EmbeddingConstraint>();
 
         constraint->initConstraint(
-            tissueData.obj->getPbdModel()->getBodies(),
-            { needleData.obj->getPbdBody()->bodyHandle, 0 },
+            tissueData.method->getPbdSystem()->getBodies(),
+            { needleData.method->getBodyHandle(), 0 },
             { bodyId, v1 }, { bodyId, v2 }, { bodyId, v3 },
             &needleData.vertices[0], &needleData.vertices[1], m_compliance);
         // Constraint acts along needle perpendicular
@@ -118,7 +119,7 @@ NeedleEmbedder::update()
     auto puncturable = m_tissueObject->getComponent<Puncturable>();
     auto needle      = m_needleObject->getComponent<StraightNeedle>();
 
-    TissueData tissueData(m_tissueObject);
+    TissueData tissueData(m_tissueObject->getComponent<PbdMethod>());
     NeedleData needleData(m_needleObject);
 
     // If collision elements are present transition to touching
@@ -135,7 +136,7 @@ NeedleEmbedder::update()
     {
         // Get force along the needle axes
         const Vec3d  needleAxes = needle->getNeedleDirection();
-        const double fN = std::max(needleAxes.dot(needleData.obj->getPbdBody()->externalForce), 0.0);
+        const double fN = std::max(needleAxes.dot(needleData.method->getPbdBody()->externalForce), 0.0);
 
         // If the normal force exceeds the threshold, mark needle as inserted
         if (fN > m_forceThreshold)
@@ -162,7 +163,7 @@ NeedleEmbedder::update()
         // be noted that a full sphere sweep (ie: bound line with sphere) would cause a giant
         // sphere for the line.
 
-        const double dt = m_needleObject->getPbdModel()->getTimeStep();
+        const double dt = m_needleObject->getComponent<PbdMethod>()->getPbdSystem()->getTimeStep();
         for (int i = 0; i < needleData.cells.size(); i++)
         {
             const Vec2i& seg = needleData.cells[i];
@@ -298,7 +299,7 @@ NeedleEmbedder::update()
             m_pbdCHNode->setEnabled(true);
             //LOG(INFO) << "Unpunctured!";
         }
-        tissueData.obj->getPbdModel()->getSolver()->addConstraints(&m_constraints);
+        tissueData.method->getPbdSystem()->getSolver()->addConstraints(&m_constraints);
     }
 
     // Stash the vertices (at this timestep) for use on the next iteration

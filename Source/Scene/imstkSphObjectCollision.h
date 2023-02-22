@@ -22,11 +22,13 @@ class SphObject;
 class SphObjectCollision : public CollisionInteraction
 {
 public:
-    SphObjectCollision(std::shared_ptr<SphObject> obj1, std::shared_ptr<Entity> obj2,
+    SphObjectCollision(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2,
                        std::string cdType = "");
     ~SphObjectCollision() override = default;
 
     IMSTK_TYPE_NAME(SphObjectCollision)
+
+    bool initialize() override;
 
     ///
     /// \brief Setup connectivity of task graph

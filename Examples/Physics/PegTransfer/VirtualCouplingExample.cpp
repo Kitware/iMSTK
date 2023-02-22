@@ -17,13 +17,14 @@
 #include "imstkOrientedBox.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
 
@@ -82,24 +83,22 @@ VirtualCouplingExample()
     }
 
     // The visual geometry is the scissor mesh read in from file
-    auto pbdObj = std::make_shared<PbdObject>();
+    std::shared_ptr<Entity> pbdObj;
+    auto                    system = std::make_shared<PbdSystem>();
     {
-        auto model = std::make_shared<PbdSystem>();
-        model->getConfig()->m_dt      = 0.001;
-        model->getConfig()->m_gravity = Vec3d::Zero();
-        pbdObj->setDynamicalModel(model);
-        pbdObj->getPbdBody()->setRigid(
+        system->getConfig()->m_dt      = 0.001;
+        system->getConfig()->m_gravity = Vec3d::Zero();
+        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
+        pbdObj = SceneUtils::makePbdEntity("", surfMesh, system);
+        auto pbdMethod = pbdObj->getComponent<PbdMethod>();
+        pbdMethod->setRigid(
             Vec3d(0.0, 0.05, 0.0),            // Position
             7.0,                              // Mass
             Quatd::Identity(),                // Orientation
             Mat3d::Identity() * 100000000.0); // Inertia
 
-        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scissors/Metzenbaum Scissors/Metz_Scissors.stl");
-        pbdObj->addComponent<Collider>()->setGeometry(surfMesh);
-        pbdObj->addComponent<VisualModel>()->setGeometry(surfMesh);
-        pbdObj->setPhysicsGeometry(surfMesh);
-
-        std::shared_ptr<RenderMaterial> mat = pbdObj->getVisualModel(0)->getRenderMaterial();
+        auto                            visualModel = pbdObj->getComponent<VisualModel>();
+        std::shared_ptr<RenderMaterial> mat = visualModel->getRenderMaterial();
         mat->setShadingModel(RenderMaterial::ShadingModel::PBR);
         mat->setRoughness(0.5);
         mat->setMetalness(1.0);
@@ -107,7 +106,7 @@ VirtualCouplingExample()
 
         // Add a component for controlling via another device
         auto controller = pbdObj->addComponent<PbdObjectController>();
-        controller->setControlledObject(pbdObj);
+        controller->setControlledObject(pbdMethod, visualModel);
         controller->setDevice(deviceClient);
         controller->setTranslationOffset(Vec3d(0.0, 0.05, 0.0));
         controller->setLinearKs(50000.0);
@@ -157,7 +156,7 @@ VirtualCouplingExample()
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 // Run the pbd model in real time
-                pbdObj->getPbdModel()->getConfig()->m_dt = driver->getDt();
+                system->getConfig()->m_dt = driver->getDt();
             });
 
         // Add mouse and keyboard controls to the viewer
