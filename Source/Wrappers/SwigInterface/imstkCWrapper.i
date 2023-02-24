@@ -75,6 +75,7 @@
 #include "imstkSurfaceMeshSmoothen.h"
 #include "imstkSurfaceMeshSubdivide.h"
 #include "imstkSurfaceMeshTextureProject.h"
+#include "imstkCleanMesh.h"
 
 /* 
  * MeshIO 
@@ -85,6 +86,7 @@
  * DynamicalModel 
  */
 #include "imstkPbdConstraint.h"
+#include "imstkPbdConstraintContainer.h"
 #include "imstkVectorizedState.h"
 #include "imstkAbstractDynamicalModel.h"
 #include "imstkDynamicalModel.h"
@@ -114,6 +116,7 @@
 #include "imstkPbdBody.h"
 #include "imstkPbdConstraint.h"
 #include "imstkRbdConstraint.h"
+#include "imstkPbdDistanceConstraint.h"
 
 /*
  * ComponentModel
@@ -271,6 +274,7 @@ namespace std
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
   %template(VectorPbdBody) vector<imstk::PbdBody>;
   %template(VectorString) vector<std::string>;
+  %template(IntPair) pair<int, int>;
 }
 
 %include <std_except.i>
@@ -358,6 +362,7 @@ namespace std
 %include "../../Filtering/imstkSurfaceMeshSmoothen.h"
 %include "../../Filtering/imstkSurfaceMeshSubdivide.h"
 %include "../../Filtering/imstkSurfaceMeshTextureProject.h"
+%include "../../Filtering/imstkCleanMesh.h"
 
 /*
  * MeshIO
@@ -373,8 +378,10 @@ namespace std
  */
 %include "../../Constraint/PbdConstraints/imstkPbdBody.h"
 %include "../../Constraint/PbdConstraints/imstkPbdConstraint.h"
+%include "../../Constraint/PbdConstraints/imstkPbdConstraintContainer.h"
 %include "../../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdFemConstraint.h"
+%include "../../Constraint/PbdConstraints/imstkPbdDistanceConstraint.h"
 %include "../../Constraint/RigidBodyConstraints/imstkRbdConstraint.h"
 
 /*

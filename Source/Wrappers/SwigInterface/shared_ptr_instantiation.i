@@ -74,6 +74,7 @@
 /*
  * Filtering
  */
+%shared_ptr(imstk::CleanMesh)
 %shared_ptr(imstk::ImplicitGeometryToImageData)
 %shared_ptr(imstk::QuadricDecimate)
 %shared_ptr(imstk::SelectEnclosedPoints)
@@ -120,7 +121,9 @@
 %shared_ptr(imstk::PbdState)
 %shared_ptr(imstk::RigidBody)
 %shared_ptr(imstk::PbdConstraint)
+%shared_ptr(imstk::PbdConstraintContainer)
 %shared_ptr(imstk::PbdFemConstraint)
+%shared_ptr(imstk::PbdDistanceConstraint)
 
 /*
  * ComponentModel
