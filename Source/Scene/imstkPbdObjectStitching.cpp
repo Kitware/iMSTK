@@ -151,7 +151,7 @@ PbdObjectStitching::addStitchConstraints()
 
     // PbdSystem geometry can only be PointSet
     std::shared_ptr<PointSet> pbdPhysicsGeom =
-        std::dynamic_pointer_cast<PointSet>(m_objectToStitch->getPhysicsGeometry());
+        std::dynamic_pointer_cast<PointSet>(m_objectToStitch->getGeometry());
 
     // If the geometry to pick hasn't been set yet, default it to the physics geometry
     // Could be different in cases where user wants to pick a mapped geometry, mapping back

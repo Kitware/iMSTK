@@ -66,7 +66,7 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     clothObj->addComponent(clothModel);
     clothObj->addComponent(clothSurfaceNormals);
     auto method = clothObj->addComponent<PbdMethod>();
-    method->setPhysicsGeometry(clothMesh);
+    method->setGeometry(clothMesh);
     method->setPbdSystem(pbdSystem);
     method->setFixedNodes({ 0, nCols - 1 });
     method->setUniformMass(width * height / (nRows * nCols));
@@ -91,7 +91,7 @@ main()
     scene->addSceneObject(clothObj);
 
     // Setup some scalars
-    auto clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getComponent<PbdMethod>()->getPhysicsGeometry());
+    auto clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getComponent<PbdMethod>()->getGeometry());
     auto scalarsPtr    = std::make_shared<DataArray<double>>(clothGeometry->getNumVertices());
     std::fill_n(scalarsPtr->getPointer(), scalarsPtr->size(), 0.0);
     clothGeometry->setVertexScalars("scalars", scalarsPtr);

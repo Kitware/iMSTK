@@ -160,7 +160,7 @@ public:
         m_scene->addSceneObject(m_pbdObj);
 
         auto pbdMethod = m_pbdObj->getComponent<PbdMethod>();
-        auto pointSet  = std::dynamic_pointer_cast<PointSet>(pbdMethod->getPhysicsGeometry());
+        auto pointSet  = std::dynamic_pointer_cast<PointSet>(pbdMethod->getGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;
 

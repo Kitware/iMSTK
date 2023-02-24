@@ -90,7 +90,7 @@ NeedlePbdCH::handle(
     std::shared_ptr<VecDataArray<int, 3>> tissueSurfMeshIndicesPtr = m_tissue.surfMesh->getCells();
     const VecDataArray<int, 3>&           tissueSurfMeshIndices    = *tissueSurfMeshIndicesPtr;
 
-    auto                                     physMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_tissue.method->getPhysicsGeometry());
+    auto                                     physMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_tissue.method->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = physMesh->getVertexPositions();
     const VecDataArray<double, 3>&           tissueVertices    = *tissueVerticesPtr;
 

@@ -183,7 +183,7 @@ updateDebugGeom(std::shared_ptr<NeedleInteraction>  interaction,
         debugGeomObj->addPoint(debugEmbeddingPts[i]);
     }
     std::shared_ptr<Entity>  tissueObj   = interaction->getEmbedder()->getTissueObject();
-    auto                     verticesPtr = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getComponent<PbdMethod>()->getPhysicsGeometry())->getVertexPositions();
+    auto                     verticesPtr = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getComponent<PbdMethod>()->getGeometry())->getVertexPositions();
     VecDataArray<double, 3>& vertices    = *verticesPtr;
     for (size_t i = 0; i < debugEmbeddingTris.size(); i++)
     {

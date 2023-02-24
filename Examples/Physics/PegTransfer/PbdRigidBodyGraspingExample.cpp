@@ -60,7 +60,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdSystem> model, bool isLeft)
     visualModel->setGeometry(toolGeometry);
     toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
     auto pbdMethod = toolObj->addComponent<PbdMethod>();
-    pbdMethod->setPhysicsGeometry(toolGeometry);
+    pbdMethod->setGeometry(toolGeometry);
     pbdMethod->setPbdSystem(model);
     pbdMethod->setRigid(
         Vec3d(0.0, 0.1, 0.0),

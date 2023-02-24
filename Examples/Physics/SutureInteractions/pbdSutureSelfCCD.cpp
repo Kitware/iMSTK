@@ -193,8 +193,8 @@ SutureSelfCCD()
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [ = ](Event*)
             {
-                auto threadLineMesh = std::dynamic_pointer_cast<LineMesh>(threadMethod->getPhysicsGeometry());
-                std::shared_ptr<Geometry> geom = needleMethod->getPhysicsGeometry();
+                auto threadLineMesh = std::dynamic_pointer_cast<LineMesh>(threadMethod->getGeometry());
+                std::shared_ptr<Geometry> geom = needleMethod->getGeometry();
                 const Vec3d pos = geom->getTranslation();
                 const Mat3d rot = geom->getRotation();
                 (*threadLineMesh->getVertexPositions())[1] = pos;

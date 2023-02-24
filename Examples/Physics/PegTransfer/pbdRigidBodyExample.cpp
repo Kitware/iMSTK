@@ -312,7 +312,7 @@ bowlScene()
             cubeObj = SceneUtils::makePbdEntity("cube", subdivide.getOutputMesh(), pbdSystem);
             cubeObj->getComponent<VisualModel>()->setRenderMaterial(material);
             auto cubeObjMethod = cubeObj->addComponent<PbdMethod>();
-            cubeObjMethod->setPhysicsGeometry(subdivide.getOutputMesh());
+            cubeObjMethod->setGeometry(subdivide.getOutputMesh());
             cubeObjMethod->setRigid(Vec3d(0.0, 0.2, 0.0), 1.0,
                 Quatd(Rotd(0.4, Vec3d(1.0, 0.0, 0.0))), Mat3d::Identity() * 0.01);
 

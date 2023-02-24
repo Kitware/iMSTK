@@ -55,7 +55,7 @@ createPbdFluid(const std::string& tetMeshName)
     deformableObj->addComponent(fluidVisualModel);
     deformableObj->addComponent<Collider>()->setGeometry(fluidMesh);
     auto method = deformableObj->addComponent<PbdMethod>();
-    method->setPhysicsGeometry(fluidMesh);
+    method->setGeometry(fluidMesh);
 
     imstkNew<PbdSystem> pbdSystem;
 

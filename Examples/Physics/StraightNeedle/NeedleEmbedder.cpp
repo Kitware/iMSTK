@@ -65,7 +65,7 @@ testSegmentTriangle2(const Vec3d& p, const Vec3d& q,
 
 TissueData::TissueData(std::shared_ptr<PbdMethod> inputMethod) :
     method(inputMethod),
-    geom(std::dynamic_pointer_cast<TetrahedralMesh>(method->getPhysicsGeometry())),
+    geom(std::dynamic_pointer_cast<TetrahedralMesh>(method->getGeometry())),
     verticesPtr(geom->getVertexPositions()),
     vertices(*verticesPtr),
     indicesPtr(geom->getCells()),

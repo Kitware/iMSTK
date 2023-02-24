@@ -22,8 +22,8 @@ PbdObjectCutting::PbdObjectCutting(std::shared_ptr<PbdMethod> cuttableObject, st
     m_cuttable(cuttableObject), m_cutter(cutterObject)
 {
     // check whether the cutable object is valid
-    CHECK(std::dynamic_pointer_cast<SurfaceMesh>(m_cuttable->getPhysicsGeometry()) != nullptr
-        || std::dynamic_pointer_cast<LineMesh>(m_cuttable->getPhysicsGeometry())) <<
+    CHECK(std::dynamic_pointer_cast<SurfaceMesh>(m_cuttable->getGeometry()) != nullptr
+        || std::dynamic_pointer_cast<LineMesh>(m_cuttable->getGeometry())) <<
         "Cutable is not a SurfaceMesh, could not create cutting pair";
 
     // check whether the cutter object is valid
@@ -47,7 +47,7 @@ PbdObjectCutting::apply()
     m_removeConstraintVertices->clear();
 
     // Perform cutting
-    if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_cuttable->getPhysicsGeometry()))
+    if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_cuttable->getGeometry()))
     {
         SurfaceMeshCut cutter;
         cutter.setInputMesh(surfMesh);
@@ -66,7 +66,7 @@ PbdObjectCutting::apply()
         surfMesh->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newMesh->getVertexPositions()));
         surfMesh->setCells(std::make_shared<VecDataArray<int, 3>>(*newMesh->getCells()));
     }
-    else if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_cuttable->getPhysicsGeometry()))
+    else if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_cuttable->getGeometry()))
     {
         LineMeshCut cutter;
         cutter.setInputMesh(lineMesh);
@@ -92,7 +92,7 @@ PbdObjectCutting::apply()
         m_cuttable->getPbdBody()->bodyHandle);
     pbdSystem->addConstraints(m_addConstraintVertices, m_cuttable->getPbdBody()->bodyHandle);
 
-    m_cuttable->getPhysicsGeometry()->postModified();
+    m_cuttable->getGeometry()->postModified();
 }
 
 void

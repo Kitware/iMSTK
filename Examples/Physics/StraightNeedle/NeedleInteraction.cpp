@@ -42,7 +42,7 @@ NeedleInteraction::initialize()
         << "NeedleInteraction only works with objects that have a Puncturable component";
     CHECK(tissueObj->getComponent<PbdMethod>() != nullptr
         && std::dynamic_pointer_cast<TetrahedralMesh>(
-        tissueObj->getComponent<PbdMethod>()->getPhysicsGeometry()) != nullptr)
+        tissueObj->getComponent<PbdMethod>()->getGeometry()) != nullptr)
         << "NeedleInteraction only works with TetrahedralMesh physics geometry on pbd tissueObj";
 
     // Assumes usage of physics geometry for this

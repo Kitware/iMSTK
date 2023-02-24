@@ -26,29 +26,26 @@ public:
     ///
     /// \brief Set/Get the geometry used for Physics computations
     ///@{
-    std::shared_ptr<Geometry> getPhysicsGeometry() const { return m_physicsGeometry; }
-    void setPhysicsGeometry(std::shared_ptr<Geometry> geometry) { m_physicsGeometry = geometry; }
+    imstkSetGetMacro(Geometry, m_physicsGeometry, std::shared_ptr<Geometry>)
     ///@}
 
     ///
     /// \brief Set/Get the Physics-to-Collision map
     ///@{
-    std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const { return m_physicsToCollidingGeomMap; }
-    void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map) { m_physicsToCollidingGeomMap = map; }
+    imstkSetGetMacro(PhysicsToCollidingMap, m_physicsToCollidingGeomMap, std::shared_ptr<GeometryMap>)
     ///@}
 
     ///
     /// \brief Set/Get the Physics-to-Visual map
     ///@{
-    std::shared_ptr<GeometryMap> getPhysicsToVisualMap() const { return m_physicsToVisualGeomMap; }
-    void setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map) { m_physicsToVisualGeomMap = map; }
+    imstkSetGetMacro(PhysicsToVisualMap, m_physicsToVisualGeomMap, std::shared_ptr<GeometryMap>)
     ///@}
 
     ///
-    /// \brief Set/Get dynamical model
+    /// \brief Set/Get the associated dynamical system
     ///@{
     std::shared_ptr<PbdSystem> getPbdSystem() const { return m_pbdSystem; }
-    void setPbdSystem(std::shared_ptr<PbdSystem> pbdSystem); // { m_pbdSystem = pbdSystem; }
+    void setPbdSystem(std::shared_ptr<PbdSystem> pbdSystem);
     ///@}
 
     ///

@@ -59,7 +59,7 @@ Tearable::handleTearable()
     int  bodyId  = m_tearableObject->getPbdBody()->bodyHandle;
 
     // Mesh data
-    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_tearableObject->getPhysicsGeometry());
+    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_tearableObject->getGeometry());
     // auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(cellMesh->getAbstractCells()); // underlying 1D array
     // const int vertsPerCell = cellMesh->getAbstractCells()->getNumberOfComponents();
 

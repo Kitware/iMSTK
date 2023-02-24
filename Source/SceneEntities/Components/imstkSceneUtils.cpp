@@ -27,7 +27,7 @@ makePbdEntity(const std::string& name, GeometryPtr visualGeometry, GeometryPtr c
     if (physicsGeometry)
     {
         auto method = entity->addComponent<PbdMethod>(name + "_PbdMethod");
-        method->setPhysicsGeometry(physicsGeometry);
+        method->setGeometry(physicsGeometry);
         method->setPbdSystem(system);
     }
 

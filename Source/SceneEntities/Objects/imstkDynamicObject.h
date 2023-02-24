@@ -27,8 +27,8 @@ public:
     ///
     /// \brief Set/Get the geometry used for Physics computations
     ///@{
-    std::shared_ptr<Geometry> getPhysicsGeometry() const { return m_physicsGeometry; }
-    virtual void setPhysicsGeometry(std::shared_ptr<Geometry> geometry) { m_physicsGeometry = geometry; }
+    std::shared_ptr<Geometry> getGeometry() const { return m_physicsGeometry; }
+    virtual void setGeometry(std::shared_ptr<Geometry> geometry) { m_physicsGeometry = geometry; }
     ///@}
 
     ///

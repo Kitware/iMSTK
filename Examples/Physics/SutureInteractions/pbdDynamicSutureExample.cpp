@@ -259,8 +259,8 @@ main()
         connect<Event>(sceneManager, &SceneManager::postUpdate,
             [ = ](Event*)
             {
-                auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleMethod->getPhysicsGeometry());
-                auto sutureLineMesh = std::dynamic_pointer_cast<LineMesh>(sutureThreadMethod->getPhysicsGeometry());
+                auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleMethod->getGeometry());
+                auto sutureLineMesh = std::dynamic_pointer_cast<LineMesh>(sutureThreadMethod->getGeometry());
                 (*sutureLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
                 (*sutureLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
             });

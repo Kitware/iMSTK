@@ -49,7 +49,7 @@ public:
 
         ASSERT_NE(m_pbdObj, nullptr) << "Missing a pbdObj for PbdObjectCollisionTest";
         auto method   = m_pbdObj->getComponent<PbdMethod>();
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(method->getPhysicsGeometry());
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(method->getGeometry());
         m_prevBodyPos = method->getRigidPosition();
         m_scene->addSceneObject(m_pbdObj);
 

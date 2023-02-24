@@ -208,7 +208,7 @@ PBDTissueCutExample()
             {
                 if (deviceClient->getButton(0))
                 {
-                    auto tissueMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getComponent<PbdMethod>()->getPhysicsGeometry());
+                    auto tissueMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tissueObj->getComponent<PbdMethod>()->getGeometry());
                     auto toolGeom   = std::dynamic_pointer_cast<SurfaceMesh>(toolObj->getComponent<Collider>()->getGeometry());
 
                     // Default config of the tool is pointing downwards on y

@@ -160,7 +160,7 @@ makePbdString(
     //system->getConfig()->enableBendConstraint(0.1, 2, true, stringHandle);
 
     // Add a component to update the suture thread to be on the needle
-    auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleMethod->getPhysicsGeometry());
+    auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleMethod->getGeometry());
 
     // Add an attachment constraint for two-way between the string and needle
     // This is important to be able to pull the needle by the string
@@ -415,7 +415,7 @@ LapToolSuturingExample()
                 const Vec2d& mousePos = mouseDeviceClient->getPos();
 
                 auto geom =
-                    std::dynamic_pointer_cast<AnalyticalGeometry>(rightToolObj->getComponent<PbdMethod>()->getPhysicsGeometry());
+                    std::dynamic_pointer_cast<AnalyticalGeometry>(rightToolObj->getComponent<PbdMethod>()->getGeometry());
 
                 // Use plane definition for dummy movement
                 Vec3d a = Vec3d(0.0, 1.0, 0.0);

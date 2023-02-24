@@ -272,7 +272,7 @@ PbdCollisionHandling::getDataFromObject(PbdMethod& method, Collider& collider)
     // Either:
     //  A.) Physics geometry == Collision Geometry
     //  B.) A PointwiseMap is used and map should refer us back to physics geometry
-    side.geometry = side.pbdMethod->getPhysicsGeometry().get();
+    side.geometry = side.pbdMethod->getGeometry().get();
     side.bodyId   = side.pbdMethod->getPbdBody()->bodyHandle;
     if (auto map = std::dynamic_pointer_cast<PointwiseMap>(side.pbdMethod->getPhysicsToCollidingMap()))
     {

@@ -70,7 +70,7 @@ unpackGraspedSide(std::shared_ptr<PbdMethod>   obj,
     if (auto pointSetToPick = std::dynamic_pointer_cast<PointSet>(geometry))
     {
         // Always should be the data that is constrained (ie: the physics mesh)
-        data.vertices = std::dynamic_pointer_cast<PointSet>(obj->getPhysicsGeometry())->getVertexPositions().get();
+        data.vertices = std::dynamic_pointer_cast<PointSet>(obj->getGeometry())->getVertexPositions().get();
 
         // This should stil be the picked geometry
         std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
@@ -252,7 +252,7 @@ PbdObjectGrasping::beginCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry, 
     // If no cd provided try to automatically pick one
     if (cdType == "")
     {
-        std::shared_ptr<Geometry> pbdPhysicsGeom = m_objectToGrasp->getPhysicsGeometry();
+        std::shared_ptr<Geometry> pbdPhysicsGeom = m_objectToGrasp->getGeometry();
 
         // If a specific geometry wasn't specified to pick, then use the physics geometry
         std::shared_ptr<Geometry> geomtryToPick = (m_geomToPick == nullptr) ? pbdPhysicsGeom : m_geomToPick;
@@ -313,7 +313,7 @@ PbdObjectGrasping::addPickConstraints()
     removePickConstraints();
 
     std::shared_ptr<PbdSystem> model = m_objectToGrasp->getPbdSystem();
-    std::shared_ptr<Geometry>  pbdPhysicsGeom = m_objectToGrasp->getPhysicsGeometry();
+    std::shared_ptr<Geometry>  pbdPhysicsGeom = m_objectToGrasp->getGeometry();
 
     // If a specific geometry wasn't specified to pick, then use the physics geometry
     std::shared_ptr<Geometry> geomtryToPick = (m_geomToPick == nullptr) ? pbdPhysicsGeom : m_geomToPick;

@@ -41,7 +41,7 @@ TEST(imstkBurningTest, testState)
     toolObj->addComponent<VisualModel>()->setGeometry(toolGeometry);
     toolObj->addComponent<Collider>()->setGeometry(toolGeometry);
     auto method = toolObj->addComponent<PbdMethod>();
-    method->setPhysicsGeometry(toolGeometry);
+    method->setGeometry(toolGeometry);
     method->setPbdSystem(pbdSystem);
     method->getPbdBody()->setRigid(
         Vec3d(0.0, 5.0, 2.0),

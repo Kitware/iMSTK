@@ -18,7 +18,7 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdMethod> pbdObj) :
     // Add checks here as needed
 
     // Get mesh and add dummy vertex for storing removed cell
-    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getPhysicsGeometry());
+    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getGeometry());
     addDummyVertex(m_mesh);
 
     // Update fixed node ids to account for dummy vertex at index zero

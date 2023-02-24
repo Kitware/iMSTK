@@ -160,7 +160,7 @@ BM_DistanceVolume(benchmark::State& state)
     pbdSystem->configure(pbdParams);
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setGeometry(prismMesh);
     prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders
@@ -235,7 +235,7 @@ BM_DistanceDihedral(benchmark::State& state)
     pbdSystem->configure(pbdParams);
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(surfMesh);
+    prismObj->setGeometry(surfMesh);
     prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders
@@ -306,7 +306,7 @@ BM_PbdFemStVK(benchmark::State& state)
     pbdSystem->configure(pbdParams);
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setGeometry(prismMesh);
     prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
 
@@ -383,7 +383,7 @@ BM_PbdFemCorotation(benchmark::State& state)
     pbdSystem->configure(pbdParams);
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setGeometry(prismMesh);
     prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
 
@@ -460,7 +460,7 @@ BM_PbdFemNeoHookean(benchmark::State& state)
     pbdSystem->configure(pbdParams);
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setGeometry(prismMesh);
     prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
 
@@ -537,7 +537,7 @@ BM_PbdFemLinear(benchmark::State& state)
     pbdSystem->configure(pbdParams);
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setGeometry(prismMesh);
     prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
 
@@ -625,7 +625,7 @@ BM_PbdContactDistanceVol(benchmark::State& state)
     pbdSystem->configure(pbdParams);
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setGeometry(prismMesh);
     prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders
@@ -728,7 +728,7 @@ BM_PbdContactDistanceDihedral(benchmark::State& state)
     pbdSystem->configure(pbdParams);
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(surfMesh);
+    prismObj->setGeometry(surfMesh);
     prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders
@@ -837,7 +837,7 @@ BM_PbdFemContact(benchmark::State& state)
     pbdSystem->configure(pbdParams);
 
     // Setup the Object
-    prismObj->setPhysicsGeometry(prismMesh);
+    prismObj->setGeometry(prismMesh);
     prismObj->setDynamicalModel(pbdSystem);
     prismObj->getPbdBody()->uniformMassValue = 0.05;
     // Fix the borders

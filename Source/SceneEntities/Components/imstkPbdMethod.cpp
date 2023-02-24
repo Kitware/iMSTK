@@ -389,7 +389,7 @@ PbdMethod::computeCellConstraintMap()
     int bodyId = m_pbdBody->bodyHandle;
 
     // Mesh data
-    auto      cellMesh     = std::dynamic_pointer_cast<AbstractCellMesh>(this->getPhysicsGeometry());
+    auto      cellMesh     = std::dynamic_pointer_cast<AbstractCellMesh>(this->getGeometry());
     auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(cellMesh->getAbstractCells()); // underlying 1D array
     const int vertsPerCell = cellMesh->getAbstractCells()->getNumberOfComponents();
 

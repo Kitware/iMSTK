@@ -190,7 +190,7 @@ public:
 
         ASSERT_NE(m_obj, nullptr) << "Missing object to remove cells from";
         auto method   = m_obj->getComponent<PbdMethod>();
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(method->getPhysicsGeometry());
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(method->getGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;
         m_scene->addSceneObject(m_obj);
@@ -270,7 +270,7 @@ TEST_F(PbdObjectCellRemovalTest, TetMeshTest)
             Vec3d(0.1, 0.1, 0.1), Vec3i(4, 4, 4), Vec3d::Zero(),
             Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))));
 
-    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getComponent<PbdMethod>()->getPhysicsGeometry());
+    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getComponent<PbdMethod>()->getGeometry());
     createScene();
 
     // Run for 3s at 0.01 fixed timestep
@@ -292,7 +292,7 @@ TEST_F(PbdObjectCellRemovalTest, SurfMeshTest)
     auto method = m_obj->getComponent<PbdMethod>();
     method->initialize();
 
-    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(method->getPhysicsGeometry());
+    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(method->getGeometry());
 
     createScene();
 
@@ -311,7 +311,7 @@ TEST_F(PbdObjectCellRemovalTest, LineMeshTest)
     m_obj = makeLineThreadObj("String", m_pbdSystem,
         0.3, 100, Vec3d(-0.15, 0.0, 0.0), Vec3d(1.0, 0.0, 0.0));
 
-    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getComponent<PbdMethod>()->getPhysicsGeometry());
+    m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getComponent<PbdMethod>()->getGeometry());
     createScene();
 
     // Run for 3s at 0.01 fixed timestep

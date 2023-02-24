@@ -38,7 +38,7 @@ TEST(imstkBurnableTest, testMemory)
     // Create Pbd object
     auto pbdObj = std::make_shared<Entity>();
     auto method = pbdObj->addComponent<PbdMethod>();
-    method->setPhysicsGeometry(lineMesh);
+    method->setGeometry(lineMesh);
     method->setPbdSystem(pbdSystem);
     method->initialize();
 

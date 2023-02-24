@@ -37,7 +37,7 @@ Burnable::init()
     m_cellRemover = std::make_shared<PbdObjectCellRemoval>(m_burnableObject);
 
     // Allocate memory for mesh state and initialize values
-    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObject->getPhysicsGeometry());
+    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObject->getGeometry());
     int  numCells = cellMesh->getNumCells();
 
     m_burnDamagePtr = std::make_shared<DataArray<double>>(numCells);
@@ -67,7 +67,7 @@ Burnable::visualUpdate(const double& dt)
     auto pbdBody = m_burnableObject->getPbdBody();
 
     // Mesh data
-    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObject->getPhysicsGeometry());
+    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObject->getGeometry());
     // auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(cellMesh->getAbstractCells()); // underlying 1D array
     // const int vertsPerCell = cellMesh->getAbstractCells()->getNumberOfComponents();
 

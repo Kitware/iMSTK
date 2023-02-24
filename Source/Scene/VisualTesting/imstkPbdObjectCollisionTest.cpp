@@ -193,7 +193,7 @@ public:
         ASSERT_NE(m_pbdObj, nullptr) << "Missing a pbdObj for PbdObjectCollisionTest";
         auto method = m_pbdObj->getComponent<PbdMethod>();
         method->getPbdSystem()->getConfig()->m_doPartitioning = false;
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(method->getPhysicsGeometry());
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(method->getGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;
         m_scene->addSceneObject(m_pbdObj);
