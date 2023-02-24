@@ -77,29 +77,13 @@ createTissue(std::shared_ptr<PbdSystem> model)
     method->setFixedNodes(fixedNodes);
     model->getConfig()->setBodyDamping(method->getBodyHandle(), 0.3);
 
+    // Use volume+distance constraints, worse results. More performant (can use larger mesh)
+    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100.0, method->getBodyHandle());
+    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0, method->getBodyHandle());
+
     pbdObject->addComponent<Puncturable>();
 
     return pbdObject;
-}
-
-static std::shared_ptr<SceneObject>
-makeClampObj(std::string name)
-{
-    auto surfMesh =
-        MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Clamps/Gregory Suture Clamp/gregory_suture_clamp.obj");
-
-    surfMesh->scale(5.0, Geometry::TransformType::ApplyToData);
-
-    auto toolObj = std::make_shared<SceneObject>(name);
-    toolObj->setVisualGeometry(surfMesh);
-    auto renderMaterial = std::make_shared<RenderMaterial>();
-    renderMaterial->setColor(Color::LightGray);
-    renderMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    renderMaterial->setRoughness(0.5);
-    renderMaterial->setMetalness(1.0);
-    toolObj->getVisualModel(0)->setRenderMaterial(renderMaterial);
-
-    return toolObj;
 }
 
 ///
@@ -143,7 +127,7 @@ makePbdString(
 }
 
 static std::shared_ptr<Entity>
-makeToolObj()
+makeToolObj(std::shared_ptr<PbdSystem> pbdSystem)
 {
     auto sutureMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
     auto sutureLineMesh = MeshIO::read<LineMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture_hull.vtk");
@@ -154,20 +138,15 @@ makeToolObj()
     sutureMesh->transform(rot, Geometry::TransformType::ApplyToData);
     sutureLineMesh->transform(rot, Geometry::TransformType::ApplyToData);
 
-    auto pbdSystem = std::make_shared<PbdSystem>();
-    pbdSystem->getConfig()->m_gravity    = Vec3d::Zero();
-    pbdSystem->getConfig()->m_iterations = 5;
-
     auto needleObj = SceneUtils::makePbdEntity("Needle", sutureMesh, sutureLineMesh, sutureLineMesh, pbdSystem);
     needleObj->getComponent<PbdMethod>()->setPhysicsToVisualMap(std::make_shared<IsometricMap>(sutureLineMesh, sutureMesh));
+    needleObj->getComponent<PbdMethod>()->setRigid(Vec3d::Zero(), 1.0, Quatd::Identity(), Mat3d::Identity() * 1.0);
 
     auto material = needleObj->getComponent<VisualModel>()->getRenderMaterial();
     material->setColor(Color(0.9, 0.9, 0.9));
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     material->setRoughness(0.5);
     material->setMetalness(1.0);
-
-    needleObj->getComponent<PbdMethod>()->setRigid(Vec3d::Zero(), 1.0, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     needleObj->addComponent<Needle>();
 
@@ -198,12 +177,10 @@ main()
     // Setup the Model
     auto pbdSystem = std::make_shared<PbdSystem>();
     auto pbdParams = std::make_shared<PbdModelConfig>();
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100.0);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.01;
-    pbdParams->m_iterations = 10;
+    pbdParams->m_iterations = 6;
     pbdSystem->configure(pbdParams);
 
     // Mesh with hole for suturing
@@ -211,7 +188,7 @@ main()
     scene->addSceneObject(tissueHole);
 
     // Create arced needle
-    auto needleObj = makeToolObj();
+    auto needleObj = makeToolObj(pbdSystem);
     scene->addSceneObject(needleObj);
 
     // Create the suture pbd-based string
@@ -224,6 +201,7 @@ main()
 
     // Add needle constraining behaviour between the tissue & arc needle/thread
     auto sutureInteraction = std::make_shared<NeedleInteraction>(tissueHole, needleObj, sutureThreadObj);
+    sutureInteraction->setRigidBodyCompliance(0.01); // Helps with smoothness
     scene->addInteraction(sutureInteraction);
 
     // Add thread CCD
@@ -259,11 +237,11 @@ main()
         hapController->setControlledObject(needleObj->getComponent<PbdMethod>(), needleObj->getComponent<VisualModel>());
         hapController->setDevice(deviceClient);
         hapController->setTranslationScaling(0.5);
-        hapController->setLinearKs(20000.0);
-        hapController->setAngularKs(100000000.0);
+        hapController->setLinearKs(5000.0);
+        hapController->setAngularKs(1000.0);
         hapController->setUseCritDamping(true);
-        hapController->setForceScaling(0.01);
-        hapController->setSmoothingKernelSize(10);
+        hapController->setForceScaling(0.001);
+        hapController->setSmoothingKernelSize(15);
         hapController->setUseForceSmoothening(true);
         scene->addControl(hapController);
 
@@ -272,7 +250,7 @@ main()
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [ = ](Event*)
             {
-                sutureThreadSystem->getConfig()->m_dt = sceneManager->getDt();
+                pbdSystem->getConfig()->m_dt = sceneManager->getDt();
             });
 
         // Constrain the first two vertices of the string to the needle
