@@ -27,8 +27,6 @@ public:
     ///
     PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
                        std::string cdType = "");
-    PbdObjectCollision(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                       std::string cdType = "");
 
     ~PbdObjectCollision() override = default;
 

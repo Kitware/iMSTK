@@ -24,26 +24,6 @@ PbdObjectCollision::PbdObjectCollision(std::shared_ptr<PbdObject> obj1, std::sha
     setupConnections(obj1, obj2, cdType);
 }
 
-PbdObjectCollision::PbdObjectCollision(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2, std::string cdType) :
-    CollisionInteraction("PbdObjectCollision_" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, cdType)
-{
-    auto pbdObject1 = std::dynamic_pointer_cast<PbdObject>(obj1);
-    auto pbdObject2 = std::dynamic_pointer_cast<PbdObject>(obj2);
-
-    CHECK(pbdObject1 != nullptr || pbdObject2 != nullptr) << "One of the objects to PBDObjectCollision" <<
-        "has to be a PBDObject";
-
-    if (pbdObject1 != nullptr)
-    {
-        setupConnections(pbdObject1, obj2, cdType);
-    }
-    else
-    {
-        std::swap(m_objA, m_objB);
-        setupConnections(pbdObject2, obj1, cdType);
-    }
-}
-
 void
 PbdObjectCollision::setRestitution(const double restitution)
 {
