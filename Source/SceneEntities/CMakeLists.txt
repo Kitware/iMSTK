@@ -12,6 +12,7 @@ set(H_FILES
   Components/imstkBurnable.h
   Components/imstkBurner.h
   Components/imstkSceneUtils.h
+  Components/imstkSphMethod.h
   Components/imstkTearable.h
   Components/imstkTextVisualModel.h
   Components/imstkVisualModel.h
@@ -44,6 +45,7 @@ set(SRC_FILES
   Components/imstkBurner.cpp
   Components/imstkTearable.cpp
   Components/imstkSceneUtils.cpp
+  Components/imstkSphMethod.cpp
   Components/imstkVisualModel.cpp
   Lights/imstkIBLProbe.cpp
   Loader/imstkVisualObjectImporter.cpp

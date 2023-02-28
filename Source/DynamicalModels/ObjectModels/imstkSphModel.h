@@ -81,6 +81,8 @@ public:
 class SphModel : public DynamicalModel<SphState>
 {
 public:
+    using AbstractDynamicalSystem::initGraphEdges;
+
     SphModel();
     ~SphModel() override = default;
 
