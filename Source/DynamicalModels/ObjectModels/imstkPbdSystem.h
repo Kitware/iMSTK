@@ -115,6 +115,13 @@ public:
     double getTimeStep() const override;
 
     ///
+    /// \brief Set/Get filter value for velocity, default is 10 in meters/second
+    ///@{
+    void setVelocityThreshold(double velCap) { m_velocityThreshold = velCap; }
+    double getVelocityThreshold() { return m_velocityThreshold; }
+    ///@}
+
+    ///
     /// \brief Return all constraints that are solved sequentially
     ///
     std::shared_ptr<PbdConstraintContainer> getConstraints() { return m_constraints; }
@@ -194,5 +201,10 @@ protected:
     std::shared_ptr<TaskNode> m_solveConstraintsNode;
     std::shared_ptr<TaskNode> m_updateVelocityNode;
     ///@}
+
+    /// \brief Limit on velocity, assumes units in Meters. If any component of velocity exceeds value set here it will be clamped to
+    /// the value set here, this prevents instabilities and positive feedback loops for the haptics. This clamp is applied to linear
+    /// and angular velocity.
+    double m_velocityThreshold = 100000.0;
 };
 } // namespace imstk

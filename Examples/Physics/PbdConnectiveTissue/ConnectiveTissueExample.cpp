@@ -25,6 +25,7 @@
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectGrasping.h"
+#include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -42,7 +43,17 @@
 #include "imstkDummyClient.h"
 #endif
 
+#include <iostream>
+
 using namespace imstk;
+
+/*
+This example simulates connective tissue by connecting a gallbladder to a kidney.
+The gallbladder is deformable with strain energy constraints and the kidney is treated as
+rigid by setting all of the nodes to be fixed.
+
+The units for this example are centimeters, kilograms, and seconds
+*/
 
 ///
 /// \brief Creates pbd simulated gallbladder object
@@ -54,10 +65,10 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdSystem> system)
     auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Gallblader/gallblader.msh");
     const Vec3d center     = tissueMesh->getCenter();
     tissueMesh->translate(-center, Geometry::TransformType::ApplyToData);
-    tissueMesh->scale(10.0, Geometry::TransformType::ApplyToData);
+    tissueMesh->scale(100.0, Geometry::TransformType::ApplyToData); // scale from meters (input mesh) to cm
     tissueMesh->rotate(Vec3d(0.0, 0.0, 1.0), 30.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
 
-    const Vec3d shift = { -0.4, 0.0, 0.0 };
+    const Vec3d shift = { -4.0, 0.0, 0.0 };
     tissueMesh->translate(shift, Geometry::TransformType::ApplyToData);
 
     auto surfMesh = tissueMesh->extractSurfaceMesh();
@@ -69,19 +80,34 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdSystem> system)
     material->setOpacity(0.5);
 
     // Setup the Object
-    auto tissueObj   = SceneUtils::makePbdEntity(name, surfMesh, system);
+    auto tissueObj   = SceneUtils::makePbdEntity(name, surfMesh, surfMesh, tissueMesh, system);
     auto visualModel = tissueObj->getComponent<VisualModel>();
     visualModel->setRenderMaterial(material);
+
     // Gallblader is about 60g
     auto tissueMethod = tissueObj->getComponent<PbdMethod>();
-    tissueMethod->setUniformMass(60.0 / tissueMesh->getNumVertices());
+
+    // Create map for collisions
+    tissueMethod->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
+
+    tissueMethod->setUniformMass(0.06 / tissueMesh->getNumVertices());
 
     system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 700.0,
         tissueMethod->getBodyHandle());
     system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 700.0,
         tissueMethod->getBodyHandle());
+    system->getConfig()->setBodyDamping(tissueMethod->getBodyHandle(), 0.01);
 
-    tissueMethod->setFixedNodes({ 57, 131, 132 }); // { 72, , 131, 132 };
+    // Fix the top of the gallbladder
+    std::shared_ptr<VecDataArray<double, 3>> vertices = tissueMesh->getVertexPositions();
+    for (int i = 0; i < tissueMesh->getNumVertices(); i++)
+    {
+        const Vec3d& pos = (*vertices)[i];
+        if (pos[1] >= 1.7)
+        {
+            tissueMethod->getPbdBody()->fixedNodeIds.push_back(i);
+        }
+    }
 
     LOG(INFO) << "Per particle mass: " << tissueMethod->getPbdBody()->uniformMassValue;
 
@@ -89,6 +115,10 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdSystem> system)
 
     return tissueObj;
 }
+
+///
+/// \brief Creates pbd simulated rigid kidney object
+///
 
 static std::shared_ptr<Entity>
 makeKidney(const std::string& name, std::shared_ptr<PbdSystem> system)
@@ -98,11 +128,11 @@ makeKidney(const std::string& name, std::shared_ptr<PbdSystem> system)
     const Vec3d center     = tissueMesh->getCenter();
 
     tissueMesh->translate(-center, Geometry::TransformType::ApplyToData);
-    tissueMesh->scale(10.0, Geometry::TransformType::ApplyToData);
+    tissueMesh->scale(100.0, Geometry::TransformType::ApplyToData); // scale from meters (input mesh) to cm
     tissueMesh->rotate(Vec3d(0.0, 0.0, 1.0), 30.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
     tissueMesh->rotate(Vec3d(0.0, 1.0, 0.0), 90.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
 
-    const Vec3d shift = { 0.4, 0.0, 0.0 };
+    const Vec3d shift = { 4.0, 0.0, 0.0 };
     tissueMesh->translate(shift, Geometry::TransformType::ApplyToData);
 
     auto surfMesh = tissueMesh->extractSurfaceMesh();
@@ -114,30 +144,35 @@ makeKidney(const std::string& name, std::shared_ptr<PbdSystem> system)
     material->setOpacity(0.5);
 
     // Setup the Object
-    auto tissueObj = SceneUtils::makePbdEntity(name, tissueMesh, surfMesh, tissueMesh, system);
+    auto tissueObj = SceneUtils::makePbdEntity(name, surfMesh, system);
     tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
 
     // Gallblader is about 60g
     auto method = tissueObj->getComponent<PbdMethod>();
-    method->setUniformMass(60.0 / tissueMesh->getNumVertices());
-    method->setFixedNodes({ 72, 57, 131, 132 });
+    method->setUniformMass(0.06 / surfMesh->getNumVertices());
 
-    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 500.0,
-        method->getBodyHandle());
-    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Volume, 500.0,
-        method->getBodyHandle());
+    // Fix the kidney in position
+    std::shared_ptr<VecDataArray<double, 3>> vertices = surfMesh->getVertexPositions();
+    for (int i = 0; i < surfMesh->getNumVertices(); i++)
+    {
+        method->getPbdBody()->fixedNodeIds.push_back(i);
+    }
 
     LOG(INFO) << "Per particle mass: " << method->getPbdBody()->uniformMassValue;
 
     return tissueObj;
 }
 
+///
+/// \brief Creates pbd simulated capsule to use as a tool
+///
+
 static std::shared_ptr<Entity>
 makeCapsuleToolObj(std::shared_ptr<PbdSystem> system)
 {
     auto toolGeometry = std::make_shared<Capsule>();
-    toolGeometry->setRadius(0.03);
-    toolGeometry->setLength(0.4);
+    toolGeometry->setRadius(0.4);
+    toolGeometry->setLength(4.0);
     toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
     toolGeometry->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
 
@@ -147,20 +182,20 @@ makeCapsuleToolObj(std::shared_ptr<PbdSystem> system)
     // Create the object
     toolMethod->setRigid(
         Vec3d(0.0, 2.0, 2.0),
-        0.1,
+        0.01,
         Quatd::Identity(),
-        Mat3d::Identity() * 1.0);
+        Mat3d::Identity() * 100000.0);
 
     toolVisual->getRenderMaterial()->setOpacity(1.0);
 
     // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
     controller->setControlledObject(toolMethod, toolVisual);
-    controller->setTranslationScaling(10.0);
-    controller->setLinearKs(500.0);
-    controller->setAngularKs(200.0);
+    controller->setTranslationScaling(100.0); // this convertes from meters to cm
+    controller->setLinearKs(1000.0);          // in N/cm
+    controller->setAngularKs(1000000000.0);
     controller->setUseCritDamping(true);
-    controller->setForceScaling(0.8);
+    controller->setForceScaling(0.01); // 1 N = 1 kg/(m*s^2) = 0.01 kg/(cm*s^2)
     controller->setSmoothingKernelSize(15);
     controller->setUseForceSmoothening(true);
 
@@ -179,17 +214,17 @@ main()
 
     // Setup the scene
     auto scene = std::make_shared<Scene>("PbdConnectiveTissue");
-    scene->getActiveCamera()->setPosition(0.278448, 0.0904159, 3.43076);
-    scene->getActiveCamera()->setFocalPoint(0.0703459, -0.539532, 0.148011);
-    scene->getActiveCamera()->setViewUp(-0.0400007, 0.980577, -0.19201);
+    scene->getActiveCamera()->setPosition(0.944275, 8.47551, 21.4164);
+    scene->getActiveCamera()->setFocalPoint(-0.450427, 0.519797, 0.817356);
+    scene->getActiveCamera()->setViewUp(-0.0370536, 0.933044, -0.357851);
 
     // Setup the PBD Model
     auto pbdSystem = std::make_shared<PbdSystem>();
     pbdSystem->getConfig()->m_doPartitioning = false;
-    pbdSystem->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
-    pbdSystem->getConfig()->m_iterations = 5;
-    pbdSystem->getConfig()->m_gravity    = Vec3d(0.0, -1.0, 0.0);
-    pbdSystem->getConfig()->m_linearDampingCoeff  = 0.005; // Removed from velocity
+    pbdSystem->getConfig()->m_dt = 0.001;
+    pbdSystem->getConfig()->m_iterations = 6;
+    pbdSystem->getConfig()->m_gravity    = Vec3d(0.0, -981.0, 0.0); //in cm/s^2
+    pbdSystem->getConfig()->m_linearDampingCoeff  = 0.005;          // Removed from velocity
     pbdSystem->getConfig()->m_angularDampingCoeff = 0.005;
 
     // Setup gallbladder object
@@ -201,7 +236,7 @@ main()
     scene->addSceneObject(kidneyObj);
 
     // Create PBD object of connective strands with associated constraints
-    double maxDist = 0.35;
+    double maxDist = 3.5;
     auto   connectiveStrands       = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdSystem, maxDist, 2.5, 7);
     auto   connectiveStrandsMethod = connectiveStrands->getComponent<PbdMethod>();
     pbdSystem->getConfig()->setBodyDamping(connectiveStrandsMethod->getBodyHandle(), 0.015, 0.0);
@@ -213,20 +248,28 @@ main()
     auto burnable = std::make_shared<Burnable>();
     connectiveStrands->addComponent(burnable);
 
+    // Add strands to scene
     scene->addSceneObject(connectiveStrands);
 
     // Setup a tool to grasp with
     auto toolObj = makeCapsuleToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
-    // add collision
-    auto collision = std::make_shared<PbdObjectCollision>(connectiveStrands, toolObj);
-    scene->addInteraction(collision);
+    // add collisions
+    auto strandCollision = std::make_shared<PbdObjectCollision>(connectiveStrands, toolObj);
+    scene->addInteraction(strandCollision);
+
+    auto gallCollision = std::make_shared<PbdObjectCollision>(gallbladerObj, toolObj);
+    scene->addInteraction(gallCollision);
 
     // Create new picking with constraints
     auto grasper = std::make_shared<PbdObjectGrasping>(connectiveStrands->getComponent<PbdMethod>(), toolObj->getComponent<PbdMethod>());
     grasper->setStiffness(0.5);
     scene->addInteraction(grasper);
+
+    auto grasper_gall = std::make_shared<PbdObjectGrasping>(gallbladerObj->getComponent<PbdMethod>(), toolObj->getComponent<PbdMethod>());
+    grasper_gall->setStiffness(0.5);
+    scene->addInteraction(grasper_gall);
 
     // Add burner component to tool
     auto burning = std::make_shared<Burner>();
@@ -246,7 +289,7 @@ main()
         auto viewer = std::make_shared<VTKViewer>();
         viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
         viewer->setActiveScene(scene);
-        viewer->setDebugAxesLength(0.1, 0.1, 0.1);
+        viewer->setDebugAxesLength(1.0, 1.0, 1.0);
 
         // Setup a scene manager to advance the scene
         auto sceneManager = std::make_shared<SceneManager>();
@@ -281,6 +324,11 @@ main()
                         auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                         dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                         grasper->beginCellGrasp(dilatedCapsule);
+                        grasper_gall->beginCellGrasp(dilatedCapsule);
+
+                        gallCollision->setEnabled(false);
+
+                        std::cout << "Grasping! \n";
                     }
                 }
                 else if (e->m_buttonState == BUTTON_RELEASED)
@@ -288,6 +336,10 @@ main()
                     if (e->m_button == 1)
                     {
                         grasper->endGrasp();
+                        grasper_gall->endGrasp();
+                        gallCollision->setEnabled(true);
+
+                        std::cout << "Released! \n";
                     }
                 }
             });
@@ -339,17 +391,23 @@ main()
                     burning->stop();
                 }
                 // If g pressed, grasp
-                if (keyDevice->getButton('g') == KEY_PRESS)
+                if (keyDevice->getButton('g') == KEY_PRESS && grasper->getGraspState() == false && grasper_gall->getGraspState() == false)
                 {
                     // Use a slightly larger capsule since collision prevents intersection
                     auto capsule = std::dynamic_pointer_cast<Capsule>(Collider::getCollidingGeometryFromEntity(toolObj.get()));
                     auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                     dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                     grasper->beginCellGrasp(dilatedCapsule);
+                    grasper_gall->beginCellGrasp(dilatedCapsule);
+
+                    std::cout << "Grasping! \n";
                 }
-                if (keyDevice->getButton('g') == KEY_RELEASE)
+                if (keyDevice->getButton('g') == KEY_RELEASE && grasper->getGraspState() == true && grasper_gall->getGraspState() == true)
                 {
                     grasper->endGrasp();
+                    grasper_gall->endGrasp();
+
+                    std::cout << "Released! \n";
                 }
             });
 

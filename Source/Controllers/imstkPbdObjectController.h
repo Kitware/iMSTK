@@ -180,5 +180,8 @@ protected:
     int  m_smoothingKernelSize = 15;
     std::deque<Vec3d> m_forces;
     Vec3d m_forceSum = Vec3d::Zero();
+
+    // Flag for initialization position during first call
+    bool m_firstRun = true;
 };
 } // namespace imstk

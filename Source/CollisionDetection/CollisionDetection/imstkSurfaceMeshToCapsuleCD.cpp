@@ -93,6 +93,9 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
             const double rSum    = triangleBoundingRadius + sphereRadius;
             if (distSqr <= rSum * rSum)
             {
+                // Create possible contact points
+                // These are set by testSphereToTriangle depending on
+                // what geometry is collided
                 Vec3d triangleContactPt;
                 Vec2i edgeContact;
                 int pointContact;
@@ -219,14 +222,17 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     elemA.parentId = i; // Triangle id
                     elemA.cellType = IMSTK_TRIANGLE;
 
-                    Vec3d contactNormal = (triTipProjection - nearestTip);
-                    const double dist   = contactNormal.norm();
+                    // Use triangle normal
+                    Vec3d contactNormal  = (x2 - x1).cross(x3 - x1).normalized();
+                    Vec3d penetrationVec = (triTipProjection - nearestTip);
+
+                    Vec3d projectionToNormal = penetrationVec.dot(contactNormal) * contactNormal;
+                    const double dist = projectionToNormal.norm();
                     const double penetrationDepth = dist + sphereRadius;// sphere radius is capsule radius
-                    contactNormal /= dist;
 
                     PointDirectionElement elemB;
                     elemB.dir = contactNormal;                                          // Direction to resolve capsule
-                    elemB.pt  = nearestTip - sphereRadius * contactNormal.normalized(); // Contact point on capsule
+                    elemB.pt  = spherePos - contactNormal * penetrationDepth;
                     elemB.penetrationDepth = penetrationDepth;
 
                     lock.lock();

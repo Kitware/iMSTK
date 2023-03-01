@@ -6,6 +6,8 @@
 
 /*
  * Instantiation of shared_ptr
+ * Classes marked with %shared_ptr will be constructed as shared_ptr
+ * rather than raw pointers
  */
 %include <std_shared_ptr.i>
 
@@ -72,6 +74,7 @@
 /*
  * Filtering
  */
+%shared_ptr(imstk::CleanMesh)
 %shared_ptr(imstk::ImplicitGeometryToImageData)
 %shared_ptr(imstk::QuadricDecimate)
 %shared_ptr(imstk::SelectEnclosedPoints)
@@ -111,6 +114,8 @@
 %shared_ptr(imstk::PbdBody)
 %shared_ptr(imstk::PbdState)
 %shared_ptr(imstk::PbdConstraint)
+%shared_ptr(imstk::PbdConstraintContainer)
+%shared_ptr(imstk::PbdDistanceConstraint)
 %shared_ptr(imstk::PbdStrainEnergyConstraint)
 
 /*

@@ -6,6 +6,7 @@ include(imstkAddLibrary)
 imstk_add_library( Common
   H_FILES
     imstkAbstractDataArray.h
+    imstkAccumulationBuffer.h
     imstkColor.h
     imstkColorFunction.h
     imstkDataArray.h

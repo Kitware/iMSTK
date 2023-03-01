@@ -82,6 +82,9 @@ PbdBaryPointToPointConstraint::computeValueAndGradient(PbdState& bodies,
     const double length = diff.norm();
     c = length - m_restLength;
 
+    // Save constraint value
+    m_C = c;
+
     if (length < 1.0e-16)
     {
         diff = Vec3d::Zero();

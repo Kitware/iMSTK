@@ -50,7 +50,6 @@
 %ignore imstk::InteractionPair::getTaskNodeOutputs();
 
 %ignore imstk::RbdConstraint;
-%ignore imstk::PbdConstraintContainer;
 %ignore imstk::PbdConstraintFunctor;
 %ignore imstk::CollisionHandling::getTaskNode();
 

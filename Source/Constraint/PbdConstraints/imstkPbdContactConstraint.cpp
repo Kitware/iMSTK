@@ -5,6 +5,7 @@
 */
 
 #include "imstkPbdContactConstraint.h"
+#include "imstkCollisionUtils.h"
 
 namespace imstk
 {
@@ -188,25 +189,14 @@ PbdTriangleToBodyConstraint::computeInterpolantsAndContact(const PbdState& bodie
     const Vec3d p = bodyPos + m_r[0];
 
     // Compute barycentric coordinates u,v,w
-    const Vec3d  v0    = x2 - x1;
-    const Vec3d  v1    = x3 - x1;
-    const Vec3d  v2    = p - x1;
-    const double d00   = v0.dot(v0);
-    const double d01   = v0.dot(v1);
-    const double d11   = v1.dot(v1);
-    const double d20   = v2.dot(v0);
-    const double d21   = v2.dot(v1);
-    const double denom = d00 * d11 - d01 * d01;
-    if (fabs(denom) < 1e-12)
-    {
-        return false;
-    }
+    const Vec3d bary = baryCentric(p, x1, x2, x3);
+
     // Point
     weights[0] = 1.0;
-    // Triangle
-    weights[3] = (d11 * d20 - d01 * d21) / denom;
-    weights[2] = (d00 * d21 - d01 * d20) / denom;
-    weights[1] = 1.0 - weights[2] - weights[3];
+    // Triangle off by 1 for point weight storage at [0]
+    weights[1] = bary[0];
+    weights[2] = bary[1];
+    weights[3] = bary[2];
 
     // This constraint becomes invalid if moved out of the triangle
     if (weights[1] < 0.0 || weights[2] < 0.0 || weights[3] < 0.0)
@@ -215,9 +205,9 @@ PbdTriangleToBodyConstraint::computeInterpolantsAndContact(const PbdState& bodie
     }
 
     // Triangle normal (pointing up on standard counter clockwise triangle)
-    contactNormal = v0.cross(v1).normalized();
+    contactNormal = (x2 - x1).cross(x3 - x1).normalized();
     // Point could be on either side of triangle, we want to resolve to the triangles plane
-    depth = v2.dot(contactNormal);
+    depth = (p - x1).dot(contactNormal);
 
     return true;
 }
@@ -237,6 +227,7 @@ PbdTriangleToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
 
     // A
     n[0] = normal;
+
     // B
     n[1] = -m_weights[1] * normal;
     n[2] = -m_weights[2] * normal;
