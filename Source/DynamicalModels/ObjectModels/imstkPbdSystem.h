@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkAbstractDynamicalModel.h"
+#include "imstkAbstractDynamicalSystem.h"
 #include "imstkPbdBody.h"
 #include "imstkPbdConstraint.h"
 
@@ -38,7 +38,7 @@ class PbdSolver;
 /// Matthias Mullerm, Miles Macklin, Nuttapong Chentanez, Stefan Jeschke, and Tae-Yong Kim. 2020. Detailed Rigid Body Simulation with Extended Position Based Dynamics
 /// Jan Bender, Matthias Muller, Miles Macklin. 2017. A Survey on Position Based Dynamics, 2017.
 ///
-class PbdSystem : public AbstractDynamicalModel
+class PbdSystem : public AbstractDynamicalSystem
 {
 public:
     PbdSystem();
@@ -150,7 +150,7 @@ public:
 
 protected:
     // Hide this function as PbdSystem doesn't require it. It can support multiple bodies
-    using AbstractDynamicalModel::setModelGeometry;
+    using AbstractDynamicalSystem::setModelGeometry;
 
     ///
     /// \brief Resize the amount of particles for a body

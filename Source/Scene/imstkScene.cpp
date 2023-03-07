@@ -24,7 +24,7 @@
 #include "imstkTimer.h"
 #include "imstkTrackingDeviceControl.h"
 #include "imstkVisualModel.h"
-#include "imstkAbstractDynamicalModel.h"
+#include "imstkAbstractDynamicalSystem.h"
 
 namespace imstk
 {
@@ -53,7 +53,7 @@ Scene::initialize()
 {
     // Gather all the systems from the object components
     // Right now this just includes DynamicalModel's
-    std::unordered_set<std::shared_ptr<AbstractDynamicalModel>> systems;
+    std::unordered_set<std::shared_ptr<AbstractDynamicalSystem>> systems;
     for (const auto& ent : m_sceneEntities)
     {
         if (auto dynObj = std::dynamic_pointer_cast<DynamicObject>(ent))
@@ -62,7 +62,7 @@ Scene::initialize()
         }
         else if (auto method = ent->getComponentUnsafe<PbdMethod>())
         {
-            systems.insert(std::static_pointer_cast<AbstractDynamicalModel>(method->getPbdSystem()));
+            systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(method->getPbdSystem()));
         }
     }
 

@@ -4,7 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkAbstractDynamicalModel.h"
+#include "imstkAbstractDynamicalSystem.h"
 #include "imstkGeometry.h"
 #include "imstkGeometryMap.h"
 #include "imstkPbdBody.h"
@@ -178,7 +178,7 @@ PbdMethod::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Task
     {
         // Should be a better way to do this than doing a dynamic cast.
         // Maybe just rename the function so it doesn't get hidden by PbdSystem.
-        std::dynamic_pointer_cast<AbstractDynamicalModel>(m_pbdSystem)->initGraphEdges();
+        std::dynamic_pointer_cast<AbstractDynamicalSystem>(m_pbdSystem)->initGraphEdges();
         m_taskGraph->nestGraph(m_pbdSystem->getTaskGraph(), m_updateNode, m_updateGeometryNode);
     }
     else

@@ -12,7 +12,7 @@ namespace imstk
 {
 class Geometry;
 class GeometryMap;
-class AbstractDynamicalModel;
+class AbstractDynamicalSystem;
 
 ///
 /// \class DynamicObject
@@ -48,8 +48,8 @@ public:
     ///
     /// \brief Set/Get dynamical model
     ///@{
-    virtual std::shared_ptr<AbstractDynamicalModel> getDynamicalModel() const { return m_dynamicalModel; }
-    virtual void setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaModel) { m_dynamicalModel = dynaModel; }
+    virtual std::shared_ptr<AbstractDynamicalSystem> getDynamicalModel() const { return m_dynamicalModel; }
+    virtual void setDynamicalModel(std::shared_ptr<AbstractDynamicalSystem> dynaModel) { m_dynamicalModel = dynaModel; }
     ///@}
 
     ///
@@ -87,7 +87,7 @@ protected:
 
     DynamicObject(const std::string& name) : SceneObject(name) { }
 
-    std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel = nullptr; ///< Dynamical model
+    std::shared_ptr<AbstractDynamicalSystem> m_dynamicalModel = nullptr; ///< Dynamical model
     std::shared_ptr<Geometry> m_physicsGeometry = nullptr;              ///< Geometry used for Physics
 
     // Maps

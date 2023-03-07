@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkAbstractDynamicalModel.h"
+#include "imstkAbstractDynamicalSystem.h"
 
 namespace imstk
 {
@@ -17,10 +17,10 @@ namespace imstk
 /// dynamic object.
 ///
 template<class StateType>
-class DynamicalModel : public AbstractDynamicalModel
+class DynamicalModel : public AbstractDynamicalSystem
 {
 public:
-    DynamicalModel(DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalModel(type),
+    DynamicalModel(DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalSystem(type),
         m_initialState(std::make_shared<StateType>()),
         m_currentState(std::make_shared<StateType>()),
         m_previousState(std::make_shared<StateType>())

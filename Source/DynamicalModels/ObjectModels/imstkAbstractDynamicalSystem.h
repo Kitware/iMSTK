@@ -38,11 +38,11 @@ enum class TimeSteppingType
 };
 
 ///
-/// \class AbstractDynamicalModel
+/// \class AbstractDynamicalSystem
 ///
 /// \brief Abstract class for mathematical model of the physics governing the dynamic object
 ///
-class AbstractDynamicalModel
+class AbstractDynamicalSystem
 {
 public:
     ///
@@ -57,7 +57,7 @@ public:
         None
     };
 
-    virtual ~AbstractDynamicalModel() = default;
+    virtual ~AbstractDynamicalSystem() = default;
 
     ///
     /// \brief Reset the current state to the initial state
@@ -126,7 +126,7 @@ public:
 ///@}
 
 protected:
-    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::None);
+    AbstractDynamicalSystem(DynamicalModelType type = DynamicalModelType::None);
 
     ///
     /// \brief Setup connectivity of the compute graph

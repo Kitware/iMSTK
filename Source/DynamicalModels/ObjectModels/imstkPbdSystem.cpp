@@ -16,7 +16,7 @@
 
 namespace imstk
 {
-PbdSystem::PbdSystem() : AbstractDynamicalModel(DynamicalModelType::PositionBasedDynamics),
+PbdSystem::PbdSystem() : AbstractDynamicalSystem(DynamicalModelType::PositionBasedDynamics),
     m_config(std::make_shared<PbdModelConfig>())
 {
     // Add a virtual particle buffer, cleared every frame
