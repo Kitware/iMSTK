@@ -125,10 +125,6 @@ TaskGraph::addChain(const std::vector<std::shared_ptr<TaskNode>>& nodes)
         LOG(WARNING) << "addChain expects at least two nodes. Edges will not be added.";
         return;
     }
-    else if (nodes.size() == 2)
-    {
-        addEdge(nodes[0], nodes[1]);
-    }
     else
     {
         auto iter0 = nodes.begin();
