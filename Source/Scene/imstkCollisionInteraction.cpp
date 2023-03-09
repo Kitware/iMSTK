@@ -20,47 +20,52 @@ CollisionInteraction::CollisionInteraction(
     std::shared_ptr<Entity> objA,
     std::shared_ptr<Entity> objB,
     std::string             cdType = "") : SceneObject(objName),
-    m_objA(objA), m_objB(objB)
+    m_objA(objA), m_objB(objB), m_cdType(cdType)
 {
-    CHECK(objA != nullptr) << "CollisionInteraction requires an Entity objA";
-    CHECK(objB != nullptr) << "CollisionInteraction requires an Entity objB";
+}
+
+bool
+CollisionInteraction::initialize()
+{
+    CHECK(m_objA != nullptr) << "CollisionInteraction requires an Entity objA";
+    CHECK(m_objB != nullptr) << "CollisionInteraction requires an Entity objB";
 
     m_collisionDetectionNode = std::make_shared<TaskNode>(std::bind(&CollisionInteraction::updateCD, this),
-        objA->getName() + "_vs_" + objB->getName() + "_CollisionDetection");
+        m_objA->getName() + "_vs_" + m_objB->getName() + "_CollisionDetection");
     m_taskGraph->addNode(m_collisionDetectionNode);
 
     m_collisionHandleANode = std::make_shared<TaskNode>(std::bind(&CollisionInteraction::updateCHA, this),
-        objA->getName() + "_vs_" + objB->getName() + "_CollisionHandlingA", true);
+        m_objA->getName() + "_vs_" + m_objB->getName() + "_CollisionHandlingA", true);
     m_taskGraph->addNode(m_collisionHandleANode);
 
     m_collisionHandleBNode = std::make_shared<TaskNode>(std::bind(&CollisionInteraction::updateCHB, this),
-        objA->getName() + "_vs_" + objB->getName() + "_CollisionHandlingB", true);
+        m_objA->getName() + "_vs_" + m_objB->getName() + "_CollisionHandlingB", true);
     m_taskGraph->addNode(m_collisionHandleBNode);
 
     // Setup a step to update geometries before detecting collision
     m_collisionGeometryUpdateNode = std::make_shared<TaskNode>(std::bind(&CollisionInteraction::updateCollisionGeometry, this),
-        objA->getName() + "_vs_" + objB->getName() + "_CollisionGeometryUpdate", true);
+        m_objA->getName() + "_vs_" + m_objB->getName() + "_CollisionGeometryUpdate", true);
     m_taskGraph->addNode(m_collisionGeometryUpdateNode);
 
     // Get default cdType if one not provided
-    auto colliderA = objA->getComponent<Collider>();
-    auto colliderB = objB->getComponent<Collider>();
+    auto colliderA = m_objA->getComponent<Collider>();
+    auto colliderB = m_objB->getComponent<Collider>();
 
     if (colliderA && colliderB)
     {
-        auto collidingGeomA = objA->getComponent<Collider>()->getGeometry();
-        auto collidingGeomB = objB->getComponent<Collider>()->getGeometry();
+        auto collidingGeomA = m_objA->getComponent<Collider>()->getGeometry();
+        auto collidingGeomB = m_objB->getComponent<Collider>()->getGeometry();
 
-        if (cdType.empty() && collidingGeomA && collidingGeomB)
+        if (m_cdType.empty() && collidingGeomA && collidingGeomB)
         {
-            // cdType = getCDType(*objA, *objB);
-            cdType = CDObjectFactory::getCDType(*collidingGeomA, *collidingGeomB);
+            // m_cdType = getCDType(*m_objA, *m_objB);
+            m_cdType = CDObjectFactory::getCDType(*collidingGeomA, *collidingGeomB);
         }
 
-        if (!cdType.empty())
+        if (!m_cdType.empty())
         {
             // Setup the CD
-            m_colDetect = CDObjectFactory::makeCollisionDetection(cdType);
+            m_colDetect = CDObjectFactory::makeCollisionDetection(m_cdType);
             m_colDetect->setInput(collidingGeomA, 0);
             m_colDetect->setInput(collidingGeomB, 1);
             setCollisionDetection(m_colDetect);
@@ -74,6 +79,7 @@ CollisionInteraction::CollisionInteraction(
     {
         LOG(FATAL) << "Failed to find Colliders.";
     }
+    return true;
 }
 
 void

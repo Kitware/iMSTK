@@ -6,6 +6,7 @@
 
 #include "imstkComponent.h"
 #include "imstkEntity.h"
+#include "imstkMacros.h"
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskNode.h"
 
@@ -18,6 +19,7 @@ namespace
 class TestComponent : public Component
 {
 public:
+    IMSTK_TYPE_NAME(TestComponent)
     TestComponent(const std::string& name = "TestComponent") : Component(name)
     {
     }
@@ -34,17 +36,18 @@ public:
     bool isInitd = false;
 };
 
-class TestBehaviour : public Behaviour<double>
+class TestBehaviour : public SceneBehaviour
 {
 public:
-    TestBehaviour() : Behaviour<double>("TestBehaviour") { }
-    TestBehaviour(const bool useTaskGraph) : Behaviour<double>(useTaskGraph, "TestBehaviour"),
+    TestBehaviour() : SceneBehaviour("TestBehaviour") { }
+    TestBehaviour(const bool useTaskGraph) : SceneBehaviour(useTaskGraph, "TestBehaviour"),
         testNode(std::make_shared<TaskNode>(std::bind(&TestBehaviour::updateFunc, this), "TestNode"))
     {
         m_taskGraph->addNode(testNode);
     }
 
     ~TestBehaviour() override = default;
+    IMSTK_TYPE_NAME(TestBehaviour)
 
     void update(const double&) { updated = true; }
     void visualUpdate(const double&) { visualUpdated = true; }
@@ -109,8 +112,9 @@ TEST(BehaviourTest, TestUpdate)
 
 TEST(BehaviourTest, TestTaskGraphUpdate)
 {
-    TestBehaviour behaviour(true);
-    behaviour.initTaskGraphEdges();
+    TestBehaviour   behaviour(true);
+    SceneBehaviour* comp = &behaviour;
+    comp->initGraphEdges();
 
     SequentialTaskGraphController taskGraphExecutor;
     taskGraphExecutor.setTaskGraph(behaviour.getTaskGraph());

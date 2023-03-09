@@ -32,6 +32,9 @@ protected:
     Component(const std::string& name = "Component") : m_name(name) { }
 
 public:
+    // Get class name
+    virtual const std::string getTypeName() const = 0;
+
     virtual ~Component() = default;
 
     const std::string& getName() const { return m_name; }
@@ -88,6 +91,24 @@ protected:
 template<typename UpdateInfo>
 class Behaviour : public Component
 {
+public:
+    ~Behaviour() override = default;
+
+    virtual void update(const UpdateInfo& imstkNotUsed(updateData)) { }
+    virtual void visualUpdate(const UpdateInfo& imstkNotUsed(updateData)) { }
+
+    ///
+    /// \brief Setup the edges/connections of the TaskGraph
+    ///
+    void initGraphEdges()
+    {
+        CHECK(m_taskGraph != nullptr) << "Tried to setup task graph edges but no TaskGraph exists";
+        m_taskGraph->clearEdges();
+        initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
+    }
+
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
+
 protected:
     Behaviour(const std::string& name = "Behaviour") : Component(name) { }
     Behaviour(const bool useTaskGraph, const std::string& name = "Behaviour") : Component(name)
@@ -102,25 +123,6 @@ protected:
         }
     }
 
-public:
-    ~Behaviour() override = default;
-
-    virtual void update(const UpdateInfo& imstkNotUsed(updateData)) { }
-    virtual void visualUpdate(const UpdateInfo& imstkNotUsed(updateData)) { }
-
-    ///
-    /// \brief Setup the edges/connections of the TaskGraph
-    ///
-    void initTaskGraphEdges()
-    {
-        CHECK(m_taskGraph != nullptr) << "Tried to setup task graph edges but no TaskGraph exists";
-        m_taskGraph->clearEdges();
-        initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
-    }
-
-    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
-
-protected:
     ///
     /// \brief Setup the edges/connections of the TaskGraph\
     //     /// \param source, first node of the graph (does no function)
@@ -149,6 +151,7 @@ class LambdaBehaviour : public SceneBehaviour
 public:
     LambdaBehaviour(const std::string& name = "LambdaBehaviour") : Behaviour(name) { }
     ~LambdaBehaviour() override = default;
+    IMSTK_TYPE_NAME(LambdaBehaviour)
 
     void update(const double& dt) override;
     void visualUpdate(const double& dt) override;

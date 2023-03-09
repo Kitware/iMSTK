@@ -6,21 +6,26 @@
 
 #include "imstkPbdObjectController.h"
 #include "imstkDeviceClient.h"
+#include "imstkEntity.h"
 #include "imstkLogger.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdBody.h"
+#include "imstkPbdMethod.h"
 
 #include <Eigen/Eigenvalues>
 
 namespace imstk
 {
 void
-PbdObjectController::setControlledObject(std::shared_ptr<SceneObject> obj)
+PbdObjectController::setControlledObject(std::shared_ptr<PbdMethod> physicsObject, std::shared_ptr<VisualModel> visibleObject)
 {
-    m_pbdObject = std::dynamic_pointer_cast<PbdObject>(obj);
-    CHECK(m_pbdObject != nullptr) << "Controlled object must be a PbdObject";
-    CHECK(m_pbdObject->getPbdBody()->bodyType == PbdBody::Type::RIGID)
+    m_controlledObject = physicsObject;
+
+    CHECK(m_controlledObject != nullptr) << "Controlled object must have a PbdMethod behaviour";
+    CHECK(m_controlledObject->getPbdBody()->bodyType == PbdBody::Type::RIGID)
         << "PbdObjectController can only operate on pbd rigid bodies";
-    SceneObjectController::setControlledObject(obj);
+
+    // Set the visible object.
+    SceneObjectController::setControlledObject(visibleObject);
 }
 
 void
@@ -36,7 +41,7 @@ PbdObjectController::update(const double& dt)
         return;
     }
 
-    if (m_pbdObject == nullptr)
+    if (m_controlledObject == nullptr)
     {
         return;
     }
@@ -45,12 +50,12 @@ PbdObjectController::update(const double& dt)
     // "A Modular Haptic Rendering Algorithm for Stable and Transparent 6 - DOF Manipulation"
     if (m_deviceClient->getTrackingEnabled() && m_useSpring)
     {
-        const Vec3d& currPos = (*m_pbdObject->getPbdBody()->vertices)[0];
-        const Quatd& currOrientation     = (*m_pbdObject->getPbdBody()->orientations)[0];
-        const Vec3d& currVelocity        = (*m_pbdObject->getPbdBody()->velocities)[0];
-        const Vec3d& currAngularVelocity = (*m_pbdObject->getPbdBody()->angularVelocities)[0];
-        Vec3d&       currForce  = m_pbdObject->getPbdBody()->externalForce;
-        Vec3d&       currTorque = m_pbdObject->getPbdBody()->externalTorque;
+        const Vec3d& currPos = (*m_controlledObject->getPbdBody()->vertices)[0];
+        const Quatd& currOrientation     = (*m_controlledObject->getPbdBody()->orientations)[0];
+        const Vec3d& currVelocity        = (*m_controlledObject->getPbdBody()->velocities)[0];
+        const Vec3d& currAngularVelocity = (*m_controlledObject->getPbdBody()->angularVelocities)[0];
+        Vec3d&       currForce  = m_controlledObject->getPbdBody()->externalForce;
+        Vec3d&       currTorque = m_controlledObject->getPbdBody()->externalTorque;
 
         const Vec3d& devicePos = getPosition();
         const Quatd& deviceOrientation = getOrientation();
@@ -59,13 +64,13 @@ PbdObjectController::update(const double& dt)
         // If using critical damping automatically compute kd
         if (m_useCriticalDamping)
         {
-            const double mass     = (*m_pbdObject->getPbdBody()->masses)[0];
+            const double mass     = (*m_controlledObject->getPbdBody()->masses)[0];
             const double linearKs = m_linearKs.maxCoeff();
 
             const double fudge = 1.05; ///< Slightly overdamp to account for numerical error with forward euler integration
             m_linearKd = 2.0 * std::sqrt(mass * linearKs) * fudge;
 
-            const Mat3d inertia = (*m_pbdObject->getPbdBody()->inertias)[0];
+            const Mat3d inertia = (*m_controlledObject->getPbdBody()->inertias)[0];
             // Currently kd is not a 3d vector though it could be.
             // So here we make an approximation. Either:
             //  - Use one colums eigenvalue (maxCoeff)
@@ -122,11 +127,11 @@ PbdObjectController::update(const double& dt)
     else
     {
         // Zero out external force/torque
-        m_pbdObject->getPbdBody()->externalForce  = Vec3d(0.0, 0.0, 0.0);
-        m_pbdObject->getPbdBody()->externalTorque = Vec3d(0.0, 0.0, 0.0);
+        m_controlledObject->getPbdBody()->externalForce  = Vec3d(0.0, 0.0, 0.0);
+        m_controlledObject->getPbdBody()->externalTorque = Vec3d(0.0, 0.0, 0.0);
         // Directly set position/rotation
-        (*m_pbdObject->getPbdBody()->vertices)[0]     = getPosition();
-        (*m_pbdObject->getPbdBody()->orientations)[0] = getOrientation();
+        (*m_controlledObject->getPbdBody()->vertices)[0]     = getPosition();
+        (*m_controlledObject->getPbdBody()->orientations)[0] = getOrientation();
     }
 
     applyForces();
@@ -138,7 +143,7 @@ PbdObjectController::applyForces()
     if (!m_deviceClient->getButton(0))
     {
         // Apply force back to device
-        if (m_pbdObject != nullptr && m_useSpring)
+        if (m_controlledObject != nullptr && m_useSpring)
         {
             const Vec3d force = -getDeviceForce();
             if (m_forceSmoothening)

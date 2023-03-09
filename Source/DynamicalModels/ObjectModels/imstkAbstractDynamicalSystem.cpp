@@ -4,19 +4,19 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkAbstractDynamicalModel.h"
+#include "imstkAbstractDynamicalSystem.h"
 #include "imstkLogger.h"
 #include "imstkTaskGraph.h"
 
 namespace imstk
 {
-AbstractDynamicalModel::AbstractDynamicalModel(DynamicalModelType type) :
+AbstractDynamicalSystem::AbstractDynamicalSystem(DynamicalModelType type) :
     m_type(type), m_numDof(0), m_taskGraph(std::make_shared<TaskGraph>("AbstractDynamicalModel_Source", "AbstractDynamicalModel_Sink"))
 {
 }
 
 bool
-AbstractDynamicalModel::isGeometryValid(const std::shared_ptr<Geometry> geometry)
+AbstractDynamicalSystem::isGeometryValid(const std::shared_ptr<Geometry> geometry)
 {
     if (geometry)
     {
@@ -45,7 +45,7 @@ AbstractDynamicalModel::isGeometryValid(const std::shared_ptr<Geometry> geometry
 }
 
 void
-AbstractDynamicalModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
+AbstractDynamicalSystem::setModelGeometry(std::shared_ptr<Geometry> geometry)
 {
     if (isGeometryValid(geometry))
     {
@@ -58,14 +58,14 @@ AbstractDynamicalModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
 }
 
 void
-AbstractDynamicalModel::initGraphEdges()
+AbstractDynamicalSystem::initGraphEdges()
 {
     m_taskGraph->clearEdges();
     initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
 }
 
 void
-AbstractDynamicalModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+AbstractDynamicalSystem::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     m_taskGraph->addEdge(source, sink);
 }

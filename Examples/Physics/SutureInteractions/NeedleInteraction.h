@@ -15,23 +15,28 @@ class NeedleEmbeddedCH;
 
 namespace imstk
 {
-class PbdObject;
+class Entity;
 } // namespace imstk
 
 ///
 /// \class NeedleInteraction
 ///
-/// \brief Defines interaction between NeedleObject and PbdObject
+/// \brief Defines interaction between a NeedleObject and PbdObject
 ///
 class NeedleInteraction : public PbdObjectCollision
 {
 public:
-    NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
-                      std::shared_ptr<PbdObject> needleObj,
-                      std::shared_ptr<PbdObject> threadObj);
+    NeedleInteraction(std::shared_ptr<Entity> tissueObj,
+                      std::shared_ptr<Entity> needleObj,
+                      std::shared_ptr<Entity> threadObj);
     ~NeedleInteraction() override = default;
 
     IMSTK_TYPE_NAME(NeedleInteraction)
 
+    bool initialize() override;
+
     void stitch();
+
+private:
+    std::shared_ptr<Entity> m_threadObj;
 };

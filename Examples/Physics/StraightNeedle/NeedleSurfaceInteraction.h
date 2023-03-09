@@ -7,7 +7,7 @@
 #pragma once
 
 #include "imstkPbdObjectCollision.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkStraightNeedle.h"
 #include "NeedlePbdCH.h"
 #include "NeedleRigidBodyCH.h"
@@ -22,30 +22,54 @@ using namespace imstk;
 class NeedleSurfaceInteraction : public PbdObjectCollision
 {
 public:
-    NeedleSurfaceInteraction(std::shared_ptr<PbdObject> tissueObj,
-                             std::shared_ptr<PbdObject> needleObj,
-                             const std::string&         collisionName = "") : PbdObjectCollision(tissueObj, needleObj, collisionName)
+    NeedleSurfaceInteraction(std::shared_ptr<Entity> tissueObj,
+                             std::shared_ptr<Entity> needleObj,
+                             const std::string&      collisionName = "") : PbdObjectCollision(tissueObj, needleObj, collisionName)
     {
-        CHECK(needleObj->containsComponent<StraightNeedle>())
-            << "NeedleSurfaceInteraction only works with objects that have a StraightNeedle component";
-        CHECK(tissueObj->containsComponent<Puncturable>())
+    }
+
+    bool initialize() override
+    {
+        PbdObjectCollision::initialize();
+
+        auto puncturable    = m_objA->getComponent<Puncturable>();
+        auto straightNeedle = m_objB->getComponent<StraightNeedle>();
+
+        CHECK(puncturable != nullptr)
             << "NeedleSurfaceInteraction only works with objects that have a Puncturable component";
+        CHECK(straightNeedle != nullptr)
+            << "NeedleSurfaceInteraction only works with objects that have a StraightNeedle component";
+
+        auto needle = m_objA;
+        auto tissue = m_objB;
 
         auto needleRigidCH = std::make_shared<NeedleRigidBodyCH>();
-        needleRigidCH->setInputObjectA(needleObj);
-        needleRigidCH->setInputObjectB(tissueObj);
+        needleRigidCH->setInputObjectA(needle->getComponent<Collider>(), needle->getComponentUnsafe<PbdMethod>());
+        needleRigidCH->setInputObjectB(tissue->getComponent<Collider>(), tissue->getComponentUnsafe<PbdMethod>());
         needleRigidCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
+        needleRigidCH->setPuncturable(puncturable);
+        needleRigidCH->setNeedle(straightNeedle);
+        needleRigidCH->initialize();
+
         setCollisionHandlingB(needleRigidCH);
 
         auto needlePbdCH = std::make_shared<NeedlePbdCH>();
-        needlePbdCH->setInputObjectA(tissueObj);
-        needlePbdCH->setInputObjectB(needleObj);
+        needlePbdCH->setInputObjectA(tissue->getComponent<Collider>(), tissue->getComponentUnsafe<PbdMethod>());
+        needlePbdCH->setInputObjectB(needle->getComponent<Collider>(), needle->getComponentUnsafe<PbdMethod>());
         needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
+        needlePbdCH->setPuncturable(puncturable);
+        needlePbdCH->setNeedle(straightNeedle);
         // These two can control compliance
         needlePbdCH->setDeformableStiffnessA(1.0);
         needlePbdCH->setDeformableStiffnessB(0.01);
+        needlePbdCH->initialize();
+
         setCollisionHandlingA(needlePbdCH);
+        return true;
     }
 
     ~NeedleSurfaceInteraction() override = default;
+
+private:
+    std::shared_ptr<Entity> m_needle, m_tissue;
 };

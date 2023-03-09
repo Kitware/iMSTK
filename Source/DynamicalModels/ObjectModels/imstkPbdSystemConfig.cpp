@@ -4,13 +4,13 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkGraph.h"
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 #include "imstkPbdConstraintFunctor.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdSolver.h"
 #include "imstkTaskGraph.h"
 
@@ -19,7 +19,7 @@
 namespace imstk
 {
 void
-PbdModelConfig::computeElasticConstants()
+PbdSystemConfig::computeElasticConstants()
 {
     if (std::abs(m_secParams->m_mu) < std::numeric_limits<double>::min()
         && std::abs(m_secParams->m_lambda) < std::numeric_limits<double>::min())
@@ -39,7 +39,7 @@ PbdModelConfig::computeElasticConstants()
 }
 
 void
-PbdModelConfig::enableConstraint(ConstraintGenType type, double stiffness, const int bodyId)
+PbdSystemConfig::enableConstraint(ConstraintGenType type, double stiffness, const int bodyId)
 {
     auto& funcs = m_functors[type];
 
@@ -101,7 +101,7 @@ PbdModelConfig::enableConstraint(ConstraintGenType type, double stiffness, const
 }
 
 void
-PbdModelConfig::enableBendConstraint(const double stiffness, const int stride, const bool restLength0, const int bodyId)
+PbdSystemConfig::enableBendConstraint(const double stiffness, const int stride, const bool restLength0, const int bodyId)
 {
     auto& funcs = m_functors[ConstraintGenType::Bend];
 
@@ -131,8 +131,8 @@ PbdModelConfig::enableBendConstraint(const double stiffness, const int stride, c
 }
 
 void
-PbdModelConfig::enableConstantDensityConstraint(const double stiffness,
-                                                const double particleRadius, const double restDensity, const int bodyId)
+PbdSystemConfig::enableConstantDensityConstraint(const double stiffness,
+                                                 const double particleRadius, const double restDensity, const int bodyId)
 {
     auto& funcs = m_functors[ConstraintGenType::ConstantDensity];
 
@@ -157,7 +157,7 @@ PbdModelConfig::enableConstantDensityConstraint(const double stiffness,
 }
 
 void
-PbdModelConfig::enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType material, const int bodyId)
+PbdSystemConfig::enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType material, const int bodyId)
 {
     auto& funcs = m_functors[ConstraintGenType::SecTet];
     if (funcs.size() == 0)
@@ -171,15 +171,15 @@ PbdModelConfig::enableStrainEnergyConstraint(PbdStrainEnergyConstraint::Material
 }
 
 void
-PbdModelConfig::setBodyDamping(const int bodyId,
-                               const double linearDampCoeff, const double angularDampCoeff)
+PbdSystemConfig::setBodyDamping(const int bodyId,
+                                const double linearDampCoeff, const double angularDampCoeff)
 {
     m_bodyLinearDampingCoeff[bodyId]  = linearDampCoeff;
     m_bodyAngularDampingCoeff[bodyId] = angularDampCoeff;
 }
 
 double
-PbdModelConfig::getLinearDamping(const int bodyId)
+PbdSystemConfig::getLinearDamping(const int bodyId)
 {
     const double dampMult = (1.0 - m_linearDampingCoeff);
     auto         iter     = m_bodyLinearDampingCoeff.find(bodyId);
@@ -195,7 +195,7 @@ PbdModelConfig::getLinearDamping(const int bodyId)
 }
 
 double
-PbdModelConfig::getAngularDamping(const int bodyId)
+PbdSystemConfig::getAngularDamping(const int bodyId)
 {
     const double dampMult = (1.0 - m_angularDampingCoeff);
     auto         iter     = m_bodyAngularDampingCoeff.find(bodyId);

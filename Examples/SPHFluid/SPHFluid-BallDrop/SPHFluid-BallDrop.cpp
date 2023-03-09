@@ -128,7 +128,7 @@ main(int argc, char* argv[])
         driver->start();
     }
 
-    MeshIO::write(std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry()), "fluid.vtk");
+    MeshIO::write(std::dynamic_pointer_cast<PointSet>(fluidObj->getGeometry()), "fluid.vtk");
 
     return 0;
 }

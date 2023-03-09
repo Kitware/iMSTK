@@ -18,14 +18,15 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNeedle.h"
 #include "imstkObjectControllerGhost.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectController.h"
+#include "imstkPbdSystem.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
@@ -75,7 +76,7 @@ setSphereTexCoords(std::shared_ptr<SurfaceMesh> surfMesh, const double uvScale)
 /// \param dimensions of tetrahedral grid used for tissue
 /// \param center of tissue block
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeTissueObj(const std::string& name,
               const Vec3d& size, const Vec3i& dim, const Vec3d& center)
 {
@@ -85,7 +86,7 @@ makeTissueObj(const std::string& name,
     setSphereTexCoords(surfMesh, 6.0);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Use Strain Energy constraints
     pbdParams->m_secParams->m_YoungModulus = 5.0;
     pbdParams->m_secParams->m_PoissonRatio = 0.4;
@@ -97,8 +98,8 @@ makeTissueObj(const std::string& name,
     pbdParams->m_linearDampingCoeff = 0.05;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the material
     auto material = std::make_shared<RenderMaterial>();
@@ -111,11 +112,6 @@ makeTissueObj(const std::string& name,
     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
     material->setNormalStrength(0.3);
 
-    // Add a visual model to render the surface of the tet mesh
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(surfMesh);
-    visualModel->setRenderMaterial(material);
-
     // Add a visual model to render the normals of the surface
     /*imstkNew<VisualModel> normalsVisualModel(surfMesh);
     normalsVisualModel->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::SurfaceNormals);
@@ -123,14 +119,14 @@ makeTissueObj(const std::string& name,
     clothObj->addVisualModel(normalsVisualModel);*/
 
     // Setup the Object
-    auto tissueObj = std::make_shared<PbdObject>(name);
-    tissueObj->addVisualModel(visualModel);
-    tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
-    tissueObj->setDynamicalModel(pbdModel);
-    tissueObj->getPbdBody()->uniformMassValue = 0.1;
+    auto tissueObj = SceneUtils::makePbdEntity(name, surfMesh, surfMesh, tissueMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    auto method = tissueObj->getComponent<PbdMethod>();
+    method->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
+    method->setUniformMass(0.1);
+
     // Fix the borders
+    std::vector<int> fixedNodeIds;
     for (int z = 0; z < dim[2]; z++)
     {
         for (int y = 0; y < dim[1]; y++)
@@ -139,19 +135,20 @@ makeTissueObj(const std::string& name,
             {
                 if (x == 0 || /*z == 0 ||*/ x == dim[0] - 1 /*|| z == dim[2] - 1*/)
                 {
-                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                    fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
                 }
             }
         }
     }
+    method->setFixedNodes(fixedNodeIds);
 
     tissueObj->addComponent<Puncturable>();
 
     return tissueObj;
 }
 
-static std::shared_ptr<PbdObject>
-makeToolObj(std::shared_ptr<PbdModel> pbdModel)
+static std::shared_ptr<Entity>
+makeToolObj(std::shared_ptr<PbdSystem> pbdSystem)
 {
     auto                    toolGeom = std::make_shared<LineMesh>();
     VecDataArray<double, 3> vertices = { Vec3d(0.0, -1.0, 0.0), Vec3d(0.0, 1.0, 0.0) };
@@ -164,19 +161,17 @@ makeToolObj(std::shared_ptr<PbdModel> pbdModel)
     syringeMesh->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2, Geometry::TransformType::ApplyToData);
     syringeMesh->translate(Vec3d(0.0, 4.4, 0.0), Geometry::TransformType::ApplyToData);
 
-    auto toolObj = std::make_shared<PbdObject>("NeedlePbdTool");
-    toolObj->setVisualGeometry(syringeMesh);
-    toolObj->addComponent<Collider>()->setGeometry(toolGeom);
-    toolObj->setPhysicsGeometry(toolGeom);
-    toolObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, syringeMesh));
-    toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
-    toolObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
+    auto toolObj    = SceneUtils::makePbdEntity("NeedlePbdTool", syringeMesh, toolGeom, toolGeom, pbdSystem);
+    auto toolVisual = toolObj->getComponent<VisualModel>();
+    auto toolMethod = toolObj->getComponent<PbdMethod>();
+    toolMethod->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, syringeMesh));
+    toolVisual->getRenderMaterial()->setColor(Color(0.9, 0.9, 0.9));
+    toolVisual->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    toolVisual->getRenderMaterial()->setRoughness(0.5);
+    toolVisual->getRenderMaterial()->setMetalness(1.0);
+    toolVisual->getRenderMaterial()->setIsDynamicMesh(false);
 
-    toolObj->setDynamicalModel(pbdModel);
-    toolObj->getPbdBody()->setRigid(Vec3d(0.0, 2.0, 0.0), 0.1, Quatd::Identity(), Mat3d::Identity() * 10000.0);
+    toolMethod->setRigid(Vec3d(0.0, 2.0, 0.0), 0.1, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     // Add a component for needle puncturing
     auto needle = toolObj->addComponent<StraightNeedle>();
@@ -184,7 +179,7 @@ makeToolObj(std::shared_ptr<PbdModel> pbdModel)
 
     // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
-    controller->setControlledObject(toolObj);
+    controller->setControlledObject(toolMethod, toolVisual);
     controller->setTranslationScaling(50.0);
     controller->setLinearKs(1000.0);
     controller->setAngularKs(10000000.0);
@@ -217,12 +212,12 @@ main()
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
     // Setup a tissue
-    std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
+    std::shared_ptr<Entity> tissueObj = makeTissueObj("Tissue",
         Vec3d(10.0, 3.0, 10.0), Vec3i(7, 3, 6), Vec3d(0.1, -1.0, 0.0));
     scene->addSceneObject(tissueObj);
 
-    auto                       pbdModel = std::dynamic_pointer_cast<PbdModel>(tissueObj->getDynamicalModel());
-    std::shared_ptr<PbdObject> toolObj  = makeToolObj(pbdModel);
+    auto                    pbdSystem = tissueObj->getComponent<PbdMethod>()->getPbdSystem();
+    std::shared_ptr<Entity> toolObj   = makeToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
     scene->addInteraction(std::make_shared<NeedleSurfaceInteraction>(tissueObj, toolObj));
@@ -272,10 +267,10 @@ main()
         controller->setDevice(deviceClient);
 
         connect<Event>(sceneManager, &SceneManager::preUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
                 // Keep the tool moving in real time
-                tissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+                pbdSystem->getConfig()->m_dt = sceneManager->getDt();
             });
 
         // Add default mouse and keyboard controls to the viewer

@@ -17,9 +17,11 @@
 // using namespace imstk;
 namespace imstk
 {
-class PbdObject;
-class PbdBaryPointToPointConstraint;
+class Entity;
 class LineMesh;
+class Needle;
+class PbdBaryPointToPointConstraint;
+class Puncturable;
 class TetrahedralMesh;
 
 /// \class NeedlePbdCH
@@ -36,10 +38,14 @@ public:
 
     IMSTK_TYPE_NAME(NeedlePbdCH)
 
+    void setTissue(std::shared_ptr<Entity> tissueEntity) { m_tissue.entity = tissueEntity.get(); }
+    void setNeedle(std::shared_ptr<Entity> needleEntity) { m_needle.entity = needleEntity.get(); }
+    void setThread(std::shared_ptr<Entity> threadEntity) { m_thread.entity = threadEntity.get(); }
+
     ///
     /// \brief Initialize interaction data
     ///
-    void init(std::shared_ptr<PbdObject> threadObj);
+    bool initialize() override;
 
     ///
     /// \brief Create stitching constraints on button press for four or more puncture points
@@ -95,12 +101,33 @@ protected:
     bool m_stitch = false;
 
     // Thread Data
-    std::shared_ptr<PbdObject> m_threadObj;
-    std::shared_ptr<LineMesh>  m_threadMesh;
+    struct
+    {
+        Entity* entity       = nullptr;
+        PbdMethod* method    = nullptr;
+        LineMesh* threadMesh = nullptr;
+    } m_thread;
+    // std::shared_ptr<Entity> m_threadObj;
+    // std::shared_ptr<LineMesh>  m_threadMesh;
 
-    // PBD Tissue Mesh Data
-    std::shared_ptr<PbdObject>   m_pbdTissueObj;
-    std::shared_ptr<SurfaceMesh> m_tissueSurfMesh;
+    // PBD Tissue Data
+    struct
+    {
+        Entity* entity        = nullptr;
+        Collider* collider    = nullptr;
+        PbdMethod* method     = nullptr;
+        SurfaceMesh* surfMesh = nullptr;
+        std::shared_ptr<Puncturable> puncturable;
+    } m_tissue;
+
+    // Needle Data
+    struct
+    {
+        Entity* entity     = nullptr;
+        Collider* collider = nullptr;
+        std::shared_ptr<Needle> needleComp;
+    } m_needle;
+    // std::shared_ptr<SurfaceMesh> m_tissueSurfMesh;
 
     bool m_punctured = false;
 };

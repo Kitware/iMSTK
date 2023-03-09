@@ -13,6 +13,9 @@
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
+// Temporary: Ideally, Scene shouldn't be aware of PbdMethod, PbdSystem.
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystem.h"
 
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskGraph.h"
@@ -21,7 +24,7 @@
 #include "imstkTimer.h"
 #include "imstkTrackingDeviceControl.h"
 #include "imstkVisualModel.h"
-#include "imstkAbstractDynamicalModel.h"
+#include "imstkAbstractDynamicalSystem.h"
 
 namespace imstk
 {
@@ -50,12 +53,21 @@ Scene::initialize()
 {
     // Gather all the systems from the object components
     // Right now this just includes DynamicalModel's
-    std::unordered_set<std::shared_ptr<AbstractDynamicalModel>> systems;
+    std::unordered_set<std::shared_ptr<AbstractDynamicalSystem>> systems;
     for (const auto& ent : m_sceneEntities)
     {
         if (auto dynObj = std::dynamic_pointer_cast<DynamicObject>(ent))
         {
             systems.insert(dynObj->getDynamicalModel());
+        }
+        else
+        {
+            // Add all the PbdSystems associated with the entities.
+            auto methods = ent->getComponents<PbdMethod>();
+            for (const auto& m : methods)
+            {
+                systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(m->getPbdSystem()));
+            }
         }
     }
 
@@ -192,7 +204,7 @@ Scene::buildTaskGraph()
             auto behaviour = std::dynamic_pointer_cast<SceneBehaviour>(comp);
             if (behaviour != nullptr && behaviour->getTaskGraph() != nullptr)
             {
-                behaviour->initTaskGraphEdges();
+                behaviour->initGraphEdges();
             }
         }
     }

@@ -12,7 +12,7 @@
 
 namespace imstk
 {
-class SceneObject;
+class VisualModel;
 
 ///
 /// \class SceneObjectController
@@ -33,11 +33,11 @@ public:
     ///
     /// \brief Get/Set controlled scene object
     ///@{
-    std::shared_ptr<SceneObject> getControlledObject() const { return m_sceneObject; }
-    virtual void setControlledObject(std::shared_ptr<SceneObject> so) { m_sceneObject = so; }
+    std::shared_ptr<VisualModel> getControlledObject() const { return m_sceneObject; }
+    void setControlledObject(std::shared_ptr<VisualModel> so) { m_sceneObject = so; }
 ///@}
 
 protected:
-    std::shared_ptr<SceneObject> m_sceneObject; ///< SceneObject controlled by the Tracker
+    std::shared_ptr<VisualModel> m_sceneObject; ///< SceneObject controlled by the Tracker
 };
 } // namespace imstk

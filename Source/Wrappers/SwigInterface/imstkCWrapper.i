@@ -88,7 +88,7 @@
 #include "imstkAbstractDynamicalModel.h"
 #include "imstkDynamicalModel.h"
 #include "imstkPbdModelConfig.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdStrainEnergyConstraint.h"
 #include "imstkPbdCollisionConstraint.h"
 #include "imstkSphBoundaryConditions.h"
@@ -367,7 +367,7 @@ namespace std
 %include "../../DynamicalModels/ObjectModels/imstkAbstractDynamicalModel.h"
 %include "../../DynamicalModels/ObjectModels/imstkDynamicalModel.h"
 %include "../../DynamicalModels/ObjectModels/imstkPbdModelConfig.h"
-%include "../../DynamicalModels/ObjectModels/imstkPbdModel.h"
+%include "../../DynamicalModels/ObjectModels/imstkPbdSystem.h"
 // %template(DynamicalModelFeDeformBodyState) imstk::DynamicalModel<imstk::FeDeformBodyState>;
 %include "../../DynamicalModels/ObjectModels/imstkSphBoundaryConditions.h"
 %include "../../DynamicalModels/ObjectStates/imstkSphState.h"

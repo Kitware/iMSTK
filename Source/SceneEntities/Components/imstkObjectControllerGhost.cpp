@@ -39,8 +39,8 @@ ObjectControllerGhost::init()
         << "ObjectControllerGhost must have a controller";
 
     // Copy the geometry to the ghost visual model
-    auto                      controlledObj = m_pbdController->getControlledObject();
-    std::shared_ptr<Geometry> ghostGeom     = controlledObj->getVisualGeometry()->clone();
+    auto                      controlledObj = std::dynamic_pointer_cast<SceneObjectController>(m_pbdController)->getControlledObject();
+    std::shared_ptr<Geometry> ghostGeom     = controlledObj->getGeometry()->clone();
     CHECK(ghostGeom != nullptr) << "Failed to copy controller geometry";
     m_ghostVisualModel->setGeometry(ghostGeom);
 }

@@ -14,18 +14,19 @@
 #include "imstkIsometricMap.h"
 #include "imstkMeshIO.h"
 #include "imstkPbdContactConstraint.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectGrasping.h"
+#include "imstkPbdSystem.h"
 #include "imstkPlane.h"
 #include "imstkPortHoleInteraction.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneControlText.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkSphere.h"
@@ -46,12 +47,10 @@ using namespace imstk;
 ///
 /// \brief Create a laprascopic tool object
 ///
-std::shared_ptr<PbdObject>
-makeLapToolObj(const std::string&        name,
-               std::shared_ptr<PbdModel> model)
+std::shared_ptr<Entity>
+makeLapToolObj(const std::string&         name,
+               std::shared_ptr<PbdSystem> model)
 {
-    auto lapTool = std::make_shared<PbdObject>(name);
-
     const double capsuleLength = 0.3;
     auto         toolGeom      = std::make_shared<Capsule>(
         Vec3d(0.0, 0.0, capsuleLength * 0.5 - 0.005), // Position
@@ -68,33 +67,32 @@ makeLapToolObj(const std::string&        name,
 
     auto lapToolVisualGeom = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/LapTool/laptool_all_in_one.obj");
 
-    lapTool->setDynamicalModel(model);
-    lapTool->setPhysicsGeometry(toolGeom);
-    lapTool->addComponent<Collider>()->setGeometry(toolGeom);
-    lapTool->setVisualGeometry(lapToolVisualGeom);
-    lapTool->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, lapToolVisualGeom));
+    auto lapTool       = SceneUtils::makePbdEntity(name, lapToolVisualGeom, toolGeom, toolGeom, model);
+    auto lapToolVisual = lapTool->getComponent<VisualModel>();
+    auto lapToolMethod = lapTool->getComponent<PbdMethod>();
+    lapToolMethod->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolGeom, lapToolVisualGeom));
+
+    std::shared_ptr<RenderMaterial> material = lapToolVisual->getRenderMaterial();
+    material->setIsDynamicMesh(false);
+    material->setMetalness(1.0);
+    material->setRoughness(0.2);
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
 
     // Add grasp capsule for visualization
     auto graspVisualModel = std::make_shared<VisualModel>();
     graspVisualModel->setGeometry(graspCapsule);
     graspVisualModel->getRenderMaterial()->setIsDynamicMesh(false);
     graspVisualModel->setIsVisible(false);
-    lapTool->addVisualModel(graspVisualModel);
+    lapTool->addComponent(graspVisualModel);
 
-    std::shared_ptr<RenderMaterial> material = lapTool->getVisualModel(0)->getRenderMaterial();
-    material->setIsDynamicMesh(false);
-    material->setMetalness(1.0);
-    material->setRoughness(0.2);
-    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
-
-    lapTool->getPbdBody()->setRigid(
+    lapToolMethod->setRigid(
         Vec3d(0.0, 0.0, capsuleLength * 0.5) + Vec3d(0.0, 0.1, -1.0),
         5.0,
         Quatd::Identity(),
         Mat3d::Identity() * 0.08);
 
     auto controller = lapTool->addComponent<PbdObjectController>();
-    controller->setControlledObject(lapTool);
+    controller->setControlledObject(lapToolMethod, lapToolVisual);
     controller->setLinearKs(10000.0);
     controller->setAngularKs(10.0);
     controller->setForceScaling(0.01);
@@ -125,15 +123,13 @@ makeLapToolObj(const std::string&        name,
 ///
 /// \brief Create pbd string object attached to a needle
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makePbdString(
     const std::string& name,
     const Vec3d& pos, const Vec3d& dir, const int numVerts,
     const double stringLength,
-    std::shared_ptr<PbdObject> needleObj)
+    std::shared_ptr<Entity> needleObj)
 {
-    auto stringObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<LineMesh> stringMesh =
         GeometryUtils::toLineGrid(pos, dir, stringLength, numVerts);
@@ -147,37 +143,36 @@ makePbdString(
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
     // Setup the Object
-    stringObj->setVisualGeometry(stringMesh);
-    stringObj->getVisualModel(0)->setRenderMaterial(material);
-    stringObj->setPhysicsGeometry(stringMesh);
-    stringObj->addComponent<Collider>()->setGeometry(stringMesh);
-    std::shared_ptr<PbdModel> model = needleObj->getPbdModel();
-    stringObj->setDynamicalModel(model);
+    auto                       needleMethod = needleObj->getComponent<PbdMethod>();
+    std::shared_ptr<PbdSystem> system       = needleMethod->getPbdSystem();
+    auto                       stringObj    = SceneUtils::makePbdEntity(name, stringMesh, system);
+    stringObj->getComponent<VisualModel>()->setRenderMaterial(material);
     //stringObj->getPbdBody()->fixedNodeIds = { 0, 1, 19, 20 };
-    stringObj->getPbdBody()->uniformMassValue = 0.02;
+    auto stringMethod = stringObj->getComponent<PbdMethod>();
+    stringMethod->setUniformMass(0.02);
 
-    const int bodyHandle = stringObj->getPbdBody()->bodyHandle;
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1000.0,
-        bodyHandle);
+    const int stringHandle = stringMethod->getBodyHandle();
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1000.0,
+        stringHandle);
     // It should have a high bend but without plasticity it's very difficult to use
-    //model->getConfig()->enableBendConstraint(100.0, 1, true, bodyHandle);
-    model->getConfig()->enableBendConstraint(1.0, 1, true, bodyHandle);
-    //model->getConfig()->enableBendConstraint(0.1, 2, true, bodyHandle);
+    //system->getConfig()->enableBendConstraint(100.0, 1, true, stringHandle);
+    system->getConfig()->enableBendConstraint(1.0, 1, true, stringHandle);
+    //system->getConfig()->enableBendConstraint(0.1, 2, true, stringHandle);
 
     // Add a component to update the suture thread to be on the needle
-    auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getPhysicsGeometry());
+    auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleMethod->getGeometry());
 
     // Add an attachment constraint for two-way between the string and needle
     // This is important to be able to pull the needle by the string
-    model->getConfig()->addPbdConstraintFunctor([ = ](PbdConstraintContainer& container)
+    system->getConfig()->addPbdConstraintFunctor([ = ](PbdConstraintContainer& container)
         {
             const Vec3d endOfNeedle   = (*needleLineMesh->getVertexPositions())[0];
             auto attachmentConstraint = std::make_shared<PbdBodyToBodyDistanceConstraint>();
-            attachmentConstraint->initConstraint(model->getBodies(),
-                { needleObj->getPbdBody()->bodyHandle, 0 },
+            attachmentConstraint->initConstraint(system->getBodies(),
+                { needleMethod->getBodyHandle(), 0 },
                 endOfNeedle,
-                { stringObj->getPbdBody()->bodyHandle, 0 }, // Start of string
-                0.0,                                        // Rest length
+                { stringHandle, 0 }, // Start of string
+                0.0,                 // Rest length
                 0.0000001);
             container.addConstraint(attachmentConstraint);
         });
@@ -201,7 +196,7 @@ LapToolSuturingExample()
     scene->getActiveCamera()->setPosition(-0.000866941, 0.0832288, -1.20377);
     scene->getActiveCamera()->setViewUp(0.0601552, 0.409407, -0.910367);
 
-    auto model = std::make_shared<PbdModel>();
+    auto model = std::make_shared<PbdSystem>();
     model->getConfig()->m_gravity = Vec3d::Zero();
     model->getConfig()->m_dt      = 0.001;
     model->getConfig()->m_doPartitioning = false;
@@ -223,30 +218,28 @@ LapToolSuturingExample()
     }
     scene->addSceneObject(bodyObject);
 
-    std::shared_ptr<PbdObject> leftToolObj = makeLapToolObj("leftLapTool", model);
+    auto leftToolObj = makeLapToolObj("leftLapTool", model);
     scene->addSceneObject(leftToolObj);
-    std::shared_ptr<PbdObject> rightToolObj = makeLapToolObj("rightLapTool", model);
+    auto rightToolObj = makeLapToolObj("rightLapTool", model);
     scene->addSceneObject(rightToolObj);
 
     // Make a pbd rigid body needle
-    auto needleObj = std::make_shared<PbdObject>();
+    std::shared_ptr<Entity> needleObj;
     {
         auto needleMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
         auto needleLineMesh = MeshIO::read<LineMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture_hull.vtk");
         // Transform so center of mass is in center of the needle
         needleMesh->translate(Vec3d(0.0, -0.0047, -0.0087), Geometry::TransformType::ApplyToData);
         needleLineMesh->translate(Vec3d(0.0, -0.0047, -0.0087), Geometry::TransformType::ApplyToData);
-        needleObj->setVisualGeometry(needleMesh);
-        needleObj->addComponent<Collider>()->setGeometry(needleLineMesh);
-        needleObj->setPhysicsGeometry(needleLineMesh);
-        needleObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(needleLineMesh, needleMesh));
-        needleObj->setDynamicalModel(model);
-        needleObj->getPbdBody()->setRigid(
+        needleObj = SceneUtils::makePbdEntity("Needle", needleMesh, needleLineMesh, needleLineMesh, model);
+        auto needleMethod = needleObj->getComponent<PbdMethod>();
+        needleMethod->setPhysicsToVisualMap(std::make_shared<IsometricMap>(needleLineMesh, needleMesh));
+        needleMethod->setRigid(
             Vec3d(0.02, 0.0, -1.26),
             1.0,
             Quatd::Identity(),
             Mat3d::Identity() * 0.01);
-        needleObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Orange);
+        needleObj->getComponent<VisualModel>()->getRenderMaterial()->setColor(Color::Orange);
     }
     scene->addSceneObject(needleObj);
 
@@ -269,16 +262,16 @@ LapToolSuturingExample()
     //threadCollision1->setFriction(0.1);
     scene->addInteraction(threadCollision1);
 
-    auto leftNeedleGrasping = std::make_shared<PbdObjectGrasping>(needleObj, leftToolObj);
+    auto leftNeedleGrasping = std::make_shared<PbdObjectGrasping>(needleObj->getComponent<PbdMethod>(), leftToolObj->getComponent<PbdMethod>());
     leftNeedleGrasping->setCompliance(0.00001);
     scene->addInteraction(leftNeedleGrasping);
-    auto leftThreadGrasping = std::make_shared<PbdObjectGrasping>(sutureThreadObj, leftToolObj);
+    auto leftThreadGrasping = std::make_shared<PbdObjectGrasping>(sutureThreadObj->getComponent<PbdMethod>(), leftToolObj->getComponent<PbdMethod>());
     leftThreadGrasping->setCompliance(0.00001);
     scene->addInteraction(leftThreadGrasping);
-    auto rightNeedleGrasping = std::make_shared<PbdObjectGrasping>(needleObj, rightToolObj);
+    auto rightNeedleGrasping = std::make_shared<PbdObjectGrasping>(needleObj->getComponent<PbdMethod>(), rightToolObj->getComponent<PbdMethod>());
     rightNeedleGrasping->setCompliance(0.00001);
     scene->addInteraction(rightNeedleGrasping);
-    auto rightThreadGrasping = std::make_shared<PbdObjectGrasping>(sutureThreadObj, rightToolObj);
+    auto rightThreadGrasping = std::make_shared<PbdObjectGrasping>(sutureThreadObj->getComponent<PbdMethod>(), rightToolObj->getComponent<PbdMethod>());
     rightThreadGrasping->setCompliance(0.00001);
     scene->addInteraction(rightThreadGrasping);
 
@@ -348,7 +341,7 @@ LapToolSuturingExample()
                 if (e->m_buttonState == BUTTON_PRESSED)
                 {
                     auto graspCapsule = std::dynamic_pointer_cast<Capsule>(
-                        leftToolObj->getVisualModel(1)->getGeometry());
+                        leftToolObj->getComponentN<VisualModel>(1)->getGeometry());
                     leftNeedleGrasping->beginCellGrasp(graspCapsule);
                     leftThreadGrasping->beginCellGrasp(graspCapsule);
                 }
@@ -362,7 +355,7 @@ LapToolSuturingExample()
 
     // Add port holes
     auto portHoleInteraction = rightToolObj->addComponent<PortHoleInteraction>();
-    portHoleInteraction->setTool(rightToolObj);
+    portHoleInteraction->setTool(rightToolObj->getComponent<PbdMethod>());
     portHoleInteraction->setPortHoleLocation(Vec3d(0.015, 0.092, -1.117));
     auto sphere = std::make_shared<Sphere>(Vec3d(0.015, 0.092, -1.117), 0.01);
     auto rightPortVisuals = rightToolObj->addComponent<VisualModel>();
@@ -371,7 +364,7 @@ LapToolSuturingExample()
     portHoleInteraction->setCompliance(0.000001);
 
     auto portHoleInteraction2 = leftToolObj->addComponent<PortHoleInteraction>();
-    portHoleInteraction2->setTool(leftToolObj);
+    portHoleInteraction2->setTool(leftToolObj->getComponent<PbdMethod>());
     portHoleInteraction2->setPortHoleLocation(Vec3d(-0.065, 0.078, -1.127));
     auto sphere2 = std::make_shared<Sphere>(Vec3d(-0.065, 0.078, -1.127), 0.01);
     auto leftPortVisuals = leftToolObj->addComponent<VisualModel>();
@@ -422,7 +415,7 @@ LapToolSuturingExample()
                 const Vec2d& mousePos = mouseDeviceClient->getPos();
 
                 auto geom =
-                    std::dynamic_pointer_cast<AnalyticalGeometry>(rightToolObj->getPhysicsGeometry());
+                    std::dynamic_pointer_cast<AnalyticalGeometry>(rightToolObj->getComponent<PbdMethod>()->getGeometry());
 
                 // Use plane definition for dummy movement
                 Vec3d a = Vec3d(0.0, 1.0, 0.0);
@@ -441,15 +434,15 @@ LapToolSuturingExample()
                 dummyOffset += e->m_scrollDx * 0.01;
             });
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
-            [&](MouseEvent* e)
+            [&](MouseEvent*)
             {
                 auto graspCapsule = std::dynamic_pointer_cast<Capsule>(
-                    rightToolObj->getVisualModel(1)->getGeometry());
+                    rightToolObj->getComponentN<VisualModel>(1)->getGeometry());
                 rightNeedleGrasping->beginCellGrasp(graspCapsule);
                 rightThreadGrasping->beginCellGrasp(graspCapsule);
             });
         connect<MouseEvent>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
-            [&](MouseEvent* e)
+            [&](MouseEvent*)
             {
                 rightNeedleGrasping->endGrasp();
                 rightThreadGrasping->endGrasp();

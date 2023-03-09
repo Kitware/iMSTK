@@ -65,7 +65,7 @@ main()
     scene->addSceneObject(object);
 
     imstkNew<SceneObjectController> controller;
-    controller->setControlledObject(object);
+    controller->setControlledObject(object->getComponent<VisualModel>());
     controller->setDevice(client);
     controller->setTranslationScaling(0.1);
     scene->addControl(controller);

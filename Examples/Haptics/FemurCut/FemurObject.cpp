@@ -54,7 +54,7 @@ FemurObject::setup()
     model->setModelGeometry(sdf);
     model->configure(lvlSetConfig);
 
-    setPhysicsGeometry(sdf);
+    setGeometry(sdf);
     //setCollidingGeometry(sdf);
     auto collider = this->addComponent<Collider>();
     collider->setGeometry(sdf);

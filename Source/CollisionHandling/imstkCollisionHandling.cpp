@@ -22,21 +22,17 @@ CollisionHandling::update()
     const std::vector<CollisionElement>* a = &m_colData->elementsA;
     const std::vector<CollisionElement>* b = &m_colData->elementsB;
 
-    std::shared_ptr<Geometry> handleGeomA = getHandlingGeometryA();
-    std::shared_ptr<Geometry> handleGeomB = getHandlingGeometryB();
+    std::shared_ptr<Geometry> handleGeomA = getCollidingGeometryA();
+    std::shared_ptr<Geometry> handleGeomB = getCollidingGeometryB();
 
     bool flipSides = false;
     // If the geometry of the CD exists on the input object B then flip
     if (m_colData->geomA != nullptr
-        && m_inputObjectB != nullptr
-        && handleGeomB != nullptr
         && m_colData->geomA == handleGeomB)
     {
         flipSides = true;
     }
     if (m_colData->geomB != nullptr
-        && m_inputObjectA != nullptr
-        && handleGeomA != nullptr
         && m_colData->geomB == handleGeomA)
     {
         flipSides = true;
@@ -48,17 +44,5 @@ CollisionHandling::update()
     }
 
     handle(*a, *b);
-}
-
-std::shared_ptr<Geometry>
-CollisionHandling::getHandlingGeometryA()
-{
-    return Collider::getCollidingGeometryFromEntity(m_inputObjectA.get());
-}
-
-std::shared_ptr<Geometry>
-CollisionHandling::getHandlingGeometryB()
-{
-    return Collider::getCollidingGeometryFromEntity(m_inputObjectB.get());
 }
 } // namespace imstk

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkAbstractDynamicalModel.h"
+#include "imstkAbstractDynamicalSystem.h"
 #include "imstkPbdBody.h"
 #include "imstkPbdConstraint.h"
 
@@ -16,40 +16,54 @@
 namespace imstk
 {
 class PbdConstraintContainer;
-class PbdModelConfig;
+class PbdSystemConfig;
 class PbdSolver;
 
 ///
-/// \class PbdModel
+/// \class PbdSystem
 ///
 /// \brief This class implements the position based dynamics model. The
-/// PbdModel is a constraint based model that iteratively solves constraints
-/// to simulate the dynamics of a body. PbdModel supports SurfaceMesh,
-/// LineMesh, or TetrahedralMesh. PointSet is also supported for PBD fluids.
+/// PbdSystem is a constraint based model that iteratively solves constraints
+/// to simulate the dynamics of a body.
 ///
-/// One of the distinct properties of the PbdModel is that it is first order.
-/// This means it simulates dynamics by modifying positions directly. Velocities
-/// of the model are computed after positions are solved. Velocities from the
-/// previous iteration are applied at the start of the update.
+/// PbdSystem supports multiple bodies which may either be rigid, deformable
+/// or fluid. While a rigid body only consists of one node, the geometry of
+/// deformable bodies may be defined through Line, Surface or Tetrahedral
+/// Meshes. Fluid meshes require a Pointset for their geometry.
+///
+/// One of the distinct properties of the PbdSystem is that it is first order.
+/// This means it simulates dynamics by modifying positions directly.
+/// Velocities of the model are computed after positions are solved. Velocities
+/// from the previous iteration are applied at the start of the update.
 ///
 /// References:
-/// Matthias Muller, Bruno Heidelberger, Marcus Hennix, and John Ratcliff. 2007. Position based dynamics.
-/// Miles Macklin, Matthias Muller, and Nuttapong Chentanez 1. XPBD: position-based simulation of compliant constrained dynamics.
-/// Matthias Mullerm, Miles Macklin, Nuttapong Chentanez, Stefan Jeschke, and Tae-Yong Kim. 2020. Detailed Rigid Body Simulation with Extended Position Based Dynamics
-/// Jan Bender, Matthias Muller, Miles Macklin. 2017. A Survey on Position Based Dynamics, 2017.
+/// [1] Matthias Muller, Bruno Heidelberger, Marcus Hennix, and John Ratcliff.
+/// 2007. Position based dynamics.
 ///
-class PbdModel : public AbstractDynamicalModel
+/// [2] Miles Macklin, Matthias Muller, and Nuttapong Chentanez 1.
+/// XPBD: position-based simulation of compliant constrained dynamics.
+///
+/// [3] Matthias Mullerm, Miles Macklin, Nuttapong Chentanez, Stefan Jeschke,
+/// and Tae-Yong Kim. 2020.
+///
+/// [4] Detailed Rigid Body Simulation with Extended Position Based Dynamics
+/// Jan Bender, Matthias Muller, Miles Macklin.
+/// A Survey on Position Based Dynamics, 2017.
+///
+class PbdSystem : public AbstractDynamicalSystem
 {
 public:
-    PbdModel();
-    ~PbdModel() override = default;
+    using AbstractDynamicalSystem::initGraphEdges;
+
+    PbdSystem();
+    ~PbdSystem() override = default;
 
     void resetToInitialState() override;
 
     ///
     /// \brief Set simulation parameters
     ///
-    void configure(std::shared_ptr<PbdModelConfig> params);
+    void configure(std::shared_ptr<PbdSystemConfig> params);
 
     ///
     /// \brief Add/remove PbdBody
@@ -87,7 +101,7 @@ public:
     ///
     /// \brief Get the simulation parameters
     ///
-    std::shared_ptr<PbdModelConfig> getConfig() const;
+    std::shared_ptr<PbdSystemConfig> getConfig() const;
 
     ///
     /// \brief Add/generate constraints for given set of vertices on the body, useful for
@@ -149,8 +163,8 @@ public:
     std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
 
 protected:
-    // Hide this function as PbdModel doesn't require it. It can support multiple bodies
-    using AbstractDynamicalModel::setModelGeometry;
+    // Hide this function as PbdSystem doesn't require it. It can support multiple bodies
+    using AbstractDynamicalSystem::setModelGeometry;
 
     ///
     /// \brief Resize the amount of particles for a body
@@ -170,15 +184,15 @@ protected:
     PbdState m_initialState;
     PbdState m_state;
 
-    std::shared_ptr<PbdSolver>      m_pbdSolver = nullptr;     ///< PBD solver
-    std::shared_ptr<PbdModelConfig> m_config    = nullptr;     ///< Model parameters, must be set before simulation
-    std::shared_ptr<PbdConstraintContainer> m_constraints;     ///< The set of constraints to update/use
+    std::shared_ptr<PbdSolver>       m_pbdSolver;          ///< PBD solver
+    std::shared_ptr<PbdSystemConfig> m_config;             ///< Model parameters, must be set before simulation
+    std::shared_ptr<PbdConstraintContainer> m_constraints; ///< The set of constraints to update/use
 
     ///< Computational Nodes
     ///@{
-    std::shared_ptr<TaskNode> m_integrationPositionNode = nullptr;
-    std::shared_ptr<TaskNode> m_solveConstraintsNode    = nullptr;
-    std::shared_ptr<TaskNode> m_updateVelocityNode      = nullptr;
+    std::shared_ptr<TaskNode> m_integrationPositionNode;
+    std::shared_ptr<TaskNode> m_solveConstraintsNode;
+    std::shared_ptr<TaskNode> m_updateVelocityNode;
     ///@}
 };
 } // namespace imstk

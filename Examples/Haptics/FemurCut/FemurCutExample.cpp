@@ -20,13 +20,14 @@
 #include "imstkObjectControllerGhost.h"
 #include "imstkPbdBody.h"
 #include "imstkPbdCollisionHandling.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectController.h"
+#include "imstkPbdSystem.h"
 #include "imstkRigidObjectLevelSetCollision.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkSurfaceMesh.h"
@@ -41,15 +42,14 @@
 
 using namespace imstk;
 
-std::shared_ptr<PbdObject>
+std::shared_ptr<Entity>
 makeCuttingTool(const std::string& name)
 {
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->getConfig()->m_iterations = 6;
-    pbdModel->getConfig()->m_gravity    = Vec3d::Zero();
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->getConfig()->m_iterations = 6;
+    pbdSystem->getConfig()->m_gravity    = Vec3d::Zero();
 
     // Create the first pbd, plane floor
-    auto cuttingTool = std::make_shared<PbdObject>(name);
 
     auto toolMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Hull_Subdivided_Shifted.stl");
     toolMesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
@@ -64,18 +64,15 @@ makeCuttingTool(const std::string& name)
     material->setDiffuseColor(Color(0.7, 0.7, 0.7));
 
     // Create the object
-    cuttingTool->setVisualGeometry(toolMesh);
-    cuttingTool->setPhysicsGeometry(toolMesh);
-
-    cuttingTool->addComponent<Collider>()->setGeometry(toolMesh);
-
-    cuttingTool->setDynamicalModel(pbdModel);
-    cuttingTool->getVisualModel(0)->setRenderMaterial(material);
-    cuttingTool->getPbdBody()->setRigid(Vec3d(0.0, 1.0, 2.0), 10.0, Quatd::Identity(), Mat3d::Identity() * 1000.0);
+    auto cuttingTool = SceneUtils::makePbdEntity(name, toolMesh, pbdSystem);
+    auto visualModel = cuttingTool->getComponent<VisualModel>();
+    auto pbdMethod   = cuttingTool->getComponent<PbdMethod>();
+    visualModel->setRenderMaterial(material);
+    pbdMethod->setRigid(Vec3d(0.0, 1.0, 2.0), 10.0, Quatd::Identity(), Mat3d::Identity() * 1000.0);
 
     // Add a component for controlling via another device
     auto controller = cuttingTool->addComponent<PbdObjectController>();
-    controller->setControlledObject(cuttingTool);
+    controller->setControlledObject(pbdMethod, visualModel);
     controller->setLinearKs(50000.0);
     controller->setAngularKs(300000000.0);
     controller->setUseCritDamping(true);
@@ -110,20 +107,16 @@ main()
     scene->addSceneObject(femurBone);
 
     // Setup the tool that cuts the femur
-    std::shared_ptr<PbdObject> cuttingTool = makeCuttingTool("CuttingTool");
+    auto cuttingTool = makeCuttingTool("CuttingTool");
     scene->addSceneObject(cuttingTool);
 
     // Setup cutting interaction between level set femur and rigid object tool
     auto cutting = std::make_shared<RigidObjectLevelSetCollision>(cuttingTool, femurBone);
-    {
-        auto colHandlerA = std::dynamic_pointer_cast<PbdCollisionHandling>(cutting->getCollisionHandlingA());
-
-        auto colHandlerB = std::dynamic_pointer_cast<LevelSetCH>(cutting->getCollisionHandlingB());
-        colHandlerB->setLevelSetVelocityScaling(0.01);
-        colHandlerB->setKernel(3, 1.0);
-        //colHandlerB->setLevelSetVelocityScaling(0.0); // Can't push the levelset
-        colHandlerB->setUseProportionalVelocity(true);
-    }
+    cutting->setLevelSetKernelSize(3);
+    cutting->setLevelSetKernelSigma(1.0);
+    //cutting->setLevelSetVelocityScaling(0.0); // Can't push the levelset
+    cutting->setLevelSetVelocityScaling(0.01);
+    cutting->setUseProportionalVelocity(true);
     scene->addInteraction(cutting);
 
     // Light
@@ -172,11 +165,12 @@ main()
         std::shared_ptr<ObjectControllerGhost> ghostObj = cuttingTool->addComponent<ObjectControllerGhost>();
         ghostObj->setController(controller);
 
+        auto cuttingToolMethod = cuttingTool->getComponent<PbdMethod>();
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
             {
-                cuttingTool->getPbdModel()->getConfig()->m_dt    = sceneManager->getDt();
-                femurBone->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
+                cuttingToolMethod->getPbdSystem()->getConfig()->m_dt = sceneManager->getDt();
+                femurBone->getLevelSetModel()->getConfig()->m_dt     = sceneManager->getDt();
         });
 
         // Add default mouse and keyboard controls to the viewer

@@ -17,7 +17,7 @@ namespace imstk
 {
 template<typename T, int N> class VecDataArray;
 class Entity;
-class PbdObject;
+class PbdMethod;
 class SurfaceMesh;
 
 ///
@@ -30,7 +30,7 @@ class SurfaceMesh;
 class PbdObjectCutting : public SceneObject
 {
 public:
-    PbdObjectCutting(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<Entity> cutObj);
+    PbdObjectCutting(std::shared_ptr<PbdMethod> cutableObject, std::shared_ptr<Collider> cuttingObject);
     ~PbdObjectCutting() override = default;
 
     IMSTK_TYPE_NAME(PbdObjectCutting)
@@ -96,8 +96,8 @@ protected:
 
     double m_epsilon = 0.1;
 
-    std::shared_ptr<PbdObject> m_objA = nullptr;
-    std::shared_ptr<Entity>    m_objB = nullptr;
+    std::shared_ptr<PbdMethod> m_cuttable;
+    std::shared_ptr<Collider>  m_cutter;
     std::shared_ptr<Geometry>  m_objBCollisionGeometry;
 
     std::shared_ptr<std::unordered_set<size_t>> m_removeConstraintVertices = std::make_shared<std::unordered_set<size_t>>();

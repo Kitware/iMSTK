@@ -7,22 +7,31 @@
 #include "imstkBoneDrillingCH.h"
 #include "imstkCollisionData.h"
 #include "imstkCollider.h"
+#include "imstkEntity.h"
 #include "imstkParallelFor.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdBody.h"
+#include "imstkPbdMethod.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkVisualModel.h"
 
 namespace imstk
 {
-void
-BoneDrillingCH::setInputObjectDrill(std::shared_ptr<PbdObject> drillObject)
+bool
+BoneDrillingCH::initialize()
 {
-    setInputObjectB(drillObject);
-}
+    CHECK(m_drill != nullptr) << "Input drill Entity is required.";
+    CHECK(m_boneMesh != nullptr) << "Input bone mesh is required.";
 
-std::shared_ptr<PbdObject>
-BoneDrillingCH::getDrillObj() const
-{
-    return std::dynamic_pointer_cast<PbdObject>(getInputObjectB());
+    m_drillCollidingGeometry = Collider::getCollidingGeometryFromEntity(m_drill.get());
+    CHECK(m_drillCollidingGeometry != nullptr) << "Cannot acquire drill colliding geometry.";
+
+    m_drillVisualGeometry = m_drill->getComponent<VisualModel>()->getGeometry();
+    CHECK(m_drillVisualGeometry != nullptr) << "Cannot acquire drill visual geometry.";
+
+    m_drillPbdBody = m_drill->getComponent<PbdMethod>()->getPbdBody();
+    CHECK(m_drillPbdBody != nullptr) << "Cannot acquire drill PbdBody.";
+
+    return true;
 }
 
 void
@@ -89,16 +98,6 @@ BoneDrillingCH::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<PbdObject> drill = getDrillObj();
-
-    // Cache the tet mesh geometry pointer of the boneObj on the first call,
-    // re-use the cached pointer in later iterations.
-    if (!m_boneMesh)
-    {
-        m_boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(Collider::getCollidingGeometryFromEntity(getBoneObj().get()));
-    }
-    CHECK(m_boneMesh != nullptr) << "Cannot acquire shared_ptr to boneMesh.";
-
     if (m_nodalDensity.size() != m_boneMesh->getNumVertices())
     {
         // Initialize bone density values
@@ -138,19 +137,11 @@ BoneDrillingCH::handle(
         return;
     }
 
-    // Check if any collisions
-    // Cache the collider geometry pointer of the drill object on the first call,
-    // re-use the cached pointer in later iterations.
-    if (!m_drillCollidingGeometry)
-    {
-        m_drillCollidingGeometry = Collider::getCollidingGeometryFromEntity(drill.get());
-    }
-    CHECK(m_drillCollidingGeometry != nullptr) << "Cannot acquire shared_ptr to drill colliding geometry.";
     const auto devicePosition = m_drillCollidingGeometry->getTranslation();
     if (elementsA.empty() && elementsB.empty())
     {
         // Set the visual object position same as the colliding object position
-        drill->getVisualGeometry()->setTranslation(devicePosition);
+        m_drillVisualGeometry->setTranslation(devicePosition);
         return;
     }
 
@@ -201,17 +192,17 @@ BoneDrillingCH::handle(
             t = dir;
         }
     }
-    drill->getVisualGeometry()->setTranslation(devicePosition + t);
+    m_drillVisualGeometry->setTranslation(devicePosition + t);
 
     // Spring force
-    Vec3d force = m_stiffness * (drill->getVisualGeometry()->getTranslation() - devicePosition);
+    Vec3d force = m_stiffness * (m_drillVisualGeometry->getTranslation() - devicePosition);
 
     // Damping force
     const double dt = 0.1; // Time step size to calculate the object velocity
     force += m_initialStep ? Vec3d(0.0, 0.0, 0.0) : m_damping * (devicePosition - m_prevPos) / dt;
 
     // Set external force on body
-    drill->getPbdBody()->externalForce = force;
+    m_drillPbdBody->externalForce = force;
 
     // Decrease the density at the nodal points and remove if the density goes below 0
     this->erodeBone(m_boneMesh, elementsA, elementsB);

@@ -93,7 +93,7 @@
 %shared_ptr(imstk::DynamicalModel<imstk::FeDeformBodyState>)
 %shared_ptr(imstk::DynamicalModel<imstk::SphState>)
 %shared_ptr(imstk::SphState)
-%shared_ptr(imstk::PbdModel)
+%shared_ptr(imstk::PbdSystem)
 %shared_ptr(imstk::SphModelConfig)
 %shared_ptr(imstk::SphModel)
 %shared_ptr(imstk::TimeIntegrator)

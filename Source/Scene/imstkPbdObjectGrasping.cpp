@@ -11,8 +11,8 @@
 #include "imstkLineMesh.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
 #include "imstkPbdContactConstraint.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdSystem.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdSolver.h"
 #include "imstkPointPicker.h"
 #include "imstkPointwiseMap.h"
@@ -28,7 +28,7 @@ namespace imstk
 /// \struct GraspedData
 ///
 /// \brief Info needed to add a constraint for the grasped object
-/// Garunteed to be a PbdObject
+/// Garunteed to be a PbdMethod
 ///
 struct GraspedData
 {
@@ -41,7 +41,7 @@ struct GraspedData
 
     GraspedData() = default;
 
-    PbdObject* pbdObj = nullptr;
+    PbdMethod* pbdObj = nullptr;
     Type objType      = Type::Deformable;
 
     VecDataArray<double, 3>* vertices = nullptr;
@@ -51,7 +51,7 @@ struct GraspedData
 };
 
 static GraspedData
-unpackGraspedSide(std::shared_ptr<PbdObject>   obj,
+unpackGraspedSide(std::shared_ptr<PbdMethod>   obj,
                   std::shared_ptr<Geometry>    geometry,
                   std::shared_ptr<GeometryMap> geomMap)
 {
@@ -70,7 +70,7 @@ unpackGraspedSide(std::shared_ptr<PbdObject>   obj,
     if (auto pointSetToPick = std::dynamic_pointer_cast<PointSet>(geometry))
     {
         // Always should be the data that is constrained (ie: the physics mesh)
-        data.vertices = std::dynamic_pointer_cast<PointSet>(obj->getPhysicsGeometry())->getVertexPositions().get();
+        data.vertices = std::dynamic_pointer_cast<PointSet>(obj->getGeometry())->getVertexPositions().get();
 
         // This should stil be the picked geometry
         std::shared_ptr<AbstractDataArray> indicesPtr = nullptr;
@@ -95,7 +95,7 @@ unpackGraspedSide(std::shared_ptr<PbdObject>   obj,
 /// \struct GrasperData
 ///
 /// \brief GrasperData is either a ray, a grasping geometry, or
-/// another PbdObject (rigid)
+/// another PbdMethod (rigid)
 ///
 struct GrasperData
 {
@@ -109,13 +109,13 @@ struct GrasperData
     GrasperData() = default;
 
     Type objType      = Type::Geometry;
-    PbdObject* pbdObj = nullptr;
+    PbdMethod* pbdObj = nullptr;
     Geometry* grasperGeometry = nullptr;
     int bodyId = -1;
 };
 
 static GrasperData
-unpackGrasperSide(std::shared_ptr<PbdObject> grasperObject,
+unpackGrasperSide(std::shared_ptr<PbdMethod> grasperObject,
                   std::shared_ptr<Geometry>  grasperGeometry)
 {
     GrasperData data;
@@ -205,8 +205,8 @@ getWeights(const PbdState& bodies, const std::vector<PbdParticleId>& particles, 
     return weights;
 }
 
-PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> graspedObject,
-                                     std::shared_ptr<PbdObject> grasperObject) :
+PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdMethod> graspedObject,
+                                     std::shared_ptr<PbdMethod> grasperObject) :
     m_objectToGrasp(graspedObject),
     m_grasperObject(grasperObject),
     m_pickMethod(std::make_shared<CellPicker>())
@@ -218,15 +218,15 @@ PbdObjectGrasping::PbdObjectGrasping(std::shared_ptr<PbdObject> graspedObject,
     m_taskGraph->addNode(m_objectToGrasp->getTaskGraph()->getSource());
     m_taskGraph->addNode(m_objectToGrasp->getTaskGraph()->getSink());
 
-    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getSolveNode());
-    m_taskGraph->addNode(m_objectToGrasp->getPbdModel()->getIntegratePositionNode());
+    m_taskGraph->addNode(m_objectToGrasp->getPbdSystem()->getSolveNode());
+    m_taskGraph->addNode(m_objectToGrasp->getPbdSystem()->getIntegratePositionNode());
 
-    if (grasperObject != nullptr)
+    if (m_grasperObject != nullptr)
     {
-        CHECK(grasperObject->getPbdModel() == m_objectToGrasp->getPbdModel()) <<
-            "Grasper object and object to grasp must shared a PbdModel";
-        m_taskGraph->addNode(grasperObject->getTaskGraph()->getSource());
-        m_taskGraph->addNode(grasperObject->getTaskGraph()->getSink());
+        CHECK(m_grasperObject->getPbdSystem() == m_objectToGrasp->getPbdSystem()) <<
+            "Grasper object and object to grasp must shared a PbdSystem";
+        m_taskGraph->addNode(m_grasperObject->getTaskGraph()->getSource());
+        m_taskGraph->addNode(m_grasperObject->getTaskGraph()->getSink());
     }
 }
 
@@ -252,7 +252,7 @@ PbdObjectGrasping::beginCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry, 
     // If no cd provided try to automatically pick one
     if (cdType == "")
     {
-        std::shared_ptr<Geometry> pbdPhysicsGeom = m_objectToGrasp->getPhysicsGeometry();
+        std::shared_ptr<Geometry> pbdPhysicsGeom = m_objectToGrasp->getGeometry();
 
         // If a specific geometry wasn't specified to pick, then use the physics geometry
         std::shared_ptr<Geometry> geomtryToPick = (m_geomToPick == nullptr) ? pbdPhysicsGeom : m_geomToPick;
@@ -312,8 +312,8 @@ PbdObjectGrasping::addPickConstraints()
 {
     removePickConstraints();
 
-    std::shared_ptr<PbdModel> model = m_objectToGrasp->getPbdModel();
-    std::shared_ptr<Geometry> pbdPhysicsGeom = m_objectToGrasp->getPhysicsGeometry();
+    std::shared_ptr<PbdSystem> model = m_objectToGrasp->getPbdSystem();
+    std::shared_ptr<Geometry>  pbdPhysicsGeom = m_objectToGrasp->getGeometry();
 
     // If a specific geometry wasn't specified to pick, then use the physics geometry
     std::shared_ptr<Geometry> geomtryToPick = (m_geomToPick == nullptr) ? pbdPhysicsGeom : m_geomToPick;
@@ -541,7 +541,7 @@ PbdObjectGrasping::addBodyToBodyConstraint(
     const Vec3d&         supportPt,
     const double         compliance)
 {
-    std::shared_ptr<PbdModel> model = m_objectToGrasp->getPbdModel();
+    std::shared_ptr<PbdSystem> model = m_objectToGrasp->getPbdSystem();
 
     // Rigid on rigid grasping
     // Constrain supportPt on body0 to supportPt on body1 by a distance of 0
@@ -567,7 +567,7 @@ PbdObjectGrasping::addPointToBodyConstraint(
     const Vec3d&         pointOnBody,
     const double         compliance)
 {
-    std::shared_ptr<PbdModel> model = m_objectToGrasp->getPbdModel();
+    std::shared_ptr<PbdSystem> model = m_objectToGrasp->getPbdSystem();
 
     // Rigid on deformable
     // Constrain supportPt on body0 to supportPt on body1 by a distance of 0
@@ -608,7 +608,7 @@ PbdObjectGrasping::updatePicking()
 void
 PbdObjectGrasping::updateConstraints()
 {
-    std::shared_ptr<PbdModel> model = m_objectToGrasp->getPbdModel();
+    std::shared_ptr<PbdSystem> model = m_objectToGrasp->getPbdSystem();
 
     // Update the grasp points when not doing two-way.
     // In two-way the points are automatically recomputed in the constraint relative
@@ -641,7 +641,7 @@ PbdObjectGrasping::updateConstraints()
 void
 PbdObjectGrasping::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    std::shared_ptr<PbdModel> pbdModel = m_objectToGrasp->getPbdModel();
+    std::shared_ptr<PbdSystem> pbdSystem = m_objectToGrasp->getPbdSystem();
 
     // Add source and sink connections for a valid graph at all times
     m_taskGraph->addEdge(source, m_objectToGrasp->getTaskGraph()->getSource());
@@ -654,8 +654,8 @@ PbdObjectGrasping::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_
     }
 
     // The ideal location is after the internal positional solve, but before collisions are solved
-    m_taskGraph->addEdge(pbdModel->getIntegratePositionNode(), m_pickingNode);
-    m_taskGraph->addEdge(m_pickingNode, pbdModel->getSolveNode());
+    m_taskGraph->addEdge(pbdSystem->getIntegratePositionNode(), m_pickingNode);
+    m_taskGraph->addEdge(m_pickingNode, pbdSystem->getSolveNode());
 }
 
 bool

@@ -10,7 +10,6 @@
 #include "imstkNeedle.h"
 #include "imstkPuncturable.h"
 #include "imstkPbdCollisionHandling.h"
-#include "imstkPbdObject.h"
 
 using namespace imstk;
 
@@ -21,6 +20,9 @@ public:
     ~NeedleRigidBodyCH() override = default;
 
     IMSTK_TYPE_NAME(NeedleRigidBodyCH)
+
+    void setNeedle(std::shared_ptr<Needle> needle) { m_needle = needle; }
+    void setPuncturable(std::shared_ptr<Puncturable> puncturable) { m_puncturable = puncturable; }
 
     void setNeedleForceThreshold(double needleForceThreshold) { m_needleForceThreshold = needleForceThreshold; }
     double getNeedleForceThrehsold() const { return m_needleForceThreshold; }
@@ -33,10 +35,8 @@ protected:
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override
     {
-        std::shared_ptr<Entity> needleObj = getInputObjectA();
-        m_needle = needleObj->getComponent<Needle>();
-        std::shared_ptr<Entity> tissueObj = getInputObjectB();
-        m_puncturable = tissueObj->getComponent<Puncturable>();
+        CHECK(m_needle != nullptr) << "Needle component not set.";
+        CHECK(m_puncturable != nullptr) << "Puncturable component not set.";
 
         // Do it the normal way
         PbdCollisionHandling::handle(elementsA, elementsB);

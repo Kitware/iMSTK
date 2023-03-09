@@ -4,122 +4,18 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkCellMesh.h"
-#include "imstkLogger.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkAbstractDynamicalSystem.h"
+#include "imstkGeometry.h"
+#include "imstkGeometryMap.h"
+#include "imstkPbdBody.h"
+#include "imstkPbdSystem.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPointSet.h"
+
+#include "imstkPbdMethod.h"
 
 namespace imstk
 {
-std::shared_ptr<PbdModel>
-PbdObject::getPbdModel()
-{
-    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
-    return m_pbdModel;
-}
-
-void
-PbdObject::setBodyFromGeometry()
-{
-    std::shared_ptr<PbdBody> body = getPbdBody();
-    if (body->bodyType == PbdBody::Type::RIGID)
-    {
-        setRigidBody(*body);
-    }
-    else
-    {
-        if (m_physicsGeometry != nullptr)
-        {
-            auto pointSet = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
-            CHECK(pointSet != nullptr) << "PbdObject " << m_name << " only supports PointSet geometries";
-            setDeformBodyFromGeometry(*body, pointSet);
-        }
-    }
-
-    // Set the geometry to all the functors that need it
-    // Not a good solution
-    auto functors = m_pbdModel->getConfig()->getFunctors();
-    for (auto& functorArray : functors)
-    {
-        for (auto& functor : functorArray.second)
-        {
-            if (auto bodyFunctor = std::dynamic_pointer_cast<PbdBodyConstraintFunctor>(functor))
-            {
-                if (bodyFunctor->m_bodyIndex == body->bodyHandle)
-                {
-                    auto pointSet = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
-                    CHECK(pointSet != nullptr) <<
-                        "Tried to generate constraints with functor on PbdObject " << m_name << " but "
-                        " object does not have PointSet geometry";
-                    bodyFunctor->setGeometry(pointSet);
-                }
-            }
-        }
-    }
-}
-
-bool
-PbdObject::initialize()
-{
-    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
-    if (m_pbdModel == nullptr)
-    {
-        LOG(FATAL) << "PbdObject " << m_name << " was not given a PbdModel. Please PbdObject::setDynamicalModel";
-        return false;
-    }
-
-    setBodyFromGeometry();
-
-    // Set up maps before updating geometry
-    DynamicObject::initialize();
-
-    updateGeometries();
-
-    return true;
-}
-
-void
-PbdObject::setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaModel)
-{
-    // todo: If already has another model, should remove the corresponding body?
-    m_pbdModel       = std::dynamic_pointer_cast<PbdModel>(dynaModel);
-    m_dynamicalModel = dynaModel;
-
-    // If the model already has a pbd body for this PbdObject remove it from
-    // that prior model
-    if (m_pbdBody != nullptr)
-    {
-        CHECK(m_pbdModel != nullptr) <<
-            "PbdObject has a PbdBody but cannot find associated PbdModel?";
-        m_pbdModel->removeBody(m_pbdBody);
-    }
-    m_pbdBody = m_pbdModel->addBody();
-}
-
-void
-PbdObject::updatePhysicsGeometry()
-{
-    CHECK(m_physicsGeometry != nullptr) << "DynamicObject \"" << m_name
-                                        << "\" expects a physics geometry, none was provided";
-
-    DynamicObject::updatePhysicsGeometry();
-
-    if (m_pbdBody->bodyType == PbdBody::Type::RIGID)
-    {
-        // Pbd has a special case here for rigid body as it cannot apply the
-        // Apply the transform back to the geometry
-        // If called before body is init'd use initial pose
-        if (m_pbdBody->vertices->size() > 0)
-        {
-            m_physicsGeometry->setTranslation((*m_pbdBody->vertices)[0]);
-            m_physicsGeometry->setRotation((*m_pbdBody->orientations)[0]);
-        }
-        m_physicsGeometry->updatePostTransformData();
-    }
-}
-
 ///
 /// \brief Convience function. Set the bodyArrPtr to the specified attribute
 /// or allocate it with initValue set
@@ -148,8 +44,218 @@ setOrAllocate(std::shared_ptr<T>& bodyArrPtr,
     }
 }
 
+///
+/// \brief If array already exists does ensure size 1, If not allocates an array with value val
+///
+template<typename ArrPtrType, typename ValueType>
+static void
+setOrAllocateRigid(ArrPtrType& array, const ValueType val)
+{
+    using ArrType = typename ArrPtrType::element_type;
+    // If array already exists, resize to 1, if no existing elements set val
+    if (array != nullptr)
+    {
+        array->resize(1);
+        if (array->size() == 0)
+        {
+            *array = { val };
+        }
+    }
+    // If array doesn't exist create it with value val
+    else
+    {
+        array  = std::make_shared<ArrType>(1);
+        *array = { val };
+    }
+}
+
+PbdMethod::PbdMethod(const std::string& name) : SceneBehaviour(name)
+{
+    const std::string prefix = getTypeName() + "_" + m_name;
+    m_taskGraph = std::make_shared<TaskGraph>(prefix + "_Source", prefix + "_Sink");
+
+    m_updateNode = m_taskGraph->addFunction(
+        prefix + "_Update",
+        [this]() {}
+        );
+
+    m_updateGeometryNode = m_taskGraph->addFunction(
+        prefix + "_UpdateGeometry",
+        [this]() { updateGeometries(); }
+        );
+}
+
+std::shared_ptr<PbdBody>
+PbdMethod::getPbdBody() const
+{
+    if (m_pbdBody == nullptr)
+    {
+        LOG(FATAL) << "Set the PbdSystem on the PbdObject before trying to acquire the body";
+    }
+    return m_pbdBody;
+}
+
+const std::vector<std::shared_ptr<PbdConstraint>>&
+PbdMethod::getCellConstraints(int cellId)
+{
+    return m_pbdBody->cellConstraintMap[cellId];
+}
+
 void
-PbdObject::setDeformBodyFromGeometry(PbdBody& body, std::shared_ptr<PointSet> geom)
+PbdMethod::updateGeometries()
+{
+    updatePhysicsGeometry();
+
+    if (m_physicsToCollidingGeomMap)
+    {
+        m_physicsToCollidingGeomMap->update();
+        m_physicsToCollidingGeomMap->getChildGeometry()->postModified();
+    }
+
+    if (m_physicsToVisualGeomMap)
+    {
+        m_physicsToVisualGeomMap->update();
+        m_physicsToVisualGeomMap->getChildGeometry()->postModified();
+    }
+}
+
+void
+PbdMethod::updatePhysicsGeometry()
+{
+    CHECK(m_physicsGeometry != nullptr) << "DynamicObject \"" << m_name
+                                        << "\" expects a physics geometry, none was provided";
+
+    // m_pbdSystem->updatePhysicsGeometry(); this doesn't do anything
+    if (m_physicsGeometry != nullptr)
+    {
+        m_physicsGeometry->postModified();
+    }
+
+    if (m_pbdBody->bodyType == PbdBody::Type::RIGID)
+    {
+        // Pbd has a special case here for rigid body as it cannot apply the
+        // Apply the transform back to the geometry
+        // If called before body is init'd use initial pose
+        if (m_pbdBody->vertices->size() > 0)
+        {
+            m_physicsGeometry->setTranslation((*m_pbdBody->vertices)[0]);
+            m_physicsGeometry->setRotation((*m_pbdBody->orientations)[0]);
+        }
+        m_physicsGeometry->updatePostTransformData();
+    }
+}
+
+void
+PbdMethod::init()
+{
+    CHECK(m_physicsGeometry != nullptr) << "PbdMethod \"" << m_name
+                                        << "\" expects a physics geometry at start, none was provided";
+    CHECK(m_pbdSystem != nullptr) << "PbdMethod \"" << m_name
+                                  << "\" expects a pbdSystem at start, none was provided";
+
+    setBodyFromGeometry();
+
+    // Set up maps before updating geometry
+    if (m_physicsToCollidingGeomMap)
+    {
+        m_physicsToCollidingGeomMap->compute();
+    }
+
+    if (m_physicsToVisualGeomMap)
+    {
+        m_physicsToVisualGeomMap->compute();
+    }
+
+    updateGeometries();
+}
+
+void
+PbdMethod::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+{
+    // Copy, sum, and connect the model graph to nest within this graph
+    m_taskGraph->addEdge(source, m_updateNode);
+    if (m_pbdSystem != nullptr)
+    {
+        // Should be a better way to do this than doing a dynamic cast.
+        // Maybe just rename the function so it doesn't get hidden by PbdSystem.
+        // std::dynamic_pointer_cast<AbstractDynamicalSystem>(m_pbdSystem)->initGraphEdges();
+        m_pbdSystem->initGraphEdges();
+        m_taskGraph->nestGraph(m_pbdSystem->getTaskGraph(), m_updateNode, m_updateGeometryNode);
+    }
+    else
+    {
+        m_taskGraph->addEdge(m_updateNode, m_updateGeometryNode);
+    }
+    m_taskGraph->addEdge(m_updateGeometryNode, sink);
+}
+
+void
+PbdMethod::reset()
+{
+    m_pbdSystem->resetToInitialState();
+    updateGeometries();
+    // Already checked for null on initialize
+    m_physicsGeometry->postModified();
+}
+
+void
+PbdMethod::setBodyFromGeometry()
+{
+    std::shared_ptr<PbdBody> body = getPbdBody();
+    if (body->bodyType == PbdBody::Type::RIGID)
+    {
+        setRigidBody(*body);
+    }
+    else
+    {
+        if (m_physicsGeometry != nullptr)
+        {
+            auto pointSet = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
+            CHECK(pointSet != nullptr) << "PbdObject_old " << m_name << " only supports PointSet geometries";
+            setDeformBodyFromGeometry(*body, pointSet);
+        }
+    }
+
+    // Set the geometry to all the functors that need it
+    // Not a good solution
+    auto functors = m_pbdSystem->getConfig()->getFunctors();
+    for (auto& functorArray : functors)
+    {
+        for (auto& functor : functorArray.second)
+        {
+            if (auto bodyFunctor = std::dynamic_pointer_cast<PbdBodyConstraintFunctor>(functor))
+            {
+                if (bodyFunctor->m_bodyIndex == body->bodyHandle)
+                {
+                    auto pointSet = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
+                    CHECK(pointSet != nullptr) <<
+                        "Tried to generate constraints with functor on PbdObject_old " << m_name << " but "
+                        " object does not have PointSet geometry";
+                    bodyFunctor->setGeometry(pointSet);
+                }
+            }
+        }
+    }
+}
+
+void
+PbdMethod::setPbdSystem(std::shared_ptr<PbdSystem> pbdSystem)
+{
+    // If the previously set system already has an associated pbdBody for this method,
+    // remove it from that prior system.
+    if (m_pbdBody != nullptr)
+    {
+        CHECK(m_pbdSystem != nullptr) <<
+            "PbdMethod has a PbdBody but cannot find associated PbdSystem?";
+        m_pbdSystem->removeBody(m_pbdBody);
+    }
+
+    m_pbdSystem = pbdSystem;
+    m_pbdBody   = m_pbdSystem->addBody();
+}
+
+void
+PbdMethod::setDeformBodyFromGeometry(PbdBody& body, std::shared_ptr<PointSet> geom)
 {
     body.vertices     = geom->getVertexPositions();
     body.prevVertices = std::make_shared<VecDataArray<double, 3>>(*body.vertices);
@@ -236,33 +342,8 @@ PbdObject::setDeformBodyFromGeometry(PbdBody& body, std::shared_ptr<PointSet> ge
     }
 }
 
-///
-/// \brief If array already exists does ensure size 1, If not allocates an array with value val
-///
-template<typename ArrPtrType, typename ValueType>
-static void
-setOrAllocateRigid(ArrPtrType& array, const ValueType val)
-{
-    using ArrType = typename ArrPtrType::element_type;
-    // If array already exists, resize to 1, if no existing elements set val
-    if (array != nullptr)
-    {
-        array->resize(1);
-        if (array->size() == 0)
-        {
-            *array = { val };
-        }
-    }
-    // If array doesn't exist create it with value val
-    else
-    {
-        array  = std::make_shared<ArrType>(1);
-        *array = { val };
-    }
-}
-
 void
-PbdObject::setRigidBody(PbdBody& body)
+PbdMethod::setRigidBody(PbdBody& body)
 {
     // Basically a PbdBody with a single particle
     setOrAllocateRigid(body.vertices, Vec3d::Zero());
@@ -288,19 +369,19 @@ PbdObject::setRigidBody(PbdBody& body)
 }
 
 void
-PbdObject::computeCellConstraintMap()
+PbdMethod::computeCellConstraintMap()
 {
     // Note: The PBD Object and constraints must be initialized before calling this function
     this->initialize();
 
-    CHECK(m_physicsGeometry != nullptr) << "PbdObject \"" << m_name
+    CHECK(m_physicsGeometry != nullptr) << "PbdObject_old \"" << m_name
                                         << "\" requires physics geometry to compute CellConstraint map";
 
     // If the map already exists, clear it and recalculate
     if (m_pbdBody->cellConstraintMap.empty() == false)
     {
         m_pbdBody->cellConstraintMap.clear();
-        LOG(INFO) << "PbdObject \"" << m_name
+        LOG(INFO) << "PbdObject_old \"" << m_name
                   << "\" already has a CellConstraintMap. Cleared and recalculated \n";
     }
 
@@ -308,13 +389,13 @@ PbdObject::computeCellConstraintMap()
     int bodyId = m_pbdBody->bodyHandle;
 
     // Mesh data
-    auto      cellMesh     = std::dynamic_pointer_cast<AbstractCellMesh>(this->getPhysicsGeometry());
+    auto      cellMesh     = std::dynamic_pointer_cast<AbstractCellMesh>(this->getGeometry());
     auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(cellMesh->getAbstractCells()); // underlying 1D array
     const int vertsPerCell = cellMesh->getAbstractCells()->getNumberOfComponents();
 
     // Constraint Data for all currently existing constraints
-    std::shared_ptr<PbdConstraintContainer> constraintsPtr = this->getPbdModel()->getConstraints();
-    CHECK(constraintsPtr != nullptr) << "PbdObject \"" << m_name
+    std::shared_ptr<PbdConstraintContainer> constraintsPtr = this->getPbdSystem()->getConstraints();
+    CHECK(constraintsPtr != nullptr) << "PbdObject_old \"" << m_name
                                      << "\" does not have constraints in computeCellConstraintMap";
 
     const std::vector<std::shared_ptr<PbdConstraint>>& constraints = constraintsPtr->getConstraints();
@@ -377,4 +458,4 @@ PbdObject::computeCellConstraintMap()
         }
     }
 }
-} // namespace imstk
+}; // namespace imstk

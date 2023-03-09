@@ -7,12 +7,12 @@
 #include "imstkCamera.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkMeshIO.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdSystem.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneUtils.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
@@ -36,27 +36,25 @@ createSoftBodyScene(std::string sceneName)
     // Extract the surface mesh
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
-    auto pbdObj   = std::make_shared<PbdObject>("PbdObj");
-    auto pbdModel = std::make_shared<PbdModel>();
+    auto pbdSystem = std::make_shared<PbdSystem>();
 
     // Configure model
-    auto pbdConfig = std::make_shared<PbdModelConfig>();
+    auto pbdConfig = std::make_shared<PbdSystemConfig>();
     pbdConfig->m_secParams->m_YoungModulus = 1000000.0;
     pbdConfig->m_secParams->m_PoissonRatio = 0.3;
     pbdConfig->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_iterations = 5;
     pbdConfig->m_dt = 0.03;
-    pbdModel->configure(pbdConfig);
+    pbdSystem->configure(pbdConfig);
 
+    auto pbdObj = SceneUtils::makePbdEntity("PbdObj", surfMesh, nullptr, tetMesh, pbdSystem);
     // Set the geometries
-    pbdObj->setDynamicalModel(pbdModel);
-    pbdObj->setVisualGeometry(surfMesh);
-    pbdObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    pbdObj->setPhysicsGeometry(tetMesh);
-    pbdObj->setPhysicsToVisualMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
-    pbdObj->getPbdBody()->uniformMassValue = 1.0;
-    pbdObj->getPbdBody()->fixedNodeIds     = { 51, 127, 178 };
+    pbdObj->getComponent<VisualModel>()->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    auto method = pbdObj->getComponent<PbdMethod>();
+    method->setPhysicsToVisualMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
+    method->getPbdBody()->uniformMassValue = 1.0;
+    method->getPbdBody()->fixedNodeIds     = { 51, 127, 178 };
 
     scene->addSceneObject(pbdObj);
 
@@ -66,35 +64,32 @@ createSoftBodyScene(std::string sceneName)
 std::shared_ptr<Scene>
 createClothScene(std::string sceneName)
 {
-    auto clothObj = std::make_shared<PbdObject>("Cloth");
-    {
-        // Setup the Geometry
-        Vec2d                        size      = Vec2d(10.0, 10.0);
-        Vec2i                        dim       = Vec2i(4, 4);
-        std::shared_ptr<SurfaceMesh> clothMesh =
-            GeometryUtils::toTriangleGrid(Vec3d::Zero(), size, dim);
+    // Setup the Geometry
+    Vec2d                        size      = Vec2d(10.0, 10.0);
+    Vec2i                        dim       = Vec2i(4, 4);
+    std::shared_ptr<SurfaceMesh> clothMesh =
+        GeometryUtils::toTriangleGrid(Vec3d::Zero(), size, dim);
 
-        // Setup the Parameters
-        auto pbdConfig = std::make_shared<PbdModelConfig>();
-        pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e2);
-        pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e1);
-        pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
-        pbdConfig->m_dt         = 0.03;
-        pbdConfig->m_iterations = 5;
+    // Setup the Parameters
+    auto pbdConfig = std::make_shared<PbdSystemConfig>();
+    pbdConfig->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1.0e2);
+    pbdConfig->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 1.0e1);
+    pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
+    pbdConfig->m_dt         = 0.03;
+    pbdConfig->m_iterations = 5;
 
-        // Setup the Model
-        auto pbdModel = std::make_shared<PbdModel>();
-        pbdModel->configure(pbdConfig);
+    // Setup the Model
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdConfig);
 
-        // Setup the Object
-        clothObj->setVisualGeometry(clothMesh);
-        clothObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
-        clothObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-        clothObj->setPhysicsGeometry(clothMesh);
-        clothObj->setDynamicalModel(pbdModel);
-        clothObj->getPbdBody()->fixedNodeIds     = { 0, dim[0] - 1 };
-        clothObj->getPbdBody()->uniformMassValue = size[0] * size[1] / static_cast<double>(dim[0] * dim[1]);
-    }
+    auto clothObj = SceneUtils::makePbdEntity("Cloth", clothMesh, nullptr, clothMesh, pbdSystem);
+    // Setup the Object
+    auto renderMat = clothObj->getComponent<VisualModel>()->getRenderMaterial();
+    renderMat->setBackFaceCulling(false);
+    renderMat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    auto pbdBody = clothObj->getComponent<PbdMethod>()->getPbdBody();
+    pbdBody->fixedNodeIds     = { 0, dim[0] - 1 };
+    pbdBody->uniformMassValue = size[0] * size[1] / static_cast<double>(dim[0] * dim[1]);
 
     auto scene = std::make_shared<Scene>("PBDCloth");
     scene->addSceneObject(clothObj);

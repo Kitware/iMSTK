@@ -6,16 +6,18 @@
 
 #include "imstkCollider.h"
 #include "imstkCollisionUtils.h"
-#include "imstkPbdConnectiveTissueConstraintGenerator.h"
+#include "imstkEntity.h"
 #include "imstkLineMesh.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
+#include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdConstraintFunctor.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystemConfig.h"
+#include "imstkPbdSystem.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTriangleToTetMap.h"
+#include "imstkVisualModel.h"
 
 #include "imstkProximitySurfaceSelector.h"
 #include "imstkConnectiveStrandGenerator.h"
@@ -23,9 +25,9 @@
 namespace imstk
 {
 void
-PbdConnectiveTissueConstraintGenerator::connectLineToTetMesh(std::shared_ptr<PbdObject> pbdObj, PbdConstraintContainer& constraints)
+PbdConnectiveTissueConstraintGenerator::connectLineToTetMesh(std::shared_ptr<PbdMethod> pbdObj, PbdConstraintContainer& constraints)
 {
-    auto                         tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(pbdObj->getPhysicsGeometry());
+    auto                         tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(pbdObj->getGeometry());
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     // Setup a map to figure out what tet the tri is from for attachment to the tet
@@ -35,7 +37,7 @@ PbdConnectiveTissueConstraintGenerator::connectLineToTetMesh(std::shared_ptr<Pbd
     triToTetMap.setTolerance(m_tolerance);
     triToTetMap.compute();
 
-    auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_connectiveStrandObj->getPhysicsGeometry());
+    auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_connectiveStrandObj->getGeometry());
     // Find all vertices of the line mesh that are coincident with the surface of mesh A
     int verticesConnected = 0;
     for (int vertId = 0; vertId < lineMesh->getNumVertices(); vertId++)
@@ -94,11 +96,11 @@ PbdConnectiveTissueConstraintGenerator::connectLineToTetMesh(std::shared_ptr<Pbd
 
 void
 PbdConnectiveTissueConstraintGenerator::connectLineToSurfMesh(
-    std::shared_ptr<PbdObject> pbdObj,
+    std::shared_ptr<PbdMethod> pbdObj,
     PbdConstraintContainer&    constraints)
 {
-    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getPhysicsGeometry());
-    auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_connectiveStrandObj->getPhysicsGeometry());
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getGeometry());
+    auto lineMesh = std::dynamic_pointer_cast<LineMesh>(m_connectiveStrandObj->getGeometry());
 
     // Find all vertices of the line mesh that are coincident with the surface of mesh A
     int verticesConnected = 0;
@@ -157,80 +159,87 @@ PbdConnectiveTissueConstraintGenerator::connectLineToSurfMesh(
 void
 PbdConnectiveTissueConstraintGenerator::generateDistanceConstraints()
 {
-    m_connectiveStrandObj->getPbdModel()->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, m_distStiffness,
+    m_connectiveStrandObj->getPbdSystem()->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, m_distStiffness,
         m_connectiveStrandObj->getPbdBody()->bodyHandle);
 }
 
 void
 PbdConnectiveTissueConstraintGenerator::operator()(PbdConstraintContainer& constraints)
 {
-    auto objAPhysMeshSurf = std::dynamic_pointer_cast<SurfaceMesh>(m_objA->getPhysicsGeometry());
+    auto objAPhysMeshSurf = std::dynamic_pointer_cast<SurfaceMesh>(m_objA->getGeometry());
     if (objAPhysMeshSurf != nullptr)
     {
         connectLineToSurfMesh(m_objA, constraints);
     }
 
-    auto objAPhysMeshTet = std::dynamic_pointer_cast<TetrahedralMesh>(m_objA->getPhysicsGeometry());
+    auto objAPhysMeshTet = std::dynamic_pointer_cast<TetrahedralMesh>(m_objA->getGeometry());
     if (objAPhysMeshTet != nullptr)
     {
         connectLineToTetMesh(m_objA, constraints);
     }
 
-    auto objBPhysMeshSurf = std::dynamic_pointer_cast<SurfaceMesh>(m_objB->getPhysicsGeometry());
+    auto objBPhysMeshSurf = std::dynamic_pointer_cast<SurfaceMesh>(m_objB->getGeometry());
     if (objBPhysMeshSurf != nullptr)
     {
         connectLineToSurfMesh(m_objB, constraints);
     }
 
-    auto objBPhysMeshTet = std::dynamic_pointer_cast<TetrahedralMesh>(m_objB->getPhysicsGeometry());
+    auto objBPhysMeshTet = std::dynamic_pointer_cast<TetrahedralMesh>(m_objB->getGeometry());
     if (objBPhysMeshTet != nullptr)
     {
         connectLineToTetMesh(m_objB, constraints);
     }
 }
 
-std::shared_ptr<PbdObject>
+std::shared_ptr<Entity>
 addConnectiveTissueConstraints(
     std::shared_ptr<LineMesh>  connectiveLineMesh,
-    std::shared_ptr<PbdObject> objA,
-    std::shared_ptr<PbdObject> objB,
-    std::shared_ptr<PbdModel>  model)
+    std::shared_ptr<PbdMethod> objA,
+    std::shared_ptr<PbdMethod> objB,
+    std::shared_ptr<PbdSystem> pbdSystem)
 {
     // Check inputs
     CHECK(connectiveLineMesh != nullptr) << "NULL line mesh passes to generateConnectiveTissueConstraints";
-    CHECK(objA != nullptr) << "PbdObject objA is NULL in generateConnectiveTissueConstraints";
-    CHECK(objB != nullptr) << "PbdObject objB is NULL in generateConnectiveTissueConstraints";
+    CHECK(objA != nullptr) << "PbdMethod objA is NULL in generateConnectiveTissueConstraints";
+    CHECK(objB != nullptr) << "PbdMethod objB is NULL in generateConnectiveTissueConstraints";
+    CHECK(pbdSystem != nullptr) << "PbdSystem is NULL in generateConnectiveTissueConstraints";
 
-    auto connectiveStrands = std::make_shared<PbdObject>("connectiveTissue");
+    // auto connectiveStrands = std::make_shared<PbdMethod>("connectiveTissue");
+    auto connectiveStrands = std::make_shared<Entity>("connectiveTissue");
+
+    auto method = std::make_shared<PbdMethod>();
+    method->setGeometry(connectiveLineMesh);
+    method->setPbdSystem(pbdSystem);
+    connectiveStrands->addComponent(method);
+
+    auto visualModel = std::make_shared<VisualModel>();
+    visualModel->setGeometry(connectiveLineMesh);
+    connectiveStrands->addComponent(visualModel);
 
     // Setup the Object
-    connectiveStrands->setVisualGeometry(connectiveLineMesh);
-    connectiveStrands->setPhysicsGeometry(connectiveLineMesh);
-    // connectiveStrands->setCollidingGeometry(connectiveLineMesh);
     auto collider = connectiveStrands->addComponent<Collider>();
     collider->setGeometry(connectiveLineMesh);
-    connectiveStrands->setDynamicalModel(model);
 
     double mass = 1.0;
-    connectiveStrands->getPbdBody()->uniformMassValue = mass / connectiveLineMesh->getNumVertices();
+    method->getPbdBody()->uniformMassValue = mass / connectiveLineMesh->getNumVertices();
 
     // Setup constraints between the gallblader and ligaments
     auto attachmentConstraintFunctor = std::make_shared<PbdConnectiveTissueConstraintGenerator>();
-    attachmentConstraintFunctor->setConnectiveStrandObj(connectiveStrands);
+    attachmentConstraintFunctor->setConnectiveStrandObj(method);
     attachmentConstraintFunctor->generateDistanceConstraints();
     attachmentConstraintFunctor->setConnectedObjA(objA);
     attachmentConstraintFunctor->setConnectedObjB(objB);
-    attachmentConstraintFunctor->setBodyIndex(connectiveStrands->getPbdBody()->bodyHandle);
-    model->getConfig()->addPbdConstraintFunctor(attachmentConstraintFunctor);
+    attachmentConstraintFunctor->setBodyIndex(method->getPbdBody()->bodyHandle);
+    pbdSystem->getConfig()->addPbdConstraintFunctor(attachmentConstraintFunctor);
 
     return connectiveStrands;
 }
 
-std::shared_ptr<PbdObject>
+std::shared_ptr<Entity>
 makeConnectiveTissue(
-    std::shared_ptr<PbdObject>                objA,
-    std::shared_ptr<PbdObject>                objB,
-    std::shared_ptr<PbdModel>                 model,
+    std::shared_ptr<Entity>                   objA,
+    std::shared_ptr<Entity>                   objB,
+    std::shared_ptr<PbdSystem>                model,
     double                                    maxDist,
     double                                    strandsPerFace,
     int                                       segmentsPerStrand,
@@ -245,7 +254,7 @@ makeConnectiveTissue(
     auto objBSurf = std::dynamic_pointer_cast<SurfaceMesh>(Collider::getCollidingGeometryFromEntity(objB.get()));
     CHECK(objBSurf != nullptr) << "Object B " << objB->getName() << " Did not contain a surface mesh as colliding geometry in generateConnectiveTissue";
 
-    CHECK(model != nullptr) << "PbdModel in generateConnectiveTissue is NULL";
+    CHECK(model != nullptr) << "PbdSystem in generateConnectiveTissue is NULL";
 
     Vec3d objACenter = objASurf->getCenter();
     Vec3d objBCenter = objBSurf->getCenter();
@@ -272,9 +281,12 @@ makeConnectiveTissue(
     // Get mesh for connective strands
     auto connectiveLineMesh = std::dynamic_pointer_cast<LineMesh>(surfConnector->getOutput(0));
 
+    auto methodA = objA->getComponent<PbdMethod>();
+    auto methodB = objB->getComponent<PbdMethod>();
+
     // Create PBD object of connective strands with associated constraints
     auto connectiveStrands = addConnectiveTissueConstraints(
-        connectiveLineMesh, objA, objB, model);
+        connectiveLineMesh, methodA, methodB, model);
 
     return connectiveStrands;
 }

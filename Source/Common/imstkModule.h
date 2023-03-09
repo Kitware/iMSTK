@@ -32,16 +32,14 @@ public:
         ADAPTIVE         // Runs governed by module
     };
 
-public:
     Module() = default;
     ~Module() override = default;
 
     ///
-    /// \brief Returns collision detection type string name
+    /// \brief Returns type name as string
     ///
     virtual const std::string getTypeName() const = 0;
 
-public:
     // *INDENT-OFF*
     ///
     /// \brief Posted before updateModule is called
@@ -59,7 +57,6 @@ public:
     SIGNAL(Module, end);
     // *INDENT-ON*
 
-public:
     ///
     /// \brief Get/Set the time step
     ///
@@ -89,14 +86,12 @@ public:
     void pause() { m_paused = true; }
     void resume() { m_paused = false; }
 
-public:
     void init() { m_init = initModule(); }
 
     void update();
 
     void uninit();
 
-public:
     virtual bool initModule() = 0;
 
     virtual void updateModule() = 0;

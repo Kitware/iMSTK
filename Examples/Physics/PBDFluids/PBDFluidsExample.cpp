@@ -12,10 +12,10 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdSystemConfig.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
+#include "imstkPbdSystem.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -31,9 +31,9 @@ using namespace imstk;
 const std::string tetMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.vtu";
 
 ///
-/// \brief create a PbdObject for fluids
+/// \brief create a PBD-based Entity for fluids
 ///
-std::shared_ptr<PbdObject>
+std::shared_ptr<Entity>
 createPbdFluid(const std::string& tetMeshName)
 {
     // Load a sample mesh
@@ -51,24 +51,25 @@ createPbdFluid(const std::string& tetMeshName)
     material->setPointSize(0.5); // Control visual particle size
     fluidVisualModel->setRenderMaterial(material);
 
-    imstkNew<PbdObject> deformableObj("Dragon");
-    deformableObj->addVisualModel(fluidVisualModel);
+    imstkNew<Entity> deformableObj("Dragon");
+    deformableObj->addComponent(fluidVisualModel);
     deformableObj->addComponent<Collider>()->setGeometry(fluidMesh);
-    deformableObj->setPhysicsGeometry(fluidMesh);
+    auto method = deformableObj->addComponent<PbdMethod>();
+    method->setGeometry(fluidMesh);
 
-    imstkNew<PbdModel> pbdModel;
+    imstkNew<PbdSystem> pbdSystem;
 
     // Configure model
-    auto         pbdParams      = std::make_shared<PbdModelConfig>();
+    auto         pbdParams      = std::make_shared<PbdSystemConfig>();
     const double particleRadius = 0.5;
     pbdParams->enableConstantDensityConstraint(1.0, particleRadius);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 2;
-    pbdModel->configure(pbdParams);
+    pbdSystem->configure(pbdParams);
 
-    deformableObj->setDynamicalModel(pbdModel);
-    deformableObj->getPbdBody()->uniformMassValue = 1.0;
+    method->setPbdSystem(pbdSystem);
+    method->setUniformMass(1.0);
 
     return deformableObj;
 }
@@ -193,7 +194,7 @@ main()
     {
         scene->getActiveCamera()->setPosition(0.0, 15.0, 20.0);
 
-        std::shared_ptr<PbdObject> fluidObj = createPbdFluid(tetMeshFileName);
+        std::shared_ptr<Entity> fluidObj = createPbdFluid(tetMeshFileName);
         scene->addSceneObject(fluidObj);
 
         imstkNew<SceneObject>        floorObj("Floor");

@@ -118,6 +118,27 @@ TaskGraph::addEdges(const std::vector<std::pair<std::shared_ptr<TaskNode>, std::
 }
 
 void
+TaskGraph::addChain(const std::vector<std::shared_ptr<TaskNode>>& nodes)
+{
+    if (nodes.size() < 2)
+    {
+        LOG(WARNING) << "addChain expects at least two nodes. Edges will not be added.";
+        return;
+    }
+    else
+    {
+        auto iter0 = nodes.begin();
+        auto iter1 = nodes.begin() + 1;
+        while (iter1 != nodes.end())
+        {
+            addEdge(*iter0, *iter1);
+            ++iter0;
+            ++iter1;
+        }
+    }
+}
+
+void
 TaskGraph::nestGraph(std::shared_ptr<TaskGraph> subgraph, std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     CHECK(containsNode(source)) << "Tried to nest a graph using source, but source does not exist in this";

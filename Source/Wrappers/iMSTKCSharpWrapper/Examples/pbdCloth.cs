@@ -100,9 +100,9 @@ public class PbdCloth
         pbdParams.m_iterations = 5;
 
         // Setup the Model
-        PbdModel pbdModel = new PbdModel();
-        pbdModel.setModelGeometry(clothMesh);
-        pbdModel.configure(pbdParams);
+        PbdSystem dynamicalModel = new PbdSystem();
+        dynamicalModel.setModelGeometry(clothMesh);
+        dynamicalModel.configure(pbdParams);
 
         // Setup the VisualModel
         RenderMaterial material = new RenderMaterial();
@@ -120,7 +120,7 @@ public class PbdCloth
         // Setup the Object
         clothObj.addVisualModel(visualModel);
         clothObj.setPhysicsGeometry(clothMesh);
-        clothObj.setDynamicalModel(pbdModel);
+        clothObj.setDynamicalModel(dynamicalModel);
 
         clothObj.getPbdBody().fixedNodeIds = new VectorInt(2);
         clothObj.getPbdBody().fixedNodeIds.Add(0);

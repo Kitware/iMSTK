@@ -6,10 +6,11 @@
 
 #include "imstkBurnable.h"
 #include "imstkCellMesh.h"
+#include "imstkEntity.h"
 #include "imstkLineMesh.h"
-#include "imstkPbdObject.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystem.h"
+#include "imstkPbdSystemConfig.h"
 
 #include <gtest/gtest.h>
 
@@ -26,26 +27,27 @@ TEST(imstkBurnableTest, testMemory)
         std::make_shared<VecDataArray<int, 2>>(indices));
 
     // Setup the PBD Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->getConfig()->m_doPartitioning = false;
-    pbdModel->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
-    pbdModel->getConfig()->m_iterations = 4;
-    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -1.0, 0.0);
-    pbdModel->getConfig()->m_linearDampingCoeff  = 0.01; // Removed from velocity
-    pbdModel->getConfig()->m_angularDampingCoeff = 0.01;
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->getConfig()->m_doPartitioning = false;
+    pbdSystem->getConfig()->m_dt = 0.005; // realtime used in update calls later in main
+    pbdSystem->getConfig()->m_iterations = 4;
+    pbdSystem->getConfig()->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdSystem->getConfig()->m_linearDampingCoeff  = 0.01; // Removed from velocity
+    pbdSystem->getConfig()->m_angularDampingCoeff = 0.01;
 
     // Create Pbd object
-    auto pbdObj = std::make_shared<PbdObject>();
-    pbdObj->setPhysicsGeometry(lineMesh);
-    pbdObj->setDynamicalModel(pbdModel);
-    pbdObj->initialize();
+    auto pbdObj = std::make_shared<Entity>();
+    auto method = pbdObj->addComponent<PbdMethod>();
+    method->setGeometry(lineMesh);
+    method->setPbdSystem(pbdSystem);
+    method->initialize();
 
     // Create burnable component
-        auto burnable = std::make_shared<Burnable>();
+    auto burnable = std::make_shared<Burnable>();
 
     // Add component to pbd object
     pbdObj->addComponent(burnable);
-    pbdObj->initialize();
+    method->initialize();
 
     burnable->initialize();
 

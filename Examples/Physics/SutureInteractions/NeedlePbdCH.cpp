@@ -9,11 +9,13 @@
 #include "NeedlePbdCH.h"
 #include "imstkCollider.h"
 #include "imstkCollisionUtils.h"
+#include "imstkEntity.h"
+#include "imstkGeometry.h"
 #include "imstkLineMesh.h"
 #include "imstkNeedle.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystem.h"
 #include "imstkPbdSolver.h"
 #include "imstkPointwiseMap.h"
 #include "imstkPuncturable.h"
@@ -26,27 +28,36 @@
 namespace imstk
 {
 // Initialize interaction data
-void
-NeedlePbdCH::init(std::shared_ptr<PbdObject> threadObj)
+// \todo: should be replaced with inherited initialize();
+bool
+NeedlePbdCH::initialize()
 {
-    // Setup pbd tissue object
-    m_pbdTissueObj = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
+    PbdCollisionHandling::initialize();
 
-    // Get surface mesh
-    m_tissueSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_pbdTissueObj->getComponent<Collider>()->getGeometry());
+    // Fetch and setup required components
+    CHECK(m_tissue.entity && m_needle.entity) << "Tissue and needle entities are required.";
+    m_tissue.collider    = m_tissue.entity->getComponent<Collider>().get();
+    m_tissue.method      =  m_tissue.entity->getComponent<PbdMethod>().get();
+    m_tissue.puncturable = m_tissue.entity->getComponent<Puncturable>();
+    m_tissue.surfMesh    = dynamic_cast<SurfaceMesh*>(m_tissue.collider->getGeometry().get());
+
+    m_needle.collider   = m_needle.entity->getComponent<Collider>().get();
+    m_needle.needleComp = m_needle.entity->getComponent<Needle>();
 
     // set up thread mesh
-    m_threadObj  = threadObj;
-    m_threadMesh = std::dynamic_pointer_cast<LineMesh>(m_threadObj->getComponent<Collider>()->getGeometry());
+    m_thread.method     = m_thread.entity->getComponent<PbdMethod>().get();
+    m_thread.threadMesh = dynamic_cast<LineMesh*>(m_thread.entity->getComponent<Collider>()->getGeometry().get());
 
     // Create storage for puncture states
-    m_isThreadPunctured.resize(m_tissueSurfMesh->getNumCells());
+    m_isThreadPunctured.resize(m_tissue.surfMesh->getNumCells());
 
     // Initialize to false
-    for (int triangleId = 0; triangleId < m_tissueSurfMesh->getNumCells(); triangleId++)
+    for (int triangleId = 0; triangleId < m_tissue.surfMesh->getNumCells(); triangleId++)
     {
         m_isThreadPunctured[triangleId] = false;
     }
+
+    return true;
 }
 
 void
@@ -62,10 +73,8 @@ NeedlePbdCH::handle(
     }
 
     // Get rigid object needle
-    auto                                     needleObj  = std::dynamic_pointer_cast<PbdObject>(getInputObjectB());
-    auto                                     needle     = needleObj->getComponent<Needle>();
-    const int                                needleId   = needleObj->getID();
-    auto                                     needleMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getComponent<Collider>()->getGeometry());
+    const int                                needleId   = m_needle.entity->getID();
+    auto                                     needleMesh = std::dynamic_pointer_cast<LineMesh>(m_needle.collider->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleMesh->getVertexPositions();
     VecDataArray<double, 3>&                 needleVertices    = *needleVerticesPtr;
     std::shared_ptr<VecDataArray<int, 2>>    needleIndicesPtr  = needleMesh->getCells();
@@ -74,15 +83,14 @@ NeedlePbdCH::handle(
     const Vec3d needleDirection = (needleVertices[35] - needleVertices[34]).normalized();
 
     // Create one to one map between the physics mesh and the surface mesh
-    auto one2one = std::dynamic_pointer_cast<PointwiseMap>(m_pbdTissueObj->getPhysicsToCollidingMap());
+    auto one2one = std::dynamic_pointer_cast<PointwiseMap>(m_tissue.method->getPhysicsToCollidingMap());
     CHECK(one2one != nullptr) << "Failed to generate one to one map in NeedlePbdCH";
 
-    auto                                  puncturable = m_pbdTissueObj->getComponent<Puncturable>();
-    const int                             tissueId    = m_pbdTissueObj->getID();
-    std::shared_ptr<VecDataArray<int, 3>> tissueSurfMeshIndicesPtr = m_tissueSurfMesh->getCells();
+    const int                             tissueId = m_tissue.entity->getID();
+    std::shared_ptr<VecDataArray<int, 3>> tissueSurfMeshIndicesPtr = m_tissue.surfMesh->getCells();
     const VecDataArray<int, 3>&           tissueSurfMeshIndices    = *tissueSurfMeshIndicesPtr;
 
-    auto                                     physMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_pbdTissueObj->getPhysicsGeometry());
+    auto                                     physMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_tissue.method->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = physMesh->getVertexPositions();
     const VecDataArray<double, 3>&           tissueVertices    = *tissueVerticesPtr;
 
@@ -99,7 +107,7 @@ NeedlePbdCH::handle(
         const Vec3d tip2    = needleVertices[nodeIds[1]];
 
         // For every triangle, check if segment is in triangle (if so, puncture)
-        for (int triangleId = 0; triangleId < m_tissueSurfMesh->getNumCells(); triangleId++)
+        for (int triangleId = 0; triangleId < m_tissue.surfMesh->getNumCells(); triangleId++)
         {
             const Vec3i& surfTriIds = tissueSurfMeshIndices[triangleId];
 
@@ -117,16 +125,16 @@ NeedlePbdCH::handle(
             Vec3d uvw = Vec3d::Zero();
 
             // If this triangle has not already been punctured
-            const PunctureId punctureId = getPunctureId(needle, puncturable, triangleId);
-            if (needle->getState(punctureId) != Puncture::State::INSERTED)
+            const PunctureId punctureId = getPunctureId(m_needle.needleComp, m_tissue.puncturable, triangleId);
+            if (m_needle.needleComp->getState(punctureId) != Puncture::State::INSERTED)
             {
                 // Check for intersection
                 if (CollisionUtils::testSegmentTriangle(tip1, tip2, a, b, c, uvw))
                 {
-                    needle->setState(punctureId, Puncture::State::INSERTED);
+                    m_needle.needleComp->setState(punctureId, Puncture::State::INSERTED);
 
                     // Save the puncture point
-                    Puncture& data = *needle->getPuncture(punctureId);
+                    Puncture& data = *m_needle.needleComp->getPuncture(punctureId);
                     data.userData.id         = triangleId;
                     data.userData.ids[0]     = physTriIds[0];
                     data.userData.ids[1]     = physTriIds[1];
@@ -143,7 +151,7 @@ NeedlePbdCH::handle(
         // Loop over penetration points and find nearest point on the needle
         // Note: Nearest point will likely be the point between two segments,
         // its dualy defined, but thats ok
-        for (auto puncture : needle->getPunctures())
+        for (auto puncture : m_needle.needleComp->getPunctures())
         {
             if (puncture.second->state != Puncture::State::INSERTED)
             {
@@ -197,7 +205,7 @@ NeedlePbdCH::handle(
             // Now that we have the closest point on the needle to this penetration point, we can
             // generate and solve the constraint
 
-            const int bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
+            const int bodyId = m_tissue.method->getBodyHandle();
             auto      pointTriangleConstraint = std::make_shared<SurfaceInsertionConstraint>();
             pointTriangleConstraint->initConstraint(puncturePt,
                 { bodyId, punctureData.ids[0] },
@@ -218,9 +226,9 @@ NeedlePbdCH::handle(
         // to set up thread penetration points
 
         // Get thread vertex positions
-        std::shared_ptr<VecDataArray<double, 3>> threadVerticesPtr = m_threadMesh->getVertexPositions();
+        std::shared_ptr<VecDataArray<double, 3>> threadVerticesPtr = m_thread.threadMesh->getVertexPositions();
         const VecDataArray<double, 3>&           threadVertices    = *threadVerticesPtr;
-        std::shared_ptr<VecDataArray<int, 2>>    threadIndcicesPtr = m_threadMesh->getCells();
+        std::shared_ptr<VecDataArray<int, 2>>    threadIndcicesPtr = m_thread.threadMesh->getCells();
         const VecDataArray<int, 2>&              threadIndices     = *threadIndcicesPtr;
 
         Vec3d threadTip = threadVertices[0];
@@ -231,7 +239,7 @@ NeedlePbdCH::handle(
         const Vec3d& threadTip2 = threadVertices[nodeIds[1]];
 
         // Loop over all triangles in the surface mesh
-        for (int triangleId = 0; triangleId < m_tissueSurfMesh->getNumCells(); triangleId++)
+        for (int triangleId = 0; triangleId < m_tissue.surfMesh->getNumCells(); triangleId++)
         {
             const Vec3i& surfTriIds = tissueSurfMeshIndices[triangleId];
 
@@ -249,7 +257,7 @@ NeedlePbdCH::handle(
             Vec3d uvw = Vec3d::Zero();
 
             // If this triangle has already been punctured by the needle
-            if (needle->getState({ tissueId, needleId, triangleId }) == Puncture::State::INSERTED)
+            if (m_needle.needleComp->getState({ tissueId, needleId, triangleId }) == Puncture::State::INSERTED)
             {
                 // If it has not yet been punctured by thread
                 if (m_isThreadPunctured[triangleId] == false)
@@ -261,7 +269,7 @@ NeedlePbdCH::handle(
 
                         // Find matching needle puncture point
                         Puncture::UserData punctureData;
-                        for (auto puncture : needle->getPunctures())
+                        for (auto puncture : m_needle.needleComp->getPunctures())
                         {
                             if (std::get<2>(puncture.first) == triangleId)
                             {
@@ -305,7 +313,7 @@ NeedlePbdCH::handle(
             int closestSegmentId = -1;
 
             // Note: stopping before last segment for visualization
-            for (int segmentId = 0; segmentId < m_threadMesh->getNumCells() - 1; segmentId++)
+            for (int segmentId = 0; segmentId < m_thread.threadMesh->getNumCells() - 1; segmentId++)
             {
                 const Vec2i& threadSegNodeIds = threadIndices[segmentId];
                 const Vec3d& x1 = threadVertices[threadSegNodeIds[0]];
@@ -327,7 +335,7 @@ NeedlePbdCH::handle(
 
             // Check and see if the closest point is at the tips of the thread
             const Vec3d diffTip  = closestPoint - threadVertices[0];
-            const Vec3d diffTail = closestPoint - threadVertices[m_threadMesh->getNumVertices() - 1];
+            const Vec3d diffTail = closestPoint - threadVertices[m_thread.threadMesh->getNumVertices() - 1];
 
             // NOTE: Commented out to force thread to stay inserted once inserted
             // If uncommented, the thread would be able to slide through the mesh and unpuncture.
@@ -357,10 +365,10 @@ NeedlePbdCH::handle(
             // Thread barycentric intersection point
             const Vec2d segBary = baryCentric(closestPoint, p, q);
 
-            const int tissueBodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
-            const int threadBodyId = m_threadObj->getPbdBody()->bodyHandle;
+            const int tissueBodyId = m_tissue.method->getBodyHandle();
+            const int threadBodyId = m_thread.method->getBodyHandle();
             threadTriangleConstraint->initConstraint(
-                m_pbdTissueObj->getPbdModel()->getBodies(),
+                m_tissue.method->getPbdSystem()->getBodies(),
                 { threadBodyId, nearestSegNodeIds[0] },
                 { threadBodyId, nearestSegNodeIds[1] },
                 segBary,
@@ -383,7 +391,7 @@ NeedlePbdCH::handle(
     }
 
     // If there are no penetration points, the needle is removed
-    if (!needle->getInserted() && m_threadPData.size() == 0)
+    if (!m_needle.needleComp->getInserted() && m_threadPData.size() == 0)
     {
         m_punctured = false;
     }
@@ -393,7 +401,7 @@ NeedlePbdCH::handle(
     {
         m_solverConstraints[i] = m_constraints[i].get();
     }
-    m_pbdTissueObj->getPbdModel()->getSolver()->addConstraints(&m_solverConstraints);
+    m_tissue.method->getPbdSystem()->getSolver()->addConstraints(&m_solverConstraints);
 }
 
 // Create stitching constraints
@@ -411,7 +419,7 @@ NeedlePbdCH::stitch()
     {
         LOG(INFO) << "Stitching!";
 
-        std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = m_tissueSurfMesh->getVertexPositions();
+        std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = m_tissue.surfMesh->getVertexPositions();
         VecDataArray<double, 3>&                 tissueVertices    = *tissueVerticesPtr;
 
         // Only calculate the center point once
@@ -437,9 +445,9 @@ NeedlePbdCH::stitch()
         for (int pPointId = 0; pPointId < m_threadPData.size(); pPointId++)
         {
             // Now create values for the central point
-            const PbdParticleId& stitchCenterPt = m_pbdTissueObj->getPbdModel()->addVirtualParticle(m_stitchCenter, 0.0);
+            const PbdParticleId& stitchCenterPt = m_tissue.method->getPbdSystem()->addVirtualParticle(m_stitchCenter, 0.0);
 
-            const int           bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
+            const int           bodyId = m_tissue.method->getBodyHandle();
             const PbdParticleId p0     = { bodyId, m_threadPData[pPointId].triVertIds[0] };
             const PbdParticleId p1     = { bodyId, m_threadPData[pPointId].triVertIds[1] };
             const PbdParticleId p2     = { bodyId, m_threadPData[pPointId].triVertIds[2] };
@@ -467,25 +475,20 @@ NeedlePbdCH::addConstraint_V_T(
     const ColElemSide& sideA,
     const ColElemSide& sideB)
 {
-    std::shared_ptr<Entity> tissueObj   = getInputObjectA();
-    auto                    puncturable = tissueObj->getComponent<Puncturable>();
-    std::shared_ptr<Entity> needleObj   = getInputObjectB();
-    auto                    needle      = needleObj->getComponent<Needle>();
-
     CHECK(sideB.elem->m_type == CollisionElementType::CellIndex)
         << "Suturing only works with CDs that report CellIndex contact";
     CHECK(sideB.elem->m_element.m_CellIndexElement.parentId != -1)
         << "Suturing only works with CDs that report parent ids";
-    const PunctureId punctureId = getPunctureId(needle, puncturable, sideB.elem->m_element.m_CellIndexElement.parentId);
+    const PunctureId punctureId = getPunctureId(m_needle.needleComp, m_tissue.puncturable, sideB.elem->m_element.m_CellIndexElement.parentId);
 
     // If removed and we are here, we must now be touching
-    if (needle->getState(punctureId) == Puncture::State::REMOVED) // Removed
+    if (m_needle.needleComp->getState(punctureId) == Puncture::State::REMOVED) // Removed
     {
-        needle->setState(punctureId, Puncture::State::TOUCHING);
-        puncturable->setPuncture(punctureId, needle->getPuncture(punctureId));
+        m_needle.needleComp->setState(punctureId, Puncture::State::TOUCHING);
+        m_tissue.puncturable->setPuncture(punctureId, m_needle.needleComp->getPuncture(punctureId));
     }
 
-    auto                                     needleMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getComponent<Collider>()->getGeometry());
+    auto                                     needleMesh = std::dynamic_pointer_cast<LineMesh>(m_needle.collider->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleMesh->getVertexPositions();
     VecDataArray<double, 3>&                 needleVertices    = *needleVerticesPtr;
     // Save the direction of the tip of the needle. NOTE: Needle indices are backwards
@@ -500,7 +503,7 @@ NeedlePbdCH::addConstraint_V_T(
 
     // Assuming triangle has points a,b,c
     std::array<PbdParticleId, 3> ptsB   = PbdCollisionHandling::getTriangle(*sideB.elem, *sideB.data);
-    const PbdState&              bodies = m_pbdTissueObj->getPbdModel()->getBodies();
+    const PbdState&              bodies = m_tissue.method->getPbdSystem()->getBodies();
     const Vec3d                  ab     = bodies.getPosition(ptsB[1]) - bodies.getPosition(ptsB[0]);
     const Vec3d                  ac     = bodies.getPosition(ptsB[2]) - bodies.getPosition(ptsB[0]);
 
@@ -514,7 +517,7 @@ NeedlePbdCH::addConstraint_V_T(
     // Arbitrary threshold
     const double threshold = 0.9;
 
-    if (needle->getState(punctureId) == Puncture::State::TOUCHING) // Touching
+    if (m_needle.needleComp->getState(punctureId) == Puncture::State::TOUCHING) // Touching
     {
         // If the needle is close to perpindicular to the face if may insert
         // Note: This is a short term solution

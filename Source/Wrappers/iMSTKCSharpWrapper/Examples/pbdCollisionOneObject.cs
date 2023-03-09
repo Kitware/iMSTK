@@ -45,8 +45,8 @@ public class PbdCollisionOneObject
                 surfMeshModel.setRenderMaterial(material);
 
                 // Create model and object
-                PbdModel pbdModel = new PbdModel();
-                pbdModel.setModelGeometry(coarseTetMesh);
+                PbdSystem dynamicalModel = new PbdSystem();
+                dynamicalModel.setModelGeometry(coarseTetMesh);
 
                 // Configure model
                 PbdModelConfig pbdParams = new PbdModelConfig();
@@ -56,13 +56,13 @@ public class PbdCollisionOneObject
                 pbdParams.m_gravity = new Vec3d(0, -10.0, 0);
                 pbdParams.m_dt = timeStep;
                 pbdParams.m_iterations = maxIter;
-                pbdModel.configure(pbdParams);
+                dynamicalModel.configure(pbdParams);
 
                 deformableObj.addVisualModel(surfMeshModel);
                 deformableObj.addComponentCollider().setGeometry(coarseTetMesh);
                 deformableObj.setPhysicsGeometry(coarseTetMesh);
                 deformableObj.setPhysicsToVisualMap(new PointToTetMap(coarseTetMesh, highResSurfMesh));
-                deformableObj.setDynamicalModel(pbdModel);
+                deformableObj.setDynamicalModel(dynamicalModel);
                 deformableObj.getPbdBody().uniformMassValue = 1.0;
             }
             scene.addSceneObject(deformableObj);

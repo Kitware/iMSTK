@@ -18,14 +18,15 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectGrasping.h"
+#include "imstkPbdSystem.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
@@ -36,7 +37,7 @@ using namespace imstk;
 ///
 /// \brief Creates tissue object
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeThinTissue(const std::string& name,
                const double       width,
                const double       height,
@@ -50,17 +51,17 @@ makeThinTissue(const std::string& name,
             Quatd::Identity(), 2.0);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 10000.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.1);
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 10000.0);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 0.1);
     pbdParams->m_gravity    = Vec3d(0.0, -0.01, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 4;
     pbdParams->m_linearDampingCoeff = 0.01;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->configure(pbdParams);
+    auto pbdSystem = std::make_shared<PbdSystem>();
+    pbdSystem->configure(pbdParams);
 
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
@@ -75,23 +76,22 @@ makeThinTissue(const std::string& name,
     material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
 
     // Setup the Object
-    auto thinTissueObj = std::make_shared<PbdObject>(name);
-    thinTissueObj->setVisualGeometry(mesh);
-    thinTissueObj->getVisualModel(0)->setRenderMaterial(material);
-    thinTissueObj->setPhysicsGeometry(mesh);
-    thinTissueObj->addComponent<Collider>()->setGeometry(mesh);
-    thinTissueObj->setDynamicalModel(pbdModel);
+    auto thinTissueObj = SceneUtils::makePbdEntity(name, mesh, pbdSystem);
+    thinTissueObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    std::vector<int> fixedNodeIds;
     for (int x = 0; x < rowCount; x++)
     {
         for (int y = 0; y < colCount; y++)
         {
             if (x == 0 || y == 0 || x == rowCount - 1 || y == colCount - 1)
             {
-                thinTissueObj->getPbdBody()->fixedNodeIds.push_back(x * colCount + y);
+                fixedNodeIds.push_back(x * colCount + y);
             }
         }
     }
-    thinTissueObj->getPbdBody()->uniformMassValue = 1.0;
+    auto method = thinTissueObj->getComponent<PbdMethod>();
+    method->setFixedNodes(fixedNodeIds);
+    method->setUniformMass(1.0);
 
     return thinTissueObj;
 }
@@ -148,7 +148,7 @@ main()
     pickGeom->setOrientation(Quatd(Rotd(PI_2, Vec3d(1.0, 0.0, 0.0))));
 
     // 300mm x 300mm patch of tissue
-    std::shared_ptr<PbdObject> thinTissueObj = makeThinTissue("ThinTissue", 0.1, 0.1, 16, 16);
+    auto thinTissueObj = makeThinTissue("ThinTissue", 0.1, 0.1, 16, 16);
     scene->addSceneObject(thinTissueObj);
 
     // Setup default haptics manager
@@ -169,7 +169,7 @@ main()
     scene->addInteraction(lowerJawCollision);
 
     // Add picking interaction for both jaws of the tool
-    auto jawPicking = std::make_shared<PbdObjectGrasping>(thinTissueObj);
+    auto jawPicking = std::make_shared<PbdObjectGrasping>(thinTissueObj->getComponent<PbdMethod>());
     scene->addInteraction(jawPicking);
 
     // Light
@@ -205,7 +205,7 @@ main()
             [&](Event*)
             {
                 // Simulate the cloth in real time
-                thinTissueObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
+                thinTissueObj->getComponent<PbdMethod>()->getPbdSystem()->getConfig()->m_dt = sceneManager->getDt();
             });
 
         connect<Event>(controller, &LaparoscopicToolController::JawClosed,

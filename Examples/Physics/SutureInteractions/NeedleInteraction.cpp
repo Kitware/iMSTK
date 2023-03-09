@@ -9,17 +9,31 @@
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkLineMesh.h"
 #include "imstkNeedle.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPuncturable.h"
 #include "NeedlePbdCH.h"
 
 using namespace imstk;
 
-NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
-                                     std::shared_ptr<PbdObject> needleObj,
-                                     std::shared_ptr<PbdObject> threadObj)
-    : PbdObjectCollision(tissueObj, needleObj)
+NeedleInteraction::NeedleInteraction(std::shared_ptr<Entity> tissueObj,
+                                     std::shared_ptr<Entity> needleObj,
+                                     std::shared_ptr<Entity> threadObj)
+    : PbdObjectCollision(tissueObj, needleObj), m_threadObj(threadObj)
 {
+}
+
+bool
+NeedleInteraction::initialize()
+{
+    PbdObjectCollision::initialize();
+
+    auto tissueObj = m_objA;
+    auto needleObj = m_objB;
+    if (m_objA->containsComponent<Needle>())
+    {
+        std::swap(tissueObj, needleObj);
+    }
+
     // Check inputs
     CHECK(needleObj->containsComponent<Needle>())
         << "NeedleInteraction only works with objects that have a Needle component";
@@ -31,15 +45,20 @@ NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
     CHECK(std::dynamic_pointer_cast<LineMesh>(needleObj->getComponent<Collider>()->getGeometry()) != nullptr) <<
         "NeedleInteraction only works with LineMesh collision geometry on NeedleObject";
 
-    CHECK(threadObj->getPbdModel() == tissueObj->getPbdModel()) << "Tissue and thread must share a PbdModel";
+    CHECK(m_threadObj->getComponent<PbdMethod>()->getPbdSystem() == tissueObj->getComponent<PbdMethod>()->getPbdSystem()) << "Tissue and thread must share a PbdSystem";
 
     // Add collision handler for the PBD reaction
     auto needlePbdCH = std::make_shared<NeedlePbdCH>();
-    needlePbdCH->setInputObjectA(tissueObj);
-    needlePbdCH->setInputObjectB(needleObj);
+    needlePbdCH->setTissue(tissueObj);
+    needlePbdCH->setNeedle(needleObj);
+    needlePbdCH->setThread(m_threadObj);
+    needlePbdCH->setInputObjectA(tissueObj->getComponent<Collider>(), tissueObj->getComponent<PbdMethod>());
+    needlePbdCH->setInputObjectB(needleObj->getComponent<Collider>(), needleObj->getComponent<PbdMethod>());
     needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
-    needlePbdCH->init(threadObj);
+    needlePbdCH->initialize();
     setCollisionHandlingAB(needlePbdCH);
+
+    return true;
 }
 
 void

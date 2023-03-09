@@ -8,6 +8,7 @@
 
 #include "imstkComponent.h"
 #include "imstkEventObject.h"
+#include "imstkMacros.h"
 
 #include <memory>
 #include <string>
@@ -25,6 +26,8 @@ class GeometryMap;
 class Collider : public Component
 {
 public:
+    IMSTK_TYPE_NAME(Collider)
+
     Collider(const std::string& name = "Collider")
         : Component(name)
     {

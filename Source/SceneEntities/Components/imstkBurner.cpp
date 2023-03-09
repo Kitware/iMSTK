@@ -9,10 +9,11 @@
 #include "imstkCDObjectFactory.h"
 #include "imstkCellMesh.h"
 #include "imstkCellPicker.h"
+#include "imstkEntity.h"
 #include "imstkParallelUtils.h"
-#include "imstkPbdObject.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystemConfig.h"
+#include "imstkPbdSystem.h"
 #include "imstkPickingAlgorithm.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskNode.h"
@@ -30,11 +31,14 @@ Burner::Burner(const std::string& name) : SceneBehaviour(true, name)
 void
 Burner::init()
 {
-    m_burningObj = std::dynamic_pointer_cast<PbdObject>(getEntity().lock());
+    auto entity =  getEntity().lock();
+    CHECK(entity != nullptr) << "Cannot acquire entity";
+
+    m_burningObj = entity->getComponent<PbdMethod>();
 
     CHECK(m_burningObj != nullptr) << "Burner requires an object to do the burning";
 
-    m_burnGeometry = std::dynamic_pointer_cast<AnalyticalGeometry>(m_burningObj->getPhysicsGeometry());
+    m_burnGeometry = std::dynamic_pointer_cast<AnalyticalGeometry>(m_burningObj->getGeometry());
     CHECK(m_burnGeometry != nullptr) << "Burner requires analytical geometry for physics geometry";
 
     // Verify that some objects are burnable
@@ -50,7 +54,7 @@ Burner::init()
         auto cellPicker = std::make_shared<CellPicker>();
         cellPicker->setPickingGeometry(m_burnGeometry);
 
-        std::shared_ptr<Geometry> pbdPhysicsGeom = burnableObject->getPhysicsGeometry();
+        std::shared_ptr<Geometry> pbdPhysicsGeom = burnableObject->getGeometry();
         CHECK(pbdPhysicsGeom != nullptr) << "Physics geometry of burnable object: " << burnableObject->getName() << " is null in Burner";
 
         auto cdType = CDObjectFactory::getCDType(*m_burnGeometry, *pbdPhysicsGeom);
@@ -62,9 +66,9 @@ Burner::init()
 
     // Add task nodes
     m_taskGraph->addNode(m_burningHandleNode);
-    m_taskGraph->addNode(m_burningObj->getPbdModel()->getTaskGraph()->getSink());
-    m_taskGraph->addNode(m_burningObj->getPbdModel()->getIntegratePositionNode());
-    m_taskGraph->addNode(m_burningObj->getPbdModel()->getSolveNode());
+    m_taskGraph->addNode(m_burningObj->getPbdSystem()->getTaskGraph()->getSink());
+    m_taskGraph->addNode(m_burningObj->getPbdSystem()->getIntegratePositionNode());
+    m_taskGraph->addNode(m_burningObj->getPbdSystem()->getSolveNode());
 }
 
 void
@@ -77,7 +81,7 @@ Burner::handle()
         for (int burnableId = 0; burnableId < m_burnableObjects.size(); burnableId++)
         {
             // Perform the picking on the bunrable object
-            std::shared_ptr<Geometry>    geometryToPick = m_burnableObjects[burnableId]->getPhysicsGeometry();
+            std::shared_ptr<Geometry>    geometryToPick = m_burnableObjects[burnableId]->getGeometry();
             const std::vector<PickData>& pickData       = m_pickers[burnableId]->pick(geometryToPick);
 
             if (pickData.empty())
@@ -106,10 +110,10 @@ void
 Burner::applyBurn(int burnableId, int cellId)
 {
     // Get model data
-    double dt = m_burnableObjects[burnableId]->getPbdModel()->getConfig()->m_dt;
+    double dt = m_burnableObjects[burnableId]->getPbdSystem()->getConfig()->m_dt;
 
     // Mesh state data
-    auto               cellMesh      = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObjects[burnableId]->getPhysicsGeometry());
+    auto               cellMesh      = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObjects[burnableId]->getGeometry());
     auto               burnDamagePtr = std::dynamic_pointer_cast<DataArray<double>>(cellMesh->getCellAttribute("BurnDamage"));
     DataArray<double>& burnDamage    = *burnDamagePtr;
 
@@ -129,10 +133,13 @@ Burner::monopolarToolModel(double& burnDmg, double& burnVis, double dt)
 void
 Burner::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    m_taskGraph->addEdge(source, m_burningObj->getPbdModel()->getIntegratePositionNode());
-    m_taskGraph->addEdge(m_burningObj->getPbdModel()->getIntegratePositionNode(), m_burningHandleNode);
-    m_taskGraph->addEdge(m_burningHandleNode, m_burningObj->getPbdModel()->getSolveNode());
-    m_taskGraph->addEdge(m_burningObj->getPbdModel()->getSolveNode(), m_burningObj->getPbdModel()->getTaskGraph()->getSink());
-    m_taskGraph->addEdge(m_burningObj->getPbdModel()->getTaskGraph()->getSink(), sink);
+    m_taskGraph->addChain({
+            source,
+            m_burningObj->getPbdSystem()->getIntegratePositionNode(),
+            m_burningHandleNode,
+            m_burningObj->getPbdSystem()->getSolveNode(),
+            m_burningObj->getPbdSystem()->getTaskGraph()->getSink(),
+            sink,
+    });
 }
 } // namespace imstk

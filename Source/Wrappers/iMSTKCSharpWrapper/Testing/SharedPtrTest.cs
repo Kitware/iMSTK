@@ -44,18 +44,18 @@ public class SharedPtrTest
     [Test]
     public void TestCast()
     {
-        PbdModel pbdModel = createPbdModel();
+        PbdSystem dynamicalModel = createPbdSystem();
         Assert.Multiple(() =>
         {
-            PointSet pointSet = Utils.castToPointSet(pbdModel.getModelGeometry());
+            PointSet pointSet = Utils.castToPointSet(dynamicalModel.getModelGeometry());
             Assert.That(pointSet, Is.Not.Null);
             Assert.AreEqual(4, pointSet.getNumVertices());
 
-            SurfaceMesh surfMesh = Utils.castToSurfaceMesh(pbdModel.getModelGeometry());
+            SurfaceMesh surfMesh = Utils.castToSurfaceMesh(dynamicalModel.getModelGeometry());
             Assert.That(surfMesh, Is.Not.Null);
             Assert.AreEqual(2, surfMesh.getNumTriangles());
 
-            TetrahedralMesh tetMesh = Utils.castToTetrahedralMesh(Utils.castToPointSet(pbdModel.getModelGeometry()));
+            TetrahedralMesh tetMesh = Utils.castToTetrahedralMesh(Utils.castToPointSet(dynamicalModel.getModelGeometry()));
             Assert.That(tetMesh, Is.Null);
         });
     }
@@ -65,8 +65,8 @@ public class SharedPtrTest
     {
         Assert.Multiple(() =>
         {
-            PbdModel pbdModel = createPbdModel();
-            PointSet pointSet = Utils.castToPointSet(pbdModel.getModelGeometry());
+            PbdSystem dynamicalModel = createPbdSystem();
+            PointSet pointSet = Utils.castToPointSet(dynamicalModel.getModelGeometry());
             Assert.AreEqual(4, pointSet.getNumVertices());
 
             VecDataArray3d vertices = pointSet.getVertexPositions();
@@ -90,7 +90,7 @@ public class SharedPtrTest
             // make changes to vertices
             vertices[0] = new Vec3d(0.1, 0.2, 0.3);
 
-            PointSet pointSet2 = Utils.castToPointSet(pbdModel.getModelGeometry());
+            PointSet pointSet2 = Utils.castToPointSet(dynamicalModel.getModelGeometry());
             VecDataArray3d changedVertices = pointSet.getVertexPositions();
             Assert.AreEqual(0.1, changedVertices[0][0], tol);
             Assert.AreEqual(0.2, changedVertices[0][1], tol);
@@ -115,8 +115,8 @@ public class SharedPtrTest
     {
         Assert.Multiple(() =>
         {
-            PbdModel pbdModel = createPbdModel();
-            SurfaceMesh surfMesh = Utils.castToSurfaceMesh(pbdModel.getModelGeometry());
+            PbdSystem dynamicalModel = createPbdSystem();
+            SurfaceMesh surfMesh = Utils.castToSurfaceMesh(dynamicalModel.getModelGeometry());
             Assert.That(surfMesh, Is.Not.Null);
             Assert.AreEqual(2, surfMesh.getNumTriangles());
 
@@ -132,7 +132,7 @@ public class SharedPtrTest
             // make changes to indices
             indices[0] = new Vec3i(1, 2, 0);
 
-            SurfaceMesh surfMesh2 = Utils.castToSurfaceMesh(pbdModel.getModelGeometry());
+            SurfaceMesh surfMesh2 = Utils.castToSurfaceMesh(dynamicalModel.getModelGeometry());
             Assert.That(surfMesh2, Is.Not.Null);
             Assert.AreEqual(2, surfMesh2.getNumTriangles());
 
@@ -148,12 +148,12 @@ public class SharedPtrTest
         });
     }
 
-    public static PbdModel createPbdModel()
+    public static PbdSystem createPbdSystem()
     {
-        PbdModel pbdModel = new PbdModel();
+        PbdSystem pbdSystem = new PbdSystem();
         SurfaceMesh surfMesh = createSurfaceMesh();
-        pbdModel.setModelGeometry(surfMesh);
-        return pbdModel;
+        pbdSystem.setModelGeometry(surfMesh);
+        return pbdSystem;
     }
 
     public static SurfaceMesh createSurfaceMesh()

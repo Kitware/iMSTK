@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkCollisionData.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -21,33 +22,16 @@ class InteractionPair;
 ///
 class CollisionHandling
 {
-protected:
-    CollisionHandling() = default;
-
 public:
     virtual ~CollisionHandling() = default;
 
     virtual const std::string getTypeName() const = 0;
 
-public:
     ///
-    /// \brief Set the input objects
+    /// \brief Initialize and pre-fetch all required resources before the start of
+    /// the simulation loop.
     ///
-    void setInputObjectA(std::shared_ptr<Entity> objectA) { m_inputObjectA = objectA; }
-    void setInputObjectB(std::shared_ptr<Entity> objectB) { m_inputObjectB = objectB; }
-
-    ///
-    /// \brief Get the input objects
-    ///
-    std::shared_ptr<Entity> getInputObjectA() const { return m_inputObjectA; }
-    std::shared_ptr<Entity> getInputObjectB() const { return m_inputObjectB; }
-
-    ///
-    /// \brief Get the geometry used for handling
-    /// defaults to the collision geometry
-    ///
-    virtual std::shared_ptr<Geometry> getHandlingGeometryA();
-    virtual std::shared_ptr<Geometry> getHandlingGeometryB();
+    virtual bool initialize() = 0;
 
     ///
     /// \brief Set/Get the input collision data used for handling
@@ -55,13 +39,20 @@ public:
     void setInputCollisionData(std::shared_ptr<CollisionData> collisionData) { m_colData = collisionData; }
     std::shared_ptr<const CollisionData> getInputCollisionData() const { return m_colData; }
 
-public:
     ///
     /// \brief Handle the input collision data
     ///
     void update();
 
 protected:
+    CollisionHandling() = default;
+    ///
+    /// \brief Get the geometry used for handling
+    /// defaults to the collision geometry
+    ///
+    virtual std::shared_ptr<Geometry> getCollidingGeometryA() = 0;
+    virtual std::shared_ptr<Geometry> getCollidingGeometryB() = 0;
+
     ///
     /// \brief Handle the input collision data. Elements will be flipped
     /// (if needed) such that elementsA corresponds with inputObjectA and B with inputObjectB
@@ -72,10 +63,6 @@ protected:
     virtual void handle(
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) = 0;
-
-protected:
-    std::shared_ptr<Entity> m_inputObjectA;
-    std::shared_ptr<Entity> m_inputObjectB;
 
     std::shared_ptr<const CollisionData> m_colData = nullptr; ///< Collision data
 };

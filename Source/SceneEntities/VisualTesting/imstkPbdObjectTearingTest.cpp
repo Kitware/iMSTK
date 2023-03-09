@@ -13,13 +13,13 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdSystem.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkTearable.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneUtils.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
@@ -33,11 +33,11 @@ using namespace imstk;
 ///
 /// \brief Create PBD model to be used by all objects
 ///
-static std::shared_ptr<PbdModel>
-makePbdModel()
+static std::shared_ptr<PbdSystem>
+makePbdSystem()
 {
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.01;
@@ -45,9 +45,9 @@ makePbdModel()
     pbdParams->m_linearDampingCoeff = 0.001;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
+    auto pbdSystem = std::make_shared<PbdSystem>();
 
-    return pbdModel;
+    return pbdSystem;
 }
 
 ///
@@ -57,42 +57,28 @@ makePbdModel()
 /// \param dimensions of tetrahedral grid used for tissue
 /// \param center of tissue block
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeSurfaceCubeObj(const std::string& name,
                    const Vec3d& size, const Vec3i& dim, const Vec3d& center,
                    const Quatd& orientation,
-                   const std::shared_ptr<PbdModel> pbdModel)
+                   const std::shared_ptr<PbdSystem> pbdSystem)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tetMesh =
         GeometryUtils::toTetGrid(center, size, dim, orientation);
 
     auto surfMesh = tetMesh->extractSurfaceMesh();
 
-    // Setup the material
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setColor(Color(0.77, 0.53, 0.34));
-    material->setEdgeColor(Color(0.87, 0.63, 0.44));
-    material->setOpacity(0.5);
-
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(surfMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    tissueObj->addVisualModel(visualModel);
-    tissueObj->setPhysicsGeometry(surfMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    tissueObj->setDynamicalModel(pbdModel);
-    tissueObj->getPbdBody()->uniformMassValue = 0.01;
+    auto tissueObj = SceneUtils::makePbdEntity(name, surfMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(SceneUtils::makeTissueMaterial(0.5));
+    auto method = tissueObj->getComponent<PbdMethod>();
+    method->getPbdBody()->uniformMassValue = 0.01;
 
-    pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
-    pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 500.0,
+        method->getPbdBody()->bodyHandle);
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 500.0,
+        method->getPbdBody()->bodyHandle);
 
     return tissueObj;
 }
@@ -104,42 +90,28 @@ makeSurfaceCubeObj(const std::string& name,
 /// \param dimensions of tetrahedral grid used for tissue
 /// \param center of tissue block
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeVolumeCubeObj(const std::string& name,
                   const Vec3d& size, const Vec3i& dim, const Vec3d& center,
                   const Quatd& orientation,
-                  const std::shared_ptr<PbdModel> pbdModel)
+                  const std::shared_ptr<PbdSystem> pbdSystem)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
     // Setup the Geometry
     std::shared_ptr<TetrahedralMesh> tetMesh =
         GeometryUtils::toTetGrid(center, size, dim, orientation);
 
     auto surfMesh = tetMesh->extractSurfaceMesh();
 
-    // Setup the material
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setColor(Color(0.77, 0.53, 0.34));
-    material->setEdgeColor(Color(0.87, 0.63, 0.44));
-    material->setOpacity(0.5);
-
-    auto visualModel = std::make_shared<VisualModel>();
-    visualModel->setGeometry(tetMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    tissueObj->addVisualModel(visualModel);
-    tissueObj->setPhysicsGeometry(tetMesh);
-    tissueObj->addComponent<Collider>()->setGeometry(surfMesh);
-    tissueObj->setDynamicalModel(pbdModel);
-    tissueObj->getPbdBody()->uniformMassValue = 0.01;
+    auto tissueObj = SceneUtils::makePbdEntity(name, tetMesh, surfMesh, tetMesh, pbdSystem);
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(SceneUtils::makeTissueMaterial(0.5));
+    auto pbdBody = tissueObj->getComponent<PbdMethod>()->getPbdBody();
+    pbdBody->uniformMassValue = 0.01;
 
-    pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
-    pbdModel->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 500.0,
-        tissueObj->getPbdBody()->bodyHandle);
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 500.0,
+        pbdBody->bodyHandle);
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Volume, 500.0,
+        pbdBody->bodyHandle);
 
     // Fix the borders
     std::shared_ptr<VecDataArray<double, 3>> vertices = tetMesh->getVertexPositions();
@@ -148,7 +120,7 @@ makeVolumeCubeObj(const std::string& name,
         const Vec3d& pos = (*vertices)[i];
         if (pos[1] <= center[1] - size[1] * 0.5)
         {
-            tissueObj->getPbdBody()->fixedNodeIds.push_back(i);
+            pbdBody->fixedNodeIds.push_back(i);
         }
     }
 
@@ -175,7 +147,8 @@ public:
 
         m_scene->addSceneObject(m_pbdObj);
 
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObj->getPhysicsGeometry());
+        auto pbdMethod = m_pbdObj->getComponent<PbdMethod>();
+        auto pointSet  = std::dynamic_pointer_cast<PointSet>(pbdMethod->getGeometry());
         m_currVerticesPtr = pointSet->getVertexPositions();
         m_prevVertices    = *m_currVerticesPtr;
 
@@ -184,7 +157,7 @@ public:
             {
                 // Run in realtime at a slightly slowed down speed
                 // Still fixed, but # of iterations may vary by system
-                m_pbdModel->getConfig()->m_dt =
+                m_pbdSystem->getConfig()->m_dt =
                     m_sceneManager->getDt();
             });
 
@@ -200,11 +173,11 @@ public:
 
         // Verify that map exists after the first iteration
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
+            [ = ](Event*)
             {
                 if (m_scene->getSceneTime() >= 0.5)
                 {
-                    ASSERT_EQ(false, m_pbdObj->getPbdBody()->cellConstraintMap.empty());
+                    ASSERT_EQ(false, pbdMethod->getPbdBody()->cellConstraintMap.empty());
                 }
             });
 
@@ -215,17 +188,15 @@ public:
         m_scene->addLight("Light", light);
     }
 
-public:
-
     // Pbd model used for simulation
-    std::shared_ptr<PbdModel> m_pbdModel = nullptr;
+    std::shared_ptr<PbdSystem> m_pbdSystem = nullptr;
 
     // Pbd object for testing component
-    std::shared_ptr<PbdObject> m_pbdObj = nullptr;
+    std::shared_ptr<Entity> m_pbdObj = nullptr;
 
     // Pbd objects to be connected for testing tearing
-    std::shared_ptr<PbdObject> m_pbdObjA = nullptr;
-    std::shared_ptr<PbdObject> m_pbdObjB = nullptr;
+    std::shared_ptr<Entity> m_pbdObjA = nullptr;
+    std::shared_ptr<Entity> m_pbdObjB = nullptr;
 
     // For assertions
     std::shared_ptr<VecDataArray<double, 3>> m_currVerticesPtr;
@@ -243,15 +214,15 @@ public:
 ///
 TEST_F(PbdObjectTearingTest, TestAddingTearingViaCall)
 {
-    m_pbdModel = makePbdModel();
+    m_pbdSystem = makePbdSystem();
 
     // Setup the tissue
     m_pbdObj = makeVolumeCubeObj("Tissue",
         Vec3d(0.4, 0.4, 0.4), Vec3i(2, 2, 2), Vec3d(0.0, 0.0, 0.0),
-        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdModel);
+        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdSystem);
 
     // Initialize Object
-    m_pbdObj->initialize();
+    m_pbdObj->getComponent<PbdMethod>()->initialize();
 
     // Do test
     auto tearing = std::make_shared<Tearable>();
@@ -273,22 +244,22 @@ TEST_F(PbdObjectTearingTest, TestAddingTearingViaCall)
 ///
 TEST_F(PbdObjectTearingTest, PbdConnectiveDropTest)
 {
-    m_pbdModel = makePbdModel();
+    m_pbdSystem = makePbdSystem();
 
     // Setup the tissue
     m_pbdObjA = makeVolumeCubeObj("TissueA",
         Vec3d(0.4, 0.4, 0.4), Vec3i(2, 2, 2), Vec3d(0.0, 0.0, 0.0),
-        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdModel);
-    m_pbdObjA->initialize();
+        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdSystem);
+    m_pbdObjA->getComponent<PbdMethod>()->initialize();
 
     m_pbdObjB = makeSurfaceCubeObj("TissueB",
         Vec3d(0.4, 0.4, 0.4), Vec3i(2, 2, 2), Vec3d(1.0, 0.0, 0.0),
-        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdModel);
-    m_pbdObjB->initialize();
+        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdSystem);
+    m_pbdObjB->getComponent<PbdMethod>()->initialize();
 
     // Setup the connective tissue
-    m_pbdObj = makeConnectiveTissue(m_pbdObjA, m_pbdObjB, m_pbdModel);
-    m_pbdObj->initialize();
+    m_pbdObj = makeConnectiveTissue(m_pbdObjA, m_pbdObjB, m_pbdSystem);
+    m_pbdObj->getComponent<PbdMethod>()->initialize();
 
     auto tearing = std::make_shared<Tearable>();
     m_pbdObj->addComponent(tearing);

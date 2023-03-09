@@ -13,7 +13,7 @@
 namespace imstk
 {
 class PbdConstraint;
-class PbdObject;
+class PbdMethod;
 class PbdObjectCellRemoval;
 class TaskNode;
 
@@ -30,22 +30,24 @@ class Burnable : public SceneBehaviour
 public:
     Burnable(const std::string& name = "BurnableBehaviour");
 
-    ///
-    /// \brief Get the PBD object to be torn
-    ///@{
-    std::shared_ptr<PbdObject> getPbdObject() const { return m_burnableObject; }
+    IMSTK_TYPE_NAME(Burnable)
+
+///
+/// \brief Get the PBD object to be torn
+///@{
+// std::shared_ptr<PbdMethod> getPbdObject() const { return m_burnableObject; }
 ///@}
 
 protected:
 
     // Check state of mesh and delete cells that are burned away
     // void update(double dt);
-    void visualUpdate(const double& dt) override;
+    void visualUpdate(const double& imstkNotUsed(dt)) override;
 
     // Allocate state against mesh
     void init() override;
 
-    std::shared_ptr<PbdObject> m_burnableObject;             ///< Object being burned
+    std::shared_ptr<PbdMethod> m_burnableObject;             ///< Object being burned
     std::shared_ptr<PbdObjectCellRemoval> m_cellRemover;     ///< Cell remover for removing cells
 
     std::shared_ptr<DataArray<double>> m_burnDamagePtr;

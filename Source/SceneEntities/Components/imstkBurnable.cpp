@@ -10,10 +10,10 @@
 #include "imstkParallelUtils.h"
 #include "imstkPbdConstraint.h"
 #include "imstkPbdConstraintContainer.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdSolver.h"
+#include "imstkPbdSystem.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskNode.h"
 
@@ -26,16 +26,18 @@ Burnable::Burnable(const std::string& name) : SceneBehaviour(false, name)
 void
 Burnable::init()
 {
-    m_burnableObject = std::dynamic_pointer_cast<PbdObject>(getEntity().lock());
+    auto entity = getEntity().lock();
+    CHECK(entity != nullptr) << "Cannot acquire entity";
+    m_burnableObject = entity->getComponent<PbdMethod>();
 
-    CHECK(m_burnableObject != nullptr) << "Burnable requires a input PBD object,"
+    CHECK(m_burnableObject != nullptr) << "Burnable requires a PbdMethod,"
         "please add it on creation";
 
     // Create cell remover for removing torn cells
     m_cellRemover = std::make_shared<PbdObjectCellRemoval>(m_burnableObject);
 
     // Allocate memory for mesh state and initialize values
-    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObject->getPhysicsGeometry());
+    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObject->getGeometry());
     int  numCells = cellMesh->getNumCells();
 
     m_burnDamagePtr = std::make_shared<DataArray<double>>(numCells);
@@ -65,9 +67,9 @@ Burnable::visualUpdate(const double& dt)
     auto pbdBody = m_burnableObject->getPbdBody();
 
     // Mesh data
-    auto      cellMesh     = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObject->getPhysicsGeometry());
-    auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(cellMesh->getAbstractCells()); // underlying 1D array
-    const int vertsPerCell = cellMesh->getAbstractCells()->getNumberOfComponents();
+    auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObject->getGeometry());
+    // auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(cellMesh->getAbstractCells()); // underlying 1D array
+    // const int vertsPerCell = cellMesh->getAbstractCells()->getNumberOfComponents();
 
     // Mesh state data
     auto               burnStatePtr = std::dynamic_pointer_cast<DataArray<double>>(cellMesh->getCellAttribute("BurnDamage"));

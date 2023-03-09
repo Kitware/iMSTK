@@ -16,11 +16,11 @@
 namespace imstk
 {
 ///
-/// \class PbdModelConfig
+/// \class PbdSystemConfig
 ///
 /// \brief Gives parameters for PBD simulation
 ///
-class PbdModelConfig
+class PbdSystemConfig
 {
 public:
     ///
@@ -148,7 +148,7 @@ public:
     std::unordered_map<int, double> m_bodyAngularDampingCoeff; ///< Per body angular damping, Body id -> angular damping for given body [0, 1]
 
 protected:
-    friend class PbdModel;
+    friend class PbdSystem;
 
     std::unordered_map<ConstraintGenType, std::vector<std::shared_ptr<PbdConstraintFunctor>>> m_functors;
 };

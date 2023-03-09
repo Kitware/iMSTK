@@ -614,6 +614,77 @@ TEST(imstkTaskGraphTest, RemoveUnusedNodes)
     }
 }
 
+TEST(imstkTaskGraphTest, AddChain)
+{
+    // 5 Nodes test
+    auto taskGraph = std::make_shared<TaskGraph>();
+    auto node1     = std::make_shared<TaskNode>();
+    auto node2     = std::make_shared<TaskNode>();
+    auto node3     = std::make_shared<TaskNode>();
+    auto source    = taskGraph->getSource();
+    auto sink      = taskGraph->getSink();
+
+    taskGraph->addNode(node1);
+    taskGraph->addNode(node2);
+    taskGraph->addNode(node3);
+    taskGraph->addChain({ source, node1, node2, node3, sink });
+
+    EXPECT_TRUE(taskGraph->containsEdge(source, node1));
+    EXPECT_TRUE(taskGraph->containsEdge(node1, node2));
+    EXPECT_TRUE(taskGraph->containsEdge(node2, node3));
+    EXPECT_TRUE(taskGraph->containsEdge(node3, sink));
+    EXPECT_TRUE(taskGraph->getAdjList().size() == 4);
+
+    EXPECT_THAT(taskGraph->getAdjList().at(source), UnorderedElementsAre(node1));
+    EXPECT_THAT(taskGraph->getAdjList().at(node1), UnorderedElementsAre(node2));
+    EXPECT_THAT(taskGraph->getAdjList().at(node2), UnorderedElementsAre(node3));
+    EXPECT_THAT(taskGraph->getAdjList().at(node3), UnorderedElementsAre(sink));
+    EXPECT_EQ(0, taskGraph->getAdjList().count(sink));
+
+    EXPECT_EQ(0, taskGraph->getInvAdjList().count(source));
+    EXPECT_THAT(taskGraph->getInvAdjList().at(node1), UnorderedElementsAre(source));
+    EXPECT_THAT(taskGraph->getInvAdjList().at(node2), UnorderedElementsAre(node1));
+    EXPECT_THAT(taskGraph->getInvAdjList().at(node3), UnorderedElementsAre(node2));
+    EXPECT_THAT(taskGraph->getInvAdjList().at(sink), UnorderedElementsAre(node3));
+
+    // 3 Nodes test
+    taskGraph = std::make_shared<TaskGraph>();
+    source    = taskGraph->getSource();
+    sink      = taskGraph->getSink();
+    taskGraph->addNode(node1);
+    taskGraph->addChain({ source, node1, sink });
+    EXPECT_TRUE(taskGraph->containsEdge(source, node1));
+    EXPECT_TRUE(taskGraph->containsEdge(node1, sink));
+    EXPECT_TRUE(taskGraph->getAdjList().size() == 2);
+
+    // 2 Nodes test
+    taskGraph = std::make_shared<TaskGraph>();
+    source    = taskGraph->getSource();
+    sink      = taskGraph->getSink();
+    taskGraph->addChain({ source, sink });
+    EXPECT_TRUE(taskGraph->containsEdge(source, sink));
+    EXPECT_TRUE(taskGraph->getAdjList().size() == 1);
+
+    // 1 Nodes test
+    taskGraph = std::make_shared<TaskGraph>();
+    source    = taskGraph->getSource();
+    sink      = taskGraph->getSink();
+    taskGraph->addNode(node1);
+    taskGraph->addChain({ node1 });
+    EXPECT_FALSE(taskGraph->containsEdge(source, sink));
+    EXPECT_TRUE(taskGraph->getAdjList().size() == 0);
+    EXPECT_TRUE(taskGraph->getNodes().size() == 3);
+
+    // 0 Nodes test
+    taskGraph = std::make_shared<TaskGraph>();
+    source    = taskGraph->getSource();
+    sink      = taskGraph->getSink();
+    taskGraph->addChain({});
+    EXPECT_FALSE(taskGraph->containsEdge(source, sink));
+    EXPECT_TRUE(taskGraph->getAdjList().size() == 0);
+    EXPECT_TRUE(taskGraph->getNodes().size() == 2);
+}
+
 //TEST(imstkTaskGraphTest, DISABLED_ResolveCriticalNodes0)
 //{
 //    /*

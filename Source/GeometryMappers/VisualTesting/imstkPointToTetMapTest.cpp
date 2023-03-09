@@ -7,12 +7,12 @@
 #include "imstkCamera.h"
 #include "imstkCollider.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdSystem.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPointToTetMap.h"
 #include "imstkPointwiseMap.h"
 #include "imstkScene.h"
+#include "imstkSceneUtils.h"
 #include "imstkVisualTestingUtils.h"
 
 using namespace imstk;
@@ -29,7 +29,7 @@ TEST_F(VisualTest, PointToTetMapTest)
     m_scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
     // Setup a physics geometry
-    auto tissueObj = std::make_shared<PbdObject>();
+    std::shared_ptr<Entity> tissueObj;
     {
         // Setup the Geometry
         std::shared_ptr<TetrahedralMesh> tetMeshFine =
@@ -42,26 +42,24 @@ TEST_F(VisualTest, PointToTetMapTest)
         std::shared_ptr<SurfaceMesh> tetMeshCoarse_sf = tetMeshCoarse->extractSurfaceMesh();
 
         // Setup the Model
-        auto pbdModel = std::make_shared<PbdModel>();
-        pbdModel->getConfig()->m_doPartitioning = false;
-        pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -9.8, 0.0);
-        pbdModel->getConfig()->m_iterations = 8;
-        pbdModel->getConfig()->m_dt = 0.001;
-        pbdModel->getConfig()->m_linearDampingCoeff = 0.025;
+        auto pbdSystem = std::make_shared<PbdSystem>();
+        pbdSystem->getConfig()->m_doPartitioning = false;
+        pbdSystem->getConfig()->m_gravity    = Vec3d(0.0, -9.8, 0.0);
+        pbdSystem->getConfig()->m_iterations = 8;
+        pbdSystem->getConfig()->m_dt = 0.001;
+        pbdSystem->getConfig()->m_linearDampingCoeff = 0.025;
 
         // Setup the Object
-        tissueObj->setPhysicsGeometry(tetMeshCoarse);
-        tissueObj->setVisualGeometry(tetMeshFine_sf);
-        tissueObj->addComponent<Collider>()->setGeometry(tetMeshCoarse_sf);
-        tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMeshCoarse, tetMeshCoarse_sf));
-        tissueObj->setPhysicsToCollidingMap(std::make_shared<PointToTetMap>(tetMeshCoarse, tetMeshFine_sf));
-        tissueObj->setDynamicalModel(pbdModel);
-        tissueObj->getPbdBody()->uniformMassValue = 0.01;
+        tissueObj = imstk::SceneUtils::makePbdEntity("tissueObj", tetMeshFine_sf, tetMeshCoarse_sf, tetMeshCoarse, pbdSystem);
+        auto tissueMethod = tissueObj->getComponent<PbdMethod>();
+        tissueMethod->setPhysicsToVisualMap(std::make_shared<PointToTetMap>(tetMeshCoarse, tetMeshFine_sf));
+        tissueMethod->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMeshCoarse, tetMeshCoarse_sf));
+        tissueMethod->getPbdBody()->uniformMassValue = 0.01;
 
-        pbdModel->getConfig()->m_secParams->m_YoungModulus = 1000.0;
-        pbdModel->getConfig()->m_secParams->m_PoissonRatio = 0.45; // 0.48 for tissue
-        pbdModel->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
-            tissueObj->getPbdBody()->bodyHandle);
+        pbdSystem->getConfig()->m_secParams->m_YoungModulus = 1000.0;
+        pbdSystem->getConfig()->m_secParams->m_PoissonRatio = 0.45; // 0.48 for tissue
+        pbdSystem->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK,
+            tissueMethod->getPbdBody()->bodyHandle);
 
         // Fix the borders
         for (int z = 0; z < coarseDim[2]; z++)
@@ -72,7 +70,7 @@ TEST_F(VisualTest, PointToTetMapTest)
                 {
                     if (x == 0 || z == 0 || x == coarseDim[0] - 1 || z == coarseDim[2] - 1)
                     {
-                        tissueObj->getPbdBody()->fixedNodeIds.push_back(x + coarseDim[0] * (y + coarseDim[1] * z));
+                        tissueMethod->getPbdBody()->fixedNodeIds.push_back(x + coarseDim[0] * (y + coarseDim[1] * z));
                     }
                 }
             }

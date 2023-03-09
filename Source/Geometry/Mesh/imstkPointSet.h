@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkGeometry.h"
+#include "imstkMacros.h"
 #include "imstkTypes.h"
 
 #include <unordered_map>

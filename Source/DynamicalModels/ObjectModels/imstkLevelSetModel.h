@@ -32,7 +32,7 @@ struct LevelSetModelConfig
 /// \brief This class implements a generic level set model, it requires both a forward
 /// and backward finite differencing method
 ///
-class LevelSetModel : public AbstractDynamicalModel
+class LevelSetModel : public AbstractDynamicalSystem
 {
 public:
     LevelSetModel();

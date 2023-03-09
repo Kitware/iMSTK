@@ -26,6 +26,8 @@ class Puncturable;
 class Puncturable : public Component
 {
 public:
+    IMSTK_TYPE_NAME(Puncturable)
+
     Puncturable(const std::string& name = "Puncturable") : Component(name) { }
     ~Puncturable() override = default;
 

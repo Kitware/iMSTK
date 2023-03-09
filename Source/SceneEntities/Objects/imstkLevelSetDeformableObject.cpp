@@ -6,7 +6,7 @@
 
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLogger.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdSystem.h"
 #include "imstkLevelSetModel.h"
 
 namespace imstk

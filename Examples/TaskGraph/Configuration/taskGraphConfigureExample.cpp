@@ -6,6 +6,7 @@
 
 #include "imstkCamera.h"
 #include "imstkColorFunction.h"
+#include "imstkEntity.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
@@ -13,9 +14,9 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdSystem.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -29,7 +30,7 @@
 
 using namespace imstk;
 
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makeClothObj(const std::string& name, double width, double height, int nRows, int nCols)
 {
     std::shared_ptr<SurfaceMesh> clothMesh =
@@ -37,16 +38,16 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
             Vec2d(width, height), Vec2i(nRows, nCols));
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e2);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e1);
+    imstkNew<PbdSystemConfig> pbdParams;
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1e2);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 1e1);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_dt         = 0.007;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
-    pbdModel->configure(pbdParams);
+    imstkNew<PbdSystem> pbdSystem;
+    pbdSystem->configure(pbdParams);
 
     // Setup visual models
     imstkNew<VisualModel> clothModel;
@@ -61,13 +62,14 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     clothSurfaceNormals->getRenderMaterial()->setPointSize(0.5);
 
     // Setup the Object
-    auto clothObj = std::make_shared<PbdObject>(name);
-    clothObj->addVisualModel(clothModel);
-    clothObj->addVisualModel(clothSurfaceNormals);
-    clothObj->setPhysicsGeometry(clothMesh);
-    clothObj->setDynamicalModel(pbdModel);
-    clothObj->getPbdBody()->fixedNodeIds     = { 0, nCols - 1 };
-    clothObj->getPbdBody()->uniformMassValue = width * height / (nRows * nCols);
+    auto clothObj = std::make_shared<Entity>(name);
+    clothObj->addComponent(clothModel);
+    clothObj->addComponent(clothSurfaceNormals);
+    auto method = clothObj->addComponent<PbdMethod>();
+    method->setGeometry(clothMesh);
+    method->setPbdSystem(pbdSystem);
+    method->setFixedNodes({ 0, nCols - 1 });
+    method->setUniformMass(width * height / (nRows * nCols));
     return clothObj;
 }
 
@@ -85,17 +87,17 @@ main()
     scene->getActiveCamera()->setPosition(0.0, 1.5, 25.0);
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
+    std::shared_ptr<Entity> clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
     scene->addSceneObject(clothObj);
 
     // Setup some scalars
-    auto clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
+    auto clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getComponent<PbdMethod>()->getGeometry());
     auto scalarsPtr    = std::make_shared<DataArray<double>>(clothGeometry->getNumVertices());
     std::fill_n(scalarsPtr->getPointer(), scalarsPtr->size(), 0.0);
     clothGeometry->setVertexScalars("scalars", scalarsPtr);
 
     // Setup the material for the scalars
-    std::shared_ptr<RenderMaterial> material = clothObj->getVisualModel(0)->getRenderMaterial();
+    std::shared_ptr<RenderMaterial> material = clothObj->getComponentN<VisualModel>(0)->getRenderMaterial();
     material->setScalarVisibility(true);
     std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
     colorFunc->setNumberOfColors(2);
@@ -131,7 +133,7 @@ main()
         }, "ComputeVelocityScalars");
 
             // After IntegratePosition
-            graph->insertAfter(clothObj->getUpdateGeometryNode(), computeVelocityScalars);
+            graph->insertAfter(clothObj->getComponent<PbdMethod>()->getUpdateGeometryNode(), computeVelocityScalars);
 
             // Write the modified graph
             writer->setFileName("taskGraphConfigureExampleNew.svg");

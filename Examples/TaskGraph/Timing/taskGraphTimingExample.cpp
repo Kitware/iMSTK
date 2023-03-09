@@ -13,12 +13,13 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdModelConfig.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdSystemConfig.h"
+#include "imstkPbdMethod.h"
+#include "imstkPbdSystem.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneUtils.h"
 #include "imstkSimulationManager.h"
 #include "imstkSimulationUtils.h"
 #include "imstkTaskGraphVizWriter.h"
@@ -30,7 +31,7 @@ using namespace imstk;
 ///
 /// \brief Create pbd string object
 ///
-static std::shared_ptr<PbdObject>
+static std::shared_ptr<Entity>
 makePbdString(
     const std::string& name,
     const Vec3d&       pos,
@@ -39,23 +40,21 @@ makePbdString(
     const double       bendStiffness,
     const Color&       color)
 {
-    imstkNew<PbdObject> stringObj(name);
-
     // Setup the Geometry
     std::shared_ptr<LineMesh> stringMesh =
         GeometryUtils::toLineGrid(pos, Vec3d(0.0, -1.0, 0.0), stringLength, numVerts);
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e7);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Bend, bendStiffness);
+    imstkNew<PbdSystemConfig> pbdParams;
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1e7);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Bend, bendStiffness);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_dt         = 0.0005;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    imstkNew<PbdModel> pbdModel;
-    pbdModel->configure(pbdParams);
+    imstkNew<PbdSystem> pbdSystem;
+    pbdSystem->configure(pbdParams);
 
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
@@ -64,21 +63,16 @@ makePbdString(
     material->setLineWidth(2.0f);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
-    imstkNew<VisualModel> visualModel;
-    visualModel->setGeometry(stringMesh);
-    visualModel->setRenderMaterial(material);
-
     // Setup the Object
-    stringObj->addVisualModel(visualModel);
-    stringObj->setPhysicsGeometry(stringMesh);
-    stringObj->setDynamicalModel(pbdModel);
-    stringObj->getPbdBody()->fixedNodeIds     = { 0 };
-    stringObj->getPbdBody()->uniformMassValue = 5.0;
+    auto stringObj = SceneUtils::makePbdEntity(name, stringMesh, nullptr, stringMesh, pbdSystem);
+    stringObj->getComponent<VisualModel>()->setRenderMaterial(material);
+    stringObj->getComponent<PbdMethod>()->setFixedNodes({ 0 });
+    stringObj->getComponent<PbdMethod>()->setUniformMass(5.0);
 
     return stringObj;
 }
 
-static std::vector<std::shared_ptr<PbdObject>>
+static std::vector<std::shared_ptr<Entity>>
 makePbdStrings(const int    numStrings,
                const int    numVerts,
                const double stringSpacing,
@@ -86,7 +80,7 @@ makePbdStrings(const int    numStrings,
                const Color& startColor,
                const Color& endColor)
 {
-    std::vector<std::shared_ptr<PbdObject>> pbdStringObjs(numStrings);
+    std::vector<std::shared_ptr<Entity>> pbdStringObjs(numStrings);
 
     const double size = stringSpacing * (numStrings - 1);
 
@@ -130,10 +124,10 @@ main()
     scene->getActiveCamera()->setPosition(0.0, 0.0, 15.0);
 
     // Setup N separate strings with varying bend stiffnesses
-    std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
+    std::vector<std::shared_ptr<Entity>> pbdStringObjs =
         makePbdStrings(numStrings, numVerts, stringSpacing, stringLength, startColor, endColor);
     // Add the string scene objects to the scene
-    for (std::shared_ptr<PbdObject> obj : pbdStringObjs)
+    for (std::shared_ptr<Entity> obj : pbdStringObjs)
     {
         scene->addSceneObject(obj);
     }
@@ -154,13 +148,16 @@ main()
                 const double dt = sceneManager->getDt();
                 for (size_t i = 0; i < pbdStringObjs.size(); i++)
                 {
-                    std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
-                    model->getConfig()->m_dt = dt;
-                    std::shared_ptr<VecDataArray<double, 3>> positions = pbdStringObjs[i]->getPbdBody()->vertices;
-                    (*positions)[0] += Vec3d(
-                        -std::sin(t) * radius * dt,
-                        0.0,
-                        std::cos(t) * radius * dt);
+                    if (auto method = pbdStringObjs[i]->getComponent<PbdMethod>())
+                    {
+                        std::shared_ptr<PbdSystem> model = method->getPbdSystem();
+                        model->getConfig()->m_dt = dt;
+                        std::shared_ptr<VecDataArray<double, 3>> positions = method->getPbdBody()->vertices;
+                        (*positions)[0] += Vec3d(
+                            -std::sin(t) * radius * dt,
+                            0.0,
+                            std::cos(t) * radius * dt);
+                    }
                 }
                 t += dt;
             });

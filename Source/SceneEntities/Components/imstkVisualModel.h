@@ -30,6 +30,8 @@ public:
     VisualModel(const std::string& name = "VisualModel");
     ~VisualModel() override = default;
 
+    IMSTK_TYPE_NAME(VisualModel)
+
     // *INDENT-OFF*
     SIGNAL(VisualModel, modified);
     // *INDENT-ON*

@@ -5,7 +5,7 @@
 */
 
 #include "imstkDynamicObject.h"
-#include "imstkAbstractDynamicalModel.h"
+#include "imstkAbstractDynamicalSystem.h"
 #include "imstkGeometryMap.h"
 #include "imstkLogger.h"
 #include "imstkTaskGraph.h"
