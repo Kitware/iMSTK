@@ -11,7 +11,7 @@
 #include "imstkMath.h"
 #include "imstkMeshIO.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPointSetToCapsuleCD.h"
@@ -145,10 +145,10 @@ BM_DistanceVolume(benchmark::State& state)
         Vec3d(0.0, 0.0, 0.0));
 
     // Setup the Parameters
-    std::shared_ptr<PbdModelConfig> pbdParams = std::make_shared<PbdModelConfig>();
+    std::shared_ptr<PbdSystemConfig> pbdParams = std::make_shared<PbdSystemConfig>();
     // Use volume+distance constraints
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 1.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Volume, 1.0);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1.0);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt         = dt;
@@ -220,10 +220,10 @@ BM_DistanceDihedral(benchmark::State& state)
     std::shared_ptr<SurfaceMesh> surfMesh = prismMesh->extractSurfaceMesh();
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Use distance+dihedral angle
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 1.0);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1.0);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -8.0, 0.0);
     pbdParams->m_dt         = dt;
@@ -290,7 +290,7 @@ BM_PbdFemStVK(benchmark::State& state)
         Vec3d(0.0, 0.0, 0.0));
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Use FEM Tet constraints
     pbdParams->m_secParams->m_YoungModulus = 5.0;
     pbdParams->m_secParams->m_PoissonRatio = 0.4;
@@ -367,7 +367,7 @@ BM_PbdFemCorotation(benchmark::State& state)
         Vec3d(0.0, 0.0, 0.0));
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Use FEM Tet constraints
     pbdParams->m_secParams->m_YoungModulus = 5.0;
     pbdParams->m_secParams->m_PoissonRatio = 0.4;
@@ -444,7 +444,7 @@ BM_PbdFemNeoHookean(benchmark::State& state)
         Vec3d(0.0, 0.0, 0.0));
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Use FEM Tet constraints
     pbdParams->m_secParams->m_YoungModulus = 5.0;
     pbdParams->m_secParams->m_PoissonRatio = 0.4;
@@ -521,7 +521,7 @@ BM_PbdFemLinear(benchmark::State& state)
         Vec3d(0.0, 0.0, 0.0));
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Use FEM Tet constraints
     pbdParams->m_secParams->m_YoungModulus = 5.0;
     pbdParams->m_secParams->m_PoissonRatio = 0.4;
@@ -610,10 +610,10 @@ BM_PbdContactDistanceVol(benchmark::State& state)
     prismObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(prismMesh, surfMesh));
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Use volume+distance
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 0.9);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.9);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Volume, 0.9);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 0.9);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -1.0 / (double)state.range(0), 0.0);
     pbdParams->m_dt         = 0.05;
@@ -713,10 +713,10 @@ BM_PbdContactDistanceDihedral(benchmark::State& state)
     prismObj->addComponent(prismCollider);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Set up distance+dihearal angle constraints
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.9);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.9);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 0.9);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 0.9);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -2.0 / (double)state.range(0), 0.0);
     pbdParams->m_dt         = dt;
@@ -821,7 +821,7 @@ BM_PbdFemContact(benchmark::State& state)
     prismObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(prismMesh, surfMesh));
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Use FEMTet constraints
     pbdParams->m_secParams->m_YoungModulus = 5.0;
     pbdParams->m_secParams->m_PoissonRatio = 0.4;

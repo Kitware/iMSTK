@@ -12,7 +12,7 @@
 #include "imstkDirectionalLight.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdSystem.h"
 #include "imstkPlane.h"

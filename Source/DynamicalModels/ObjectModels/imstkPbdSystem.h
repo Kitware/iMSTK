@@ -16,7 +16,7 @@
 namespace imstk
 {
 class PbdConstraintContainer;
-class PbdModelConfig;
+class PbdSystemConfig;
 class PbdSolver;
 
 ///
@@ -63,7 +63,7 @@ public:
     ///
     /// \brief Set simulation parameters
     ///
-    void configure(std::shared_ptr<PbdModelConfig> params);
+    void configure(std::shared_ptr<PbdSystemConfig> params);
 
     ///
     /// \brief Add/remove PbdBody
@@ -101,7 +101,7 @@ public:
     ///
     /// \brief Get the simulation parameters
     ///
-    std::shared_ptr<PbdModelConfig> getConfig() const;
+    std::shared_ptr<PbdSystemConfig> getConfig() const;
 
     ///
     /// \brief Add/generate constraints for given set of vertices on the body, useful for
@@ -184,8 +184,8 @@ protected:
     PbdState m_initialState;
     PbdState m_state;
 
-    std::shared_ptr<PbdSolver>      m_pbdSolver;           ///< PBD solver
-    std::shared_ptr<PbdModelConfig> m_config;              ///< Model parameters, must be set before simulation
+    std::shared_ptr<PbdSolver>       m_pbdSolver;          ///< PBD solver
+    std::shared_ptr<PbdSystemConfig> m_config;             ///< Model parameters, must be set before simulation
     std::shared_ptr<PbdConstraintContainer> m_constraints; ///< The set of constraints to update/use
 
     ///< Computational Nodes

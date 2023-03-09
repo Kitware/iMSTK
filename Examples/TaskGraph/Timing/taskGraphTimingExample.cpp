@@ -13,7 +13,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdSystem.h"
 #include "imstkRenderMaterial.h"
@@ -45,9 +45,9 @@ makePbdString(
         GeometryUtils::toLineGrid(pos, Vec3d(0.0, -1.0, 0.0), stringLength, numVerts);
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e7);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Bend, bendStiffness);
+    imstkNew<PbdSystemConfig> pbdParams;
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1e7);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Bend, bendStiffness);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_dt         = 0.0005;
     pbdParams->m_iterations = 5;

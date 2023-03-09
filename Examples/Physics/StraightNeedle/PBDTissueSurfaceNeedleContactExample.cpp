@@ -19,7 +19,7 @@
 #include "imstkNeedle.h"
 #include "imstkObjectControllerGhost.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdSystem.h"
 #include "imstkPointwiseMap.h"
@@ -86,7 +86,7 @@ makeTissueObj(const std::string& name,
     setSphereTexCoords(surfMesh, 6.0);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     // Use Strain Energy constraints
     pbdParams->m_secParams->m_YoungModulus = 5.0;
     pbdParams->m_secParams->m_PoissonRatio = 0.4;

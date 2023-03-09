@@ -16,7 +16,7 @@
 #include "imstkOrientedBox.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPlane.h"
 #include "imstkPointwiseMap.h"
@@ -51,7 +51,7 @@ makeTetTissueObj(const std::string& name,
         GeometryUtils::toTetGrid(center, size, dim, orientation);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
@@ -105,7 +105,7 @@ makeTriTissueObj(const std::string& name,
         GeometryUtils::toTriangleGrid(center, size, dim, orientation);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
@@ -128,9 +128,9 @@ makeTriTissueObj(const std::string& name,
     auto method = tissueObj->getComponent<PbdMethod>();
     method->setUniformMass(0.00001);
 
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 0.1,
         method->getBodyHandle());
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6,
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 1e-6,
         method->getBodyHandle());
 
     return tissueObj;
@@ -149,7 +149,7 @@ makeLineThreadObj(const std::string& name,
         GeometryUtils::toLineGrid(start, dir, length, dim);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.001;
     pbdParams->m_iterations = 5;
@@ -173,7 +173,7 @@ makeLineThreadObj(const std::string& name,
     auto method = tissueObj->getComponent<PbdMethod>();
     method->setUniformMass(0.00001);
 
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 0.1,
         method->getBodyHandle());
 
     return tissueObj;

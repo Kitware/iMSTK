@@ -15,7 +15,7 @@
 #include "imstkMeshIO.h"
 #include "imstkPbdContactConstraint.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectGrasping.h"
@@ -152,7 +152,7 @@ makePbdString(
     stringMethod->setUniformMass(0.02);
 
     const int stringHandle = stringMethod->getBodyHandle();
-    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1000.0,
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1000.0,
         stringHandle);
     // It should have a high bend but without plasticity it's very difficult to use
     //system->getConfig()->enableBendConstraint(100.0, 1, true, stringHandle);

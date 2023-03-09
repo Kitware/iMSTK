@@ -15,7 +15,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
@@ -51,7 +51,7 @@ pbdRigidInDeformableGraspingExample()
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
     auto pbdSystem = std::make_shared<PbdSystem>();
-    auto pbdConfig = std::make_shared<PbdModelConfig>();
+    auto pbdConfig = std::make_shared<PbdSystemConfig>();
     pbdConfig->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdConfig->m_dt         = 0.001;
     pbdConfig->m_iterations = 5;
@@ -65,8 +65,8 @@ pbdRigidInDeformableGraspingExample()
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Organs/Vessels/vessel_test.obj");
 
         // Setup the Parameters
-        pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 10000.0);
-        pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.1);
+        pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 10000.0);
+        pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 0.1);
 
         // Setup the VisualModel
         auto material = std::make_shared<RenderMaterial>();

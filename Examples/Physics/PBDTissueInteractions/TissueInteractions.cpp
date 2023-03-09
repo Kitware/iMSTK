@@ -19,7 +19,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectGrasping.h"
 #include "imstkPbdSystem.h"
@@ -51,9 +51,9 @@ makeThinTissue(const std::string& name,
             Quatd::Identity(), 2.0);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 10000.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 0.1);
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 10000.0);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 0.1);
     pbdParams->m_gravity    = Vec3d(0.0, -0.01, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 4;

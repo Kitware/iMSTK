@@ -12,7 +12,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdSystem.h"
@@ -60,7 +60,7 @@ createPbdFluid(const std::string& tetMeshName)
     imstkNew<PbdSystem> pbdSystem;
 
     // Configure model
-    auto         pbdParams      = std::make_shared<PbdModelConfig>();
+    auto         pbdParams      = std::make_shared<PbdSystemConfig>();
     const double particleRadius = 0.5;
     pbdParams->enableConstantDensityConstraint(1.0, particleRadius);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);

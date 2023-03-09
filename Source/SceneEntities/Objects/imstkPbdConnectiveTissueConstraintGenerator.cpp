@@ -12,7 +12,7 @@
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdConstraintFunctor.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdSystem.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
@@ -159,7 +159,7 @@ PbdConnectiveTissueConstraintGenerator::connectLineToSurfMesh(
 void
 PbdConnectiveTissueConstraintGenerator::generateDistanceConstraints()
 {
-    m_connectiveStrandObj->getPbdSystem()->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, m_distStiffness,
+    m_connectiveStrandObj->getPbdSystem()->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, m_distStiffness,
         m_connectiveStrandObj->getPbdBody()->bodyHandle);
 }
 

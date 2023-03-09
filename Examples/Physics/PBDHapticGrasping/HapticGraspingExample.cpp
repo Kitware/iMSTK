@@ -16,7 +16,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkObjectControllerGhost.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectGrasping.h"
@@ -57,9 +57,9 @@ makePbdObjSurface(
     auto method = prismObj->getComponent<PbdMethod>();
     method->setUniformMass(0.05);
     // Use volume+distance constraints, worse results. More performant (can use larger mesh)
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1000.0,
+    model->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 1000.0,
         method->getBodyHandle());
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
+    model->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 500.0,
         method->getBodyHandle());
     // Fix the borders
     auto             vertices = surfMesh->getVertexPositions();
@@ -132,8 +132,8 @@ main()
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 0.96, -0.28);
 
-    auto                            pbdSystem = std::make_shared<PbdSystem>();
-    std::shared_ptr<PbdModelConfig> pbdParams = pbdSystem->getConfig();
+    auto                             pbdSystem = std::make_shared<PbdSystem>();
+    std::shared_ptr<PbdSystemConfig> pbdParams = pbdSystem->getConfig();
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.005;
     pbdParams->m_iterations = 8;

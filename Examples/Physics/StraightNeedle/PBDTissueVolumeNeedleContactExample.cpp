@@ -20,7 +20,7 @@
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdContactConstraint.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdSystem.h"
 #include "imstkPointwiseMap.h"

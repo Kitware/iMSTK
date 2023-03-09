@@ -16,7 +16,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectController.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
@@ -38,7 +38,7 @@ static std::shared_ptr<PbdSystem>
 makePbdModel()
 {
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.01;
@@ -76,9 +76,9 @@ makeSurfaceCubeObj(const std::string& name,
     auto pbdBody = tissueObj->getComponent<PbdMethod>()->getPbdBody();
     pbdBody->uniformMassValue = 0.01;
 
-    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 500.0,
         pbdBody->bodyHandle);
-    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 500.0,
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 500.0,
         pbdBody->bodyHandle);
 
     return tissueObj;
@@ -109,9 +109,9 @@ makeVolumeCubeObj(const std::string& name,
     auto pbdBody = tissueObj->getComponent<PbdMethod>()->getPbdBody();
     pbdBody->uniformMassValue = 0.01;
 
-    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 500.0,
         pbdBody->bodyHandle);
-    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 500.0,
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Volume, 500.0,
         pbdBody->bodyHandle);
 
     // Fix the borders

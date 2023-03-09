@@ -16,7 +16,7 @@
 #include "imstkObjectControllerGhost.h"
 #include "imstkOrientedBox.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"

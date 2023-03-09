@@ -20,7 +20,7 @@
 #include "imstkObjectControllerGhost.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
@@ -76,9 +76,9 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdSystem> system)
     auto tissueMethod = tissueObj->getComponent<PbdMethod>();
     tissueMethod->setUniformMass(60.0 / tissueMesh->getNumVertices());
 
-    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 700.0,
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 700.0,
         tissueMethod->getBodyHandle());
-    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 700.0,
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 700.0,
         tissueMethod->getBodyHandle());
 
     tissueMethod->setFixedNodes({ 57, 131, 132 }); // { 72, , 131, 132 };
@@ -122,9 +122,9 @@ makeKidney(const std::string& name, std::shared_ptr<PbdSystem> system)
     method->setUniformMass(60.0 / tissueMesh->getNumVertices());
     method->setFixedNodes({ 72, 57, 131, 132 });
 
-    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0,
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 500.0,
         method->getBodyHandle());
-    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 500.0,
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Volume, 500.0,
         method->getBodyHandle());
 
     LOG(INFO) << "Per particle mass: " << method->getPbdBody()->uniformMassValue;

@@ -11,7 +11,7 @@
 #include "imstkDummyClient.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdObjectGrasping.h"
 #include "imstkPointwiseMap.h"
@@ -120,9 +120,9 @@ makeTriTissueObj(const std::string& name,
     auto method = tissueObj->getComponent<PbdMethod>();
     method->setUniformMass(0.00001);
 
-    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 0.1,
                 method->getBodyHandle());
-    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e-6,
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 1e-6,
                 method->getBodyHandle());
 
     // Fix the borders
@@ -171,7 +171,7 @@ makeLineThreadObj(const std::string& name,
     auto method = tissueObj->getComponent<PbdMethod>();
     method->setUniformMass(0.00001);
 
-    pbdSystem->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 0.1,
+    pbdSystem->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 0.1,
                 method->getBodyHandle());
     method->setFixedNodes({ 0, lineMesh->getNumVertices() - 1 });
 

@@ -18,7 +18,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkNeedle.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPointwiseMap.h"
@@ -78,8 +78,8 @@ createTissue(std::shared_ptr<PbdSystem> model)
     model->getConfig()->setBodyDamping(method->getBodyHandle(), 0.3);
 
     // Use volume+distance constraints, worse results. More performant (can use larger mesh)
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100.0, method->getBodyHandle());
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 500.0, method->getBodyHandle());
+    model->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Volume, 100.0, method->getBodyHandle());
+    model->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 500.0, method->getBodyHandle());
 
     pbdObject->addComponent<Puncturable>();
 
@@ -119,7 +119,7 @@ makePbdString(
     stringMethod->setFixedNodes({ 0, 1 });
     stringMethod->setUniformMass(0.0001 / numVerts); // 0.002 / numVerts; // grams
     const int bodyHandle = stringMethod->getBodyHandle();
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50.0, bodyHandle);
+    model->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 50.0, bodyHandle);
     model->getConfig()->enableBendConstraint(0.2, 1, true, bodyHandle);
     model->getConfig()->setBodyDamping(bodyHandle, 0.03);
 
@@ -176,7 +176,7 @@ main()
 
     // Setup the Model
     auto pbdSystem = std::make_shared<PbdSystem>();
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.01;

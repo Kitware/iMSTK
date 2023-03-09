@@ -10,7 +10,7 @@
 #include "imstkLineMesh.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 
 #include <gtest/gtest.h>
 

@@ -16,7 +16,7 @@ set(H_FILES
   ObjectModels/imstkLevelSetModel.h
   ObjectModels/imstkPbdConstraintFunctor.h
   ObjectModels/imstkPbdSystem.h
-  ObjectModels/imstkPbdModelConfig.h
+  ObjectModels/imstkPbdSystemConfig.h
   ObjectModels/imstkSphBoundaryConditions.h
   ObjectModels/imstkSPHKernels.h
   ObjectModels/imstkSphModel.h
@@ -27,7 +27,7 @@ set(SRC_FILES
   ObjectModels/imstkAbstractDynamicalSystem.cpp
   ObjectModels/imstkLevelSetModel.cpp
   ObjectModels/imstkPbdSystem.cpp
-  ObjectModels/imstkPbdModelConfig.cpp
+  ObjectModels/imstkPbdSystemConfig.cpp
   ObjectModels/imstkSphBoundaryConditions.cpp
   ObjectModels/imstkSphModel.cpp
   ObjectStates/imstkSphState.cpp

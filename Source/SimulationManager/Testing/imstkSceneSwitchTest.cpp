@@ -8,7 +8,7 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkMeshIO.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
@@ -39,7 +39,7 @@ createSoftBodyScene(std::string sceneName)
     auto pbdSystem = std::make_shared<PbdSystem>();
 
     // Configure model
-    auto pbdConfig = std::make_shared<PbdModelConfig>();
+    auto pbdConfig = std::make_shared<PbdSystemConfig>();
     pbdConfig->m_secParams->m_YoungModulus = 1000000.0;
     pbdConfig->m_secParams->m_PoissonRatio = 0.3;
     pbdConfig->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
@@ -71,9 +71,9 @@ createClothScene(std::string sceneName)
         GeometryUtils::toTriangleGrid(Vec3d::Zero(), size, dim);
 
     // Setup the Parameters
-    auto pbdConfig = std::make_shared<PbdModelConfig>();
-    pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e2);
-    pbdConfig->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e1);
+    auto pbdConfig = std::make_shared<PbdSystemConfig>();
+    pbdConfig->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1.0e2);
+    pbdConfig->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 1.0e1);
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_dt         = 0.03;
     pbdConfig->m_iterations = 5;

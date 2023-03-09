@@ -9,7 +9,7 @@
 #include "imstkPbdEdgeEdgeCCDConstraint.h"
 #include "imstkPbdEdgeEdgeConstraint.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdPointEdgeConstraint.h"
 #include "imstkPbdPointPointConstraint.h"

@@ -18,7 +18,7 @@
 #include "imstkOrientedBox.h"
 #include "imstkPbdAngularConstraint.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPlane.h"
@@ -55,8 +55,8 @@ makeTissueObj(const std::string& name,
             Vec2d(width, height), Vec2i(rowCount, colCount));
 
     // Setup the Parameters
-    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, distStiffness);
-    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, bendStiffness);
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, distStiffness);
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, bendStiffness);
 
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
@@ -98,7 +98,7 @@ planeContactScene()
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
     auto pbdSystem = std::make_shared<PbdSystem>();
-    auto pbdConfig = std::make_shared<PbdModelConfig>();
+    auto pbdConfig = std::make_shared<PbdSystemConfig>();
     // Slightly larger gravity to compensate damping
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdConfig->m_dt         = 0.001;
@@ -242,7 +242,7 @@ bowlScene()
     {
         // This model is shared among interacting rigid bodies
         auto pbdSystem = std::make_shared<PbdSystem>();
-        auto pbdConfig = std::make_shared<PbdModelConfig>();
+        auto pbdConfig = std::make_shared<PbdSystemConfig>();
         // Slightly larger gravity to compensate damping
         pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0);
         pbdConfig->m_dt         = 0.001;
@@ -425,7 +425,7 @@ tissueCapsuleDrop()
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
     auto pbdSystem = std::make_shared<PbdSystem>();
-    auto pbdConfig = std::make_shared<PbdModelConfig>();
+    auto pbdConfig = std::make_shared<PbdSystemConfig>();
     pbdConfig->m_gravity    = Vec3d(0.0, -9.8, 0.0); // Slightly larger gravity to compensate viscosity
     pbdConfig->m_dt         = 0.001;
     pbdConfig->m_iterations = 5;
@@ -523,7 +523,7 @@ hingeScene()
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
     auto pbdSystem = std::make_shared<PbdSystem>();
-    auto pbdConfig = std::make_shared<PbdModelConfig>();
+    auto pbdConfig = std::make_shared<PbdSystemConfig>();
     pbdConfig->m_gravity    = Vec3d(0.0, 0.0, 0.0); // Slightly larger gravity to compensate viscosity
     pbdConfig->m_dt         = 0.001;
     pbdConfig->m_iterations = 5;

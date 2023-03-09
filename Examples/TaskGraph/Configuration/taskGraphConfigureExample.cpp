@@ -16,7 +16,7 @@
 #include "imstkNew.h"
 #include "imstkPbdSystem.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -38,9 +38,9 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
             Vec2d(width, height), Vec2i(nRows, nCols));
 
     // Setup the Parameters
-    imstkNew<PbdModelConfig> pbdParams;
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1e2);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1e1);
+    imstkNew<PbdSystemConfig> pbdParams;
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 1e2);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 1e1);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_dt         = 0.007;
     pbdParams->m_iterations = 5;

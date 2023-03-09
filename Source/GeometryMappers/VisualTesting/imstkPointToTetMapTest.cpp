@@ -8,7 +8,7 @@
 #include "imstkCollider.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPointToTetMap.h"
 #include "imstkPointwiseMap.h"
 #include "imstkScene.h"

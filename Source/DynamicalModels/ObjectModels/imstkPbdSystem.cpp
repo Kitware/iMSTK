@@ -10,14 +10,14 @@
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 #include "imstkPbdConstraintFunctor.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdSolver.h"
 #include "imstkTaskGraph.h"
 
 namespace imstk
 {
 PbdSystem::PbdSystem() : AbstractDynamicalSystem(DynamicalModelType::PositionBasedDynamics),
-    m_config(std::make_shared<PbdModelConfig>())
+    m_config(std::make_shared<PbdSystemConfig>())
 {
     // Add a virtual particle buffer, cleared every frame
     addBody();
@@ -66,7 +66,7 @@ PbdSystem::resetToInitialState()
 }
 
 void
-PbdSystem::configure(std::shared_ptr<PbdModelConfig> config)
+PbdSystem::configure(std::shared_ptr<PbdSystemConfig> config)
 {
     m_config = config;
 }
@@ -136,7 +136,7 @@ PbdSystem::clearVirtualParticles()
     resizeBodyParticles(*m_state.m_bodies[0], 0);
 }
 
-std::shared_ptr<PbdModelConfig>
+std::shared_ptr<PbdSystemConfig>
 PbdSystem::getConfig() const
 {
     CHECK(m_config != nullptr) << "Cannot PbdSystem::getConfig, config is nullptr";

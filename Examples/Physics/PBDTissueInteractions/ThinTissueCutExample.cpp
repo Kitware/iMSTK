@@ -15,7 +15,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
@@ -69,9 +69,9 @@ makeTissueObj(const std::string&         name,
     method->setFixedNodes({ 0, nCols - 1 });
     method->setUniformMass(0.01);
 
-    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance,
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance,
         1e4, method->getBodyHandle());
-    system->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral,
+    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral,
         0.1, method->getBodyHandle());
 
     return tissueObj;

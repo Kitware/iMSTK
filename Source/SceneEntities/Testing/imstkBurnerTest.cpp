@@ -10,7 +10,7 @@
 #include "imstkEntity.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkVisualModel.h"
 
 #include <gtest/gtest.h>

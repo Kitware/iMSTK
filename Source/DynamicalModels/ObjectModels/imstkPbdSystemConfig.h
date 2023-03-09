@@ -16,11 +16,11 @@
 namespace imstk
 {
 ///
-/// \class PbdModelConfig
+/// \class PbdSystemConfig
 ///
 /// \brief Gives parameters for PBD simulation
 ///
-class PbdModelConfig
+class PbdSystemConfig
 {
 public:
     ///

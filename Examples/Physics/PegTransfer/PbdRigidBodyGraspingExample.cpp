@@ -18,7 +18,7 @@
 #include "imstkMeshIO.h"
 #include "imstkObjectControllerGhost.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include <imstkPbdObjectGrasping.h>
@@ -121,8 +121,8 @@ PbdRigidBodyGraspingExample()
     scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getActiveCamera()->setViewUp(0.0, 1.0, 0.0);
 
-    auto                            pbdSystem = std::make_shared<PbdSystem>();
-    std::shared_ptr<PbdModelConfig> pbdParams = pbdSystem->getConfig();
+    auto                             pbdSystem = std::make_shared<PbdSystem>();
+    std::shared_ptr<PbdSystemConfig> pbdParams = pbdSystem->getConfig();
     pbdParams->m_gravity = Vec3d(0.0, -9.8, 0.0);
     //pbdParams->m_gravity = Vec3d::Zero();
     pbdParams->m_dt = 0.002;

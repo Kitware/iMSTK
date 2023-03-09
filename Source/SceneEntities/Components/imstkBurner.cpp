@@ -12,7 +12,7 @@
 #include "imstkEntity.h"
 #include "imstkParallelUtils.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdSystem.h"
 #include "imstkPickingAlgorithm.h"
 #include "imstkTaskGraph.h"

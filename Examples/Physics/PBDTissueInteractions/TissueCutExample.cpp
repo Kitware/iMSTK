@@ -17,7 +17,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"

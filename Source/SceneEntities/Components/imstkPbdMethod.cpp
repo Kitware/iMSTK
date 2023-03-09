@@ -9,7 +9,7 @@
 #include "imstkGeometryMap.h"
 #include "imstkPbdBody.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPointSet.h"
 
 #include "imstkPbdMethod.h"

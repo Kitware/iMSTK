@@ -12,7 +12,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdMethod.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPbdSystem.h"
@@ -46,7 +46,7 @@ makePbdString(const std::string& name, const std::string& filename)
     const int numVerts = stringMesh->getNumVertices();
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PbdModelConfig>();
+    auto pbdParams = std::make_shared<PbdSystemConfig>();
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_dt         = 0.0005;
     pbdParams->m_iterations = 1;
@@ -71,7 +71,7 @@ makePbdString(const std::string& name, const std::string& filename)
     stringObj->getComponent<PbdMethod>()->setUniformMass(0.0001 / numVerts); // grams
     stringObj->getComponent<PbdMethod>()->setFixedNodes({ 0, 1,
                                                           stringMesh->getNumVertices() - 2, stringMesh->getNumVertices() - 1 });
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 200.0);
+    pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 200.0);
     pbdParams->enableBendConstraint(0.01, 1);
     //pbdParams->enableBendConstraint(.5, 2);
 

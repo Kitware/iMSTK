@@ -18,7 +18,7 @@
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectGrasping.h"
@@ -78,7 +78,7 @@ makeTissueObj(const std::string& name,
     setSphereTexCoords(surfMesh, 6.0);
 
     // Setup the Parameters
-    auto       pbdParams       = std::make_shared<PbdModelConfig>();
+    auto       pbdParams       = std::make_shared<PbdSystemConfig>();
     const bool useStrainEnergy = true;
     if (useStrainEnergy)
     {
@@ -96,8 +96,8 @@ makeTissueObj(const std::string& name,
     }
     else
     {
-        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 100000.0);
-        pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100000.0);
+        pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 100000.0);
+        pbdParams->enableConstraint(PbdSystemConfig::ConstraintGenType::Volume, 100000.0);
     }
     pbdParams->m_doPartitioning = false;
     pbdParams->m_dt = 0.001; // realtime used in update calls later in main
