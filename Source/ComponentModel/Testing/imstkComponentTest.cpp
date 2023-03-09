@@ -47,6 +47,7 @@ public:
     }
 
     ~TestBehaviour() override = default;
+    IMSTK_TYPE_NAME(TestBehaviour)
 
     void update(const double&) { updated = true; }
     void visualUpdate(const double&) { visualUpdated = true; }

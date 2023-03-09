@@ -30,11 +30,9 @@ public:
         rotZ = 0x20
     };
 
-protected:
-    TrackingDeviceControl(const std::string& name = "TrackingDeviceControl");
-
-public:
     ~TrackingDeviceControl() override = default;
+
+    IMSTK_TYPE_NAME(TrackingDeviceControl)
 
     ///
     /// \brief Apply forces to the haptic device
@@ -129,6 +127,8 @@ public:
     virtual bool updateTrackingData(const double dt);
 
 protected:
+    TrackingDeviceControl(const std::string& name = "TrackingDeviceControl");
+
     double m_scaling = 1.0;                                ///< Scaling factor for physical to virtual translations
     Vec3d  m_translationOffset      = Vec3d::Zero();       ///< Translation concatenated to the device translation
     Quatd  m_rotationOffset         = Quatd::Identity();   ///< Rotation concatenated to the device rotation

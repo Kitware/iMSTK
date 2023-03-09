@@ -178,7 +178,8 @@ PbdMethod::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Task
     {
         // Should be a better way to do this than doing a dynamic cast.
         // Maybe just rename the function so it doesn't get hidden by PbdSystem.
-        std::dynamic_pointer_cast<AbstractDynamicalSystem>(m_pbdSystem)->initGraphEdges();
+        // std::dynamic_pointer_cast<AbstractDynamicalSystem>(m_pbdSystem)->initGraphEdges();
+        m_pbdSystem->initGraphEdges();
         m_taskGraph->nestGraph(m_pbdSystem->getTaskGraph(), m_updateNode, m_updateGeometryNode);
     }
     else
@@ -240,18 +241,17 @@ PbdMethod::setBodyFromGeometry()
 void
 PbdMethod::setPbdSystem(std::shared_ptr<PbdSystem> pbdSystem)
 {
-    // todo: If already has another model, should remove the corresponding body?
-    m_pbdSystem = pbdSystem;
-
-    // If the model already has a pbd body for this PbdObject_old remove it from
-    // that prior model
+    // If the previously set system already has an associated pbdBody for this method,
+    // remove it from that prior system.
     if (m_pbdBody != nullptr)
     {
         CHECK(m_pbdSystem != nullptr) <<
             "PbdMethod has a PbdBody but cannot find associated PbdSystem?";
         m_pbdSystem->removeBody(m_pbdBody);
     }
-    m_pbdBody = m_pbdSystem->addBody();
+
+    m_pbdSystem = pbdSystem;
+    m_pbdBody   = m_pbdSystem->addBody();
 }
 
 void

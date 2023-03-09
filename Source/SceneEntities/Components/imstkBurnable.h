@@ -28,7 +28,9 @@ class TaskNode;
 class Burnable : public SceneBehaviour
 {
 public:
-    IMSTK_TYPE_NAME(Burnable) Burnable(const std::string& name = "BurnableBehaviour");
+    Burnable(const std::string& name = "BurnableBehaviour");
+
+    IMSTK_TYPE_NAME(Burnable)
 
 ///
 /// \brief Get the PBD object to be torn

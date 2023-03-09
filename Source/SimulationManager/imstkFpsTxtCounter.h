@@ -25,6 +25,8 @@ class FpsTxtCounter : public SceneBehaviour
 public:
     FpsTxtCounter(const std::string& name = "FpsTxtCounter");
 
+    IMSTK_TYPE_NAME(FpsTxtCounter)
+
     ///
     /// \brief Update the display of the last frames update times
     ///

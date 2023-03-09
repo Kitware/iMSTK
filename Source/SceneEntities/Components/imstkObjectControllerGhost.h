@@ -27,6 +27,8 @@ class ObjectControllerGhost : public SceneBehaviour
 public:
     ObjectControllerGhost(const std::string& name = "ObjectControllerGhost");
 
+    IMSTK_TYPE_NAME(ObjectControllerGhost)
+
     void setController(std::shared_ptr<PbdObjectController> controller) { m_pbdController = controller; }
     std::shared_ptr<PbdObjectController> getPbdController() const { return m_pbdController; }
 

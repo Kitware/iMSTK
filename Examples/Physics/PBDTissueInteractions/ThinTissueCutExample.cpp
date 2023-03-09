@@ -33,7 +33,7 @@
 using namespace imstk;
 
 ///
-/// \brief Creates cloth object
+/// \brief Creates thinTissue object
 ///
 static std::shared_ptr<Entity>
 makeTissueObj(const std::string&         name,
@@ -44,10 +44,10 @@ makeTissueObj(const std::string&         name,
               std::shared_ptr<PbdSystem> system)
 {
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh =
+    std::shared_ptr<SurfaceMesh> thinTissueMesh =
         GeometryUtils::toTriangleGrid(Vec3d::Zero(),
             Vec2d(width, height), Vec2i(nRows, nCols));
-    clothMesh->translate(Vec3d(0.0, height * 0.5, width * 0.5),
+    thinTissueMesh->translate(Vec3d(0.0, height * 0.5, width * 0.5),
         Geometry::TransformType::ApplyToData);
 
     // Setup the VisualModel
@@ -56,12 +56,12 @@ makeTissueObj(const std::string&         name,
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
     auto vertexLabelModel = std::make_shared<VertexLabelVisualModel>();
-    vertexLabelModel->setGeometry(clothMesh);
+    vertexLabelModel->setGeometry(thinTissueMesh);
     vertexLabelModel->setFontSize(20.0);
     vertexLabelModel->setTextColor(Color::Red);
 
     // Setup the Object
-    auto tissueObj   = SceneUtils::makePbdEntity(name, clothMesh, system);
+    auto tissueObj   = SceneUtils::makePbdEntity(name, thinTissueMesh, system);
     auto visualModel = tissueObj->getComponent<VisualModel>();
     visualModel->setRenderMaterial(material);
     tissueObj->addComponent(vertexLabelModel);
@@ -137,7 +137,7 @@ PBDThinTissueCutExample()
     auto toolObj = makeToolObj(pbdSystem);
     scene->addSceneObject(toolObj);
 
-    // Create a pbd cloth object in the scene
+    // Create a pbd thinTissue object in the scene
     auto tissueObj = makeTissueObj("Tissue",
         0.1, 0.1, 12, 12,
         pbdSystem);
@@ -189,7 +189,7 @@ PBDThinTissueCutExample()
         queueConnect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged, sceneManager,
             [&](ButtonEvent* e)
             {
-                // When button 0 is pressed replace the PBD cloth with a cut one
+                // When button 0 is pressed replace the PBD thinTissue with a cut one
                 if (e->m_button == 0 && e->m_buttonState == BUTTON_PRESSED)
                 {
                     cutting->apply();
@@ -205,7 +205,7 @@ PBDThinTissueCutExample()
             });
 
         std::cout << "================================================\n";
-        std::cout << "Haptic button 0 or key 'g' to cut the cloth.\n";
+        std::cout << "Haptic button 0 or key 'g' to cut the thinTissue.\n";
         std::cout << "================================================\n\n";
 
         driver->start();

@@ -28,7 +28,9 @@ class TaskNode;
 class Tearable : public SceneBehaviour
 {
 public:
-    IMSTK_TYPE_NAME(Tearable) Tearable(const std::string& name = "TearablePbdObjectBehavior");
+    Tearable(const std::string& name = "TearablePbdObjectBehavior");
+
+    IMSTK_TYPE_NAME(Tearable)
 
     ///
     /// \brief Get the PBD object to be torn

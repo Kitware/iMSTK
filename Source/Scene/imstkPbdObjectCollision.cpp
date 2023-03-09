@@ -51,9 +51,9 @@ PbdObjectCollision::initialize()
     CollisionInteraction::initialize();
 
     m_objectA.method   = m_objA->getComponentUnsafe<PbdMethod>();
-    m_objectA.collider = m_objA->getComponentUnsafe<Collider>();
+    m_objectA.collider = m_objA->getComponent<Collider>();
     m_objectB.method   = m_objB->getComponentUnsafe<PbdMethod>();
-    m_objectB.collider = m_objB->getComponentUnsafe<Collider>();
+    m_objectB.collider = m_objB->getComponent<Collider>();
 
     CHECK(m_objectA.method != nullptr || m_objectB.method != nullptr) << "At least one input object to PbdObjectCollision" <<
         "should have a PbdMethod.";
@@ -73,8 +73,6 @@ PbdObjectCollision::initialize()
     }
 
     CHECK(m_objectA.method && m_objectA.system) << "At this point, ObjectA should have a PbdMethod and a PbdSystem.";
-
-    CHECK(m_objectA.collider && m_objectB.collider) << "Both input objects should have a Collider.";
 
     CHECK(m_objectB.method == nullptr || m_objectA.system == m_objectB.system) <<
         "PbdObjectCollision may only be used with PbdObjects that share the same PbdSystem";

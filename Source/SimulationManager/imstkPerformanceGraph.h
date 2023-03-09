@@ -24,6 +24,8 @@ class PerformanceGraph : public SceneBehaviour
 public:
     PerformanceGraph(const std::string& name = "PerformanceGraph") : SceneBehaviour(name) { }
 
+    IMSTK_TYPE_NAME(PerformanceGraph)
+
     ///
     /// \brief Update the display of the last frames update times
     ///

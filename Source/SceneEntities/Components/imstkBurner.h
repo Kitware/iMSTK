@@ -30,6 +30,8 @@ class Burner : public SceneBehaviour
 public:
     Burner(const std::string& name = "BurnerPbdObjectBehavior");
 
+    IMSTK_TYPE_NAME(Burner)
+
     void init() override;
 
     ///

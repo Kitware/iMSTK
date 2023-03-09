@@ -44,8 +44,8 @@ public:
         auto tissue = m_objB;
 
         auto needleRigidCH = std::make_shared<NeedleRigidBodyCH>();
-        needleRigidCH->setInputObjectA(needle->getComponentUnsafe<Collider>(), needle->getComponentUnsafe<PbdMethod>());
-        needleRigidCH->setInputObjectB(tissue->getComponentUnsafe<Collider>(), tissue->getComponentUnsafe<PbdMethod>());
+        needleRigidCH->setInputObjectA(needle->getComponent<Collider>(), needle->getComponentUnsafe<PbdMethod>());
+        needleRigidCH->setInputObjectB(tissue->getComponent<Collider>(), tissue->getComponentUnsafe<PbdMethod>());
         needleRigidCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
         needleRigidCH->setPuncturable(puncturable);
         needleRigidCH->setNeedle(straightNeedle);
@@ -54,8 +54,8 @@ public:
         setCollisionHandlingB(needleRigidCH);
 
         auto needlePbdCH = std::make_shared<NeedlePbdCH>();
-        needlePbdCH->setInputObjectA(tissue->getComponentUnsafe<Collider>(), tissue->getComponentUnsafe<PbdMethod>());
-        needlePbdCH->setInputObjectB(needle->getComponentUnsafe<Collider>(), needle->getComponentUnsafe<PbdMethod>());
+        needlePbdCH->setInputObjectA(tissue->getComponent<Collider>(), tissue->getComponentUnsafe<PbdMethod>());
+        needlePbdCH->setInputObjectB(needle->getComponent<Collider>(), needle->getComponentUnsafe<PbdMethod>());
         needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
         needlePbdCH->setPuncturable(puncturable);
         needlePbdCH->setNeedle(straightNeedle);

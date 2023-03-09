@@ -25,6 +25,8 @@ class ControllerForceText : public SceneBehaviour
 public:
     ControllerForceText(const std::string& name = "ControllerForceText");
 
+    IMSTK_TYPE_NAME(ControllerForceText)
+
     ///
     /// \brief Update the display of the last frames update times
     ///

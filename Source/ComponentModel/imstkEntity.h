@@ -8,7 +8,6 @@
 
 #include "imstkEventObject.h"
 #include "imstkLogger.h"
-#include "imstkMacros.h"
 
 #include <atomic>
 

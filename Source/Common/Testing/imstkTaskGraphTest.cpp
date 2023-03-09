@@ -647,7 +647,6 @@ TEST(imstkTaskGraphTest, AddChain)
     EXPECT_THAT(taskGraph->getInvAdjList().at(node3), UnorderedElementsAre(node2));
     EXPECT_THAT(taskGraph->getInvAdjList().at(sink), UnorderedElementsAre(node3));
 
-
     // 3 Nodes test
     taskGraph = std::make_shared<TaskGraph>();
     source    = taskGraph->getSource();

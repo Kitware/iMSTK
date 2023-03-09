@@ -60,9 +60,14 @@ Scene::initialize()
         {
             systems.insert(dynObj->getDynamicalModel());
         }
-        else if (auto method = ent->getComponentUnsafe<PbdMethod>())
+        else
         {
-            systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(method->getPbdSystem()));
+            // Add all the PbdSystems associated with the entities.
+            auto methods = ent->getComponents<PbdMethod>();
+            for (const auto& m : methods)
+            {
+                systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(m->getPbdSystem()));
+            }
         }
     }
 

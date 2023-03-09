@@ -26,17 +26,6 @@
 
 using namespace imstk;
 
-static std::shared_ptr<RenderMaterial>
-makeMaterial()
-{
-    // Setup the material
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setColor(Color(0.77, 0.53, 0.34));
-    material->setEdgeColor(Color(0.87, 0.63, 0.44));
-    return material;
-}
-
 ///
 /// \brief Creates tetrahedral tissue object
 /// \param name
@@ -74,7 +63,7 @@ makeTetTissueObj(const std::string& name,
         auto method = tissueObj->getComponent<PbdMethod>();
         method->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     }
-    tissueObj->getComponent<VisualModel>()->setRenderMaterial(makeMaterial());
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(SceneUtils::makeTissueMaterial());
     auto method = tissueObj->getComponent<PbdMethod>();
     method->setUniformMass(0.01);
 
@@ -122,7 +111,7 @@ makeTriTissueObj(const std::string& name,
         GeometryUtils::toTriangleGrid(center, size, dim, orientation);
 
     // Setup the VisualModel
-    auto material = makeMaterial();
+    auto material = SceneUtils::makeTissueMaterial();
     material->setBackFaceCulling(false);
 
     // Setup the Object
@@ -172,7 +161,7 @@ makeLineThreadObj(const std::string& name,
         GeometryUtils::toLineGrid(start, dir, length, dim);
 
     // Setup the VisualModel
-    auto material = makeMaterial();
+    auto material = SceneUtils::makeTissueMaterial();
     material->setBackFaceCulling(false);
     material->setLineWidth(3.0);
 

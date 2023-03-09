@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "imstkMacros.h"
 #include "imstkTimer.h"
 #include "imstkEventObject.h"
 
@@ -37,7 +36,7 @@ public:
     ~Module() override = default;
 
     ///
-    /// \brief Returns type as string name
+    /// \brief Returns type name as string
     ///
     virtual const std::string getTypeName() const = 0;
 

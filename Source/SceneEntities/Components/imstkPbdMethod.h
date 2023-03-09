@@ -21,7 +21,9 @@ class PointSet;
 class PbdMethod : public SceneBehaviour
 {
 public:
-    IMSTK_TYPE_NAME(PbdMethod) PbdMethod(const std::string& name = "PbdMethod");
+    PbdMethod(const std::string& name = "PbdMethod");
+
+    IMSTK_TYPE_NAME(PbdMethod)
 
     ///
     /// \brief Set/Get the geometry used for Physics computations
@@ -118,13 +120,13 @@ private:
     void updatePhysicsGeometry();
 
     // Physics related geometry and maps
-    std::shared_ptr<Geometry>    m_physicsGeometry;                     ///< Geometry used for Physics
-    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap = nullptr; ///< Maps from Physics to collision geometry
-    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap    = nullptr; ///< Maps from Physics to visual geometry
-    std::shared_ptr<PbdBody>     m_pbdBody;                             ///< Handle to this object in the model/system
-    std::shared_ptr<PbdSystem>   m_pbdSystem;                           ///< Pbd mathematical model and solver system
+    std::shared_ptr<Geometry>    m_physicsGeometry;           ///< Geometry used for Physics
+    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap; ///< Maps from Physics to collision geometry
+    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;    ///< Maps from Physics to visual geometry
+    std::shared_ptr<PbdBody>     m_pbdBody;                   ///< Handle to this object in the model/system
+    std::shared_ptr<PbdSystem>   m_pbdSystem;                 ///< Pbd mathematical model and solver system
 
-    std::shared_ptr<TaskNode> m_updateNode = nullptr;
-    std::shared_ptr<TaskNode> m_updateGeometryNode = nullptr;
+    std::shared_ptr<TaskNode> m_updateNode;
+    std::shared_ptr<TaskNode> m_updateGeometryNode;
 };
 } // namespace imstk

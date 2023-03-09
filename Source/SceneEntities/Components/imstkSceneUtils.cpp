@@ -4,14 +4,16 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkRenderMaterial.h"
 #include "imstkSceneUtils.h"
 
 namespace imstk
 {
 namespace SceneUtils
 {
-EntityPtr
-makePbdEntity(const std::string& name, GeometryPtr visualGeometry, GeometryPtr collidingGeometry, GeometryPtr physicsGeometry, PbdSystemPtr system)
+std::shared_ptr<Entity>
+makePbdEntity(const std::string& name, std::shared_ptr<Geometry> visualGeometry, std::shared_ptr<Geometry> collidingGeometry, std::shared_ptr<Geometry> physicsGeometry,
+              std::shared_ptr<PbdSystem> system)
 {
     auto entity = std::make_shared<Entity>(name);
     if (visualGeometry)
@@ -39,10 +41,21 @@ makePbdEntity(const std::string& name, GeometryPtr visualGeometry, GeometryPtr c
     return entity;
 }
 
-EntityPtr
-makePbdEntity(const std::string& name, GeometryPtr geom, PbdSystemPtr system)
+std::shared_ptr<Entity>
+makePbdEntity(const std::string& name, std::shared_ptr<Geometry> geom, std::shared_ptr<PbdSystem> system)
 {
     return makePbdEntity(name, geom, geom, geom, system);
+}
+
+std::shared_ptr<RenderMaterial>
+makeTissueMaterial(double opacity)
+{
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setColor(Color(0.77, 0.53, 0.34));
+    material->setEdgeColor(Color(0.87, 0.63, 0.44));
+    material->setOpacity(opacity);
+    return material;
 }
 } // namespace SceneUtils
 } // namespace imstk

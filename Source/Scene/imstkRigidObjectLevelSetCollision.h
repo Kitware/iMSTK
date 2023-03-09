@@ -29,8 +29,10 @@ template<typename T, int N> class VecDataArray;
 class RigidObjectLevelSetCollision : public CollisionInteraction
 {
 public:
-    IMSTK_TYPE_NAME(RigidObjectLevelSetCollision) RigidObjectLevelSetCollision(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2);
+    RigidObjectLevelSetCollision(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2);
     ~RigidObjectLevelSetCollision() override = default;
+
+    IMSTK_TYPE_NAME(RigidObjectLevelSetCollision)
 
     ///
     /// \brief Initialize the interaction based on set input before the simulation starts.
@@ -48,7 +50,7 @@ public:
 
     imstkSetGetMacro(LevelSetVelocityScaling, m_levelSetVelocityScaling, double)
 
-    imstkSetGetMacro(UseProportionalVelocity, m_useProportionalVelocity, double)
+    imstkSetGetMacro(UseProportionalVelocity, m_useProportionalVelocity, bool)
 
     void copyVertsToPrevious();
 

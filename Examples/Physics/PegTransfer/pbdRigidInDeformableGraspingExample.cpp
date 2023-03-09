@@ -60,7 +60,7 @@ pbdRigidInDeformableGraspingExample()
     pbdConfig->m_doPartitioning      = false;
     pbdSystem->configure(pbdConfig);
 
-    EntityPtr tissueObj;
+    std::shared_ptr<Entity> tissueObj;
     {
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Organs/Vessels/vessel_test.obj");
 
@@ -83,7 +83,7 @@ pbdRigidInDeformableGraspingExample()
     scene->addSceneObject(tissueObj);
 
     // auto capsule0Obj = std::make_shared<Entity>("capsule0");
-    EntityPtr capsule0Obj;
+    std::shared_ptr<Entity> capsule0Obj;
     {
         //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.0018);
         auto rigidGeom = std::make_shared<Capsule>(Vec3d(0.0, 0.0, 0.0), 0.004, 0.01);
@@ -111,7 +111,7 @@ pbdRigidInDeformableGraspingExample()
     collision0->setRigidBodyCompliance(0.00001);
     scene->addInteraction(collision0);
 
-    EntityPtr                  lapTool;
+    std::shared_ptr<Entity>    lapTool;
     std::shared_ptr<PbdMethod> lapToolMethod;
     {
         const double capsuleLength = 0.3;

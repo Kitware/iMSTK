@@ -24,23 +24,37 @@ class PbdSolver;
 ///
 /// \brief This class implements the position based dynamics model. The
 /// PbdSystem is a constraint based model that iteratively solves constraints
-/// to simulate the dynamics of a body. PbdSystem supports SurfaceMesh,
-/// LineMesh, or TetrahedralMesh. PointSet is also supported for PBD fluids.
+/// to simulate the dynamics of a body.
+///
+/// PbdSystem supports multiple bodies which may either be rigid, deformable
+/// or fluid. While a rigid body only consists of one node, the geometry of
+/// deformable bodies may be defined through Line, Surface or Tetrahedral
+/// Meshes. Fluid meshes require a Pointset for their geometry.
 ///
 /// One of the distinct properties of the PbdSystem is that it is first order.
-/// This means it simulates dynamics by modifying positions directly. Velocities
-/// of the model are computed after positions are solved. Velocities from the
-/// previous iteration are applied at the start of the update.
+/// This means it simulates dynamics by modifying positions directly.
+/// Velocities of the model are computed after positions are solved. Velocities
+/// from the previous iteration are applied at the start of the update.
 ///
 /// References:
-/// Matthias Muller, Bruno Heidelberger, Marcus Hennix, and John Ratcliff. 2007. Position based dynamics.
-/// Miles Macklin, Matthias Muller, and Nuttapong Chentanez 1. XPBD: position-based simulation of compliant constrained dynamics.
-/// Matthias Mullerm, Miles Macklin, Nuttapong Chentanez, Stefan Jeschke, and Tae-Yong Kim. 2020. Detailed Rigid Body Simulation with Extended Position Based Dynamics
-/// Jan Bender, Matthias Muller, Miles Macklin. 2017. A Survey on Position Based Dynamics, 2017.
+/// [1] Matthias Muller, Bruno Heidelberger, Marcus Hennix, and John Ratcliff.
+/// 2007. Position based dynamics.
+///
+/// [2] Miles Macklin, Matthias Muller, and Nuttapong Chentanez 1.
+/// XPBD: position-based simulation of compliant constrained dynamics.
+///
+/// [3] Matthias Mullerm, Miles Macklin, Nuttapong Chentanez, Stefan Jeschke,
+/// and Tae-Yong Kim. 2020.
+///
+/// [4] Detailed Rigid Body Simulation with Extended Position Based Dynamics
+/// Jan Bender, Matthias Muller, Miles Macklin.
+/// A Survey on Position Based Dynamics, 2017.
 ///
 class PbdSystem : public AbstractDynamicalSystem
 {
 public:
+    using AbstractDynamicalSystem::initGraphEdges;
+
     PbdSystem();
     ~PbdSystem() override = default;
 
@@ -170,15 +184,15 @@ protected:
     PbdState m_initialState;
     PbdState m_state;
 
-    std::shared_ptr<PbdSolver>      m_pbdSolver = nullptr;     ///< PBD solver
-    std::shared_ptr<PbdModelConfig> m_config    = nullptr;     ///< Model parameters, must be set before simulation
-    std::shared_ptr<PbdConstraintContainer> m_constraints;     ///< The set of constraints to update/use
+    std::shared_ptr<PbdSolver>      m_pbdSolver;           ///< PBD solver
+    std::shared_ptr<PbdModelConfig> m_config;              ///< Model parameters, must be set before simulation
+    std::shared_ptr<PbdConstraintContainer> m_constraints; ///< The set of constraints to update/use
 
     ///< Computational Nodes
     ///@{
-    std::shared_ptr<TaskNode> m_integrationPositionNode = nullptr;
-    std::shared_ptr<TaskNode> m_solveConstraintsNode    = nullptr;
-    std::shared_ptr<TaskNode> m_updateVelocityNode      = nullptr;
+    std::shared_ptr<TaskNode> m_integrationPositionNode;
+    std::shared_ptr<TaskNode> m_solveConstraintsNode;
+    std::shared_ptr<TaskNode> m_updateVelocityNode;
     ///@}
 };
 } // namespace imstk

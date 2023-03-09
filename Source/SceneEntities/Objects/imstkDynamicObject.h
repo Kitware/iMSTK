@@ -88,7 +88,7 @@ protected:
     DynamicObject(const std::string& name) : SceneObject(name) { }
 
     std::shared_ptr<AbstractDynamicalSystem> m_dynamicalModel = nullptr; ///< Dynamical model
-    std::shared_ptr<Geometry> m_physicsGeometry = nullptr;              ///< Geometry used for Physics
+    std::shared_ptr<Geometry> m_physicsGeometry = nullptr;               ///< Geometry used for Physics
 
     // Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap = nullptr; ///< Maps from Physics to collision geometry

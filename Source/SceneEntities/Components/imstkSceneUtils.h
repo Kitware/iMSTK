@@ -19,10 +19,6 @@
 
 namespace imstk
 {
-using EntityPtr    = std::shared_ptr<Entity>;
-using GeometryPtr  = std::shared_ptr<Geometry>;
-using PbdSystemPtr = std::shared_ptr<PbdSystem>;
-
 namespace SceneUtils
 {
 /**
@@ -34,7 +30,8 @@ namespace SceneUtils
  * @param system
  * @return Entity constructed from provided geometries and PbdSystem
 */
-EntityPtr makePbdEntity(const std::string& name, GeometryPtr visualGeometry, GeometryPtr collidingGeometry, GeometryPtr physicsGeometry, PbdSystemPtr system);
+std::shared_ptr<Entity> makePbdEntity(const std::string& name, std::shared_ptr<Geometry> visualGeometry, std::shared_ptr<Geometry> collidingGeometry, std::shared_ptr<Geometry> physicsGeometry,
+                                      std::shared_ptr<PbdSystem> system);
 
 /**
  * @brief Construct a default style PBD based entity that uses the same geometry for all of
@@ -43,6 +40,12 @@ EntityPtr makePbdEntity(const std::string& name, GeometryPtr visualGeometry, Geo
  * @param system
  * @return Entity constructed from provided geometry and PbdSystem
 */
-EntityPtr makePbdEntity(const std::string& name, GeometryPtr geom, PbdSystemPtr system);
+std::shared_ptr<Entity> makePbdEntity(const std::string& name, std::shared_ptr<Geometry> geom, std::shared_ptr<PbdSystem> system);
+
+/**
+* @brief Construct a default RenderMaterial object for a tissue object.
+* @param opacity Optionally provide an opacity value. Default value is 1.0.
+*/
+std::shared_ptr<RenderMaterial> makeTissueMaterial(double opacity = 1.0);
 } // namespace SceneUtils
 } // namespace imstk

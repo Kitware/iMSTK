@@ -31,11 +31,8 @@ class DebugGeometryModel : public SceneBehaviour
 public:
     DebugGeometryModel(const std::string& name = "DebugGeometryModel");
     ~DebugGeometryModel() override = default;
+    IMSTK_TYPE_NAME(DebugGeometryModel)
 
-protected:
-    void init() override;
-
-public:
     ///
     /// \brief Adds a line to the debug lines with default color
     ///
@@ -115,6 +112,8 @@ public:
     int getNumTriangles() const;
 
 protected:
+    void init() override;
+
     double m_arrowScale;
     Color  m_arrowColor;
 

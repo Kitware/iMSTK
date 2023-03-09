@@ -30,18 +30,6 @@
 
 using namespace imstk;
 
-// Setup the material
-std::shared_ptr<RenderMaterial>
-makeMaterial()
-{
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setColor(Color(0.77, 0.53, 0.34));
-    material->setEdgeColor(Color(0.87, 0.63, 0.44));
-    material->setOpacity(0.5);
-    return material;
-}
-
 ///
 /// \brief Create PBD model to be used by all objects
 ///
@@ -83,7 +71,7 @@ makeSurfaceCubeObj(const std::string& name,
 
     // Setup the Object
     auto tissueObj = SceneUtils::makePbdEntity(name, surfMesh, pbdSystem);
-    tissueObj->getComponent<VisualModel>()->setRenderMaterial(makeMaterial());
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(SceneUtils::makeTissueMaterial(0.5));
     auto method = tissueObj->getComponent<PbdMethod>();
     method->getPbdBody()->uniformMassValue = 0.01;
 
@@ -116,7 +104,7 @@ makeVolumeCubeObj(const std::string& name,
 
     // Setup the Object
     auto tissueObj = SceneUtils::makePbdEntity(name, tetMesh, surfMesh, tetMesh, pbdSystem);
-    tissueObj->getComponent<VisualModel>()->setRenderMaterial(makeMaterial());
+    tissueObj->getComponent<VisualModel>()->setRenderMaterial(SceneUtils::makeTissueMaterial(0.5));
     auto pbdBody = tissueObj->getComponent<PbdMethod>()->getPbdBody();
     pbdBody->uniformMassValue = 0.01;
 

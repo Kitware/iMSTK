@@ -31,6 +31,8 @@ class PortHoleInteraction : public SceneBehaviour
 public:
     PortHoleInteraction(const std::string& name = "PortHoleInteraction");
 
+    IMSTK_TYPE_NAME(PortHoleInteraction)
+
     void init() override;
 
     ///

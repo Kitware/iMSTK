@@ -91,23 +91,8 @@ protected:
 template<typename UpdateInfo>
 class Behaviour : public Component
 {
-protected:
-    Behaviour(const std::string& name = "Behaviour") : Component(name) { }
-    Behaviour(const bool useTaskGraph, const std::string& name = "Behaviour") : Component(name)
-    {
-        if (useTaskGraph)
-        {
-            m_taskGraph = std::make_shared<TaskGraph>();
-
-            // Set default names
-            m_taskGraph->getSource()->m_name = "Behavior_Source";
-            m_taskGraph->getSink()->m_name   = "Behavior_Sink";
-        }
-    }
-
 public:
     ~Behaviour() override = default;
-    IMSTK_TYPE_NAME(Behaviour<UpdateInfo>)
 
     virtual void update(const UpdateInfo& imstkNotUsed(updateData)) { }
     virtual void visualUpdate(const UpdateInfo& imstkNotUsed(updateData)) { }
@@ -125,6 +110,19 @@ public:
     std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
 protected:
+    Behaviour(const std::string& name = "Behaviour") : Component(name) { }
+    Behaviour(const bool useTaskGraph, const std::string& name = "Behaviour") : Component(name)
+    {
+        if (useTaskGraph)
+        {
+            m_taskGraph = std::make_shared<TaskGraph>();
+
+            // Set default names
+            m_taskGraph->getSource()->m_name = "Behavior_Source";
+            m_taskGraph->getSink()->m_name   = "Behavior_Sink";
+        }
+    }
+
     ///
     /// \brief Setup the edges/connections of the TaskGraph\
     //     /// \param source, first node of the graph (does no function)
@@ -153,6 +151,7 @@ class LambdaBehaviour : public SceneBehaviour
 public:
     LambdaBehaviour(const std::string& name = "LambdaBehaviour") : Behaviour(name) { }
     ~LambdaBehaviour() override = default;
+    IMSTK_TYPE_NAME(LambdaBehaviour)
 
     void update(const double& dt) override;
     void visualUpdate(const double& dt) override;

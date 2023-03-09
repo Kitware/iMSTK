@@ -224,7 +224,7 @@ LapToolSuturingExample()
     scene->addSceneObject(rightToolObj);
 
     // Make a pbd rigid body needle
-    EntityPtr needleObj;
+    std::shared_ptr<Entity> needleObj;
     {
         auto needleMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
         auto needleLineMesh = MeshIO::read<LineMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture_hull.vtk");

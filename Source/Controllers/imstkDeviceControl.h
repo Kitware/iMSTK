@@ -22,11 +22,10 @@ class DeviceClient;
 ///
 class DeviceControl : public SceneBehaviour, public EventObject
 {
-protected:
-    DeviceControl(const std::string& name = "DeviceControl") : SceneBehaviour(name) { }
-
 public:
     ~DeviceControl() override = default;
+
+    IMSTK_TYPE_NAME(DeviceControl)
 
     // *INDENT-OFF*
     SIGNAL(DeviceControl, modified);
@@ -45,6 +44,8 @@ public:
     virtual void printControls() { }
 
 protected:
+    DeviceControl(const std::string& name = "DeviceControl") : SceneBehaviour(name) { }
+
     std::shared_ptr<DeviceClient> m_deviceClient;
 };
 } // namespace imstk

@@ -34,6 +34,7 @@ testPlaneLine2(const Vec3d& p, const Vec3d& q,
     // const Vec3d  dir = n.normalized();
     t   = (planePt - p).dot(planeNormal) / denom;
     iPt = p + t * n;
+    return true;
 }
 
 ///

@@ -116,7 +116,7 @@ planeContactScene()
     scene->addSceneObject(planeObj);
 
     // Setup a capsule
-    EntityPtr rigidCapsule;
+    std::shared_ptr<Entity> rigidCapsule;
     {
         // Setup line geometry
         //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.5);
@@ -237,8 +237,8 @@ bowlScene()
     // Write log to stdout and file
     Logger::startLogger();
 
-    auto      scene = std::make_shared<Scene>("PbdSDFCollision");
-    EntityPtr cubeObj;
+    auto                    scene = std::make_shared<Scene>("PbdSDFCollision");
+    std::shared_ptr<Entity> cubeObj;
     {
         // This model is shared among interacting rigid bodies
         auto pbdSystem = std::make_shared<PbdSystem>();
@@ -444,7 +444,7 @@ tissueCapsuleDrop()
     pbdConfig->setBodyDamping(tissueObj->getComponent<PbdMethod>()->getBodyHandle(), 0.1);
 
     // Setup capsule to drop on tissue
-    EntityPtr capsuleObj;
+    std::shared_ptr<Entity> capsuleObj;
     {
         // Setup line geometry
         auto rigidGeom = std::make_shared<Capsule>(Vec3d(-0.005, 0.0, 0.0), 0.005, 0.015);
@@ -533,7 +533,7 @@ hingeScene()
     pbdSystem->configure(pbdConfig);
 
     // Setup a capsule
-    EntityPtr rigidCapsule;
+    std::shared_ptr<Entity> rigidCapsule;
     {
         // Setup line geometry
         //auto rigidGeom = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), 0.5);
