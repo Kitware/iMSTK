@@ -77,7 +77,7 @@ SphModelConfig::initialize()
     m_pressureStiffness = m_restDensity * m_speedOfSound * m_speedOfSound / 7.0;
 }
 
-SphModel::SphModel() : DynamicalModel<SphState>(DynamicalModelType::SmoothedParticleHydrodynamics)
+SphModel::SphModel() : DynamicalSystem<SphState>(DynamicalModelType::SmoothedParticleHydrodynamics)
 {
     m_validGeometryTypes = { "PointSet" };
 

@@ -73,7 +73,7 @@ public:
     bool initialize() override;
 
     ///
-    /// \brief Reset the dynamic object by reseting the respective DynamicalModel and Geometry
+    /// \brief Reset the dynamic object by reseting the respective DynamicalSystem and Geometry
     ///
     void reset() override;
 

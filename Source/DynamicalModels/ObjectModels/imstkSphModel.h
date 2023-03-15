@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkDynamicalModel.h"
+#include "imstkDynamicalSystem.h"
 #include "imstkSphState.h"
 #include "imstkSPHKernels.h"
 #include "imstkNeighborSearch.h"
@@ -78,7 +78,7 @@ public:
 /// \class SPHModel
 /// \brief SPH fluid model
 ///
-class SphModel : public DynamicalModel<SphState>
+class SphModel : public DynamicalSystem<SphState>
 {
 public:
     using AbstractDynamicalSystem::initGraphEdges;

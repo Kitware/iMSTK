@@ -98,7 +98,7 @@ public:
     const Vec3d& getRigidPosition() const { return m_pbdBody->getRigidPosition(); }
 
     ///
-    /// \brief Reset the behaviour by reseting the respective DynamicalModel and Geometry
+    /// \brief Reset the behaviour by reseting the respective DynamicalSystem and Geometry
     ///
     void reset();
 

@@ -55,7 +55,7 @@ public:
     void updateGeometries();
 
     ///
-    /// \brief Reset the dynamic object by reseting the respective DynamicalModel and Geometry
+    /// \brief Reset the dynamic object by reseting the respective DynamicalSystem and Geometry
     ///
     void reset();
 

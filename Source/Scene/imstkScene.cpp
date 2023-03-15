@@ -52,7 +52,7 @@ bool
 Scene::initialize()
 {
     // Gather all the systems from the object components
-    // Right now this just includes DynamicalModel's
+    // Right now this just includes DynamicalSystem's
     std::unordered_set<std::shared_ptr<AbstractDynamicalSystem>> systems;
     for (const auto& ent : m_sceneEntities)
     {

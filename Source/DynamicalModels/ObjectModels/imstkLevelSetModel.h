@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkDynamicalModel.h"
+#include "imstkDynamicalSystem.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 
 #include <unordered_map>
