@@ -92,10 +92,9 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdSystem> system)
 
     tissueMethod->setUniformMass(0.06 / tissueMesh->getNumVertices());
 
-    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Distance, 700.0,
-        tissueMethod->getBodyHandle());
-    system->getConfig()->enableConstraint(PbdSystemConfig::ConstraintGenType::Dihedral, 700.0,
-        tissueMethod->getBodyHandle());
+    system->getConfig()->m_secParams->m_YoungModulus = 100.0; // in kg/(cm*s^2)
+    system->getConfig()->m_secParams->m_PoissonRatio = 0.4;
+    system->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::StVK);
     system->getConfig()->setBodyDamping(tissueMethod->getBodyHandle(), 0.01);
 
     // Fix the top of the gallbladder
