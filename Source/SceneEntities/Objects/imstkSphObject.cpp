@@ -5,14 +5,14 @@
 */
 
 #include "imstkSphObject.h"
-#include "imstkSphModel.h"
+#include "imstkSphSystem.h"
 
 namespace imstk
 {
 bool
 SphObject::initialize()
 {
-    m_sphModel = std::dynamic_pointer_cast<SphModel>(m_dynamicalModel);
+    m_sphModel = std::dynamic_pointer_cast<SphSystem>(m_dynamicalModel);
     if (m_sphModel == nullptr)
     {
         LOG(FATAL) << "Dynamics pointer cast failure in SPHObject::initialize()";
@@ -26,10 +26,10 @@ SphObject::initialize()
     return true;
 }
 
-std::shared_ptr<SphModel>
+std::shared_ptr<SphSystem>
 SphObject::getSphModel()
 {
-    m_sphModel = std::dynamic_pointer_cast<SphModel>(m_dynamicalModel);
+    m_sphModel = std::dynamic_pointer_cast<SphSystem>(m_dynamicalModel);
     return m_sphModel;
 }
 } // namespace imstk

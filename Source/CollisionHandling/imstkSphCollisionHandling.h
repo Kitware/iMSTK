@@ -13,7 +13,7 @@ namespace imstk
 {
 class CollisionData;
 class CollisionDetectionAlgorithm;
-class SphModel;
+class SphSystem;
 class SphObject;
 
 ///
@@ -71,6 +71,6 @@ private:
     double m_boundaryFriction = 0.0;
 
     std::shared_ptr<SphObject> m_sphObject;
-    std::shared_ptr<SphModel>  m_sphModel;
+    std::shared_ptr<SphSystem> m_sphModel;
 };
 } // end namespace imstk

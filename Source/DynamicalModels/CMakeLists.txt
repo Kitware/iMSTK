@@ -19,7 +19,7 @@ set(H_FILES
   ObjectModels/imstkPbdSystemConfig.h
   ObjectModels/imstkSphBoundaryConditions.h
   ObjectModels/imstkSPHKernels.h
-  ObjectModels/imstkSphModel.h
+  ObjectModels/imstkSphSystem.h
   ObjectStates/imstkSphState.h
   )
 
@@ -29,7 +29,7 @@ set(SRC_FILES
   ObjectModels/imstkPbdSystem.cpp
   ObjectModels/imstkPbdSystemConfig.cpp
   ObjectModels/imstkSphBoundaryConditions.cpp
-  ObjectModels/imstkSphModel.cpp
+  ObjectModels/imstkSphSystem.cpp
   ObjectStates/imstkSphState.cpp
   )
 

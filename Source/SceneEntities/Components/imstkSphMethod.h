@@ -13,7 +13,7 @@ namespace imstk
 {
 class Geometry;
 class GeometryMap;
-class SphModel;
+class SphSystem;
 
 class SphMethod : public SceneBehaviour
 {
@@ -25,7 +25,7 @@ public:
     ///
     /// \brief Get the model governing the SPH fluid dynamics of this object
     ///
-    imstkSetGetMacro(SphSystem, m_sphSystem, std::shared_ptr<SphModel>)
+    imstkSetGetMacro(SphSystem, m_sphSystem, std::shared_ptr<SphSystem>)
 
     ///
     /// \brief Set/Get the geometry used for Physics computations
@@ -68,7 +68,7 @@ private:
 
     void postModifiedAll();
 
-    std::shared_ptr<SphModel> m_sphSystem;
+    std::shared_ptr<SphSystem> m_sphSystem;
 
     // Physics related geometry and maps
     std::shared_ptr<Geometry>    m_physicsGeometry;           ///< Geometry used for Physics

@@ -11,7 +11,7 @@
 
 namespace imstk
 {
-class SphModel;
+class SphSystem;
 
 ///
 /// \class SphObject
@@ -30,7 +30,7 @@ public:
     ///
     /// \brief Get the model governing the Sph fluid dynamics of this object
     ///
-    std::shared_ptr<SphModel> getSphModel();
+    std::shared_ptr<SphSystem> getSphModel();
 
     ///
     /// \brief Initialize the SphObject
@@ -38,6 +38,6 @@ public:
     bool initialize() override;
 
 protected:
-    std::shared_ptr<SphModel> m_sphModel = nullptr;
+    std::shared_ptr<SphSystem> m_sphModel = nullptr;
 };
 } // namespace imstk

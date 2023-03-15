@@ -9,7 +9,7 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSphObject.h"
-#include "imstkSphModel.h"
+#include "imstkSphSystem.h"
 #include "imstkVisualModel.h"
 
 using namespace imstk;
@@ -192,11 +192,11 @@ generateFluid(const double particleRadius)
     visualModel->setRenderMaterial(material);
 
     // Create a physics model
-    imstkNew<SphModel> sphModel;
+    imstkNew<SphSystem> sphModel;
     sphModel->setModelGeometry(geometry);
 
     // Configure model
-    imstkNew<SphModelConfig> sphParams(particleRadius);
+    imstkNew<SphSystemConfig> sphParams(particleRadius);
     sphParams->m_bNormalizeDensity = true;
     if (SCENE_ID == 2)   // highly viscous fluid
     {

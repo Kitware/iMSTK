@@ -9,7 +9,7 @@
 #include "imstkCollisionData.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
 #include "imstkSphCollisionHandling.h"
-#include "imstkSphModel.h"
+#include "imstkSphSystem.h"
 #include "imstkSphObject.h"
 #include "imstkTaskGraph.h"
 

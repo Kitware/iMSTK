@@ -8,7 +8,7 @@
 #include "imstkGeometry.h"
 #include "imstkGeometryMap.h"
 #include "imstkSphMethod.h"
-#include "imstkSphModel.h"
+#include "imstkSphSystem.h"
 
 namespace imstk
 {
@@ -36,7 +36,7 @@ SphMethod::init()
         LOG(FATAL) << "SPH system is required to be set before initialization.";
         return;
     }
-    // Currently, SphModel cannot handle multiple bodies.
+    // Currently, SphSystem cannot handle multiple bodies.
     // Ideally this system should be initialized outside the behaviour.
     m_sphSystem->initialize();
 
