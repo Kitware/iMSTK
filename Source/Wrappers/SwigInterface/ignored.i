@@ -5,14 +5,17 @@
 */
 
 %ignore imstk::PbdCollisionConstraint;
-/* %ignore imstk::PbdFEMConstraint; */
+%ignore imstk::PbdConstraintFunctor;
 %ignore imstk::PbdSystem::getIntegratePositionNode();
 %ignore imstk::PbdSystem::getUpdateCollisionGeometryNode();
 %ignore imstk::PbdSystem::getSolveNode();
 %ignore imstk::PbdSystem::getUpdateVelocityNode();
-%ignore imstk::PbdSystem::addPbdConstraintFunctor(std::shared_ptr<PbdConstraintFunctor>);
-%ignore imstk::PbdSystem::addPbdConstraintFunctor(std::function<void(PbdConstraintContainer&)>);
-%ignore imstk::PbdSystem::getFunctors();
+%ignore imstk::PbdSystem::initGraphEdges(std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>);
+%ignore imstk::PbdSystemConfig::addPbdConstraintFunctor(std::shared_ptr<PbdConstraintFunctor>);
+%ignore imstk::PbdSystemConfig::addPbdConstraintFunctor(std::function<void(PbdConstraintContainer&)>);
+%ignore imstk::PbdSystemConfig::getFunctors();
+
+%ignore imstk::AbstractDynamicalSystem::initGraphEdges(std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>);
 
 %ignore imstk::AbstractDataArray::clone(); /* unique_ptrs can't be returned in SWIG right now */
 %ignore imstk::DataArray::iterator; /* fix the multiple-definition problem. */

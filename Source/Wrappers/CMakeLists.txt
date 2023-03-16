@@ -43,7 +43,7 @@ if (MSVC)
 endif()
 
 set_target_properties(iMSTKCWrapper PROPERTIES
-    SWIG_COMPILE_OPTIONS "-namespace;Imstk;-Wall"
+    SWIG_COMPILE_OPTIONS "-namespace;Imstk" #Add ;-Wall for debugging
     FOLDER Wrappers)
 
 set(imstk_SWIG_DEFINITIONS "")

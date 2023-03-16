@@ -130,7 +130,7 @@
 %shared_ptr(imstk::SceneObject)
 %shared_ptr(imstk::DynamicObject)
 %shared_ptr(imstk::PbdConnectiveTissueConstraintGenerator)
-%shared_ptr(imstk::PbdObject)
+%shared_ptr(imstk::PbdMethod)
 %shared_ptr(imstk::SphObject)
 %shared_ptr(imstk::VisualModel)
 %shared_ptr(imstk::Camera)
