@@ -23,6 +23,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
+#include "imstkPbdCollisionHandling.h"
 
 using namespace imstk;
 
@@ -202,7 +203,10 @@ main()
         scene->addSceneObject(floorObj);
 
         // Collisions
-        scene->addInteraction(std::make_shared<PbdObjectCollision>(fluidObj, floorObj));
+        auto interaction = std::make_shared<PbdObjectCollision>(fluidObj, floorObj);
+        auto handling = std::dynamic_pointer_cast<PbdCollisionHandling>(interaction->getCollisionHandlingA());
+        handling->setEnableBoundaryCollisions(true);
+        scene->addInteraction(interaction);
     }
 
     // Run the simulation

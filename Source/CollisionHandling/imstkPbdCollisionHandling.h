@@ -193,8 +193,8 @@ public:
     ///
     /// \brief Get enableBoundaryCollision
     ///@{
-    void setEnableBoundaryCollisions(const double enableBoundaryCollisions) { m_enableBoundaryCollisions = enableBoundaryCollisions; }
-    const double getEnableBoundaryCollisions() const { return m_enableBoundaryCollisions; }
+    void setEnableBoundaryCollisions(const bool enableBoundaryCollisions) { m_enableBoundaryCollisions = enableBoundaryCollisions; }
+    const bool getEnableBoundaryCollisions() const { return m_enableBoundaryCollisions; }
     ///@}
 
     ///
