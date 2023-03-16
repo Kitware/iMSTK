@@ -192,7 +192,7 @@ PbdCollisionHandling::PbdCollisionHandling()
 
 PbdCollisionHandling::~PbdCollisionHandling()
 {
-    removeCollisionConstraints();
+    deleteCollisionConstraints();
 }
 
 PbdCollisionHandling::CollisionSideData
@@ -284,13 +284,29 @@ PbdCollisionHandling::getCaseFromElement(const ColElemSide& elem)
     return PbdContactCase::None;
 }
 
+template<class T>
+T*
+PbdCollisionHandling::getCachedConstraint(ConstraintType type)
+{
+    if (!m_constraintCache[type].empty())
+    {
+        T* result = static_cast<T*>(m_constraintCache[type].back());
+        m_constraintCache[type].pop_back();
+        return result;
+    }
+    else
+    {
+        return new T;
+    }
+}
+
 void
 PbdCollisionHandling::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
     // Clear constraints vectors
-    removeCollisionConstraints();
+    m_collisionConstraints.clear();
 
     // Break early if no collision elements
     if (elementsA.size() == 0 && elementsB.size() == 0)
@@ -445,7 +461,7 @@ PbdCollisionHandling::addConstraint_Body_V(const ColElemSide& sideA, const ColEl
         ptB = getVertex(*sideB.elem, *sideB.data)[0];
     }
 
-    PbdVertexToBodyConstraint* constraint = new PbdVertexToBodyConstraint();
+    PbdVertexToBodyConstraint* constraint = getCachedConstraint<PbdVertexToBodyConstraint>(BodyVertex);
     constraint->initConstraint(sideA.data->model->getBodies(),
         ptAAndContact.first,
         ptAAndContact.second,
@@ -463,7 +479,7 @@ PbdCollisionHandling::addConstraint_Body_E(const ColElemSide& sideA, const ColEl
     const std::pair<PbdParticleId, Vec3d>& ptAAndContact = getBodyAndContactPoint(*sideA.elem, *sideA.data);
     std::array<PbdParticleId, 2>           ptsB = getEdge(*sideB.elem, *sideB.data);
 
-    PbdEdgeToBodyConstraint* constraint = new PbdEdgeToBodyConstraint();
+    PbdEdgeToBodyConstraint* constraint = getCachedConstraint<PbdEdgeToBodyConstraint>(BodyEdge);
     constraint->initConstraint(sideB.data->model->getBodies(),
         ptAAndContact.first,
         ptAAndContact.second,
@@ -481,7 +497,7 @@ PbdCollisionHandling::addConstraint_Body_T(const ColElemSide& sideA, const ColEl
     const std::pair<PbdParticleId, Vec3d>& ptAAndContact = getBodyAndContactPoint(*sideA.elem, *sideA.data);
     std::array<PbdParticleId, 3>           ptsB = getTriangle(*sideB.elem, *sideB.data);
 
-    PbdTriangleToBodyConstraint* constraint = new PbdTriangleToBodyConstraint();
+    PbdTriangleToBodyConstraint* constraint = getCachedConstraint<PbdTriangleToBodyConstraint>(BodyTriangle);
     constraint->initConstraint(sideB.data->model->getBodies(),
         ptAAndContact.first,
         ptAAndContact.second,
@@ -505,7 +521,8 @@ PbdCollisionHandling::addConstraint_Body_Body(const ColElemSide& sideA, const Co
         normal = sideA.elem->m_element.m_PointDirectionElement.dir;
     }
 
-    PbdBodyToBodyNormalConstraint* constraint = new PbdBodyToBodyNormalConstraint();
+    PbdBodyToBodyNormalConstraint* constraint = getCachedConstraint<PbdBodyToBodyNormalConstraint>(BodyBody);
+
     constraint->initConstraint(
         sideA.data->model->getBodies(),
         ptAAndContact.first,
@@ -526,7 +543,7 @@ PbdCollisionHandling::addConstraint_V_T(const ColElemSide& sideA, const ColElemS
     const PbdParticleId          ptA  = getVertex(*sideA.elem, *sideA.data)[0];
     std::array<PbdParticleId, 3> ptsB = getTriangle(*sideB.elem, *sideB.data);
 
-    PbdPointTriangleConstraint* constraint = new PbdPointTriangleConstraint();
+    PbdPointTriangleConstraint* constraint = getCachedConstraint<PbdPointTriangleConstraint>(VertexTriangle);
     constraint->initConstraint(ptA, ptsB[0], ptsB[1], ptsB[2],
         sideA.data->stiffness, sideB.data->stiffness);
     constraint->setFriction(m_friction);
@@ -542,7 +559,7 @@ PbdCollisionHandling::addConstraint_E_E(const ColElemSide& sideA, const ColElemS
     std::array<PbdParticleId, 2> ptsA = getEdge(*sideA.elem, *sideA.data);
     std::array<PbdParticleId, 2> ptsB = getEdge(*sideB.elem, *sideB.data);
 
-    PbdEdgeEdgeConstraint* constraint = new PbdEdgeEdgeConstraint();
+    PbdEdgeEdgeConstraint* constraint = getCachedConstraint<PbdEdgeEdgeConstraint>(EdgeEdge);
     constraint->initConstraint(ptsA[0], ptsA[1], ptsB[0], ptsB[1],
         sideA.data->stiffness, sideB.data->stiffness);
     constraint->setFriction(m_friction);
@@ -565,7 +582,7 @@ PbdCollisionHandling::addConstraint_E_E_CCD(
     std::array<Vec3d*, 2> prevPtsA = getElementVertIdsPrev<2>(ptsA, *sideA.data);
     std::array<Vec3d*, 2> prevPtsB = getElementVertIdsPrev<2>(ptsB, *sideB.data);
 
-    PbdEdgeEdgeCCDConstraint* constraint = new PbdEdgeEdgeCCDConstraint();
+    PbdEdgeEdgeCCDConstraint* constraint = getCachedConstraint<PbdEdgeEdgeCCDConstraint>(EdgeEdgeCCD);
     constraint->initConstraint(
         prevPtsA[0], prevPtsA[1], prevPtsB[0], prevPtsB[1],
         ptsA[0], ptsA[1], ptsB[0], ptsB[1],
@@ -582,7 +599,7 @@ PbdCollisionHandling::addConstraint_V_E(const ColElemSide& sideA, const ColElemS
     const PbdParticleId          ptA  = getVertex(*sideA.elem, *sideA.data)[0];
     std::array<PbdParticleId, 2> ptsB = getEdge(*sideB.elem, *sideB.data);
 
-    PbdPointEdgeConstraint* constraint = new PbdPointEdgeConstraint();
+    PbdPointEdgeConstraint* constraint = getCachedConstraint<PbdPointEdgeConstraint>(VertexEdge);
     constraint->initConstraint(ptA, ptsB[0], ptsB[1],
         sideA.data->stiffness, sideB.data->stiffness);
     constraint->setFriction(m_friction);
@@ -630,7 +647,7 @@ PbdCollisionHandling::addConstraint_V_V(const ColElemSide& sideA, const ColElemS
         ptB = getVertex(*sideB.elem, *sideB.data)[0];
     }
 
-    PbdPointPointConstraint* constraint = new PbdPointPointConstraint();
+    PbdPointPointConstraint* constraint = getCachedConstraint<PbdPointPointConstraint>(VertexVertex);
     constraint->initConstraint(ptA, ptB,
         sideA.data->stiffness,
         (sideB.data == nullptr) ? 0.0 : sideB.data->stiffness);
@@ -642,9 +659,9 @@ PbdCollisionHandling::addConstraint_V_V(const ColElemSide& sideA, const ColElemS
 }
 
 void
-PbdCollisionHandling::removeCollisionConstraints()
+PbdCollisionHandling::deleteCollisionConstraints()
 {
-    // Remove constraints without actually clearing
+    // Deletes all collision Constraints
     // There could be a large variance in constraints/contacts count,
     // 10s to 100s of constraints changing frequently over few frames.
     for (int i = 0; i < NumTypes; i++)
@@ -654,13 +671,14 @@ PbdCollisionHandling::removeCollisionConstraints()
             delete  m_constraintBins[i][j];
         }
         m_constraintBins[i].resize(0);
+
+        for (size_t j = 0; j < m_constraintCache[i].size(); j++)
+        {
+            delete  m_constraintBins[i][j];
+        }
+        m_constraintBins[i].resize(0);
     }
 
-    // Delete the pointers from the above constraints and resize collision constraint bin
-    for (size_t i = 0; i < m_collisionConstraints.size(); i++)
-    {
-        delete  m_collisionConstraints[i];
-    }
     m_collisionConstraints.resize(0);
 }
 
@@ -671,6 +689,7 @@ PbdCollisionHandling::orderCollisionConstraints()
     for (int i = 0; i < NumTypes; i++)
     {
         m_collisionConstraints.insert(m_collisionConstraints.end(), m_constraintBins[i].begin(), m_constraintBins[i].end());
+        m_constraintCache[i].insert(m_constraintCache[i].end(), m_constraintBins[i].begin(), m_constraintBins[i].end());
         m_constraintBins[i].resize(0);
     }
 }

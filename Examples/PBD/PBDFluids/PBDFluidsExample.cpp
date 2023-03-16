@@ -204,7 +204,7 @@ main()
 
         // Collisions
         auto interaction = std::make_shared<PbdObjectCollision>(fluidObj, floorObj);
-        auto handling = std::dynamic_pointer_cast<PbdCollisionHandling>(interaction->getCollisionHandlingA());
+        auto handling    = std::dynamic_pointer_cast<PbdCollisionHandling>(interaction->getCollisionHandlingA());
         handling->setEnableBoundaryCollisions(true);
         scene->addInteraction(interaction);
     }
