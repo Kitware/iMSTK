@@ -32,7 +32,6 @@ set(H_FILES
   Objects/imstkPbdConnectiveTissueConstraintGenerator.h
   Objects/imstkPbdObjectCellRemoval.h
   Objects/imstkSceneObject.h
-  Objects/imstkSphObject.h
   )
 
 set(SRC_FILES
@@ -58,7 +57,6 @@ set(SRC_FILES
   Objects/imstkPbdConnectiveTissueConstraintGenerator.cpp
   Objects/imstkPbdObjectCellRemoval.cpp
   Objects/imstkSceneObject.cpp
-  Objects/imstkSphObject.cpp
   )
 
 include(imstkAddLibrary)

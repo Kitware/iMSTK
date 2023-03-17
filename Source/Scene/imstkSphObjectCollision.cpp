@@ -6,11 +6,12 @@
 
 #include "imstkSphObjectCollision.h"
 #include "imstkCDObjectFactory.h"
+#include "imstkCollider.h"
 #include "imstkCollisionData.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
 #include "imstkSphCollisionHandling.h"
+#include "imstkSphMethod.h"
 #include "imstkSphSystem.h"
-#include "imstkSphObject.h"
 #include "imstkTaskGraph.h"
 
 namespace imstk
@@ -27,20 +28,22 @@ SphObjectCollision::initialize()
 {
     CollisionInteraction::initialize();
 
-    auto sphObjA = std::dynamic_pointer_cast<SphObject>(m_objA);
-    auto sphObjB = std::dynamic_pointer_cast<SphObject>(m_objB);
-    CHECK(sphObjA || sphObjB) << "At least one input Entity should be an SphObject.";
+    auto sphMethodA = m_objA->getComponentUnsafe<SphMethod>();
+    auto sphMethodB = m_objB->getComponentUnsafe<SphMethod>();
+    CHECK(sphMethodA || sphMethodB) << "At least one input Entity should have an SphMethod.";
 
     // Swap so that the first object (m_objA) is always the SPH object.
-    if (sphObjB)
+    if (sphMethodB)
     {
         std::swap(m_objA, m_objB);
-        std::swap(sphObjA, sphObjB);
+        std::swap(sphMethodA, sphMethodB);
     }
 
+    auto colliderA = m_objA->getComponent<Collider>();
+
     // Setup the handler
-    std::shared_ptr<SphCollisionHandling> ch = std::make_shared<SphCollisionHandling>();
-    ch->setInputSphObject(sphObjA);
+    auto ch = std::make_shared<SphCollisionHandling>();
+    ch->setInputSphObject(sphMethodA, colliderA);
     ch->setInputCollisionData(m_colDetect->getCollisionData());
     ch->setDetection(m_colDetect);
     setCollisionHandlingA(ch);
@@ -48,14 +51,9 @@ SphObjectCollision::initialize()
     // they will require explicit initialization inside the Interaction classes where they are instantiated.
     ch->initialize();
 
-    auto obj2AsSceneObject = std::dynamic_pointer_cast<SceneObject>(m_objB);
-    CHECK(obj2AsSceneObject != nullptr) << "Expected obj2 to be a SceneObject.";
     // Collision should happen after positions and velocities are computed
-    m_taskGraph->addNode(sphObjA->getUpdateGeometryNode());
-    m_taskGraph->addNode(obj2AsSceneObject->getUpdateGeometryNode());
-
-    m_taskGraph->addNode(sphObjA->getTaskGraph()->getSink());
-    m_taskGraph->addNode(obj2AsSceneObject->getTaskGraph()->getSink());
+    m_taskGraph->addNode(sphMethodA->getUpdateGeometryNode());
+    m_taskGraph->addNode(sphMethodA->getTaskGraph()->getSink());
 
     return true;
 }
@@ -65,7 +63,7 @@ SphObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
 {
     CollisionInteraction::initGraphEdges(source, sink);
 
-    auto sphObj1 = std::dynamic_pointer_cast<SphObject>(m_objA);
+    auto sphMethodA = m_objA->getComponent<SphMethod>();
 
     //
     // ...Sph steps...
@@ -74,13 +72,10 @@ SphObjectCollision::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared
     //                 Collision Handling A
     //    objA Sink                          objB Sink
     //
-    m_taskGraph->addEdge(sphObj1->getUpdateGeometryNode(), m_collisionDetectionNode);
-    auto objBAsSceneObject = std::dynamic_pointer_cast<SceneObject>(m_objB);
-    m_taskGraph->addEdge(objBAsSceneObject->getUpdateGeometryNode(), m_collisionDetectionNode);
+    m_taskGraph->addEdge(sphMethodA->getUpdateGeometryNode(), m_collisionDetectionNode);
 
     m_taskGraph->addEdge(m_collisionDetectionNode, m_collisionHandleANode);
 
-    m_taskGraph->addEdge(m_collisionHandleANode, sphObj1->getTaskGraph()->getSink());
-    m_taskGraph->addEdge(m_collisionHandleANode, objBAsSceneObject->getTaskGraph()->getSink());
+    m_taskGraph->addEdge(m_collisionHandleANode, sphMethodA->getTaskGraph()->getSink());
 }
 } // namespace imstk

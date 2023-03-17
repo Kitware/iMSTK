@@ -8,7 +8,7 @@
 #include "imstkPointSet.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSphObject.h"
+#include "imstkSphMethod.h"
 #include "imstkSphSystem.h"
 #include "imstkVisualModel.h"
 
@@ -145,7 +145,7 @@ initializeNonZeroVelocities(const int numParticles)
     return initVelocitiesPtr;
 }
 
-std::shared_ptr<SphObject>
+std::shared_ptr<Entity>
 generateFluid(const double particleRadius)
 {
     std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
@@ -171,10 +171,10 @@ generateFluid(const double particleRadius)
     geometry->initialize(particles);
 
     // Create a fluids object
-    imstkNew<SphObject> fluidObj("SPHSphere");
+    auto fluidObj = std::make_shared<Entity>("SPHSphere");
 
     // Create a visual model
-    imstkNew<VisualModel> visualModel;
+    auto visualModel = fluidObj->addComponent<VisualModel>();
     visualModel->setGeometry(geometry);
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
@@ -213,10 +213,11 @@ generateFluid(const double particleRadius)
     sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Add the component models
-    fluidObj->addVisualModel(visualModel);
     fluidObj->addComponent<Collider>()->setGeometry(geometry);
-    fluidObj->setDynamicalModel(sphModel);
-    fluidObj->setGeometry(geometry);
+
+    auto sphMethod = fluidObj->addComponent<SphMethod>();
+    sphMethod->setSphSystem(sphModel);
+    sphMethod->setGeometry(geometry);
 
     return fluidObj;
 }
