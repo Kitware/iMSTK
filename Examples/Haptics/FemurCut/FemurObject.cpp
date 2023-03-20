@@ -6,7 +6,7 @@
 
 #include "FemurObject.h"
 #include "imstkCollider.h"
-#include "imstkLevelSetModel.h"
+#include "imstkLevelSetSystem.h"
 #include "imstkLocalMarchingCubes.h"
 #include "imstkMeshIO.h"
 #include "imstkRenderMaterial.h"
@@ -50,7 +50,7 @@ FemurObject::setup()
     auto sdf = std::make_shared<SignedDistanceField>(initLvlSetImage);
 
     // Setup the Model
-    auto model = std::make_shared<LevelSetModel>();
+    auto model = std::make_shared<LevelSetSystem>();
     model->setModelGeometry(sdf);
     model->configure(lvlSetConfig);
 

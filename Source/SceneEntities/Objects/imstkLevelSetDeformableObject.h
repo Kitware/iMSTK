@@ -11,7 +11,7 @@
 
 namespace imstk
 {
-class LevelSetModel;
+class LevelSetSystem;
 
 ///
 /// \class LevelSetDeformableObject
@@ -30,7 +30,7 @@ public:
     ///
     /// \brief Get the LevelSet model of the object
     ///
-    std::shared_ptr<LevelSetModel> getLevelSetModel();
+    std::shared_ptr<LevelSetSystem> getLevelSetModel();
 
     ///
     /// \brief Initialize the LevelSet scene object
@@ -38,6 +38,6 @@ public:
     bool initialize() override;
 
 protected:
-    std::shared_ptr<LevelSetModel> m_levelSetModel = nullptr; ///< LevelSet mathematical model
+    std::shared_ptr<LevelSetSystem> m_levelSetModel = nullptr; ///< LevelSet mathematical model
 };
 } // namespace imstk

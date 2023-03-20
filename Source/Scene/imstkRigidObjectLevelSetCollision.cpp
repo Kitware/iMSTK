@@ -12,7 +12,7 @@
 #include "imstkImplicitGeometryToPointSetCD.h"
 #include "imstkLevelSetCH.h"
 #include "imstkLevelSetDeformableObject.h"
-#include "imstkLevelSetModel.h"
+#include "imstkLevelSetSystem.h"
 #include "imstkParallelFor.h"
 #include "imstkPointSet.h"
 #include "imstkPbdMethod.h"
@@ -149,7 +149,7 @@ RigidObjectLevelSetCollision::initGraphEdges(std::shared_ptr<TaskNode> source, s
     CollisionInteraction::initGraphEdges(source, sink);
 
     auto                           lvlSetObj2 = std::dynamic_pointer_cast<LevelSetDeformableObject>(m_objB);
-    std::shared_ptr<LevelSetModel> lsmModel   = lvlSetObj2->getLevelSetModel();
+    std::shared_ptr<LevelSetSystem> lsmModel   = lvlSetObj2->getLevelSetModel();
 
     std::shared_ptr<TaskNode> pbdHandlerNode = m_collisionHandleANode;
     std::shared_ptr<TaskNode> lsmHandlerNode = m_collisionHandleBNode;

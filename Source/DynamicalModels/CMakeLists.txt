@@ -13,7 +13,7 @@ list(APPEND Dependencies
 
 set(H_FILES
   ObjectModels/imstkAbstractDynamicalSystem.h
-  ObjectModels/imstkLevelSetModel.h
+  ObjectModels/imstkLevelSetSystem.h
   ObjectModels/imstkPbdConstraintFunctor.h
   ObjectModels/imstkPbdSystem.h
   ObjectModels/imstkPbdSystemConfig.h
@@ -25,7 +25,7 @@ set(H_FILES
 
 set(SRC_FILES
   ObjectModels/imstkAbstractDynamicalSystem.cpp
-  ObjectModels/imstkLevelSetModel.cpp
+  ObjectModels/imstkLevelSetSystem.cpp
   ObjectModels/imstkPbdSystem.cpp
   ObjectModels/imstkPbdSystemConfig.cpp
   ObjectModels/imstkSphBoundaryConditions.cpp

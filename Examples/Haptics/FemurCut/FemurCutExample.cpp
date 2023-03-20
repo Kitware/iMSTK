@@ -13,7 +13,7 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetCH.h"
-#include "imstkLevelSetModel.h"
+#include "imstkLevelSetSystem.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseDeviceClient.h"
 #include "imstkMouseSceneControl.h"

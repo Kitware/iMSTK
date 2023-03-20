@@ -6,7 +6,7 @@
 
 #include "imstkDataArray.h"
 #include "imstkImageData.h"
-#include "imstkLevelSetModel.h"
+#include "imstkLevelSetSystem.h"
 #include "imstkLogger.h"
 #include "imstkMacros.h"
 #include "imstkParallelFor.h"
@@ -14,7 +14,7 @@
 
 namespace imstk
 {
-LevelSetModel::LevelSetModel() :
+LevelSetSystem::LevelSetSystem() :
     m_config(std::make_shared<LevelSetModelConfig>())
 {
     // If given an image data
@@ -25,7 +25,7 @@ LevelSetModel::LevelSetModel() :
     m_generateVelocitiesEnd   = std::make_shared<TaskNode>(nullptr, "Compute Velocities End");
 
     // By default the level set defines a function for evolving the distances, this can be removed in subclasses
-    m_evolveQuantitiesNodes.push_back(std::make_shared<TaskNode>(std::bind(&LevelSetModel::evolve, this), "Evolve Distances"));
+    m_evolveQuantitiesNodes.push_back(std::make_shared<TaskNode>(std::bind(&LevelSetSystem::evolve, this), "Evolve Distances"));
 
     m_taskGraph->addNode(m_generateVelocitiesBegin);
     m_taskGraph->addNode(m_generateVelocitiesEnd);
@@ -33,7 +33,7 @@ LevelSetModel::LevelSetModel() :
 }
 
 bool
-LevelSetModel::initialize()
+LevelSetSystem::initialize()
 {
     if (m_geometry == nullptr)
     {
@@ -87,15 +87,15 @@ LevelSetModel::initialize()
 }
 
 void
-LevelSetModel::configure(std::shared_ptr<LevelSetModelConfig> config)
+LevelSetSystem::configure(std::shared_ptr<LevelSetModelConfig> config)
 {
-    LOG_IF(FATAL, (!this->getModelGeometry())) << "LevelSetModel::configure - Set LevelSetModel geometry before configuration!";
+    LOG_IF(FATAL, (!this->getModelGeometry())) << "LevelSetSystem::configure - Set LevelSetSystem geometry before configuration!";
 
     m_config = config;
 }
 
 void
-LevelSetModel::evolve()
+LevelSetSystem::evolve()
 {
     auto         sdf       = std::dynamic_pointer_cast<SignedDistanceField>(m_mesh);
     auto         imageData = std::dynamic_pointer_cast<ImageData>(sdf->getImage());
@@ -254,7 +254,7 @@ LevelSetModel::evolve()
 }
 
 void
-LevelSetModel::addImpulse(const Vec3i& coord, double f)
+LevelSetSystem::addImpulse(const Vec3i& coord, double f)
 {
     auto         sdf       = std::dynamic_pointer_cast<SignedDistanceField>(m_mesh);
     auto         imageData = std::dynamic_pointer_cast<ImageData>(sdf->getImage());
@@ -285,7 +285,7 @@ LevelSetModel::addImpulse(const Vec3i& coord, double f)
 }
 
 void
-LevelSetModel::setImpulse(const Vec3i& coord, double f)
+LevelSetSystem::setImpulse(const Vec3i& coord, double f)
 {
     auto         sdf       = std::dynamic_pointer_cast<SignedDistanceField>(m_mesh);
     auto         imageData = std::dynamic_pointer_cast<ImageData>(sdf->getImage());
@@ -309,14 +309,14 @@ LevelSetModel::setImpulse(const Vec3i& coord, double f)
 }
 
 void
-LevelSetModel::resetToInitialState()
+LevelSetSystem::resetToInitialState()
 {
     // Due to having to store a copy of the initial image which is quite large reset is not implemented
-    LOG(WARNING) << "LevelSetModel cannot reset";
+    LOG(WARNING) << "LevelSetSystem cannot reset";
 }
 
 void
-LevelSetModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+LevelSetSystem::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     m_taskGraph->addEdge(source, m_generateVelocitiesBegin);
     m_taskGraph->addEdge(m_generateVelocitiesBegin, m_generateVelocitiesEnd);

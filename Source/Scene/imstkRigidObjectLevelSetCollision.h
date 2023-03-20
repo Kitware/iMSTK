@@ -13,7 +13,7 @@ namespace imstk
 {
 class LevelSetDeformableObject;
 class Collider;
-class LevelSetModel;
+class LevelSetSystem;
 class PbdMethod;
 class PbdSystem;
 class PointSet;
@@ -77,7 +77,7 @@ protected:
         // \todo: To be deleted after LevelSetDeformableObject has been removed:
         std::shared_ptr<LevelSetDeformableObject> obj;
 
-        std::shared_ptr<LevelSetModel> method;
+        std::shared_ptr<LevelSetSystem> method;
         std::shared_ptr<Collider> collider;
         std::shared_ptr<TaskGraph> taskGraph;
     } m_objectB;

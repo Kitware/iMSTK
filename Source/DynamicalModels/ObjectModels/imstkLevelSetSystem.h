@@ -27,16 +27,16 @@ struct LevelSetModelConfig
 };
 
 ///
-/// \class LevelSetModel
+/// \class LevelSetSystem
 ///
 /// \brief This class implements a generic level set model, it requires both a forward
 /// and backward finite differencing method
 ///
-class LevelSetModel : public AbstractDynamicalSystem
+class LevelSetSystem : public AbstractDynamicalSystem
 {
 public:
-    LevelSetModel();
-    ~LevelSetModel() override = default;
+    LevelSetSystem();
+    ~LevelSetSystem() override = default;
 
     ///
     /// \brief Get/Set the time step size

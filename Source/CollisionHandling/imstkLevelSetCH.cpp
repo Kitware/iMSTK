@@ -9,7 +9,7 @@
 #include "imstkCollider.h"
 #include "imstkCollisionData.h"
 #include "imstkImageData.h"
-#include "imstkLevelSetModel.h"
+#include "imstkLevelSetSystem.h"
 #include "imstkPbdBody.h"
 #include "imstkPbdMethod.h"
 
@@ -29,7 +29,7 @@ LevelSetCH::~LevelSetCH()
 }
 
 void
-LevelSetCH::setInputLvlSetObj(std::shared_ptr<LevelSetModel> levelSetObject, std::shared_ptr<Collider> levelSetCollider)
+LevelSetCH::setInputLvlSetObj(std::shared_ptr<LevelSetSystem> levelSetObject, std::shared_ptr<Collider> levelSetCollider)
 {
     m_levelSetObject   = levelSetObject;
     m_levelSetCollider = levelSetCollider;
@@ -65,7 +65,7 @@ LevelSetCH::getCollidingGeometryB()
 }
 
 /*
-std::shared_ptr<LevelSetModel>
+std::shared_ptr<LevelSetSystem>
 LevelSetCH::getLvlSetObj()
 {
     return m_levelSetObject;
