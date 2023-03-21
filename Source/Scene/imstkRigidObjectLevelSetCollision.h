@@ -8,23 +8,25 @@
 
 #include "imstkCollisionInteraction.h"
 #include "imstkMacros.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
-class LevelSetDeformableObject;
+class LevelSetDeformableObject_old;
 class Collider;
+class LevelSetMethod;
 class LevelSetSystem;
 class PbdMethod;
 class PbdSystem;
 class PointSet;
 class TaskGraph;
-template<typename T, int N> class VecDataArray;
+// template<typename T, int N> class VecDataArray;
 
 ///
 /// \class RigidObjectLevelSetCollision
 ///
 /// \brief This class defines a collision interaction pipeline between a
-/// RigidObject and LevelSetDeformableObject.
+/// RigidObject and LevelSetDeformableObject_old.
 ///
 class RigidObjectLevelSetCollision : public CollisionInteraction
 {
@@ -57,7 +59,7 @@ public:
     void measureDisplacementFromPrevious();
 
 protected:
-    std::shared_ptr<VecDataArray<double, 3>> m_prevVertices;
+    VecDataArray<double, 3> m_prevVertices;
 
     std::shared_ptr<TaskNode> m_copyVertToPrevNode      = nullptr;
     std::shared_ptr<TaskNode> m_computeDisplacementNode = nullptr;
@@ -74,10 +76,8 @@ protected:
 
     struct
     {
-        // \todo: To be deleted after LevelSetDeformableObject has been removed:
-        std::shared_ptr<LevelSetDeformableObject> obj;
-
-        std::shared_ptr<LevelSetSystem> method;
+        std::shared_ptr<LevelSetMethod> method;
+        std::shared_ptr<LevelSetSystem> system;
         std::shared_ptr<Collider> collider;
         std::shared_ptr<TaskGraph> taskGraph;
     } m_objectB;

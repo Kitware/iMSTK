@@ -35,6 +35,8 @@ struct LevelSetModelConfig
 class LevelSetSystem : public AbstractDynamicalSystem
 {
 public:
+    using AbstractDynamicalSystem::initGraphEdges;
+
     LevelSetSystem();
     ~LevelSetSystem() override = default;
 
@@ -97,9 +99,9 @@ protected:
     size_t noteUpdatePoolSize;
     size_t m_maxVelocitiesParallel = 100;                      // In sparse mode, if surpass this value, switch to parallel
 
-    std::shared_ptr<ImageData> m_gradientMagnitudes = nullptr; ///< Gradient magnitude field when using dense
-    std::shared_ptr<ImageData> m_velocities = nullptr;
-    std::shared_ptr<ImageData> m_curvatures = nullptr;
+    std::shared_ptr<ImageData> m_gradientMagnitudes; ///< Gradient magnitude field when using dense
+    std::shared_ptr<ImageData> m_velocities;
+    std::shared_ptr<ImageData> m_curvatures;
 
     // I'm unable to use the more generic double/floating pt based version
     // suspect floating point error

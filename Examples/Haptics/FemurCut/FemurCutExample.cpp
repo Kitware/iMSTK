@@ -88,6 +88,15 @@ makeCuttingTool(const std::string& name)
     return cuttingTool;
 }
 
+std::shared_ptr<Entity> makeFemurEntity()
+{
+    auto femurEntity = std::make_shared<Entity>("Femur");
+    auto femurMethod = std::make_shared<FemurObject>();
+    femurMethod->setup(femurEntity);
+    femurEntity->addComponent(femurMethod);
+    return femurEntity;
+}
+
 ///
 /// \brief This example demonstrates cutting a femur bone with a tool
 /// Some of the example parameters may need to be tweaked for differing
@@ -102,8 +111,7 @@ main()
     auto scene = std::make_shared<Scene>("FemurCut");
 
     // Setup the Femur
-    auto femurBone = std::make_shared<FemurObject>();
-    femurBone->setup();
+    auto femurBone = makeFemurEntity();
     scene->addSceneObject(femurBone);
 
     // Setup the tool that cuts the femur
@@ -151,7 +159,7 @@ main()
         std::shared_ptr<DeviceClient> deviceClient = hapticManager->makeDeviceClient();
 #else
         auto deviceClient = std::make_shared<DummyClient>();
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [=](Event*)
             {
                 const Vec2d mousePos = viewer->getMouseDevice()->getPos();
                 const Vec3d worldPos = Vec3d(mousePos[0] * 0.5 - 0.5, mousePos[1] * 0.2 + 0.1, -0.025);
@@ -166,12 +174,13 @@ main()
         ghostObj->setController(controller);
 
         auto cuttingToolMethod = cuttingTool->getComponent<PbdMethod>();
+        auto femurBoneMethod = femurBone->getComponent<LevelSetMethod>();
         connect<Event>(sceneManager, &SceneManager::preUpdate,
-            [&](Event*)
+            [=](Event*)
             {
                 cuttingToolMethod->getPbdSystem()->getConfig()->m_dt = sceneManager->getDt();
-                femurBone->getLevelSetModel()->getConfig()->m_dt     = sceneManager->getDt();
-        });
+                femurBoneMethod->getLevelSetSystem()->getConfig()->m_dt = sceneManager->getDt();
+            });
 
         // Add default mouse and keyboard controls to the viewer
         std::shared_ptr<Entity> mouseAndKeyControls =

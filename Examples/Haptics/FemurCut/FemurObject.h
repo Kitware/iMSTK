@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkLevelSetDeformableObject.h"
+#include "imstkLevelSetMethod.h"
 
 #include <unordered_set>
 
@@ -26,21 +26,20 @@ using namespace imstk;
 /// were modified, we supply this to the local marching cubes and it will update
 /// only the respective chunks.
 ///
-class FemurObject : public LevelSetDeformableObject
+class FemurObject : public LevelSetMethod
 {
 public:
     FemurObject();
+
     ~FemurObject() override = default;
 
-    void setup();
-    bool initialize() override;
-
+    void setup(std::shared_ptr<Entity> parent);
     ///
     /// \brief Update the isosurface before rendering, the isosurface
     /// is not used for simulation so we can afford to update it
     /// less frequently
     ///
-    void visualUpdate() override;
+    void visualUpdate(const double& dt) override;
 
     ///
     /// \brief Creates visual models for any chunk that has non-zero vertices
@@ -52,6 +51,9 @@ public:
     bool getUseRandomChunkColors() const { return m_useRandomChunkColors; }
 
 protected:
+
+    void init() override;
+
     ///
     /// \brief Forwards/copies the levelsets list of modified voxels to the isosurface
     /// extraction filters list of modified voxels

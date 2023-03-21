@@ -10,6 +10,8 @@
 #include "imstkCameraController.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkDynamicObject.h"
+#include "imstkLevelSetMethod.h"
+#include "imstkLevelSetSystem.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
@@ -67,6 +69,12 @@ Scene::initialize()
             for (const auto& m : methods)
             {
                 systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(m->getPbdSystem()));
+            }
+            // Add all the PbdSystems associated with the entities.
+            auto lvlsetMethods = ent->getComponents<LevelSetMethod>();
+            for (const auto& m : lvlsetMethods)
+            {
+                systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(m->getLevelSetSystem()));
             }
         }
     }

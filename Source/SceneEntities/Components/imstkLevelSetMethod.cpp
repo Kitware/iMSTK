@@ -4,15 +4,15 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkAbstractDynamicalSystem.h"
 #include "imstkGeometry.h"
 #include "imstkGeometryMap.h"
-#include "imstkSphMethod.h"
-#include "imstkSphSystem.h"
+#include "imstkLevelSetMethod.h"
+#include "imstkLevelSetSystem.h"
 
 namespace imstk
 {
-SphMethod::SphMethod(const std::string& name) : SceneBehaviour(name)
+
+LevelSetMethod::LevelSetMethod(const std::string& name) : SceneBehaviour(name)
 {
     const std::string prefix = getTypeName() + "_" + m_name;
     m_taskGraph = std::make_shared<TaskGraph>(prefix + "_Source", prefix + "_Sink");
@@ -29,18 +29,19 @@ SphMethod::SphMethod(const std::string& name) : SceneBehaviour(name)
 }
 
 void
-SphMethod::init()
+LevelSetMethod::init()
 {
-    if (!m_sphSystem)
+    if (m_system == nullptr)
     {
-        LOG(FATAL) << "SPH system is required to be set before initialization.";
+        LOG(FATAL) << "Dynamics pointer cast failure in LevelSetDeformableObject_old::initialize()";
         return;
     }
-    // Currently, SphSystem cannot handle multiple bodies.
-    // Ideally this system should be initialized outside the behaviour.
-    m_sphSystem->initialize();
 
-    CHECK(m_physicsGeometry != nullptr) << "SphMethod \"" << m_name
+    // DynamicObject::initialize();
+    // m_levelSetModel->initialize();
+    m_system->initialize();
+
+    CHECK(m_physicsGeometry != nullptr) << "LevelSetMethod \"" << m_name
                                         << "\" expects a physics geometry at start, none was provided";
 
     if (m_physicsToCollidingGeomMap)
@@ -55,7 +56,7 @@ SphMethod::init()
 }
 
 void
-SphMethod::updateGeometries()
+LevelSetMethod::updateGeometries()
 {
     updatePhysicsGeometry();
 
@@ -74,9 +75,9 @@ SphMethod::updateGeometries()
 }
 
 void
-SphMethod::updatePhysicsGeometry()
+LevelSetMethod::updatePhysicsGeometry()
 {
-    m_sphSystem->updatePhysicsGeometry();
+    m_system->updatePhysicsGeometry();
     if (m_physicsGeometry != nullptr)
     {
         m_physicsGeometry->postModified();
@@ -84,45 +85,31 @@ SphMethod::updatePhysicsGeometry()
 }
 
 void
-SphMethod::reset()
+LevelSetMethod::reset()
 {
-    m_sphSystem->resetToInitialState();
+    m_system->resetToInitialState();
     updateGeometries();
     postModifiedAll();
 }
 
 void
-SphMethod::postModifiedAll()
+LevelSetMethod::postModifiedAll()
 {
     if (m_physicsGeometry != nullptr)
     {
         m_physicsGeometry->postModified();
     }
-
-    /*
-    // Assume geometry may be changed upon reset
-    for (auto comp : m_components)
-    {
-        if (auto visualModel = std::dynamic_pointer_cast<VisualModel>(comp))
-        {
-            if (visualModel->getGeometry() != nullptr)
-            {
-                visualModel->getGeometry()->postModified();
-            }
-        }
-    }
-    */
 }
 
 void
-SphMethod::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+LevelSetMethod::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Copy, sum, and connect the model graph to nest within this graph
     m_taskGraph->addEdge(source, m_updateNode);
-    if (m_sphSystem != nullptr)
+    if (m_system != nullptr)
     {
-        m_sphSystem->initGraphEdges();
-        m_taskGraph->nestGraph(m_sphSystem->getTaskGraph(), m_updateNode, m_updateGeometryNode);
+        m_system->initGraphEdges();
+        m_taskGraph->nestGraph(m_system->getTaskGraph(), m_updateNode, m_updateGeometryNode);
     }
     else
     {
@@ -130,4 +117,5 @@ SphMethod::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Task
     }
     m_taskGraph->addEdge(m_updateGeometryNode, sink);
 }
+
 } // namespace imstk

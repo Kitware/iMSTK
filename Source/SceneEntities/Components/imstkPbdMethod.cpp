@@ -176,9 +176,6 @@ PbdMethod::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Task
     m_taskGraph->addEdge(source, m_updateNode);
     if (m_pbdSystem != nullptr)
     {
-        // Should be a better way to do this than doing a dynamic cast.
-        // Maybe just rename the function so it doesn't get hidden by PbdSystem.
-        // std::dynamic_pointer_cast<AbstractDynamicalSystem>(m_pbdSystem)->initGraphEdges();
         m_pbdSystem->initGraphEdges();
         m_taskGraph->nestGraph(m_pbdSystem->getTaskGraph(), m_updateNode, m_updateGeometryNode);
     }
