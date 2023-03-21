@@ -193,8 +193,8 @@ public:
     ///
     /// \brief Get enableBoundaryCollision
     ///@{
-    void setEnableBoundaryCollisions(const double enableBoundaryCollisions) { m_enableBoundaryCollisions = enableBoundaryCollisions; }
-    const double getEnableBoundaryCollisions() const { return m_enableBoundaryCollisions; }
+    void setEnableBoundaryCollisions(const bool enableBoundaryCollisions) { m_enableBoundaryCollisions = enableBoundaryCollisions; }
+    const bool getEnableBoundaryCollisions() const { return m_enableBoundaryCollisions; }
     ///@}
 
     ///
@@ -317,7 +317,7 @@ private:
     ///
     /// \brief Clear the collision constraints without clearning memory
     ///
-    void removeCollisionConstraints();
+    void deleteCollisionConstraints();
 
     ///
     /// \brief Order constraints to resolve in gauss-seidel solver.
@@ -349,8 +349,14 @@ protected:
         NumTypes
     };
 
+    template<class T>
+    T* getCachedConstraint(ConstraintType type);
+
     // Vectors to split out constraint types and allow for ordering
+    // A single constraint instance should always either be in a bin or the cache
+    // additionally it _may_ be in the m_collisionConstraints structure
     std::vector<PbdConstraint*> m_constraintBins[NumTypes];
+    std::vector<PbdConstraint*> m_constraintCache[NumTypes];
 
     std::vector<PbdConstraint*> m_collisionConstraints; ///< Vector of all collision constraints
 
