@@ -122,7 +122,7 @@ PbdMethod::updateGeometries()
 void
 PbdMethod::updatePhysicsGeometry()
 {
-    CHECK(m_physicsGeometry != nullptr) << "DynamicObject \"" << m_name
+    CHECK(m_physicsGeometry != nullptr) << "PbdMethod \"" << m_name
                                         << "\" expects a physics geometry, none was provided";
 
     // m_pbdSystem->updatePhysicsGeometry(); this doesn't do anything

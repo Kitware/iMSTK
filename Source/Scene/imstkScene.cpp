@@ -9,7 +9,6 @@
 #include "imstkDeviceControl.h"
 #include "imstkCameraController.h"
 #include "imstkCollisionDetectionAlgorithm.h"
-#include "imstkDynamicObject.h"
 #include "imstkLevelSetMethod.h"
 #include "imstkLevelSetSystem.h"
 #include "imstkLight.h"
@@ -19,7 +18,10 @@
 #include "imstkPbdMethod.h"
 #include "imstkPbdSystem.h"
 
+#include "imstkSceneObject.h"
 #include "imstkSequentialTaskGraphController.h"
+#include "imstkSphMethod.h"
+#include "imstkSphSystem.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkTbbTaskGraphController.h"
@@ -55,27 +57,25 @@ Scene::initialize()
 {
     // Gather all the systems from the object components
     // Right now this just includes DynamicalSystem's
-    std::unordered_set<std::shared_ptr<AbstractDynamicalSystem>> systems;
     for (const auto& ent : m_sceneEntities)
     {
-        if (auto dynObj = std::dynamic_pointer_cast<DynamicObject>(ent))
+        // Add all the PbdSystem associated with the entities.
+        auto methods = ent->getComponents<PbdMethod>();
+        for (const auto& m : methods)
         {
-            systems.insert(dynObj->getDynamicalModel());
+            m_systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(m->getPbdSystem()));
         }
-        else
+        // Add all the LevelSetSystem associated with the entities.
+        auto lvlsetMethods = ent->getComponents<LevelSetMethod>();
+        for (const auto& m : lvlsetMethods)
         {
-            // Add all the PbdSystems associated with the entities.
-            auto methods = ent->getComponents<PbdMethod>();
-            for (const auto& m : methods)
-            {
-                systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(m->getPbdSystem()));
-            }
-            // Add all the PbdSystems associated with the entities.
-            auto lvlsetMethods = ent->getComponents<LevelSetMethod>();
-            for (const auto& m : lvlsetMethods)
-            {
-                systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(m->getLevelSetSystem()));
-            }
+            m_systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(m->getLevelSetSystem()));
+        }
+        // Add all the SphSystem associated with the entities.
+        auto sphMethods = ent->getComponents<SphMethod>();
+        for (const auto& m : sphMethods)
+        {
+            m_systems.insert(std::static_pointer_cast<AbstractDynamicalSystem>(m->getSphSystem()));
         }
     }
 
@@ -125,7 +125,7 @@ Scene::initialize()
     }
 
     // Initialize all systems
-    for (const auto& system : systems)
+    for (const auto& system : m_systems)
     {
         CHECK(system->initialize()) << "Error initializing system";
     }
@@ -546,14 +546,11 @@ Scene::advance(const double dt)
     StopWatch wwt;
     wwt.start();
 
-    for (auto obj : this->getSceneObjects())
+    for (auto s : m_systems)
     {
-        if (auto dynaObj = std::dynamic_pointer_cast<DynamicObject>(obj))
+        if (s->getTimeStepSizeType() == TimeSteppingType::RealTime)
         {
-            if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::RealTime)
-            {
-                dynaObj->getDynamicalModel()->setTimeStep(dt);
-            }
+            s->setTimeStep(dt);
         }
     }
 

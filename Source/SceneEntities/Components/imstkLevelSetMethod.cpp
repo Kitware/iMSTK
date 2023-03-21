@@ -37,10 +37,6 @@ LevelSetMethod::init()
         return;
     }
 
-    // DynamicObject::initialize();
-    // m_levelSetModel->initialize();
-    m_system->initialize();
-
     CHECK(m_physicsGeometry != nullptr) << "LevelSetMethod \"" << m_name
                                         << "\" expects a physics geometry at start, none was provided";
 

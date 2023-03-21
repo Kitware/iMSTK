@@ -36,9 +36,6 @@ SphMethod::init()
         LOG(FATAL) << "SPH system is required to be set before initialization.";
         return;
     }
-    // Currently, SphSystem cannot handle multiple bodies.
-    // Ideally this system should be initialized outside the behaviour.
-    m_sphSystem->initialize();
 
     CHECK(m_physicsGeometry != nullptr) << "SphMethod \"" << m_name
                                         << "\" expects a physics geometry at start, none was provided";

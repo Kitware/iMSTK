@@ -28,7 +28,6 @@ set(H_FILES
   Objects/imstkAnimationObject.h
   Objects/imstkCollisionDataDebugModel.h
   Objects/imstkDebugGeometryModel.h
-  Objects/imstkDynamicObject.h
   Objects/imstkPbdConnectiveTissueConstraintGenerator.h
   Objects/imstkPbdObjectCellRemoval.h
   Objects/imstkSceneObject.h
@@ -53,7 +52,6 @@ set(SRC_FILES
   Objects/imstkAnimationObject.cpp
   Objects/imstkCollisionDataDebugModel.cpp
   Objects/imstkDebugGeometryModel.cpp
-  Objects/imstkDynamicObject.cpp
   Objects/imstkPbdConnectiveTissueConstraintGenerator.cpp
   Objects/imstkPbdObjectCellRemoval.cpp
   Objects/imstkSceneObject.cpp

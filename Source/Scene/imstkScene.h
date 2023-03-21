@@ -19,6 +19,7 @@
 
 namespace imstk
 {
+class AbstractDynamicalSystem;
 class Camera;
 class CameraController;
 class DeviceControl;
@@ -277,6 +278,7 @@ protected:
     std::shared_ptr<SceneConfig> m_config;
 
     std::string m_name; ///< Name of the scene
+    std::unordered_set<std::shared_ptr<AbstractDynamicalSystem>> m_systems;
     std::unordered_set<std::shared_ptr<Entity>> m_sceneEntities;
     std::unordered_map<std::string, std::shared_ptr<Light>> m_lightsMap;
     std::shared_ptr<IblProbe> m_globalIBLProbe = nullptr;
