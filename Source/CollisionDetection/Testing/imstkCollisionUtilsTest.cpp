@@ -140,5 +140,125 @@ TEST(imstkColliosUtilsTest, PlaneToSphere)
     EXPECT_TRUE(sphereContactP.isApprox(Vec3d(0, -4, 0))) << sphereContactP.transpose();
     EXPECT_TRUE(planeContactP.isApprox(Vec3d(0, 0, 0))) << planeContactP.transpose();
 }
+
+TEST(imstkCollisionUtilsTest, ClosestPointOnTriangleTest)
+{
+    // Triangle abc
+    const Vec3d& a = Vec3d(1.0, 0.0, -1.0);
+    const Vec3d& b = Vec3d(-1.0, 0.0, -1.0);
+    const Vec3d& c = Vec3d(0.0, 0.0, 1.0);
+
+    int caseType = -1;
+
+    // Test a
+    // Point pA is closest to a
+    const Vec3d& pA = Vec3d(1.1, 0.0, -1.1);
+
+    const Vec3d trianglePointA = closestPointOnTriangle(pA, a, b, c, caseType);
+
+    ASSERT_EQ(0, caseType);
+    EXPECT_TRUE(trianglePointA.isApprox(a));
+
+    // Test b
+    // Point pB is closest to b
+    const Vec3d& pB = Vec3d(-1.1, 0.0, -1.1);
+    const Vec3d  trianglePointB = closestPointOnTriangle(pB, a, b, c, caseType);
+    ASSERT_EQ(1, caseType);
+    EXPECT_TRUE(trianglePointB.isApprox(b));
+
+    // Test c
+    // Point pC is closest to b
+    const Vec3d& pC = Vec3d(0.0, 0.0, 1.1);
+    const Vec3d  trianglePointC = closestPointOnTriangle(pC, a, b, c, caseType);
+    ASSERT_EQ(2, caseType);
+    EXPECT_TRUE(trianglePointC.isApprox(c));
+
+    // Test edge AB
+    // Point pAB is closest edge AB
+    const Vec3d& pAB = Vec3d(0.0, 0.0, -1.1);
+    const Vec3d  trianglePointAB = closestPointOnTriangle(pAB, a, b, c, caseType);
+    ASSERT_EQ(3, caseType);
+    EXPECT_TRUE(trianglePointAB.isApprox(Vec3d(0.0, 0.0, -1.0)));
+
+    // Test edge BC
+    // Point pBC is closest edge BC
+    const Vec3d& pBC = Vec3d(-1.0, 0.0, 0.0);
+    const Vec3d  trianglePointBC = closestPointOnTriangle(pBC, a, b, c, caseType);
+    ASSERT_EQ(4, caseType);
+
+    // Test edge AC
+    // Point pAC is closest edge AC
+    const Vec3d& pAC = Vec3d(1.0, 0.0, 0.0);
+    const Vec3d  trianglePointAC = closestPointOnTriangle(pAC, a, b, c, caseType);
+    ASSERT_EQ(5, caseType);
+
+    // Test inside triangle
+    // Point pAC is closest edge AC
+    const Vec3d& pCenter = Vec3d(0.1, 0.0, 0.1);
+    const Vec3d  trianglePointCenter = closestPointOnTriangle(pCenter, a, b, c, caseType);
+    ASSERT_EQ(6, caseType);
+    EXPECT_TRUE(trianglePointCenter.isApprox(pCenter));
+}
+
+TEST(imstkCollisionUtilsTest, ClosestPointOnSegment) {
+    Vec3d x1(-1.0, -1.0, -1.0);
+    Vec3d x2(1.0, 1.0, 1.0);
+
+    {
+        SCOPED_TRACE("p==x1");
+        int  caseType = -1;
+        auto result   = closestPointOnSegment(x1, x1, x2, caseType);
+        EXPECT_EQ(2, caseType);
+        EXPECT_TRUE(result.isApprox(x1));
+    }
+
+    {
+        SCOPED_TRACE("p closest to x1");
+        Vec3d p(-2, -4, -2);
+        int   caseType = -1;
+        auto  result   = closestPointOnSegment(p, x1, x2, caseType);
+        EXPECT_EQ(0, caseType);
+        EXPECT_TRUE(result.isApprox(x1));
+    }
+
+    {
+        SCOPED_TRACE("p==x2");
+        int  caseType = -1;
+        auto result   = closestPointOnSegment(x2, x1, x2, caseType);
+        EXPECT_EQ(2, caseType);
+        EXPECT_TRUE(result.isApprox(x2));
+    }
+
+    {
+        SCOPED_TRACE("p closest to x2");
+        Vec3d p(2, 4, 2);
+        int   caseType = -1;
+        auto  result   = closestPointOnSegment(p, x1, x2, caseType);
+        EXPECT_EQ(1, caseType);
+        EXPECT_TRUE(result.isApprox(x2));
+    }
+
+    {
+        SCOPED_TRACE("p is midpoint");
+        int   caseType = -1;
+        Vec3d midPoint = x1 + (x2 - x1) / 2;
+        auto  result   = closestPointOnSegment(midPoint, x1, x2, caseType);
+        EXPECT_EQ(2, caseType);
+        EXPECT_TRUE(result.isApprox(midPoint));
+    }
+
+    {
+        SCOPED_TRACE("p closest to midpoint");
+        int   caseType = -1;
+        Vec3d midPoint = x1 + (x2 - x1) / 2;
+        Vec3d dir      = x2 - x1;
+        Vec3d norm     = dir.cross(Vec3d(1, 0, 0)).normalized();
+        Vec3d p = norm * 2;
+
+        auto result = closestPointOnSegment(p, x1, x2, caseType);
+        EXPECT_EQ(2, caseType);
+        EXPECT_TRUE(result.isApprox(midPoint)) << result.transpose();
+    }
+}
 } // namespace CollisionUtils
 } // namespace imstk

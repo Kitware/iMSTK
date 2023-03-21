@@ -27,13 +27,10 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdMethod> pbdObj) :
         m_obj->getPbdBody()->fixedNodeIds[fixedId]++;
     }
 
-    // Fix dummy vertex
-    m_obj->getPbdBody()->fixedNodeIds.push_back(0);
-
     // Reinitialize to account for new dummy vertex
     m_obj->initialize();
 
-    // Note: maps no longer valid after this point
+    // Note: maps on the PbdMethod are no longer valid after this point
 }
 
 void
@@ -57,8 +54,14 @@ PbdObjectCellRemoval::removeConstraints()
         for (auto j = constraints.begin(); j != constraints.end();)
         {
             const std::vector<PbdParticleId>& vertexIds = (*j)->getParticles();
-            std::unordered_set<int>           constraintVertIds;
-            std::unordered_set<int>           cellVertIds;
+
+            // Dont remove any constraints that do not involve
+            // every node of the cell
+            if (vertexIds.size() < vertsPerCell)
+            {
+                j++;
+                continue;
+            }
 
             // Check that constraint involves this body and get associated vertices
             bool isBody = false;
@@ -71,20 +74,29 @@ PbdObjectCellRemoval::removeConstraints()
                 }
             }
 
+            // Skip if body is not involved
             if (isBody == false)
             {
                 j++;
                 continue;
             }
 
-            // Dont remove any constraints that do not involve every node
-            // of the cell
-            if (vertexIds.size() < vertsPerCell)
+            // Check if the constraint involves ONLY the body of interest
+            // This is used for removing constraints that connect two or more bodies
+            bool isOnlyBody = true;
+            for (int cVertId = 0; cVertId < vertexIds.size(); cVertId++)
             {
-                j++;
-                continue;
+                if (vertexIds[cVertId].first != bodyId)
+                {
+                    isOnlyBody = false;
+                    break;
+                }
             }
 
+            // Sets for comparing constraint vertices to cell vertices
+            std::unordered_set<int> constraintVertIds;
+            std::unordered_set<int> cellVertIds;
+            // Fill in sets
             for (int vertId = 0; vertId < vertsPerCell; vertId++)
             {
                 cellVertIds.insert((*cellVerts)[cellId * vertsPerCell + vertId]);
@@ -95,20 +107,35 @@ PbdObjectCellRemoval::removeConstraints()
                 constraintVertIds.insert(vertexIds[cVertId].second);
             }
 
-            // Check if cell nodes are at subset of the nodes used for the constraint
+            // Check if cell nodes are a subset of the nodes used for the constraint
             bool isSubset = true;
-            for (int cVertId = 0; cVertId < vertexIds.size(); cVertId++)
+            for (const auto& elem : constraintVertIds)
             {
-                for (int vertId = 0; vertId < vertsPerCell; vertId++)
+                if (cellVertIds.find(elem) == cellVertIds.end())
                 {
-                    std::unordered_set<int>::const_iterator indx = constraintVertIds.find((*cellVerts)[cellId * vertsPerCell + vertId]);
-                    if (indx == constraintVertIds.end())
+                    isSubset = false;
+                    break;
+                }
+            }
+
+            // Handle constraints connecting two bodies when an associated cell is deleted.
+            bool isMultiBodyConstraint = false;
+            if (isOnlyBody == false)
+            {
+                for (int cVertId = 0; cVertId < vertexIds.size(); cVertId++)
+                {
+                    if (vertexIds[cVertId].first == bodyId && cellVertIds.find(vertexIds[cVertId].second) != cellVertIds.end())
                     {
-                        isSubset = false;
+                        isMultiBodyConstraint = true;
                     }
                 }
             }
+
             if (isSubset == true)
+            {
+                j = constraintsPtr->eraseConstraint(j);
+            }
+            else if (isMultiBodyConstraint && isSubset == false)
             {
                 j = constraintsPtr->eraseConstraint(j);
             }

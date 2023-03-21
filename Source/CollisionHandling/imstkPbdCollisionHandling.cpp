@@ -4,6 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkAbstractCellMesh.h"
 #include "imstkPbdCollisionHandling.h"
 #include "imstkPbdContactConstraint.h"
 #include "imstkPbdEdgeEdgeCCDConstraint.h"
@@ -192,7 +193,7 @@ PbdCollisionHandling::PbdCollisionHandling()
 
 PbdCollisionHandling::~PbdCollisionHandling()
 {
-    for (const auto ptr: m_constraints)
+    for (const auto ptr: m_collisionConstraints)
     {
         delete ptr;
     }
@@ -273,7 +274,7 @@ PbdCollisionHandling::getDataFromObject(PbdMethod& method, Collider& collider)
     //  A.) Physics geometry == Collision Geometry
     //  B.) A PointwiseMap is used and map should refer us back to physics geometry
     side.geometry = side.pbdMethod->getGeometry().get();
-    side.bodyId   = side.pbdMethod->getPbdBody()->bodyHandle;
+    side.bodyId   = side.pbdMethod->getBodyHandle();
     if (auto map = std::dynamic_pointer_cast<PointwiseMap>(side.pbdMethod->getPhysicsToCollidingMap()))
     {
         side.mapPtr = map.get();
@@ -355,12 +356,8 @@ PbdCollisionHandling::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    // Delete previous constraints
-    for (size_t i = 0; i < m_constraints.size(); i++)
-    {
-        delete m_constraints[i];
-    }
-    m_constraints.clear();
+    // Clear constraints vectors
+    removeCollisionConstraints();
 
     // Break early if no collision elements
     if (elementsA.size() == 0 && elementsB.size() == 0)
@@ -399,9 +396,11 @@ PbdCollisionHandling::handle(
         }
     }
 
-    if (!m_constraints.empty())
+    orderCollisionConstraints();
+
+    if (!m_collisionConstraints.empty())
     {
-        m_objectA.method->getPbdSystem()->getSolver()->addConstraints(&m_constraints);
+        m_objectA.method->getPbdSystem()->getSolver()->addConstraints(&m_collisionConstraints);
     }
 }
 
@@ -498,7 +497,7 @@ PbdCollisionHandling::addConstraint_Body_V(const ColElemSide& sideA, const ColEl
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
-    m_constraints.push_back(constraint);
+    m_constraintBins[BodyVertex].push_back(constraint);
 }
 
 void
@@ -516,7 +515,7 @@ PbdCollisionHandling::addConstraint_Body_E(const ColElemSide& sideA, const ColEl
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
-    m_constraints.push_back(constraint);
+    m_constraintBins[BodyEdge].push_back(constraint);
 }
 
 void
@@ -534,7 +533,7 @@ PbdCollisionHandling::addConstraint_Body_T(const ColElemSide& sideA, const ColEl
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
-    m_constraints.push_back(constraint);
+    m_constraintBins[BodyTriangle].push_back(constraint);
 }
 
 void
@@ -561,7 +560,7 @@ PbdCollisionHandling::addConstraint_Body_Body(const ColElemSide& sideA, const Co
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
-    m_constraints.push_back(constraint);
+    m_constraintBins[BodyBody].push_back(constraint);
 }
 
 void
@@ -577,7 +576,7 @@ PbdCollisionHandling::addConstraint_V_T(const ColElemSide& sideA, const ColElemS
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
-    m_constraints.push_back(constraint);
+    m_constraintBins[VertexTriangle].push_back(constraint);
 }
 
 void
@@ -593,7 +592,7 @@ PbdCollisionHandling::addConstraint_E_E(const ColElemSide& sideA, const ColElemS
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
-    m_constraints.push_back(constraint);
+    m_constraintBins[EdgeEdge].push_back(constraint);
 }
 
 void
@@ -617,7 +616,7 @@ PbdCollisionHandling::addConstraint_E_E_CCD(
         m_ccdSubsteps);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
-    m_constraints.push_back(constraint);
+    m_constraintBins[EdgeEdgeCCD].push_back(constraint);
 }
 
 void
@@ -633,7 +632,7 @@ PbdCollisionHandling::addConstraint_V_E(const ColElemSide& sideA, const ColElemS
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
-    m_constraints.push_back(constraint);
+    m_constraintBins[VertexEdge].push_back(constraint);
 }
 
 void
@@ -682,6 +681,40 @@ PbdCollisionHandling::addConstraint_V_V(const ColElemSide& sideA, const ColElemS
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
-    m_constraints.push_back(constraint);
+    m_constraintBins[VertexVertex].push_back(constraint);
+}
+
+void
+PbdCollisionHandling::removeCollisionConstraints()
+{
+    // Remove constraints without actually clearing
+    // There could be a large variance in constraints/contacts count,
+    // 10s to 100s of constraints changing frequently over few frames.
+    for (int i = 0; i < NumTypes; i++)
+    {
+        for (size_t j = 0; j < m_constraintBins[i].size(); j++)
+        {
+            delete  m_constraintBins[i][j];
+        }
+        m_constraintBins[i].resize(0);
+    }
+
+    // Delete the pointers from the above constraints and resize collision constraint bin
+    for (size_t i = 0; i < m_collisionConstraints.size(); i++)
+    {
+        delete  m_collisionConstraints[i];
+    }
+    m_collisionConstraints.resize(0);
+}
+
+void
+PbdCollisionHandling::orderCollisionConstraints()
+{
+    // Add constraints from bins to constraints vector for solver
+    for (int i = 0; i < NumTypes; i++)
+    {
+        m_collisionConstraints.insert(m_collisionConstraints.end(), m_constraintBins[i].begin(), m_constraintBins[i].end());
+        m_constraintBins[i].resize(0);
+    }
 }
 } // namespace imstk

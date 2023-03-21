@@ -50,6 +50,19 @@ PbdObjectController::update(const double& dt)
     // "A Modular Haptic Rendering Algorithm for Stable and Transparent 6 - DOF Manipulation"
     if (m_deviceClient->getTrackingEnabled() && m_useSpring)
     {
+        // Move the virtual tool to the physical tool position on the first call
+        if (m_firstRun)
+        {
+            m_firstRun = false;
+            // Zero out external force/torque
+            m_controlledObject->getPbdBody()->externalForce  = Vec3d(0.0, 0.0, 0.0);
+            m_controlledObject->getPbdBody()->externalTorque = Vec3d(0.0, 0.0, 0.0);
+            // Directly set position/rotation
+            (*m_controlledObject->getPbdBody()->vertices)[0]     = getPosition();
+            (*m_controlledObject->getPbdBody()->orientations)[0] = getOrientation();
+            return;
+        }
+
         const Vec3d& currPos = (*m_controlledObject->getPbdBody()->vertices)[0];
         const Quatd& currOrientation     = (*m_controlledObject->getPbdBody()->orientations)[0];
         const Vec3d& currVelocity        = (*m_controlledObject->getPbdBody()->velocities)[0];
@@ -67,7 +80,7 @@ PbdObjectController::update(const double& dt)
             const double mass     = (*m_controlledObject->getPbdBody()->masses)[0];
             const double linearKs = m_linearKs.maxCoeff();
 
-            const double fudge = 1.05; ///< Slightly overdamp to account for numerical error with forward euler integration
+            const double fudge = 1.00;  ///< Slightly overdamp to account for numerical error with forward euler integration
             m_linearKd = 2.0 * std::sqrt(mass * linearKs) * fudge;
 
             const Mat3d inertia = (*m_controlledObject->getPbdBody()->inertias)[0];
@@ -85,7 +98,7 @@ PbdObjectController::update(const double& dt)
         // If kd > 2 * sqrt(mass * ks); The system is overdamped (may be intentional)
         // If kd < 2 * sqrt(mass * ks); The system is underdamped (never intended)
 
-        // Uses non-relative force
+        // Uses non-relative velocity
         {
             // Compute force
             m_fS = m_linearKs.cwiseProduct(devicePos - currPos - hapticOffsetLocal);
@@ -140,36 +153,29 @@ PbdObjectController::update(const double& dt)
 void
 PbdObjectController::applyForces()
 {
-    if (!m_deviceClient->getButton(0))
+    // Apply force back to device
+    if (m_controlledObject && m_useSpring)
     {
-        // Apply force back to device
-        if (m_controlledObject != nullptr && m_useSpring)
+        const Vec3d force = -getDeviceForce();
+        if (m_forceSmoothening)
         {
-            const Vec3d force = -getDeviceForce();
-            if (m_forceSmoothening)
+            m_forces.push_back(force);
+            m_forceSum += force;
+            if (static_cast<int>(m_forces.size()) > m_smoothingKernelSize)
             {
-                m_forces.push_back(force);
-                m_forceSum += force;
-                if (static_cast<int>(m_forces.size()) > m_smoothingKernelSize)
-                {
-                    m_forceSum -= m_forces.front();
-                    m_forces.pop_front();
-                }
-                const Vec3d avgForce = m_forceSum / m_forces.size();
+                m_forceSum -= m_forces.front();
+                m_forces.pop_front();
+            }
+            const Vec3d avgForce = m_forceSum / m_forces.size();
 
-                // Render only the spring force (not the other forces the body has)
-                m_deviceClient->setForce(avgForce);
-            }
-            else
-            {
-                // Render only the spring force (not the other forces the body has)
-                m_deviceClient->setForce(force);
-            }
+            // Render only the spring force (not the other forces the body has)
+            m_deviceClient->setForce(avgForce);
         }
-    }
-    else
-    {
-        m_deviceClient->setForce(Vec3d(0.0, 0.0, 0.0));
+        else
+        {
+            // Render only the spring force (not the other forces the body has)
+            m_deviceClient->setForce(force);
+        }
     }
 }
 } // namespace imstk

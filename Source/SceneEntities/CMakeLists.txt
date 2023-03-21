@@ -13,6 +13,7 @@ set(H_FILES
   Components/imstkBurner.h
   Components/imstkSceneUtils.h
   Components/imstkTearable.h
+  Components/imstkTextVisualModel.h
   Components/imstkVisualModel.h
   Components/imstkVertexLabelVisualModel.h
   Lights/imstkDirectionalLight.h

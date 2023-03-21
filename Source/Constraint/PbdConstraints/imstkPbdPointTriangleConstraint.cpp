@@ -33,26 +33,10 @@ PbdPointTriangleConstraint::computeValueAndGradient(
     const Vec3d& x3 = bodies.getPosition(m_particles[3]);
 
     // Compute barycentric coordinates u,v,w
-    const Vec3d  v0    = x2 - x1;
-    const Vec3d  v1    = x3 - x1;
-    const Vec3d  v2    = x0 - x1;
-    const double d00   = v0.dot(v0);
-    const double d01   = v0.dot(v1);
-    const double d11   = v1.dot(v1);
-    const double d20   = v2.dot(v0);
-    const double d21   = v2.dot(v1);
-    const double denom = d00 * d11 - d01 * d01;
-    if (fabs(denom) < 1e-12)
-    {
-        c = 0.0;
-        return false;
-    }
-    const double v = (d11 * d20 - d01 * d21) / denom;
-    const double w = (d00 * d21 - d01 * d20) / denom;
-    const double u = 1.0 - v - w;
+    const Vec3d bary = baryCentric(x0, x1, x2, x3);
 
     // This constraint becomes invalid if moved out of the triangle
-    if (u < 0.0 || v < 0.0 || w < 0.0)
+    if (bary[0] < 0.0 || bary[1] < 0.0 || bary[2] < 0.0)
     {
         c = 0.0;
         return false;
@@ -62,7 +46,7 @@ PbdPointTriangleConstraint::computeValueAndGradient(
     if (!m_enableBoundaryCollisions)
     {
         int maxId = 0;
-        Vec3d(u, v, w).maxCoeff(&maxId);
+        bary.maxCoeff(&maxId);
         // +1 as first particle is from other body (vertex)
         if (bodies.getInvMass(m_particles[maxId + 1]) == 0.0)
         {
@@ -71,17 +55,17 @@ PbdPointTriangleConstraint::computeValueAndGradient(
         }
     }
 
-    // Triangle normal (pointing up on standard counter clockwise triangle)
-    const Vec3d n = v0.cross(v1).normalized();
+    // Triangle normal (pointing up on counter clockwise triangle)
+    const Vec3d n = (x2 - x1).cross(x3 - x1).normalized();
     // Point could be on either side of triangle, we want to resolve to the triangles plane
-    const double l = v2.dot(n);
+    const double l = (x0 - x1).dot(n);
 
     // A
     dcdx[0] = -n;
     // B
-    dcdx[1] = u * n;
-    dcdx[2] = v * n;
-    dcdx[3] = w * n;
+    dcdx[1] = bary[0] * n;
+    dcdx[2] = bary[1] * n;
+    dcdx[3] = bary[2] * n;
 
     c = l;
 

@@ -17,11 +17,12 @@
 namespace imstk
 {
 PbdSystem::PbdSystem() : AbstractDynamicalSystem(DynamicalModelType::PositionBasedDynamics),
-    m_config(std::make_shared<PbdSystemConfig>())
+    m_config(std::make_shared<PbdSystemConfig>()),
+    m_constraints(std::make_shared<PbdConstraintContainer>())
 {
     // Add a virtual particle buffer, cleared every frame
     addBody();
-    // Add a virtual particle buffer, persistant
+    // Add a virtual particle buffer, persistent
     addBody();
 
     m_validGeometryTypes = {
@@ -180,8 +181,6 @@ PbdSystem::initialize()
 
     // Initialize constraints
     {
-        m_constraints = std::make_shared<PbdConstraintContainer>();
-
         m_config->computeElasticConstants();
 
         // Run all the functors to generate the constraints
@@ -288,9 +287,13 @@ PbdSystem::integratePosition(PbdBody& body)
         {
             if (std::abs(invMasses[i]) > 0.0)
             {
-                const Vec3d accel = m_config->m_gravity + body.externalForce * invMasses[i];
-                vel[i]    += accel * dt;
-                vel[i]    *= linearVelocityDamp;
+                const Vec3d accel = static_cast<double>(body.bodyGravity) * m_config->m_gravity + body.externalForce * invMasses[i];
+                vel[i] += accel * dt;
+                vel[i] *= linearVelocityDamp;
+
+                // Cap velocity to increase stability
+                vel[i] = vel[i].cwiseMax(-m_velocityThreshold).cwiseMin(m_velocityThreshold);
+
                 prevPos[i] = pos[i];
                 pos[i]    += vel[i] * dt;
             }
@@ -323,6 +326,9 @@ PbdSystem::integratePosition(PbdBody& body)
                     w += dt * accel;
                     w *= angularVelocityDamp;
                     prevOrientations[i] = orientations[i];
+
+                    // Cap angular velocity to increase stability (uses same value as linear in rad/sec)
+                    w.cwiseMax(-m_velocityThreshold).cwiseMin(m_velocityThreshold);
 
                     // Limit on rotation
                     double scale     = dt;

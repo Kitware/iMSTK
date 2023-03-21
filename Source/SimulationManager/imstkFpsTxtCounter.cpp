@@ -35,7 +35,7 @@ FpsTxtCounter::init()
 }
 
 void
-FpsTxtCounter::visualUpdate(const double&)
+FpsTxtCounter::visualUpdate(const double& dt)
 {
     std::shared_ptr<Viewer> viewer    = m_viewer.lock();
     const int               infoLevel = viewer->getInfoLevel();
@@ -52,16 +52,19 @@ FpsTxtCounter::visualUpdate(const double&)
     }
     m_prevInfoLevel = infoLevel;
 
+    m_lastUpdate += dt;
+
     // Only update when visible
-    if (m_fpsTextVisualModel->getVisibility())
+    if (m_fpsTextVisualModel->getVisibility() && m_lastUpdate > m_fpsUpdateDelay)
     {
         std::shared_ptr<SceneManager> sceneManager = m_sceneManager.lock();
 
         std::string fpsVisualStr = "V: " +
                                    std::to_string(static_cast<int>(viewer->getVisualFps())) + " | " +
                                    "P: " +
-                                   std::to_string(static_cast<int>(sceneManager->getActiveScene()->getFPS()));
+                                   std::to_string(sceneManager->getActiveScene()->getFrameTime() * 1000.0) + " ms";
         m_fpsTextVisualModel->setText(fpsVisualStr);
+        m_lastUpdate = 0.0;
     }
 }
 } // namespace imstk

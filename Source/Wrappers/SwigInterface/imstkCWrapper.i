@@ -6,6 +6,18 @@
 
 %module(directors="1") Utils
 #pragma SWIG nowarn=302,314,317,401,476,501,503,505,516,844,
+/*
+302. Identifier 'name' redefined (ignored).
+314. 'identifier' is a lang keyword.
+317. Specialization of non-template 'name'.
+401. Nothing known about class 'name'. Ignored.
+476. Initialization using std::initializer_list.
+501. Overloaded declaration ignored. decl. Previous declaration is decl.
+503. Can't wrap 'identifier' unless renamed to a valid identifier.
+505. Variable length arguments discarded.
+516. Overloaded method declaration ignored, using declaration instead.
+844. C# exception may not be thrown - no $excode or excode attribute in typemap typemap. (C#).
+*/
 %{
 /* Common */
 #include "imstkMacros.h"
@@ -75,6 +87,7 @@
 #include "imstkSurfaceMeshSmoothen.h"
 #include "imstkSurfaceMeshSubdivide.h"
 #include "imstkSurfaceMeshTextureProject.h"
+#include "imstkCleanMesh.h"
 
 /* 
  * MeshIO 
@@ -85,12 +98,12 @@
  * DynamicalModel 
  */
 #include "imstkPbdConstraint.h"
-#include "imstkAbstractDynamicalModel.h"
+#include "imstkPbdConstraintContainer.h"
+#include "imstkPbdConstraintFunctor.h"
 #include "imstkDynamicalModel.h"
-#include "imstkPbdModelConfig.h"
+#include "imstkPbdSystemConfig.h"
 #include "imstkPbdSystem.h"
-#include "imstkPbdStrainEnergyConstraint.h"
-#include "imstkPbdCollisionConstraint.h"
+
 #include "imstkSphBoundaryConditions.h"
 #include "imstkSphState.h"
 #include "imstkSphModel.h"
@@ -106,6 +119,9 @@
  */
 #include "imstkPbdBody.h"
 #include "imstkPbdConstraint.h"
+#include "imstkPbdCollisionConstraint.h"
+#include "imstkPbdDistanceConstraint.h"
+#include "imstkPbdStrainEnergyConstraint.h"
 
 /*
  * ComponentModel
@@ -120,7 +136,7 @@
 #include "imstkSceneObject.h"
 #include "imstkDynamicObject.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
-#include "imstkPbdObject.h"
+#include "imstkPbdMethod.h"
 #include "imstkPbdObjectCellRemoval.h"
 #include "imstkTearable.h"
 #include "imstkBurnable.h"
@@ -256,6 +272,7 @@ namespace std
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
   %template(VectorPbdBody) vector<imstk::PbdBody>;
   %template(VectorString) vector<std::string>;
+  %template(IntPair) pair<int, int>;
 }
 
 %include <std_except.i>
@@ -343,6 +360,7 @@ namespace std
 %include "../../Filtering/imstkSurfaceMeshSmoothen.h"
 %include "../../Filtering/imstkSurfaceMeshSubdivide.h"
 %include "../../Filtering/imstkSurfaceMeshTextureProject.h"
+%include "../../Filtering/imstkCleanMesh.h"
 
 /*
  * MeshIO
@@ -358,20 +376,20 @@ namespace std
  */
 %include "../../Constraint/PbdConstraints/imstkPbdBody.h"
 %include "../../Constraint/PbdConstraints/imstkPbdConstraint.h"
+%include "../../Constraint/PbdConstraints/imstkPbdConstraintContainer.h"
 %include "../../Constraint/PbdConstraints/imstkPbdCollisionConstraint.h"
+%include "../../Constraint/PbdConstraints/imstkPbdDistanceConstraint.h"
 %include "../../Constraint/PbdConstraints/imstkPbdStrainEnergyConstraint.h"
 
 /*
  * DynamicalModel
  */
-%include "../../DynamicalModels/ObjectModels/imstkAbstractDynamicalModel.h"
-%include "../../DynamicalModels/ObjectModels/imstkDynamicalModel.h"
-%include "../../DynamicalModels/ObjectModels/imstkPbdModelConfig.h"
+%include "../../DynamicalModels/ObjectModels/imstkAbstractDynamicalSystem.h"
+%include "../../DynamicalModels/ObjectModels/imstkPbdSystemConfig.h"
 %include "../../DynamicalModels/ObjectModels/imstkPbdSystem.h"
-// %template(DynamicalModelFeDeformBodyState) imstk::DynamicalModel<imstk::FeDeformBodyState>;
 %include "../../DynamicalModels/ObjectModels/imstkSphBoundaryConditions.h"
 %include "../../DynamicalModels/ObjectStates/imstkSphState.h"
-%template(DynamicalModelSphState) imstk::DynamicalModel<imstk::SphState>;
+//%template(DynamicalModelSphState) imstk::DynamicalModel<imstk::SphState>;
 %include "../../DynamicalModels/ObjectModels/imstkSphModel.h"
 
 /* 
@@ -385,6 +403,7 @@ namespace std
  */
 %include "../../ComponentModel/imstkEntity.h"
 %include "../../ComponentModel/imstkComponent.h"
+
 /*
  * SceneEntities
  */
@@ -395,10 +414,10 @@ namespace std
 %include "../../SceneEntities/Components/imstkBurnable.h";
 %include "../../SceneEntities/Components/imstkBurner.h";
 %include "../../SceneEntities/Components/imstkVisualModel.h";
+%include "../../SceneEntities/Components/imstkPbdMethod.h";
 %include "../../SceneEntities/Objects/imstkSceneObject.h";
 %include "../../SceneEntities/Objects/imstkDynamicObject.h";
 %include "../../SceneEntities/Objects/imstkPbdConnectiveTissueConstraintGenerator.h";
-%include "../../SceneEntities/Objects/imstkPbdObject.h";
 %include "../../SceneEntities/Objects/imstkPbdObjectCellRemoval.h";
 %include "../../SceneEntities/Objects/imstkSphObject.h";
 %include "../../SceneEntities/Camera/imstkCamera.h";

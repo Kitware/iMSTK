@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "imstkAccumulationBuffer.h"
 #include "imstkEventObject.h"
 #include "imstkMath.h"
 
@@ -248,6 +249,8 @@ public:
     ///
     double getFPS() const { return m_fps; }
 
+    double getFrameTime() const { return m_frameTimes.getAverage(); }
+
     ///
     /// \brief Get the total scene time passed (accumulated deltatime)
     ///
@@ -288,6 +291,7 @@ protected:
     std::shared_ptr<ParallelUtils::SpinLock> m_computeTimesLock;
     std::unordered_map<std::string, double>  m_nodeComputeTimes; ///< Map of ComputeNode names to elapsed times for benchmarking
 
+    AccumulationBuffer<double> m_frameTimes = AccumulationBuffer<double>(1024);
     double m_fps       = 0.0;
     double m_sceneTime = 0.0; ///< Scene time/simulation total time, updated at the end of scene update
 

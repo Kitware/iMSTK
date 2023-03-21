@@ -245,6 +245,9 @@ struct PbdBody
         /// Mass properties, not used if per vertex masses are given in geometry attributes
         double uniformMassValue = 1.0;
 
+        /// Switch to activate/deactivate gravity for this Pbd Body. 1 is gravity on, 0 is gravity off
+        bool bodyGravity = true;
+
         Vec3d externalForce  = Vec3d::Zero();
         Vec3d externalTorque = Vec3d::Zero();
 
