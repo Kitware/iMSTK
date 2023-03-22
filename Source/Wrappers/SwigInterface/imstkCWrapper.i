@@ -95,18 +95,18 @@
 #include "imstkMeshIO.h"
 
 /* 
- * DynamicalModel 
+ * DynamicalSystem 
  */
 #include "imstkPbdConstraint.h"
 #include "imstkPbdConstraintContainer.h"
 #include "imstkPbdConstraintFunctor.h"
-#include "imstkDynamicalModel.h"
+#include "imstkDynamicalSystem.h"
 #include "imstkPbdSystemConfig.h"
 #include "imstkPbdSystem.h"
 
 #include "imstkSphBoundaryConditions.h"
 #include "imstkSphState.h"
-#include "imstkSphModel.h"
+#include "imstkSphSystem.h"
 
 /* 
  * Rendering
@@ -132,20 +132,20 @@
 /* 
  * SceneEntities
  */
+#include "imstkBurnable.h"
+#include "imstkBurner.h"
+#include "imstkCamera.h"
 #include "imstkCollider.h"
-#include "imstkSceneObject.h"
-#include "imstkDynamicObject.h"
+#include "imstkDirectionalLight.h"
+#include "imstkLevelSetMethod.h"
+#include "imstkLight.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
 #include "imstkPbdMethod.h"
 #include "imstkPbdObjectCellRemoval.h"
+#include "imstkSceneObject.h"
+#include "imstkSphMethod.h"
 #include "imstkTearable.h"
-#include "imstkBurnable.h"
-#include "imstkBurner.h"
 #include "imstkVisualModel.h"
-#include "imstkCamera.h"
-#include "imstkLight.h"
-#include "imstkDirectionalLight.h"
-#include "imstkSphObject.h"
 
 /*
  * CollisionDetection
@@ -382,15 +382,15 @@ namespace std
 %include "../../Constraint/PbdConstraints/imstkPbdStrainEnergyConstraint.h"
 
 /*
- * DynamicalModel
+ * DynamicalSystem
  */
-%include "../../DynamicalModels/ObjectModels/imstkAbstractDynamicalSystem.h"
-%include "../../DynamicalModels/ObjectModels/imstkPbdSystemConfig.h"
-%include "../../DynamicalModels/ObjectModels/imstkPbdSystem.h"
-%include "../../DynamicalModels/ObjectModels/imstkSphBoundaryConditions.h"
-%include "../../DynamicalModels/ObjectStates/imstkSphState.h"
+%include "../../DynamicalSystems/imstkAbstractDynamicalSystem.h"
+%include "../../DynamicalSystems/imstkPbdSystemConfig.h"
+%include "../../DynamicalSystems/imstkPbdSystem.h"
+%include "../../DynamicalSystems/imstkSphBoundaryConditions.h"
+%include "../../DynamicalSystems/imstkSphState.h"
 //%template(DynamicalModelSphState) imstk::DynamicalModel<imstk::SphState>;
-%include "../../DynamicalModels/ObjectModels/imstkSphModel.h"
+%include "../../DynamicalSystems/imstkSphSystem.h"
 
 /* 
  * Rendering 
@@ -410,16 +410,16 @@ namespace std
 %include "../../SceneEntities/Components/imstkCollider.h"
 %template(addComponentCollider) imstk::Entity::addComponent<imstk::Collider>;
 %template(getComponentCollider) imstk::Entity::getComponent<imstk::Collider>;
-%include "../../SceneEntities/Components/imstkTearable.h";
 %include "../../SceneEntities/Components/imstkBurnable.h";
 %include "../../SceneEntities/Components/imstkBurner.h";
-%include "../../SceneEntities/Components/imstkVisualModel.h";
+%include "../../SceneEntities/Components/imstkLevelSetMethod.h";
 %include "../../SceneEntities/Components/imstkPbdMethod.h";
+%include "../../SceneEntities/Components/imstkSphMethod.h";
+%include "../../SceneEntities/Components/imstkTearable.h";
+%include "../../SceneEntities/Components/imstkVisualModel.h";
 %include "../../SceneEntities/Objects/imstkSceneObject.h";
-%include "../../SceneEntities/Objects/imstkDynamicObject.h";
 %include "../../SceneEntities/Objects/imstkPbdConnectiveTissueConstraintGenerator.h";
 %include "../../SceneEntities/Objects/imstkPbdObjectCellRemoval.h";
-%include "../../SceneEntities/Objects/imstkSphObject.h";
 %include "../../SceneEntities/Camera/imstkCamera.h";
 %include "../../SceneEntities/Lights/imstkLight.h";
 %include "../../SceneEntities/Lights/imstkDirectionalLight.h";
