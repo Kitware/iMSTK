@@ -102,7 +102,7 @@ private:
     double* m_kernelWeights = nullptr;
 
     std::shared_ptr<LevelSetSystem> m_levelSetObject;
-    std::shared_ptr<Collider>      m_levelSetCollider;
+    std::shared_ptr<Collider>       m_levelSetCollider;
 
     std::shared_ptr<PbdMethod> m_rigidPhysics;
     std::shared_ptr<Collider>  m_rigidCollider;

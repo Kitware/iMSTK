@@ -11,7 +11,6 @@
 
 namespace imstk
 {
-
 LevelSetMethod::LevelSetMethod(const std::string& name) : SceneBehaviour(name)
 {
     const std::string prefix = getTypeName() + "_" + m_name;
@@ -56,7 +55,6 @@ LevelSetMethod::updateGeometries()
 {
     updatePhysicsGeometry();
 
-    // SceneObject::updateGeometries();
     if (m_physicsToCollidingGeomMap)
     {
         m_physicsToCollidingGeomMap->update();
@@ -113,5 +111,4 @@ LevelSetMethod::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr
     }
     m_taskGraph->addEdge(m_updateGeometryNode, sink);
 }
-
 } // namespace imstk

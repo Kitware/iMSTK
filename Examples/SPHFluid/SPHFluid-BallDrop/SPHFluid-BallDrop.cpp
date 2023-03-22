@@ -65,7 +65,7 @@ main(int argc, char* argv[])
     imstkNew<Scene> scene("SPH Fluid");
 
     // Generate fluid and solid objects
-    std::shared_ptr<Entity>           fluidObj    = generateFluid(particleRadius);
+    std::shared_ptr<Entity>              fluidObj = generateFluid(particleRadius);
     std::vector<std::shared_ptr<Entity>> solids   = generateSolids(scene);
 
     scene->addSceneObject(fluidObj);
@@ -116,7 +116,7 @@ main(int argc, char* argv[])
         txtStatus->setFontSize(30);
         txtStatus->setTextColor(Color::Red);
         connect<Event>(viewer, &VTKViewer::preUpdate,
-            [=](Event*)
+            [ = ](Event*)
             {
                 txtStatus->setText("Number of particles: " +
                     std::to_string(fluidObj->getComponent<SphMethod>()->getSphSystem()->getCurrentState()->getNumParticles()) +

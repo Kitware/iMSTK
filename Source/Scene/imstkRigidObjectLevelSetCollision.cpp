@@ -225,7 +225,7 @@ RigidObjectLevelSetCollision::measureDisplacementFromPrevious()
     if (pointSet && displacements)
     {
         auto& displacementsArr = *displacements;
-        auto& vertices     = *pointSet->getVertexPositions();
+        auto& vertices = *pointSet->getVertexPositions();
 
         ParallelUtils::parallelFor(displacements->size(),
             [&](const int i)

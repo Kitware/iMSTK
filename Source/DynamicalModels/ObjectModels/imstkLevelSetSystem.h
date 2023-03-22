@@ -97,7 +97,7 @@ protected:
     std::unordered_map<size_t, std::tuple<Vec3i, double>> m_nodesToUpdate;
     std::vector<std::tuple<size_t, Vec3i, double, Vec2d, double>> m_nodeUpdatePool;
     size_t noteUpdatePoolSize;
-    size_t m_maxVelocitiesParallel = 100;                      // In sparse mode, if surpass this value, switch to parallel
+    size_t m_maxVelocitiesParallel = 100;            // In sparse mode, if surpass this value, switch to parallel
 
     std::shared_ptr<ImageData> m_gradientMagnitudes; ///< Gradient magnitude field when using dense
     std::shared_ptr<ImageData> m_velocities;

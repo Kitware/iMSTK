@@ -88,7 +88,8 @@ makeCuttingTool(const std::string& name)
     return cuttingTool;
 }
 
-std::shared_ptr<Entity> makeFemurEntity()
+std::shared_ptr<Entity>
+makeFemurEntity()
 {
     auto femurEntity = std::make_shared<Entity>("Femur");
     auto femurMethod = std::make_shared<FemurObject>();
@@ -159,7 +160,7 @@ main()
         std::shared_ptr<DeviceClient> deviceClient = hapticManager->makeDeviceClient();
 #else
         auto deviceClient = std::make_shared<DummyClient>();
-        connect<Event>(sceneManager, &SceneManager::postUpdate, [=](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [ = ](Event*)
             {
                 const Vec2d mousePos = viewer->getMouseDevice()->getPos();
                 const Vec3d worldPos = Vec3d(mousePos[0] * 0.5 - 0.5, mousePos[1] * 0.2 + 0.1, -0.025);
@@ -174,11 +175,11 @@ main()
         ghostObj->setController(controller);
 
         auto cuttingToolMethod = cuttingTool->getComponent<PbdMethod>();
-        auto femurBoneMethod = femurBone->getComponent<LevelSetMethod>();
+        auto femurBoneMethod   = femurBone->getComponent<LevelSetMethod>();
         connect<Event>(sceneManager, &SceneManager::preUpdate,
-            [=](Event*)
+            [ = ](Event*)
             {
-                cuttingToolMethod->getPbdSystem()->getConfig()->m_dt = sceneManager->getDt();
+                cuttingToolMethod->getPbdSystem()->getConfig()->m_dt    = sceneManager->getDt();
                 femurBoneMethod->getLevelSetSystem()->getConfig()->m_dt = sceneManager->getDt();
             });
 

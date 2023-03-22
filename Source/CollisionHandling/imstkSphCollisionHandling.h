@@ -35,7 +35,7 @@ public:
     void setInputSphObject(std::shared_ptr<SphMethod> sphObj, std::shared_ptr<Collider> collider)
     {
         m_sphMethod = sphObj;
-        m_collider = collider;
+        m_collider  = collider;
     }
 
     ///
@@ -76,7 +76,7 @@ private:
     double m_boundaryFriction = 0.0;
 
     std::shared_ptr<SphMethod> m_sphMethod;
-    std::shared_ptr<Collider> m_collider;
+    std::shared_ptr<Collider>  m_collider;
     std::shared_ptr<SphSystem> m_sphSystem;
 };
 } // end namespace imstk

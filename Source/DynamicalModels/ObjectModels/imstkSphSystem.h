@@ -247,12 +247,12 @@ protected:
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
 
-    double m_dt = 0.0;                                  ///< time step size
-    double m_defaultDt;                                 ///< default time step size
+    double m_dt = 0.0;                                   ///< time step size
+    double m_defaultDt;                                  ///< default time step size
 
-    SphSimulationKernels m_kernels;                     ///< SPH kernels (must be initialized during model initialization)
+    SphSimulationKernels m_kernels;                      ///< SPH kernels (must be initialized during model initialization)
     std::shared_ptr<SphSystemConfig> m_modelParameters;  ///< SPH Model parameters (must be set before simulation)
-    std::shared_ptr<NeighborSearch> m_neighborSearcher; ///< Neighbor Search (must be initialized during model initialization)
+    std::shared_ptr<NeighborSearch>  m_neighborSearcher; ///< Neighbor Search (must be initialized during model initialization)
 
     std::shared_ptr<VecDataArray<double, 3>> m_pressureAccels       = nullptr;
     std::shared_ptr<VecDataArray<double, 3>> m_surfaceTensionAccels = nullptr;

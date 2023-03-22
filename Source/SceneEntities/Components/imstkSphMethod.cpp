@@ -95,20 +95,6 @@ SphMethod::postModifiedAll()
     {
         m_physicsGeometry->postModified();
     }
-
-    /*
-    // Assume geometry may be changed upon reset
-    for (auto comp : m_components)
-    {
-        if (auto visualModel = std::dynamic_pointer_cast<VisualModel>(comp))
-        {
-            if (visualModel->getGeometry() != nullptr)
-            {
-                visualModel->getGeometry()->postModified();
-            }
-        }
-    }
-    */
 }
 
 void

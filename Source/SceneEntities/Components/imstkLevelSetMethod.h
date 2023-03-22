@@ -53,7 +53,6 @@ public:
     ///
     std::shared_ptr<TaskNode> getUpdateGeometryNode() const { return m_updateGeometryNode; }
 
-
     ///
     /// \brief Update the physics geometry and the apply the maps (if defined)
     ///
@@ -63,7 +62,6 @@ public:
     /// \brief Reset the dynamic object by reseting the respective DynamicalSystem and Geometry
     ///
     void reset();
-
 
 private:
     void init() override;
@@ -83,6 +81,5 @@ private:
 
     std::shared_ptr<TaskNode> m_updateNode;
     std::shared_ptr<TaskNode> m_updateGeometryNode;
-
 };
 } // namespace imstk
