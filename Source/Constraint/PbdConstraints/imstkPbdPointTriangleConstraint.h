@@ -22,6 +22,8 @@ public:
     PbdPointTriangleConstraint() : PbdCollisionConstraint(1, 3) { }
     ~PbdPointTriangleConstraint() override = default;
 
+    IMSTK_TYPE_NAME(PbdTriangleConstraint)
+
 public:
     ///
     /// \brief Initialize the constraint

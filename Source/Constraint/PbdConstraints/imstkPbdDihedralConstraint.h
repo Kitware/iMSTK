@@ -20,6 +20,8 @@ class PbdDihedralConstraint : public PbdConstraint
 public:
     PbdDihedralConstraint() : PbdConstraint(4) { }
 
+    IMSTK_TYPE_NAME(PbdDihedralConstraint)
+
     /**
       \brief initConstraint
              p3

@@ -5,7 +5,6 @@
 */
 
 #include "imstkRbdDistanceConstraint.h"
-#include "imstkMacros.h"
 
 namespace imstk
 {

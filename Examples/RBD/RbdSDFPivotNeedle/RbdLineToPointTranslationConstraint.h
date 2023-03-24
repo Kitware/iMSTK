@@ -30,6 +30,8 @@ public:
 
     ~RbdLineToPointTranslationConstraint() override = default;
 
+    IMSTK_TYPE_NAME(RbdLineToPointTranslationConstraint)
+
 public:
     void compute(double dt) override
     {

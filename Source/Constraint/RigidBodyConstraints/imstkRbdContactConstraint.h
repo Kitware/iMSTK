@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkRbdConstraint.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -32,6 +33,8 @@ public:
     }
 
     ~RbdContactConstraint() override = default;
+
+    IMSTK_TYPE_NAME(RbdContactConstraint);
 
 public:
     void compute(double dt) override;

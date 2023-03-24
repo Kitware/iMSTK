@@ -31,6 +31,8 @@ public:
 
     ~RbdAxesLockingConstraint() override = default;
 
+    IMSTK_TYPE_NAME(RbdAxesLockingConstraint)
+
 public:
     void compute(double dt) override
     {

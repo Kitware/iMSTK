@@ -19,6 +19,8 @@ public:
     PbdRigidBaryPointToPointConstraint(std::shared_ptr<RigidBody> obj1);
     ~PbdRigidBaryPointToPointConstraint() override = default;
 
+    IMSTK_TYPE_NAME(PbdRigidBaryPointToPointConstraint);
+
     ///
     /// \brief Compute value and gradient of constraint function
     /// \param[inout] set of bodies involved in system

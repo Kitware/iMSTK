@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkRbdConstraint.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -26,6 +27,8 @@ public:
         double dist,
         const Side side = Side::AB);
     ~RbdDistanceConstraint() override = default;
+
+    IMSTK_TYPE_NAME(RbdDistanceConstraint);
 
 public:
     void compute(double dt) override;

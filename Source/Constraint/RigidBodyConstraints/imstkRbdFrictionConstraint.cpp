@@ -5,7 +5,6 @@
 */
 
 #include "imstkRbdFrictionConstraint.h"
-#include "imstkMacros.h"
 
 namespace imstk
 {

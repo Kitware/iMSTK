@@ -30,6 +30,8 @@ class PbdCollisionConstraint : public PbdConstraint
 public:
     ~PbdCollisionConstraint() override = default;
 
+    IMSTK_TYPE_NAME(PbdCollisionConstraint)
+
 public:
     ///
     /// \brief Get/Set stiffness A or B

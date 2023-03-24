@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkRbdConstraint.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {
@@ -27,6 +28,8 @@ public:
         const double               frictionCoefficient,
         const Side                 side = Side::AB);
     ~RbdFrictionConstraint() override = default;
+
+    IMSTK_TYPE_NAME(RbdFrictionConstraint);
 
 public:
     void compute(double dt) override;

@@ -20,6 +20,8 @@ class PbdDistanceConstraint : public PbdConstraint
 public:
     PbdDistanceConstraint() : PbdConstraint(2) { }
 
+    IMSTK_TYPE_NAME(PbdDistanceConstraint)
+
     ///
     /// \brief Initialize the constraint with resting length
     /// as the length between the two points

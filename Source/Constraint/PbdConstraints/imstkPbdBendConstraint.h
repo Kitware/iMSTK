@@ -21,6 +21,8 @@ class PbdBendConstraint : public PbdConstraint
 public:
     PbdBendConstraint() : PbdConstraint(3) { }
 
+    IMSTK_TYPE_NAME(PbdBendConstraint)
+
     /**
         \brief Initialize the constraint
             p0

@@ -56,6 +56,8 @@ public:
     {
     }
 
+    IMSTK_TYPE_NAME(PbdFemConstraint)
+
 public:
     double       m_initialElementVolume = 0.0; ///< Volume of the element
     MaterialType m_material;                   ///< Material type

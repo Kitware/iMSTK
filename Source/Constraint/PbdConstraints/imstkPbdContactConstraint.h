@@ -30,6 +30,8 @@ protected:
 public:
     ~PbdContactConstraint() override = default;
 
+    IMSTK_TYPE_NAME(PbdContactConstraint)
+
     ///
     /// \brief Update positions by projecting constraints.
     ///

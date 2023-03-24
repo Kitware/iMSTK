@@ -23,6 +23,9 @@ public:
 
     ~LinearProjectionConstraint() = default;
 
+    static const std::string getStaticTypeName() { return "LinearProjectionConstraint"; }
+    const std::string getTypeName() const { return "LinearProjectionConstraint"; }
+
     ///
     /// \brief Form the projection
     ///
