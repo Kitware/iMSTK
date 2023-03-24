@@ -23,6 +23,8 @@ class PbdConstantDensityConstraint : public PbdConstraint
 public:
     PbdConstantDensityConstraint();
 
+    IMSTK_TYPE_NAME(PbdConstantDensityConstraint)
+
     ///
     /// \brief Constant Density Constraint Initialization
     /// \param Bodies containing all the particles

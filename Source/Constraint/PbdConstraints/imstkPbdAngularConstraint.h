@@ -21,6 +21,8 @@ public:
     PbdAngularConstraint(int numParticles) : PbdConstraint(numParticles) { }
     ~PbdAngularConstraint() override = default;
 
+    IMSTK_TYPE_NAME(PbdAngularConstraint)
+
     ///
     /// \brief Update positions by projecting constraints.
     ///

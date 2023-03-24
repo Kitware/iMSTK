@@ -30,6 +30,8 @@ public:
 
     ~RbdLineToPointRotationConstraint() override = default;
 
+    IMSTK_TYPE_NAME(RbdLineToPointRotationConstraint)
+
 public:
     void compute(double dt) override
     {

@@ -29,6 +29,8 @@ public:
 
     ~RbdAngularLockingConstraint() override = default;
 
+    IMSTK_TYPE_NAME(RbdAngularLockingConstraint)
+
 public:
     void compute(double dt) override
     {

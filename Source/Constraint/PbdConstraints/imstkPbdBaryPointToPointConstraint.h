@@ -26,6 +26,8 @@ public:
     PbdBaryPointToPointConstraint() : PbdCollisionConstraint(0, 0) { }
     ~PbdBaryPointToPointConstraint() override = default;
 
+    IMSTK_TYPE_NAME(PbdBaryPointToPointConstraint)
+
     double getRestLength() const { return m_restLength; }
     void setRestLength(const double length) { m_restLength = length; }
 

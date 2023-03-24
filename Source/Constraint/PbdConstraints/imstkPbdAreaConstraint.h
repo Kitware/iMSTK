@@ -20,6 +20,8 @@ class PbdAreaConstraint : public PbdConstraint
 public:
     PbdAreaConstraint() : PbdConstraint(3) { }
 
+    IMSTK_TYPE_NAME(PbdAreaConstraint)
+
     ///
     /// \brief Initialize the constraint
     ///

@@ -22,6 +22,8 @@ public:
     PbdEdgeEdgeConstraint() : PbdCollisionConstraint(2, 2) { }
     ~PbdEdgeEdgeConstraint() override = default;
 
+    IMSTK_TYPE_NAME(PbdEdgeEdgeConstraint)
+
 public:
     ///
     /// \brief Initialize constraint

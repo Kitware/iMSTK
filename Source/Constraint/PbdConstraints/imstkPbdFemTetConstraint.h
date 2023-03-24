@@ -22,6 +22,8 @@ public:
     PbdFemTetConstraint(MaterialType mType = MaterialType::StVK) :
         PbdFemConstraint(4, mType) { }
 
+    IMSTK_TYPE_NAME(PbdFemTetConstraint)
+
     ///
     /// \brief Initialize the constraint
     ///

@@ -36,6 +36,8 @@ public:
     PbdConstraint() = default;
     virtual ~PbdConstraint() = default;
 
+    virtual const std::string getTypeName() const = 0;
+
     ///
     /// \brief Compute value and gradient of the constraint
     /// \param bodies PbdState provides all the bodies

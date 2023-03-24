@@ -46,6 +46,8 @@ public:
 
     ~RbdPointToArcConstraint() override = default;
 
+    IMSTK_TYPE_NAME(RbdPointToArcConstraint)
+
 public:
     void compute(double dt) override
     {

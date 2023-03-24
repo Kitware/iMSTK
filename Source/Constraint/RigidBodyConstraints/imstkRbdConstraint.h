@@ -98,6 +98,8 @@ public:
 
     virtual ~RbdConstraint() = default;
 
+    virtual const std::string getTypeName() const = 0;
+
     ///
     /// \brief Compute constraint jacobian
     ///

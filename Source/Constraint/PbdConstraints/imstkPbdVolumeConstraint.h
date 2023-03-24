@@ -20,6 +20,8 @@ class PbdVolumeConstraint : public PbdConstraint
 public:
     PbdVolumeConstraint() : PbdConstraint(4) { }
 
+    IMSTK_TYPE_NAME(PbdVolumeConstraint)
+
     ///
     /// \brief Initializes the volume constraint
     ///
