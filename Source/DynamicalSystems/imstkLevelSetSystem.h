@@ -37,8 +37,10 @@ class LevelSetSystem : public AbstractDynamicalSystem
 public:
     using AbstractDynamicalSystem::initGraphEdges;
 
-    LevelSetSystem();
+    LevelSetSystem(const std::string& name = "LevelSetSystem");
     ~LevelSetSystem() override = default;
+
+    IMSTK_TYPE_NAME(LevelSetSystem)
 
     ///
     /// \brief Get/Set the time step size

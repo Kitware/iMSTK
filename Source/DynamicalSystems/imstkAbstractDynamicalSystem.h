@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkGeometry.h"
+#include "imstkMacros.h"
 
 #include <set>
 
@@ -58,6 +59,17 @@ public:
     };
 
     virtual ~AbstractDynamicalSystem() = default;
+
+    ///
+    /// \brief Returns class name as string
+    ///
+    virtual const std::string getTypeName() const = 0;
+
+    ///
+    /// \brief get/set name of the dynamical system
+    ///
+    const std::string& getName() const { return m_name; }
+    void setName(const std::string& name) { m_name = name; }
 
     ///
     /// \brief Reset the current state to the initial state
@@ -126,7 +138,7 @@ public:
 ///@}
 
 protected:
-    AbstractDynamicalSystem(DynamicalModelType type = DynamicalModelType::None);
+    AbstractDynamicalSystem(const std::string& name = "AbstractDynamicalSystem", DynamicalModelType type = DynamicalModelType::None);
 
     ///
     /// \brief Setup connectivity of the compute graph
@@ -143,5 +155,7 @@ protected:
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::Fixed;
 
     std::shared_ptr<TaskGraph> m_taskGraph = nullptr;
+
+    std::string m_name;
 };
 } // namespace imstk

@@ -14,7 +14,7 @@
 
 namespace imstk
 {
-LevelSetSystem::LevelSetSystem() :
+LevelSetSystem::LevelSetSystem(const std::string& name) : AbstractDynamicalSystem(name),
     m_config(std::make_shared<LevelSetModelConfig>())
 {
     // If given an image data

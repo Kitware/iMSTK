@@ -20,7 +20,7 @@ template<class StateType>
 class DynamicalSystem : public AbstractDynamicalSystem
 {
 public:
-    DynamicalSystem(DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalSystem(type),
+    DynamicalSystem(const std::string& name = "DynamicalSystem", DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalSystem(name, type),
         m_initialState(std::make_shared<StateType>()),
         m_currentState(std::make_shared<StateType>()),
         m_previousState(std::make_shared<StateType>())

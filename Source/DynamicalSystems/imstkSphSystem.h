@@ -83,8 +83,10 @@ class SphSystem : public DynamicalSystem<SphState>
 public:
     using AbstractDynamicalSystem::initGraphEdges;
 
-    SphSystem();
+    SphSystem(const std::string& name = "SphSystem");
     ~SphSystem() override = default;
+
+    IMSTK_TYPE_NAME(SphSystem)
 
     ///
     /// \brief Set simulation parameters

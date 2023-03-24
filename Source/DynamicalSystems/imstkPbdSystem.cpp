@@ -16,7 +16,7 @@
 
 namespace imstk
 {
-PbdSystem::PbdSystem() : AbstractDynamicalSystem(DynamicalModelType::PositionBasedDynamics),
+PbdSystem::PbdSystem(const std::string& name) : AbstractDynamicalSystem(name, DynamicalModelType::PositionBasedDynamics),
     m_config(std::make_shared<PbdSystemConfig>()),
     m_constraints(std::make_shared<PbdConstraintContainer>())
 {

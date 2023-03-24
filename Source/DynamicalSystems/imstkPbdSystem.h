@@ -55,8 +55,10 @@ class PbdSystem : public AbstractDynamicalSystem
 public:
     using AbstractDynamicalSystem::initGraphEdges;
 
-    PbdSystem();
+    PbdSystem(const std::string& name = "PbdSystem");
     ~PbdSystem() override = default;
+
+    IMSTK_TYPE_NAME(PbdSystem)
 
     void resetToInitialState() override;
 
