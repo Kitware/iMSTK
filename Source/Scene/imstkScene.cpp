@@ -110,7 +110,7 @@ Scene::initialize()
                 compIsInitd[comp] = true;
             }
 
-            // Rnu through all the components again, if any were added (found not init'd)
+            // Run through all the components again, if any were added (found not init'd)
             // then add them to the compsToInit
             std::vector<std::shared_ptr<Component>> newComps = ent->getComponents();
             compsToInit.clear();
@@ -127,7 +127,7 @@ Scene::initialize()
     // Initialize all systems
     for (const auto& system : m_systems)
     {
-        CHECK(system->initialize()) << "Error initializing system";
+        CHECK(system->initialize()) << "Error initializing system \"" << system->getName() << "\" of type: " << system->getTypeName();
     }
 
     // Build the compute graph

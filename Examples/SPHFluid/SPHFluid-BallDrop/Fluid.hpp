@@ -192,8 +192,8 @@ generateFluid(const double particleRadius)
     visualModel->setRenderMaterial(material);
 
     // Create a physics model
-    imstkNew<SphSystem> sphModel;
-    sphModel->setModelGeometry(geometry);
+    imstkNew<SphSystem> sphSystem;
+    sphSystem->setModelGeometry(geometry);
 
     // Configure model
     imstkNew<SphSystemConfig> sphParams(particleRadius);
@@ -209,14 +209,14 @@ generateFluid(const double particleRadius)
         sphParams->m_frictionBoundary = 0.3;
     }
 
-    sphModel->configure(sphParams);
-    sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
+    sphSystem->configure(sphParams);
+    sphSystem->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Add the component models
     fluidObj->addComponent<Collider>()->setGeometry(geometry);
 
     auto sphMethod = fluidObj->addComponent<SphMethod>();
-    sphMethod->setSphSystem(sphModel);
+    sphMethod->setSphSystem(sphSystem);
     sphMethod->setGeometry(geometry);
 
     return fluidObj;

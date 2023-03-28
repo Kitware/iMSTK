@@ -32,7 +32,7 @@ LevelSetMethod::init()
 {
     if (m_system == nullptr)
     {
-        LOG(FATAL) << "Dynamics pointer cast failure in LevelSetDeformableObject_old::initialize()";
+        LOG(FATAL) << "LevelSetMethod \"" << m_name << "\" expects a system object, none was provided";
         return;
     }
 

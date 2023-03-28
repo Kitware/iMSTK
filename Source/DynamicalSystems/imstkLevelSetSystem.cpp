@@ -15,7 +15,7 @@
 namespace imstk
 {
 LevelSetSystem::LevelSetSystem(const std::string& name) : AbstractDynamicalSystem(name),
-    m_config(std::make_shared<LevelSetModelConfig>())
+    m_config(std::make_shared<LevelSetSystemConfig>())
 {
     // If given an image data
     m_validGeometryTypes = { "ImageData", "SignedDistanceField" };
@@ -87,7 +87,7 @@ LevelSetSystem::initialize()
 }
 
 void
-LevelSetSystem::configure(std::shared_ptr<LevelSetModelConfig> config)
+LevelSetSystem::configure(std::shared_ptr<LevelSetSystemConfig> config)
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "LevelSetSystem::configure - Set LevelSetSystem geometry before configuration!";
 

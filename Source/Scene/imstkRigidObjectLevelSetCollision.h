@@ -12,7 +12,6 @@
 
 namespace imstk
 {
-class LevelSetDeformableObject_old;
 class Collider;
 class LevelSetMethod;
 class LevelSetSystem;
@@ -26,7 +25,7 @@ class TaskGraph;
 /// \class RigidObjectLevelSetCollision
 ///
 /// \brief This class defines a collision interaction pipeline between a
-/// RigidObject and LevelSetDeformableObject_old.
+/// PBD based rigid object and a LevelSetMethod based object.
 ///
 class RigidObjectLevelSetCollision : public CollisionInteraction
 {

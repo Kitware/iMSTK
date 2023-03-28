@@ -31,7 +31,7 @@ FemurObject::setup(std::shared_ptr<Entity> parent)
     initLvlSetImage->setOrigin(Vec3d(0.0, 0.8, 1.5));
 
     // Setup the Parameters
-    auto lvlSetConfig = std::make_shared<LevelSetModelConfig>();
+    auto lvlSetConfig = std::make_shared<LevelSetSystemConfig>();
     lvlSetConfig->m_sparseUpdate = true;
     lvlSetConfig->m_substeps     = 15;
 

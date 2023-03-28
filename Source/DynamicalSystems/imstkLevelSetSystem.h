@@ -16,7 +16,7 @@ namespace imstk
 {
 class ImageData;
 
-struct LevelSetModelConfig
+struct LevelSetSystemConfig
 {
     double m_dt = 0.001;             ///< Time step size
     bool m_sparseUpdate = false;     ///< Only updates nodes that recieve force
@@ -49,7 +49,7 @@ public:
     double getTimeStep() const override { return m_config->m_dt; }
     ///@}
 
-    std::shared_ptr<LevelSetModelConfig> getConfig() const { return m_config; }
+    std::shared_ptr<LevelSetSystemConfig> getConfig() const { return m_config; }
 
     ///
     /// \brief Initialize the LevelSet model
@@ -59,7 +59,7 @@ public:
     ///
     /// \brief Configure the model
     ///
-    void configure(std::shared_ptr<LevelSetModelConfig> config);
+    void configure(std::shared_ptr<LevelSetSystemConfig> config);
 
     virtual void evolve();
 
@@ -94,7 +94,7 @@ protected:
     std::shared_ptr<TaskNode> m_generateVelocitiesBegin;
     std::shared_ptr<TaskNode> m_generateVelocitiesEnd;
 
-    std::shared_ptr<LevelSetModelConfig> m_config;
+    std::shared_ptr<LevelSetSystemConfig> m_config;
 
     std::unordered_map<size_t, std::tuple<Vec3i, double>> m_nodesToUpdate;
     std::vector<std::tuple<size_t, Vec3i, double, Vec2d, double>> m_nodeUpdatePool;
