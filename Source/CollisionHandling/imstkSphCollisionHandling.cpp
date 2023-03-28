@@ -9,17 +9,17 @@
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkParallelFor.h"
-#include "imstkSphModel.h"
-#include "imstkSphObject.h"
+#include "imstkSphMethod.h"
+#include "imstkSphSystem.h"
 
 namespace imstk
 {
 bool
 SphCollisionHandling::initialize()
 {
-    CHECK(m_sphObject != nullptr) << "Input SphObject is required.";
-    m_sphModel = m_sphObject->getSphModel();
-    CHECK(m_sphModel != nullptr) << "SPH model was not initialized";
+    CHECK(m_sphMethod != nullptr) << "Input SphMethod is required.";
+    m_sphSystem = m_sphMethod->getSphSystem();
+    CHECK(m_sphSystem != nullptr) << "SPH model was not initialized";
     return true;
 }
 
@@ -28,13 +28,13 @@ SphCollisionHandling::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& imstkNotUsed(elementsB))
 {
-    m_boundaryFriction = m_sphModel->getParameters()->m_frictionBoundary;
+    m_boundaryFriction = m_sphSystem->getParameters()->m_frictionBoundary;
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
     LOG_IF(FATAL, (m_boundaryFriction<0.0 || m_boundaryFriction>1.0))
         << "Invalid boundary friction coefficient (value must be in [0, 1])";
 #endif
 
-    std::shared_ptr<SphState>                state = m_sphModel->getCurrentState();
+    std::shared_ptr<SphState>                state = m_sphSystem->getCurrentState();
     std::shared_ptr<VecDataArray<double, 3>> positionsPtr  = state->getPositions();
     std::shared_ptr<VecDataArray<double, 3>> velocitiesPtr = state->getVelocities();
     VecDataArray<double, 3>&                 positions     = *positionsPtr;
@@ -47,7 +47,7 @@ SphCollisionHandling::handle(
         if (i != 0 && m_colDetect != nullptr)
         {
             // Update the collision geometry
-            m_sphObject->updateGeometries();
+            m_sphMethod->updateGeometries();
             // Compute collision again
             m_colDetect->update();
         }
@@ -109,14 +109,7 @@ SphCollisionHandling::solve(Vec3d& pos, Vec3d& velocity, const Vec3d& penetratio
 std::shared_ptr<Geometry>
 SphCollisionHandling::getCollidingGeometryA()
 {
-    if (m_sphObject)
-    {
-        if (auto collider = m_sphObject->getComponent<Collider>())
-        {
-            return collider->getGeometry();
-        }
-    }
-    return nullptr;
+    return (m_collider ? m_collider->getGeometry() : nullptr);
 }
 
 std::shared_ptr<Geometry>

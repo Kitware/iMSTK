@@ -73,7 +73,7 @@ computeFixedPtsViaMap(std::shared_ptr<PointSet> parent,
 ///
 /// \brief Creates PBD tetrahedral simulated tissue
 /// \param name The name of the object
-/// \param system The DynamicalModel to use
+/// \param system The DynamicalSystem to use
 ///
 static std::shared_ptr<Entity>
 makeTissueObj(const std::string&               name,

@@ -12,25 +12,26 @@ list(APPEND Dependencies
   )
 
 set(H_FILES
-  ObjectModels/imstkAbstractDynamicalSystem.h
-  ObjectModels/imstkLevelSetModel.h
-  ObjectModels/imstkPbdConstraintFunctor.h
-  ObjectModels/imstkPbdSystem.h
-  ObjectModels/imstkPbdSystemConfig.h
-  ObjectModels/imstkSphBoundaryConditions.h
-  ObjectModels/imstkSPHKernels.h
-  ObjectModels/imstkSphModel.h
-  ObjectStates/imstkSphState.h
+  imstkAbstractDynamicalSystem.h
+  imstkLevelSetSystem.h
+  imstkPbdConstraintFunctor.h
+  imstkPbdState.h
+  imstkPbdSystem.h
+  imstkPbdSystemConfig.h
+  imstkSphBoundaryConditions.h
+  imstkSPHKernels.h
+  imstkSphSystem.h
+  imstkSphState.h
   )
 
 set(SRC_FILES
-  ObjectModels/imstkAbstractDynamicalSystem.cpp
-  ObjectModels/imstkLevelSetModel.cpp
-  ObjectModels/imstkPbdSystem.cpp
-  ObjectModels/imstkPbdSystemConfig.cpp
-  ObjectModels/imstkSphBoundaryConditions.cpp
-  ObjectModels/imstkSphModel.cpp
-  ObjectStates/imstkSphState.cpp
+  imstkAbstractDynamicalSystem.cpp
+  imstkLevelSetSystem.cpp
+  imstkPbdSystem.cpp
+  imstkPbdSystemConfig.cpp
+  imstkSphBoundaryConditions.cpp
+  imstkSphSystem.cpp
+  imstkSphState.cpp
   )
 
 include(imstkAddLibrary)

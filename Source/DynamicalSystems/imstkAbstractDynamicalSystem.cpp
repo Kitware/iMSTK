@@ -10,8 +10,8 @@
 
 namespace imstk
 {
-AbstractDynamicalSystem::AbstractDynamicalSystem(DynamicalModelType type) :
-    m_type(type), m_numDof(0), m_taskGraph(std::make_shared<TaskGraph>("AbstractDynamicalModel_Source", "AbstractDynamicalModel_Sink"))
+AbstractDynamicalSystem::AbstractDynamicalSystem(const std::string& name, DynamicalModelType type) :
+    m_name(name), m_type(type), m_numDof(0), m_taskGraph(std::make_shared<TaskGraph>("AbstractDynamicalModel_Source", "AbstractDynamicalModel_Sink"))
 {
 }
 

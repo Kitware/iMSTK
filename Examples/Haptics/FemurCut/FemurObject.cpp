@@ -5,8 +5,10 @@
 */
 
 #include "FemurObject.h"
+#include "imstkEntity.h"
 #include "imstkCollider.h"
-#include "imstkLevelSetModel.h"
+#include "imstkLevelSetMethod.h"
+#include "imstkLevelSetSystem.h"
 #include "imstkLocalMarchingCubes.h"
 #include "imstkMeshIO.h"
 #include "imstkRenderMaterial.h"
@@ -14,13 +16,13 @@
 #include "imstkTaskGraph.h"
 #include "imstkVisualModel.h"
 
-FemurObject::FemurObject() : LevelSetDeformableObject("Femur"),
+FemurObject::FemurObject() : LevelSetMethod("Femur"),
     m_isoExtract(std::make_shared<LocalMarchingCubes>())
 {
 }
 
 void
-FemurObject::setup()
+FemurObject::setup(std::shared_ptr<Entity> parent)
 {
     std::shared_ptr<ImageData> initLvlSetImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/legs/femurBoneSolid_SDF.nii")->cast(IMSTK_DOUBLE);
     //const Vec3d& currSpacing = initLvlSetImage->getSpacing();
@@ -29,7 +31,7 @@ FemurObject::setup()
     initLvlSetImage->setOrigin(Vec3d(0.0, 0.8, 1.5));
 
     // Setup the Parameters
-    auto lvlSetConfig = std::make_shared<LevelSetModelConfig>();
+    auto lvlSetConfig = std::make_shared<LevelSetSystemConfig>();
     lvlSetConfig->m_sparseUpdate = true;
     lvlSetConfig->m_substeps     = 15;
 
@@ -50,32 +52,31 @@ FemurObject::setup()
     auto sdf = std::make_shared<SignedDistanceField>(initLvlSetImage);
 
     // Setup the Model
-    auto model = std::make_shared<LevelSetModel>();
-    model->setModelGeometry(sdf);
-    model->configure(lvlSetConfig);
+    auto system = std::make_shared<LevelSetSystem>();
+    system->setModelGeometry(sdf);
+    system->configure(lvlSetConfig);
 
     setGeometry(sdf);
     //setCollidingGeometry(sdf);
-    auto collider = this->addComponent<Collider>();
+    auto collider = parent->addComponent<Collider>();
     collider->setGeometry(sdf);
-    setDynamicalModel(model);
+    setLevelSetSystem(system);
 
-    // Setup a custom task to forward the modified voxels of the level set model
+    // Setup a custom task to forward the modified voxels of the level set system
     // to the marching cubes before they're cleared
     m_forwardModifiedVoxels = std::make_shared<TaskNode>(
         std::bind(&FemurObject::updateModifiedVoxels, this), "Isosurface: SetModifiedVoxels");
     m_taskGraph->addNode(m_forwardModifiedVoxels);
 }
 
-bool
-FemurObject::initialize()
+void
+FemurObject::init()
 {
     createVisualModels();
-    return true;
 }
 
 void
-FemurObject::visualUpdate()
+FemurObject::visualUpdate(const double& imstkNotUsed(dt))
 {
     // Update any chunks that contain a voxel which was set modified
     m_isoExtract->update();
@@ -112,7 +113,8 @@ FemurObject::createVisualModels()
             }
             //material->setOpacity(0.7);
             surfMeshModel->setRenderMaterial(material);
-            addVisualModel(surfMeshModel);
+            auto parent = this->getEntity().lock();
+            parent->addComponent(surfMeshModel);
             m_chunksGenerated.insert(i);
         }
     }
@@ -122,7 +124,7 @@ void
 FemurObject::updateModifiedVoxels()
 {
     // Forward the level set's modified nodes to the isosurface extraction
-    for (auto i : getLevelSetModel()->getNodesToUpdate())
+    for (auto i : getLevelSetSystem()->getNodesToUpdate())
     {
         m_isoExtract->setModified(std::get<0>(i.second));
     }
@@ -134,13 +136,13 @@ FemurObject::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Ta
     // Copy, sum, and connect the model graph to nest within this graph
     m_taskGraph->addEdge(source, getUpdateNode());
 
-    m_dynamicalModel->initGraphEdges();
-    m_taskGraph->nestGraph(m_dynamicalModel->getTaskGraph(), getUpdateNode(), getUpdateGeometryNode());
+    getLevelSetSystem()->initGraphEdges();
+    m_taskGraph->nestGraph(getLevelSetSystem()->getTaskGraph(), getUpdateNode(), getUpdateGeometryNode());
 
     // The levelsetmodel produces a list of modified voxels, we forward that to the isosurface extraction
     // filter to update only the modified chunks
-    m_taskGraph->addEdge(getLevelSetModel()->getGenerateVelocitiesEndNode(), m_forwardModifiedVoxels);
-    m_taskGraph->addEdge(m_forwardModifiedVoxels, getLevelSetModel()->getQuantityEvolveNode(0));
+    m_taskGraph->addEdge(getLevelSetSystem()->getGenerateVelocitiesEndNode(), m_forwardModifiedVoxels);
+    m_taskGraph->addEdge(m_forwardModifiedVoxels, getLevelSetSystem()->getQuantityEvolveNode(0));
 
     m_taskGraph->addEdge(getUpdateGeometryNode(), sink);
 }

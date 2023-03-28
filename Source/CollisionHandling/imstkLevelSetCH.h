@@ -18,7 +18,7 @@ class Collider;
 class CollisionData;
 struct PbdBody;
 class PbdMethod;
-class LevelSetModel;
+class LevelSetSystem;
 
 ///
 /// \class LevelSetCH
@@ -34,7 +34,7 @@ public:
 
     IMSTK_TYPE_NAME(LevelSetCH)
 
-    void setInputLvlSetObj(std::shared_ptr<LevelSetModel> lvlSetObj, std::shared_ptr<Collider> lvlSetCollider);
+    void setInputLvlSetObj(std::shared_ptr<LevelSetSystem> lvlSetObj, std::shared_ptr<Collider> lvlSetCollider);
     void setInputRigidObj(std::shared_ptr<PbdMethod> rigidObject, std::shared_ptr<Collider> rigidCollider);
 
     ///
@@ -101,8 +101,8 @@ private:
     double  m_kernelSigma   = 1.0;
     double* m_kernelWeights = nullptr;
 
-    std::shared_ptr<LevelSetModel> m_levelSetObject;
-    std::shared_ptr<Collider>      m_levelSetCollider;
+    std::shared_ptr<LevelSetSystem> m_levelSetObject;
+    std::shared_ptr<Collider>       m_levelSetCollider;
 
     std::shared_ptr<PbdMethod> m_rigidPhysics;
     std::shared_ptr<Collider>  m_rigidCollider;

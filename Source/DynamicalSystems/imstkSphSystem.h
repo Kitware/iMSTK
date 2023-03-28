@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkDynamicalModel.h"
+#include "imstkDynamicalSystem.h"
 #include "imstkSphState.h"
 #include "imstkSPHKernels.h"
 #include "imstkNeighborSearch.h"
@@ -17,18 +17,18 @@ namespace imstk
 class PointSet;
 
 ///
-/// \class SphModelConfig
+/// \class SphSystemConfig
 ///
 /// \brief Class that holds the SPH model parameters
 ///
-class SphModelConfig
+class SphSystemConfig
 {
 private:
     void initialize();
 
 public:
-    SphModelConfig(const double particleRadius);
-    SphModelConfig(const double particleRadius, const double speedOfSound, const double restDensity);
+    SphSystemConfig(const double particleRadius);
+    SphSystemConfig(const double particleRadius, const double speedOfSound, const double restDensity);
 
     /// \todo Move this to solver or time integrator in the future
     double m_minTimestep = 1.0e-6;
@@ -78,16 +78,20 @@ public:
 /// \class SPHModel
 /// \brief SPH fluid model
 ///
-class SphModel : public DynamicalModel<SphState>
+class SphSystem : public DynamicalSystem<SphState>
 {
 public:
-    SphModel();
-    ~SphModel() override = default;
+    using AbstractDynamicalSystem::initGraphEdges;
+
+    SphSystem(const std::string& name = "SphSystem");
+    ~SphSystem() override = default;
+
+    IMSTK_TYPE_NAME(SphSystem)
 
     ///
     /// \brief Set simulation parameters
     ///
-    void configure(const std::shared_ptr<SphModelConfig>& params) { m_modelParameters = params; }
+    void configure(const std::shared_ptr<SphSystemConfig>& params) { m_modelParameters = params; }
 
     ///
     /// \brief Initialize the dynamical model
@@ -102,7 +106,7 @@ public:
     ///
     /// \brief Get the simulation parameters
     ///
-    const std::shared_ptr<SphModelConfig>& getParameters() const
+    const std::shared_ptr<SphSystemConfig>& getParameters() const
     {
         assert(m_modelParameters);
         return m_modelParameters;
@@ -245,12 +249,12 @@ protected:
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
 
-    double m_dt = 0.0;                                  ///< time step size
-    double m_defaultDt;                                 ///< default time step size
+    double m_dt = 0.0;                                   ///< time step size
+    double m_defaultDt;                                  ///< default time step size
 
-    SphSimulationKernels m_kernels;                     ///< SPH kernels (must be initialized during model initialization)
-    std::shared_ptr<SphModelConfig> m_modelParameters;  ///< SPH Model parameters (must be set before simulation)
-    std::shared_ptr<NeighborSearch> m_neighborSearcher; ///< Neighbor Search (must be initialized during model initialization)
+    SphSimulationKernels m_kernels;                      ///< SPH kernels (must be initialized during model initialization)
+    std::shared_ptr<SphSystemConfig> m_modelParameters;  ///< SPH Model parameters (must be set before simulation)
+    std::shared_ptr<NeighborSearch>  m_neighborSearcher; ///< Neighbor Search (must be initialized during model initialization)
 
     std::shared_ptr<VecDataArray<double, 3>> m_pressureAccels       = nullptr;
     std::shared_ptr<VecDataArray<double, 3>> m_surfaceTensionAccels = nullptr;

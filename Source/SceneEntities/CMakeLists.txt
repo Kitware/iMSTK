@@ -6,16 +6,18 @@ set(H_FILES
   Camera/imstkCamera.h
   Components/imstkAxesModel.h
   Components/imstkCollider.h
+  Components/imstkBurnable.h
+  Components/imstkBurner.h
+  Components/imstkLevelSetMethod.h
   Components/imstkObjectControllerGhost.h
   Components/imstkPbdMethod.h
   Components/imstkPortHoleInteraction.h
-  Components/imstkBurnable.h
-  Components/imstkBurner.h
   Components/imstkSceneUtils.h
+  Components/imstkSphMethod.h
   Components/imstkTearable.h
   Components/imstkTextVisualModel.h
-  Components/imstkVisualModel.h
   Components/imstkVertexLabelVisualModel.h
+  Components/imstkVisualModel.h
   Lights/imstkDirectionalLight.h
   Lights/imstkIBLProbe.h
   Lights/imstkLight.h
@@ -26,24 +28,23 @@ set(H_FILES
   Objects/imstkAnimationObject.h
   Objects/imstkCollisionDataDebugModel.h
   Objects/imstkDebugGeometryModel.h
-  Objects/imstkDynamicObject.h
-  Objects/imstkLevelSetDeformableObject.h
   Objects/imstkPbdConnectiveTissueConstraintGenerator.h
   Objects/imstkPbdObjectCellRemoval.h
   Objects/imstkSceneObject.h
-  Objects/imstkSphObject.h
   )
 
 set(SRC_FILES
   Camera/imstkCamera.cpp
-  Components/imstkObjectControllerGhost.cpp
   Components/imstkCollider.cpp
-  Components/imstkPbdMethod.cpp
-  Components/imstkPortHoleInteraction.cpp
   Components/imstkBurnable.cpp
   Components/imstkBurner.cpp
-  Components/imstkTearable.cpp
+  Components/imstkLevelSetMethod.cpp
+  Components/imstkObjectControllerGhost.cpp
+  Components/imstkPbdMethod.cpp
+  Components/imstkPortHoleInteraction.cpp
   Components/imstkSceneUtils.cpp
+  Components/imstkSphMethod.cpp
+  Components/imstkTearable.cpp
   Components/imstkVisualModel.cpp
   Lights/imstkIBLProbe.cpp
   Loader/imstkVisualObjectImporter.cpp
@@ -51,12 +52,9 @@ set(SRC_FILES
   Objects/imstkAnimationObject.cpp
   Objects/imstkCollisionDataDebugModel.cpp
   Objects/imstkDebugGeometryModel.cpp
-  Objects/imstkDynamicObject.cpp
-  Objects/imstkLevelSetDeformableObject.cpp
   Objects/imstkPbdConnectiveTissueConstraintGenerator.cpp
   Objects/imstkPbdObjectCellRemoval.cpp
   Objects/imstkSceneObject.cpp
-  Objects/imstkSphObject.cpp
   )
 
 include(imstkAddLibrary)

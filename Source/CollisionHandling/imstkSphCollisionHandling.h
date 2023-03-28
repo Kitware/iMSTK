@@ -11,10 +11,11 @@
 
 namespace imstk
 {
+class Collider;
 class CollisionData;
 class CollisionDetectionAlgorithm;
-class SphModel;
-class SphObject;
+class SphSystem;
+class SphMethod;
 
 ///
 /// \class SphCollisionHandling
@@ -31,7 +32,11 @@ public:
 
     IMSTK_TYPE_NAME(SphCollisionHandling)
 
-    void setInputSphObject(std::shared_ptr<SphObject> sphObj) { m_sphObject = sphObj; }
+    void setInputSphObject(std::shared_ptr<SphMethod> sphObj, std::shared_ptr<Collider> collider)
+    {
+        m_sphMethod = sphObj;
+        m_collider  = collider;
+    }
 
     ///
     /// \brief How many times to resolve and correct position. This is useful when colliding
@@ -70,7 +75,8 @@ private:
     int    m_iterations       = 1;
     double m_boundaryFriction = 0.0;
 
-    std::shared_ptr<SphObject> m_sphObject;
-    std::shared_ptr<SphModel>  m_sphModel;
+    std::shared_ptr<SphMethod> m_sphMethod;
+    std::shared_ptr<Collider>  m_collider;
+    std::shared_ptr<SphSystem> m_sphSystem;
 };
 } // end namespace imstk

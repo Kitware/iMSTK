@@ -16,8 +16,8 @@ class SphObject;
 ///
 /// \class SphObjectCollision
 ///
-/// \brief This class defines where collision should happen between SphObject
-/// and Entity pipelines
+/// \brief This class defines where collision should happen between
+/// an entity with an SphMethod and another entity with a collider.
 ///
 class SphObjectCollision : public CollisionInteraction
 {

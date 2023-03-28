@@ -11,8 +11,8 @@
 #include "imstkImplicitGeometryToPointSetCCD.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
 #include "imstkLevelSetCH.h"
-#include "imstkLevelSetDeformableObject.h"
-#include "imstkLevelSetModel.h"
+#include "imstkLevelSetMethod.h"
+#include "imstkLevelSetSystem.h"
 #include "imstkParallelFor.h"
 #include "imstkPointSet.h"
 #include "imstkPbdMethod.h"
@@ -25,8 +25,7 @@
 namespace imstk
 {
 RigidObjectLevelSetCollision::RigidObjectLevelSetCollision(std::shared_ptr<Entity> obj1, std::shared_ptr<Entity> obj2) :
-    CollisionInteraction("RigidObjectLevelSetCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, ""),
-    m_prevVertices(std::make_shared<VecDataArray<double, 3>>())
+    CollisionInteraction("RigidObjectLevelSetCollision" + obj1->getName() + "_vs_" + obj2->getName(), obj1, obj2, "")
 {
 }
 
@@ -35,12 +34,17 @@ RigidObjectLevelSetCollision::initialize()
 {
     CollisionInteraction::initialize();
 
-    auto levelSetObjA = std::dynamic_pointer_cast<LevelSetDeformableObject>(m_objA);
-    auto levelSetObjB = std::dynamic_pointer_cast<LevelSetDeformableObject>(m_objB);
+    auto levelSetObjA = m_objA->getComponentUnsafe<LevelSetMethod>();
+    auto levelSetObjB = m_objB->getComponentUnsafe<LevelSetMethod>();
 
     CHECK(levelSetObjA != nullptr || levelSetObjB != nullptr) <<
-        "One input object is expected to be a LevelSetDeformableObject.";
+        "One input object is expected to have a LevelSetMethod.";
 
+    /*
+    The following conditional swap ensures that the first object (objA)
+    is always the rigid object and the second object (objB) is always
+    the LevelSet based object.
+    */
     if (levelSetObjA)
     {
         std::swap(m_objA, m_objB);
@@ -74,10 +78,10 @@ RigidObjectLevelSetCollision::initialize()
     }
 
     // Fetch all components and structures required for objectB
-    m_objectB.obj       = levelSetObjB;
-    m_objectB.method    = levelSetObjB->getLevelSetModel();
+    m_objectB.method    = levelSetObjB;
+    m_objectB.system    = levelSetObjB->getLevelSetSystem();
     m_objectB.collider  = m_objB->getComponent<Collider>();
-    m_objectB.taskGraph = m_objectB.obj->getTaskGraph();
+    m_objectB.taskGraph = m_objectB.system->getTaskGraph();
 
     if (m_objectA.system == nullptr || m_objectB.method == nullptr)
     {
@@ -95,8 +99,8 @@ RigidObjectLevelSetCollision::initialize()
     m_taskGraph->addNode(m_objectA.system->getIntegratePositionNode());
     m_taskGraph->addNode(m_objectA.system->getUpdateVelocityNode());
 
-    m_taskGraph->addNode(m_objectB.method->getGenerateVelocitiesBeginNode());
-    m_taskGraph->addNode(m_objectB.method->getGenerateVelocitiesEndNode());
+    m_taskGraph->addNode(m_objectB.system->getGenerateVelocitiesBeginNode());
+    m_taskGraph->addNode(m_objectB.system->getGenerateVelocitiesEndNode());
 
     // Setup the rigid body handler to move the rigid body according to collision data
     auto pbdCH = std::make_shared<PbdCollisionHandling>();
@@ -109,7 +113,7 @@ RigidObjectLevelSetCollision::initialize()
 
     // Setup the levelset handler to erode the levelset according to collision data
     auto lvlSetCH = std::make_shared<LevelSetCH>();
-    lvlSetCH->setInputLvlSetObj(m_objectB.method, m_objectB.collider);
+    lvlSetCH->setInputLvlSetObj(m_objectB.system, m_objectB.collider);
     lvlSetCH->setInputRigidObj(m_objectA.method, m_objectA.collider);
     lvlSetCH->setInputCollisionData(m_colDetect->getCollisionData());
     lvlSetCH->setLevelSetVelocityScaling(getLevelSetVelocityScaling());
@@ -148,9 +152,6 @@ RigidObjectLevelSetCollision::initGraphEdges(std::shared_ptr<TaskNode> source, s
 {
     CollisionInteraction::initGraphEdges(source, sink);
 
-    auto                           lvlSetObj2 = std::dynamic_pointer_cast<LevelSetDeformableObject>(m_objB);
-    std::shared_ptr<LevelSetModel> lsmModel   = lvlSetObj2->getLevelSetModel();
-
     std::shared_ptr<TaskNode> pbdHandlerNode = m_collisionHandleANode;
     std::shared_ptr<TaskNode> lsmHandlerNode = m_collisionHandleBNode;
 
@@ -179,10 +180,10 @@ RigidObjectLevelSetCollision::initGraphEdges(std::shared_ptr<TaskNode> source, s
 
     // Add levelset process tasks
     m_taskGraph->addChain({
-            lsmModel->getGenerateVelocitiesBeginNode(),
+            m_objectB.system->getGenerateVelocitiesBeginNode(),
             m_collisionDetectionNode,
             lsmHandlerNode,
-            lsmModel->getGenerateVelocitiesEndNode()
+            m_objectB.system->getGenerateVelocitiesEndNode()
     });
 
     // The tentative body is never actually computed, it should be good to catch the contact
@@ -207,11 +208,11 @@ RigidObjectLevelSetCollision::copyVertsToPrevious()
     if (m_objectA.displacements)
     {
         auto vertices = pointSet->getVertexPositions();
-        if (m_prevVertices->size() != vertices->size())
+        if (m_prevVertices.size() != vertices->size())
         {
-            m_prevVertices->resize(vertices->size());
+            m_prevVertices.resize(vertices->size());
         }
-        std::copy_n(vertices->getPointer(), vertices->size(), m_prevVertices->getPointer());
+        std::copy_n(vertices->getPointer(), vertices->size(), m_prevVertices.getPointer());
     }
 }
 
@@ -224,13 +225,12 @@ RigidObjectLevelSetCollision::measureDisplacementFromPrevious()
     if (pointSet && displacements)
     {
         auto& displacementsArr = *displacements;
-        auto& vertices     = *pointSet->getVertexPositions();
-        auto& prevVertices = *m_prevVertices;
+        auto& vertices = *pointSet->getVertexPositions();
 
         ParallelUtils::parallelFor(displacements->size(),
             [&](const int i)
             {
-                displacementsArr[i] = vertices[i] - prevVertices[i];
+                displacementsArr[i] = vertices[i] - m_prevVertices[i];
             });
     }
 }

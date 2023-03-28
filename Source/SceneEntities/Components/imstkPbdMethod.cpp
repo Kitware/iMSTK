@@ -122,7 +122,7 @@ PbdMethod::updateGeometries()
 void
 PbdMethod::updatePhysicsGeometry()
 {
-    CHECK(m_physicsGeometry != nullptr) << "DynamicObject \"" << m_name
+    CHECK(m_physicsGeometry != nullptr) << "PbdMethod \"" << m_name
                                         << "\" expects a physics geometry, none was provided";
 
     // m_pbdSystem->updatePhysicsGeometry(); this doesn't do anything
@@ -176,9 +176,6 @@ PbdMethod::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Task
     m_taskGraph->addEdge(source, m_updateNode);
     if (m_pbdSystem != nullptr)
     {
-        // Should be a better way to do this than doing a dynamic cast.
-        // Maybe just rename the function so it doesn't get hidden by PbdSystem.
-        // std::dynamic_pointer_cast<AbstractDynamicalSystem>(m_pbdSystem)->initGraphEdges();
         m_pbdSystem->initGraphEdges();
         m_taskGraph->nestGraph(m_pbdSystem->getTaskGraph(), m_updateNode, m_updateGeometryNode);
     }
@@ -211,7 +208,7 @@ PbdMethod::setBodyFromGeometry()
         if (m_physicsGeometry != nullptr)
         {
             auto pointSet = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
-            CHECK(pointSet != nullptr) << "PbdObject_old " << m_name << " only supports PointSet geometries";
+            CHECK(pointSet != nullptr) << "PbdMethod " << m_name << " only supports PointSet geometries";
             setDeformBodyFromGeometry(*body, pointSet);
         }
     }
@@ -229,7 +226,7 @@ PbdMethod::setBodyFromGeometry()
                 {
                     auto pointSet = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
                     CHECK(pointSet != nullptr) <<
-                        "Tried to generate constraints with functor on PbdObject_old " << m_name << " but "
+                        "Tried to generate constraints with functor on PbdMethod " << m_name << " but "
                         " object does not have PointSet geometry";
                     bodyFunctor->setGeometry(pointSet);
                 }
@@ -374,14 +371,14 @@ PbdMethod::computeCellConstraintMap()
     // Note: The PBD Object and constraints must be initialized before calling this function
     this->initialize();
 
-    CHECK(m_physicsGeometry != nullptr) << "PbdObject_old \"" << m_name
+    CHECK(m_physicsGeometry != nullptr) << "PbdMethod \"" << m_name
                                         << "\" requires physics geometry to compute CellConstraint map";
 
     // If the map already exists, clear it and recalculate
     if (m_pbdBody->cellConstraintMap.empty() == false)
     {
         m_pbdBody->cellConstraintMap.clear();
-        LOG(INFO) << "PbdObject_old \"" << m_name
+        LOG(INFO) << "PbdMethod \"" << m_name
                   << "\" already has a CellConstraintMap. Cleared and recalculated \n";
     }
 
@@ -395,7 +392,7 @@ PbdMethod::computeCellConstraintMap()
 
     // Constraint Data for all currently existing constraints
     std::shared_ptr<PbdConstraintContainer> constraintsPtr = this->getPbdSystem()->getConstraints();
-    CHECK(constraintsPtr != nullptr) << "PbdObject_old \"" << m_name
+    CHECK(constraintsPtr != nullptr) << "PbdMethod \"" << m_name
                                      << "\" does not have constraints in computeCellConstraintMap";
 
     const std::vector<std::shared_ptr<PbdConstraint>>& constraints = constraintsPtr->getConstraints();

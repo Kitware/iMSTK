@@ -11,23 +11,23 @@
 namespace imstk
 {
 ///
-/// \class DynamicalModel
+/// \class DynamicalSystem
 ///
 /// \brief Base class for mathematical model of the physics governing the
 /// dynamic object.
 ///
 template<class StateType>
-class DynamicalModel : public AbstractDynamicalSystem
+class DynamicalSystem : public AbstractDynamicalSystem
 {
 public:
-    DynamicalModel(DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalSystem(type),
+    DynamicalSystem(const std::string& name = "DynamicalSystem", DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalSystem(name, type),
         m_initialState(std::make_shared<StateType>()),
         m_currentState(std::make_shared<StateType>()),
         m_previousState(std::make_shared<StateType>())
     {
     }
 
-    ~DynamicalModel() override = default;
+    ~DynamicalSystem() override = default;
 
     ///
     /// \brief Return the initial state of the problem

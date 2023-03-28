@@ -84,21 +84,19 @@
 %shared_ptr(imstk::SurfaceMeshTextureProject)
 
 /* 
- * DynamicalModel 
+ * DynamicalSystem 
  */
 %shared_ptr(imstk::PbdObject)
-%shared_ptr(imstk::PbdModelConfig)
+%shared_ptr(imstk::PbdSystemConfig)
 %shared_ptr(imstk::PbdCollisionConstraintConfig)
 %shared_ptr(imstk::PbdStrainEnergyConstraintConfig)
 %shared_ptr(imstk::PbdSolver)
-%shared_ptr(imstk::FeDeformBodyState)
-%shared_ptr(imstk::AbstractDynamicalModel)
-%shared_ptr(imstk::DynamicalModel<imstk::FeDeformBodyState>)
-%shared_ptr(imstk::DynamicalModel<imstk::SphState>)
+%shared_ptr(imstk::AbstractDynamicalSystem)
+%shared_ptr(imstk::DynamicalSystem<imstk::SphState>)
 %shared_ptr(imstk::SphState)
 %shared_ptr(imstk::PbdSystem)
-%shared_ptr(imstk::SphModelConfig)
-%shared_ptr(imstk::SphModel)
+%shared_ptr(imstk::SphSystemConfig)
+%shared_ptr(imstk::SphSystem)
 %shared_ptr(imstk::TimeIntegrator)
 %shared_ptr(imstk::BackwardEuler)
 
@@ -113,6 +111,7 @@
  */
 %shared_ptr(imstk::PbdBody)
 %shared_ptr(imstk::PbdState)
+%shared_ptr(imstk::PbdCollisionConstraint)
 %shared_ptr(imstk::PbdConstraint)
 %shared_ptr(imstk::PbdConstraintContainer)
 %shared_ptr(imstk::PbdDistanceConstraint)
@@ -128,10 +127,10 @@
  * SceneEntities
  */
 %shared_ptr(imstk::SceneObject)
-%shared_ptr(imstk::DynamicObject)
 %shared_ptr(imstk::PbdConnectiveTissueConstraintGenerator)
 %shared_ptr(imstk::PbdMethod)
-%shared_ptr(imstk::SphObject)
+%shared_ptr(imstk::SphMethod)
+%shared_ptr(imstk::LevelSetMethod)
 %shared_ptr(imstk::VisualModel)
 %shared_ptr(imstk::Camera)
 %shared_ptr(imstk::Light)

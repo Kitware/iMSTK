@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "imstkDynamicalModel.h"
+#include "imstkDynamicalSystem.h"
 #include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 
 #include <unordered_map>
@@ -16,7 +16,7 @@ namespace imstk
 {
 class ImageData;
 
-struct LevelSetModelConfig
+struct LevelSetSystemConfig
 {
     double m_dt = 0.001;             ///< Time step size
     bool m_sparseUpdate = false;     ///< Only updates nodes that recieve force
@@ -27,16 +27,20 @@ struct LevelSetModelConfig
 };
 
 ///
-/// \class LevelSetModel
+/// \class LevelSetSystem
 ///
 /// \brief This class implements a generic level set model, it requires both a forward
 /// and backward finite differencing method
 ///
-class LevelSetModel : public AbstractDynamicalSystem
+class LevelSetSystem : public AbstractDynamicalSystem
 {
 public:
-    LevelSetModel();
-    ~LevelSetModel() override = default;
+    using AbstractDynamicalSystem::initGraphEdges;
+
+    LevelSetSystem(const std::string& name = "LevelSetSystem");
+    ~LevelSetSystem() override = default;
+
+    IMSTK_TYPE_NAME(LevelSetSystem)
 
     ///
     /// \brief Get/Set the time step size
@@ -45,7 +49,7 @@ public:
     double getTimeStep() const override { return m_config->m_dt; }
     ///@}
 
-    std::shared_ptr<LevelSetModelConfig> getConfig() const { return m_config; }
+    std::shared_ptr<LevelSetSystemConfig> getConfig() const { return m_config; }
 
     ///
     /// \brief Initialize the LevelSet model
@@ -55,7 +59,7 @@ public:
     ///
     /// \brief Configure the model
     ///
-    void configure(std::shared_ptr<LevelSetModelConfig> config);
+    void configure(std::shared_ptr<LevelSetSystemConfig> config);
 
     virtual void evolve();
 
@@ -90,16 +94,16 @@ protected:
     std::shared_ptr<TaskNode> m_generateVelocitiesBegin;
     std::shared_ptr<TaskNode> m_generateVelocitiesEnd;
 
-    std::shared_ptr<LevelSetModelConfig> m_config;
+    std::shared_ptr<LevelSetSystemConfig> m_config;
 
     std::unordered_map<size_t, std::tuple<Vec3i, double>> m_nodesToUpdate;
     std::vector<std::tuple<size_t, Vec3i, double, Vec2d, double>> m_nodeUpdatePool;
     size_t noteUpdatePoolSize;
-    size_t m_maxVelocitiesParallel = 100;                      // In sparse mode, if surpass this value, switch to parallel
+    size_t m_maxVelocitiesParallel = 100;            // In sparse mode, if surpass this value, switch to parallel
 
-    std::shared_ptr<ImageData> m_gradientMagnitudes = nullptr; ///< Gradient magnitude field when using dense
-    std::shared_ptr<ImageData> m_velocities = nullptr;
-    std::shared_ptr<ImageData> m_curvatures = nullptr;
+    std::shared_ptr<ImageData> m_gradientMagnitudes; ///< Gradient magnitude field when using dense
+    std::shared_ptr<ImageData> m_velocities;
+    std::shared_ptr<ImageData> m_curvatures;
 
     // I'm unable to use the more generic double/floating pt based version
     // suspect floating point error

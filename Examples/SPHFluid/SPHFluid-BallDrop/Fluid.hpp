@@ -8,8 +8,8 @@
 #include "imstkPointSet.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSphObject.h"
-#include "imstkSphModel.h"
+#include "imstkSphMethod.h"
+#include "imstkSphSystem.h"
 #include "imstkVisualModel.h"
 
 using namespace imstk;
@@ -145,7 +145,7 @@ initializeNonZeroVelocities(const int numParticles)
     return initVelocitiesPtr;
 }
 
-std::shared_ptr<SphObject>
+std::shared_ptr<Entity>
 generateFluid(const double particleRadius)
 {
     std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
@@ -171,10 +171,10 @@ generateFluid(const double particleRadius)
     geometry->initialize(particles);
 
     // Create a fluids object
-    imstkNew<SphObject> fluidObj("SPHSphere");
+    auto fluidObj = std::make_shared<Entity>("SPHSphere");
 
     // Create a visual model
-    imstkNew<VisualModel> visualModel;
+    auto visualModel = fluidObj->addComponent<VisualModel>();
     visualModel->setGeometry(geometry);
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
@@ -192,11 +192,11 @@ generateFluid(const double particleRadius)
     visualModel->setRenderMaterial(material);
 
     // Create a physics model
-    imstkNew<SphModel> sphModel;
-    sphModel->setModelGeometry(geometry);
+    imstkNew<SphSystem> sphSystem;
+    sphSystem->setModelGeometry(geometry);
 
     // Configure model
-    imstkNew<SphModelConfig> sphParams(particleRadius);
+    imstkNew<SphSystemConfig> sphParams(particleRadius);
     sphParams->m_bNormalizeDensity = true;
     if (SCENE_ID == 2)   // highly viscous fluid
     {
@@ -209,14 +209,15 @@ generateFluid(const double particleRadius)
         sphParams->m_frictionBoundary = 0.3;
     }
 
-    sphModel->configure(sphParams);
-    sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
+    sphSystem->configure(sphParams);
+    sphSystem->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Add the component models
-    fluidObj->addVisualModel(visualModel);
     fluidObj->addComponent<Collider>()->setGeometry(geometry);
-    fluidObj->setDynamicalModel(sphModel);
-    fluidObj->setGeometry(geometry);
+
+    auto sphMethod = fluidObj->addComponent<SphMethod>();
+    sphMethod->setSphSystem(sphSystem);
+    sphMethod->setGeometry(geometry);
 
     return fluidObj;
 }

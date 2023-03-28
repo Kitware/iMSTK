@@ -4,7 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "imstkSphModel.h"
+#include "imstkSphSystem.h"
 #include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkTaskGraph.h"
@@ -12,7 +12,7 @@
 
 namespace imstk
 {
-SphModelConfig::SphModelConfig(const double particleRadius)
+SphSystemConfig::SphSystemConfig(const double particleRadius)
 {
     // \todo Warning in all paths?
     if (std::abs(particleRadius) > 1.0e-6)
@@ -28,7 +28,7 @@ SphModelConfig::SphModelConfig(const double particleRadius)
     initialize();
 }
 
-SphModelConfig::SphModelConfig(const double particleRadius, const double speedOfSound, const double restDensity)
+SphSystemConfig::SphSystemConfig(const double particleRadius, const double speedOfSound, const double restDensity)
 {
     if (std::abs(particleRadius) > 1.0e-6)
     {
@@ -62,7 +62,7 @@ SphModelConfig::SphModelConfig(const double particleRadius, const double speedOf
 }
 
 void
-SphModelConfig::initialize()
+SphSystemConfig::initialize()
 {
     // Compute the derived quantities
     m_particleRadiusSqr = m_particleRadius * m_particleRadius;
@@ -77,35 +77,35 @@ SphModelConfig::initialize()
     m_pressureStiffness = m_restDensity * m_speedOfSound * m_speedOfSound / 7.0;
 }
 
-SphModel::SphModel() : DynamicalModel<SphState>(DynamicalModelType::SmoothedParticleHydrodynamics)
+SphSystem::SphSystem(const std::string& name) : DynamicalSystem<SphState>(name, DynamicalModelType::SmoothedParticleHydrodynamics)
 {
     m_validGeometryTypes = { "PointSet" };
 
-    m_findParticleNeighborsNode = m_taskGraph->addFunction("SPHModel_Partition", std::bind(&SphModel::findParticleNeighbors, this));
+    m_findParticleNeighborsNode = m_taskGraph->addFunction("SPHModel_Partition", std::bind(&SphSystem::findParticleNeighbors, this));
     m_computeDensityNode = m_taskGraph->addFunction("SPHModel_ComputeDensity", [&]()
         {
             computeNeighborRelativePositions();
             computeDensity();
         });
 
-    m_normalizeDensityNode = m_taskGraph->addFunction("SPHModel_NormalizeDensity", std::bind(&SphModel::normalizeDensity, this));
+    m_normalizeDensityNode = m_taskGraph->addFunction("SPHModel_NormalizeDensity", std::bind(&SphSystem::normalizeDensity, this));
 
-    m_collectNeighborDensityNode = m_taskGraph->addFunction("SPHModel_CollectNeighborDensity", std::bind(&SphModel::collectNeighborDensity, this));
+    m_collectNeighborDensityNode = m_taskGraph->addFunction("SPHModel_CollectNeighborDensity", std::bind(&SphSystem::collectNeighborDensity, this));
 
     m_computeTimeStepSizeNode =
-        m_taskGraph->addFunction("SPHModel_ComputeTimestep", std::bind(&SphModel::computeTimeStepSize, this));
+        m_taskGraph->addFunction("SPHModel_ComputeTimestep", std::bind(&SphSystem::computeTimeStepSize, this));
 
     m_computePressureAccelNode =
-        m_taskGraph->addFunction("SPHModel_ComputePressureAccel", std::bind(&SphModel::computePressureAcceleration, this));
+        m_taskGraph->addFunction("SPHModel_ComputePressureAccel", std::bind(&SphSystem::computePressureAcceleration, this));
 
     m_computeSurfaceTensionNode =
-        m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SphModel::computeSurfaceTension, this));
+        m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SphSystem::computeSurfaceTension, this));
 
     m_computeViscosityNode =
-        m_taskGraph->addFunction("SPHModel_ComputeViscosity", std::bind(&SphModel::computeViscosity, this));
+        m_taskGraph->addFunction("SPHModel_ComputeViscosity", std::bind(&SphSystem::computeViscosity, this));
 
     m_integrateNode =
-        m_taskGraph->addFunction("SPHModel_Integrate", std::bind(&SphModel::sumAccels, this));
+        m_taskGraph->addFunction("SPHModel_Integrate", std::bind(&SphSystem::sumAccels, this));
 
     m_updateVelocityNode =
         m_taskGraph->addFunction("SPHModel_UpdateVelocity", [&]()
@@ -127,7 +127,7 @@ SphModel::SphModel() : DynamicalModel<SphState>(DynamicalModelType::SmoothedPart
 }
 
 bool
-SphModel::initialize()
+SphSystem::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
     m_pointSetGeometry = std::dynamic_pointer_cast<PointSet>(m_geometry);
@@ -187,7 +187,7 @@ SphModel::initialize()
 }
 
 void
-SphModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+SphSystem::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
     m_taskGraph->addEdge(source, m_findParticleNeighborsNode);
@@ -212,13 +212,13 @@ SphModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
 }
 
 void
-SphModel::computeTimeStepSize()
+SphSystem::computeTimeStepSize()
 {
     m_dt = (this->m_timeStepSizeType == TimeSteppingType::Fixed) ? m_defaultDt : computeCFLTimeStepSize();
 }
 
 double
-SphModel::computeCFLTimeStepSize()
+SphSystem::computeCFLTimeStepSize()
 {
     auto maxVel = ParallelUtils::findMaxL2Norm(*getCurrentState()->getFullStepVelocities());
 
@@ -240,7 +240,7 @@ SphModel::computeCFLTimeStepSize()
 }
 
 void
-SphModel::findParticleNeighbors()
+SphSystem::findParticleNeighbors()
 {
     m_neighborSearcher->getNeighbors(getCurrentState()->getFluidNeighborLists(), *getCurrentState()->getPositions());
 
@@ -253,7 +253,7 @@ SphModel::findParticleNeighbors()
 }
 
 void
-SphModel::computeNeighborRelativePositions()
+SphSystem::computeNeighborRelativePositions()
 {
     auto computeRelativePositions = [&](const Vec3d& ppos, const std::vector<size_t>& neighborList,
                                         const VecDataArray<double, 3>& allPositions, std::vector<NeighborInfo>& neighborInfo)
@@ -295,7 +295,7 @@ SphModel::computeNeighborRelativePositions()
 }
 
 void
-SphModel::collectNeighborDensity()
+SphSystem::collectNeighborDensity()
 {
     // After computing particle densities, cache them into neighborInfo variable, next to relative positions
     // this is useful because relative positions and densities are accessed together multiple times
@@ -330,7 +330,7 @@ SphModel::collectNeighborDensity()
 }
 
 void
-SphModel::computeDensity()
+SphSystem::computeDensity()
 {
     std::shared_ptr<DataArray<double>> densitiesPtr = getCurrentState()->getDensities();
     DataArray<double>&                 densities    = *densitiesPtr;
@@ -374,7 +374,7 @@ SphModel::computeDensity()
 //}
 
 void
-SphModel::normalizeDensity()
+SphSystem::normalizeDensity()
 {
     if (!m_modelParameters->m_bNormalizeDensity)
     {
@@ -420,7 +420,7 @@ SphModel::normalizeDensity()
 }
 
 void
-SphModel::computePressureAcceleration()
+SphSystem::computePressureAcceleration()
 {
     std::shared_ptr<DataArray<double>> densitiesPtr   = getCurrentState()->getDensities();
     const DataArray<double>&           densities      = *densitiesPtr;
@@ -466,7 +466,7 @@ SphModel::computePressureAcceleration()
 }
 
 void
-SphModel::computeViscosity()
+SphSystem::computeViscosity()
 {
     VecDataArray<double, 3>&       viscousAccels      = *m_viscousAccels;
     VecDataArray<double, 3>&       neighborVelContr   = *m_neighborVelContr;
@@ -528,7 +528,7 @@ SphModel::computeViscosity()
 }
 
 void
-SphModel::computeSurfaceTension()
+SphSystem::computeSurfaceTension()
 {
     VecDataArray<double, 3>& surfaceNormals = *getCurrentState()->getNormals();
 
@@ -623,7 +623,7 @@ SphModel::computeSurfaceTension()
 }
 
 void
-SphModel::sumAccels()
+SphSystem::sumAccels()
 {
     const VecDataArray<double, 3>& pressureAccels       = *m_pressureAccels;
     const VecDataArray<double, 3>& surfaceTensionAccels = *m_surfaceTensionAccels;
@@ -645,7 +645,7 @@ SphModel::sumAccels()
 }
 
 void
-SphModel::updateVelocity(const double timestep)
+SphSystem::updateVelocity(const double timestep)
 {
     VecDataArray<double, 3>&       halfStepVelocities = *getCurrentState()->getHalfStepVelocities();
     VecDataArray<double, 3>&       fullStepVelocities = *getCurrentState()->getFullStepVelocities();
@@ -682,7 +682,7 @@ SphModel::updateVelocity(const double timestep)
 }
 
 void
-SphModel::moveParticles(const double timestep)
+SphSystem::moveParticles(const double timestep)
 {
     //ParallelUtils::parallelFor(getState().getNumParticles(),
     //  [&](const size_t p) {
@@ -752,7 +752,7 @@ SphModel::moveParticles(const double timestep)
 }
 
 double
-SphModel::getParticlePressure(const double density)
+SphSystem::getParticlePressure(const double density)
 {
     const double d     = density / m_modelParameters->m_restDensity;
     const double d2    = d * d;
@@ -763,7 +763,7 @@ SphModel::getParticlePressure(const double density)
 }
 
 void
-SphModel::setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocity)
+SphSystem::setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocity)
 {
     m_initialVelocities->clear();
     m_initialVelocities->reserve(static_cast<int>(numParticles));
@@ -783,7 +783,7 @@ SphModel::setInitialVelocities(const size_t numParticles, const Vec3d& initialVe
 }
 
 void
-SphModel::findNearestParticleToVertex(const VecDataArray<double, 3>& points, const std::vector<std::vector<size_t>>& indices)
+SphSystem::findNearestParticleToVertex(const VecDataArray<double, 3>& points, const std::vector<std::vector<size_t>>& indices)
 {
     const VecDataArray<double, 3>& positions = *getCurrentState()->getPositions();
     for (size_t i = 0; i < static_cast<size_t>(points.size()); i++)

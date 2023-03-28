@@ -156,7 +156,7 @@ public:
             {
                 // Run in realtime at a slightly slowed down speed
                 // Still fixed, but # of iterations may vary by system
-                m_pbdModel->getConfig()->m_dt =
+                m_pbdSystem->getConfig()->m_dt =
                     m_sceneManager->getDt();
             });
 
@@ -180,7 +180,7 @@ public:
 public:
 
     // Pbd model used for simulation
-    std::shared_ptr<PbdSystem> m_pbdModel = nullptr;
+    std::shared_ptr<PbdSystem> m_pbdSystem = nullptr;
 
     // Pbd objects to be connected
     std::shared_ptr<Entity> m_pbdObjA = nullptr;
@@ -205,19 +205,19 @@ public:
 ///
 TEST_F(PbdConnectiveTissueTest, PbdConnectiveDropTest)
 {
-    m_pbdModel = makePbdModel();
+    m_pbdSystem = makePbdModel();
 
     // Setup the tissue
     m_pbdObjA = makeVolumeCubeObj("TissueA",
         Vec3d(0.4, 0.4, 0.4), Vec3i(2, 2, 2), Vec3d(0.0, 0.0, 0.0),
-        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdModel);
+        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdSystem);
 
     m_pbdObjB = makeSurfaceCubeObj("TissueB",
         Vec3d(0.4, 0.4, 0.4), Vec3i(2, 2, 2), Vec3d(1.0, 0.0, 0.0),
-        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdModel);
+        Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))), m_pbdSystem);
 
     // Setup the connective tissue
-    m_pbdObjCT = makeConnectiveTissue(m_pbdObjA, m_pbdObjB, m_pbdModel);
+    m_pbdObjCT = makeConnectiveTissue(m_pbdObjA, m_pbdObjB, m_pbdSystem);
 
     m_assertionBoundsMin = Vec3d(-3.0, -3.0, -3.0);
     m_assertionBoundsMax = Vec3d(3.0, 3.0, 3.0);
