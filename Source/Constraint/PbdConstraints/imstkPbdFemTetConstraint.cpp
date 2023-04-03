@@ -20,7 +20,7 @@ PbdFemTetConstraint::initConstraint(
     m_particles[2] = pIdx2;
     m_particles[3] = pIdx3;
 
-    m_initialElementVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
+    m_initialElementVolume = tetVolume(p0, p1, p2, p3);
     m_config     = config;
     m_compliance = 1.0 / (config->m_lambda + 2 * config->m_mu);
 
