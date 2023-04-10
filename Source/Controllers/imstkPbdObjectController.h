@@ -169,8 +169,9 @@ protected:
 
     Vec3d  m_hapticOffset       = Vec3d::Zero();
     double m_forceScaling       = 0.0000075;
-    bool   m_useSpring          = true; ///< If off, pos & orientation directly set
-    bool   m_useCriticalDamping = true; ///< If on, kd is automatically computed
+    bool   m_useSpring          = true;                 ///< If off, pos & orientation directly set
+    bool   m_useCriticalDamping = true;                 ///< If on, kd is automatically computed
+    Vec3d  m_inversionParams    = Vec3d(1.0, 1.0, 1.0); ///< Inversion parameters for each axis
 
     bool m_forceSmoothening    = true;
     int  m_smoothingKernelSize = 15;

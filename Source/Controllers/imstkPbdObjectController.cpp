@@ -55,6 +55,11 @@ PbdObjectController::update(const double& dt)
             // Directly set position/rotation
             (*m_pbdObject->getPbdBody()->vertices)[0]     = getPosition();
             (*m_pbdObject->getPbdBody()->orientations)[0] = getOrientation();
+
+            m_inversionParams[0] = (m_invertFlags& InvertFlag::transX) ? -1.0 : 1.0;
+            m_inversionParams[1] = (m_invertFlags& InvertFlag::transY) ? -1.0 : 1.0;
+            m_inversionParams[2] = (m_invertFlags& InvertFlag::transZ) ? -1.0 : 1.0;
+
             return;
         }
 
@@ -151,7 +156,11 @@ PbdObjectController::applyForces()
     // Apply force back to device
     if (m_pbdObject != nullptr && m_useSpring)
     {
-        const Vec3d force = -getDeviceForce();
+        // Get Device Force but also apply inversion if it was set up
+        // for this device, NOTE that we are not inverting the torque
+        // here
+        const Vec3d force = -getDeviceForce().cwiseProduct(m_inversionParams);
+
         if (m_forceSmoothening)
         {
             m_forces.push_back(force);
