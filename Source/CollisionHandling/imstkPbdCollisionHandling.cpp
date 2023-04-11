@@ -666,13 +666,13 @@ PbdCollisionHandling::deleteCollisionConstraints()
     // 10s to 100s of constraints changing frequently over few frames.
     for (int i = 0; i < NumTypes; i++)
     {
-        for (size_t j = 0; j < m_constraintBins[i].size(); j++)
-        {
-            delete  m_constraintBins[i][j];
-        }
-        m_constraintBins[i].resize(0);
-
         for (size_t j = 0; j < m_constraintCache[i].size(); j++)
+        {
+            delete  m_constraintCache[i][j];
+        }
+        m_constraintCache[i].resize(0);
+
+        for (size_t j = 0; j < m_constraintBins[i].size(); j++)
         {
             delete  m_constraintBins[i][j];
         }
