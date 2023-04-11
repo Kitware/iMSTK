@@ -23,7 +23,7 @@ class PbdContactConstraint : public PbdConstraint
 {
 protected:
     PbdContactConstraint(const int numParticles) :
-        PbdConstraint(numParticles), m_r(numParticles), m_weights(numParticles)
+        PbdConstraint(numParticles), m_r(numParticles, Vec3d::Zero()), m_weights(numParticles)
     {
     }
 
