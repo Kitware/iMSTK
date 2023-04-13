@@ -60,7 +60,7 @@ public:
 
     ///
     /// \return the body with the given index nullptr otherwise
-    /// 
+    ///
     std::shared_ptr<PbdBody> getBody(size_t index) const;
 
     PbdState& getBodies() { return m_state; }

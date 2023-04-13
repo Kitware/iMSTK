@@ -90,12 +90,15 @@ PbdModel::removeBody(std::shared_ptr<PbdBody> body)
     m_modified = true;
 }
 
-std::shared_ptr<imstk::PbdBody> PbdModel::getBody(size_t index) const
+std::shared_ptr<imstk::PbdBody>
+PbdModel::getBody(size_t index) const
 {
-    if (index < m_state.m_bodies.size()) {
+    if (index < m_state.m_bodies.size())
+    {
         return m_state.m_bodies[index];
     }
-    else {
+    else
+    {
         LOG(WARNING) << "PbdModel::getBody: index out of range";
         return nullptr;
     }
