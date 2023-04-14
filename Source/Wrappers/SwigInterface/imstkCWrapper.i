@@ -266,6 +266,13 @@
 %include <std_string.i>
 %include <std_vector.i>
 %include <std_pair.i>
+
+/*
+ * https://github.com/swig/swig/pull/2480
+ * Copied unordered_map for c# from the above pull request
+ */
+
+%include <std_unordered_map.i> 
 namespace std
 {
   %template(VectorInt) vector<int>;
@@ -275,6 +282,7 @@ namespace std
   %template(VectorPbdBody) vector<imstk::PbdBody>;
   %template(VectorString) vector<std::string>;
   %template(IntPair) pair<int, int>;
+  %template(UnorderedMapStringDouble) unordered_map<std::string, double>;
 }
 
 %include <std_except.i>

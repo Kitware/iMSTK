@@ -32,6 +32,7 @@ if (MSVC)
 		${SWIG_INTERFACE_DIR}/modifiers.i
 		${SWIG_INTERFACE_DIR}/shared_ptr_instantiation.i
 		${SWIG_INTERFACE_DIR}/std_function.i
+        ${SWIG_INTERFACE_DIR}/std_unordered_map.i
 		${SWIG_INTERFACE_DIR}/type_cast.i
 		${SWIG_INTERFACE_DIR}/weak_ptr.i)
 

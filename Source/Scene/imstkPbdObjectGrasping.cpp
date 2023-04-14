@@ -584,16 +584,16 @@ PbdObjectGrasping::addPointToBodyConstraint(
 void
 PbdObjectGrasping::updatePicking()
 {
-    m_objectToGrasp->updateGeometries();
-
     // If started picking
     if (!m_isPrevGrasping && m_isGrasping)
     {
+        m_objectToGrasp->updateGeometries();
         addPickConstraints();
     }
     // If stopped picking
     if (!m_isGrasping && m_isPrevGrasping)
     {
+        m_objectToGrasp->updateGeometries();
         removePickConstraints();
     }
     // Push back the picking state
@@ -601,6 +601,7 @@ PbdObjectGrasping::updatePicking()
 
     if (m_isGrasping)
     {
+        m_objectToGrasp->updateGeometries();
         updateConstraints();
     }
 }
