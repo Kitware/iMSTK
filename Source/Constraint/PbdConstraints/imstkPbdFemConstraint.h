@@ -22,6 +22,26 @@ struct PbdFemConstraintConfig
     {
     }
 
+    void setYoungAndPoisson(double youngModulus, double poissonRatio)
+    {
+        m_YoungModulus = youngModulus;
+        m_PoissonRatio = poissonRatio;
+        const double E  = youngModulus;
+        const double nu = poissonRatio;
+        m_mu     = E / 2.0 / (1.0 + nu);
+        m_lambda = E * nu / ((1.0 + nu) * (1.0 - 2.0 * nu));
+    }
+
+    void setMuAndLambda(double mu, double lambda)
+    {
+        m_mu           = mu;
+        m_lambda       = lambda;
+        m_YoungModulus = mu * (3.0 * lambda + 2.0 * mu) / (lambda + mu);
+        m_PoissonRatio = lambda / 2.0 / (lambda + mu);
+    }
+
+    PbdFemConstraintConfig() = default;
+
     double m_mu     = 0.0;        ///< Lame constant, if constraint type is Fem
     double m_lambda = 0.0;        ///< Lame constant, if constraint type is Fem
 
@@ -63,6 +83,6 @@ public:
     MaterialType m_material;                   ///< Material type
     Mat3d m_invRestMat;
 
-    std::shared_ptr<PbdFemConstraintConfig> m_config = nullptr;
+    PbdFemConstraintConfig m_config;
 };
 } // namespace imstk

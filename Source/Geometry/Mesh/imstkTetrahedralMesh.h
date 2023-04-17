@@ -20,11 +20,15 @@ namespace imstk
 /// \brief Represents a set of tetrahedrons & vertices via an array of
 /// Vec3d double vertices & Vec4i integer indices
 ///
+/// To allow for flexible configuration of the tetrahedral mesh the the "StrainParameter"
+/// attribute can be used.
 class TetrahedralMesh : public VolumetricMesh<4>
 {
 public:
     TetrahedralMesh() = default;
     ~TetrahedralMesh() override = default;
+
+    static std::string StrainParameterName;
 
     IMSTK_TYPE_NAME(TetrahedralMesh)
 
@@ -68,6 +72,18 @@ public:
     {
         return std::unique_ptr<TetrahedralMesh>(cloneImplementation());
     }
+
+    ///
+    /// \brief Get/Set the strain parameters for the tetrahedral mesh the strain parameters are
+    /// expected to be a VecDataArray<double, 3> with the same number of elements as the number of
+    /// tetrahedra in the mesh
+    /// index 0: Model type from the enum TetrahedralMeshStrainModelType
+    /// index 1: Youngs modulus
+    /// index 2: Poisson ratio
+    ///@{
+    std::shared_ptr<VecDataArray<double, 3>> getStrainParameters() const;
+    void setStrainParameters(std::shared_ptr<VecDataArray<double, 3>> strainParameters);
+///@}
 
 protected:
     std::vector<bool> m_removedMeshElems;

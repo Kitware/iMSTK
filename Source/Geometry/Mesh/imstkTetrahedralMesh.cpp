@@ -30,6 +30,27 @@ TetrahedralMesh::getVolume()
     return volume;
 }
 
+void
+TetrahedralMesh::setStrainParameters(std::shared_ptr<VecDataArray<double, 3>> strainParameters)
+{
+    CHECK(strainParameters->size() == m_indices->size()) << "Strain parameters must be the same size as the number of tetrahedra";
+    setCellAttribute(StrainParameterName, strainParameters);
+}
+
+std::shared_ptr<imstk::VecDataArray<double, 3>>
+TetrahedralMesh::getStrainParameters() const
+{
+    auto params = std::dynamic_pointer_cast<VecDataArray<double, 3>>(getCellAttribute(StrainParameterName));
+    if (params != nullptr && params->size() != m_indices->size())
+    {
+        LOG(WARNING) << "Strain parameters are not the same size as the number of tetrahedra";
+        return nullptr;
+    }
+    return params;
+}
+
+std::string TetrahedralMesh::StrainParameterName = "StrainParameters";
+
 std::shared_ptr<SurfaceMesh>
 TetrahedralMesh::extractSurfaceMesh()
 {

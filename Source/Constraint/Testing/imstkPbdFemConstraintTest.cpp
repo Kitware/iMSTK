@@ -37,7 +37,7 @@ TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionStVK)
     m.col(2) = m_vertices[2] - m_vertices[3];
 
     // PbdFemConstraintConfig(mu, lambda, youngModulus, poissonRatio)
-    auto femConfig = std::make_shared<PbdFemConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
+    auto femConfig = PbdFemConstraintConfig(344.82, 3103.44, 1000.0, 0.45);
 
     // Set up constraint
     PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::StVK);
@@ -96,7 +96,7 @@ TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionNeoHookean)
     indices[0] = Vec4i(0, 1, 2, 3);
 
     // PbdFemConstraintConfig(mu, lambda, youngModulus, poissonRatio)
-    auto femConfig = std::make_shared<PbdFemConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
+    auto femConfig = PbdFemConstraintConfig(344.82, 3103.44, 1000.0, 0.45);
 
     // Set up constraint
     PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::NeoHookean);
@@ -155,7 +155,7 @@ TEST_F(PbdConstraintTest, FemTetConstraint_TestTetInversionCorotational)
     indices[0] = Vec4i(0, 1, 2, 3);
 
     // PbdFemConstraintConfig(mu, lambda, youngModulus, poissonRatio)
-    auto femConfig = std::make_shared<PbdFemConstraintConfig>(344.82, 3103.44, 1000.0, 0.45);
+    auto femConfig = PbdFemConstraintConfig(344.82, 3103.44, 1000.0, 0.45);
 
     // Set up constraint
     PbdFemTetConstraint constraint(PbdFemConstraint::MaterialType::Corotation);
