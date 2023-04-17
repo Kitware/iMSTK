@@ -150,6 +150,7 @@ MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::strin
     case MeshFileType::VTP:
     case MeshFileType::STL:
     case MeshFileType::PLY:
+    case MeshFileType::OBJ:
     case MeshFileType::MHD:
     case MeshFileType::BMP:
     case MeshFileType::PNG:
