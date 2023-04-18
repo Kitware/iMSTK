@@ -324,9 +324,12 @@ struct PbdFemTetConstraintFunctor : public PbdBodyConstraintFunctor
             std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getCells();
             const VecDataArray<int, 4>&              elements    = *elementsPtr;
 
-            auto strainParams = std::make_shared<VecDataArray<double, 4>>();
+            std::shared_ptr<VecDataArray<double, 3>> strainParameters;
 
-            std::shared_ptr<VecDataArray<double, 3>> strainParameters = tetMesh->getStrainParameters();
+            if (tetMesh->hasCellAttribute(TetrahedralMesh::StrainParameterName))
+            {
+                strainParameters = tetMesh->getStrainParameters();
+            }
 
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
