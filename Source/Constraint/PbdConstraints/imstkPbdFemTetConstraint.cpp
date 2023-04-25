@@ -13,7 +13,7 @@ PbdFemTetConstraint::initConstraint(
     const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
     const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
     const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
-    std::shared_ptr<PbdFemConstraintConfig> config)
+    PbdFemConstraintConfig config)
 {
     m_particles[0] = pIdx0;
     m_particles[1] = pIdx1;
@@ -22,7 +22,7 @@ PbdFemTetConstraint::initConstraint(
 
     m_initialElementVolume = tetVolume(p0, p1, p2, p3);
     m_config     = config;
-    m_compliance = 1.0 / (config->m_lambda + 2 * config->m_mu);
+    m_compliance = 1.0 / (config.m_lambda + 2 * config.m_mu);
 
     Mat3d m;
     m.col(0) = p0 - p3;
@@ -75,8 +75,8 @@ PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
     // energy constraint
     double C = 0;
 
-    const double mu     = m_config->m_mu;
-    const double lambda = m_config->m_lambda;
+    const double mu     = m_config.m_mu;
+    const double lambda = m_config.m_lambda;
 
     switch (m_material)
     {

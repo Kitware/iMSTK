@@ -104,3 +104,35 @@ TEST(imstkTetrahedralMeshTest, GetVolume)
     tetMesh.initialize(verticesPtr, indicesPtr);
     EXPECT_NEAR(expectedVolume, tetMesh.getVolume(), 0.000001);
 }
+
+TEST(imstkTetrahedralMeshTest, StrainParameters)
+{
+    TetrahedralMesh          tetMesh;
+    const double             edgeLength  = 2.0;
+    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
+    auto                     indicesPtr  = std::make_shared<VecDataArray<int, 4>>(1);
+    VecDataArray<double, 3>& vertices    = *verticesPtr;
+    VecDataArray<int, 4>&    indices     = *indicesPtr;
+
+    vertices[0] = Vec3d(1.0, 0.0, -1.0 / std::sqrt(edgeLength));
+    vertices[1] = Vec3d(-1.0, 0.0, -1.0 / std::sqrt(edgeLength));
+    vertices[2] = Vec3d(0.0, 1.0, 1.0 / std::sqrt(edgeLength));
+    vertices[3] = Vec3d(0.0, -1.0, 1.0 / std::sqrt(edgeLength));
+
+    indices[0] = Vec4i(0, 1, 2, 3);
+
+    tetMesh.initialize(verticesPtr, indicesPtr);
+
+    auto strainParameters = std::make_shared<VecDataArray<double, 3>>(1);
+    (*strainParameters)[0] = Vec3d(-2, 123, 0.789);
+
+    tetMesh.setStrainParameters(strainParameters);
+
+    EXPECT_EQ(strainParameters, tetMesh.getStrainParameters());
+
+    auto wrongParames = std::make_shared<VecDataArray<float, 2>>(1);
+    (*wrongParames)[0] = Vec2f(1, 2);
+    tetMesh.setCellAttribute(TetrahedralMesh::StrainParameterName, wrongParames);
+
+    EXPECT_EQ(nullptr, tetMesh.getStrainParameters());
+}

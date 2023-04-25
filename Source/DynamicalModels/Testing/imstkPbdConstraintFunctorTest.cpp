@@ -170,10 +170,117 @@ TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGeneration)
 
     // Check constraint generated between correct elements and with correct values
     EXPECT_EQ(constraint->m_material, PbdFemTetConstraint::MaterialType::Corotation);
-    EXPECT_EQ(constraint->m_config->m_mu, 0.0);
-    EXPECT_EQ(constraint->m_config->m_lambda, 0.0);
-    EXPECT_EQ(constraint->m_config->m_YoungModulus, 1000.0);
-    EXPECT_EQ(constraint->m_config->m_PoissonRatio, 0.2);
+    EXPECT_EQ(constraint->m_config.m_mu, 0.0);
+    EXPECT_EQ(constraint->m_config.m_lambda, 0.0);
+    EXPECT_EQ(constraint->m_config.m_YoungModulus, 1000.0);
+    EXPECT_EQ(constraint->m_config.m_PoissonRatio, 0.2);
+    EXPECT_EQ(constraint->getParticles().size(), 4);
+    EXPECT_EQ(constraint->getParticles()[0].second, 0);
+    EXPECT_EQ(constraint->getParticles()[1].second, 1);
+    EXPECT_EQ(constraint->getParticles()[2].second, 2);
+    EXPECT_EQ(constraint->getParticles()[3].second, 3);
+}
+
+///
+/// \brief Test that the correct pbd FEM tetrahedral constraint was generated
+///
+TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGenerationAttribute)
+{
+    auto tetMesh  = std::make_shared<TetrahedralMesh>();
+    auto vertices = std::make_shared<VecDataArray<double, 3>>(4);
+    (*vertices)[0] = Vec3d(0.0, 0.0, 0.0);
+    (*vertices)[1] = Vec3d(1.0, 0.0, 0.0);
+    (*vertices)[2] = Vec3d(0.0, 1.0, 0.0);
+    (*vertices)[3] = Vec3d(0.0, 0.0, 1.0);
+    auto indices = std::make_shared<VecDataArray<int, 4>>(1);
+    (*indices)[0] = Vec4i(0, 1, 2, 3);
+    tetMesh->initialize(vertices, indices);
+
+    auto attributes = std::make_shared<VecDataArray<double, 3>>(1);
+    (*attributes)[0] = Vec3d(2, 123, 0.789);
+    PbdFemConstraintConfig c;
+    c.setYoungAndPoisson(123, 0.789);
+    double expectedMu     = c.m_mu;
+    double expectedLambda = c.m_lambda;
+
+    tetMesh->setCellAttribute(TetrahedralMesh::StrainParameterName, attributes);
+
+    // Create functor
+    PbdFemTetConstraintFunctor constraintFunctor;
+    constraintFunctor.setMaterialType(PbdFemTetConstraint::MaterialType::Corotation);
+    auto FeConfig = std::make_shared<PbdFemConstraintConfig>(0.0, 0.0, 1000.0, 0.2);
+
+    constraintFunctor.setFemConfig(FeConfig);
+    constraintFunctor.setGeometry(tetMesh);
+
+    // Fill container
+    PbdConstraintContainer container;
+    constraintFunctor(container);
+
+    // Check that constraint got generated
+    EXPECT_EQ(container.getConstraints().size(), 1);
+
+    // Check that correct constraint type got generated
+    auto constraint = std::dynamic_pointer_cast<PbdFemTetConstraint>(container.getConstraints()[0]);
+    EXPECT_NE(constraint, nullptr);
+
+    // Check constraint generated between correct elements and with correct values
+    EXPECT_EQ(constraint->m_material, PbdFemTetConstraint::MaterialType::StVK);
+    EXPECT_EQ(constraint->m_config.m_mu, expectedMu);
+    EXPECT_EQ(constraint->m_config.m_lambda, expectedLambda);
+    EXPECT_EQ(constraint->m_config.m_YoungModulus, 123);
+    EXPECT_EQ(constraint->m_config.m_PoissonRatio, 0.789);
+    EXPECT_EQ(constraint->getParticles().size(), 4);
+    EXPECT_EQ(constraint->getParticles()[0].second, 0);
+    EXPECT_EQ(constraint->getParticles()[1].second, 1);
+    EXPECT_EQ(constraint->getParticles()[2].second, 2);
+    EXPECT_EQ(constraint->getParticles()[3].second, 3);
+}
+
+///
+/// \brief Test that the correct pbd FEM tetrahedral constraint was generated
+///
+TEST(imstkPbdConstraintFunctorTest, TestFEMTetConstraintGenerationAttributeDefault)
+{
+    auto tetMesh  = std::make_shared<TetrahedralMesh>();
+    auto vertices = std::make_shared<VecDataArray<double, 3>>(4);
+    (*vertices)[0] = Vec3d(0.0, 0.0, 0.0);
+    (*vertices)[1] = Vec3d(1.0, 0.0, 0.0);
+    (*vertices)[2] = Vec3d(0.0, 1.0, 0.0);
+    (*vertices)[3] = Vec3d(0.0, 0.0, 1.0);
+    auto indices = std::make_shared<VecDataArray<int, 4>>(1);
+    (*indices)[0] = Vec4i(0, 1, 2, 3);
+    tetMesh->initialize(vertices, indices);
+
+    auto attributes = std::make_shared<VecDataArray<double, 3>>(1);
+    (*attributes)[0] = Vec3d(-2, 123, 0.789);
+
+    tetMesh->setCellAttribute(TetrahedralMesh::StrainParameterName, attributes);
+
+    // Create functor
+    PbdFemTetConstraintFunctor constraintFunctor;
+    constraintFunctor.setMaterialType(PbdFemTetConstraint::MaterialType::Corotation);
+    auto FeConfig = std::make_shared<PbdFemConstraintConfig>(0.0, 0.0, 1000.0, 0.2);
+    constraintFunctor.setFemConfig(FeConfig);
+    constraintFunctor.setGeometry(tetMesh);
+
+    // Fill container
+    PbdConstraintContainer container;
+    constraintFunctor(container);
+
+    // Check that constraint got generated
+    EXPECT_EQ(container.getConstraints().size(), 1);
+
+    // Check that correct constraint type got generated
+    auto constraint = std::dynamic_pointer_cast<PbdFemTetConstraint>(container.getConstraints()[0]);
+    EXPECT_NE(constraint, nullptr);
+
+    // Check constraint generated between correct elements and with correct values
+    EXPECT_EQ(constraint->m_material, PbdFemTetConstraint::MaterialType::Corotation);
+    EXPECT_EQ(constraint->m_config.m_mu, 0.0);
+    EXPECT_EQ(constraint->m_config.m_lambda, 0.0);
+    EXPECT_EQ(constraint->m_config.m_YoungModulus, 1000.0);
+    EXPECT_EQ(constraint->m_config.m_PoissonRatio, 0.2);
     EXPECT_EQ(constraint->getParticles().size(), 4);
     EXPECT_EQ(constraint->getParticles()[0].second, 0);
     EXPECT_EQ(constraint->getParticles()[1].second, 1);

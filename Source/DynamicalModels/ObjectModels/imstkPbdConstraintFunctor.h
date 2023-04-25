@@ -324,16 +324,33 @@ struct PbdFemTetConstraintFunctor : public PbdBodyConstraintFunctor
             std::shared_ptr<VecDataArray<int, 4>>    elementsPtr = tetMesh->getCells();
             const VecDataArray<int, 4>&              elements    = *elementsPtr;
 
+            std::shared_ptr<VecDataArray<double, 3>> strainParameters;
+
+            if (tetMesh->hasCellAttribute(TetrahedralMesh::StrainParameterName))
+            {
+                strainParameters = tetMesh->getStrainParameters();
+            }
+
             ParallelUtils::parallelFor(elements.size(),
                 [&](const size_t k)
                 {
                     const Vec4i& tet = elements[k];
-                    auto c = std::make_shared<PbdFemTetConstraint>(m_matType);
+
+                    PbdFemTetConstraint::MaterialType materialType = m_matType;
+                    PbdFemConstraintConfig config = *m_femConfig;
+                    if (strainParameters && strainParameters->at(k)[0] >= 0)
+                    {
+                        materialType = static_cast<PbdFemTetConstraint::MaterialType>((int)strainParameters->at(k)[0]);
+                        config.setYoungAndPoisson(strainParameters->at(k)[1], strainParameters->at(k)[2]);
+                    }
+
+                    auto c = std::make_shared<PbdFemTetConstraint>(materialType);
+
                     c->initConstraint(
                         vertices[tet[0]], vertices[tet[1]], vertices[tet[2]], vertices[tet[3]],
                         { m_bodyIndex, tet[0] }, { m_bodyIndex, tet[1] },
                         { m_bodyIndex, tet[2] }, { m_bodyIndex, tet[3] },
-                        m_femConfig);
+                        config);
                     constraints.addConstraint(c);
             }, elements.size() > 100);
         }

@@ -27,6 +27,7 @@
 #include <vtkNIFTIImageWriter.h>
 #include <vtkNrrdReader.h>
 #include <vtkOBJReader.h>
+#include <vtkOBJWriter.h>
 #include <vtkPLYReader.h>
 #include <vtkPLYWriter.h>
 #include <vtkPNGReader.h>
@@ -168,6 +169,8 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
             return VTKMeshIO::writeVtkPolyData<vtkPLYWriter>(sMesh, filePath);
         case MeshFileType::VTK:
             return VTKMeshIO::writeVtkPolyData<vtkPolyDataWriter>(sMesh, filePath);
+        case MeshFileType::OBJ:
+            return VTKMeshIO::writeVtkPolyData<vtkOBJWriter>(sMesh, filePath);
         default:
             LOG(WARNING) << "Error: file type not supported for SurfaceMesh. Target path supplied:" << filePath;
             return false;

@@ -31,7 +31,7 @@ public:
         const Vec3d& p0, const Vec3d& p1, const Vec3d& p2, const Vec3d& p3,
         const PbdParticleId& pIdx0, const PbdParticleId& pIdx1,
         const PbdParticleId& pIdx2, const PbdParticleId& pIdx3,
-        std::shared_ptr<PbdFemConstraintConfig> config);
+        PbdFemConstraintConfig config);
 
     ///
     /// \brief Compute value and gradient of constraint function
