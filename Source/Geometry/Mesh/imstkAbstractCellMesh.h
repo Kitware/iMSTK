@@ -63,9 +63,13 @@ public:
     ///
     const std::vector<std::unordered_set<int>>& getVertexToCellMap() const { return m_vertexToCells; }
 
+    /// \brief Returns cells that contain the vertex, will calculate vertex cells if necessary
+    /// \return vector of cell ids the vertex is contained in, uses vector to support SWIG wrapping
+    /// Note: Currently copies the data into a vector, the m_vertextocellmap should be refactored to contain a vector
+    const std::vector<int> getCellsForVertex(const int vertexId);
+
     ///
     /// \brief Returns map of vertices to neighboring vertices
-    ///
     const std::vector<std::unordered_set<int>>& getVertexNeighbors() const { return m_vertexToNeighborVertex; }
 
     // Attributes

@@ -36,6 +36,23 @@ AbstractCellMesh::print() const
     LOG(INFO) << "Active Cell Scalars: " << m_activeCellScalars;
 }
 
+const std::vector<int>
+AbstractCellMesh::getCellsForVertex(const int vertexId)
+{
+    if (vertexId < 0 || vertexId >= getNumVertices())
+    {
+        return {};
+    }
+
+    if (m_vertexToCells.size() == 0)
+    {
+        computeVertexToCellMap();
+    }
+    std::vector<int> cells(m_vertexToCells[vertexId].size());
+    std::copy(m_vertexToCells[vertexId].begin(), m_vertexToCells[vertexId].end(), cells.begin());
+    return cells;
+}
+
 void
 AbstractCellMesh::setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
                                          const int expectedNumComponents, const ScalarTypeId expectedScalarType)
