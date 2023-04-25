@@ -20,7 +20,7 @@ namespace imstk
 /// \brief Represents a set of tetrahedrons & vertices via an array of
 /// Vec3d double vertices & Vec4i integer indices
 ///
-/// To allow for flexible configuration of the tetrahedral mesh the the "StrainParameter"
+/// To allow for flexible configuration of the tetrahedral mesh the "StrainParameter"
 /// attribute can be used.
 class TetrahedralMesh : public VolumetricMesh<4>
 {
