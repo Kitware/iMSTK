@@ -18,6 +18,7 @@ std::shared_ptr<Derived> type_cast(std::shared_ptr<Base> base) {
 %pragma(csharp) modulecode=%{
   public static T CastTo<T>(object from, bool cMemoryOwn=false)
   {
+      if (from == null) return default(T);
       System.Reflection.MethodInfo CPtrGetter = from.GetType().GetMethod("getCPtr", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
       return CPtrGetter == null ? default(T) : (T) System.Activator.CreateInstance
       (
