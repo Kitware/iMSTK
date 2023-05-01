@@ -7,6 +7,7 @@
 #include "imstkCDObjectFactory.h"
 #include "imstkBidirectionalPlaneToSphereCD.h"
 #include "imstkCapsuleToCapsuleCD.h"
+#include "imstkClosedSurfaceMeshToCapsuleCD.h"
 #include "imstkClosedSurfaceMeshToMeshCD.h"
 #include "imstkGeometry.h"
 #include "imstkImplicitGeometryToPointSetCCD.h"
@@ -35,6 +36,7 @@ namespace imstk
 {
 IMSTK_REGISTER_COLLISION_DETECTION(BidirectionalPlaneToSphereCD);
 IMSTK_REGISTER_COLLISION_DETECTION(CapsuleToCapsuleCD);
+IMSTK_REGISTER_COLLISION_DETECTION(ClosedSurfaceMeshToCapsuleCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ClosedSurfaceMeshToMeshCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCD);
 IMSTK_REGISTER_COLLISION_DETECTION(ImplicitGeometryToPointSetCCD);
@@ -114,6 +116,7 @@ CDObjectFactory::getCDType(
         IMSTK_MAP_TYPES(Capsule, PointSet, PointSetToCapsuleCD),
         IMSTK_MAP_TYPES(Capsule, LineMesh, LineMeshToCapsuleCD),
         IMSTK_MAP_TYPES(Capsule, SurfaceMesh, SurfaceMeshToCapsuleCD),
+        // IMSTK_MAP_TYPES(Capsule, SurfaceMesh, ClosedSurfaceMeshToCapsuleCD),
         IMSTK_MAP_TYPES(Capsule, TetrahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Capsule, HexahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(Cylinder, Sphere, SphereToCylinderCD),

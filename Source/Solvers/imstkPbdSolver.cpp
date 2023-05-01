@@ -53,6 +53,17 @@ PbdSolver::solve()
     unsigned int i = 0;
     while (i++ < m_iterations)
     {
+        // Project collision and all external constraints
+        for (auto constraintList : *m_constraintLists)
+        {
+            const std::vector<PbdConstraint*>& constraintVec = *constraintList;
+            for (size_t j = 0; j < constraintVec.size(); j++)
+            {
+                constraintVec[j]->projectConstraint(*m_state, m_dt, m_solverType);
+            }
+        }
+
+        // Project all internal body constraints
         for (const auto& constraint : constraints)
         {
             constraint->projectConstraint(*m_state, m_dt, m_solverType);
@@ -70,15 +81,6 @@ PbdSolver::solve()
             //{
             //    constraintPartition[k]->projectConstraint(invMasses, m_dt, m_solverType, currPositions);
             //}
-        }
-
-        for (auto constraintList : *m_constraintLists)
-        {
-            const std::vector<PbdConstraint*>& constraintVec = *constraintList;
-            for (size_t j = 0; j < constraintVec.size(); j++)
-            {
-                constraintVec[j]->projectConstraint(*m_state, m_dt, m_solverType);
-            }
         }
     }
 }
