@@ -91,7 +91,8 @@ PbdFemTetConstraint::computeValueAndGradient(PbdState& bodies,
 
         // C here is strain energy (Often denoted as W in literature)
         // for the StVK mondel W = mu[tr(E^{T}E)] + 0.5*lambda*(tr(E))^2
-        C = mu * ((E.transpose() * E).trace()) + 0.5 * lambda * (E.trace() * E.trace());
+        // C = mu * ((E.transpose() * E).trace()) + 0.5 * lambda * (E.trace() * E.trace());
+        C = 0.5 * lambda * (E.trace() * E.trace()) + mu * (E * E).trace();
 
         break;
     }

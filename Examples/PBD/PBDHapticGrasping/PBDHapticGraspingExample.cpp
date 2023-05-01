@@ -30,6 +30,8 @@
 #include "imstkVTKViewer.h"
 #include "imstkMeshIO.h"
 
+#include "imstkImageData.h"
+
 #ifdef iMSTK_USE_HAPTICS
 #include "imstkDeviceManager.h"
 #include "imstkDeviceManagerFactory.h"
@@ -79,7 +81,7 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdModel> model)
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
 
     // Gallblader is about 60g
-    tissueObj->getPbdBody()->uniformMassValue = 0.6 / tissueMesh->getNumVertices();
+    tissueObj->getPbdBody()->uniformMassValue =  0.6 / tissueMesh->getNumVertices();
 
     model->getConfig()->m_femParams->m_YoungModulus = 108000.0;
     model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
@@ -130,13 +132,43 @@ makePbdObjCube(
     prismObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     prismObj->setDynamicalModel(model);
     // prismObj->getPbdBody()->uniformMassValue = 0.05;
-    prismObj->getPbdBody()->uniformMassValue = 0.06 / prismMesh->getNumVertices();
+    prismObj->getPbdBody()->uniformMassValue = 0.003; // 0.06 / surfMesh->getNumVertices();
+
     prismObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(prismMesh, surfMesh));
 
-    model->getConfig()->m_femParams->m_YoungModulus = 108000.0;
+    //model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance,
+    //    1e4,
+    //    prismObj->getPbdBody()->bodyHandle);
+    //model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral,
+    //    0.1,
+    //    prismObj->getPbdBody()->bodyHandle);
+
+    //prismObj->initialize();
+    model->getConfig()->m_femParams->m_YoungModulus = 6000.0;
     model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
     model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
-    model->getConfig()->setBodyDamping(prismObj->getPbdBody()->bodyHandle, 0.01);
+    model->getConfig()->setBodyDamping(prismObj->getPbdBody()->bodyHandle, 0.001);
+
+    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = surfMesh->getCells();
+    const VecDataArray<int, 3>&              indices     = *indicesPtr;
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
+    const VecDataArray<double, 3>&           verts       = *verticesPtr;
+
+    double avgArea = 0.0;
+    for (int i = 0; i < surfMesh->getNumCells(); i++)
+    {
+        const Vec3i& cell = indices[i];
+        const Vec3d& p0   = verts[cell[0]];
+        const Vec3d& p1   = verts[cell[1]];
+        const Vec3d& p2   = verts[cell[2]];
+        avgArea += 0.5 * (p1 - p0).cross(p2 - p0).norm();
+    }
+
+    avgArea /= surfMesh->getNumCells();
+    LOG(INFO) << "Average Cell Area = " << avgArea;
+    LOG(INFO) << "Cell Characteristic Length = " << sqrt(avgArea);
+    LOG(INFO) << "Per node mass = " << prismObj->getPbdBody()->uniformMassValue;
+
     // Fix the borders
     std::shared_ptr<VecDataArray<double, 3>> vertices = prismMesh->getVertexPositions();
     for (int i = 0; i < prismMesh->getNumVertices(); i++)
@@ -152,17 +184,83 @@ makePbdObjCube(
 }
 
 ///
+/// \brief Creates tissue object
+///
+static std::shared_ptr<PbdObject>
+makeTissueObj(const std::string&        name,
+              std::shared_ptr<PbdModel> model,
+              const double              width,
+              const double              height,
+              const int                 rowCount,
+              const int                 colCount)
+{
+    // Setup the Geometry
+    std::shared_ptr<SurfaceMesh> surfMesh =
+        GeometryUtils::toTriangleGrid(Vec3d::Zero(),
+            Vec2d(width, height), Vec2i(rowCount, colCount));
+
+    // Setup the Object
+    auto pbdObject = std::make_shared<PbdObject>(name);
+
+    pbdObject->setVisualGeometry(surfMesh);
+    pbdObject->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    pbdObject->setPhysicsGeometry(surfMesh);
+    pbdObject->setCollidingGeometry(surfMesh);
+    pbdObject->setDynamicalModel(model);
+    pbdObject->getPbdBody()->uniformMassValue = 0.003; // 0.06 / surfMesh->getNumVertices();
+    for (int x = 0; x < rowCount; x++)
+    {
+        for (int y = 0; y < colCount; y++)
+        {
+            if (x == 0 || y == 0 || y == colCount - 1) //|| x == rowCount - 1
+            {
+                pbdObject->getPbdBody()->fixedNodeIds.push_back(x * colCount + y);
+            }
+        }
+    }
+
+    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = surfMesh->getCells();
+    const VecDataArray<int, 3>&              indices     = *indicesPtr;
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices    = *verticesPtr;
+
+    double avgArea = 0.0;
+    for (int i = 0; i < surfMesh->getNumCells(); i++)
+    {
+        const Vec3i& cell = indices[i];
+        const Vec3d& p0   = vertices[cell[0]];
+        const Vec3d& p1   = vertices[cell[1]];
+        const Vec3d& p2   = vertices[cell[2]];
+        avgArea += 0.5 * (p1 - p0).cross(p2 - p0).norm();
+    }
+
+    avgArea /= surfMesh->getNumCells();
+    LOG(INFO) << "Average Cell Area = " << avgArea;
+    LOG(INFO) << "Cell Characteristic Length = " << sqrt(avgArea);
+    LOG(INFO) << "Per node mass = " << pbdObject->getPbdBody()->uniformMassValue;
+
+    return pbdObject;
+}
+
+///
 /// \brief Creates capsule to use as a tool
 ///
 static std::shared_ptr<PbdObject>
 makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
 {
+    double radius = 0.005;
+    double length = 0.2;
+    double mass   = 0.02;
+
     auto toolGeometry = std::make_shared<Capsule>();
     // auto toolGeometry = std::make_shared<Sphere>();
-    toolGeometry->setRadius(0.003);
-    toolGeometry->setLength(0.1);
+    toolGeometry->setRadius(radius);
+    toolGeometry->setLength(length);
     toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
     toolGeometry->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
+
+    LOG(INFO) << "Tool Radius  = " << radius;
+    LOG(INFO) << "Tool mass = " << mass;
 
     auto toolObj = std::make_shared<PbdObject>("Tool");
 
@@ -172,10 +270,10 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     toolObj->setCollidingGeometry(toolGeometry);
     toolObj->setDynamicalModel(model);
     toolObj->getPbdBody()->setRigid(
-                Vec3d(0.04, 0.0, 0.0),
-                0.02,
-                Quatd::Identity(),
-                Mat3d::Identity() * 1.0);
+        Vec3d(0.04, 0.0, 0.0),
+        mass,
+        Quatd::Identity(),
+        Mat3d::Identity() * 1.0);
 
     toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(1.0);
 
@@ -216,13 +314,25 @@ main()
     auto                            pbdModel  = std::make_shared<PbdModel>();
     std::shared_ptr<PbdModelConfig> pbdParams = pbdModel->getConfig();
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
-    pbdParams->m_dt         = 0.005;
-    pbdParams->m_iterations = 8;
+    pbdParams->m_dt         = 0.002;
+    pbdParams->m_iterations = 2;
     pbdParams->m_linearDampingCoeff = 0.03;
+    /* pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1.0e2);
+     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Dihedral, 1.0e1);*/
 
     // Setup a gallbladder
-    std::shared_ptr<PbdObject> pbdObj = makeGallBladder("Gallbladder", pbdModel);
+    //std::shared_ptr<PbdObject> pbdObj = makeGallBladder("Gallbladder", pbdModel);
+    //scene->addSceneObject(pbdObj);
+
+    Vec3d                      size   = Vec3d(0.10, 0.08, 0.10);
+    Vec3i                      dim    = Vec3i(18, 4, 18);
+    Vec3d                      center = Vec3d(0.0, -0.05, 0.0);
+    std::shared_ptr<PbdObject> pbdObj = makePbdObjCube("Cube", pbdModel, size, dim, center);
     scene->addSceneObject(pbdObj);
+
+    // int resolution = 35;
+    //std::shared_ptr<PbdObject> pbdObj = makeTissueObj("Plane", pbdModel, 0.15, 0.15, resolution, resolution);
+    //scene->addSceneObject(pbdObj);
 
     // Setup a tool to grasp with
     std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdModel);
@@ -299,7 +409,7 @@ main()
                         pbdToolCollision->setEnabled(true);
                     }
                 }
-        });
+            });
 #else
         auto deviceClient = std::make_shared<DummyClient>();
         connect<Event>(sceneManager, &SceneManager::postUpdate,
@@ -309,7 +419,7 @@ main()
                 const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.1;
 
                 deviceClient->setPosition(worldPos);
-             });
+            });
 
         // Add click event and side effects
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
@@ -338,7 +448,7 @@ main()
                     toolPicking->beginVertexGrasp(dilatedCapsule);
                     pbdToolCollision->setEnabled(false);
                 }
-                        });
+            });
         connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyRelease,
             [&](KeyEvent* e)
             {
@@ -347,7 +457,7 @@ main()
                     toolPicking->endGrasp();
                     pbdToolCollision->setEnabled(true);
                 }
-             });
+            });
         controller->setDevice(deviceClient);
 
         // Add default mouse and keyboard controls to the viewer

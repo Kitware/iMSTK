@@ -225,6 +225,11 @@ PbdTriangleToBodyConstraint::computeValueAndGradient(PbdState&           bodies,
         return false;
     }
 
+    if (depth >= 0.0)
+    {
+        return false;
+    }
+
     // A
     n[0] = normal;
 

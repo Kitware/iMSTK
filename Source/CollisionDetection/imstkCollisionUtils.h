@@ -804,6 +804,30 @@ testSphereToTriangle(const Vec3d& spherePt, const double sphereRadius,
 }
 
 ///
+/// \brief Check if sphere and triangle intersect, with contact info
+/// Only handles triangle collision
+/// If point contact, pointContact gives the index of the vertex in contact
+/// \return contact type, 0-no intersection, 1-triangle
+///
+inline int
+testSphereToTriangle(const Vec3d& spherePt, const double sphereRadius,
+                     const Vec3d& a, const Vec3d& b, const Vec3d& c,
+                     Vec3d& triangleContactPt)
+{
+    int caseType = 0;
+    triangleContactPt = closestPointOnTriangle(spherePt, a, b, c, caseType);
+    const Vec3d  diff = spherePt - triangleContactPt;
+    const double dist = diff.squaredNorm();
+
+    // If intersecting
+    if (dist <= sphereRadius * sphereRadius)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+///
 /// \brief Tests if a point is inside a tetrahedron
 ///
 inline bool
