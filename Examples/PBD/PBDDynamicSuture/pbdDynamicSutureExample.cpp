@@ -23,9 +23,6 @@
 #include "imstkPuncturable.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRenderMaterial.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkRigidObject2.h"
-#include "imstkRigidObjectController.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
@@ -33,6 +30,7 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "NeedleInteraction.h"
+#include "imstkPbdObjectController.h"
 
 using namespace imstk;
 
@@ -147,10 +145,10 @@ makePbdString(
     return stringObj;
 }
 
-static std::shared_ptr<RigidObject2>
-makeToolObj()
+static std::shared_ptr<PbdObject>
+makeToolObj(std::shared_ptr<PbdModel> model)
 {
-    auto needleObj      = std::make_shared<RigidObject2>();
+    auto needleObj      = std::make_shared<PbdObject>();
     auto sutureMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
     auto sutureLineMesh = MeshIO::read<LineMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture_hull.vtk");
 
@@ -171,14 +169,8 @@ makeToolObj()
     needleObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
     needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
 
-    std::shared_ptr<RigidBodyModel2> rbdModel = std::make_shared<RigidBodyModel2>();
-    rbdModel->getConfig()->m_gravity = Vec3d::Zero();
-    rbdModel->getConfig()->m_maxNumIterations = 5;
-    needleObj->setDynamicalModel(rbdModel);
-
-    needleObj->getRigidBody()->m_mass = 1.0;
-    needleObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
-    needleObj->getRigidBody()->m_initPos = Vec3d(0.0, 0.0, 0.0);
+    needleObj->setDynamicalModel(model);
+    needleObj->getPbdBody()->setRigid(Vec3d(0,0, 0.1), 0.1, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     needleObj->addComponent<Needle>();
 
@@ -222,7 +214,7 @@ main()
     scene->addSceneObject(tissueHole);
 
     // Create arced needle
-    std::shared_ptr<RigidObject2> needleObj = makeToolObj();
+    std::shared_ptr<PbdObject> needleObj = makeToolObj(pbdModel);
     scene->addSceneObject(needleObj);
 
     // Create the suture pbd-based string
@@ -233,7 +225,7 @@ main()
             stringVertexCount, stringLength, pbdModel);
     scene->addSceneObject(sutureThreadObj);
 
-    // Add needle constraining behaviour between the tissue & arc needle/thread
+    // Add needle constraining behavior between the tissue & arc needle/thread
     auto sutureInteraction = std::make_shared<NeedleInteraction>(tissueHole, needleObj, sutureThreadObj);
     scene->addInteraction(sutureInteraction);
 
@@ -259,21 +251,21 @@ main()
         auto driver = std::make_shared<SimulationManager>();
         driver->addModule(viewer);
         driver->addModule(sceneManager);
-        driver->setDesiredDt(0.01);         // 1ms, 1000hz
+        driver->setDesiredDt(0.005);
 
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
         std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        auto hapController = std::make_shared<RigidObjectController>();
+        auto hapController = std::make_shared<PbdObjectController>();
         hapController->setControlledObject(needleObj);
         hapController->setDevice(deviceClient);
         hapController->setTranslationScaling(0.5);
-        hapController->setLinearKs(20000.0);
+        hapController->setLinearKs(2000.0);
         hapController->setAngularKs(100000000.0);
         hapController->setUseCritDamping(true);
-        hapController->setForceScaling(0.01);
+        hapController->setForceScaling(0.001);
         hapController->setSmoothingKernelSize(10);
         hapController->setUseForceSmoothening(true);
         scene->addControl(hapController);
