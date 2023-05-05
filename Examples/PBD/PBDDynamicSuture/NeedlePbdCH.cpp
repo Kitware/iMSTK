@@ -8,6 +8,7 @@
 
 #include "NeedlePbdCH.h"
 #include "imstkCollisionUtils.h"
+#include "imstkCollisionData.h"
 #include "imstkLineMesh.h"
 #include "imstkNeedle.h"
 #include "imstkPbdBaryPointToPointConstraint.h"
@@ -56,6 +57,8 @@ NeedlePbdCH::handle(
     // Handle collision normally if no insertion
     if (!m_punctured)
     {
+        // Revert to put the triangle collisions into the second part
+        m_punctured = didPuncture(elementsB, elementsA);
         PbdCollisionHandling::handle(elementsA, elementsB); // (PBD Object, Needle Object)
         return;
     }
@@ -458,73 +461,74 @@ NeedlePbdCH::stitch()
     }
 }
 
-///
-/// \brief Add a vertex-triangle constraint
-///
-void
-NeedlePbdCH::addConstraint_V_T(
-    const ColElemSide& sideA,
-    const ColElemSide& sideB)
+bool NeedlePbdCH::didPuncture(const std::vector<CollisionElement>& elementsA, const std::vector<CollisionElement>& elementsB)
 {
-    std::shared_ptr<CollidingObject> tissueObj   = getInputObjectA();
+    // Old code expects the needle to be object A (and therefor elementsA) 
+    // and the mesh to be object B (and therefor elementsB)
+    std::shared_ptr<CollidingObject> tissueObj = getInputObjectA();
     auto                             puncturable = tissueObj->getComponent<Puncturable>();
-    std::shared_ptr<CollidingObject> needleObj   = getInputObjectB();
-    auto                             needle      = needleObj->getComponent<Needle>();
+    std::shared_ptr<CollidingObject> needleObj = getInputObjectB();
+    auto                             needle = needleObj->getComponent<Needle>();
 
-    CHECK(sideB.elem->m_type == CollisionElementType::CellIndex)
-        << "Suturing only works with CDs that report CellIndex contact";
-    CHECK(sideB.elem->m_element.m_CellIndexElement.parentId != -1)
-        << "Suturing only works with CDs that report parent ids";
-    const PunctureId punctureId = getPunctureId(needle, puncturable, sideB.elem->m_element.m_CellIndexElement.parentId);
+    for (int i = 0; i < elementsA.size(); ++i) {
+        auto sideA = elementsA[i];
+        auto sideB = elementsB[i];
 
-    // If removed and we are here, we must now be touching
-    if (needle->getState(punctureId) == Puncture::State::REMOVED) // Removed
-    {
-        needle->setState(punctureId, Puncture::State::TOUCHING);
-        puncturable->setPuncture(punctureId, needle->getPuncture(punctureId));
-    }
+//         CHECK(sideB.m_type == CollisionElementType::CellIndex)
+//             << "Suturing only works with CDs that report CellIndex contact";
+//         CHECK(sideB.m_element.m_CellIndexElement.parentId != -1)
+//             << "Suturing only works with CDs that report parent ids";
+        if (sideB.m_type != CollisionElementType::CellIndex || sideB.m_element.m_CellIndexElement.parentId == -1) continue;
 
-    auto                                     needleMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry());
-    std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleMesh->getVertexPositions();
-    VecDataArray<double, 3>&                 needleVertices    = *needleVerticesPtr;
-    // Save the direction of the tip of the needle. NOTE: Needle indices are backwards
-    const Vec3d needleDirection = (needleVertices[35] - needleVertices[34]).normalized();
+        const PunctureId punctureId = getPunctureId(needle, puncturable, sideB.m_element.m_CellIndexElement.parentId);
 
-    // If touching we may test for insertion
-    // Calculate the surface normal using the set of vertices associated with the triangle and normalize
-    // use dot product to project onto the needle stabing direction, if close to 1 assume its inserted
-    // Possibly add contact time or pseudo force calculation to know if penetration occurs
-
-    // Note: assumes closed mesh
-
-    // Assuming triangle has points a,b,c
-    std::array<PbdParticleId, 3> ptsB   = PbdCollisionHandling::getTriangle(*sideB.elem, *sideB.data);
-    const PbdState&              bodies = m_pbdTissueObj->getPbdModel()->getBodies();
-    const Vec3d                  ab     = bodies.getPosition(ptsB[1]) - bodies.getPosition(ptsB[0]);
-    const Vec3d                  ac     = bodies.getPosition(ptsB[2]) - bodies.getPosition(ptsB[0]);
-
-    // Calculate surface normal
-    const Vec3d surfNormal = ac.cross(ab).normalized();
-
-    // Get vector pointing in direction of needle
-    // Use absolute value to ignore direction issues
-    const double dotProduct = std::fabs(needleDirection.dot(surfNormal));
-
-    // Arbitrary threshold
-    const double threshold = 0.9;
-
-    if (needle->getState(punctureId) == Puncture::State::TOUCHING) // Touching
-    {
-        // If the needle is close to perpindicular to the face if may insert
-        // Note: This is a short term solution
-        if (dotProduct > threshold)
+        // If removed and we are here, we must now be touching
+        if (needle->getState(punctureId) == Puncture::State::REMOVED) // Removed
         {
-            m_punctured = true;
+            needle->setState(punctureId, Puncture::State::TOUCHING);
+            puncturable->setPuncture(punctureId, needle->getPuncture(punctureId));
         }
-        else
+
+        auto                                     needleMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry());
+        std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleMesh->getVertexPositions();
+        VecDataArray<double, 3>& needleVertices = *needleVerticesPtr;
+        // Save the direction of the tip of the needle. NOTE: Needle indices are backwards
+        const Vec3d needleDirection = (needleVertices[35] - needleVertices[34]).normalized();
+
+        // If touching we may test for insertion
+        // Calculate the surface normal using the set of vertices associated with the triangle and normalize
+        // use dot product to project onto the needle stabbing direction, if close to 1 assume its inserted
+        // Possibly add contact time or pseudo force calculation to know if penetration occurs
+
+        // Note: assumes closed mesh
+
+        // Assuming triangle has points a,b,c
+        std::array<PbdParticleId, 3> ptsB = PbdCollisionHandling::getTriangle(sideB, getDataFromObject(tissueObj));
+        const PbdState& bodies = m_pbdTissueObj->getPbdModel()->getBodies();
+        const Vec3d                  ab = bodies.getPosition(ptsB[1]) - bodies.getPosition(ptsB[0]);
+        const Vec3d                  ac = bodies.getPosition(ptsB[2]) - bodies.getPosition(ptsB[0]);
+
+        // Calculate surface normal
+        const Vec3d surfNormal = ac.cross(ab).normalized();
+
+        // Get vector pointing in direction of needle
+        // Use absolute value to ignore direction issues
+        const double dotProduct = std::fabs(needleDirection.dot(surfNormal));
+
+        // Arbitrary threshold
+        const double threshold = 0.8;
+
+        if (needle->getState(punctureId) == Puncture::State::TOUCHING) // Touching
         {
-            PbdCollisionHandling::addConstraint_V_T(sideA, sideB);
+            // If the needle is close to perpendicular to the face if may insert
+            // Note: This is a short term solution
+            if (dotProduct > threshold)
+            {
+                return true;
+            }
         }
     }
+    return false;
 }
+
 } // namespace imstk

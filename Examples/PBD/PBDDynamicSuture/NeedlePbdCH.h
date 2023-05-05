@@ -53,12 +53,6 @@ public:
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override;
 
-    ///
-    /// \brief Add a vertex-triangle constraint
-    ///
-    void addConstraint_V_T(const ColElemSide& sideA,
-                           const ColElemSide& sideB) override;
-
 protected:
     // Stores data for penetration points, both for the needle and the thread
     struct SuturePenetrationData
@@ -103,5 +97,8 @@ protected:
     std::shared_ptr<SurfaceMesh> m_tissueSurfMesh;
 
     bool m_punctured = false;
+private:
+
+    bool didPuncture(const std::vector<CollisionElement>& elementsA, const std::vector<CollisionElement>& elementsB);
 };
 } // end iMSTK namespace

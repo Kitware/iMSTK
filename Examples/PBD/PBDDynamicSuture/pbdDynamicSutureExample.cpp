@@ -45,7 +45,8 @@ createTissue(std::shared_ptr<PbdModel> model)
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     std::vector<int> fixedNodes;
-    for (int i = 0; i < tetMesh->getNumVertices(); i++)
+    const int numVerts = tetMesh->getNumVertices();
+    for (int i = 0; i < numVerts; i++)
     {
         const Vec3d& position = tetMesh->getVertexPosition(i);
         if (std::fabs(1.40984 - std::fabs(position[1])) <= 1E-4)
@@ -74,7 +75,7 @@ createTissue(std::shared_ptr<PbdModel> model)
     pbdObject->setCollidingGeometry(surfMesh);
     pbdObject->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     pbdObject->setDynamicalModel(model);
-    pbdObject->getPbdBody()->uniformMassValue = 0.01;
+    pbdObject->getPbdBody()->uniformMassValue = 0.2 / numVerts;
     // Fix the borders
     pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
     model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.3);
@@ -137,7 +138,7 @@ makePbdString(
     stringObj->setCollidingGeometry(stringMesh);
     stringObj->setDynamicalModel(model);
     stringObj->getPbdBody()->fixedNodeIds     = { 0, 1 };
-    stringObj->getPbdBody()->uniformMassValue = 0.0001 / numVerts; // 0.002 / numVerts; // grams
+    stringObj->getPbdBody()->uniformMassValue = 0.001 / numVerts; // 0.002 / numVerts; // grams
     model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50.0, stringObj->getPbdBody()->bodyHandle);
     model->getConfig()->enableBendConstraint(0.2, 1, true, stringObj->getPbdBody()->bodyHandle);
     model->getConfig()->setBodyDamping(stringObj->getPbdBody()->bodyHandle, 0.03);
