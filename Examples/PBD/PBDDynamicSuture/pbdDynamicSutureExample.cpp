@@ -29,8 +29,9 @@
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "NeedleInteraction.h"
+#include "imstkNeedleInteraction.h"
 #include "imstkPbdObjectController.h"
+#include "imstkLoggerSynchronous.h"
 
 using namespace imstk;
 
@@ -186,6 +187,7 @@ main()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();
+    Logger::instance()->setOutput(std::make_shared<StreamOutput>(std::cout));
 
     // Construct the scene
     auto scene = std::make_shared<Scene>("DynamicSuture");

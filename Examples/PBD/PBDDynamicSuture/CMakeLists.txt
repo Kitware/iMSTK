@@ -15,14 +15,7 @@ if(iMSTK_USE_HAPTICS AND iMSTK_USE_RENDERING_VTK)
     #-----------------------------------------------------------------------------
     imstk_add_executable(${PROJECT_NAME}
         pbdDynamicSutureExample.cpp
-        NeedleInteraction.h
-        NeedleInteraction.cpp
-        NeedlePbdCH.h
-        NeedlePbdCH.cpp
-        SurfaceInsertionConstraint.h
-        SurfaceInsertionConstraint.cpp
-        ThreadInsertionConstraint.h
-        ThreadInsertionConstraint.cpp
+
     )
 
     #-----------------------------------------------------------------------------

@@ -11,8 +11,8 @@
 #include "imstkPbdPointTriangleConstraint.h"
 #include "imstkSurfaceMesh.h"
 
-#include "SurfaceInsertionConstraint.h"
-#include "ThreadInsertionConstraint.h"
+#include "imstkSurfaceInsertionConstraint.h"
+#include "imstkThreadInsertionConstraint.h"
 
 // using namespace imstk;
 namespace imstk

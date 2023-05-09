@@ -4,13 +4,13 @@
 ** See accompanying NOTICE for details.
 */
 
-#include "NeedleInteraction.h"
+#include "imstkNeedleInteraction.h"
 #include "imstkCollisionDetectionAlgorithm.h"
 #include "imstkLineMesh.h"
 #include "imstkNeedle.h"
 #include "imstkPbdObject.h"
 #include "imstkPuncturable.h"
-#include "NeedlePbdCH.h"
+#include "imstkNeedlePbdCH.h"
 
 using namespace imstk;
 

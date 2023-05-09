@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "SurfaceInsertionConstraint.h"
+#include "imstkSurfaceInsertionConstraint.h"
 
 using namespace imstk;
 
@@ -35,7 +35,7 @@ SurfaceInsertionConstraint::initConstraint(
 }
 
 bool
-SurfaceInsertionConstraint::computeValueAndGradient(PbdState& bodies,
+SurfaceInsertionConstraint::computeValueAndGradient(PbdState&,
                                                     double& c, std::vector<Vec3d>& dcdx)
 {
     // Get current position of puncture point
