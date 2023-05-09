@@ -196,11 +196,13 @@
 /*
  * Needle
  */
-%shared_ptr(imstk::Puncture)
-%shared_ptr(imstk::Needle)
-%shared_ptr(imstk::StraightNeedle)
 %shared_ptr(imstk::ArcNeedle)
+%shared_ptr(imstk::imstkNeedleInteraction)
+%shared_ptr(imstk::imstkNeedlePbdCH)
+%shared_ptr(imstk::Needle)
 %shared_ptr(imstk::Puncturable)
+%shared_ptr(imstk::Puncture)
+%shared_ptr(imstk::StraightNeedle)
 
 /*
  * Scene

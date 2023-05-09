@@ -191,11 +191,15 @@
 /*
  * Needle
  */
-#include "imstkPuncture.h"
-#include "imstkNeedle.h"
-#include "imstkStraightNeedle.h"
 #include "imstkArcNeedle.h"
+#include "imstkNeedle.h"
+#include "imstkNeedleInteraction.h"
+#include "imstkNeedlePbdCH.h"
 #include "imstkPuncturable.h"
+#include "imstkPuncture.h"
+#include "imstkStraightNeedle.h"
+#include "imstkSurfaceInsertionConstraint.h"
+#include "imstkThreadInsertionConstraint.h"
 
 /*
  * Scene
