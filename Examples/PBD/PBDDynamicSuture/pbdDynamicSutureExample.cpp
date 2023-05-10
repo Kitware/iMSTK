@@ -46,7 +46,7 @@ createTissue(std::shared_ptr<PbdModel> model)
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     std::vector<int> fixedNodes;
-    const int numVerts = tetMesh->getNumVertices();
+    const int        numVerts = tetMesh->getNumVertices();
     for (int i = 0; i < numVerts; i++)
     {
         const Vec3d& position = tetMesh->getVertexPosition(i);
@@ -172,7 +172,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
     needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
 
     needleObj->setDynamicalModel(model);
-    needleObj->getPbdBody()->setRigid(Vec3d(0,0, 0.1), 0.1, Quatd::Identity(), Mat3d::Identity() * 10000.0);
+    needleObj->getPbdBody()->setRigid(Vec3d(0, 0, 0.1), 0.1, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     needleObj->addComponent<Needle>();
 
@@ -273,21 +273,11 @@ main()
         hapController->setUseForceSmoothening(true);
         scene->addControl(hapController);
 
-        // Update the needle opbject for real time
+        // Update the needle object for real time
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
             {
                 sutureThreadObj->getPbdModel()->getConfig()->m_dt = sceneManager->getDt();
-            });
-
-        // Constrain the first two vertices of the string to the needle
-        connect<Event>(sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
-            {
-                auto needleLineMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getPhysicsGeometry());
-                auto sutureLineMesh = std::dynamic_pointer_cast<LineMesh>(sutureThreadObj->getPhysicsGeometry());
-                (*sutureLineMesh->getVertexPositions())[1] = (*needleLineMesh->getVertexPositions())[0];
-                (*sutureLineMesh->getVertexPositions())[0] = (*needleLineMesh->getVertexPositions())[1];
             });
 
         // Add default mouse and keyboard controls to the viewer

@@ -14,9 +14,9 @@
 
 using namespace imstk;
 
-NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
+NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
                                      std::shared_ptr<PbdObject> needleObj,
-                                     std::shared_ptr<PbdObject>    threadObj)
+                                     std::shared_ptr<PbdObject> threadObj)
     : PbdObjectCollision(tissueObj, needleObj)
 {
     // Check inputs

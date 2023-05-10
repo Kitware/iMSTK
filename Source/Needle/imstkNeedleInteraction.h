@@ -26,9 +26,9 @@ class PbdObject;
 class NeedleInteraction : public PbdObjectCollision
 {
 public:
-    NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
+    NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
                       std::shared_ptr<PbdObject> needleObj,
-                      std::shared_ptr<PbdObject>    threadObj);
+                      std::shared_ptr<PbdObject> threadObj);
     ~NeedleInteraction() override = default;
 
     IMSTK_TYPE_NAME(NeedleInteraction)

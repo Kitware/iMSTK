@@ -99,6 +99,9 @@ protected:
     bool m_punctured = false;
 private:
 
+    std::vector<PbdParticleId> m_particles;                          ///< Particles to attach the thread to the needle
+    std::vector<std::shared_ptr<PbdConstraint>> m_threadConstraints; ///< Constraints to attach the thread to the needle
+
     bool didPuncture(const std::vector<CollisionElement>& elementsA, const std::vector<CollisionElement>& elementsB);
 };
 } // end iMSTK namespace
