@@ -27,3 +27,9 @@ imstk_add_project_test(iMSTKBuildSystemTest.iMSTKProjectAgainstInstallTree
     -DiMSTK_DIR:PATH=${CMAKE_INSTALL_PREFIX}/lib/cmake/iMSTK-${iMSTK_VERSION_MAJOR}.${iMSTK_VERSION_MINOR}
   WORKING_DIR ${CMAKE_INSTALL_PREFIX}/bin
   )
+
+#-----------------------------------------------------------------------------
+# Add Verification and validation subdirectories
+#-----------------------------------------------------------------------------
+add_subdirectory(VandV)
+ 

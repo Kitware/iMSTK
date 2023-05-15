@@ -4,6 +4,7 @@
 ** See accompanying NOTICE for details.
 */
 
+#include "imstkDataTracker.h"
 #include "imstkPbdModel.h"
 #include "imstkGraph.h"
 #include "imstkLineMesh.h"
@@ -222,6 +223,15 @@ PbdModel::initialize()
     {
         m_pbdSolver = std::make_shared<PbdSolver>();
     }
+
+    if (m_config->m_dataTracker)
+    {
+        m_pbdSolver->m_dataTracker = m_config->m_dataTracker;
+        m_config->m_dataTracker->configureProbe(DataTracker::Physics::SolverTime_ms, DataTracker::ePhysics::SolverTime_ms);
+        m_config->m_dataTracker->configureProbe(DataTracker::Physics::NumConstraints, DataTracker::ePhysics::NumConstraints);
+        m_config->m_dataTracker->configureProbe(DataTracker::Physics::AverageC, DataTracker::ePhysics::AverageC);
+    }
+
 
     return true;
 }

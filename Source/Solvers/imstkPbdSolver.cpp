@@ -21,9 +21,19 @@ PbdSolver::PbdSolver() :
 void
 PbdSolver::solve()
 {
+    if (m_dataTracker)
+    {
+        m_dataTracker->getStopWatch(DataTracker::ePhysics::SolverTime_ms).start();
+    }
+
+
+    size_t                                                          numConstraints = 0;
     const std::vector<std::shared_ptr<PbdConstraint>>&              constraints = m_constraints->getConstraints();
     const std::vector<std::vector<std::shared_ptr<PbdConstraint>>>& partitionedConstraints = m_constraints->getPartitionedConstraints();
 
+    double averageC      = 0.0;
+    double averageLambda = 0.0;
+    numConstraints += constraints.size();
     // Zero out the Lagrange multiplier
     for (const auto& constraint : constraints)
     {
@@ -33,6 +43,7 @@ PbdSolver::solve()
     // Zero out paritioned constraints
     for (const auto& constraintPartition : partitionedConstraints)
     {
+        numConstraints += constraints.size();
         ParallelUtils::parallelFor(constraintPartition.size(),
             [&](const size_t idx)
             {
@@ -44,6 +55,7 @@ PbdSolver::solve()
     for (auto constraintList : *m_constraintLists)
     {
         const std::vector<PbdConstraint*>& constraintVec = *constraintList;
+        numConstraints += constraintVec.size();
         for (size_t j = 0; j < constraintVec.size(); j++)
         {
             constraintVec[j]->zeroOutLambda();
@@ -83,5 +95,40 @@ PbdSolver::solve()
             //}
         }
     }
+
+    if (m_dataTracker)
+    {
+        m_dataTracker->probeElapsedTime_s(DataTracker::ePhysics::SolverTime_ms);
+        m_dataTracker->probe(DataTracker::ePhysics::NumConstraints, numConstraints);
+
+        for (const auto& constraint : constraints)
+        {
+            averageC      += constraint->getConstraintC();
+            averageLambda += constraint->getLambda();
+        }
+
+        for (const auto& constraintPartition : partitionedConstraints)
+        {
+            for (size_t k = 0; k < constraintPartition.size(); k++)
+            {
+                averageC      += constraintPartition[k]->getConstraintC();
+                averageLambda += constraintPartition[k]->getLambda();
+            }
+        }
+
+        for (auto constraintList : *m_constraintLists)
+        {
+            const std::vector<PbdConstraint*>& constraintVec = *constraintList;
+            for (size_t j = 0; j < constraintVec.size(); j++)
+            {
+                averageC      += constraintVec[j]->getConstraintC();
+                averageLambda += constraintVec[j]->getLambda();
+            }
+        }
+
+        averageC /= numConstraints;
+        m_dataTracker->probe(DataTracker::ePhysics::AverageC, averageC);
+    }
+
 }
 } // namespace imstk

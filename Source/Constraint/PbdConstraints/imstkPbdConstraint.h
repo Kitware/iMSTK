@@ -119,6 +119,11 @@ public:
     double getConstraintC() const { return m_C; }
 
     ///
+    /// \brief Get constraint value C (how much the constraint is violated)
+    ///
+    double getLambda() const { return m_lambda; }
+
+    ///
     /// \brief Get reference constraint value. This value will have different context depending on
     /// the constraint being used.
     ///

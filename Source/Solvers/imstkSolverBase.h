@@ -5,6 +5,7 @@
 */
 
 #pragma once
+#include "imstkDataTracker.h"
 
 namespace imstk
 {
@@ -22,5 +23,7 @@ public:
     virtual ~SolverBase() = default;
 
     virtual void solve() = 0;
+
+    std::shared_ptr<DataTracker> m_dataTracker;
 };
 } // namespace imstk
