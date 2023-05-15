@@ -498,15 +498,6 @@ namespace std
 %include "../../Controllers/imstkRigidObjectController.h"
 %include "../../Controllers/imstkPbdObjectController.h"
 
-/*
- * Needle
- */
-%include "../../Needle/imstkPuncture.h"
-%include "../../Needle/imstkNeedle.h"
-%include "../../Needle/imstkStraightNeedle.h"
-%include "../../Needle/imstkArcNeedle.h"
-%include "../../Needle/imstkPuncturable.h"
-
 /* 
  * Scene
  */
@@ -519,6 +510,17 @@ namespace std
 %include "../../Scene/imstkPbdRigidObjectCollision.h"
 %include "../../Scene/imstkPbdRigidObjectGrasping.h"
 %include "../../Scene/imstkSphObjectCollision.h"
+
+/*
+ * Needle
+ */
+%include "../../Needle/imstkPuncture.h"
+%include "../../Needle/imstkNeedle.h"
+%include "../../Needle/imstkStraightNeedle.h"
+%include "../../Needle/imstkArcNeedle.h"
+%include "../../Needle/imstkPuncturable.h"
+%include "../../Needle/imstkNeedlePbdCH.h"
+%include "../../Needle/imstkNeedleInteraction.h"
 
 /*
  * ViewerCore

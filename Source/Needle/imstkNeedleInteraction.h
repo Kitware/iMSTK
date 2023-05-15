@@ -9,14 +9,12 @@
 #include "imstkMacros.h"
 #include "imstkPbdObjectCollision.h"
 
-using namespace imstk;
-
 class NeedleEmbeddedCH;
 
 namespace imstk
 {
 class PbdObject;
-} // namespace imstk
+
 
 ///
 /// \class NeedleInteraction
@@ -35,3 +33,5 @@ public:
 
     void stitch();
 };
+
+} 

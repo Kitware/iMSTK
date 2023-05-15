@@ -194,17 +194,6 @@
 %shared_ptr(imstk::PbdObjectController)
 
 /*
- * Needle
- */
-%shared_ptr(imstk::ArcNeedle)
-%shared_ptr(imstk::imstkNeedleInteraction)
-%shared_ptr(imstk::imstkNeedlePbdCH)
-%shared_ptr(imstk::Needle)
-%shared_ptr(imstk::Puncturable)
-%shared_ptr(imstk::Puncture)
-%shared_ptr(imstk::StraightNeedle)
-
-/*
  * Scene
  */
 %shared_ptr(imstk::SceneConfig)
@@ -218,6 +207,17 @@
 %shared_ptr(imstk::PbdRigidObjectCollision)
 %shared_ptr(imstk::PbdRigidObjectGrasping)
 %shared_ptr(imstk::SphObjectCollision)
+
+/*
+ * Needle
+ */
+%shared_ptr(imstk::ArcNeedle)
+%shared_ptr(imstk::NeedleInteraction)
+%shared_ptr(imstk::NeedlePbdCH)
+%shared_ptr(imstk::Needle)
+%shared_ptr(imstk::Puncturable)
+%shared_ptr(imstk::Puncture)
+%shared_ptr(imstk::StraightNeedle)
 
 /*
  * SimulationManager

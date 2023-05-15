@@ -12,38 +12,54 @@
 #include "imstkPuncturable.h"
 #include "imstkNeedlePbdCH.h"
 
-using namespace imstk;
 
-NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
-                                     std::shared_ptr<PbdObject> needleObj,
-                                     std::shared_ptr<PbdObject> threadObj)
-    : PbdObjectCollision(tissueObj, needleObj)
+
+namespace imstk 
 {
-    // Check inputs
-    CHECK(needleObj->containsComponent<Needle>())
-        << "NeedleInteraction only works with objects that have a Needle component";
-    CHECK(tissueObj->containsComponent<Puncturable>())
-        << "NeedleInteraction only works with objects that have a Puncturable component";
+    NeedleInteraction::NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
+        std::shared_ptr<PbdObject> needleObj,
+        std::shared_ptr<PbdObject> threadObj)
+        : PbdObjectCollision(tissueObj, needleObj)
+    {
+        // Check inputs
+        CHECK(threadObj != nullptr) << "NeedleInteraction: Thread object cannot be null";
+        CHECK(tissueObj != nullptr) << "NeedleInteraction: Tissue object cannot be null";
+        CHECK(needleObj != nullptr) << "NeedleInteraction: Needle object cannot be null";
 
-    CHECK(std::dynamic_pointer_cast<SurfaceMesh>(tissueObj->getCollidingGeometry()) != nullptr) <<
-        "NeedleInteraction only works with SufraceMesh collision geometry on the tissue object";
-    CHECK(std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry()) != nullptr) <<
-        "NeedleInteraction only works with LineMesh collision geometry on NeedleObject";
+        if (!needleObj->containsComponent<Needle>())
+        {
+            needleObj->addComponent<Needle>();
+            LOG(INFO) << "NeedleInteraction: Needle component added to needle object";
+        }
 
-    CHECK(threadObj->getPbdModel() == tissueObj->getPbdModel()) << "Tissue and thread must share a PbdModel";
+        if (!tissueObj->containsComponent<Puncturable>())
+        {
+            tissueObj->addComponent<Puncturable>();
+            LOG(INFO) << "NeedleInteraction: Puncturable component added to tissue object";
+        }
 
-    // Add collision handler for the PBD reaction
-    auto needlePbdCH = std::make_shared<NeedlePbdCH>();
-    needlePbdCH->setInputObjectA(tissueObj);
-    needlePbdCH->setInputObjectB(needleObj);
-    needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
-    needlePbdCH->init(threadObj);
-    setCollisionHandlingAB(needlePbdCH);
-}
+        CHECK(std::dynamic_pointer_cast<SurfaceMesh>(tissueObj->getCollidingGeometry()) != nullptr) <<
+            "NeedleInteraction only works with SufraceMesh collision geometry on the tissue object";
+        CHECK(std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry()) != nullptr) <<
+            "NeedleInteraction only works with LineMesh collision geometry on NeedleObject";
 
-void
-NeedleInteraction::stitch()
-{
-    auto CH = std::dynamic_pointer_cast<NeedlePbdCH>(this->getCollisionHandlingAB());
-    CH->stitch();
-}
+        CHECK(threadObj->getPbdModel() == tissueObj->getPbdModel() &&
+            threadObj->getPbdModel() == needleObj->getPbdModel())
+            << "Tissue, thread, and needle must share a PbdModel";
+
+        // Add collision handler for the PBD reaction
+        auto needlePbdCH = std::make_shared<NeedlePbdCH>();
+        needlePbdCH->setInputObjectA(tissueObj);
+        needlePbdCH->setInputObjectB(needleObj);
+        needlePbdCH->setInputCollisionData(getCollisionDetection()->getCollisionData());
+        needlePbdCH->init(threadObj);
+        setCollisionHandlingAB(needlePbdCH);
+    }
+
+    void
+        NeedleInteraction::stitch()
+    {
+        auto CH = std::dynamic_pointer_cast<NeedlePbdCH>(this->getCollisionHandlingAB());
+        CH->stitch();
+    }
+                                     }
