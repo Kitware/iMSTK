@@ -60,7 +60,7 @@ NeedlePbdCH::handle(
     auto needleMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry());
 
     m_constraints.clear();
-    /* Not working atm 
+    /* Not working atm
     // Initialization order, don't know when the state gets set up
     if (m_particles.size() == 0)
     {
@@ -86,17 +86,16 @@ NeedlePbdCH::handle(
     (*m_threadMesh->getVertexPositions())[0] = (*needleMesh->getVertexPositions())[1];
 
     // Handle collision normally if no insertion
+    m_punctured = didPuncture(elementsA, elementsB) || m_punctured;
     if (!m_punctured)
     {
-        // Revert to put the triangle collisions into the second part
-        m_punctured = didPuncture(elementsA, elementsB);
         PbdCollisionHandling::handle(elementsA, elementsB); // (PBD Object, Needle Object)
     }
     else
     {
         // Get rigid object needle
-        auto                                     needle    = needleObj->getComponent<Needle>();
-        const int                                needleId  = needleObj->getID();
+        auto                                     needle   = needleObj->getComponent<Needle>();
+        const int                                needleId = needleObj->getID();
         std::shared_ptr<VecDataArray<double, 3>> needleVerticesPtr = needleMesh->getVertexPositions();
         VecDataArray<double, 3>&                 needleVertices    = *needleVerticesPtr;
         std::shared_ptr<VecDataArray<int, 2>>    needleIndicesPtr  = needleMesh->getCells();
