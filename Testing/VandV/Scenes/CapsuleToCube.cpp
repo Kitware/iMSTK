@@ -16,6 +16,7 @@
 #include "imstkCamera.h"
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
+#include "imstkPointToTetMap.h"
 
 namespace imstk
 {
@@ -78,6 +79,7 @@ makePbdCube(
     cube->setPhysicsGeometry(surfMesh);
     cube->setCollidingGeometry(surfMesh);
     cube->setVisualGeometry(surfMesh);
+    // cube->setPhysicsToCollidingMap(std::make_shared<PointToTetMap>(tetMesh, surfMesh));
     cube->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     cube->setDynamicalModel(model);
     cube->getPbdBody()->uniformMassValue = cfg.uniformMassValue;
@@ -96,6 +98,11 @@ makePbdCube(
             model->getConfig()->enableConstraint(cfg.constraintTypes[i], cfg.constraintValues[i], cube->getPbdBody()->bodyHandle);
         }
     }
+    
+    // model->getConfig()->m_femParams->m_YoungModulus = 6000.0;
+    // model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
+    // model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
+    // model->getConfig()->setBodyDamping(cube->getPbdBody()->bodyHandle, 0.001);
     // Set bottom verts to be static
     std::shared_ptr<VecDataArray<double, 3>> vertices = surfMesh->getVertexPositions();
     for (int i = 0; i < surfMesh->getNumVertices(); i++)
@@ -189,8 +196,9 @@ CapsuleToCubeScene::setupScene(double sampleTime)
     {
         auto cube = makePbdCube("Cube", m_pbdModel, m_config);
         m_scene->addSceneObject(cube);
-        auto pbdToolCollision = std::make_shared<PbdObjectCollision>(capsule, cube);
+        auto pbdToolCollision = std::make_shared<PbdObjectCollision>(cube, capsule);
         pbdToolCollision->setRigidBodyCompliance(0.0001); // Helps with smoothness
+        // pbdToolCollision->setEnabled(false);
         m_scene->addInteraction(pbdToolCollision);
         if (m_config.type == Type::GraspDeformableCube)
         {

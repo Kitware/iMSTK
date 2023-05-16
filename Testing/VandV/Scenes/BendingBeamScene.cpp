@@ -17,6 +17,7 @@
 #include "imstkCamera.h"
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
+#include "imstkPointToTetMap.h"
 
 #include <algorithm>
 
@@ -30,21 +31,21 @@ BendingBeamScene::Configuration::toString(std::ostream& str) const
     str << "\tdisplacement: " << displacement << "\n";
     str << "\tyoungsModulus: " << youngsModulus << "\n";
     str << "\tpoissonRatio: " << poissonRatio << "\n";
-    // switch (materialType)
-    // {
-    // case PbdStrainEnergyConstraint::MaterialType::Linear:
-    //     str << "\tmaterialType: Linear\n";
-    //     break;
-    // case PbdStrainEnergyConstraint::MaterialType::Corotation:
-    //     str << "\tmaterialType: Corotation\n";
-    //     break;
-    // case PbdStrainEnergyConstraint::MaterialType::StVK:
-    //     str << "\tmaterialType: StVK\n";
-    //     break;
-    // case PbdStrainEnergyConstraint::MaterialType::NeoHookean:
-    //     str << "\tmaterialType: NeoHookean\n";
-    //     break;
-    // }
+    switch (materialType)
+    {
+    case PbdFemConstraint::MaterialType::Linear:
+        str << "\tmaterialType: Linear\n";
+        break;
+    case PbdFemConstraint::MaterialType::Corotation:
+        str << "\tmaterialType: Corotation\n";
+        break;
+    case PbdFemConstraint::MaterialType::StVK:
+        str << "\tmaterialType: StVK\n";
+        break;
+    case PbdFemConstraint::MaterialType::NeoHookean:
+        str << "\tmaterialType: NeoHookean\n";
+        break;
+    }
 }
 
 ///
@@ -129,11 +130,11 @@ makeBeam(
 
     // Note: Calculate mass per node from material
     beamObj->getPbdBody()->uniformMassValue = 0.06 / prismMesh->getNumVertices();
-    // beamObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(prismMesh, surfMesh));
+    beamObj->setPhysicsToCollidingMap(std::make_shared<PointToTetMap>(prismMesh, surfMesh));
 
-    // model->getConfig()->m_secParams->m_YoungModulus = 108000.0;
-    // model->getConfig()->m_secParams->m_PoissonRatio = 0.49;
-    // model->getConfig()->enableStrainEnergyConstraint(PbdStrainEnergyConstraint::MaterialType::NeoHookean);
+    model->getConfig()->m_femParams->m_YoungModulus = 108000.0;
+    model->getConfig()->m_femParams->m_PoissonRatio = 0.49;
+    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
     //model->getConfig()->setBodyDamping(beamObj->getPbdBody()->bodyHandle, 0.01);
 
     // Fix the borders
@@ -177,7 +178,7 @@ BendingBeamScene::BendingBeamScene() : ProgrammableScene()
     cfg.youngsModulus = 1000.0;       // https://doi.org/10.1016/S0301-5629(02)00489-1
     cfg.poissonRatio  = 0.49;         // https://doi.org/10.1118/1.279566
     cfg.partitions    = Vec3i(15, 5, 4);
-    // cfg.materialType  = PbdStrainEnergyConstraint::MaterialType::StVK;
+    cfg.materialType  = PbdFemConstraint::MaterialType::StVK;
     setConfiguration(cfg);
 }
 
@@ -316,5 +317,7 @@ BendingBeamScene::postProcessAnalyticResults()
     {
         LOG(INFO) << "At time " << cfg.times[t] << ", xRMS=" << cfg.xRootMeanSquared[t] << ", yRMS=" << cfg.yRootMeanSquared[t];
     }
+
+    return true;
 }
 } // end namespace imstk

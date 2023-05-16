@@ -26,12 +26,12 @@ main()
 
     bool bRet = true;
 
-    //bRet &= CMBBE2023(exec);
+    bRet &= CMBBE2023(exec);
 
-    CapsuleToCubeScene::Configuration c2cConfig;
-    c2cConfig.type = CapsuleToCubeScene::Type::DeformableCube;
-    c2cConfig.sceneOutputDirectory = "CapsuleToCube/DeformableCube/";
-    bRet &= exec.executeScene(std::make_shared<CapsuleToCubeScene>(c2cConfig));
+    // CapsuleToCubeScene::Configuration c2cConfig;
+    // c2cConfig.type = CapsuleToCubeScene::Type::DeformableCube;
+    // c2cConfig.sceneOutputDirectory = "CapsuleToCube/DeformableCube/";
+    // bRet &= exec.executeScene(std::make_shared<CapsuleToCubeScene>(c2cConfig));
 
     // c2cConfig.divisions = Vec3i(18, 4, 18);
     // c2cConfig.sceneOutputDirectory = "CapsuleToCube/HighResDeformableCube/";

@@ -36,13 +36,14 @@ ProgrammableSceneExec::executeScene(std::shared_ptr<ProgrammableScene> pScene)
         for (size_t i = 0; i < numSteps; i++)
         {
             pScene->trackData(now);
-            now += pScene->getTimeStep();
             pScene->getScene()->advance(pScene->getTimeStep());
 
             for (auto pc : pScene->getClients())
             {
                 pc->update();
             }
+
+            now += pScene->getTimeStep();
         }
     }
     else

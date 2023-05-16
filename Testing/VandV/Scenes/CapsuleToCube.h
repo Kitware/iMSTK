@@ -20,7 +20,7 @@ public:
         std::vector<double> constraintValues;
         Vec3d size      = Vec3d(1.0, 1.0, 1.0);
         Vec3i divisions =  Vec3i(3, 3, 3);
-        double uniformMassValue = 0.05;
+        double uniformMassValue = 0.0005;
 
         void toString(std::ostream& str) const override;
         void addConstraint(PbdModelConfig::ConstraintGenType& constraintType, double& constraintValue);

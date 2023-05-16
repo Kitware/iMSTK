@@ -6,7 +6,7 @@
 
 #include "ProgrammableScene.h"
 
-// #include "imstkPbdStrainEnergyConstraint.h"
+#include "imstkPbdFemConstraint.h"
 
 namespace imstk
 {
@@ -21,7 +21,7 @@ public:
         double youngsModulus;
         double poissonRatio;
         ProgrammableClient::DeformationType deformationType;
-        // PbdStrainEnergyConstraint::MaterialType materialType;
+        PbdFemConstraint::MaterialType materialType;
     };
 
     UnitCubeStrainScene();

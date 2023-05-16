@@ -205,6 +205,7 @@ EntityToVTK::getVertexInformation(std::shared_ptr<PointSet> pointSet, std::share
     velArray->SetNumberOfTuples(numVerticies * 3);
     displacementArray->SetNumberOfTuples(numVerticies * 3);
     int i = 0;
+    bool foundNan = false;
     for (const auto& index : m_indexToRecord[name])
     {
         if (index >= pointSet->getNumVertices())
@@ -213,7 +214,10 @@ EntityToVTK::getVertexInformation(std::shared_ptr<PointSet> pointSet, std::share
         }
         Vec3d currentPosition = pointSet->getVertexPosition(index);
 
-        std::cout << index << " " << currentPosition << std::endl;
+        if (isnan(currentPosition.norm()))
+        {
+            foundNan = true;
+        }
 
         vtkSmartPointer<vtkVertex> vertex = vtkSmartPointer<vtkVertex>::New();
         vertex->GetPointIds()->SetId(0, points->InsertNextPoint(currentPosition[0], currentPosition[1], currentPosition[2]));
@@ -223,6 +227,11 @@ EntityToVTK::getVertexInformation(std::shared_ptr<PointSet> pointSet, std::share
         displacementArray->InsertTuple(i, (*body->prevVertices)[index].data());
         i++;
     }
+
+    // if (foundNan)
+    // {
+    //     std::cout << "Found NaN Position" << std::endl;
+    // }
 
     polydata->SetPoints(points);
     polydata->SetVerts(vertices);
@@ -468,14 +477,14 @@ EntityToVTK::writeObjectsToTimeSeries(vtkSmartPointer<vtkMultiBlockDataSet> mb, 
 void
 EntityToVTK::writeTimeSeriesJsonFile()
 {
-    // std::string   fullPath = this->m_timeSeriesFilepath + "/blocks.vtm.series";
-    // std::ofstream file(fullPath);
+    std::string   fullPath = this->m_timeSeriesFilepath + "/blocks.vtm.series";
+    std::ofstream file(fullPath);
 
-    // this->m_timeSeriesJson = this->m_timeSeriesJson.substr(0, this->m_timeSeriesJson.size() - 2);
+    this->m_timeSeriesJson = this->m_timeSeriesJson.substr(0, this->m_timeSeriesJson.size() - 2);
 
-    // this->m_timeSeriesJson += "\n]}\n";
-    // file << this->m_timeSeriesJson;
-    // file.close();
+    this->m_timeSeriesJson += "\n]}\n";
+    file << this->m_timeSeriesJson;
+    file.close();
     LOG(INFO) << "Writing to file " << this->m_timeSeriesFilepath;
 }
 
@@ -487,7 +496,7 @@ EntityToVTK::recordObjectState(double timeStamp)
         this->m_accumlatedTime += timeStamp;
         this->m_timesteps.push_back(this->m_accumlatedTime);
         vtkSmartPointer<vtkMultiBlockDataSet> objectsMb   = vtkSmartPointer<vtkMultiBlockDataSet>::New();
-        std::cout << this->m_blockCount << std::endl;
+        // std::cout << this->m_blockCount << std::endl;
         unsigned int                          objectCount = 0;
         for (const auto& n : this->m_Entities)
         {
@@ -504,7 +513,7 @@ EntityToVTK::recordObjectState(double timeStamp)
             }
         }
 
-        // this->writeObjectsToTimeSeries(objectsMb, this->m_accumlatedTime);
+        this->writeObjectsToTimeSeries(objectsMb, this->m_accumlatedTime);
 
         this->m_outputBlock->SetBlock(this->m_blockCount, objectsMb);
         this->m_outputBlock->GetMetaData(this->m_blockCount)->Set(vtkMultiBlockDataSet::NAME(), "Timestep " + std::to_string(this->m_accumlatedTime));

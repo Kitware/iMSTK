@@ -86,17 +86,14 @@ ProgrammableScene::setupScene(double sampleTime)
             auto pbdObject = std::dynamic_pointer_cast<PbdObject>(obj);
             if (pbdObject)
             {
-                if (!strcmp(pbdObject->getName().c_str(), "Cube"))
-                {
-                    m_entity2vtk->addEntity(obj);
-                    CSVComparison displacementCompare;
-                    displacementCompare.name = obj->getName() + "_timestep_displacement";
-                    m_displacementComparision.emplace_back(displacementCompare);
+                m_entity2vtk->addEntity(obj);
+                CSVComparison displacementCompare;
+                displacementCompare.name = obj->getName() + "_timestep_displacement";
+                m_displacementComparision.emplace_back(displacementCompare);
 
-                    CSVComparison posAndVelCompare;
-                    posAndVelCompare.name = obj->getName() + "_position_and_velocity";
-                    m_positionAndVelocityComparision.emplace_back(posAndVelCompare);
-                }
+                CSVComparison posAndVelCompare;
+                posAndVelCompare.name = obj->getName() + "_position_and_velocity";
+                m_positionAndVelocityComparision.emplace_back(posAndVelCompare);
                 
             }
         }

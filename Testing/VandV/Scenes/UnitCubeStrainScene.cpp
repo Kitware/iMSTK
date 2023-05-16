@@ -44,9 +44,9 @@ makePbdUnitCube(
     cubeObj->setDynamicalModel(model);
     cubeObj->getPbdBody()->uniformMassValue = 1000.0 / cubeMesh->getNumVertices();
 
-    // model->getConfig()->m_secParams->m_YoungModulus = cfg.youngsModulus;
-    // model->getConfig()->m_secParams->m_PoissonRatio = cfg.poissonRatio;
-    // model->getConfig()->enableStrainEnergyConstraint(cfg.materialType);
+    model->getConfig()->m_femParams->m_YoungModulus = cfg.youngsModulus;
+    model->getConfig()->m_femParams->m_PoissonRatio = cfg.poissonRatio;
+    model->getConfig()->enableFemConstraint(cfg.materialType);
     // model->getConfig()->setBodyDamping(cubeObj->getPbdBody()->bodyHandle, 0.01);
 
     std::shared_ptr<VecDataArray<double, 3>> vertices = cubeMesh->getVertexPositions();
@@ -221,76 +221,76 @@ UnitCubeStrainScene::writeAnalyticStrainEnergyBaseline()
 
         double strainEnergy = 0.0;
         // Use the deformation gradient to calculate the expected strain energy for a unit cube
-        // switch (m_config.materialType)
-        // {
-        // case PbdStrainEnergyConstraint::MaterialType::StVK:
-        // {
-        //     Mat3d  greenStrain = 0.5 * (defGrad.transpose() * defGrad - Mat3d::Identity());
-        //     double lambda      = youngsModulus * poissons / ((1.0 + poissons) * (1.0 - 2.0 * poissons));
-        //     double mu = youngsModulus / (2.0 * (1.0 + poissons));
+        switch (m_config.materialType)
+        {
+        case PbdFemConstraint::MaterialType::StVK:
+        {
+            Mat3d  greenStrain = 0.5 * (defGrad.transpose() * defGrad - Mat3d::Identity());
+            double lambda      = youngsModulus * poissons / ((1.0 + poissons) * (1.0 - 2.0 * poissons));
+            double mu = youngsModulus / (2.0 * (1.0 + poissons));
 
-        //     // double SE = (lambda / 2.0) * greenStrain.trace() * greenStrain.trace() + mu * (greenStrain * greenStrain).trace();
+            // double SE = (lambda / 2.0) * greenStrain.trace() * greenStrain.trace() + mu * (greenStrain * greenStrain).trace();
 
-        //     Mat3d I = Mat3d::Identity();
-        //     Mat3d E = 0.5 * (defGrad.transpose() * defGrad - I);
+            Mat3d I = Mat3d::Identity();
+            Mat3d E = 0.5 * (defGrad.transpose() * defGrad - I);
 
-        //     // C here is strain energy (Often denoted as W in literature)
-        //     // for the StVK model W = mu[tr(E^{T}E)] + 0.5*lambda*(tr(E))^2
-        //     strainEnergy = mu * ((E.transpose() * E).trace()) + 0.5 * lambda * (E.trace() * E.trace());
-        //     break;
-        // }
-        // case PbdStrainEnergyConstraint::MaterialType::NeoHookean:
-        // {
-        //     double lambda = youngsModulus * poissons / ((1.0 + poissons) * (1 - 2.0 * poissons));
-        //     double mu     = youngsModulus / (2.0 * (1 + poissons));
+            // C here is strain energy (Often denoted as W in literature)
+            // for the StVK model W = mu[tr(E^{T}E)] + 0.5*lambda*(tr(E))^2
+            strainEnergy = mu * ((E.transpose() * E).trace()) + 0.5 * lambda * (E.trace() * E.trace());
+            break;
+        }
+        case PbdFemConstraint::MaterialType::NeoHookean:
+        {
+            double lambda = youngsModulus * poissons / ((1.0 + poissons) * (1 - 2.0 * poissons));
+            double mu     = youngsModulus / (2.0 * (1 + poissons));
 
-        //     double I1    = (defGrad * defGrad.transpose()).trace();
-        //     double I3    = (defGrad.transpose() * defGrad).determinant();
-        //     auto   logI3 = log(I3);
+            double I1    = (defGrad * defGrad.transpose()).trace();
+            double I3    = (defGrad.transpose() * defGrad).determinant();
+            auto   logI3 = log(I3);
 
-        //     // auto F_invT = defGrad.inverse().transpose();
+            // auto F_invT = defGrad.inverse().transpose();
 
-        //     auto J   = defGrad.determinant();
-        //     auto lnJ = log(J);
+            auto J   = defGrad.determinant();
+            auto lnJ = log(J);
 
-        //     strainEnergy = 0.5 * mu * (I1 - 3.0 - 2 * lnJ) + 0.5 * lambda * lnJ * lnJ;
-        //     break;
-        // }
+            strainEnergy = 0.5 * mu * (I1 - 3.0 - 2 * lnJ) + 0.5 * lambda * lnJ * lnJ;
+            break;
+        }
 
-        // case PbdStrainEnergyConstraint::MaterialType::Corotation:
-        // {
-        //     double lambda = youngsModulus * poissons / ((1.0 + poissons) * (1 - 2.0 * poissons));
-        //     double mu     = youngsModulus / (2.0 * (1 + poissons));
+        case PbdFemConstraint::MaterialType::Corotation:
+        {
+            double lambda = youngsModulus * poissons / ((1.0 + poissons) * (1 - 2.0 * poissons));
+            double mu     = youngsModulus / (2.0 * (1 + poissons));
 
-        //     Eigen::JacobiSVD<Mat3d> svd(defGrad, Eigen::ComputeFullU | Eigen::ComputeFullV);
-        //     Mat3d                   R = svd.matrixU() * svd.matrixV().adjoint();
-        //     Vec3d                   Sigma(svd.singularValues());
-        //     Mat3d                   invFT = svd.matrixU();
-        //     invFT.col(0) /= Sigma(0);
-        //     invFT.col(1) /= Sigma(1);
-        //     invFT.col(2) /= Sigma(2);
-        //     invFT *= svd.matrixV().adjoint();
-        //     double J  = Sigma(0) * Sigma(1) * Sigma(2);
-        //     Mat3d  FR = defGrad - R;
+            Eigen::JacobiSVD<Mat3d> svd(defGrad, Eigen::ComputeFullU | Eigen::ComputeFullV);
+            Mat3d                   R = svd.matrixU() * svd.matrixV().adjoint();
+            Vec3d                   Sigma(svd.singularValues());
+            Mat3d                   invFT = svd.matrixU();
+            invFT.col(0) /= Sigma(0);
+            invFT.col(1) /= Sigma(1);
+            invFT.col(2) /= Sigma(2);
+            invFT *= svd.matrixV().adjoint();
+            double J  = Sigma(0) * Sigma(1) * Sigma(2);
+            Mat3d  FR = defGrad - R;
 
-        //     double SE = FR(0, 0) * FR(0, 0) + FR(0, 1) * FR(0, 1) + FR(0, 2) * FR(0, 2)
-        //                 + FR(1, 0) * FR(1, 0) + FR(1, 1) * FR(1, 1) + FR(1, 2) * FR(1, 2)
-        //                 + FR(2, 0) * FR(2, 0) + FR(2, 1) * FR(2, 1) + FR(2, 2) * FR(2, 2);
+            double SE = FR(0, 0) * FR(0, 0) + FR(0, 1) * FR(0, 1) + FR(0, 2) * FR(0, 2)
+                        + FR(1, 0) * FR(1, 0) + FR(1, 1) * FR(1, 1) + FR(1, 2) * FR(1, 2)
+                        + FR(2, 0) * FR(2, 0) + FR(2, 1) * FR(2, 1) + FR(2, 2) * FR(2, 2);
 
-        //     strainEnergy = mu * SE + 0.5 * lambda * (J - 1) * (J - 1);
-        //     break;
-        // }
+            strainEnergy = mu * SE + 0.5 * lambda * (J - 1) * (J - 1);
+            break;
+        }
 
-        // case PbdStrainEnergyConstraint::MaterialType::Linear:
-        // {
-        //     double lambda = youngsModulus * poissons / ((1.0 + poissons) * (1 - 2.0 * poissons));
-        //     double mu     = youngsModulus / (2.0 * (1 + poissons));
-        //     Mat3d  I      = Mat3d::Identity();
-        //     Mat3d  e      = 0.5 * (defGrad * defGrad.transpose() - I);
-        //     strainEnergy = mu * (e * e).trace() + 0.5 * lambda * e.trace() * e.trace();
-        //     break;
-        // }
-        // }
+        case PbdFemConstraint::MaterialType::Linear:
+        {
+            double lambda = youngsModulus * poissons / ((1.0 + poissons) * (1 - 2.0 * poissons));
+            double mu     = youngsModulus / (2.0 * (1 + poissons));
+            Mat3d  I      = Mat3d::Identity();
+            Mat3d  e      = 0.5 * (defGrad * defGrad.transpose() - I);
+            strainEnergy = mu * (e * e).trace() + 0.5 * lambda * e.trace() * e.trace();
+            break;
+        }
+        }
 
         tracker.probe(seIdx, strainEnergy);
         time += m_config.dt;

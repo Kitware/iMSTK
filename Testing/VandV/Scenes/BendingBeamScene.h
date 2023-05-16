@@ -6,7 +6,7 @@
 
 #include "ProgrammableScene.h"
 #include "imstkPbdObject.h"
-// #include "imstkPbdStrainEnergyConstraint.h"
+#include "imstkPbdFemConstraint.h"
 
 namespace imstk
 {
@@ -19,7 +19,7 @@ public:
         double displacement;
         double youngsModulus;
         double poissonRatio;
-        // PbdStrainEnergyConstraint::MaterialType materialType;
+        PbdFemConstraint::MaterialType materialType;
 
         void toString(std::ostream& str) const override;
     };

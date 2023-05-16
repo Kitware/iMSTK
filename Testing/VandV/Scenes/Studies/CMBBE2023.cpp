@@ -23,12 +23,12 @@ bool
 CMBBE2023(ProgrammableSceneExec& exec)
 {
     bool bRet = true;
-    //bRet &= chainDropStudy(exec);
+    // bRet &= chainDropStudy(exec);
     // bRet &= bendingBeamStudy(exec);
-    //bRet &= springMassStudy(exec);
-    //bRet &= unitCubeStudyCompression(exec);
-    //bRet &= unitCubeStudyShear(exec);
-    //bRet &= unitCubeStudyTension(exec);
+    // bRet &= springMassStudy(exec);
+    // bRet &= unitCubeStudyCompression(exec);
+    // bRet &= unitCubeStudyShear(exec);
+    // bRet &= unitCubeStudyTension(exec);
 
     return bRet;
 }
@@ -54,7 +54,7 @@ unitCubeStudyTension(ProgrammableSceneExec& exec)
             cfg.youngsModulus       = 1000.0; // https://doi.org/10.1016/S0301-5629(02)00489-1
             cfg.poissonRatio         = 0.49;  // https://doi.org/10.1118/1.279566
             cfg.deformationType      = ProgrammableClient::DeformationType::Tension;
-            // cfg.materialType         = PbdStrainEnergyConstraint::MaterialType::StVK;
+            cfg.materialType         = PbdFemConstraint::MaterialType::StVK;
             cfg.sceneOutputDirectory = "cmbbe2023/UnitCubeStrain/Tension_" + std::to_string(cfg.iterations) + "_Iterations_" + std::to_string(cfg.partitions[0]) + "_Partitions/";
 
             if (!exec.executeScene(std::make_shared<UnitCubeStrainScene>(cfg)))
@@ -87,7 +87,7 @@ unitCubeStudyCompression(ProgrammableSceneExec& exec)
             cfg.youngsModulus       = 1000.0; // https://doi.org/10.1016/S0301-5629(02)00489-1
             cfg.poissonRatio         = 0.49;  // https://doi.org/10.1118/1.279566
             cfg.deformationType      = ProgrammableClient::DeformationType::Compression;
-            // cfg.materialType         = PbdStrainEnergyConstraint::MaterialType::StVK;
+            cfg.materialType         = PbdFemConstraint::MaterialType::StVK;
             cfg.sceneOutputDirectory = "cmbbe2023/UnitCubeStrain/Compression_" + std::to_string(cfg.iterations) + "_Iterations_" + std::to_string(cfg.partitions[0]) + "_Partitions/";
 
             if (!exec.executeScene(std::make_shared<UnitCubeStrainScene>(cfg)))
@@ -120,7 +120,7 @@ unitCubeStudyShear(ProgrammableSceneExec& exec)
             cfg.youngsModulus       = 1000.0; // https://doi.org/10.1016/S0301-5629(02)00489-1
             cfg.poissonRatio         = 0.49;  // https://doi.org/10.1118/1.279566
             cfg.deformationType      = ProgrammableClient::DeformationType::PureShear;
-            // cfg.materialType         = PbdStrainEnergyConstraint::MaterialType::StVK;
+            cfg.materialType         = PbdFemConstraint::MaterialType::StVK;
             cfg.sceneOutputDirectory = "cmbbe2023/UnitCubeStrain/Shear_" + std::to_string(cfg.iterations) + "_Iterations_" + std::to_string(cfg.partitions[0]) + "_Partitions/";
 
             if (!exec.executeScene(std::make_shared<UnitCubeStrainScene>(cfg)))
@@ -199,7 +199,7 @@ bendingBeamStudy(ProgrammableSceneExec& exec)
             cfg.youngsModulus = 1000.0;
             cfg.poissonRatio  = 0.49;
             cfg.partitions    = partitions[refine];
-            // cfg.materialType  = PbdStrainEnergyConstraint::MaterialType::StVK;
+            cfg.materialType  = PbdFemConstraint::MaterialType::StVK;
             cfg.sceneOutputDirectory = "cmbbe2023/BendingBeam/" + std::to_string(cfg.iterations) + "_Iterations_" +
                                        std::to_string(cfg.partitions[0]) + "x" + std::to_string(cfg.partitions[1]) + "x" + std::to_string(cfg.partitions[2]) + "_Partitions/";
 
