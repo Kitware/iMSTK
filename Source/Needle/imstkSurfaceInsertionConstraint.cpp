@@ -13,6 +13,7 @@ using namespace imstk;
 void
 SurfaceInsertionConstraint::initConstraint(
     const Vec3d&         insertionPoint,
+    const PbdParticleId& ptN,
     const PbdParticleId& ptB1,
     const PbdParticleId& ptB2,
     const PbdParticleId& ptB3,
@@ -25,10 +26,10 @@ SurfaceInsertionConstraint::initConstraint(
     m_contactPt      = contactPt;
     m_barycentricPt  = barycentricPt;
 
-    //m_particles[0] = { -1, 0 }; // Not two-way
-    m_particles[0] = ptB1;
-    m_particles[1] = ptB2;
-    m_particles[2] = ptB3;
+    m_particles[0] = ptN; 
+    m_particles[1] = ptB1;
+    m_particles[2] = ptB2;
+    m_particles[3] = ptB3;
 
     m_stiffness[0] = stiffnessA;
     m_stiffness[1] = stiffnessB;
@@ -54,12 +55,12 @@ SurfaceInsertionConstraint::computeValueAndGradient(PbdState&,
     diff.normalize();// gradient dcdx
 
     // Dont adjust position of needle, force mesh to follow needle
-    //dcdx[0] = Vec3d::Zero(); // Not two-way
+    dcdx[0] = -1.0*diff;// Vec3d::Zero(); //  Vec3d::Zero(); // Not two-way
 
     // Weight by berycentric coordinates
-    dcdx[0] = diff * m_barycentricPt[0];
-    dcdx[1] = diff * m_barycentricPt[1];
-    dcdx[2] = diff * m_barycentricPt[2];
+    dcdx[1] = diff * m_barycentricPt[0];
+    dcdx[2] = diff * m_barycentricPt[1];
+    dcdx[3] = diff * m_barycentricPt[2];
 
     return true;
 }

@@ -225,15 +225,17 @@ NeedlePbdCH::handle(
                 // generate and solve the constraint
 
                 const int bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
+                const int needleId = needleObj->getPbdBody()->bodyHandle;
                 auto      pointTriangleConstraint = std::make_shared<SurfaceInsertionConstraint>();
                 pointTriangleConstraint->initConstraint(puncturePt,
+                    { needleId, 0 },
                     { bodyId, punctureData.ids[0] },
                     { bodyId, punctureData.ids[1] },
                     { bodyId, punctureData.ids[2] },
-                closestPoint,
-                baryPoint,
-                0.0, 0.1 // stiffness parameters
-                    );
+                    closestPoint,
+                    baryPoint,
+                    0.3, 0.3 // stiffness parameters
+                );
                 m_constraints.push_back(pointTriangleConstraint);
             }
         }
@@ -390,12 +392,12 @@ NeedlePbdCH::handle(
                 m_pbdTissueObj->getPbdModel()->getBodies(),
                     { threadBodyId, nearestSegNodeIds[0] },
                     { threadBodyId, nearestSegNodeIds[1] },
-                segBary,
+                    segBary,
                     { tissueBodyId, m_threadPData[pPointId].triVertIds[0] },
                     { tissueBodyId, m_threadPData[pPointId].triVertIds[1] },
                     { tissueBodyId, m_threadPData[pPointId].triVertIds[2] },
                 m_threadPData[pPointId].triBaryPuncturePoint,
-                0.1, 0.0); // Tissue is not currently moved
+                0.3, 0.3); // Tissue is not currently moved
                 m_constraints.push_back(threadTriangleConstraint);
             }
         }

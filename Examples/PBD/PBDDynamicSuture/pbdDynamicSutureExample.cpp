@@ -33,6 +33,8 @@
 #include "imstkPbdObjectController.h"
 #include "imstkLoggerSynchronous.h"
 
+#include "imstkObjectControllerGhost.h"
+
 using namespace imstk;
 
 // Create tissue object to stitch
@@ -77,6 +79,7 @@ createTissue(std::shared_ptr<PbdModel> model)
     pbdObject->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     pbdObject->setDynamicalModel(model);
     pbdObject->getPbdBody()->uniformMassValue = 0.2 / numVerts;
+    std::cout<<"Tissue nodal mass = "<< 0.2 / numVerts<<"\n";
     // Fix the borders
     pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
     model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.3);
@@ -139,10 +142,10 @@ makePbdString(
     stringObj->setCollidingGeometry(stringMesh);
     stringObj->setDynamicalModel(model);
     stringObj->getPbdBody()->fixedNodeIds     = { 0, 1 };
-    stringObj->getPbdBody()->uniformMassValue = 0.001 / numVerts; // 0.002 / numVerts; // grams
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50.0, stringObj->getPbdBody()->bodyHandle);
+    stringObj->getPbdBody()->uniformMassValue = 0.1 / numVerts; // 0.002 / numVerts; // grams
+    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50000.0, stringObj->getPbdBody()->bodyHandle);
     model->getConfig()->enableBendConstraint(0.2, 1, true, stringObj->getPbdBody()->bodyHandle);
-    model->getConfig()->setBodyDamping(stringObj->getPbdBody()->bodyHandle, 0.03);
+    model->getConfig()->setBodyDamping(stringObj->getPbdBody()->bodyHandle, 0.3);
 
     return stringObj;
 }
@@ -172,7 +175,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
     needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
 
     needleObj->setDynamicalModel(model);
-    needleObj->getPbdBody()->setRigid(Vec3d(0, 0, 0.1), 0.1, Quatd::Identity(), Mat3d::Identity() * 10000.0);
+    needleObj->getPbdBody()->setRigid(Vec3d(0, 0, 0.1), 0.0007, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     needleObj->addComponent<Needle>();
 
@@ -187,7 +190,7 @@ main()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();
-    Logger::instance()->setOutput(std::make_shared<StreamOutput>(std::cout));
+    // Logger::instance()->setOutput(std::make_shared<StreamOutput>(std::cout));
 
     // Construct the scene
     auto scene = std::make_shared<Scene>("DynamicSuture");
@@ -205,11 +208,11 @@ main()
     auto pbdModel  = std::make_shared<PbdModel>();
     auto pbdParams = std::make_shared<PbdModelConfig>();
     pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 100.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 20.0);
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
-    pbdParams->m_dt         = 0.01;
-    pbdParams->m_iterations = 10;
+    pbdParams->m_dt         = 0.001;
+    pbdParams->m_iterations = 3;
     pbdModel->configure(pbdParams);
 
     // Mesh with hole for suturing
@@ -221,8 +224,8 @@ main()
     scene->addSceneObject(needleObj);
 
     // Create the suture pbd-based string
-    const double               stringLength      = 0.12;
-    const int                  stringVertexCount = 70;
+    const double               stringLength      = 0.08;
+    const int                  stringVertexCount = 47;
     std::shared_ptr<PbdObject> sutureThreadObj   =
         makePbdString("SutureThread", Vec3d(0.0, 0.0, 0.018), Vec3d(0.0, 0.0, 1.0),
             stringVertexCount, stringLength, pbdModel);
@@ -265,14 +268,17 @@ main()
         hapController->setControlledObject(needleObj);
         hapController->setDevice(deviceClient);
         hapController->setTranslationScaling(0.5);
-        hapController->setLinearKs(2000.0);
+        hapController->setLinearKs(10.0);
         hapController->setAngularKs(100000000.0);
         hapController->setUseCritDamping(true);
-        hapController->setForceScaling(0.001);
+        hapController->setForceScaling(10.0);
         hapController->setSmoothingKernelSize(10);
         hapController->setUseForceSmoothening(true);
         scene->addControl(hapController);
 
+        // Add extra component to tool for the ghost
+        auto controllerGhost = needleObj->addComponent<ObjectControllerGhost>();
+        controllerGhost->setController(hapController);
         // Update the needle object for real time
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)

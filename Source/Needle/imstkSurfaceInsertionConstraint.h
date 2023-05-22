@@ -18,11 +18,12 @@ using namespace imstk;
 class SurfaceInsertionConstraint : public PbdCollisionConstraint
 {
 public:
-    SurfaceInsertionConstraint() :  PbdCollisionConstraint(0, 3) { }
+    SurfaceInsertionConstraint() :  PbdCollisionConstraint(1, 3) { }
     ~SurfaceInsertionConstraint() override = default;
 
     void initConstraint(
         const Vec3d&         insertionPoint,
+        const PbdParticleId& ptN,
         const PbdParticleId& ptB1,
         const PbdParticleId& ptB2,
         const PbdParticleId& ptB3,
