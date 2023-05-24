@@ -265,7 +265,7 @@ NeedlePbdCH::handle(
                     { bodyId, punctureData.ids[2] },
                     closestPoint,
                     baryPoint,
-                    0.0, 0.3 // stiffness parameters
+                    m_needleToSurfaceStiffness, m_surfaceToNeedleStiffness // stiffness parameters
                 );
                 m_constraints.push_back(pointTriangleConstraint);
             }
@@ -439,7 +439,7 @@ NeedlePbdCH::handle(
                     { tissueBodyId, m_threadPData[pPointId].triVertIds[1] },
                     { tissueBodyId, m_threadPData[pPointId].triVertIds[2] },
                 m_threadPData[pPointId].triBaryPuncturePoint,
-                0.3, 0.0); // Tissue is not currently moved
+                m_threadToSurfaceStiffness, m_surfaceToThreadStiffness); // Tissue is not currently moved
                 m_constraints.push_back(threadTriangleConstraint);
             }
         }

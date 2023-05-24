@@ -53,6 +53,18 @@ public:
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override;
 
+    void setNeedleToSurfaceStiffness(double stiffness) { m_needleToSurfaceStiffness = stiffness; }
+    double getNeedleToSurfaceStiffness() { return m_needleToSurfaceStiffness; }
+
+    void setSurfaceToNeedleStiffness(double stiffness) { m_surfaceToNeedleStiffness = stiffness; }
+    double getSurfaceToNeedleStiffness() { return m_surfaceToNeedleStiffness; }
+
+    void setThreadToSurfaceStiffness(double stiffness) { m_needleToSurfaceStiffness = stiffness; }
+    double getThreadToSurfaceStiffness() { return m_needleToSurfaceStiffness; }
+
+    void setSurfaceToThreadStiffness(double stiffness) { m_surfaceToThreadStiffness = stiffness; }
+    double getSurfaceToThreadStiffness() { return m_surfaceToThreadStiffness; }
+
 protected:
     // Stores data for penetration points, both for the needle and the thread
     struct PenetrationData
@@ -97,6 +109,13 @@ protected:
     // PBD Tissue Mesh Data
     std::shared_ptr<PbdObject>   m_pbdTissueObj;
     std::shared_ptr<SurfaceMesh> m_tissueSurfMesh;
+
+    // Stiffnesses
+    double m_needleToSurfaceStiffness = 0.0;
+    double m_surfaceToNeedleStiffness = 0.3;
+    double m_threadToSurfaceStiffness = 0.3;
+    double m_surfaceToThreadStiffness = 0.0;
+
 
     bool m_punctured = false;
 private:
