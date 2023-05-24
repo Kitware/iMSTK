@@ -46,37 +46,37 @@ EntityToVTK::convertToMultiBlock(std::shared_ptr<Entity> entity)
         blockCount++;
     }
 
-    // auto physGeo = this->getPhysicalGeometry(entity);
-    // if (physGeo)
-    // {
-    //     mb->SetBlock(blockCount, physGeo);
-    //     mb->GetMetaData(blockCount)->Set(vtkMultiBlockDataSet::NAME(), "Physical Geometry");
-    //     blockCount++;
-    // }
+    auto physGeo = this->getPhysicalGeometry(entity);
+    if (physGeo)
+    {
+        mb->SetBlock(blockCount, physGeo);
+        mb->GetMetaData(blockCount)->Set(vtkMultiBlockDataSet::NAME(), "Physical Geometry");
+        blockCount++;
+    }
 
-    // auto visGeo = this->getVisualGeometry(entity);
-    // if (visGeo)
-    // {
-    //     mb->SetBlock(blockCount, visGeo);
-    //     mb->GetMetaData(blockCount)->Set(vtkMultiBlockDataSet::NAME(), "Visual Geometry");
-    //     blockCount++;
-    // }
+    auto visGeo = this->getVisualGeometry(entity);
+    if (visGeo)
+    {
+        mb->SetBlock(blockCount, visGeo);
+        mb->GetMetaData(blockCount)->Set(vtkMultiBlockDataSet::NAME(), "Visual Geometry");
+        blockCount++;
+    }
 
-    // auto collisionGeo = this->getCollisionGeometry(entity);
-    // if (collisionGeo)
-    // {
-    //     mb->SetBlock(blockCount, collisionGeo);
-    //     mb->GetMetaData(blockCount)->Set(vtkMultiBlockDataSet::NAME(), "Collision Geometry");
-    //     blockCount++;
-    // }
+    auto collisionGeo = this->getCollisionGeometry(entity);
+    if (collisionGeo)
+    {
+        mb->SetBlock(blockCount, collisionGeo);
+        mb->GetMetaData(blockCount)->Set(vtkMultiBlockDataSet::NAME(), "Collision Geometry");
+        blockCount++;
+    }
 
-    // auto ghost = this->getGhost(entity);
-    // if (ghost)
-    // {
-    //     mb->SetBlock(blockCount, ghost);
-    //     mb->GetMetaData(blockCount)->Set(vtkMultiBlockDataSet::NAME(), "Ghost");
-    //     blockCount++;
-    // }
+    auto ghost = this->getGhost(entity);
+    if (ghost)
+    {
+        mb->SetBlock(blockCount, ghost);
+        mb->GetMetaData(blockCount)->Set(vtkMultiBlockDataSet::NAME(), "Ghost");
+        blockCount++;
+    }
 
     if (blockCount == 0)
     {
@@ -205,7 +205,7 @@ EntityToVTK::getVertexInformation(std::shared_ptr<PointSet> pointSet, std::share
     velArray->SetNumberOfTuples(numVerticies * 3);
     displacementArray->SetNumberOfTuples(numVerticies * 3);
     int i = 0;
-    bool foundNan = false;
+
     for (const auto& index : m_indexToRecord[name])
     {
         if (index >= pointSet->getNumVertices())
@@ -213,11 +213,6 @@ EntityToVTK::getVertexInformation(std::shared_ptr<PointSet> pointSet, std::share
             continue;
         }
         Vec3d currentPosition = pointSet->getVertexPosition(index);
-
-        if (isnan(currentPosition.norm()))
-        {
-            foundNan = true;
-        }
 
         vtkSmartPointer<vtkVertex> vertex = vtkSmartPointer<vtkVertex>::New();
         vertex->GetPointIds()->SetId(0, points->InsertNextPoint(currentPosition[0], currentPosition[1], currentPosition[2]));
@@ -227,11 +222,6 @@ EntityToVTK::getVertexInformation(std::shared_ptr<PointSet> pointSet, std::share
         displacementArray->InsertTuple(i, (*body->prevVertices)[index].data());
         i++;
     }
-
-    // if (foundNan)
-    // {
-    //     std::cout << "Found NaN Position" << std::endl;
-    // }
 
     polydata->SetPoints(points);
     polydata->SetVerts(vertices);

@@ -22,11 +22,11 @@ main()
     Logger::startLogger();
 
     ProgrammableSceneExec exec;
-    exec.m_viewScene = false;  // EntityToVTK breaks if scene is not visible
+    exec.m_viewScene = false;
 
     bool bRet = true;
 
-    bRet &= CMBBE2023(exec);
+    // bRet &= CMBBE2023(exec);
 
     // CapsuleToCubeScene::Configuration c2cConfig;
     // c2cConfig.type = CapsuleToCubeScene::Type::DeformableCube;

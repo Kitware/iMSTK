@@ -78,13 +78,12 @@ ProgrammableScene::getTimeStep() const
 bool
 ProgrammableScene::setupScene(double sampleTime)
 {
-    // EntityToVTK breaks if scene is not visible
-    // if (!m_viewScene)
-    // {
+    if (!m_viewScene)
+    {
         for (auto obj :m_scene->getSceneObjects())
         {
-            auto pbdObject = std::dynamic_pointer_cast<PbdObject>(obj);
-            if (pbdObject)
+            auto dynamicObject = std::dynamic_pointer_cast<DynamicObject>(obj);
+            if (dynamicObject)
             {
                 m_entity2vtk->addEntity(obj);
                 CSVComparison displacementCompare;
@@ -97,7 +96,7 @@ ProgrammableScene::setupScene(double sampleTime)
                 
             }
         }
-    // }
+    }
     m_entity2vtk->setTimeBetweenRecordings(sampleTime);
     m_numSteps = m_duration / m_pbdModel->getConfig()->m_dt;
     return true;

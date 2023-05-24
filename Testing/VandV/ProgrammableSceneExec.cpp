@@ -35,14 +35,14 @@ ProgrammableSceneExec::executeScene(std::shared_ptr<ProgrammableScene> pScene)
         pScene->getScene()->initialize();
         for (size_t i = 0; i < numSteps; i++)
         {
+            // The order must be Track -> Update -> Advance
             pScene->trackData(now);
-            pScene->getScene()->advance(pScene->getTimeStep());
-
             for (auto pc : pScene->getClients())
             {
                 pc->update();
             }
 
+            pScene->getScene()->advance(pScene->getTimeStep());
             now += pScene->getTimeStep();
         }
     }
@@ -82,6 +82,9 @@ ProgrammableSceneExec::executeScene(std::shared_ptr<ProgrammableScene> pScene)
         connect<Event>(sceneManager, &SceneManager::preUpdate, [&](Event*)
             {
                 size_t complete = 0;
+                pScene->trackData(now);
+                now += pScene->getTimeStep();
+
                 for (auto pc : pScene->getClients())
                 {
                     pc->update();
@@ -91,12 +94,8 @@ ProgrammableSceneExec::executeScene(std::shared_ptr<ProgrammableScene> pScene)
                 {
                     driver->requestStatus(ModuleDriverStopped);
                 }
-                else
-                {
-                    pScene->trackData(now);
-                    now += pScene->getTimeStep();
-                }
-                });
+            
+            });
 
         connect<Event>(driver, &SimulationManager::ending, [&](Event*)
             {
