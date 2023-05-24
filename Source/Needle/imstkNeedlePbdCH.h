@@ -27,7 +27,8 @@ class TetrahedralMesh;
 /// \brief Handles penetration constraints for the needle and the thread by creating a set of puncture points
 /// that are used to find the nearest segment on either the needle or the thread and constraining the tissue to the
 /// needle, or the thread to the tissue. This class assumes the mesh is not cut or otherwise modified during runtime.
-///
+/// WARNING: This class currently assumes a tetrahedral mesh for the physics mesh of the punctureable pbdObject and
+/// a triangle mesh for the collision geometry of that object.
 class NeedlePbdCH : public PbdCollisionHandling
 {
 public:
@@ -52,6 +53,9 @@ public:
     void handle(
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) override;
+
+    void generateNewPunctureData();
+    void addPunctureConstraints();
 
     void setNeedleToSurfaceStiffness(double stiffness) { m_needleToSurfaceStiffness = stiffness; }
     double getNeedleToSurfaceStiffness() { return m_needleToSurfaceStiffness; }
@@ -110,14 +114,17 @@ protected:
     std::shared_ptr<PbdObject>   m_pbdTissueObj;
     std::shared_ptr<SurfaceMesh> m_tissueSurfMesh;
 
+    std::shared_ptr<PbdObject> m_needleObj;
+    std::shared_ptr<LineMesh>  m_needleMesh;
+
     // Stiffnesses
     double m_needleToSurfaceStiffness = 0.0;
     double m_surfaceToNeedleStiffness = 0.3;
     double m_threadToSurfaceStiffness = 0.3;
     double m_surfaceToThreadStiffness = 0.0;
 
-
-    bool m_punctured = false;
+    bool m_needlePunctured = false;
+    bool m_threadPunctured = false;
 private:
 
     std::vector<PbdParticleId> m_particles;                          ///< Particles to attach the thread to the needle

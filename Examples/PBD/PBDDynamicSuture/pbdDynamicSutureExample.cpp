@@ -79,7 +79,7 @@ createTissue(std::shared_ptr<PbdModel> model)
     pbdObject->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     pbdObject->setDynamicalModel(model);
     pbdObject->getPbdBody()->uniformMassValue = 0.2 / numVerts;
-    std::cout<<"Tissue nodal mass = "<< 0.2 / numVerts<<"\n";
+    std::cout << "Tissue nodal mass = " << 0.2 / numVerts << "\n";
     // Fix the borders
     pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
     model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.3);

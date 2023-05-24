@@ -26,7 +26,7 @@ SurfaceInsertionConstraint::initConstraint(
     m_contactPt      = contactPt;
     m_barycentricPt  = barycentricPt;
 
-    m_particles[0] = ptN; 
+    m_particles[0] = ptN;
     m_particles[1] = ptB1;
     m_particles[2] = ptB2;
     m_particles[3] = ptB3;
@@ -55,7 +55,7 @@ SurfaceInsertionConstraint::computeValueAndGradient(PbdState&,
     diff.normalize();// gradient dcdx
 
     // Dont adjust position of needle, force mesh to follow needle
-    dcdx[0] = -1.0*diff;// Vec3d::Zero(); //  Vec3d::Zero(); // Not two-way
+    dcdx[0] = -1.0 * diff;// Vec3d::Zero(); //  Vec3d::Zero(); // Not two-way
 
     // Weight by berycentric coordinates
     dcdx[1] = diff * m_barycentricPt[0];

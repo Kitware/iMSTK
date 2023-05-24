@@ -15,7 +15,6 @@ namespace imstk
 {
 class PbdObject;
 
-
 ///
 /// \class NeedleInteraction
 ///
@@ -33,5 +32,4 @@ public:
 
     void stitch();
 };
-
-} 
+} // namespace imstk
