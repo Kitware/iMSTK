@@ -212,7 +212,7 @@ main()
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.001;
-    pbdParams->m_iterations = 3;
+    pbdParams->m_iterations = 9;
     pbdModel->configure(pbdParams);
 
     // Mesh with hole for suturing
@@ -268,7 +268,7 @@ main()
         hapController->setControlledObject(needleObj);
         hapController->setDevice(deviceClient);
         hapController->setTranslationScaling(0.5);
-        hapController->setLinearKs(10.0);
+        hapController->setLinearKs(5.0);
         hapController->setAngularKs(100000000.0);
         hapController->setUseCritDamping(true);
         hapController->setForceScaling(10.0);

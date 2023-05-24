@@ -55,7 +55,7 @@ public:
 
 protected:
     // Stores data for penetration points, both for the needle and the thread
-    struct SuturePenetrationData
+    struct PenetrationData
     {
         // Triangle ID
         int triId = -1;
@@ -83,7 +83,9 @@ protected:
     // Center of puncture points for stitching constraint
     Vec3d m_stitchCenter = Vec3d::Zero();
 
-    std::vector<SuturePenetrationData> m_threadPData;
+    std::vector<PenetrationData> m_threadPData;
+    std::vector<PenetrationData> m_needlePData;
+    std::vector<PenetrationData> m_punctureData;
 
     // Bool to activate stitching constraint
     bool m_stitch = false;

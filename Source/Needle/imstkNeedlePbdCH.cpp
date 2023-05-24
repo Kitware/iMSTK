@@ -116,6 +116,14 @@ NeedlePbdCH::handle(
         std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = physMesh->getVertexPositions();
         const VecDataArray<double, 3>&           tissueVertices    = *tissueVerticesPtr;
 
+
+        // Needle tail
+        const Vec3d& needleTail1 = needleVertices[0];
+        const Vec3d& needleTail2 = needleVertices[1];
+
+        bool endSeg = false;
+        int nearestSeg = -1;
+
         // Scope for needle
         {
             // First, find new penetration points using the tip of the needle (needle mesh is reversed)
@@ -162,7 +170,21 @@ NeedlePbdCH::handle(
                         data.userData.weights[1] = uvw[1];
                         data.userData.weights[2] = uvw[2];
 
-                        LOG(DEBUG) << "Punctured triangle: " << triangleId;
+                        PenetrationData newPuncture;
+
+                        newPuncture.triId = triangleId;
+
+                        newPuncture.triVertIds[0] = physTriIds[0];
+                        newPuncture.triVertIds[1] = physTriIds[1];
+                        newPuncture.triVertIds[2] = physTriIds[2];
+
+                        newPuncture.triBaryPuncturePoint[0] = uvw[0];
+                        newPuncture.triBaryPuncturePoint[1] = uvw[1];
+                        newPuncture.triBaryPuncturePoint[2] = uvw[2];
+
+                        m_needlePData.push_back(newPuncture);
+
+                        LOG(DEBUG) << "Needle punctured triangle: " << triangleId;
                     }
                 }
             }
@@ -170,6 +192,7 @@ NeedlePbdCH::handle(
             // Loop over penetration points and find nearest point on the needle
             // Note: Nearest point will likely be the point between two segments,
             // its dualy defined, but thats ok
+            
             for (auto puncture : needle->getPunctures())
             {
                 if (puncture.second->state != Puncture::State::INSERTED)
@@ -189,6 +212,7 @@ NeedlePbdCH::handle(
                 const Vec3d baryPoint  = punctureData.weights.head<3>();
                 const Vec3d puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
 
+                
                 for (int segmentId = 0; segmentId < needleMesh->getNumCells(); segmentId++)
                 {
                     const Vec2i& needleSegNodeIds = needleIndices[segmentId];
@@ -205,7 +229,13 @@ NeedlePbdCH::handle(
                     {
                         closestDist  = newDist;
                         closestPoint = segClosestPoint;
+                        nearestSeg = segmentId;
+                       
                     }
+                }
+                if (nearestSeg == 0) {
+                    endSeg = true;
+                    // LOG(INFO) << "Puncture thread now";
                 }
 
                 // Check and see if the closest point is at the tips of the needle
@@ -221,20 +251,21 @@ NeedlePbdCH::handle(
                     continue;
                 }
 
+
                 // Now that we have the closest point on the needle to this penetration point, we can
                 // generate and solve the constraint
 
                 const int bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
-                const int needleId = needleObj->getPbdBody()->bodyHandle;
+                const int needleBodyId = needleObj->getPbdBody()->bodyHandle;
                 auto      pointTriangleConstraint = std::make_shared<SurfaceInsertionConstraint>();
                 pointTriangleConstraint->initConstraint(puncturePt,
-                    { needleId, 0 },
+                    { needleBodyId, 0 },
                     { bodyId, punctureData.ids[0] },
                     { bodyId, punctureData.ids[1] },
                     { bodyId, punctureData.ids[2] },
                     closestPoint,
                     baryPoint,
-                    0.3, 0.3 // stiffness parameters
+                    0.0, 0.3 // stiffness parameters
                 );
                 m_constraints.push_back(pointTriangleConstraint);
             }
@@ -260,8 +291,10 @@ NeedlePbdCH::handle(
             const Vec3d& threadTip2 = threadVertices[nodeIds[1]];
 
             // Loop over all triangles in the surface mesh
-            for (int triangleId = 0; triangleId < m_tissueSurfMesh->getNumCells(); triangleId++)
+            // for (int triangleId = 0; triangleId < m_tissueSurfMesh->getNumCells(); triangleId++)
+            for (int punctureId = 0; punctureId < m_needlePData.size(); punctureId++)
             {
+                int triangleId = m_needlePData[punctureId].triId;
                 const Vec3i& surfTriIds = tissueSurfMeshIndices[triangleId];
 
                 // Indices of the vertices on the physics mesh
@@ -280,12 +313,13 @@ NeedlePbdCH::handle(
                 // If this triangle has already been punctured by the needle
                 if (needle->getState({ tissueId, needleId, triangleId }) == Puncture::State::INSERTED)
                 {
-                    // If it has not yet been punctured by thread
+                    // If this triangle has not yet been punctured by thread
                     if (m_isThreadPunctured[triangleId] == false)
                     {
                         // Check for intersection
-                        if (CollisionUtils::testSegmentTriangle(threadTip1, threadTip2, a, b, c, uvw))
+                        if (endSeg == true) // CollisionUtils::testSegmentTriangle(needleTail1, needleTail2, a, b, c, uvw)
                         {
+                            endSeg = false;
                             m_isThreadPunctured[triangleId] = true;
 
                             // Find matching needle puncture point
@@ -299,7 +333,7 @@ NeedlePbdCH::handle(
                             }
 
                             // Create thread puncture point and copy in data from needle puncture point
-                            SuturePenetrationData newPuncture;
+                            PenetrationData newPuncture;
 
                             newPuncture.triId = punctureData.id;
 
@@ -307,10 +341,18 @@ NeedlePbdCH::handle(
                             newPuncture.triVertIds[1] = punctureData.ids[1];
                             newPuncture.triVertIds[2] = punctureData.ids[2];
 
-                            newPuncture.triBaryPuncturePoint = uvw;
+                            newPuncture.triBaryPuncturePoint[0] = punctureData.weights[0];
+                            newPuncture.triBaryPuncturePoint[1] = punctureData.weights[1];
+                            newPuncture.triBaryPuncturePoint[2] = punctureData.weights[2];
+
+
+
+                            // newPuncture.triBaryPuncturePoint = uvw;
 
                             // Create and save the puncture point
                             m_threadPData.push_back(newPuncture);
+
+                            LOG(DEBUG) << "Thread punctured triangle: " << triangleId;
                         }
                     }
                 }
@@ -397,7 +439,7 @@ NeedlePbdCH::handle(
                     { tissueBodyId, m_threadPData[pPointId].triVertIds[1] },
                     { tissueBodyId, m_threadPData[pPointId].triVertIds[2] },
                 m_threadPData[pPointId].triBaryPuncturePoint,
-                0.3, 0.3); // Tissue is not currently moved
+                0.3, 0.0); // Tissue is not currently moved
                 m_constraints.push_back(threadTriangleConstraint);
             }
         }
@@ -434,7 +476,7 @@ NeedlePbdCH::stitch()
     // First, verify that at least 4 points have been penetrated by the thread
     if (m_threadPData.size() < 4)
     {
-        LOG(INFO) << "Cant stitch less than 4 points";
+        LOG(INFO) << "Cant stitch less than 4 points, currently only "<< m_threadPData.size()<<" points";
         return;
     }
 
@@ -582,7 +624,7 @@ NeedlePbdCH::didPuncture(const std::vector<CollisionElement>& elementsA, const s
             // Note: This is a short term solution
             if (dotProduct > threshold)
             {
-                LOG(INFO) << "Needle inserted";
+                // LOG(INFO) << "Needle inserted";
                 return true;
             }
         }
