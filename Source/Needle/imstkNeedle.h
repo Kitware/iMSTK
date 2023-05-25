@@ -39,7 +39,7 @@ public:
     Puncture::State getState(const PunctureId& id);
     /// @}
 
-    PunctureMap& getPunctures()  { return m_punctures; }
+    PunctureMap& getPunctures() { return m_punctures; }
 
     ///
     /// \brief Get if inserted at all

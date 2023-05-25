@@ -532,15 +532,13 @@ NeedlePbdCH::didPuncture(const std::vector<CollisionElement>& elementsA, const s
         // Use absolute value to ignore direction issues
         const double dotProduct = std::fabs(needleDirection.dot(surfNormal));
 
-        // Arbitrary threshold
-        const double threshold = 0.8;
         if (contactPtId == endIndex)
         {
             if (needle->getState(punctureId) == Puncture::State::TOUCHING) // Touching
             {
                 // If the needle is close to perpendicular to the face if may insert
                 // Note: This is a short term solution
-                if (dotProduct > threshold)
+                if (dotProduct > m_threshold)
                 {
                     // LOG(INFO) << "Needle inserted";
                     return true;

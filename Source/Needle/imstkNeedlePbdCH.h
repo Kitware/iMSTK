@@ -69,6 +69,9 @@ public:
     void setSurfaceToThreadStiffness(double stiffness) { m_surfaceToThreadStiffness = stiffness; }
     double getSurfaceToThreadStiffness() { return m_surfaceToThreadStiffness; }
 
+    void setPunctureDotThreshold(double threshold) { m_threshold = threshold; }
+    double getPunctureDotThreshold() { return m_threshold; }
+
 protected:
     // Stores data for penetration points, both for the needle and the thread
     struct PenetrationData
@@ -125,6 +128,10 @@ protected:
 
     bool m_needlePunctured = false;
     bool m_threadPunctured = false;
+
+    // Puncture angle dot product threshold
+    double m_threshold = 0.8;
+
 private:
 
     std::vector<PbdParticleId> m_particles;                          ///< Particles to attach the thread to the needle
