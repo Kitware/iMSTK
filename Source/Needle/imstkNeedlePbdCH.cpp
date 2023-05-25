@@ -23,6 +23,7 @@
 #include <cmath>
 #include "imstkPbdPointPointConstraint.h"
 #include "imstkPbdDistanceConstraint.h"
+#include "imstkPbdContactConstraint.h"
 
 // using namespace imstk;
 namespace imstk
@@ -306,30 +307,54 @@ NeedlePbdCH::handle(
     auto needleMesh = std::dynamic_pointer_cast<LineMesh>(needleObj->getCollidingGeometry());
 
     m_constraints.clear();
-    /* Not working atm
-    // Initialization order, don't know when the state gets set up
-    if (m_particles.size() == 0)
-    {
-        for (int i = 0; i < 2; ++i)
-        {
-            m_particles.push_back(m_threadObj->getPbdModel()->addVirtualParticle(Vec3d::Zero(), -1.0, Vec3d::Zero(), true));
-            auto c = std::make_shared<PbdDistanceConstraint>();
-            auto threadBodyId = m_threadObj->getPbdBody()->bodyHandle;
-            c->initConstraint(0.0, m_particles[i], { threadBodyId, i });
-            m_threadConstraints.push_back(c);
-        }
-    }
+
+
+
+    //for (int i = 0; i < 2; ++i)
+    //{
+    //    auto threadBodyId = m_threadObj->getPbdBody()->bodyHandle;
+    //    auto needleBodyId = m_needleObj->getPbdBody()->bodyHandle;
+    //    auto needleThreadConstraint = std::make_shared<PbdVertexToBodyConstraint>();
+    //    needleThreadConstraint->initConstraint(
+    //        m_threadObj->getPbdModel()->getBodies(),
+    //        { needleBodyId, i },
+    //        needleMesh->getVertexPositions()->at(i),
+    //        { threadBodyId, i },
+    //        0.3);
+    //    m_constraints.push_back(needleThreadConstraint);
+    //}
+
+    auto threadBodyId = m_threadObj->getPbdBody()->bodyHandle;
+    auto needleBodyId = m_needleObj->getPbdBody()->bodyHandle;
+    auto needleThreadConstraint0 = std::make_shared<PbdVertexToBodyConstraint>();
+    needleThreadConstraint0->initConstraint(
+        m_threadObj->getPbdModel()->getBodies(),
+        { needleBodyId, 0 },
+        needleMesh->getVertexPositions()->at(1),
+        { threadBodyId, 0 },
+        0.0009);
+    m_constraints.push_back(needleThreadConstraint0);
+
+    auto needleThreadConstraint1 = std::make_shared<PbdVertexToBodyConstraint>();
+    needleThreadConstraint1->initConstraint(
+        m_threadObj->getPbdModel()->getBodies(),
+        { needleBodyId, 0 },
+        needleMesh->getVertexPositions()->at(0),
+        { threadBodyId, 1 },
+        0.0009);
+    m_constraints.push_back(needleThreadConstraint1);
 
     // Update Thread To Needle Constraints
-    needleObj->getPbdModel()->getBodies().getPosition(m_particles[0]) = needleMesh->getVertexPositions()->at(1);
-    needleObj->getPbdModel()->getBodies().getPosition(m_particles[1]) = needleMesh->getVertexPositions()->at(0);
+    //needleObj->getPbdModel()->getBodies().getPosition(m_particles[0]) = needleMesh->getVertexPositions()->at(1);
+    //needleObj->getPbdModel()->getBodies().getPosition(m_particles[1]) = needleMesh->getVertexPositions()->at(0);
 
-    m_constraints.push_back(m_threadConstraints[0]);
-    m_constraints.push_back(m_threadConstraints[1]);
-    */
+    //m_constraints.push_back(m_threadConstraints[0]);
+    //m_constraints.push_back(m_threadConstraints[1]);
 
-    (*m_threadMesh->getVertexPositions())[1] = (*needleMesh->getVertexPositions())[0];
-    (*m_threadMesh->getVertexPositions())[0] = (*needleMesh->getVertexPositions())[1];
+    
+
+   /* (*m_threadMesh->getVertexPositions())[1] = (*needleMesh->getVertexPositions())[0];
+    (*m_threadMesh->getVertexPositions())[0] = (*needleMesh->getVertexPositions())[1];*/
 
     // Handle needle collision normally if no insertion
     m_needlePunctured = didPuncture(elementsA, elementsB) || m_needlePunctured;

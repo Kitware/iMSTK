@@ -82,7 +82,11 @@ createTissue(std::shared_ptr<PbdModel> model)
     std::cout << "Tissue nodal mass = " << 0.2 / numVerts << "\n";
     // Fix the borders
     pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
-    model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.3);
+
+    model->getConfig()->m_femParams->m_YoungModulus = 2500.0;
+    model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
+    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
+    model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.05);
 
     pbdObject->addComponent<Puncturable>();
 
@@ -141,7 +145,7 @@ makePbdString(
     stringObj->setPhysicsGeometry(stringMesh);
     stringObj->setCollidingGeometry(stringMesh);
     stringObj->setDynamicalModel(model);
-    stringObj->getPbdBody()->fixedNodeIds     = { 0, 1 };
+    //stringObj->getPbdBody()->fixedNodeIds     = { 0, 1 };
     stringObj->getPbdBody()->uniformMassValue = 0.1 / numVerts; // 0.002 / numVerts; // grams
     model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50000.0, stringObj->getPbdBody()->bodyHandle);
     model->getConfig()->enableBendConstraint(0.2, 1, true, stringObj->getPbdBody()->bodyHandle);
@@ -175,7 +179,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
     needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
 
     needleObj->setDynamicalModel(model);
-    needleObj->getPbdBody()->setRigid(Vec3d(0, 0, 0.1), 0.0007, Quatd::Identity(), Mat3d::Identity() * 10000.0);
+    needleObj->getPbdBody()->setRigid(Vec3d(0, 0, 0.1), 0.00007, Quatd::Identity(), Mat3d::Identity() * 10000.0);
 
     needleObj->addComponent<Needle>();
 
@@ -207,12 +211,12 @@ main()
     // Setup the Model
     auto pbdModel  = std::make_shared<PbdModel>();
     auto pbdParams = std::make_shared<PbdModelConfig>();
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 20.0);
+    /*pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5.0);
+    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 20.0);*/
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.001;
-    pbdParams->m_iterations = 9;
+    pbdParams->m_iterations = 3;
     pbdModel->configure(pbdParams);
 
     // Mesh with hole for suturing

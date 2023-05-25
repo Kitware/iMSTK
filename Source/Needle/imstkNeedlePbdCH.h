@@ -121,10 +121,10 @@ protected:
     std::shared_ptr<LineMesh>  m_needleMesh;
 
     // Stiffnesses
-    double m_needleToSurfaceStiffness = 0.0;
-    double m_surfaceToNeedleStiffness = 0.3;
-    double m_threadToSurfaceStiffness = 0.3;
-    double m_surfaceToThreadStiffness = 0.0;
+    double m_needleToSurfaceStiffness = 0.333;
+    double m_surfaceToNeedleStiffness = 0.333;
+    double m_threadToSurfaceStiffness = 0.333;
+    double m_surfaceToThreadStiffness = 0.333;
 
     bool m_needlePunctured = false;
     bool m_threadPunctured = false;
