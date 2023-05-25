@@ -232,7 +232,6 @@ PbdModel::initialize()
         m_config->m_dataTracker->configureProbe(DataTracker::Physics::AverageC, DataTracker::ePhysics::AverageC);
     }
 
-
     return true;
 }
 

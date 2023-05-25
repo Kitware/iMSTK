@@ -26,9 +26,8 @@ PbdSolver::solve()
         m_dataTracker->getStopWatch(DataTracker::ePhysics::SolverTime_ms).start();
     }
 
-
     size_t                                                          numConstraints = 0;
-    const std::vector<std::shared_ptr<PbdConstraint>>&              constraints = m_constraints->getConstraints();
+    const std::vector<std::shared_ptr<PbdConstraint>>&              constraints    = m_constraints->getConstraints();
     const std::vector<std::vector<std::shared_ptr<PbdConstraint>>>& partitionedConstraints = m_constraints->getPartitionedConstraints();
 
     double averageC      = 0.0;
@@ -129,6 +128,5 @@ PbdSolver::solve()
         averageC /= numConstraints;
         m_dataTracker->probe(DataTracker::ePhysics::AverageC, averageC);
     }
-
 }
 } // namespace imstk
