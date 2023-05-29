@@ -84,6 +84,9 @@ protected:
 
         // Puncture barycentric coordinate on triangle
         Vec3d triBaryPuncturePoint = { 0.0, 0.0, 0.0 };
+
+        // Line segment ID of needle or thread
+        int segId = -1;
     };
 
     // Flags for which entity is puncturing a triangle
@@ -121,10 +124,12 @@ protected:
     std::shared_ptr<LineMesh>  m_needleMesh;
 
     // Stiffnesses
-    double m_needleToSurfaceStiffness = 0.333;
-    double m_surfaceToNeedleStiffness = 0.333;
-    double m_threadToSurfaceStiffness = 0.333;
-    double m_surfaceToThreadStiffness = 0.333;
+    // NOTE: for now, this stiffness times the iteration count needs to be one
+    // TODO: Reformat constraints with reprojection step
+    double m_needleToSurfaceStiffness = 0.2;
+    double m_surfaceToNeedleStiffness = 0.2;
+    double m_threadToSurfaceStiffness = 0.2;
+    double m_surfaceToThreadStiffness = 0.2;
 
     bool m_needlePunctured = false;
     bool m_threadPunctured = false;

@@ -52,6 +52,11 @@ ObjectControllerGhost::init()
     std::shared_ptr<Geometry> ghostGeom = controlledObj->getVisualGeometry()->clone();
     CHECK(ghostGeom != nullptr) << "Failed to copy controller geometry";
 
+    if (m_pbdController != nullptr)
+    {
+        ghostGeom->translate(-1.0 * m_pbdController->getHapticOffset(), Geometry::TransformType::ApplyToData);
+    }
+
     m_ghostVisualModel->setGeometry(ghostGeom);
 }
 
@@ -64,7 +69,7 @@ ObjectControllerGhost::visualUpdate(const double&)
     if (m_pbdController != nullptr)
     {
         orientation = m_pbdController->getOrientation();
-        position    = m_pbdController->getPosition();
+        position    = m_pbdController->getPosition(); //
         force       = m_pbdController->getDeviceForce();
     }
     else
@@ -76,8 +81,8 @@ ObjectControllerGhost::visualUpdate(const double&)
 
     // Update the ghost debug geometry
     std::shared_ptr<Geometry> toolGhostMesh = m_ghostVisualModel->getGeometry();
-    toolGhostMesh->setRotation(orientation);
     toolGhostMesh->setTranslation(position);
+    toolGhostMesh->setRotation(orientation);
     toolGhostMesh->updatePostTransformData();
     toolGhostMesh->postModified();
 

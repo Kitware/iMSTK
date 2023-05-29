@@ -112,6 +112,7 @@ NeedlePbdCH::generateNewPunctureData()
                 newPuncture.triBaryPuncturePoint[0] = uvw[0];
                 newPuncture.triBaryPuncturePoint[1] = uvw[1];
                 newPuncture.triBaryPuncturePoint[2] = uvw[2];
+                newPuncture.segId = tipSegmentId;
 
                 m_needlePData.push_back(newPuncture);
                 m_punctureData.push_back(newPuncture);
@@ -130,9 +131,6 @@ NeedlePbdCH::addPunctureConstraints()
     auto physMesh    = std::dynamic_pointer_cast<TetrahedralMesh>(m_pbdTissueObj->getPhysicsGeometry());
     auto puncturable = m_pbdTissueObj->getComponent<Puncturable>();
 
-    // Variable for checking if there is a need to transition a puncture from the needle to the thread
-    int nearestSeg = -1;
-
     // Loop over penetration points and find nearest point on the needle
     // Note: Nearest point will likely be the point between two segments,
     // its dualy defined, but thats ok
@@ -142,6 +140,9 @@ NeedlePbdCH::addPunctureConstraints()
         Vec3d  closestPoint = { IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX };
         double closestDist  = IMSTK_DOUBLE_MAX;
 
+        // Variable for storing the segement nearest to the needle
+        int nearestSegmentId = -1;
+
         const Vec3d& a = physMesh->getVertexPositions()->at(puncture->triVertIds[0]);
         const Vec3d& b = physMesh->getVertexPositions()->at(puncture->triVertIds[1]);
         const Vec3d& c = physMesh->getVertexPositions()->at(puncture->triVertIds[2]);
@@ -149,7 +150,18 @@ NeedlePbdCH::addPunctureConstraints()
         const Vec3d baryPoint  = puncture->triBaryPuncturePoint.head<3>();
         const Vec3d puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
 
-        for (int segmentId = 0; segmentId < m_needleMesh->getNumCells(); segmentId++)
+        // Only check segments within checkStride of previous segments.
+        // This helps with thread switching directions
+        int checkStride     = 1;
+        int previousSegment = puncture->segId;
+
+        int lowerBound = previousSegment - checkStride;
+        int upperBound = previousSegment + checkStride;
+
+        int strideStart = (lowerBound > 0) ? lowerBound : 0;
+        int strideEnd   = (upperBound < m_needleMesh->getNumCells()) ? upperBound : m_needleMesh->getNumCells() - 1;
+
+        for (int segmentId = strideStart; segmentId <= strideEnd; segmentId++)
         {
             const Vec2i& needleSegNodeIds = m_needleMesh->getCells()->at(segmentId);
             const Vec3d& x1 = m_needleMesh->getVertexPositions()->at(needleSegNodeIds[0]);
@@ -163,11 +175,13 @@ NeedlePbdCH::addPunctureConstraints()
             double newDist = (segClosestPoint - puncturePt).squaredNorm();
             if (newDist < closestDist)
             {
-                closestDist  = newDist;
-                closestPoint = segClosestPoint;
-                nearestSeg   = segmentId;
+                closestDist      = newDist;
+                closestPoint     = segClosestPoint;
+                nearestSegmentId = segmentId;
             }
         }
+
+        puncture->segId = nearestSegmentId;
 
         // Check and see if the closest point is at the tips of the needle
         // Note: Needle mesh is backwards
@@ -185,8 +199,10 @@ NeedlePbdCH::addPunctureConstraints()
         }
 
         // If the tissue is on the last segment of the needle, then transition onto the thread
-        if (nearestSeg == 0)
+        if (puncture->segId == 0)
         {
+            // Switch to thread
+            puncture->segId = 0; // start at first segment on thread
             m_threadPData.push_back(*puncture);
 
             const PunctureId punctureId = getPunctureId(needle, puncturable, puncture->triId);
@@ -234,10 +250,23 @@ NeedlePbdCH::addPunctureConstraints()
 
         auto puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
 
-        int closestSegmentId = -1;
+        int nearestSegmentId = -1;
+
+        // Only check segments within checkStride of previous segments.
+        // This helps with thread switching directions
+        int checkStride     = 1;
+        int previousSegment = puncture->segId;
+
+        int lowerBound = previousSegment - checkStride;
+        int upperBound = previousSegment + checkStride;
+
+        int numSegsNonPenetrating = 4;
+
+        int strideStart = (lowerBound > 0) ? lowerBound : 0;
+        int strideEnd   = (upperBound < m_threadMesh->getNumCells() - numSegsNonPenetrating) ? upperBound : m_threadMesh->getNumCells() - numSegsNonPenetrating;
 
         // Note: stopping before last segment for visualization
-        for (int segmentId = 0; segmentId < m_threadMesh->getNumCells(); segmentId++)
+        for (int segmentId = strideStart; segmentId <= strideEnd; segmentId++)
         {
             const Vec2i& threadSegNodeIds = m_threadMesh->getCells()->at(segmentId);
             const Vec3d& x1 = m_threadMesh->getVertexPositions()->at(threadSegNodeIds[0]);
@@ -253,9 +282,11 @@ NeedlePbdCH::addPunctureConstraints()
             if (newDist.norm() <= oldDist.norm())
             {
                 closestPoint     = segClosestPoint;
-                closestSegmentId = segmentId;
+                nearestSegmentId = segmentId;
             }
         } // end loop over thread segments
+
+        puncture->segId = nearestSegmentId;
 
         // NOTE: Commented out to force thread to stay inserted once inserted
         // If uncommented, the thread would be able to slide through the mesh and unpuncture.
@@ -273,7 +304,7 @@ NeedlePbdCH::addPunctureConstraints()
         auto threadTriangleConstraint = std::make_shared<ThreadInsertionConstraint>();
 
         // Set of VM pairs for thread
-        const Vec2i& nearestSegNodeIds = m_threadMesh->getCells()->at(closestSegmentId);
+        const Vec2i& nearestSegNodeIds = m_threadMesh->getCells()->at(puncture->segId);
         const Vec3d& p = m_threadMesh->getVertexPositions()->at(nearestSegNodeIds[0]);
         const Vec3d& q = m_threadMesh->getVertexPositions()->at(nearestSegNodeIds[1]);
 
@@ -308,53 +339,22 @@ NeedlePbdCH::handle(
 
     m_constraints.clear();
 
-
-
-    //for (int i = 0; i < 2; ++i)
-    //{
-    //    auto threadBodyId = m_threadObj->getPbdBody()->bodyHandle;
-    //    auto needleBodyId = m_needleObj->getPbdBody()->bodyHandle;
-    //    auto needleThreadConstraint = std::make_shared<PbdVertexToBodyConstraint>();
-    //    needleThreadConstraint->initConstraint(
-    //        m_threadObj->getPbdModel()->getBodies(),
-    //        { needleBodyId, i },
-    //        needleMesh->getVertexPositions()->at(i),
-    //        { threadBodyId, i },
-    //        0.3);
-    //    m_constraints.push_back(needleThreadConstraint);
-    //}
-
     auto threadBodyId = m_threadObj->getPbdBody()->bodyHandle;
     auto needleBodyId = m_needleObj->getPbdBody()->bodyHandle;
-    auto needleThreadConstraint0 = std::make_shared<PbdVertexToBodyConstraint>();
-    needleThreadConstraint0->initConstraint(
-        m_threadObj->getPbdModel()->getBodies(),
-        { needleBodyId, 0 },
-        needleMesh->getVertexPositions()->at(1),
-        { threadBodyId, 0 },
-        0.0009);
-    m_constraints.push_back(needleThreadConstraint0);
 
-    auto needleThreadConstraint1 = std::make_shared<PbdVertexToBodyConstraint>();
-    needleThreadConstraint1->initConstraint(
-        m_threadObj->getPbdModel()->getBodies(),
-        { needleBodyId, 0 },
-        needleMesh->getVertexPositions()->at(0),
-        { threadBodyId, 1 },
-        0.0009);
-    m_constraints.push_back(needleThreadConstraint1);
-
-    // Update Thread To Needle Constraints
-    //needleObj->getPbdModel()->getBodies().getPosition(m_particles[0]) = needleMesh->getVertexPositions()->at(1);
-    //needleObj->getPbdModel()->getBodies().getPosition(m_particles[1]) = needleMesh->getVertexPositions()->at(0);
-
-    //m_constraints.push_back(m_threadConstraints[0]);
-    //m_constraints.push_back(m_threadConstraints[1]);
-
-    
-
-   /* (*m_threadMesh->getVertexPositions())[1] = (*needleMesh->getVertexPositions())[0];
-    (*m_threadMesh->getVertexPositions())[0] = (*needleMesh->getVertexPositions())[1];*/
+    // Add constraint to connect the needle to the thread
+    int numTiedSegments = 1;
+    for (int i = 0; i <= numTiedSegments; i++)
+    {
+        auto needleThreadConstraint = std::make_shared<PbdVertexToBodyConstraint>();
+        needleThreadConstraint->initConstraint(
+            m_threadObj->getPbdModel()->getBodies(),
+            { needleBodyId, 0 },
+            needleMesh->getVertexPositions()->at(numTiedSegments - i),
+            { threadBodyId, i },
+            0.0001);
+        m_constraints.push_back(needleThreadConstraint);
+    }
 
     // Handle needle collision normally if no insertion
     m_needlePunctured = didPuncture(elementsA, elementsB) || m_needlePunctured;
@@ -383,7 +383,7 @@ NeedlePbdCH::handle(
             }
         }
 
-        if (m_needlePData.size() == 0 && m_needlePData.size() == 0)
+        if (m_needlePData.size() == 0)
         {
             m_needlePunctured = false;
         }

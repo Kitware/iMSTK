@@ -280,6 +280,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
     controller->setControlledObject(toolObj);
+    controller->setHapticOffset(Vec3d(0.0, 0.0, -0.1));
     controller->setTranslationScaling(1.0);
     controller->setLinearKs(1000.0);
     controller->setAngularKs(10000.0);

@@ -34,8 +34,12 @@
 #include "imstkLoggerSynchronous.h"
 
 #include "imstkObjectControllerGhost.h"
+#include "imstkCapsule.h"
+#include "imstkPbdRigidObjectGrasping.h"
 
 using namespace imstk;
+
+#include <iostream>
 
 // Create tissue object to stitch
 std::shared_ptr<PbdObject>
@@ -64,8 +68,8 @@ createTissue(std::shared_ptr<PbdModel> model)
     surfMesh->rotate(Vec3d(0.0, 0.0, 1.0), -PI_2, Geometry::TransformType::ApplyToData);
     surfMesh->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2 / 1.0, Geometry::TransformType::ApplyToData);
 
-    tetMesh->scale(0.018, Geometry::TransformType::ApplyToData); // 0.015
-    surfMesh->scale(0.018, Geometry::TransformType::ApplyToData);
+    tetMesh->scale(0.02, Geometry::TransformType::ApplyToData); // 0.02
+    surfMesh->scale(0.02, Geometry::TransformType::ApplyToData);
 
     surfMesh->computeVertexNormals();
     surfMesh->computeTrianglesNormals();
@@ -78,14 +82,14 @@ createTissue(std::shared_ptr<PbdModel> model)
     pbdObject->setCollidingGeometry(surfMesh);
     pbdObject->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     pbdObject->setDynamicalModel(model);
-    pbdObject->getPbdBody()->uniformMassValue = 0.2 / numVerts;
-    std::cout << "Tissue nodal mass = " << 0.2 / numVerts << "\n";
+    pbdObject->getPbdBody()->uniformMassValue = 0.25 / numVerts; // 0.025
+    std::cout << "Tissue nodal mass = " << 0.025 / numVerts << "\n";
     // Fix the borders
     pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
 
-    model->getConfig()->m_femParams->m_YoungModulus = 2500.0;
+    model->getConfig()->m_femParams->m_YoungModulus = 8000.0;                            // 8000
     model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
-    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
+    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean); // StVK
     model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.05);
 
     pbdObject->addComponent<Puncturable>();
@@ -93,22 +97,56 @@ createTissue(std::shared_ptr<PbdModel> model)
     return pbdObject;
 }
 
-static std::shared_ptr<SceneObject>
-makeClampObj(std::string name)
+///
+/// \brief Creates capsule to use as a tool
+///
+static std::shared_ptr<PbdObject>
+makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
 {
-    auto surfMesh =
-        MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Clamps/Gregory Suture Clamp/gregory_suture_clamp.obj");
+    double radius = 0.002; // Harry radius is 0.005
+    double length = 0.2;   // Harry length is 1
+    double mass   = 0.1;   // 0.1 (kg)
 
-    surfMesh->scale(5.0, Geometry::TransformType::ApplyToData);
+    auto toolGeometry = std::make_shared<Capsule>();
+    // auto toolGeometry = std::make_shared<Sphere>();
+    toolGeometry->setRadius(radius);
+    toolGeometry->setLength(length);
+    toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
+    toolGeometry->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
 
-    auto toolObj = std::make_shared<SceneObject>(name);
-    toolObj->setVisualGeometry(surfMesh);
-    auto renderMaterial = std::make_shared<RenderMaterial>();
-    renderMaterial->setColor(Color::LightGray);
-    renderMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    renderMaterial->setRoughness(0.5);
-    renderMaterial->setMetalness(1.0);
-    toolObj->getVisualModel(0)->setRenderMaterial(renderMaterial);
+    LOG(INFO) << "Tool Radius  = " << radius;
+    LOG(INFO) << "Tool mass = " << mass;
+
+    auto toolObj = std::make_shared<PbdObject>("Tool");
+
+    // Create the object
+    toolObj->setVisualGeometry(toolGeometry);
+    toolObj->setPhysicsGeometry(toolGeometry);
+    toolObj->setCollidingGeometry(toolGeometry);
+    toolObj->setDynamicalModel(model);
+    toolObj->getPbdBody()->setRigid(
+        Vec3d(0.04, 0.0, 0.0),
+        mass,
+        Quatd::Identity(),
+        Mat3d::Identity() * 1.0);
+
+    toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(1.0);
+
+    // Add a component for controlling via another device
+    auto controller = toolObj->addComponent<PbdObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setHapticOffset(Vec3d(0.0, 0.0, -0.1));
+    controller->setTranslationScaling(1.0);
+    controller->setLinearKs(500.0);
+    controller->setAngularKs(1000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(1.0);
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setController(controller);
 
     return toolObj;
 }
@@ -127,12 +165,19 @@ makePbdString(
     std::shared_ptr<LineMesh> stringMesh =
         GeometryUtils::toLineGrid(pos, dir, stringLength, numVerts);
 
+    double segLength = (stringMesh->getVertexPositions()->at(0) - stringMesh->getVertexPositions()->at(1)).norm();
+    std::cout << "Segment length = " << segLength << "\n"; // 0.0016
+    std::cout << "Critical length = " << 0.0016 << "\n";
+
+    const Vec3d shift = Vec3d(0.0, 0.05, 0.0);
+    stringMesh->translate(shift, Geometry::TransformType::ApplyToData);
+
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setColor(Color::Red);
     material->setLineWidth(2.0);
-    material->setPointSize(18.0);
+    material->setPointSize(3.0);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
     auto visualModel = std::make_shared<VisualModel>();
@@ -146,16 +191,22 @@ makePbdString(
     stringObj->setCollidingGeometry(stringMesh);
     stringObj->setDynamicalModel(model);
     //stringObj->getPbdBody()->fixedNodeIds     = { 0, 1 };
-    stringObj->getPbdBody()->uniformMassValue = 0.1 / numVerts; // 0.002 / numVerts; // grams
-    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 50000.0, stringObj->getPbdBody()->bodyHandle);
-    model->getConfig()->enableBendConstraint(0.2, 1, true, stringObj->getPbdBody()->bodyHandle);
-    model->getConfig()->setBodyDamping(stringObj->getPbdBody()->bodyHandle, 0.3);
+    stringObj->getPbdBody()->uniformMassValue = 0.00125;
+    model->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 1E12, stringObj->getPbdBody()->bodyHandle);
+    model->getConfig()->enableBendConstraint(100, 1, true, stringObj->getPbdBody()->bodyHandle);
+    model->getConfig()->setBodyDamping(stringObj->getPbdBody()->bodyHandle, 0.05);
 
     return stringObj;
+
+    // Harrys thread
+    // 201 verts
+    // total length of 0.75
+    // mass = 0.1
+    // bend constraints stiffness 2 with stride of 2
 }
 
 static std::shared_ptr<PbdObject>
-makeToolObj(std::shared_ptr<PbdModel> model)
+makeNeedleObj(std::shared_ptr<PbdModel> model)
 {
     auto needleObj      = std::make_shared<PbdObject>();
     auto sutureMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Needles/c6_suture.stl");
@@ -164,8 +215,17 @@ makeToolObj(std::shared_ptr<PbdModel> model)
     const Mat4d rot = mat4dRotation(Rotd(-PI_2, Vec3d(0.0, 1.0, 0.0))) *
                       mat4dRotation(Rotd(-0.6, Vec3d(1.0, 0.0, 0.0)));
 
+    const Vec3d center = sutureLineMesh->getCenter();
+    sutureMesh->translate(-center, Geometry::TransformType::ApplyToData);
+    sutureLineMesh->translate(-center, Geometry::TransformType::ApplyToData);
+
+    const Vec3d shift = Vec3d(0.0, 0.05, -0.1);
+
     sutureMesh->transform(rot, Geometry::TransformType::ApplyToData);
+    sutureMesh->translate(shift, Geometry::TransformType::ApplyToData);
+
     sutureLineMesh->transform(rot, Geometry::TransformType::ApplyToData);
+    sutureLineMesh->translate(shift, Geometry::TransformType::ApplyToData);
 
     needleObj->setVisualGeometry(sutureMesh);
     // setVisualGeometry(sutureLineMesh);
@@ -179,7 +239,9 @@ makeToolObj(std::shared_ptr<PbdModel> model)
     needleObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
 
     needleObj->setDynamicalModel(model);
-    needleObj->getPbdBody()->setRigid(Vec3d(0, 0, 0.1), 0.00007, Quatd::Identity(), Mat3d::Identity() * 10000.0);
+    needleObj->getPbdBody()->setRigid(Vec3d(0, 0, 0.1), 0.1, Quatd::Identity(), Mat3d::Identity() * 0.00012);
+    // needle mass 0.1
+    // inertia is 0.00012
 
     needleObj->addComponent<Needle>();
 
@@ -199,9 +261,9 @@ main()
     // Construct the scene
     auto scene = std::make_shared<Scene>("DynamicSuture");
 
-    scene->getActiveCamera()->setPosition(0.0, 0.04, 0.09);
-    scene->getActiveCamera()->setFocalPoint(0.0, 0.02, 0.05);
-    scene->getActiveCamera()->setViewUp(0.001, 1.0, -0.4);
+    scene->getActiveCamera()->setPosition(0.001, 0.1, 0.145);
+    scene->getActiveCamera()->setFocalPoint(0.000, 0.025, 0.035);
+    scene->getActiveCamera()->setViewUp(0.0, 0.83, -0.55);
 
     auto light = std::make_shared<DirectionalLight>();
     light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
@@ -211,12 +273,10 @@ main()
     // Setup the Model
     auto pbdModel  = std::make_shared<PbdModel>();
     auto pbdParams = std::make_shared<PbdModelConfig>();
-    /*pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, 5.0);
-    pbdParams->enableConstraint(PbdModelConfig::ConstraintGenType::Volume, 20.0);*/
     pbdParams->m_doPartitioning = false;
     pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
     pbdParams->m_dt         = 0.001;
-    pbdParams->m_iterations = 3;
+    pbdParams->m_iterations = 5;
     pbdModel->configure(pbdParams);
 
     // Mesh with hole for suturing
@@ -224,16 +284,35 @@ main()
     scene->addSceneObject(tissueHole);
 
     // Create arced needle
-    std::shared_ptr<PbdObject> needleObj = makeToolObj(pbdModel);
+    std::shared_ptr<PbdObject> needleObj = makeNeedleObj(pbdModel);
     scene->addSceneObject(needleObj);
 
-    // Create the suture pbd-based string
+    // Create the thread
     const double               stringLength      = 0.08;
-    const int                  stringVertexCount = 47;
+    const int                  stringVertexCount = 41;
     std::shared_ptr<PbdObject> sutureThreadObj   =
         makePbdString("SutureThread", Vec3d(0.0, 0.0, 0.018), Vec3d(0.0, 0.0, 1.0),
             stringVertexCount, stringLength, pbdModel);
     scene->addSceneObject(sutureThreadObj);
+
+    // Setup a tool to grasp with
+    std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdModel);
+    scene->addSceneObject(toolObj);
+
+    // Create grasping interactions
+    auto needleGrasp = std::make_shared<PbdObjectGrasping>(needleObj, toolObj);
+    needleGrasp->setStiffness(0.3);
+    scene->addInteraction(needleGrasp);
+
+    auto threadGrasp = std::make_shared<PbdObjectGrasping>(sutureThreadObj, toolObj);
+    threadGrasp->setStiffness(0.3);
+    scene->addInteraction(threadGrasp);
+
+    // Add tool to tissue collision
+    auto pbdToolCollision = std::make_shared<PbdObjectCollision>(tissueHole, toolObj);
+    pbdToolCollision->setRigidBodyCompliance(0.0001); // Helps with smoothness
+    pbdToolCollision->setUseCorrectVelocity(true);
+    scene->addInteraction(pbdToolCollision);
 
     // Add needle constraining behavior between the tissue & arc needle/thread
     auto sutureInteraction = std::make_shared<NeedleInteraction>(tissueHole, needleObj, sutureThreadObj);
@@ -242,8 +321,8 @@ main()
     // Add thread CCD
     auto interactionCCDThread = std::make_shared<PbdObjectCollision>(sutureThreadObj, sutureThreadObj);
     // Very important parameter for stability of solver, keep lower than 1.0:
-    interactionCCDThread->setDeformableStiffnessA(0.01);
-    interactionCCDThread->setDeformableStiffnessB(0.01);
+    interactionCCDThread->setDeformableStiffnessA(0.1);
+    interactionCCDThread->setDeformableStiffnessB(0.1);
     scene->addInteraction(interactionCCDThread);
 
     {
@@ -263,26 +342,85 @@ main()
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.005);
 
+#ifdef iMSTK_USE_HAPTICS
         // Setup default haptics manager
         std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
         std::shared_ptr<DeviceClient>  deviceClient  = hapticManager->makeDeviceClient();
         driver->addModule(hapticManager);
 
-        auto hapController = std::make_shared<PbdObjectController>();
-        hapController->setControlledObject(needleObj);
-        hapController->setDevice(deviceClient);
-        hapController->setTranslationScaling(0.5);
-        hapController->setLinearKs(5.0);
-        hapController->setAngularKs(100000000.0);
-        hapController->setUseCritDamping(true);
-        hapController->setForceScaling(10.0);
-        hapController->setSmoothingKernelSize(10);
-        hapController->setUseForceSmoothening(true);
-        scene->addControl(hapController);
+        auto controller = toolObj->getComponent<PbdObjectController>();
+        controller->setDevice(deviceClient);
 
-        // Add extra component to tool for the ghost
-        auto controllerGhost = needleObj->addComponent<ObjectControllerGhost>();
-        controllerGhost->setController(hapController);
+        connect<ButtonEvent>(deviceClient, &DeviceClient::buttonStateChanged,
+            [&](ButtonEvent* e)
+            {
+                if (e->m_buttonState == BUTTON_PRESSED)
+                {
+                    if (e->m_button == 1)
+                    {
+                        // Use a slightly larger capsule since collision prevents intersection
+                        auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
+                        auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
+                        dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
+                        needleGrasp->beginCellGrasp(dilatedCapsule);
+                        threadGrasp->beginCellGrasp(dilatedCapsule);
+                        // pbdToolCollision->setEnabled(false);
+                        std::cout << "Grasp\n";
+                    }
+                }
+                else if (e->m_buttonState == BUTTON_RELEASED)
+                {
+                    if (e->m_button == 1)
+                    {
+                        needleGrasp->endGrasp();
+                        threadGrasp->endGrasp();
+                        // pbdToolCollision->setEnabled(true);
+                    }
+                }
+            });
+#else
+        auto deviceClient = std::make_shared<DummyClient>();
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+            {
+                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.1;
+
+                deviceClient->setPosition(worldPos);
+            });
+
+        // Add click event and side effects
+        connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
+            [&](Event*)
+            {
+                toolPicking->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
+                pbdToolCollision->setEnabled(false);
+            });
+        connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
+            [&](Event*)
+            {
+                toolPicking->endGrasp();
+                pbdToolCollision->setEnabled(true);
+            });
+#endif
+
+        //auto hapController = std::make_shared<PbdObjectController>();
+        //hapController->setControlledObject(needleObj);
+        //hapController->setDevice(deviceClient);
+        //hapController->setTranslationScaling(0.5);
+        //hapController->setLinearKs(50.0);
+        //hapController->setAngularKs(100000000.0);
+        //hapController->setUseCritDamping(true);
+        //hapController->setForceScaling(1.0);
+        //hapController->setSmoothingKernelSize(10);
+        //hapController->setUseForceSmoothening(true);
+
+        //// Add extra component to tool for the ghost
+        //auto controllerGhost = needleObj->addComponent<ObjectControllerGhost>();
+        //controllerGhost->setController(hapController);
+
+        // scene->addControl(controller);
+
         // Update the needle object for real time
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
@@ -301,7 +439,7 @@ main()
                 // Perform stitch
                 if (e->m_key == 's')
                 {
-                    sutureInteraction->stitch();
+                    // sutureInteraction->stitch();
                 }
             });
 
