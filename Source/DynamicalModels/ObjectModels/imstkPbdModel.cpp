@@ -25,6 +25,35 @@ PbdModel::PbdModel() : AbstractDynamicalModel(DynamicalModelType::PositionBasedD
     // Add a virtual particle buffer, persistent
     addBody();
 
+    // Create a virtual particles buffer for particles that need to be quickly added/removed
+    // such as during collision
+    m_state.m_bodies[0] = std::make_shared<PbdBody>(0);
+    m_state.m_bodies[0]->bodyType          = PbdBody::Type::DEFORMABLE_ORIENTED;
+    m_state.m_bodies[0]->prevVertices      = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[0]->vertices          = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[0]->prevOrientations  = std::make_shared<StdVectorOfQuatd>();
+    m_state.m_bodies[0]->orientations      = std::make_shared<StdVectorOfQuatd>();
+    m_state.m_bodies[0]->velocities        = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[0]->angularVelocities = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[0]->masses      = std::make_shared<DataArray<double>>();
+    m_state.m_bodies[0]->invMasses   = std::make_shared<DataArray<double>>();
+    m_state.m_bodies[0]->inertias    = std::make_shared<StdVectorOfMat3d>();
+    m_state.m_bodies[0]->invInertias = std::make_shared<StdVectorOfMat3d>();
+
+    // The second virtual particle buffer is for persistant virtual particles
+    m_state.m_bodies[1] = std::make_shared<PbdBody>(1);
+    m_state.m_bodies[1]->bodyType          = PbdBody::Type::DEFORMABLE_ORIENTED;
+    m_state.m_bodies[1]->prevVertices      = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[1]->vertices          = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[1]->prevOrientations  = std::make_shared<StdVectorOfQuatd>();
+    m_state.m_bodies[1]->orientations      = std::make_shared<StdVectorOfQuatd>();
+    m_state.m_bodies[1]->velocities        = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[1]->angularVelocities = std::make_shared<VecDataArray<double, 3>>();
+    m_state.m_bodies[1]->masses      = std::make_shared<DataArray<double>>();
+    m_state.m_bodies[1]->invMasses   = std::make_shared<DataArray<double>>();
+    m_state.m_bodies[1]->inertias    = std::make_shared<StdVectorOfMat3d>();
+    m_state.m_bodies[1]->invInertias = std::make_shared<StdVectorOfMat3d>();
+
     m_validGeometryTypes = {
         "PointSet",
         "LineMesh",
@@ -161,35 +190,6 @@ PbdModel::getConfig() const
 bool
 PbdModel::initialize()
 {
-    // Create a virtual particles buffer for particles that need to be quickly added/removed
-    // such as during collision
-    m_state.m_bodies[0] = std::make_shared<PbdBody>(0);
-    m_state.m_bodies[0]->bodyType          = PbdBody::Type::DEFORMABLE_ORIENTED;
-    m_state.m_bodies[0]->prevVertices      = std::make_shared<VecDataArray<double, 3>>();
-    m_state.m_bodies[0]->vertices          = std::make_shared<VecDataArray<double, 3>>();
-    m_state.m_bodies[0]->prevOrientations  = std::make_shared<StdVectorOfQuatd>();
-    m_state.m_bodies[0]->orientations      = std::make_shared<StdVectorOfQuatd>();
-    m_state.m_bodies[0]->velocities        = std::make_shared<VecDataArray<double, 3>>();
-    m_state.m_bodies[0]->angularVelocities = std::make_shared<VecDataArray<double, 3>>();
-    m_state.m_bodies[0]->masses      = std::make_shared<DataArray<double>>();
-    m_state.m_bodies[0]->invMasses   = std::make_shared<DataArray<double>>();
-    m_state.m_bodies[0]->inertias    = std::make_shared<StdVectorOfMat3d>();
-    m_state.m_bodies[0]->invInertias = std::make_shared<StdVectorOfMat3d>();
-
-    // The second virtual particle buffer is for persistant virtual particles
-    m_state.m_bodies[1] = std::make_shared<PbdBody>(1);
-    m_state.m_bodies[1]->bodyType          = PbdBody::Type::DEFORMABLE_ORIENTED;
-    m_state.m_bodies[1]->prevVertices      = std::make_shared<VecDataArray<double, 3>>();
-    m_state.m_bodies[1]->vertices          = std::make_shared<VecDataArray<double, 3>>();
-    m_state.m_bodies[1]->prevOrientations  = std::make_shared<StdVectorOfQuatd>();
-    m_state.m_bodies[1]->orientations      = std::make_shared<StdVectorOfQuatd>();
-    m_state.m_bodies[1]->velocities        = std::make_shared<VecDataArray<double, 3>>();
-    m_state.m_bodies[1]->angularVelocities = std::make_shared<VecDataArray<double, 3>>();
-    m_state.m_bodies[1]->masses      = std::make_shared<DataArray<double>>();
-    m_state.m_bodies[1]->invMasses   = std::make_shared<DataArray<double>>();
-    m_state.m_bodies[1]->inertias    = std::make_shared<StdVectorOfMat3d>();
-    m_state.m_bodies[1]->invInertias = std::make_shared<StdVectorOfMat3d>();
-
     // Store a copy of the initial state
     m_initialState.deepCopy(m_state);
 

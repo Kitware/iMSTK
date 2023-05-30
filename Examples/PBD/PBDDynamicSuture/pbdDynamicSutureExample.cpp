@@ -37,6 +37,8 @@
 #include "imstkCapsule.h"
 #include "imstkPbdRigidObjectGrasping.h"
 
+#include "imstkPbdDistanceConstraint.h"
+
 using namespace imstk;
 
 #include <iostream>
@@ -51,16 +53,7 @@ createTissue(std::shared_ptr<PbdModel> model)
 
     std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
-    std::vector<int> fixedNodes;
-    const int        numVerts = tetMesh->getNumVertices();
-    for (int i = 0; i < numVerts; i++)
-    {
-        const Vec3d& position = tetMesh->getVertexPosition(i);
-        if (std::fabs(1.40984 - std::fabs(position[1])) <= 1E-4)
-        {
-            fixedNodes.push_back(i);
-        }
-    }
+    const int numVerts = tetMesh->getNumVertices();
 
     tetMesh->rotate(Vec3d(0.0, 0.0, 1.0), -PI_2, Geometry::TransformType::ApplyToData);
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -PI_2 / 1.0, Geometry::TransformType::ApplyToData);
@@ -70,6 +63,10 @@ createTissue(std::shared_ptr<PbdModel> model)
 
     tetMesh->scale(0.02, Geometry::TransformType::ApplyToData); // 0.02
     surfMesh->scale(0.02, Geometry::TransformType::ApplyToData);
+
+    double squish = 0.5;
+    tetMesh->scale(Vec3d(1.0, squish, 1.0), Geometry::TransformType::ApplyToData);
+    surfMesh->scale(Vec3d(1.0, squish, 1.0), Geometry::TransformType::ApplyToData);
 
     surfMesh->computeVertexNormals();
     surfMesh->computeTrianglesNormals();
@@ -82,17 +79,46 @@ createTissue(std::shared_ptr<PbdModel> model)
     pbdObject->setCollidingGeometry(surfMesh);
     pbdObject->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tetMesh, surfMesh));
     pbdObject->setDynamicalModel(model);
-    pbdObject->getPbdBody()->uniformMassValue = 0.25 / numVerts; // 0.025
-    std::cout << "Tissue nodal mass = " << 0.025 / numVerts << "\n";
-    // Fix the borders
-    pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
-
-    model->getConfig()->m_femParams->m_YoungModulus = 2500.0;                            // 8000
-    model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
-    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean); // StVK
-    model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.05);
-
+    double mass = 2.5;
+    pbdObject->getPbdBody()->uniformMassValue = mass / numVerts; // 0.025
+    std::cout << "Tissue nodal mass = " << mass / numVerts << "\n";
     pbdObject->addComponent<Puncturable>();
+    pbdObject->initialize();
+
+    std::cout << "Tissue body index = " << pbdObject->getPbdBody()->bodyHandle << "\n";
+
+    model->getConfig()->m_femParams->m_YoungModulus = 8000.0;                                                                 // 8000
+    model->getConfig()->m_femParams->m_PoissonRatio = 0.2;
+    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean, pbdObject->getPbdBody()->bodyHandle); // StVK
+    model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.2);
+
+    // Fix the borders (boundary conditions
+    std::vector<int> fixedNodes;
+    std::cout << "Num Verts = " << numVerts << "\n";
+    for (int i = 0; i < numVerts; i++)
+    {
+        const Vec3d& position = tetMesh->getVertexPosition(i);
+        if (std::fabs(0.0281968 - std::fabs(position[0])) <= 1E-4)
+        {
+            fixedNodes.push_back(i);
+        }
+    }
+
+    // Fix nodes in place using constraints
+    const int bodyId = pbdObject->getPbdBody()->bodyHandle;
+    for (int nodeId = 0; nodeId < fixedNodes.size(); nodeId++)
+    {
+        const auto& position = tetMesh->getVertexPositions()->at(fixedNodes[nodeId]);
+
+        const PbdParticleId& p0 = model->addVirtualParticle(position, 0.0, Vec3d::Zero(), true);
+        const PbdParticleId  p1 = { bodyId, fixedNodes[nodeId] };
+
+        auto   boundConstraint = std::make_shared<PbdDistanceConstraint>();
+        double restLength      = 0.0;
+        double stiffness       = 10.0;
+        boundConstraint->initConstraint(restLength, p0, p1, stiffness);
+        model->getConstraints()->addConstraint(boundConstraint);
+    }
 
     return pbdObject;
 }
@@ -105,7 +131,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
 {
     double radius = 0.002; // Harry radius is 0.005
     double length = 0.2;   // Harry length is 1
-    double mass   = 0.1;   // 0.1 (kg)
+    double mass   = 0.01;  // 0.1 (kg)
 
     auto toolGeometry = std::make_shared<Capsule>();
     // auto toolGeometry = std::make_shared<Sphere>();
@@ -137,7 +163,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     controller->setControlledObject(toolObj);
     controller->setHapticOffset(Vec3d(0.0, 0.0, -0.1));
     controller->setTranslationScaling(1.0);
-    controller->setLinearKs(500.0);
+    controller->setLinearKs(50.0);
     controller->setAngularKs(1000.0);
     controller->setUseCritDamping(true);
     controller->setForceScaling(1.0);
@@ -295,9 +321,10 @@ main()
     auto pbdModel  = std::make_shared<PbdModel>();
     auto pbdParams = std::make_shared<PbdModelConfig>();
     pbdParams->m_doPartitioning = false;
-    pbdParams->m_gravity    = Vec3d(0.0, 0.0, 0.0);
-    pbdParams->m_dt         = 0.001;
-    pbdParams->m_iterations = 5;
+    pbdParams->m_gravity        = Vec3d(0.0, 0.0, 0.0);
+    pbdParams->m_dt             = 0.001;
+    pbdParams->m_iterations     = 5;
+    pbdParams->m_doPartitioning = false;
     pbdModel->configure(pbdParams);
 
     // Mesh with hole for suturing

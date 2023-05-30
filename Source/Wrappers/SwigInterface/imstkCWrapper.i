@@ -287,6 +287,8 @@ namespace std
   %template(VectorString) vector<std::string>;
   %template(IntPair) pair<int, int>;
   %template(UnorderedMapStringDouble) unordered_map<std::string, double>;
+  %template(VectorPuncturePoint) vector<NeedlePbdCH::PuncturePoint>;
+  %template(VectorVectorPuncturePoint) vector<vector<NeedlePbdCH::PuncturePoint>>;
 }
 
 %include <std_except.i>
