@@ -356,6 +356,12 @@ NeedlePbdCH::handle(
         m_constraints.push_back(needleThreadConstraint);
     }
 
+    // Add constraints for stitched tissue
+    for (size_t i = 0; i < m_stitchConstraints.size(); i++)
+    {
+        m_constraints.push_back(m_stitchConstraints[i]);
+    }
+
     // Handle needle collision normally if no insertion
     m_needlePunctured = didPuncture(elementsA, elementsB) || m_needlePunctured;
     if (!m_needlePunctured)
@@ -375,13 +381,13 @@ NeedlePbdCH::handle(
         addPunctureConstraints();
 
         // Solve stitching constraint
-        if (m_stitch)
-        {
-            for (size_t i = 0; i < m_stitchConstraints.size(); i++)
-            {
-                m_constraints.push_back(m_stitchConstraints[i]);
-            }
-        }
+        //if (m_stitch)
+        //{
+        //    for (size_t i = 0; i < m_stitchConstraints.size(); i++)
+        //    {
+        //        m_constraints.push_back(m_stitchConstraints[i]);
+        //    }
+        //}
 
         if (m_needlePData.size() == 0)
         {
@@ -407,13 +413,15 @@ void
 NeedlePbdCH::stitch()
 {
     // First, verify that at least 4 points have been penetrated by the thread
-    if (m_punctureData.size() < 4)
+    if (m_threadPData.size() < 4)
     {
-        LOG(INFO) << "Cant stitch less than 4 points, currently only " << m_punctureData.size() << " points";
+        LOG(INFO) << "Cant stitch less than 4 points punctured by thread, currently only " << m_threadPData.size() << " points";
         return;
     }
 
-    if (m_punctureData.size() >= 4)
+    // If stitching, move the puncture data from the thread to the stitch, and generate
+    // constraints to solve for the stitch.
+    if (m_threadPData.size() >= 4)
     {
         LOG(INFO) << "Stitching!";
 
@@ -423,44 +431,56 @@ NeedlePbdCH::stitch()
         // Only calculate the center point once
         if (m_stitch == false)
         {
-            // Calculate the average position of the points punctured by thread
-            for (size_t pPointId = 0; pPointId < m_punctureData.size(); pPointId++)
+            std::vector<PenetrationData> stitchedPoints;
+            for (size_t pPointId = 0; pPointId < m_threadPData.size(); pPointId++)
             {
-                Vec3d pPoint = tissueVertices[m_punctureData[pPointId].triVertIds[0]] * m_punctureData[pPointId].triBaryPuncturePoint[0]
-                               + tissueVertices[m_punctureData[pPointId].triVertIds[1]] * m_punctureData[pPointId].triBaryPuncturePoint[1]
-                               + tissueVertices[m_punctureData[pPointId].triVertIds[2]] * m_punctureData[pPointId].triBaryPuncturePoint[2];
-
-                for (int i = 0; i < 3; i++)
-                {
-                    m_stitchCenter[i] += pPoint[i] / static_cast<double>(m_punctureData.size());
-                }
+                stitchedPoints.push_back(m_threadPData[pPointId]);
             }
+
+            m_stitchPData.push_back(stitchedPoints);
+            m_threadPData.clear();
+
+            // Calculate the average position of the points punctured by thread
+            Vec3d center = Vec3d::Zero();
+            Vec3d pPoint = Vec3d::Zero();
+            for (size_t pPointId = 0; pPointId < stitchedPoints.size(); pPointId++)
+            {
+                pPoint += tissueVertices[stitchedPoints[pPointId].triVertIds[0]] * stitchedPoints[pPointId].triBaryPuncturePoint[0]
+                          + tissueVertices[stitchedPoints[pPointId].triVertIds[1]] * stitchedPoints[pPointId].triBaryPuncturePoint[1]
+                          + tissueVertices[stitchedPoints[pPointId].triVertIds[2]] * stitchedPoints[pPointId].triBaryPuncturePoint[2];
+            }
+
+            center = pPoint / 3.0;
+            m_stitchPoints.push_back(center);
         }
 
         m_stitch = true;
 
         // Create constraints to pull the puncture points to the center location
-        for (int pPointId = 0; pPointId < m_punctureData.size(); pPointId++)
+        for (int stitchId = 0; stitchId < m_stitchPData.size(); stitchId++)
         {
-            // Now create values for the central point
-            const PbdParticleId& stitchCenterPt = m_pbdTissueObj->getPbdModel()->addVirtualParticle(m_stitchCenter, 0.0);
+            for (int pPointId = 0; pPointId < m_stitchPData[stitchId].size(); pPointId++)
+            {
+                // Now create values for the central point
+                const PbdParticleId& stitchCenterPt = m_pbdTissueObj->getPbdModel()->addVirtualParticle(m_stitchPoints[stitchId], 0.0, Vec3d::Zero(), true);
 
-            const int           bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
-            const PbdParticleId p0     = { bodyId, m_punctureData[pPointId].triVertIds[0] };
-            const PbdParticleId p1     = { bodyId, m_punctureData[pPointId].triVertIds[1] };
-            const PbdParticleId p2     = { bodyId, m_punctureData[pPointId].triVertIds[2] };
+                const int           bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
+                const PbdParticleId p0     = { bodyId, m_stitchPData[stitchId][pPointId].triVertIds[0] };
+                const PbdParticleId p1     = { bodyId, m_stitchPData[stitchId][pPointId].triVertIds[1] };
+                const PbdParticleId p2     = { bodyId, m_stitchPData[stitchId][pPointId].triVertIds[2] };
 
-            auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
-            constraint->initConstraint(
-                { p0, p1, p2 },
-                { m_punctureData[pPointId].triBaryPuncturePoint[0],
-                  m_punctureData[pPointId].triBaryPuncturePoint[1],
-                  m_punctureData[pPointId].triBaryPuncturePoint[2] },
-                { stitchCenterPt }, { 1.0 },
+                auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
+                constraint->initConstraint(
+                    { p0, p1, p2 },
+                    { m_stitchPData[stitchId][pPointId].triBaryPuncturePoint[0],
+                      m_stitchPData[stitchId][pPointId].triBaryPuncturePoint[1],
+                      m_stitchPData[stitchId][pPointId].triBaryPuncturePoint[2] },
+                    { stitchCenterPt }, { 1.0 },
                     0.2, 0.0);
 
-            // Add to list of constraints to be solved together in the handler
-            m_stitchConstraints.push_back(constraint);
+                // Add to list of constraints to be solved together in the handler
+                m_stitchConstraints.push_back(constraint);
+            }
         }
     }
 }

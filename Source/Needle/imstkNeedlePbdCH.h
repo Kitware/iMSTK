@@ -102,15 +102,19 @@ protected:
     std::vector<std::shared_ptr<PbdConstraint>> m_constraints;
     std::vector<PbdConstraint*> m_solverConstraints;
 
-    // Center of puncture points for stitching constraint
-    Vec3d m_stitchCenter = Vec3d::Zero();
-
+    // Penetration data for needle, thread, and overall pool
     std::vector<PenetrationData> m_threadPData;
     std::vector<PenetrationData> m_needlePData;
+    // std::vector<PenetrationData> m_stitchPData;
     std::vector<PenetrationData> m_punctureData;
+
+    std::vector<std::vector<PenetrationData>> m_stitchPData;
 
     // Bool to activate stitching constraint
     bool m_stitch = false;
+
+    // Center of puncture points for stitching constraint
+    std::vector<Vec3d> m_stitchPoints;
 
     // Thread Data
     std::shared_ptr<PbdObject> m_threadObj;

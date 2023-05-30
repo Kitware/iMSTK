@@ -87,7 +87,7 @@ createTissue(std::shared_ptr<PbdModel> model)
     // Fix the borders
     pbdObject->getPbdBody()->fixedNodeIds = fixedNodes;
 
-    model->getConfig()->m_femParams->m_YoungModulus = 8000.0;                            // 8000
+    model->getConfig()->m_femParams->m_YoungModulus = 2500.0;                            // 8000
     model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
     model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean); // StVK
     model->getConfig()->setBodyDamping(pbdObject->getPbdBody()->bodyHandle, 0.05);
@@ -149,6 +149,27 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     controllerGhost->setController(controller);
 
     return toolObj;
+}
+
+static std::shared_ptr<CollidingObject>
+makeCollidingCapsule()
+{
+    double radius = 0.009; // Harry radius is 0.005
+    double length = 0.05;  // Harry length is 1
+
+    auto capsuleGeometry = std::make_shared<Capsule>();
+    // auto capsuleGeometry = std::make_shared<Sphere>();
+    capsuleGeometry->setRadius(radius);
+    capsuleGeometry->setLength(length);
+    capsuleGeometry->setPosition(Vec3d(0.0, 0.0, -0.02));
+    capsuleGeometry->setOrientation(Quatd(0.0, 0.0, 0.0, 0.0));
+
+    auto capsuleObject = std::make_shared<CollidingObject>("Esophagus");
+
+    capsuleObject->setCollidingGeometry(capsuleGeometry);
+    capsuleObject->setVisualGeometry(capsuleGeometry);
+
+    return capsuleObject;
 }
 
 ///
@@ -283,13 +304,17 @@ main()
     std::shared_ptr<PbdObject> tissueHole = createTissue(pbdModel);
     scene->addSceneObject(tissueHole);
 
+    // Capsule for esophagus
+    auto esophagus = makeCollidingCapsule();
+    scene->addSceneObject(esophagus);
+
     // Create arced needle
     std::shared_ptr<PbdObject> needleObj = makeNeedleObj(pbdModel);
     scene->addSceneObject(needleObj);
 
     // Create the thread
-    const double               stringLength      = 0.08;
-    const int                  stringVertexCount = 41;
+    const double               stringLength      = 0.15;
+    const int                  stringVertexCount = 65;
     std::shared_ptr<PbdObject> sutureThreadObj   =
         makePbdString("SutureThread", Vec3d(0.0, 0.0, 0.018), Vec3d(0.0, 0.0, 1.0),
             stringVertexCount, stringLength, pbdModel);
@@ -313,6 +338,17 @@ main()
     pbdToolCollision->setRigidBodyCompliance(0.0001); // Helps with smoothness
     pbdToolCollision->setUseCorrectVelocity(true);
     scene->addInteraction(pbdToolCollision);
+
+    // Add esophagus to tissue, needle, and tool collision
+    auto esophagusTissueCollision = std::make_shared<PbdObjectCollision>(tissueHole, esophagus);
+    esophagusTissueCollision->setRigidBodyCompliance(0.0001); // Helps with smoothness
+    esophagusTissueCollision->setUseCorrectVelocity(true);
+    scene->addInteraction(esophagusTissueCollision);
+
+    auto esophagusToolCollision = std::make_shared<PbdObjectCollision>(toolObj, esophagus);
+    esophagusToolCollision->setRigidBodyCompliance(0.0001); // Helps with smoothness
+    esophagusToolCollision->setUseCorrectVelocity(true);
+    scene->addInteraction(esophagusToolCollision);
 
     // Add needle constraining behavior between the tissue & arc needle/thread
     auto sutureInteraction = std::make_shared<NeedleInteraction>(tissueHole, needleObj, sutureThreadObj);
@@ -404,23 +440,6 @@ main()
             });
 #endif
 
-        //auto hapController = std::make_shared<PbdObjectController>();
-        //hapController->setControlledObject(needleObj);
-        //hapController->setDevice(deviceClient);
-        //hapController->setTranslationScaling(0.5);
-        //hapController->setLinearKs(50.0);
-        //hapController->setAngularKs(100000000.0);
-        //hapController->setUseCritDamping(true);
-        //hapController->setForceScaling(1.0);
-        //hapController->setSmoothingKernelSize(10);
-        //hapController->setUseForceSmoothening(true);
-
-        //// Add extra component to tool for the ghost
-        //auto controllerGhost = needleObj->addComponent<ObjectControllerGhost>();
-        //controllerGhost->setController(hapController);
-
-        // scene->addControl(controller);
-
         // Update the needle object for real time
         connect<Event>(sceneManager, &SceneManager::preUpdate,
             [&](Event*)
@@ -439,7 +458,7 @@ main()
                 // Perform stitch
                 if (e->m_key == 's')
                 {
-                    // sutureInteraction->stitch();
+                    sutureInteraction->stitch();
                 }
             });
 
