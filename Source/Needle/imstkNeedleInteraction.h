@@ -8,8 +8,7 @@
 
 #include "imstkMacros.h"
 #include "imstkPbdObjectCollision.h"
-
-class NeedleEmbeddedCH;
+#include "imstkNeedlePbdCH.h"
 
 namespace imstk
 {
@@ -31,5 +30,7 @@ public:
     IMSTK_TYPE_NAME(NeedleInteraction)
 
     void stitch();
+
+    const NeedlePbdCH::PunctureData getPunctureData();
 };
 } // namespace imstk

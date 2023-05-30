@@ -60,4 +60,11 @@ NeedleInteraction::stitch()
     auto CH = std::dynamic_pointer_cast<NeedlePbdCH>(this->getCollisionHandlingAB());
     CH->stitch();
 }
+
+const NeedlePbdCH::PunctureData
+NeedleInteraction::getPunctureData()
+{
+    auto CH = std::dynamic_pointer_cast<NeedlePbdCH>(this->getCollisionHandlingAB());
+    return CH->getPunctureData();
+}
 } // namespace imstk

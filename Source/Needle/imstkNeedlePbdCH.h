@@ -37,6 +37,22 @@ public:
 
     IMSTK_TYPE_NAME(NeedlePbdCH)
 
+    // Stores data for penetration points, both for the needle and the thread
+    struct PuncturePoint                      // Note, this needs to be public
+    {
+        int triId = -1;                       // Triangle ID
+        Vec3i triVertIds = { -1, -1, -1 };    // Triangle vertices
+        Vec3d baryCoords = { 0.0, 0.0, 0.0 }; // Puncture barycentric coordinate on triangle
+        int segId = -1;                       // Line segment ID of needle or thread
+    };
+
+    struct PunctureData
+    {
+        std::vector<PuncturePoint> thread;
+        std::vector<PuncturePoint> needle;
+        std::vector<std::vector<PuncturePoint>> stitch;
+    };
+
     ///
     /// \brief Initialize interaction data
     ///
@@ -72,22 +88,10 @@ public:
     void setPunctureDotThreshold(double threshold) { m_threshold = threshold; }
     double getPunctureDotThreshold() { return m_threshold; }
 
+    // Add getters for all puncture data
+    const PunctureData getPunctureData() { return pData; };
+
 protected:
-    // Stores data for penetration points, both for the needle and the thread
-    struct PenetrationData
-    {
-        // Triangle ID
-        int triId = -1;
-
-        // Triangle vertices
-        Vec3i triVertIds = { -1, -1, -1 };
-
-        // Puncture barycentric coordinate on triangle
-        Vec3d triBaryPuncturePoint = { 0.0, 0.0, 0.0 };
-
-        // Line segment ID of needle or thread
-        int segId = -1;
-    };
 
     // Flags for which entity is puncturing a triangle
     std::vector<bool> m_isThreadPunctured;
@@ -102,13 +106,8 @@ protected:
     std::vector<std::shared_ptr<PbdConstraint>> m_constraints;
     std::vector<PbdConstraint*> m_solverConstraints;
 
-    // Penetration data for needle, thread, and overall pool
-    std::vector<PenetrationData> m_threadPData;
-    std::vector<PenetrationData> m_needlePData;
-    // std::vector<PenetrationData> m_stitchPData;
-    std::vector<PenetrationData> m_punctureData;
-
-    std::vector<std::vector<PenetrationData>> m_stitchPData;
+    // Penetration data for needle, thread, and stitch
+    PunctureData pData;
 
     // Bool to activate stitching constraint
     bool m_stitch = false;

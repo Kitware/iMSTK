@@ -103,19 +103,19 @@ NeedlePbdCH::generateNewPunctureData()
                 data.userData.weights[2] = uvw[2];
 
                 // Create penetration data for constraints
-                PenetrationData newPuncture;
+                PuncturePoint newPuncture;
 
                 newPuncture.triId = triangleId;
                 newPuncture.triVertIds[0] = physTriIds[0];
                 newPuncture.triVertIds[1] = physTriIds[1];
                 newPuncture.triVertIds[2] = physTriIds[2];
-                newPuncture.triBaryPuncturePoint[0] = uvw[0];
-                newPuncture.triBaryPuncturePoint[1] = uvw[1];
-                newPuncture.triBaryPuncturePoint[2] = uvw[2];
+                newPuncture.baryCoords[0] = uvw[0];
+                newPuncture.baryCoords[1] = uvw[1];
+                newPuncture.baryCoords[2] = uvw[2];
                 newPuncture.segId = tipSegmentId;
 
-                m_needlePData.push_back(newPuncture);
-                m_punctureData.push_back(newPuncture);
+                pData.needle.push_back(newPuncture);
+
                 m_needlePunctured = true;
                 LOG(DEBUG) << "Needle punctured triangle: " << triangleId;
             }
@@ -134,7 +134,7 @@ NeedlePbdCH::addPunctureConstraints()
     // Loop over penetration points and find nearest point on the needle
     // Note: Nearest point will likely be the point between two segments,
     // its dualy defined, but thats ok
-    for (auto puncture = m_needlePData.begin(); puncture != m_needlePData.end();)
+    for (auto puncture = pData.needle.begin(); puncture != pData.needle.end();)
     {
         // Start with large value
         Vec3d  closestPoint = { IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX };
@@ -147,7 +147,7 @@ NeedlePbdCH::addPunctureConstraints()
         const Vec3d& b = physMesh->getVertexPositions()->at(puncture->triVertIds[1]);
         const Vec3d& c = physMesh->getVertexPositions()->at(puncture->triVertIds[2]);
 
-        const Vec3d baryPoint  = puncture->triBaryPuncturePoint.head<3>();
+        const Vec3d baryPoint  = puncture->baryCoords.head<3>();
         const Vec3d puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
 
         // Only check segments within checkStride of previous segments.
@@ -194,7 +194,7 @@ NeedlePbdCH::addPunctureConstraints()
         {
             const PunctureId punctureId = getPunctureId(needle, puncturable, puncture->triId);
             needle->setState(punctureId, Puncture::State::REMOVED);
-            puncture = m_needlePData.erase(puncture);
+            puncture = pData.needle.erase(puncture);
             continue;
         }
 
@@ -203,14 +203,14 @@ NeedlePbdCH::addPunctureConstraints()
         {
             // Switch to thread
             puncture->segId = 0; // start at first segment on thread
-            m_threadPData.push_back(*puncture);
+            pData.thread.push_back(*puncture);
 
             const PunctureId punctureId = getPunctureId(needle, puncturable, puncture->triId);
             needle->setState(punctureId, Puncture::State::REMOVED);
 
             LOG(DEBUG) << "Thread punctured triangle: " << puncture->triId;
             m_threadPunctured = true;
-            puncture = m_needlePData.erase(puncture);
+            puncture = pData.needle.erase(puncture);
 
             continue;
         }
@@ -237,7 +237,7 @@ NeedlePbdCH::addPunctureConstraints()
     // Loop over thread penetration points and find nearest point on the thread
     // Note: Nearest point will likely be the point between two segments, its dualy defined
     // for (auto puncture : m_threadPData)
-    for (auto puncture = m_threadPData.begin(); puncture != m_threadPData.end();)
+    for (auto puncture = pData.thread.begin(); puncture != pData.thread.end();)
     {
         // Start with arbitrary large value
         Vec3d closestPoint = { IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX };
@@ -246,7 +246,7 @@ NeedlePbdCH::addPunctureConstraints()
         const Vec3d& b = physMesh->getVertexPositions()->at(puncture->triVertIds[1]);
         const Vec3d& c = physMesh->getVertexPositions()->at(puncture->triVertIds[2]);
 
-        Vec3d baryPoint = puncture->triBaryPuncturePoint;
+        Vec3d baryPoint = puncture->baryCoords;
 
         auto puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
 
@@ -295,7 +295,7 @@ NeedlePbdCH::addPunctureConstraints()
         //int numCells = m_threadMesh->getNumCells();
         //if (closestSegmentId == numCells-1) {
 
-        //    puncture = m_threadPData.erase(puncture);
+        //    puncture = pData.thread.erase(puncture);
         //    continue;
         //}
 
@@ -321,7 +321,7 @@ NeedlePbdCH::addPunctureConstraints()
             { tissueBodyId, puncture->triVertIds[0] },
             { tissueBodyId, puncture->triVertIds[1] },
             { tissueBodyId, puncture->triVertIds[2] },
-            puncture->triBaryPuncturePoint,
+            puncture->baryCoords,
             m_threadToSurfaceStiffness, m_surfaceToThreadStiffness); // Tissue is not currently moved
         m_constraints.push_back(threadTriangleConstraint);
 
@@ -389,12 +389,12 @@ NeedlePbdCH::handle(
         //    }
         //}
 
-        if (m_needlePData.size() == 0)
+        if (pData.needle.size() == 0)
         {
             m_needlePunctured = false;
         }
 
-        if (m_threadPData.size() == 0)
+        if (pData.thread.size() == 0)
         {
             m_threadPunctured = false;
         }
@@ -413,74 +413,69 @@ void
 NeedlePbdCH::stitch()
 {
     // First, verify that at least 4 points have been penetrated by the thread
-    if (m_threadPData.size() < 4)
+    if (pData.thread.size() < 4)
     {
-        LOG(INFO) << "Cant stitch less than 4 points punctured by thread, currently only " << m_threadPData.size() << " points";
+        LOG(INFO) << "Cant stitch less than 4 points punctured by thread, currently only " << pData.thread.size() << " points";
         return;
     }
 
     // If stitching, move the puncture data from the thread to the stitch, and generate
     // constraints to solve for the stitch.
-    if (m_threadPData.size() >= 4)
+    if (pData.thread.size() >= 4)
     {
         LOG(INFO) << "Stitching!";
 
-        std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = m_tissueSurfMesh->getVertexPositions();
+        auto                                     physMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_pbdTissueObj->getPhysicsGeometry());
+        std::shared_ptr<VecDataArray<double, 3>> tissueVerticesPtr = physMesh->getVertexPositions();
         VecDataArray<double, 3>&                 tissueVertices    = *tissueVerticesPtr;
 
-        // Only calculate the center point once
-        if (m_stitch == false)
+        std::vector<PuncturePoint> stitchedPoints;
+        for (size_t pPointId = 0; pPointId < pData.thread.size(); pPointId++)
         {
-            std::vector<PenetrationData> stitchedPoints;
-            for (size_t pPointId = 0; pPointId < m_threadPData.size(); pPointId++)
-            {
-                stitchedPoints.push_back(m_threadPData[pPointId]);
-            }
-
-            m_stitchPData.push_back(stitchedPoints);
-            m_threadPData.clear();
-
-            // Calculate the average position of the points punctured by thread
-            Vec3d center = Vec3d::Zero();
-            Vec3d pPoint = Vec3d::Zero();
-            for (size_t pPointId = 0; pPointId < stitchedPoints.size(); pPointId++)
-            {
-                pPoint += tissueVertices[stitchedPoints[pPointId].triVertIds[0]] * stitchedPoints[pPointId].triBaryPuncturePoint[0]
-                          + tissueVertices[stitchedPoints[pPointId].triVertIds[1]] * stitchedPoints[pPointId].triBaryPuncturePoint[1]
-                          + tissueVertices[stitchedPoints[pPointId].triVertIds[2]] * stitchedPoints[pPointId].triBaryPuncturePoint[2];
-            }
-
-            center = pPoint / 3.0;
-            m_stitchPoints.push_back(center);
+            stitchedPoints.push_back(pData.thread[pPointId]);
         }
+
+        pData.stitch.push_back(stitchedPoints);
+        pData.thread.clear();
+
+        // Calculate the average position of the points punctured by thread
+        Vec3d center = Vec3d::Zero();
+        Vec3d pPoint = Vec3d::Zero();
+        for (size_t pPointId = 0; pPointId < stitchedPoints.size(); pPointId++)
+        {
+            pPoint += tissueVertices[stitchedPoints[pPointId].triVertIds[0]] * stitchedPoints[pPointId].baryCoords[0]
+                      + tissueVertices[stitchedPoints[pPointId].triVertIds[1]] * stitchedPoints[pPointId].baryCoords[1]
+                      + tissueVertices[stitchedPoints[pPointId].triVertIds[2]] * stitchedPoints[pPointId].baryCoords[2];
+        }
+
+        center = pPoint / stitchedPoints.size();
+        m_stitchPoints.push_back(center);
 
         m_stitch = true;
 
         // Create constraints to pull the puncture points to the center location
-        for (int stitchId = 0; stitchId < m_stitchPData.size(); stitchId++)
+        auto points = pData.stitch.back();
+        for (int pPointId = 0; pPointId < points.size(); pPointId++)
         {
-            for (int pPointId = 0; pPointId < m_stitchPData[stitchId].size(); pPointId++)
-            {
-                // Now create values for the central point
-                const PbdParticleId& stitchCenterPt = m_pbdTissueObj->getPbdModel()->addVirtualParticle(m_stitchPoints[stitchId], 0.0, Vec3d::Zero(), true);
+            // Now create values for the central point
+            const PbdParticleId& stitchCenterPt = m_pbdTissueObj->getPbdModel()->addVirtualParticle(center, 0.0, Vec3d::Zero(), true);
 
-                const int           bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
-                const PbdParticleId p0     = { bodyId, m_stitchPData[stitchId][pPointId].triVertIds[0] };
-                const PbdParticleId p1     = { bodyId, m_stitchPData[stitchId][pPointId].triVertIds[1] };
-                const PbdParticleId p2     = { bodyId, m_stitchPData[stitchId][pPointId].triVertIds[2] };
+            const int           bodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
+            const PbdParticleId p0     = { bodyId, points[pPointId].triVertIds[0] };
+            const PbdParticleId p1     = { bodyId, points[pPointId].triVertIds[1] };
+            const PbdParticleId p2     = { bodyId, points[pPointId].triVertIds[2] };
 
-                auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
-                constraint->initConstraint(
-                    { p0, p1, p2 },
-                    { m_stitchPData[stitchId][pPointId].triBaryPuncturePoint[0],
-                      m_stitchPData[stitchId][pPointId].triBaryPuncturePoint[1],
-                      m_stitchPData[stitchId][pPointId].triBaryPuncturePoint[2] },
-                    { stitchCenterPt }, { 1.0 },
-                    0.2, 0.0);
+            auto constraint = std::make_shared<PbdBaryPointToPointConstraint>();
+            constraint->initConstraint(
+                { p0, p1, p2 },
+                { points[pPointId].baryCoords[0],
+                  points[pPointId].baryCoords[1],
+                  points[pPointId].baryCoords[2] },
+                { stitchCenterPt }, { 1.0 },
+                0.01, 0.0);
 
-                // Add to list of constraints to be solved together in the handler
-                m_stitchConstraints.push_back(constraint);
-            }
+            // Add to list of constraints to be solved together in the handler
+            m_stitchConstraints.push_back(constraint);
         }
     }
 }
