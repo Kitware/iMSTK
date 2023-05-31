@@ -61,7 +61,7 @@ NeedleInteraction::stitch()
     CH->stitch();
 }
 
-const NeedlePbdCH::PunctureData
+const NeedlePbdCH::PunctureData&
 NeedleInteraction::getPunctureData()
 {
     auto CH = std::dynamic_pointer_cast<NeedlePbdCH>(this->getCollisionHandlingAB());

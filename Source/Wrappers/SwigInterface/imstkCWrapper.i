@@ -274,6 +274,7 @@
 /*
  * https://github.com/swig/swig/pull/2480
  * Copied unordered_map for c# from the above pull request
+ * Note: Don't forget to put imstk classes under the `imstk::` namespace
  */
 
 %include <std_unordered_map.i> 
@@ -287,8 +288,8 @@ namespace std
   %template(VectorString) vector<std::string>;
   %template(IntPair) pair<int, int>;
   %template(UnorderedMapStringDouble) unordered_map<std::string, double>;
-  %template(VectorPuncturePoint) vector<NeedlePbdCH::PuncturePoint>;
-  %template(VectorVectorPuncturePoint) vector<vector<NeedlePbdCH::PuncturePoint>>;
+  %template(VectorPuncturePoint) std::vector<imstk::NeedlePbdCH::PuncturePoint>;
+  %template(VectorVectorPuncturePoint) std::vector<std::vector<imstk::NeedlePbdCH::PuncturePoint>>;
 }
 
 %include <std_except.i>
