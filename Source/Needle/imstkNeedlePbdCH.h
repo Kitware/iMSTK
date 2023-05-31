@@ -94,7 +94,7 @@ public:
     double getPunctureDotThreshold() { return m_threshold; }
 
     // Add getters for all puncture data
-    const PunctureData getPunctureData() { return pData; };
+    const PunctureData& getPunctureData() { return pData; };
 
 protected:
 

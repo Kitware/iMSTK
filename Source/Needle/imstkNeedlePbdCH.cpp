@@ -108,12 +108,8 @@ NeedlePbdCH::generateNewPunctureData()
                 PuncturePoint newPuncture;
 
                 newPuncture.triId = triangleId;
-                newPuncture.triVertIds[0] = physTriIds[0];
-                newPuncture.triVertIds[1] = physTriIds[1];
-                newPuncture.triVertIds[2] = physTriIds[2];
-                newPuncture.baryCoords[0] = uvw[0];
-                newPuncture.baryCoords[1] = uvw[1];
-                newPuncture.baryCoords[2] = uvw[2];
+                newPuncture.triVertIds = physTriIds;
+                newPuncture.baryCoords = uvw;
                 newPuncture.segId = tipSegmentId;
 
                 pData.needle.push_back(newPuncture);

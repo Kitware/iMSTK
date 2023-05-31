@@ -31,6 +31,6 @@ public:
 
     void stitch();
 
-    const NeedlePbdCH::PunctureData getPunctureData();
+    const NeedlePbdCH::PunctureData& getPunctureData();
 };
 } // namespace imstk
