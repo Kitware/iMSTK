@@ -40,10 +40,15 @@ public:
     // Stores data for penetration points, both for the needle and the thread
     struct PuncturePoint                      // Note, this needs to be public
     {
-        int triId = -1;                       // Triangle ID
-        Vec3i triVertIds = { -1, -1, -1 };    // Triangle vertices
-        Vec3d baryCoords = { 0.0, 0.0, 0.0 }; // Puncture barycentric coordinate on triangle
-        int segId = -1;                       // Line segment ID of needle or thread
+        // Triangle ID on Surface mesh used for suture
+        int triId = -1;
+        
+        // Triangle vertices on Physics mesh used for suture (found via map from surface -> physics mesh)
+        Vec3i triVertIds = { -1, -1, -1 };
+        // Puncture barycentric coordinate on triangle
+        Vec3d baryCoords = { 0.0, 0.0, 0.0 }; 
+        // Line segment ID of needle or thread
+        int segId = -1;                       
     };
 
     struct PunctureData

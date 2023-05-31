@@ -25,6 +25,8 @@
 #include "imstkPbdDistanceConstraint.h"
 #include "imstkPbdContactConstraint.h"
 
+#include <iostream>
+
 // using namespace imstk;
 namespace imstk
 {
@@ -247,8 +249,7 @@ NeedlePbdCH::addPunctureConstraints()
         const Vec3d& c = physMesh->getVertexPositions()->at(puncture->triVertIds[2]);
 
         Vec3d baryPoint = puncture->baryCoords;
-
-        auto puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
+        Vec3d puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
 
         int nearestSegmentId = -1;
 

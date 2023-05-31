@@ -136,6 +136,53 @@ TEST(imstkSurfaceMeshTest, VertexTriangleNeigbors)
     EXPECT_THAT(neighbors[3], UnorderedElementsAre(1, 2, 3));
 }
 
+
+TEST(imstkSurfaceMeshTest, ComputeWorldPosition)
+{
+    using testing::UnorderedElementsAre;
+
+    auto mesh = makeRect();
+
+    Vec3d baryPt = Vec3d::Zero();
+    Vec3d pos = Vec3d::Zero();
+
+    // Test cell 0 node 0, global node 2
+    baryPt = Vec3d(0.0, 0.0, 1.0);
+    pos = mesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.0, 0.0, 0.0));
+
+    // Test cell 0 node 1, global node 1
+    baryPt = Vec3d(0.0, 1.0, 0.0);
+    pos = mesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(1.0, 0.0, 0.0));
+
+    // Test cell 0 node 2, global node 0
+    baryPt = Vec3d(0.0, 0.0, 2.0);
+    pos = mesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.0, 0.0, 0.0));
+
+    // Test cell 0 node Center
+    baryPt = Vec3d(1.0/3.0, 1.0 / 3.0, 1.0 / 3.0);
+    pos = mesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(1.0 / 3.0, 0.0, 1.0 / 3.0));
+
+    // Test cell 0 edge 0-1
+    baryPt = Vec3d(0.0, 1.0 / 2.0, 1.0 / 2.0);
+    pos = mesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.5, 0.0, 0.0));
+
+    // Test cell 0 edge 1-2
+    baryPt = Vec3d(1.0 / 2.0, 1.0 / 2.0, 0.0);
+    pos = mesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.5, 0.0, 0.5));
+
+    // Test cell 1 edge 1-2
+    baryPt = Vec3d(0.0, 1.0 / 2.0, 1.0 / 2.0);
+    pos = mesh->computeWorldPosition(1, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.5, 0.0, 0.5));
+
+}
+
 TEST(imstkSurfaceMeshTest, CellTangentAttributes)
 {
     SurfaceMesh surfMesh;

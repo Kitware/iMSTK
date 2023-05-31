@@ -53,3 +53,36 @@ TEST(imstkLineMeshTest, VertexLineNeigbors)
     EXPECT_EQ(1, map[1].size());   // Vertex 1 should map to one line
     EXPECT_EQ(0, *map[1].begin()); // It should map to a line whose cell index is 0
 }
+
+TEST(imstkLineMeshTest, ComputeWorldPosition)
+{
+    auto                    lineMesh = std::make_shared<LineMesh>();
+    VecDataArray<double, 3> vertices = { Vec3d(-0.5, 0.0, 0.0), Vec3d(0.5, 0.0, 0.0) };
+    VecDataArray<int, 2>    indices = { Vec2i(0, 1) };
+    lineMesh->initialize(
+        std::make_shared<VecDataArray<double, 3>>(vertices),
+        std::make_shared<VecDataArray<int, 2>>(indices));
+
+    Vec2d baryPt = Vec2d::Zero();
+    Vec3d pos = Vec3d::Zero();
+
+    // Test cell 0 node 0
+    baryPt = Vec2d(1.0, 0.0);
+    pos = lineMesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(-0.5, 0.0, 0.0));
+
+    // Test cell 0 node 1
+    baryPt = Vec2d(0.0, 1.0);
+    pos = lineMesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.5, 0.0, 0.0));
+
+    // Test cell 0 halfway
+    baryPt = Vec2d(0.5, 0.5);
+    pos = lineMesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.0, 0.0, 0.0));
+
+    // Test cell 0 quarterWay
+    baryPt = Vec2d(0.25, 0.75);
+    pos = lineMesh->computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.25, 0.0, 0.0));
+}
