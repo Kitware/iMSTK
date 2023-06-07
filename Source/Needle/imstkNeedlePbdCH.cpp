@@ -107,10 +107,10 @@ NeedlePbdCH::generateNewPunctureData()
                 // Create penetration data for constraints
                 PuncturePoint newPuncture;
 
-                newPuncture.triId = triangleId;
+                newPuncture.triId      = triangleId;
                 newPuncture.triVertIds = physTriIds;
                 newPuncture.baryCoords = uvw;
-                newPuncture.segId = tipSegmentId;
+                newPuncture.segId      = tipSegmentId;
 
                 pData.needle.push_back(newPuncture);
 
@@ -232,35 +232,41 @@ NeedlePbdCH::addPunctureConstraints()
         puncture++;
     }
 
+    // Use to keep track of the segments that have puncture points
+    std::vector<std::pair<Vec2i, Vec2d>> punctureSegments;
+
     // Loop over thread penetration points and find nearest point on the thread
     // Note: Nearest point will likely be the point between two segments, its dualy defined
     // for (auto puncture : m_threadPData)
     for (auto puncture = pData.thread.begin(); puncture != pData.thread.end();)
     {
-        // Start with arbitrary large value
-        Vec3d closestPoint = { IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX };
 
         const Vec3d& a = physMesh->getVertexPositions()->at(puncture->triVertIds[0]);
         const Vec3d& b = physMesh->getVertexPositions()->at(puncture->triVertIds[1]);
         const Vec3d& c = physMesh->getVertexPositions()->at(puncture->triVertIds[2]);
 
-        Vec3d baryPoint = puncture->baryCoords;
-        Vec3d puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
-
-        int nearestSegmentId = -1;
+        const Vec3d& baryPoint  = puncture->baryCoords;
+        const Vec3d& puncturePt = baryPoint[0] * a + baryPoint[1] * b + baryPoint[2] * c;
 
         // Only check segments within checkStride of previous segments.
         // This helps with thread switching directions
-        int checkStride     = 1;
-        int previousSegment = puncture->segId;
+        const int checkStride     = 1;
+        const int previousSegment = puncture->segId;
 
-        int lowerBound = previousSegment - checkStride;
-        int upperBound = previousSegment + checkStride;
+        const int lowerBound = previousSegment - checkStride;
+        const int upperBound = previousSegment + checkStride;
 
-        int numSegsNonPenetrating = 4;
+        const int numSegsNonPenetrating = 4;
 
-        int strideStart = (lowerBound > 0) ? lowerBound : 0;
-        int strideEnd   = (upperBound < m_threadMesh->getNumCells() - numSegsNonPenetrating) ? upperBound : m_threadMesh->getNumCells() - numSegsNonPenetrating;
+        const int strideStart = (lowerBound > 0) ? lowerBound : 0;
+        const int strideEnd   = (upperBound < m_threadMesh->getNumCells() - numSegsNonPenetrating) ? upperBound : m_threadMesh->getNumCells() - numSegsNonPenetrating;
+
+        int closestSegmentId = -1;
+
+        Vec3d closestPoint = { IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX };
+        double closestDist = IMSTK_DOUBLE_MAX;
+
+        int caseType = -1;
 
         // Note: stopping before last segment for visualization
         for (int segmentId = strideStart; segmentId <= strideEnd; segmentId++)
@@ -269,21 +275,19 @@ NeedlePbdCH::addPunctureConstraints()
             const Vec3d& x1 = m_threadMesh->getVertexPositions()->at(threadSegNodeIds[0]);
             const Vec3d& x2 = m_threadMesh->getVertexPositions()->at(threadSegNodeIds[1]);
 
-            int caseType = -1;
-
             const Vec3d segClosestPoint = CollisionUtils::closestPointOnSegment(puncturePt, x1, x2, caseType);
 
-            const Vec3d newDist = segClosestPoint - puncturePt;
-            const Vec3d oldDist = closestPoint - puncturePt;
+            double newDist = (segClosestPoint - puncturePt).squaredNorm();
 
-            if (newDist.norm() <= oldDist.norm())
+            if (newDist  < closestDist)
             {
                 closestPoint     = segClosestPoint;
-                nearestSegmentId = segmentId;
+                closestDist      = newDist;
+                closestSegmentId = segmentId;
             }
         } // end loop over thread segments
 
-        puncture->segId = nearestSegmentId;
+        puncture->segId = closestSegmentId;
 
         // NOTE: Commented out to force thread to stay inserted once inserted
         // If uncommented, the thread would be able to slide through the mesh and unpuncture.
@@ -296,33 +300,56 @@ NeedlePbdCH::addPunctureConstraints()
         //    continue;
         //}
 
-        // Now that we have the closest point on the thread to this penetration point, we can
-        // generate and solve the constraint
-        auto threadTriangleConstraint = std::make_shared<ThreadInsertionConstraint>();
-
         // Set of VM pairs for thread
-        const Vec2i& nearestSegNodeIds = m_threadMesh->getCells()->at(puncture->segId);
-        const Vec3d& p = m_threadMesh->getVertexPositions()->at(nearestSegNodeIds[0]);
-        const Vec3d& q = m_threadMesh->getVertexPositions()->at(nearestSegNodeIds[1]);
+        const Vec2i& closestSegment = m_threadMesh->getCells()->at(puncture->segId);
+
+        if (closestSegment[0] < 0 || closestSegment[0] >= m_threadMesh->getNumCells()
+            || closestSegment[1] < 0 || closestSegment[1] >= m_threadMesh->getNumCells())
+        {
+            LOG(FATAL) << "Invalid thread segment id: " << closestSegment[0] << ", " <<
+                closestSegment[1];
+        }
+
+        const Vec3d& p = m_threadMesh->getVertexPositions()->at(closestSegment[0]);
+        const Vec3d& q = m_threadMesh->getVertexPositions()->at(closestSegment[1]);
 
         // Thread barycentric intersection point
         const Vec2d segBary = baryCentric(closestPoint, p, q);
 
+        punctureSegments.push_back(std::make_pair(closestSegment, segBary));
+
+        puncture++;
+    }
+
+    // To match the order of the closest segments to the puncture points we 
+    // sort as the order of the puncture points is know to be in order of the thread
+    std::sort(punctureSegments.begin(), punctureSegments.end(), [](const auto& seg1, const auto& seg2) {
+            return seg1.first[0] > seg2.first[0] || (seg1.first[0] == seg2.first[0] && seg1.second[1] > seg2.second[1]);
+        });
+
+    // Generate constraints for each puncture point and the appropriate thread segment
+    for (int i = 0; i < pData.thread.size() && i < punctureSegments.size(); ++i)
+    {
+        const auto& puncture = pData.thread[i];
+        const auto& nearestSegNodeIds = punctureSegments[i].first;
+        const auto& segBary = punctureSegments[i].second;
+
         const int tissueBodyId = m_pbdTissueObj->getPbdBody()->bodyHandle;
         const int threadBodyId = m_threadObj->getPbdBody()->bodyHandle;
+
+        auto threadTriangleConstraint = std::make_shared<ThreadInsertionConstraint>();
+
         threadTriangleConstraint->initConstraint(
             m_pbdTissueObj->getPbdModel()->getBodies(),
             { threadBodyId, nearestSegNodeIds[0] },
             { threadBodyId, nearestSegNodeIds[1] },
             segBary,
-            { tissueBodyId, puncture->triVertIds[0] },
-            { tissueBodyId, puncture->triVertIds[1] },
-            { tissueBodyId, puncture->triVertIds[2] },
-            puncture->baryCoords,
+            { tissueBodyId, puncture.triVertIds[0] },
+            { tissueBodyId, puncture.triVertIds[1] },
+            { tissueBodyId, puncture.triVertIds[2] },
+            puncture.baryCoords,
             m_threadToSurfaceStiffness, m_surfaceToThreadStiffness); // Tissue is not currently moved
         m_constraints.push_back(threadTriangleConstraint);
-
-        puncture++;
     }
 }
 
