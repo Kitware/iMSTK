@@ -122,12 +122,12 @@ public:
     /// \brief compute the world position of a point in 3D given the cellId and a set of barycentric coordinates
     ///
     Vec3d computeWorldPosition(const int cellId,
-        const Eigen::Matrix<double, N, 1>& bary) const
+                               const Eigen::Matrix<double, N, 1>& bary) const
     {
         Vec3d position = Vec3d::Zero();
 
         const VecDataArray<double, 3>& vertices = *m_vertexPositions;
-        const VecDataArray<int, N>& indices = *m_indices;
+        const VecDataArray<int, N>&    indices  = *m_indices;
 
         const Eigen::Matrix<int, N, 1>& cell = indices[cellId];
 

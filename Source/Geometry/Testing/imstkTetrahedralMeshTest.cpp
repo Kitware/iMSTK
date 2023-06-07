@@ -82,9 +82,9 @@ TEST(imstkTetrahedralMeshTest, ComputeWorldPosition)
     TetrahedralMesh tetMesh;
 
     auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
-    auto                     indicesPtr = std::make_shared<VecDataArray<int, 4>>(1);
-    VecDataArray<double, 3>& vertices = *verticesPtr;
-    VecDataArray<int, 4>& indices = *indicesPtr;
+    auto                     indicesPtr  = std::make_shared<VecDataArray<int, 4>>(1);
+    VecDataArray<double, 3>& vertices    = *verticesPtr;
+    VecDataArray<int, 4>&    indices     = *indicesPtr;
 
     // We use a regular tetrahedron with edge lengths 2
     const double edgeLength = 2.0;
@@ -98,35 +98,33 @@ TEST(imstkTetrahedralMeshTest, ComputeWorldPosition)
     tetMesh.initialize(verticesPtr, indicesPtr);
 
     Vec4d baryPt = Vec4d::Zero();
-    Vec3d pos = Vec3d::Zero();
+    Vec3d pos    = Vec3d::Zero();
 
     // Test cell 0 node 0
     baryPt = Vec4d(1.0, 0.0, 0.0, 0.0);
-    pos = tetMesh.computeWorldPosition(0, baryPt);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
     EXPECT_EQ(pos, Vec3d(1.0, 0.0, -1.0 / std::sqrt(edgeLength)));
 
     // Test cell 0 node 1
     baryPt = Vec4d(0.0, 1.0, 0.0, 0.0);
-    pos = tetMesh.computeWorldPosition(0, baryPt);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
     EXPECT_EQ(pos, Vec3d(-1.0, 0.0, -1.0 / std::sqrt(edgeLength)));
 
     // Test cell 0 node 2
     baryPt = Vec4d(0.0, 0.0, 1.0, 0.0);
-    pos = tetMesh.computeWorldPosition(0, baryPt);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
     EXPECT_EQ(pos, Vec3d(0.0, 1.0, 1.0 / std::sqrt(edgeLength)));
 
     // Test cell 0 node 3
     baryPt = Vec4d(0.0, 0.0, 0.0, 1.0);
-    pos = tetMesh.computeWorldPosition(0, baryPt);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
     EXPECT_EQ(pos, Vec3d(0.0, -1.0, 1.0 / std::sqrt(edgeLength)));
 
     // Test cell 0 edge 0-1 halfway
     baryPt = Vec4d(0.5, 0.5, 0.0, 0.0);
-    pos = tetMesh.computeWorldPosition(0, baryPt);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
     EXPECT_EQ(pos, Vec3d(0.0, 0.0, -1.0 / std::sqrt(edgeLength)));
-
 }
-
 
 ///
 /// \brief Test the computation of volume
