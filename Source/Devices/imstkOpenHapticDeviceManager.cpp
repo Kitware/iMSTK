@@ -12,6 +12,14 @@
 
 namespace imstk
 {
+
+OpenHapticDeviceManager::OpenHapticDeviceManager()
+{
+    // Default a 1ms sleep to avoid over consumption of the CPU
+    setSleepDelay(1.0);
+    setMuteUpdateEvents(true);
+}
+
 std::shared_ptr<DeviceClient>
 OpenHapticDeviceManager::makeDeviceClient(std::string name)
 {

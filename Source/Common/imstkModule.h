@@ -78,6 +78,12 @@ public:
     void setPaused(const bool paused) { m_paused = paused; }
 
     ///
+    /// \brief Set/Get whether the module should post pre/post update events
+    ///
+    void setMuteUpdateEvents(const bool mute) { m_muteUpdateEvents = mute; }
+    bool getMuteUpdateEvents() const { return m_muteUpdateEvents; }
+
+    ///
     /// \brief Set/Get the execution type (see imstk::ExecutionType)
     ///
     ExecutionType getExecutionType() const { return m_executionType; }

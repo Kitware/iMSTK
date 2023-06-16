@@ -24,11 +24,7 @@ class OpenHapticDeviceClient;
 class OpenHapticDeviceManager : public DeviceManager
 {
 public:
-    OpenHapticDeviceManager()
-    {
-        // Default a 1ms sleep to avoid over consumption of the CPU
-        m_sleepDelay = 1.0;
-    }
+    OpenHapticDeviceManager();
 
     ~OpenHapticDeviceManager() override = default;
 
@@ -41,16 +37,11 @@ public:
     std::shared_ptr<DeviceClient> makeDeviceClient(std::string name = "") override;
 
 protected:
-    ///
-    /// \brief
-    ///
+
     bool initModule() override;
 
     void updateModule() override;
 
-    ///
-    /// \brief
-    ///
     void uninitModule() override;
 
 private:
