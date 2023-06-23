@@ -64,9 +64,9 @@ Vec3d
 DeviceClient::getForce()
 {
     Vec3d force;
-    m_transformLock.lock();
+    m_forceLock.lock();
     force = m_force;
-    m_transformLock.unlock();
+    m_forceLock.unlock();
     return force;
 }
 

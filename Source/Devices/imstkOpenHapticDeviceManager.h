@@ -10,6 +10,7 @@
 #include "imstkMacros.h"
 
 #include <vector>
+#include <memory>
 
 namespace imstk
 {
@@ -45,8 +46,7 @@ protected:
     void uninitModule() override;
 
 private:
-    friend OpenHapticDeviceClient;
-
-    std::vector<std::shared_ptr<OpenHapticDeviceClient>> m_deviceClients; ///< list of all the device clients
+    class OpenHapticDeviceManagerImpl;
+    std::unique_ptr<OpenHapticDeviceManagerImpl> m_impl;
 };
 } // namespace imstk
