@@ -207,6 +207,7 @@ public:
 
     void uninit()
     {
+        hdStopScheduler();
         hdUnschedule(m_schedulerHandle);
         for (const auto handle : m_handles)
         {
