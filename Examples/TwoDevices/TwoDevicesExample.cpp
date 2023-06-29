@@ -27,6 +27,9 @@
 #include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
 
+#include "imstkPbdDistanceConstraint.h"
+#include "imstkPbdRigidObjectGrasping.h"
+
 #include "imstkCapsule.h"
 
 #ifdef iMSTK_USE_RENDERING_VTK
@@ -46,13 +49,14 @@ std::shared_ptr<PbdObject>
 makeOrgan(const std::string& name, std::shared_ptr<PbdModel> model)
 {
     // Setup the Geometry
-    auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Gallblader/gallblader.msh"); //NOTE: Replace with path to stomach
+    //NOTE: Replace with path to stomach
+    auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Stomach/stomach.msh"); 
     const Vec3d center = tissueMesh->getCenter();
     tissueMesh->translate(-center, Geometry::TransformType::ApplyToData);
     tissueMesh->scale(1.0, Geometry::TransformType::ApplyToData);
     tissueMesh->rotate(Vec3d(0.0, 0.0, 1.0), 30.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
 
-    const Vec3d shift = { 0.0, 0.1, 0.0 }; // use this to offset organ posiiton
+    const Vec3d shift = { 0.0, 0.01, 0.0 }; // use this to offset organ posiiton
     tissueMesh->translate(shift, Geometry::TransformType::ApplyToData);
 
     auto surfMesh = tissueMesh->extractSurfaceMesh();
@@ -79,6 +83,7 @@ makeOrgan(const std::string& name, std::shared_ptr<PbdModel> model)
     tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
 
     // Gallblader is about 60g
+    // NOTE: Replace with parameters used in hernia
     tissueObj->getPbdBody()->uniformMassValue = 0.6 / tissueMesh->getNumVertices();
 
     model->getConfig()->m_femParams->m_YoungModulus = 108000.0;
@@ -88,10 +93,11 @@ makeOrgan(const std::string& name, std::shared_ptr<PbdModel> model)
 
 
     // Define box to set up boundary conditions
-    Vec3d boxPos = { 0.0, 0.0, 0.0 }; // center of box
-    Vec3d boxSize = { 2.1, 2.1, 2.1 }; // edge length of box
+    // NOTE: Move this box to constrain point on the stomach
+    Vec3d boxPos = { 0.0, 0.0, 0.1 }; // center of box
+    Vec3d boxSize = { 0.1, 0.1, 0.15 }; // edge length of box
 
-    // Fix the borders
+    // Fix the borders using constraints if point is within the defined box
     std::shared_ptr<VecDataArray<double, 3>> vertices = tissueMesh->getVertexPositions();
     for (int i = 0; i < tissueMesh->getNumVertices(); i++)
     {
@@ -100,7 +106,13 @@ makeOrgan(const std::string& name, std::shared_ptr<PbdModel> model)
             pos[1] < boxPos[1] + (boxSize[1] / 2.0) && pos[1] > boxPos[1] - (boxSize[1] / 2.0) &&
             pos[2] < boxPos[2] + (boxSize[2] / 2.0) && pos[2] > boxPos[2] - (boxSize[2] / 2.0))
         {
-            tissueObj->getPbdBody()->fixedNodeIds.push_back(i);
+            auto newPt = model->addVirtualParticle(pos, 0, Vec3d::Zero(), true);
+
+            PbdParticleId vertex = { tissueObj->getPbdBody()->bodyHandle, i };
+            auto constraint = std::make_shared<PbdDistanceConstraint>();
+            constraint->initConstraint(0, newPt, vertex, 10.0);
+
+            model->getConstraints()->addConstraint(constraint);
         }
     }
 
@@ -239,7 +251,7 @@ main(int argc, char* argv[])
     std::shared_ptr<PbdModelConfig> pbdParams = pbdModel->getConfig();
     pbdParams->m_gravity = Vec3d(0.0, -1.0, 0.0);
     pbdParams->m_dt = 0.002;
-    pbdParams->m_iterations = 2;
+    pbdParams->m_iterations = 1;
     pbdParams->m_linearDampingCoeff = 0.03;
 
     for (int i = 0; i < deviceCount; i++)
@@ -269,14 +281,15 @@ main(int argc, char* argv[])
     std::shared_ptr<PbdObject> stomach = makeOrgan("Stomach", pbdModel);
     scene->addSceneObject(stomach);
 
-    for (int i = 0; i < 1; i++)
+    for (auto obj : obstacleObjs)
     {
-        obstacleObjs[i]->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
-        scene->addSceneObject(obstacleObjs[i]);
+        obj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
+        scene->addSceneObject(obj);
     }
 
     std::vector<std::shared_ptr<PbdObject>> toolObjs;
 
+    // Add collision between the tools and the floor
     for (auto client : deviceClients)
     {
         // auto tool = makeTool(client);
@@ -293,13 +306,21 @@ main(int argc, char* argv[])
 
     // Add collision between tools and organ
     for (auto tool : toolObjs) {
-        scene->addInteraction(std::make_shared<PbdObjectCollision>(tool, stomach));
+        scene->addInteraction(std::make_shared<PbdObjectCollision>(stomach, tool ));
     }
 
-    // Add collision between tools and floor
+    // Add collision between stomach and floor
     for (auto obj : obstacleObjs)
     {
         scene->addInteraction(std::make_shared<PbdObjectCollision>(stomach, obj));
+    }
+
+    std::vector<std::shared_ptr<PbdObjectGrasping>> grasping;
+
+    for (auto tool : toolObjs) {
+        auto grasp = std::make_shared<PbdObjectGrasping>(stomach, tool);
+        grasping.push_back(grasp);
+        scene->addInteraction(grasp);
     }
     
 
@@ -322,6 +343,8 @@ main(int argc, char* argv[])
         // Setup a viewer to render
         auto viewer = std::make_shared<VTKViewer>();
         viewer->setActiveScene(scene);
+        viewer->setDebugAxesLength(0.1, 0.1, 0.1);
+
         driver->addModule(viewer);
 #endif
         driver->addModule(sceneManager);
@@ -335,6 +358,32 @@ main(int argc, char* argv[])
                 }
             });
 
+        // grasping: NOTE: For some reason I cant set up the ButtonEvents connects in a loop. If you want both devices to grasp then copy paste and set [0] to [1]
+        connect<ButtonEvent>(deviceClients[0], &DeviceClient::buttonStateChanged,
+            [&](ButtonEvent* e)
+            {
+                if (e->m_buttonState == BUTTON_PRESSED)
+                {
+                    if (e->m_button == 1)
+                    {
+                        // Use a slightly larger capsule since collision prevents intersection
+                        auto capsule = std::dynamic_pointer_cast<Capsule>(toolObjs[0]->getCollidingGeometry());
+                        auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
+                        dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
+                        grasping[0]->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(dilatedCapsule));
+                    }
+                }
+                else if (e->m_buttonState == BUTTON_RELEASED)
+                {
+                    if (e->m_button == 1)
+                    {
+                        grasping[0]->endGrasp();
+                    }
+                }
+            });
+
+
+        
         // Add mouse and keyboard controls to the viewer
 #ifdef iMSTK_USE_RENDERING_VTK
         // Add default mouse and keyboard controls to the viewer
