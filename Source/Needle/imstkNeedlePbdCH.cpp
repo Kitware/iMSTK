@@ -240,7 +240,6 @@ NeedlePbdCH::addPunctureConstraints()
     // for (auto puncture : m_threadPData)
     for (auto puncture = pData.thread.begin(); puncture != pData.thread.end();)
     {
-
         const Vec3d& a = physMesh->getVertexPositions()->at(puncture->triVertIds[0]);
         const Vec3d& b = physMesh->getVertexPositions()->at(puncture->triVertIds[1]);
         const Vec3d& c = physMesh->getVertexPositions()->at(puncture->triVertIds[2]);
@@ -263,8 +262,8 @@ NeedlePbdCH::addPunctureConstraints()
 
         int closestSegmentId = -1;
 
-        Vec3d closestPoint = { IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX };
-        double closestDist = IMSTK_DOUBLE_MAX;
+        Vec3d  closestPoint = { IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX };
+        double closestDist  = IMSTK_DOUBLE_MAX;
 
         int caseType = -1;
 
@@ -279,7 +278,7 @@ NeedlePbdCH::addPunctureConstraints()
 
             double newDist = (segClosestPoint - puncturePt).squaredNorm();
 
-            if (newDist  < closestDist)
+            if (newDist < closestDist)
             {
                 closestPoint     = segClosestPoint;
                 closestDist      = newDist;
@@ -321,7 +320,7 @@ NeedlePbdCH::addPunctureConstraints()
         puncture++;
     }
 
-    // To match the order of the closest segments to the puncture points we 
+    // To match the order of the closest segments to the puncture points we
     // sort as the order of the puncture points is know to be in order of the thread
     std::sort(punctureSegments.begin(), punctureSegments.end(), [](const auto& seg1, const auto& seg2) {
             return seg1.first[0] > seg2.first[0] || (seg1.first[0] == seg2.first[0] && seg1.second[1] > seg2.second[1]);

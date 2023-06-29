@@ -36,8 +36,8 @@ public:
     /// \param Device name or use empty string for default device
     ///
     OpenHapticDeviceClient(const std::string& name = "") : DeviceClient(name, "localhost")
-    { 
-        m_buttons = { {0,0},{1,0},{2,0},{3,0} };
+    {
+        m_buttons = { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } };
     }
 
 protected:

@@ -13,8 +13,8 @@
 #include <iostream>
 #include <iomanip>
 
-namespace {
-
+namespace
+{
 struct HDstate
 {
     // \todo pos are redundant?
@@ -24,13 +24,12 @@ struct HDstate
     HDdouble transform[16];
     HDint buttons;
 };
-}
-
-
+} // namespace
 
 namespace imstk
 {
-class OpenHapticDeviceManager::OpenHapticDeviceManagerImpl {
+class OpenHapticDeviceManager::OpenHapticDeviceManagerImpl
+{
 public:
 
     /// Check for OpenHaptics HDAPI errors, display them, and signal fatal errors.
@@ -48,11 +47,11 @@ public:
         // We do head recursion to get them all in the correct order, and hope we don't overrun the stack...
         bool anotherFatalError = isFatalError(message);
 
-        bool isFatal = ((error.errorCode != HD_WARM_MOTORS) &&
-            (error.errorCode != HD_EXCEEDED_MAX_FORCE) &&
-            (error.errorCode != HD_EXCEEDED_MAX_FORCE_IMPULSE) &&
-            (error.errorCode != HD_EXCEEDED_MAX_VELOCITY) &&
-            (error.errorCode != HD_FORCE_ERROR));
+        bool isFatal = ((error.errorCode != HD_WARM_MOTORS)
+                        && (error.errorCode != HD_EXCEEDED_MAX_FORCE)
+                        && (error.errorCode != HD_EXCEEDED_MAX_FORCE_IMPULSE)
+                        && (error.errorCode != HD_EXCEEDED_MAX_VELOCITY)
+                        && (error.errorCode != HD_FORCE_ERROR));
 
         LOG(WARNING) << "Phantom: " << message <<
             std::endl << "  Error text: '" << hdGetErrorString(error.errorCode) << "'" << std::endl <<
@@ -62,15 +61,14 @@ public:
         return (isFatal || anotherFatalError);
     }
 
-    static HDCallbackCode HDCALLBACK
-    hapticCallback(void* pData)
+    static HDCallbackCode HDCALLBACK hapticCallback(void* pData)
     {
-        auto impl = static_cast<OpenHapticDeviceManagerImpl*>(pData);
+        auto    impl = static_cast<OpenHapticDeviceManagerImpl*>(pData);
         HDstate state;
 
         for (int num = 0; num < impl->m_deviceClients.size(); ++num)
         {
-            HHD handle = impl->m_handles[num];
+            HHD                     handle = impl->m_handles[num];
             OpenHapticDeviceClient* client = impl->m_deviceClients[num].get();
 
             if (handle == HD_BAD_HANDLE || handle == HD_INVALID_HANDLE)
@@ -127,12 +125,10 @@ public:
                 }
             }
             client->m_dataLock.unlock();
-
         }
 
         return HD_CALLBACK_CONTINUE;
     }
-
 
     std::shared_ptr<imstk::OpenHapticDeviceClient> makeDeviceClient(std::string name)
     {
@@ -141,7 +137,8 @@ public:
         return client;
     }
 
-    bool init() {
+    bool init()
+    {
         for (const auto& client : m_deviceClients)
         {
             client->initialize();
@@ -163,7 +160,6 @@ public:
                 handle = hdInitDevice(name.c_str());
             }
 
-
             CHECK(!isFatalError("Failed to initialize device"));
 
             m_handles.push_back(handle);
@@ -176,7 +172,7 @@ public:
                 // Worth noting that in this case the name will not match the actual device name and is
                 // now only useful for scene level identification, OpenHaptics provides no mechanisms
                 // for querying device names
-               
+
                 HDstring str = hdGetString(HD_DEVICE_SERIAL_NUMBER);
                 client->setDeviceName("Device_" + std::string(str));
             }
@@ -212,17 +208,17 @@ public:
         for (const auto handle : m_handles)
         {
             hdDisableDevice(handle);
-        CHECK(!isFatalError("Failed to Disable device"));
+            CHECK(!isFatalError("Failed to Disable device"));
         }
     }
 
 private:
     HDSchedulerHandle m_schedulerHandle = 0;
     std::vector<std::shared_ptr<imstk::OpenHapticDeviceClient>> m_deviceClients; ///< list of all the device clients
-    std::vector<HHD> m_handles; ///< a device handle for each client
+    std::vector<HHD> m_handles;                                                  ///< a device handle for each client
 };
 
-OpenHapticDeviceManager::OpenHapticDeviceManager() : 
+OpenHapticDeviceManager::OpenHapticDeviceManager() :
     m_impl(new OpenHapticDeviceManagerImpl)
 {
     // Default a 1ms sleep to avoid over consumption of the CPU
@@ -233,7 +229,8 @@ OpenHapticDeviceManager::OpenHapticDeviceManager() :
 std::shared_ptr<DeviceClient>
 OpenHapticDeviceManager::makeDeviceClient(std::string name)
 {
-    if (getInit()) {
+    if (getInit())
+    {
         LOG(WARNING) << "Can't add device client after initialization.";
         return nullptr;
     }
@@ -260,7 +257,6 @@ OpenHapticDeviceManager::updateModule()
 void
 OpenHapticDeviceManager::uninitModule()
 {
-   m_impl->uninit();
+    m_impl->uninit();
 }
-
 } // namespace imstk

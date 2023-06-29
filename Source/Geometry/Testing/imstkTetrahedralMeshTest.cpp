@@ -187,7 +187,7 @@ TEST(imstkTetrahedralMeshTest, StrainParameters)
     auto wrongParames = std::make_shared<VecDataArray<float, 2>>(1);
     (*wrongParames)[0] = Vec2f(1, 2);
     tetMesh.setCellAttribute(TetrahedralMesh::StrainParameterName, wrongParames);
-    
+
     // When setting an invalid strain param array, it will be replaced with default on fetch
     EXPECT_TRUE(defaultParameters->at(0).isApprox(tetMesh.getStrainParameters()->at(0)));
 }

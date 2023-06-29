@@ -49,7 +49,8 @@ TetrahedralMesh::getStrainParameters()
     if (params == nullptr)
     {
         params = std::make_shared<VecDataArray<double, 3>>(m_indices->size());
-        for (int i = 0; i < params->size(); ++i) {
+        for (int i = 0; i < params->size(); ++i)
+        {
             (*params)[i] = Vec3d(-1.0, 0.0, 0.0);
         }
         setCellAttribute(StrainParameterName, params);

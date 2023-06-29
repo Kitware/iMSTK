@@ -33,6 +33,4 @@ void
 OpenHapticDeviceClient::disable()
 {
 }
-
-
 } // namespace imstk

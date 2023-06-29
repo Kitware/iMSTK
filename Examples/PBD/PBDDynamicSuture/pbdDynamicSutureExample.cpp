@@ -488,7 +488,6 @@ main()
                     sutureInteraction->stitch();
                 }
             });
-
         driver->start();
     }
     return 0;

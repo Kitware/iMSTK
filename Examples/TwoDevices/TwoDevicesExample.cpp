@@ -35,15 +35,13 @@
 
 using namespace imstk;
 
-
-
 std::shared_ptr<PbdObject>
 makeTool(std::shared_ptr<DeviceClient> deviceClient)
 {
     // The visual geometry is the scissor mesh read in from file
     auto rbdObj = std::make_shared<PbdObject>();
-    auto model = std::make_shared<PbdModel>();
-    model->getConfig()->m_dt = 0.001;
+    auto model  = std::make_shared<PbdModel>();
+    model->getConfig()->m_dt      = 0.001;
     model->getConfig()->m_gravity = Vec3d::Zero();
     rbdObj->setDynamicalModel(model);
     rbdObj->getPbdBody()->setRigid(
@@ -91,7 +89,8 @@ int
 main(int argc, char* argv[])
 {
     int deviceCount = 2;
-    if (argc > 1) {
+    if (argc > 1)
+    {
         std::string arg(argv[1]);
         std::cout << "Device count: " << arg << std::endl;
         deviceCount = std::min(2, std::max(0, std::stoi(arg)));
@@ -106,8 +105,9 @@ main(int argc, char* argv[])
     std::vector<std::string> deviceName = { "Right Device", "Left Device" };
 
     std::vector<std::shared_ptr<DeviceClient>> deviceClients;
-    
-    for (int i = 0; i < deviceCount; i++) {
+
+    for (int i = 0; i < deviceCount; i++)
+    {
         deviceClients.push_back(hapticManager->makeDeviceClient(deviceName[i]));
     }
 
