@@ -175,6 +175,11 @@ TEST(imstkTetrahedralMeshTest, StrainParameters)
     auto strainParameters = std::make_shared<VecDataArray<double, 3>>(1);
     (*strainParameters)[0] = Vec3d(-2, 123, 0.789);
 
+    auto defaultParameters = std::make_shared<VecDataArray<double, 3>>(1);
+    (*defaultParameters)[0] = Vec3d(-1, 0, 0);
+
+    EXPECT_TRUE(defaultParameters->at(0).isApprox(tetMesh.getStrainParameters()->at(0)));
+
     tetMesh.setStrainParameters(strainParameters);
 
     EXPECT_EQ(strainParameters, tetMesh.getStrainParameters());
@@ -182,6 +187,7 @@ TEST(imstkTetrahedralMeshTest, StrainParameters)
     auto wrongParames = std::make_shared<VecDataArray<float, 2>>(1);
     (*wrongParames)[0] = Vec2f(1, 2);
     tetMesh.setCellAttribute(TetrahedralMesh::StrainParameterName, wrongParames);
-
-    EXPECT_EQ(nullptr, tetMesh.getStrainParameters());
+    
+    // When setting an invalid strain param array, it will be replaced with default on fetch
+    EXPECT_TRUE(defaultParameters->at(0).isApprox(tetMesh.getStrainParameters()->at(0)));
 }

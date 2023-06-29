@@ -41,7 +41,12 @@ std::shared_ptr<imstk::VecDataArray<double, 3>>
 TetrahedralMesh::getStrainParameters()
 {
     std::shared_ptr<VecDataArray<double, 3>> params;
-    if (hasCellAttribute(StrainParameterName) == false)
+    if (hasCellAttribute(StrainParameterName))
+    {
+        params = std::dynamic_pointer_cast<VecDataArray<double, 3>>(getCellAttribute(StrainParameterName));
+    }
+
+    if (params == nullptr)
     {
         params = std::make_shared<VecDataArray<double, 3>>(m_indices->size());
         for (int i = 0; i < params->size(); ++i) {
@@ -49,14 +54,13 @@ TetrahedralMesh::getStrainParameters()
         }
         setCellAttribute(StrainParameterName, params);
     }
-    else {
-        params = std::dynamic_pointer_cast<VecDataArray<double, 3>>(getCellAttribute(StrainParameterName));
-    }
+
     if (params->size() != m_indices->size())
     {
         LOG(WARNING) << "Strain parameters are not the same size as the number of tetrahedra";
         return nullptr;
     }
+
     return params;
 }
 
