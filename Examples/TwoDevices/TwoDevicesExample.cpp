@@ -20,11 +20,14 @@
 #include "imstkPbdObjectCollision.h"
 #include "imstkPbdObjectController.h"
 #include "imstkPlane.h"
+#include "imstkPointwiseMap.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
+
+#include "imstkCapsule.h"
 
 #ifdef iMSTK_USE_RENDERING_VTK
 #include "imstkKeyboardSceneControl.h"
@@ -34,6 +37,79 @@
 #endif
 
 using namespace imstk;
+
+
+///
+/// \brief Creates pbd simulated organ
+///
+std::shared_ptr<PbdObject>
+makeOrgan(const std::string& name, std::shared_ptr<PbdModel> model)
+{
+    // Setup the Geometry
+    auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Gallblader/gallblader.msh"); //NOTE: Replace with path to stomach
+    const Vec3d center = tissueMesh->getCenter();
+    tissueMesh->translate(-center, Geometry::TransformType::ApplyToData);
+    tissueMesh->scale(1.0, Geometry::TransformType::ApplyToData);
+    tissueMesh->rotate(Vec3d(0.0, 0.0, 1.0), 30.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
+
+    const Vec3d shift = { 0.0, 0.1, 0.0 }; // use this to offset organ posiiton
+    tissueMesh->translate(shift, Geometry::TransformType::ApplyToData);
+
+    auto surfMesh = tissueMesh->extractSurfaceMesh();
+
+    // Setup the material
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setBackFaceCulling(false);
+    material->setOpacity(0.5);
+
+    // Add a visual model to render the tet mesh
+    auto visualModel = std::make_shared<VisualModel>();
+    visualModel->setGeometry(surfMesh);
+    visualModel->setRenderMaterial(material);
+
+    // Setup the Object
+    auto tissueObj = std::make_shared<PbdObject>(name);
+    tissueObj->addVisualModel(visualModel);
+    //tissueObj->addVisualModel(labelModel);
+    tissueObj->setPhysicsGeometry(tissueMesh);
+    tissueObj->setCollidingGeometry(surfMesh);
+    tissueObj->setDynamicalModel(model);
+
+    tissueObj->setPhysicsToCollidingMap(std::make_shared<PointwiseMap>(tissueMesh, surfMesh));
+
+    // Gallblader is about 60g
+    tissueObj->getPbdBody()->uniformMassValue = 0.6 / tissueMesh->getNumVertices();
+
+    model->getConfig()->m_femParams->m_YoungModulus = 108000.0;
+    model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
+    model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
+    model->getConfig()->setBodyDamping(tissueObj->getPbdBody()->bodyHandle, 0.01);
+
+
+    // Define box to set up boundary conditions
+    Vec3d boxPos = { 0.0, 0.0, 0.0 }; // center of box
+    Vec3d boxSize = { 2.1, 2.1, 2.1 }; // edge length of box
+
+    // Fix the borders
+    std::shared_ptr<VecDataArray<double, 3>> vertices = tissueMesh->getVertexPositions();
+    for (int i = 0; i < tissueMesh->getNumVertices(); i++)
+    {
+        const Vec3d& pos = (*vertices)[i];
+        if( pos[0] < boxPos[0] + (boxSize[0] / 2.0) && pos[0] > boxPos[0] - (boxSize[0] / 2.0) &&
+            pos[1] < boxPos[1] + (boxSize[1] / 2.0) && pos[1] > boxPos[1] - (boxSize[1] / 2.0) &&
+            pos[2] < boxPos[2] + (boxSize[2] / 2.0) && pos[2] > boxPos[2] - (boxSize[2] / 2.0))
+        {
+            tissueObj->getPbdBody()->fixedNodeIds.push_back(i);
+        }
+    }
+
+    LOG(INFO) << "Per particle mass: " << tissueObj->getPbdBody()->uniformMassValue;
+
+    tissueObj->initialize();
+
+    return tissueObj;
+}
 
 std::shared_ptr<PbdObject>
 makeTool(std::shared_ptr<DeviceClient> deviceClient)
@@ -80,6 +156,61 @@ makeTool(std::shared_ptr<DeviceClient> deviceClient)
     return rbdObj;
 }
 
+
+///
+/// \brief Creates capsule to use as a tool
+///
+static std::shared_ptr<PbdObject>
+makeCapsuleToolObj(std::shared_ptr<PbdModel> model, std::shared_ptr<DeviceClient> deviceClient)
+{
+    double radius = 0.005;
+    double length = 0.2;
+    double mass = 0.02;
+
+    auto toolGeometry = std::make_shared<Capsule>();
+    // auto toolGeometry = std::make_shared<Sphere>();
+    toolGeometry->setRadius(radius);
+    toolGeometry->setLength(length);
+    toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
+    toolGeometry->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
+
+    LOG(INFO) << "Tool Radius  = " << radius;
+    LOG(INFO) << "Tool mass = " << mass;
+
+    auto toolObj = std::make_shared<PbdObject>("Tool");
+
+    // Create the object
+    toolObj->setVisualGeometry(toolGeometry);
+    toolObj->setPhysicsGeometry(toolGeometry);
+    toolObj->setCollidingGeometry(toolGeometry);
+    toolObj->setDynamicalModel(model);
+    toolObj->getPbdBody()->setRigid(
+        Vec3d(0.04, 0.0, 0.0),
+        mass,
+        Quatd::Identity(),
+        Mat3d::Identity() * 1.0);
+
+    toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(1.0);
+
+    // Add a component for controlling via another device
+    auto controller = toolObj->addComponent<PbdObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setDevice(deviceClient);
+    controller->setHapticOffset(Vec3d(0.0, 0.0, -0.1));
+    controller->setTranslationScaling(1.0);
+    controller->setLinearKs(1000.0);
+    controller->setAngularKs(10000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(1.0);
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
+    // Add extra component to tool for the ghost
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setController(controller);
+
+    return toolObj;
+}
 ///
 /// \brief This example demonstrates the concept of virtual coupling
 /// for haptic interaction.
@@ -88,7 +219,7 @@ makeTool(std::shared_ptr<DeviceClient> deviceClient)
 int
 main(int argc, char* argv[])
 {
-    int deviceCount = 2;
+    int deviceCount = 1;
     if (argc > 1)
     {
         std::string arg(argv[1]);
@@ -103,6 +234,13 @@ main(int argc, char* argv[])
     std::shared_ptr<DeviceManager>             hapticManager = DeviceManagerFactory::makeDeviceManager();
     std::vector<std::string>                   deviceName    = { "Right Device", "Left Device" };
     std::vector<std::shared_ptr<DeviceClient>> deviceClients;
+
+    auto                            pbdModel = std::make_shared<PbdModel>();
+    std::shared_ptr<PbdModelConfig> pbdParams = pbdModel->getConfig();
+    pbdParams->m_gravity = Vec3d(0.0, -1.0, 0.0);
+    pbdParams->m_dt = 0.002;
+    pbdParams->m_iterations = 2;
+    pbdParams->m_linearDampingCoeff = 0.03;
 
     for (int i = 0; i < deviceCount; i++)
     {
@@ -127,11 +265,9 @@ main(int argc, char* argv[])
     obstacleObjs[0]->setVisualGeometry(plane);
     obstacleObjs[0]->setCollidingGeometry(plane);
 
-    // 0.1m size cube, slight rotation
-    /*auto cube = std::make_shared<OrientedBox>(Vec3d(0.0, 0.0, 0.0),
-        Vec3d(0.05, 0.05, 0.05), Quatd(Rotd(1.0, Vec3d(0.0, 1.0, 0.0))));
-    obstacleObjs[1]->setVisualGeometry(cube);
-    obstacleObjs[1]->setCollidingGeometry(cube);*/
+    // Read in organ mesh and set up as PBD deformable
+    std::shared_ptr<PbdObject> stomach = makeOrgan("Stomach", pbdModel);
+    scene->addSceneObject(stomach);
 
     for (int i = 0; i < 1; i++)
     {
@@ -143,7 +279,8 @@ main(int argc, char* argv[])
 
     for (auto client : deviceClients)
     {
-        auto tool = makeTool(client);
+        // auto tool = makeTool(client);
+        auto tool = makeCapsuleToolObj(pbdModel, client);
         scene->addSceneObject(tool);
 
         toolObjs.push_back(tool);
@@ -153,6 +290,18 @@ main(int argc, char* argv[])
             scene->addInteraction(std::make_shared<PbdObjectCollision>(tool, obj));
         }
     }
+
+    // Add collision between tools and organ
+    for (auto tool : toolObjs) {
+        scene->addInteraction(std::make_shared<PbdObjectCollision>(tool, stomach));
+    }
+
+    // Add collision between tools and floor
+    for (auto obj : obstacleObjs)
+    {
+        scene->addInteraction(std::make_shared<PbdObjectCollision>(stomach, obj));
+    }
+    
 
     // Light
     auto light = std::make_shared<DirectionalLight>();
