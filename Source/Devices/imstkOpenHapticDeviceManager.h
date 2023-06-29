@@ -14,39 +14,39 @@
 
 namespace imstk
 {
-    class OpenHapticDeviceClient;
+class OpenHapticDeviceClient;
+
+///
+/// \class OpenHapticDeviceManager
+///
+/// \brief Devices manager using HDAPI
+/// \todo add the frame rate option for the servo loop
+///
+class OpenHapticDeviceManager : public DeviceManager
+{
+public:
+    OpenHapticDeviceManager();
+
+    ~OpenHapticDeviceManager() override = default;
+
+    IMSTK_TYPE_NAME(OpenHapticDeviceManager)
 
     ///
-    /// \class OpenHapticDeviceManager
+    /// \brief Create a haptic device client and add it to the internal list
+    /// \param Device name or use empty string for default device
     ///
-    /// \brief Devices manager using HDAPI
-    /// \todo add the frame rate option for the servo loop
-    ///
-    class OpenHapticDeviceManager : public DeviceManager
-    {
-    public:
-        OpenHapticDeviceManager();
+    std::shared_ptr<DeviceClient> makeDeviceClient(std::string name = "") override;
 
-        ~OpenHapticDeviceManager() override = default;
+protected:
 
-        IMSTK_TYPE_NAME(OpenHapticDeviceManager)
+    bool initModule() override;
 
-            ///
-            /// \brief Create a haptic device client and add it to the internal list
-            /// \param Device name or use empty string for default device
-            ///
-            std::shared_ptr<DeviceClient> makeDeviceClient(std::string name = "") override;
+    void updateModule() override;
 
-    protected:
+    void uninitModule() override;
 
-        bool initModule() override;
-
-        void updateModule() override;
-
-        void uninitModule() override;
-
-    private:
-        class OpenHapticDeviceManagerImpl;
-        std::unique_ptr<OpenHapticDeviceManagerImpl> m_impl;
-    };
+private:
+    class OpenHapticDeviceManagerImpl;
+    std::unique_ptr<OpenHapticDeviceManagerImpl> m_impl;
+};
 } // namespace imstk

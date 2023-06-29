@@ -100,10 +100,8 @@ main(int argc, char* argv[])
     Logger::startLogger();
 
     // Setup default haptics manager
-    std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
-
-    std::vector<std::string> deviceName = { "Right Device", "Left Device" };
-
+    std::shared_ptr<DeviceManager>             hapticManager = DeviceManagerFactory::makeDeviceManager();
+    std::vector<std::string>                   deviceName    = { "Right Device", "Left Device" };
     std::vector<std::shared_ptr<DeviceClient>> deviceClients;
 
     for (int i = 0; i < deviceCount; i++)
@@ -120,7 +118,7 @@ main(int argc, char* argv[])
     std::shared_ptr<CollidingObject> obstacleObjs[] =
     {
         std::make_shared<CollidingObject>("Plane"),
-        std::make_shared<CollidingObject>("Cube")
+        // std::make_shared<CollidingObject>("Cube")
     };
 
     // Create a plane and cube for collision with scissors
@@ -130,12 +128,12 @@ main(int argc, char* argv[])
     obstacleObjs[0]->setCollidingGeometry(plane);
 
     // 0.1m size cube, slight rotation
-    auto cube = std::make_shared<OrientedBox>(Vec3d(0.0, 0.0, 0.0),
+    /*auto cube = std::make_shared<OrientedBox>(Vec3d(0.0, 0.0, 0.0),
         Vec3d(0.05, 0.05, 0.05), Quatd(Rotd(1.0, Vec3d(0.0, 1.0, 0.0))));
     obstacleObjs[1]->setVisualGeometry(cube);
-    obstacleObjs[1]->setCollidingGeometry(cube);
+    obstacleObjs[1]->setCollidingGeometry(cube);*/
 
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 1; i++)
     {
         obstacleObjs[i]->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
         scene->addSceneObject(obstacleObjs[i]);
