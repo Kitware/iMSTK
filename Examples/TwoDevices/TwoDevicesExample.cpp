@@ -50,7 +50,8 @@ makeOrgan(const std::string& name, std::shared_ptr<PbdModel> model)
 {
     // Setup the Geometry
     //NOTE: Replace with path to stomach
-    auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Stomach/stomach.msh"); 
+    // auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Stomach/stomach.msh"); 
+    auto        tissueMesh = MeshIO::read<TetrahedralMesh>("./stomach.msh");
     const Vec3d center = tissueMesh->getCenter();
     tissueMesh->translate(-center, Geometry::TransformType::ApplyToData);
     tissueMesh->scale(1.0, Geometry::TransformType::ApplyToData);
@@ -173,7 +174,7 @@ makeTool(std::shared_ptr<DeviceClient> deviceClient)
 /// \brief Creates capsule to use as a tool
 ///
 static std::shared_ptr<PbdObject>
-makeCapsuleToolObj(std::shared_ptr<PbdModel> model, std::shared_ptr<DeviceClient> deviceClient)
+makeCapsuleToolObj(std::shared_ptr<PbdModel> model, std::shared_ptr<DeviceClient> deviceClient, double shiftX)
 {
     double radius = 0.005;
     double length = 0.2;
@@ -183,7 +184,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model, std::shared_ptr<DeviceClient
     // auto toolGeometry = std::make_shared<Sphere>();
     toolGeometry->setRadius(radius);
     toolGeometry->setLength(length);
-    toolGeometry->setPosition(Vec3d(0.0, 0.0, 0.0));
+    toolGeometry->setPosition(Vec3d(shiftX, 0.0, 0.0));
     toolGeometry->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
 
     LOG(INFO) << "Tool Radius  = " << radius;
@@ -231,7 +232,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model, std::shared_ptr<DeviceClient
 int
 main(int argc, char* argv[])
 {
-    int deviceCount = 1;
+    int deviceCount = 2;
     if (argc > 1)
     {
         std::string arg(argv[1]);
@@ -289,20 +290,24 @@ main(int argc, char* argv[])
 
     std::vector<std::shared_ptr<PbdObject>> toolObjs;
 
-    // Add collision between the tools and the floor
-    for (auto client : deviceClients)
+    for (int i = 0; i < deviceCount; i++)
     {
         // auto tool = makeTool(client);
-        auto tool = makeCapsuleToolObj(pbdModel, client);
+        auto tool = makeCapsuleToolObj(pbdModel, deviceClients[i], 0.1 + ((double)i/10.0));
         scene->addSceneObject(tool);
 
         toolObjs.push_back(tool);
-
-        for (auto obj : obstacleObjs)
-        {
-            scene->addInteraction(std::make_shared<PbdObjectCollision>(tool, obj));
-        }
     }
+
+    // Add collision between the tools and the floor
+    //for (auto client : deviceClients)
+    //{
+    //    // auto tool = makeTool(client);
+    //    auto tool = makeCapsuleToolObj(pbdModel, client, 0.1);
+    //    scene->addSceneObject(tool);
+
+    //    toolObjs.push_back(tool);
+    //}
 
     // Add collision between tools and organ
     for (auto tool : toolObjs) {
