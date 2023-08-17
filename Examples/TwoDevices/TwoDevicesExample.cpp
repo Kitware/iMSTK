@@ -41,7 +41,6 @@
 
 using namespace imstk;
 
-
 ///
 /// \brief Creates pbd simulated organ
 ///
@@ -50,9 +49,9 @@ makeOrgan(const std::string& name, std::shared_ptr<PbdModel> model)
 {
     // Setup the Geometry
     //NOTE: Replace with path to stomach
-    // auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Stomach/stomach.msh"); 
+    // auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Stomach/stomach.msh");
     auto        tissueMesh = MeshIO::read<TetrahedralMesh>("./stomach.msh");
-    const Vec3d center = tissueMesh->getCenter();
+    const Vec3d center     = tissueMesh->getCenter();
     tissueMesh->translate(-center, Geometry::TransformType::ApplyToData);
     tissueMesh->scale(1.0, Geometry::TransformType::ApplyToData);
     tissueMesh->rotate(Vec3d(0.0, 0.0, 1.0), 30.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
@@ -92,10 +91,9 @@ makeOrgan(const std::string& name, std::shared_ptr<PbdModel> model)
     model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::NeoHookean);
     model->getConfig()->setBodyDamping(tissueObj->getPbdBody()->bodyHandle, 0.01);
 
-
     // Define box to set up boundary conditions
     // NOTE: Move this box to constrain point on the stomach
-    Vec3d boxPos = { 0.0, 0.0, 0.1 }; // center of box
+    Vec3d boxPos  = { 0.0, 0.0, 0.1 };  // center of box
     Vec3d boxSize = { 0.1, 0.1, 0.15 }; // edge length of box
 
     // Fix the borders using constraints if point is within the defined box
@@ -103,14 +101,14 @@ makeOrgan(const std::string& name, std::shared_ptr<PbdModel> model)
     for (int i = 0; i < tissueMesh->getNumVertices(); i++)
     {
         const Vec3d& pos = (*vertices)[i];
-        if( pos[0] < boxPos[0] + (boxSize[0] / 2.0) && pos[0] > boxPos[0] - (boxSize[0] / 2.0) &&
-            pos[1] < boxPos[1] + (boxSize[1] / 2.0) && pos[1] > boxPos[1] - (boxSize[1] / 2.0) &&
-            pos[2] < boxPos[2] + (boxSize[2] / 2.0) && pos[2] > boxPos[2] - (boxSize[2] / 2.0))
+        if (pos[0] < boxPos[0] + (boxSize[0] / 2.0) && pos[0] > boxPos[0] - (boxSize[0] / 2.0)
+            && pos[1] < boxPos[1] + (boxSize[1] / 2.0) && pos[1] > boxPos[1] - (boxSize[1] / 2.0)
+            && pos[2] < boxPos[2] + (boxSize[2] / 2.0) && pos[2] > boxPos[2] - (boxSize[2] / 2.0))
         {
             auto newPt = model->addVirtualParticle(pos, 0, Vec3d::Zero(), true);
 
-            PbdParticleId vertex = { tissueObj->getPbdBody()->bodyHandle, i };
-            auto constraint = std::make_shared<PbdDistanceConstraint>();
+            PbdParticleId vertex     = { tissueObj->getPbdBody()->bodyHandle, i };
+            auto          constraint = std::make_shared<PbdDistanceConstraint>();
             constraint->initConstraint(0, newPt, vertex, 10.0);
 
             model->getConstraints()->addConstraint(constraint);
@@ -169,7 +167,6 @@ makeTool(std::shared_ptr<DeviceClient> deviceClient)
     return rbdObj;
 }
 
-
 ///
 /// \brief Creates capsule to use as a tool
 ///
@@ -178,7 +175,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model, std::shared_ptr<DeviceClient
 {
     double radius = 0.005;
     double length = 0.2;
-    double mass = 0.02;
+    double mass   = 0.02;
 
     auto toolGeometry = std::make_shared<Capsule>();
     // auto toolGeometry = std::make_shared<Sphere>();
@@ -224,6 +221,7 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model, std::shared_ptr<DeviceClient
 
     return toolObj;
 }
+
 ///
 /// \brief This example demonstrates the concept of virtual coupling
 /// for haptic interaction.
@@ -248,10 +246,10 @@ main(int argc, char* argv[])
     std::vector<std::string>                   deviceName    = { "Right Device", "Left Device" };
     std::vector<std::shared_ptr<DeviceClient>> deviceClients;
 
-    auto                            pbdModel = std::make_shared<PbdModel>();
+    auto                            pbdModel  = std::make_shared<PbdModel>();
     std::shared_ptr<PbdModelConfig> pbdParams = pbdModel->getConfig();
-    pbdParams->m_gravity = Vec3d(0.0, -1.0, 0.0);
-    pbdParams->m_dt = 0.002;
+    pbdParams->m_gravity    = Vec3d(0.0, -1.0, 0.0);
+    pbdParams->m_dt         = 0.002;
     pbdParams->m_iterations = 1;
     pbdParams->m_linearDampingCoeff = 0.03;
 
@@ -293,7 +291,7 @@ main(int argc, char* argv[])
     for (int i = 0; i < deviceCount; i++)
     {
         // auto tool = makeTool(client);
-        auto tool = makeCapsuleToolObj(pbdModel, deviceClients[i], 0.1 + ((double)i/10.0));
+        auto tool = makeCapsuleToolObj(pbdModel, deviceClients[i], 0.1 + ((double)i / 10.0));
         scene->addSceneObject(tool);
 
         toolObjs.push_back(tool);
@@ -310,8 +308,9 @@ main(int argc, char* argv[])
     //}
 
     // Add collision between tools and organ
-    for (auto tool : toolObjs) {
-        scene->addInteraction(std::make_shared<PbdObjectCollision>(stomach, tool ));
+    for (auto tool : toolObjs)
+    {
+        scene->addInteraction(std::make_shared<PbdObjectCollision>(stomach, tool));
     }
 
     // Add collision between stomach and floor
@@ -322,12 +321,12 @@ main(int argc, char* argv[])
 
     std::vector<std::shared_ptr<PbdObjectGrasping>> grasping;
 
-    for (auto tool : toolObjs) {
+    for (auto tool : toolObjs)
+    {
         auto grasp = std::make_shared<PbdObjectGrasping>(stomach, tool);
         grasping.push_back(grasp);
         scene->addInteraction(grasp);
     }
-    
 
     // Light
     auto light = std::make_shared<DirectionalLight>();
@@ -387,8 +386,6 @@ main(int argc, char* argv[])
                 }
             });
 
-
-        
         // Add mouse and keyboard controls to the viewer
 #ifdef iMSTK_USE_RENDERING_VTK
         // Add default mouse and keyboard controls to the viewer
