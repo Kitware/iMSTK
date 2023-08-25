@@ -81,7 +81,7 @@ public:
     /// index 1: Youngs modulus
     /// index 2: Poisson ratio
     ///@{
-    std::shared_ptr<VecDataArray<double, 3>> getStrainParameters() const;
+    std::shared_ptr<VecDataArray<double, 3>> getStrainParameters();
     void setStrainParameters(std::shared_ptr<VecDataArray<double, 3>> strainParameters);
 ///@}
 

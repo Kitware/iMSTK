@@ -8,16 +8,11 @@
 
 #include "imstkMacros.h"
 #include "imstkPbdObjectCollision.h"
-
-using namespace imstk;
-
-class NeedleEmbeddedCH;
+#include "imstkNeedlePbdCH.h"
 
 namespace imstk
 {
 class PbdObject;
-class RigidObject2;
-} // namespace imstk
 
 ///
 /// \class NeedleInteraction
@@ -27,12 +22,15 @@ class RigidObject2;
 class NeedleInteraction : public PbdObjectCollision
 {
 public:
-    NeedleInteraction(std::shared_ptr<PbdObject>    tissueObj,
-                      std::shared_ptr<RigidObject2> needleObj,
-                      std::shared_ptr<PbdObject>    threadObj);
+    NeedleInteraction(std::shared_ptr<PbdObject> tissueObj,
+                      std::shared_ptr<PbdObject> needleObj,
+                      std::shared_ptr<PbdObject> threadObj);
     ~NeedleInteraction() override = default;
 
     IMSTK_TYPE_NAME(NeedleInteraction)
 
     void stitch();
+
+    const NeedlePbdCH::PunctureData& getPunctureData();
 };
+} // namespace imstk

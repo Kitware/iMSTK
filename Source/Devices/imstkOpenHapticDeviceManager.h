@@ -10,6 +10,7 @@
 #include "imstkMacros.h"
 
 #include <vector>
+#include <memory>
 
 namespace imstk
 {
@@ -24,11 +25,7 @@ class OpenHapticDeviceClient;
 class OpenHapticDeviceManager : public DeviceManager
 {
 public:
-    OpenHapticDeviceManager()
-    {
-        // Default a 1ms sleep to avoid over consumption of the CPU
-        m_sleepDelay = 1.0;
-    }
+    OpenHapticDeviceManager();
 
     ~OpenHapticDeviceManager() override = default;
 
@@ -41,21 +38,15 @@ public:
     std::shared_ptr<DeviceClient> makeDeviceClient(std::string name = "") override;
 
 protected:
-    ///
-    /// \brief
-    ///
+
     bool initModule() override;
 
     void updateModule() override;
 
-    ///
-    /// \brief
-    ///
     void uninitModule() override;
 
 private:
-    friend OpenHapticDeviceClient;
-
-    std::vector<std::shared_ptr<OpenHapticDeviceClient>> m_deviceClients; ///< list of all the device clients
+    class OpenHapticDeviceManagerImpl;
+    std::unique_ptr<OpenHapticDeviceManagerImpl> m_impl;
 };
 } // namespace imstk

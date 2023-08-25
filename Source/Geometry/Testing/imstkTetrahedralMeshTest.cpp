@@ -77,6 +77,55 @@ TEST(imstkTetrahedralMeshTest, ExtractSurfaceMesh)
     }
 }
 
+TEST(imstkTetrahedralMeshTest, ComputeWorldPosition)
+{
+    TetrahedralMesh tetMesh;
+
+    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
+    auto                     indicesPtr  = std::make_shared<VecDataArray<int, 4>>(1);
+    VecDataArray<double, 3>& vertices    = *verticesPtr;
+    VecDataArray<int, 4>&    indices     = *indicesPtr;
+
+    // We use a regular tetrahedron with edge lengths 2
+    const double edgeLength = 2.0;
+    vertices[0] = Vec3d(1.0, 0.0, -1.0 / std::sqrt(edgeLength));
+    vertices[1] = Vec3d(-1.0, 0.0, -1.0 / std::sqrt(edgeLength));
+    vertices[2] = Vec3d(0.0, 1.0, 1.0 / std::sqrt(edgeLength));
+    vertices[3] = Vec3d(0.0, -1.0, 1.0 / std::sqrt(edgeLength));
+
+    indices[0] = Vec4i(0, 1, 2, 3);
+
+    tetMesh.initialize(verticesPtr, indicesPtr);
+
+    Vec4d baryPt = Vec4d::Zero();
+    Vec3d pos    = Vec3d::Zero();
+
+    // Test cell 0 node 0
+    baryPt = Vec4d(1.0, 0.0, 0.0, 0.0);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(1.0, 0.0, -1.0 / std::sqrt(edgeLength)));
+
+    // Test cell 0 node 1
+    baryPt = Vec4d(0.0, 1.0, 0.0, 0.0);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(-1.0, 0.0, -1.0 / std::sqrt(edgeLength)));
+
+    // Test cell 0 node 2
+    baryPt = Vec4d(0.0, 0.0, 1.0, 0.0);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.0, 1.0, 1.0 / std::sqrt(edgeLength)));
+
+    // Test cell 0 node 3
+    baryPt = Vec4d(0.0, 0.0, 0.0, 1.0);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.0, -1.0, 1.0 / std::sqrt(edgeLength)));
+
+    // Test cell 0 edge 0-1 halfway
+    baryPt = Vec4d(0.5, 0.5, 0.0, 0.0);
+    pos    = tetMesh.computeWorldPosition(0, baryPt);
+    EXPECT_EQ(pos, Vec3d(0.0, 0.0, -1.0 / std::sqrt(edgeLength)));
+}
+
 ///
 /// \brief Test the computation of volume
 ///
@@ -126,6 +175,11 @@ TEST(imstkTetrahedralMeshTest, StrainParameters)
     auto strainParameters = std::make_shared<VecDataArray<double, 3>>(1);
     (*strainParameters)[0] = Vec3d(-2, 123, 0.789);
 
+    auto defaultParameters = std::make_shared<VecDataArray<double, 3>>(1);
+    (*defaultParameters)[0] = Vec3d(-1, 0, 0);
+
+    EXPECT_TRUE(defaultParameters->at(0).isApprox(tetMesh.getStrainParameters()->at(0)));
+
     tetMesh.setStrainParameters(strainParameters);
 
     EXPECT_EQ(strainParameters, tetMesh.getStrainParameters());
@@ -134,5 +188,6 @@ TEST(imstkTetrahedralMeshTest, StrainParameters)
     (*wrongParames)[0] = Vec2f(1, 2);
     tetMesh.setCellAttribute(TetrahedralMesh::StrainParameterName, wrongParames);
 
-    EXPECT_EQ(nullptr, tetMesh.getStrainParameters());
+    // When setting an invalid strain param array, it will be replaced with default on fetch
+    EXPECT_TRUE(defaultParameters->at(0).isApprox(tetMesh.getStrainParameters()->at(0)));
 }

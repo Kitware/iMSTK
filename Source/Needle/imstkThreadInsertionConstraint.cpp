@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ThreadInsertionConstraint.h"
+#include "imstkThreadInsertionConstraint.h"
 
 using namespace imstk;
 

@@ -191,11 +191,15 @@
 /*
  * Needle
  */
-#include "imstkPuncture.h"
-#include "imstkNeedle.h"
-#include "imstkStraightNeedle.h"
 #include "imstkArcNeedle.h"
+#include "imstkNeedle.h"
+#include "imstkNeedleInteraction.h"
+#include "imstkNeedlePbdCH.h"
 #include "imstkPuncturable.h"
+#include "imstkPuncture.h"
+#include "imstkStraightNeedle.h"
+#include "imstkSurfaceInsertionConstraint.h"
+#include "imstkThreadInsertionConstraint.h"
 
 /*
  * Scene
@@ -270,6 +274,7 @@
 /*
  * https://github.com/swig/swig/pull/2480
  * Copied unordered_map for c# from the above pull request
+ * Note: Don't forget to put imstk classes under the `imstk::` namespace
  */
 
 %include <std_unordered_map.i> 
@@ -283,6 +288,8 @@ namespace std
   %template(VectorString) vector<std::string>;
   %template(IntPair) pair<int, int>;
   %template(UnorderedMapStringDouble) unordered_map<std::string, double>;
+  %template(VectorPuncturePoint) std::vector<imstk::NeedlePbdCH::PuncturePoint>;
+  %template(VectorVectorPuncturePoint) std::vector<std::vector<imstk::NeedlePbdCH::PuncturePoint>>;
 }
 
 %include <std_except.i>
@@ -494,15 +501,6 @@ namespace std
 %include "../../Controllers/imstkRigidObjectController.h"
 %include "../../Controllers/imstkPbdObjectController.h"
 
-/*
- * Needle
- */
-%include "../../Needle/imstkPuncture.h"
-%include "../../Needle/imstkNeedle.h"
-%include "../../Needle/imstkStraightNeedle.h"
-%include "../../Needle/imstkArcNeedle.h"
-%include "../../Needle/imstkPuncturable.h"
-
 /* 
  * Scene
  */
@@ -515,6 +513,17 @@ namespace std
 %include "../../Scene/imstkPbdRigidObjectCollision.h"
 %include "../../Scene/imstkPbdRigidObjectGrasping.h"
 %include "../../Scene/imstkSphObjectCollision.h"
+
+/*
+ * Needle
+ */
+%include "../../Needle/imstkPuncture.h"
+%include "../../Needle/imstkNeedle.h"
+%include "../../Needle/imstkStraightNeedle.h"
+%include "../../Needle/imstkArcNeedle.h"
+%include "../../Needle/imstkPuncturable.h"
+%include "../../Needle/imstkNeedlePbdCH.h"
+%include "../../Needle/imstkNeedleInteraction.h"
 
 /*
  * ViewerCore
