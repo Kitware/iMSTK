@@ -2,7 +2,7 @@
 # Create target
 #-----------------------------------------------------------------------------
 
-list(APPEND Dependencies Common)
+list(APPEND Dependencies Common Scene SceneEntities)
 
 set(H_FILES
   imstkDeviceClient.h
@@ -11,6 +11,7 @@ set(H_FILES
   imstkDummyClient.h
   imstkKeyboardDeviceClient.h
   imstkMouseDeviceClient.h
+  imstkProgrammableClient.h
   imstkOpenVRDeviceClient.h
   )
 
@@ -20,6 +21,7 @@ set(SRC_FILES
   imstkDummyClient.cpp
   imstkKeyboardDeviceClient.cpp
   imstkMouseDeviceClient.cpp
+  imstkProgrammableClient.cpp
   imstkOpenVRDeviceClient.cpp
   )
 

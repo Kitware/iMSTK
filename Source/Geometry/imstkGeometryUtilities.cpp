@@ -692,7 +692,7 @@ GeometryUtils::copyToVtkPolyData(std::shared_ptr<LineMesh> imstkMesh)
 
     auto polydata = vtkSmartPointer<vtkPolyData>::New();
     polydata->SetPoints(points);
-    polydata->SetPolys(polys);
+    polydata->SetLines(polys);
 
     // Copy vertex attributes
     copyToVtkDataAttributes(polydata->GetPointData(), imstkMesh->getVertexAttributes());
@@ -1319,7 +1319,7 @@ RCM(const std::vector<ElemConn>& conn, const size_t numVerts)
 }
 
 ///
-/// \brief Given a set of points mark them as inside (true) and outside
+/// \brief Given a set of points mark them as e (true) and outside
 /// \param surfaceMesh a \ref SurfaceMesh
 /// \param coords a set of points to be tested
 ///

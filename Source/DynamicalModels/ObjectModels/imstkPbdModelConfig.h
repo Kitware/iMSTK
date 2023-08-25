@@ -9,6 +9,7 @@
 #include "imstkPbdCollisionConstraint.h"
 #include "imstkPbdFemConstraint.h"
 #include "imstkPbdConstraintFunctor.h"
+#include "imstkDataTracker.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -146,6 +147,8 @@ public:
 
     std::unordered_map<int, double> m_bodyLinearDampingCoeff;  ///< Per body linear damping, Body id -> linear damping for given body [0, 1]
     std::unordered_map<int, double> m_bodyAngularDampingCoeff; ///< Per body angular damping, Body id -> angular damping for given body [0, 1]
+
+    std::shared_ptr<DataTracker> m_dataTracker;
 
 protected:
     friend class PbdModel;
