@@ -150,7 +150,7 @@ LineMeshToLineMeshCCD::internalComputeCollision(
                     CellIndexElement elemA;
                     elemA.cellType = IMSTK_EDGE;
                     elemA.idCount  = 2;
-                    elemA.parentId = i; // line id
+                    elemA.parentId = static_cast<int>(i); // line id
                     elemA.ids[0]   = cellA(0);
                     elemA.ids[1]   = cellA(1);
                     CollisionElement e(elemA);
@@ -162,7 +162,7 @@ LineMeshToLineMeshCCD::internalComputeCollision(
                     CellIndexElement elemB;
                     elemB.cellType = IMSTK_EDGE;
                     elemB.idCount  = 2;
-                    elemB.parentId = j; // line id
+                    elemB.parentId = static_cast<int>(j); // line id
                     elemB.ids[0]   = cellB(0);
                     elemB.ids[1]   = cellB(1);
                     CollisionElement e(elemB);

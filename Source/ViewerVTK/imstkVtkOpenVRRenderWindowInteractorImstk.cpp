@@ -251,7 +251,7 @@ vtkOpenVRRenderWindowInteractorImstk::StartEventLoop()
 
     vtkOpenVRRenderWindow* renWin = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
 
-    vtkRenderer* ren = static_cast<vtkRenderer*>(renWin->GetRenderers()->GetItemAsObject(0));
+    static_cast<vtkRenderer*>(renWin->GetRenderers()->GetItemAsObject(0));
 
     while (!this->Done)
     {
