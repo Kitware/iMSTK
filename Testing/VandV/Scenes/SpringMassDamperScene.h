@@ -8,9 +8,19 @@
 
 namespace imstk
 {
+///
+/// \class SpringMassDamperScene
+///
+/// \brief Creates a simple spring mass damper and validates against an analytic implementation
+///
 class SpringMassDamperScene : public ProgrammableScene
 {
 public:
+    ///
+    /// \struct Configuration
+    ///
+    /// \brief Configurable parameters for this scene
+    ///
     struct Configuration : ProgrammableScene::Configuration
     {
         double initialLength;
@@ -24,10 +34,28 @@ public:
 
     bool hasAnalyticResults() override { return true; }
     std::string getName() const { return "SpringMassDamper"; }
+
+    ///
+    /// \brief Sets the scene specific geometry
+    /// \param How often to sample the scene data
+    ///
     bool setupScene(double sampleTime) override;
+
+    ///
+    /// \brief Sets up a scene camera if the scene is rendering is enabled
+    ///
     bool setupView() override;
+
+    ///
+    /// \brief Record scene specific data to the data track file for the provided sim time
+    ///
     bool trackData(double time) override;
+
+    ///
+    /// \brief Scene specific post processing for analytic implementations
+    ///
     bool postProcessAnalyticResults() override;
+    
     Configuration& getConfiguration() override { return m_config; }
 
 protected:

@@ -9,10 +9,16 @@
 
 namespace imstk
 {
+///
+/// \class ProgrammableSceneExec
+///
+/// \brief Executes a ProgrammableScene to generate data files,
+///        Then compares those new files with a baseline file and generates a report with differences
+///
 class ProgrammableSceneExec
 {
 public:
-    ProgrammableSceneExec() {};
+    ProgrammableSceneExec() { m_viewScene = false; };
     ~ProgrammableSceneExec() = default;
 
     bool executeScene(std::shared_ptr<ProgrammableScene>);

@@ -436,12 +436,6 @@ compareCSVs(const CSV& baseline, const CSV& computed, CSVComparison& cmp)
 }
 
 bool
-plotTimeSeriesCSV(std::string const& base_name, std::vector<CSVPlotSource> const& srcs)
-{
-    return plotTimeSeriesCSV(base_name, srcs, false);
-}
-
-bool
 plotTimeSeriesCSV(std::string const& base_name, std::vector<CSVPlotSource> const& srcs, bool const_y_axis)
 {
     if (srcs.empty())
