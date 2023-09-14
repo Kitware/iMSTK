@@ -13,9 +13,19 @@
 
 namespace imstk
 {
+///
+/// \class ProgrammableScene
+///
+/// \brief Base class for programmable scenes
+///
 class ProgrammableScene
 {
 public:
+    ///
+    /// \struct Configuration
+    ///
+    /// \brief Configurable parameters for scene execution
+    ///
     struct Configuration
     {
         double dt = 0.001;
@@ -34,13 +44,36 @@ public:
 
     virtual std::string getName() const = 0;
 
+    ///
+    /// \brief Sets the scene specific geometry
+    /// \param How often to sample the scene data
+    ///
     virtual bool setupScene(double sampleTime);
+
     virtual void setViewScene(bool viewScene) { m_viewScene = viewScene; }
+
+    ///
+    /// \brief Sets up a scene camera if the scene is rendering is enabled
+    ///
     virtual bool setupView() { return true; };
+
+    ///
+    /// \brief Record scene specific data to the data track file for the provided sim time
+    ///
     virtual bool trackData(double time);
+
+    ///
+    /// \brief Scene specific post processing
+    ///
     virtual bool postProcessAnalysis();
+
     virtual bool hasAnalyticResults() = 0;
+
+    ///
+    /// \brief Scene specific post processing for analytic implementations
+    ///
     virtual bool postProcessAnalyticResults() { return true; }
+
     virtual Configuration& getConfiguration() = 0;
 
     double getTimeStep() const;
