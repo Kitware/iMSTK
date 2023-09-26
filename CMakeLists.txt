@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(iMSTK VERSION 6.0.0 LANGUAGES C CXX)
+project(iMSTK VERSION 7.0.0 LANGUAGES C CXX)
 
 include(CMakeDependentOption)
 

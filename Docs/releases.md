@@ -2,6 +2,358 @@
 Releases
 ========
 
+# Announcement: iMSTK 7.0.0
+On behalf of the iMSTK community, we are pleased to announce the release of iMSTK version 7.0. The Interactive Medical Simulation Toolkit (iMSTK) is an open-source toolkit that allows faster prototyping of surgical simulators and skill trainers. iMSTK features advanced high-performance libraries for physics simulation, haptics, advanced rendering/visualization, user hardware interfacing, geometric processing, collision detection, contact modeling, and numerical solvers.
+
+Here is a comprehensive list of changes made for this release.
+
+## Aaron Bray (4):
+- ([f6c57d486](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f6c57d48648ac4679868e517a9cf2690f390bfb5>)) Remove explicit .NET version
+- ([5562c4c3a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5562c4c3a51b91f1a1a38164db35430b6721527d>)) Remove SFML
+- ([2caa94145](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/2caa94145da3370abf3b66e3726ab5971c809f52>)) BUG: Add missing file to CMake
+- ([01b2a6be5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/01b2a6be5a4f8f960b29dad97a1b22d4f65ae882>)) DOC: Add documentation to V&V classes
+
+
+## Andrew Wilson (199):
+- ([289177b3e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/289177b3e2452a03cf8c487e4159057d15d4758d>)) BUG: Adjust epsilon for PointwiseMap
+- ([679f38203](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/679f38203ec5354238c515012f784f024ee7c35b>)) REFAC: Remove unused constraint names
+- ([ddb0037e7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ddb0037e7aae24b126338b4d9bb504cbddb41597>)) ENH: Add vertex label render delegate and model
+- ([039895ebc](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/039895ebc6261655ea1ddf86e2476a751da29a19>)) BUG: Fix gravity in RbdModel
+- ([879c580e7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/879c580e7386777faedafa89336da639aa32e797>)) BUG: Fix dt not being passed to PbdSolver, add public solve function
+- ([8eeebcb4e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/8eeebcb4e981a11e56de5e5f0418a3e9303987f4>)) REFAC: Use toTetGrid function in haptic grasping example
+- ([ad60d5061](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ad60d5061cd03d08173da27696c941b8d96d4f5e>)) REFAC: PbdInjectionExample updates
+- ([e9d8043b9](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e9d8043b91e18339536d341125cdf79859d8c94a>)) REFAC: PbdThinTissueCut name fixes
+- ([ff3281f9b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ff3281f9b5a4332b4aea9acb9701e2680292c6e3>)) DOC: Improve comments
+- ([c2064ade1](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c2064ade14bc08370072abb0f4f85287049ba64e>)) TEST: Add test case to fix
+- ([9204c106d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9204c106d6b08e66457243f00714814facac27a6>)) DOC: Fix comment
+- ([8e75f8f05](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/8e75f8f0550eace0d9380706ce137fca577ac2c0>)) REFAC: LevelSetModel extend AbstractDynamicalModel instead
+- ([5ec78ecbf](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5ec78ecbf4e6b3d30916ad5ad23c4fe6e192308d>)) DOC: RigidBodyModel references
+- ([d320f5284](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d320f5284c074f74dcaa68a1e93f3f19c8451b39>)) REFAC: Default constructor for SphState
+- ([c00a251d1](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c00a251d189e64b35683d21569308a85e78bdb93>)) REFAC: Remove LevelSetState
+- ([895ff69cd](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/895ff69cd4b9065deaf9eee1374308ac314528e0>)) REFAC: PointwiseMap getter
+- ([cf87bd7bc](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cf87bd7bc2287e21b145b324a27561f05761f4f7>)) REFAC: Unused forward declare
+- ([0a1e73d84](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/0a1e73d846e525e49ad1d93da219ad5a817a8b50>)) REFAC: Lambda instead of bind
+- ([3a3d8a28d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/3a3d8a28d23ba7eb81760dab2b84ad27f13ed338>)) REFAC: Ignore PbdConstraintContainer in wrapper
+- ([32ac09e2e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/32ac09e2ed2fa7734631bf4f1459a0fba0e40647>)) BUG: Fix missing include
+- ([4c43ca7f5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4c43ca7f51fc5addb84450bc05bfd5763159054e>)) REFAC: Avoid constructor usage on DeviceControl, templated DeviceControl for concrete DeviceClient access, DeviceControls stem off SceneObject
+- ([87111ab62](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/87111ab62d33d28c5c4d21b47be96e8de4e1c711>)) REFAC: Remove old forward declares
+- ([07e0ae1ef](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/07e0ae1effff6e34adbc98006b1408e31ca501b7>)) REFAC: Cleanup HapticDeviceClient
+- ([141daae09](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/141daae09e7a3fd3844121e596a05796791ac2c6>)) REFAC: Remove unused forward declare
+- ([8ec712bd5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/8ec712bd579222f2f1529a97913da8b1f92ca26a>)) REFAC: Remove unused tracker out of date flag
+- ([ae57a318c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ae57a318cc72503eb859534ad75daf95aca0c653>)) REFAC: Missing include
+- ([cad3ab5b0](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cad3ab5b0b10eebda28a0e4d40031cc725e8ffb6>)) REFAC: Default name for colliding object
+- ([0aa5ade27](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/0aa5ade2797f9ec61682bf1b1582afe312693484>)) REFAC: Apply forces right after available
+- ([4937c41b6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4937c41b62a575e3c4d6e73519f3f30dc3928b20>)) REFAC: Add LineMesh compute vertex neighbors & rename SurfaceMesh::computeVertexNeighbors
+- ([c31ea2b5e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c31ea2b5e6ea54d3045c8635a012b438a0ed3fea>)) DOC: Improve some comments
+- ([6fc719379](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6fc7193792293c9cbbfc84bf6587c85b9f1e3522>)) ENH: Add cell mesh
+- ([4dc70115a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4dc70115ad072d04ab2ca9ad7e91e4e10a58f4e0>)) REFAC: Prefer getCells and getNumCells
+- ([758e73646](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/758e7364644cc717101fb32af42d7446462d7c14>)) BUG: Fix mesh writing functions
+- ([1b3628ef0](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1b3628ef0d992afef862348432f1b73f9eb0524d>)) REFAC: Wrapper updates for CellMesh
+- ([9fcc2cc73](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9fcc2cc735f4fdf4654fdb59c6996ec586a849ba>)) REFAC: AbstractCellMesh in own file
+- ([89a36bfe6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/89a36bfe6e99ff5b87b20b5897ddb9dbbe4feeca>)) BUG: Fix HexahedralMesh extra indices
+- ([64cf0f98d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/64cf0f98dc8f7c546bf1467f2ff6cb99e54fc4d1>)) REFAC: Const ref in NeedlePbdCH
+- ([89952fda4](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/89952fda4484f21c167433e59120bc0b12a9bde4>)) REFAC: Update getIndices to getAbstractCells
+- ([93c08d02e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/93c08d02e6834ee076521f5cf01f9ce44e4c4a7d>)) REFAC: Update use of AbstractCellMesh
+- ([c3cefc035](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c3cefc0352d92b158e600e250aa33557fff9a9fc>)) ENH: Ability to forward parameters to the functor for constant density
+- ([cb838f539](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cb838f53963d6fbc8731fc11310611236670622e>)) BUG: DeviceClient should be updated in its own thread only
+- ([48e09bf08](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/48e09bf080c0e3b338075581e128358db3dd2edf>)) BUG: HapticDeviceClient update fix
+- ([fa7ce9053](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fa7ce905313e3455d02799105ff5c50f7168a243>)) Add option to disable screen text, for tests, on by default, fixes typo
+- ([6bc1001f4](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6bc1001f4fc6a22a247948c99d751d8a7c2d4864>)) BUG: Fix Line dimensions
+- ([d2ec0cb1d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d2ec0cb1d505554e528f97fab91c286b631190d5>)) ENH: Add option to turn off remainder divide for completely fixed substepping
+- ([497ef9288](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/497ef92888dc48d4ead03ca1d70ce1f8f81bc253>)) TEST: Add PbdLineMeshToLineMeshCCD visual test
+- ([c6f9f40e1](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c6f9f40e13e86ab5f8e3d7bae73936cf17a85251>)) DOC: Fix comment
+- ([742622371](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/742622371621b0dcc4b5a7cbc0f0cbd376d2654a>)) REFAC: Update csharp examples for control changes
+- ([84b1bff57](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/84b1bff571ba821d161a42ddcdab93afd142faaf>)) ENH: Multi body Pbd and Rigid Body Pbd
+- ([0572102b9](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/0572102b929fcd310712932081165e8195b8f903>)) REFAC: Example update for multi body and rigid body pbd
+- ([370fb1a80](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/370fb1a8083d994e749f2eb676a29440318b3b7d>)) ENH: Refactor cutting filters and add LineMeshCut
+- ([a5e87ce74](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a5e87ce74e00cf3355a61df8144cc4b7ac057abd>)) BUG: Add missing primitive case
+- ([ed0debefb](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ed0debefb0e38dcaa09b2ce88405f998c62a0e48>)) BUG: Fix reset for external force and torque
+- ([395bab47a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/395bab47a2ba73bf019f46769f205373cd7e21b3>)) REFAC: Use cwisemax in PbdFemTetConstraint
+- ([957540e70](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/957540e701528c059a0eabe55354e7dc70dba0d2>)) ENH: Persistent virtual particle buffer and orientation update rotation limits
+- ([9213f48a8](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9213f48a83a37110519d63fa5a6a9d5c346d9160>)) ENH: Correct friction for pbd rbd
+- ([38268c317](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/38268c3171d63c9b49be7200fc16bf320331ba08>)) ENH: Improvements to PbdBodyDistanceConstraint
+- ([f14d883b7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f14d883b7403045ca8b783a71fae6205d4b87c4d>)) ENH: Updates to pbd rbd example
+- ([5d381080f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5d381080f62f258403b86809add30d3af75b7d9f>)) REFAC: Remove SurfaceMeshToCapsuleTest
+- ([ebf5768d3](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ebf5768d3a964dcc1088cb3f1001ec67ddee5cc9>)) REFAC: Remame SurfaceMeshToCapsuleVisualTest to SurfaceMeshToCapsuleTest
+- ([4fb7c042c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4fb7c042c0334ba801797a4d14d3d32afbf4c600>)) BUG: Fix FemTetConstraint
+- ([46638dcd6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/46638dcd6a5c8e1dbc45f74791d08397c5c410f2>)) REFAC: PbdConstraint improvements
+- ([fc3746991](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fc374699114466d231cfecf95965553c6fbba51f>)) DOC: Improve comments
+- ([478abdd00](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/478abdd008796b71b9687e2bdac6bbf0d2ee125c>)) REFAC: Rename to cloth to tissue
+- ([8696a8f6f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/8696a8f6fe1e3756b79a5d54394aa1b50c73c112>)) REFAC: Rename collision cases, PbdCollisionHandling improvements
+- ([15dda0c4e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/15dda0c4e1f0bef0776a8ba9d628fe8a79b11716>)) REFAC: PbdCollisionHandling Improvements, remove unused from NeedlePbdCH in dynamic suture
+- ([dd70d9265](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/dd70d9265873f320bbd0351ac7c77e6f78bf20a3>)) REFAC: Move resitution calc with friction
+- ([af0ae117d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/af0ae117d28f09c1f0d3a9f8265295cb01801a8a>)) REFAC: Example fix
+- ([51e8faba5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/51e8faba5e64810b4df3b528050f6f5e440b1b04>)) BUG: Avoid setting dynamical model twice
+- ([ae920e5f8](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ae920e5f8954bda955b3a1f7a7f1e330f09ff24a>)) REFAC: Update license headers
+- ([361922ef3](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/361922ef3f1370e651ec6286d0118f2489269663>)) REFAC: Remove unused PbdContactType
+- ([970b37a51](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/970b37a515576cbc9bccdc515307d4c1a47b3831>)) BUG: gcc fixes
+- ([4477c72ba](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4477c72baac6bf37a5a88ae0abefcdf851d1b17f>)) BUG: Revert FemTet Change
+- ([ca5f98cbe](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ca5f98cbe85f2f35feb1e53543d76558505dcdc2>)) DOC: Improve comments
+- ([8dfe06272](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/8dfe062726734aaa845755e2d8af8c5fe023fadc>)) REFAC: Various fixes for pbd rbd
+- ([d614da684](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d614da684d5a53cf6b05ec68fe78076060b7b7d8>)) REFAC: Replace epslions
+- ([1857ca4dd](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1857ca4dd11c7f852b16c90574385f0c0540d7fa>)) BUG: Fix PbdBenchmark
+- ([6439947c9](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6439947c9c8125ae902068d3f216c55e8f4fa5f0>)) REFAC: Inline generalized inv mass function
+- ([42ab4e2d8](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/42ab4e2d85632e25ba27b78dbc3f61417644a8be>)) REFAC: Revert cloth example
+- ([1b7f8a80c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1b7f8a80cf1c826ba8abbce60ca71ca3da7f98fc>)) BUG: Fix generalized inverse mass
+- ([66174f5ec](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/66174f5ec686987f31206ac26aa90ea715967e1b>)) DOC: Improve comments
+- ([bb3369357](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/bb3369357c9a999a9504da7ccb1fbb3c3b9c4a02>)) Improve Comments
+- ([722e054b6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/722e054b66b2ad38479a9827b485c09c84f37888>)) BUG: Fix relative velocity in friction
+- ([b24f17ad6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/b24f17ad63fc3420d1f113a6cacdcff2e809103a>)) ENH: Getter for handler constraints
+- ([4356477aa](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4356477aa80b07044121150f0eba122e8c49d7ed>)) BUG: Text should be displayed by default, text update fixed
+- ([5c777c529](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5c777c529aa047287bdc28cc768d4fbfbf2416bf>)) ENH: Update PbdTissueContactExample to use a two-way proper compliance interaction with new xpbd simualted rigid bodies
+- ([408dc01df](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/408dc01dfbf111d2dadc0ea2beba8d0394366b17>)) DOC: Update license text
+- ([10ec196b1](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/10ec196b1678b060d1d6481cf9ad22f1de7dbc40>)) ENH: Get torque for contact constraints
+- ([8dd1ea6e1](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/8dd1ea6e1f41ec3a584deca905cdb44ba2a66176>)) REFAC: Don't reset externl force and torque until end of update
+- ([348ff2fdc](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/348ff2fdc564916137304e6c4168731c5fe52d00>)) ENH: Update PbdTissueVolumeNeedleContact to only use pbd, other minor improvements
+- ([3c1ade8fe](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/3c1ade8fe0c28f52ee70fdd09c4d0089d44d61ef>)) DOC: Fix doxy comment HapticDeviceManager
+- ([468b15f4e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/468b15f4e64711fceda08335f42556bdce7b7584>)) ENH: Haply integration
+- ([dfa9a371a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/dfa9a371a89ade01199e19be720a2bacad97a0f6>)) ENH: Haply examples test
+- ([1923e56dc](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1923e56dca060c6b217c929cd0cb64e7383bad06>)) ENH: Haply Hardware API support
+- ([41654eb41](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/41654eb419460f2aa7670ca7a3f3e80df41fb226>)) REFAC: Remove BoneShavingExample
+- ([f5fb827c0](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f5fb827c04f3255d22adf812756e5bcddc69a224>)) REFAC: HapticDeviceManager tuned to meters, Add DeviceManagerFactory, rescale examples, use shared_ptr
+- ([19bd8c267](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/19bd8c2672d09c6749b0a923fe4cec3b42a684e6>)) REFAC: Unused includes in CDObjectFactory
+- ([989727d60](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/989727d6088452c161e8483d8ee114466943de1a>)) REFAC: Remove HaplyTestExample
+- ([f362e3d00](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f362e3d009f7982e7d682d5c1ef8790404531bb4>)) DOC: Add build instructions for Haply support
+- ([79ead0ff6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/79ead0ff6041f13e00da1de25d089314022d1048>)) REFAC: Update data
+- ([cf9780f26](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cf9780f260e51b39b2ae0d383c0cbd78435b373c>)) REFAC: Use relative data directory path
+- ([032f5bb11](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/032f5bb11a954354001c2fbd59739b92df9290c5>)) PbdRbd Grasping Fixes, Fix PbdBodyToBodyDistanceConstraint, Other Cleanups
+- ([00b8da4b6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/00b8da4b6b870bff726a4c62f76740f8d74a45cb>)) ENH: Fix wrapper for HaplyDevice
+- ([1a3201e2e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1a3201e2e5bfea427bf8307d082437b0fc515362>)) DOC: Fix comment
+- ([e10c3598e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e10c3598e6b4231e242f0e8d94ac47f8e1db8034>)) REFAC: Remove extra include
+- ([5a8eab9ab](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5a8eab9ab970ed2eb4db8d77e27bbd7345a6390f>)) REFAC: Rename HapticDeviceManager/Client -> OpenHapticDeviceManager/Client
+- ([91845fbf7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/91845fbf7bbd120ad831f5b2623134fed293514c>)) BUG: Fix VTKTextRenderDelegate issue
+- ([3328a6dae](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/3328a6daeca15f04270af12a26371a0613d800d2>)) REFAC: Pbd Test Fixes
+- ([5ccf98bc5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5ccf98bc53a099b62d50090ac7c5be782762dc03>)) ENH: Cloning for Geometry
+- ([48042e7c3](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/48042e7c323958be102007829cbdf23b7269a3b8>)) ENH: Change enter/exit criteria in pbd volume needle contact
+- ([c372d00a1](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c372d00a1b194285992c7f54461d4b477e8e5d99>)) ENH: Update paths for laptool, add laptool body in RbdLapToolCollision example
+- ([ddbacd6a4](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ddbacd6a402cae14f4185b870dc7349c9bd9eb80>)) DOC: Fix comments and other small bits
+- ([e2767fd36](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e2767fd367c44a8633fa9fcb36f9d2f885fc29d1>)) REFAC: Remove some includes
+- ([ceed901ea](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ceed901ea92932ca698bb4a109d2b1d3a1994634>)) ENH: Add base component model
+- ([f7df3844e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f7df3844e2630d2935fe97efb811d440efd48df7>)) tmp commit
+- ([d1e07b61b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d1e07b61b43e3a365810f2bf0fed7e262e981668>)) REFAC: Improve entity addition/removal, Rework the controls as components
+- ([80b4334cf](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/80b4334cf5e2c31bc8518f63428cd0b368b34ae6>)) ENH: Rework initialization for dependent components
+- ([0177bab7c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/0177bab7c69c89e9bd4c9cfb9879b21d88929a1d>)) ENH: Update ECS, remove TextStatusManager, introduce FpsTxtCounter
+- ([92bb3f5ad](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/92bb3f5adaafe4977b7be75b42ac2bfe501b9e1d>)) ENH: PerformanceGraph component
+- ([40d12e9ea](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/40d12e9ea8eb5ce93bec846d19331e543df6e16e>)) ENH: AxesRenderDelegate and AxesModel components
+- ([39f2c2ab5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/39f2c2ab5cfad4af8e602a4092a3a187bb970823>)) ENH: Needle and Puncturable component
+- ([cbdc8bf69](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cbdc8bf695eb11bd5c9de3e896f64d2268e4a70d>)) REFAC: Move to Components directory
+- ([0ba6e0c37](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/0ba6e0c371681dba3b36e5107855d5d94f5cc6cc>)) ENH: Add setter for epsilon in cutting
+- ([73a18a436](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/73a18a4368bde6c05ad058069bfe10f551d6254a>)) REFAC: Add controllers as components to objects they control
+- ([edb82d29a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/edb82d29acaeea12c5ddb6e4fc90081682fec69c>)) ENH: ControllerForceText component
+- ([c4240f41b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c4240f41b8dccda4ea5d6cbefe8c9c271877a021>)) BUG: Fix multiple needles puncturing same tissue
+- ([1b6f3d30b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1b6f3d30b58e6656f85e3093d383625e69c33a7e>)) REFAC: DebugGeometryObject renamed to DebugGeoemtryModel, turned into a component
+- ([c21298439](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c212984390561d5220c7761fb5c58c22e29c3e61>)) REFAC: Remove some creation methods
+- ([780338570](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/7803385709df03b36d38c43e938977cbf0398432>)) ENH: ComponentModel csharp wrappings
+- ([19731d0cf](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/19731d0cf26a080569f5fa6a056d0b4ac13a7a42>)) DOC: Improve comments
+- ([6b28d5357](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6b28d535764b55ec6e6213182167b12f995e377e>)) REFAC: Check nullptr Component in Entity
+- ([a5b5636ad](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a5b5636ad18397007836c047412d7cd5f208c2dd>)) REFAC: Reuse addComponent call in Entity
+- ([730fb80f5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/730fb80f5836b55cb36873788827c9c37b86e8fa>)) REFAC: Rename createDefaultSceneControl
+- ([f8922b336](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f8922b336bc613ee2bdb089363c688c3b5f242fa>)) REFAC: Add weak_ptr
+- ([d8a8cc95c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d8a8cc95c251fd863f11f6b3644b8130816762d8>)) REFAC: Rename Entity count member
+- ([51201d37e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/51201d37edf631e620339ba1fae00f1b4e1b8fd4>)) BUG: Fix recursive component initialization
+- ([d034a61eb](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d034a61eb94013c47b7c447afd4c737b7366802a>)) REFAC: Compentize RenderingDebugExample
+- ([13cbebcaa](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/13cbebcaa926d69bfbae3711d77ec2f59f7128a6>)) REFAC: Move SceneControlText to its own file
+- ([c46690ca3](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c46690ca35bea7ceb465af1a804a333e2a78c39b>)) REFAC: parentId updates
+- ([5b175e50a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5b175e50a09321378577472cd32893a7fc423efa>)) REFAC: Remove macro call in PbdObjectCutting
+- ([9306a07ea](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9306a07ea5af77d2b6e2c322ff78130883bca456>)) REFAC: More checks in PerformanceGraph
+- ([2c978b986](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/2c978b986a816ed1e4e4ed594947c685bf201d24>)) REFAC: Improve Component documentation, add tests, add SceneBehaviour
+- ([69858bb9b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/69858bb9b3b32f62c8c38ae8999879a076e4cbf9>)) REFAC: Rebase updates with PbdVolumeNeedleContact
+- ([f92770d94](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f92770d94df3d84304ecaa990a70377f86b27dd2>)) REFAC: Remove unused function
+- ([d16e28567](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d16e285677398089ca143d4d28a3f11f93aac758>)) REFAC: Add some null checks
+- ([914366000](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9143660000ed46d23bd78ed900560ece62a3ae24>)) BUG: Fix issue with scene switching under new initialization
+- ([d66937c3d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d66937c3d8fbe9de323b90edbed48e39a8a93b09>)) REFAC: Separate Needle into separate files and Needle module
+- ([5c42f2878](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5c42f2878dde5ae3f504077c17915f8d710de842>)) BUG: Add missing includes
+- ([4725421af](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4725421afb89ca30122e177705b76d7f9c8db5f4>)) BUG: Fix issue with data paths on linux
+- ([c43c2c7c7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c43c2c7c7e638de881406e01626493df88ab0bea>)) BUG: Add ids and assertion bounds
+- ([1167ac01b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1167ac01bd9625f711e8f0b2ade929614ec21bb3>)) ENH: Combine the collision and internal solve
+- ([f485764c2](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f485764c24eee9b0cc969413869a9c865cc49d04>)) REFAC: Remove unused include, flip correct velocity statement, code format
+- ([aa5756a75](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/aa5756a7513c92d1f3e35c3d2343ac2201e9b45f>)) ENH: Adds port hole interaction and body on body contact
+- ([d6d10916f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d6d10916f65504bbdc16a3e05fd3474ddf88a626>)) ENH: Adds SphereToCapsuleCD and UnidirectionalPlaneToCapsuleCD
+- ([fb094f0cc](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fb094f0ccb7c5b3c9e52809fc9835619d1170b9c>)) DOC: Update comment and CD table
+- ([1b9d9161b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1b9d9161b17edba6408ba7934382b0841042e9a3>)) TEST: Add constraint tests
+- ([78b569355](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/78b5693552bb10f26e60e5cfd794f7e7ba614f88>)) BUG: Fix pbd test issue
+- ([a18904aaf](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a18904aaf96b343ad5ff33869d3997ed95d5194c>)) ENH: Add haptic offset to exert forces off the center of mass, add parent id to cell picker
+- ([babe02583](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/babe0258363bde28846b964a84b8d3cd705d83f0>)) REFAC: Fix sticky lap tools and improve some comments
+- ([0c5c8a42b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/0c5c8a42bc6e1add5a17f5ad1663c369352090a7>)) REFAC: Tighten up the thread in the tissue in suturing example
+- ([cef608671](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cef6086711400240480d22b47d08e2c6241dda44>)) REFAC: Better warning message for PbdConstraintFunctors
+- ([4a9055122](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4a9055122f0d22628c4ef5e8bee401f6140a2dd2>)) ENH: Add pbd rigid grasping and relevant examples
+- ([2301d1a3c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/2301d1a3c9d2b9c7bfcdd84954be89e0263a30ac>)) BUG: Fix issue introduce in CellPicker when fixing cell ids
+- ([fe011c8e5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fe011c8e57daa3ee7201259e028d944e36a4270d>)) REFAC: Mouse controls and rename for rigid in deformable grasping example
+- ([fc633b3bb](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fc633b3bb85242ea2fc2a19319f9804583a26bba>)) REFAC: Move example to pbd group, include remove
+- ([0f77be8db](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/0f77be8db557c9b7ef23b7fbb09c286f4aeca58c>)) TEST: Add grasping tests
+- ([3825e3686](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/3825e3686f65c2e1e224891948b84871ab07e307>)) REFAC: Improve comments and renames
+- ([24be036df](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/24be036df1b7362545f0cc8746614056fa1fb1e2>)) TEST: Add CellPicker tests
+- ([64ab7ab3e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/64ab7ab3eb3893b86a7428aa2ffab61129902a83>)) REFAC: Fix HingeConstraint rename
+- ([dffa44a0a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/dffa44a0af4ba46bff1c7afc635c74022febef61>)) BUG: Fix some linux warnings
+- ([fade41a3c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fade41a3c74785f2125f926a6f77cfb4f32effe8>)) BUG: Ensure order of cells by CellPicker
+- ([63381b517](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/63381b51759fd0d690b38ff28cecd831f5432383>)) REFAC: Fix FemurCut bug, remove unused virtuals, offset in IsometricMap
+- ([f34bcbd58](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f34bcbd58cf7dadbe8ef7799cf60f7d41ac9f8b2>)) ENH: Add TaskBehaviour for task graph based components
+- ([759601a77](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/759601a773de9b7c14429ba993c40fec40b3aa05>)) REFAC: PortHoleInteraction use TaskBehaviour
+- ([3f6d49ba1](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/3f6d49ba105a4bd4b31570579c98dea06f0d170c>)) ENH: Update Haply to 0.0.5 and add handle support
+- ([e9307e129](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e9307e129287e2665e8a425b6f63359346659ced>)) REFAC: TaskBehaviour from Behaviour, add test
+- ([2995fe5c3](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/2995fe5c3e9fc090b9ccfa0a69adbd734950f876>)) REFAC: Update doc and rename to local offset
+- ([a30d71b17](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a30d71b17dee6e5a6fd1c0a1db69460a2415bba2>)) BUG: Fix issue with map setup when using differing visual and physics maps, add test
+- ([352904b45](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/352904b45920eb7f67139c73f1d69a7732841ea2>)) BUG: Update wrapper for ECS changes
+- ([e3209fdc7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e3209fdc7b4271a594aeb1d16d01cc359906a6d6>)) BUG: Add check for msvc version when using Haply 0.0.5
+- ([00a9e1d67](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/00a9e1d67f9000f802b34a2889e0c94a1f10a9e5>)) BUG: Fix VR controls so multi buttons can be pressed at once, update camera movement, fix release on grasping, and move FPS counting down to imstkViewer base
+- ([cd32e3c03](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cd32e3c0389bb0cc3999e0406c1f1f2ff7e87aa4>)) REFAC: TaskBehaviour in Behaviour
+- ([00884e977](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/00884e977b3e1d8a8ecd16720822ec05722398d2>)) REFAC: Remove imstkNew from LevelSetExample
+- ([b408005e3](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/b408005e306aac788c533e9d73f30f69510aedeb>)) REFAC: Add default construction for LevelSetModels config
+- ([9424dedf9](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9424dedf9373422b55ad0be69fcbf6eb3de76464>)) REFAC: Add initialization for image bounds
+- ([7ef326ca8](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/7ef326ca8db8a4f3189fc2689e6b477579575907>)) BUG: Fix issue with parallelization in SurfaceMeshDistanceTransform
+- ([fde117e89](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fde117e89a5bf5a4ac0308b2e900488fe09d61b6>)) REFAC: VRCameraControl comments, remove test code
+- ([76aae16cd](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/76aae16cd9508064cbc3f738662e633b337741ac>)) DOC: Add Behaviour documentation
+- ([70dda2e31](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/70dda2e31fa495729775325c065e066c52ee3d2a>)) BUG: Fix port hole conflict from merge
+- ([a1a9b3a3d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a1a9b3a3d0f764fbb1b6f0a34414262a4886797a>)) BUG: Fix port holes in haptic examples
+- ([498512db9](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/498512db95e682ae02bdf746183d9a8cf4569c45>)) REFAC: Enable VRPN in dashboard
+- ([3e37b9631](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/3e37b963180d9cd68c3e1395744d3c5f38c787ba>)) BUG: Fix an issue with observers in the EventObject
+- ([e096c99c3](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e096c99c3aa79f71ce4bccc4d0b3e40cdbcea9e7>)) REFAC: Fix some warnings
+- ([b4eaf5a07](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/b4eaf5a077bfd51cfaebb74bad4793fd35b68899>)) BUG: Update EventObject to deal with deconstruction
+- ([06ad3d2c7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/06ad3d2c78b94f04eea31922f08e57fb421d0e03>)) REFAC: Fix connect calls to use shared_from_this
+- ([66e8e77c7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/66e8e77c7df1a180da94296c2803125f1a6b817d>)) TEST: Add small test for the viewer
+- ([a93cb3bbf](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a93cb3bbf06f802c69253c15a2cbe729018fdafe>)) TEST: Add some tests for adding/removing scene objects to viewer+renderer
+- ([27afd6bf8](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/27afd6bf86a2f08882d5cae5c1b710e4ac464986>)) REFAC: Better collision stiffness and compliance defaults
+- ([a6e575e68](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a6e575e6880cab16c777943ca2bba2adc10da5cf>)) DOC: Update documentation
+
+
+## Ben Boeckel (8):
+
+- ([c2706971c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c2706971c0bc8bf825feb0ede040ca89a6ec2f00>)) imstkGraph: include `<cstdlib>` for `size_t`
+- ([b2e28f782](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/b2e28f78223e9e40da927488b97c046752a72b07>)) VegaFEM: update to fix missing includes
+- ([e553ec077](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e553ec077bb2657083990f327ad9e016d2c0a111>)) tbb: update to 2021.5.0
+- ([12a1141ec](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/12a1141ec1f594539f79a3592f8832937c9f90ce>)) tbb: disable `-Werror`
+- ([fba361c9f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fba361c9fbb816af2991ccfcf0dca0e83381b0e3>)) gtest, vtk: force install into `lib`
+- ([533314e92](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/533314e9295bba7be691791b977d53a56c332667>)) ci: add Dockerfile for Fedora 36 testing
+- ([1706f422f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1706f422fd3a434c0b61a8403d3b810288238b77>)) gitlab-ci: add basic Linux job
+- ([4d4d78605](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4d4d786059b2ca76ea203d6ea338942b526723fa>)) gitlab-ci: use arch-specific tags for OS selection
+
+## Connor Bowley (1):
+- ([533efe701](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/533efe701d5a6233e4467c205b56ea07d0eabd96>)) BUG: Fix X Error during shutdown on Linux
+
+## Harald Scheirich (64):
+- ([32f367e3e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/32f367e3ed416a42ab922de53e91babaa6a80779>)) DOC: Update Openhaptics links
+- ([38722a164](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/38722a1643bcf6a004341ef076f7ef0487904e1a>)) ENH: Add at() function to vectors
+- ([dbef83915](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/dbef8391594926826804954c97e4d9349c727c20>)) ENH: Add polymorphic `clone()`
+- ([5819273cb](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5819273cbf7eff445d20037c1f3444c9d8c9ab88>)) DOC: Change license header
+- ([016268cfb](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/016268cfb496ee92bba3560e9004181e892d0755>)) REFAC: Fixup MR
+- ([8891fc2c8](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/8891fc2c82902fd0fb609c444441a9ab657908d9>)) BUG: Fixes issues with wrapped classes in the device hierarchy
+- ([62bcc6dc5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/62bcc6dc5694d1655f7007b519e06d330ac232e6>)) COMP: Remove unused configuration file
+- ([d7d8f8b7f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d7d8f8b7ffb5d85fe21636265979f2b929d29bbf>)) COMP: Renaming external project broke CI
+- ([51e409518](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/51e4095186cb2178ac2d6ed8589ef30da9c63823>)) COMP: Force C# project to be configured more aggressively
+- ([575839e7d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/575839e7d2240b1701a8963c9f5b25a04b6963e4>)) ENH: add accessors for rigid body position and orientation
+- ([e4aa1ab9c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e4aa1ab9c3390bc8df3d99152a3999895f819fc1>)) ENH: Wrap PbdObjectController
+- ([a74545ac0](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a74545ac037509778070dd09c8c70d4ce10f7ac9>)) ENH: Enable a fractional density for the connective tissue generation
+- ([2b86a9de6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/2b86a9de695bec18a4be036b9b13432d8f0ecb6f>)) ENH: Remove constraint if it already exists in `enableConstraint()`
+- ([f567db13b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f567db13bb503ed63ff07d0cc270b1dc497db082>)) BUG: Uncrustify
+- ([6f5c7748b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6f5c7748b02b1efac730e53adb469b1c5d7d5f4b>)) ENH: Improve distribution of the endpoints
+- ([00b6c760f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/00b6c760f8fd463db0075894c90a64fd08979ce5>)) COMP: Remove extraneous include
+- ([9270931a1](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9270931a12914947fe71faf6f96f063ee1789b9d>)) BUG: Fix parameters for copy operation
+- ([210cfe24c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/210cfe24cde65b6a7c8c0b84476bd87144ff0b60>)) BUG: fix a range error
+- ([60a866f99](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/60a866f99f3f5dd033dea2167f3e46f7e9fa3f82>)) ENH: Expose CD Factory
+- ([de1ccd3da](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/de1ccd3daf7fc89700415aa13391d3a9a00f00e1>)) ENH: Add constructor with fewer type restrictions
+- ([ca22d78c8](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ca22d78c8c74b949b71507df63f1ef83b53acd51>)) COMP: Fix linux build
+- ([dae8e5ef3](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/dae8e5ef331c4cf57beec6cc9191184b77c2949d>)) BUG: swap members if necessary
+- ([bd4191a27](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/bd4191a27cc68823e0376a607cbe5a70b2a047e2>)) ENH: Show average physics frame times in stats
+- ([5df176876](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5df1768764f4e50ffd3e460500006179d167e5e5>)) ENH: Add unit test for closest point on segment
+- ([cf5708e08](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cf5708e082f1d07141254f26eea13dc016937cff>)) BUG: Add test and fix calculation bug
+- ([e886951b7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e886951b72eb84d733e562f92be2c879c90bf380>)) ENH: expose distance constraint
+- ([71db5f439](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/71db5f4397188ae7885cd6b3fa5ea1f708dc6251>)) ENH: Expose ConstraintContainer and support
+- ([557bcb6c7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/557bcb6c765aaa5fc802988406e1e06c99abef35>)) FIX: Order agnostic constructor was not working correctly removing it
+- ([f2aae63d4](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f2aae63d40df009227e358ad8ae629b1fbb05837>)) BUG: Fix Fluids example
+- ([cac1e7ca9](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cac1e7ca9d15a4379fa396354cd901250d6a767f>)) PERF: Reuse Collision Constraints
+- ([68a63b31e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/68a63b31ee7eae837e916729ce2fc10f594a05e2>)) BUG: Fix Tetrhedral volume calculation
+- ([ff58c5174](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ff58c5174ef1efda0423bb89d802de9142090dd0>)) BUG: Fix deletion of cached constraints
+- ([1b49b274c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/1b49b274cf8433c7e2b90540d9eb3d2626f5fe01>)) BUG: Invert the rendered forces to match the controllers inversion parameters
+- ([9b8ec3c01](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9b8ec3c0175e2ebbb455e2db22d50a0826ebe109>)) ENH: Expose task timings in swig
+- ([909e2508c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/909e2508c5c5aca9f628ea30f0924c77f0a458ad>)) ENH: Add accessor for single body in model
+- ([6e61d167e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6e61d167e90b5b66b488294d034b4eb2a693de6e>)) PERF: Remove extraneous geometry updates in grasping
+- ([5d7073d17](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5d7073d177accd1191ab4f51c674b695d559a3e7>)) ENH: Allow configuring the strain model via cell attributes
+- ([b53cc30f5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/b53cc30f5ec8db1e9c500eb3740f940551db660c>)) ENH: Allow writing of obj files
+- ([59197bb69](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/59197bb69705b4f42873c2a163286b1c94ac6fc2>)) BUG: fix issue with strain parameter setter
+- ([80722b7f9](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/80722b7f94064b1f45b80b224ffeaa7ebe8230d4>)) ENH: Add accessor for cells of a vertex
+- ([9e159e152](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9e159e152ccac01552e59a7347678f950cb612fb>)) DOC: Fix comment
+- ([2f166de9b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/2f166de9b51dd2795ad66aa775bac08ad56b7865>)) COMP: Fix test build (was missing include)
+- ([d7d03000a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/d7d03000a9a4bb63078e652e5aca6fa91e2c3b65>)) BUG: C# CastTo was causing an exception when passed a nullptr
+- ([2018d1c90](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/2018d1c90136cbd1dc637c246b2c4a2105989755>)) REFAC: Remove RigidObject2 in favor of Pbd
+- ([a19410bdd](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a19410bdd03fdf005d81d7167a4ffc4b9396951f>)) WIP: Move puncture detection into separate function
+- ([43303168f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/43303168fa7709c820423b7eef3e4ec9a82f4c3b>)) REFAC: Move stiching support into needle library
+- ([ecbbed67b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/ecbbed67b426c75de4785f5d1b55d14e8aa1368e>)) ENH: Add Suturing support to C# Wrapping
+- ([4eb93c520](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/4eb93c5205dbf43f8f2df1ac45a7804b379d2d3a>)) WIP: Move Needle To Thread maintainance into Collision handler
+- ([42ac66f14](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/42ac66f14872b067f5c680d3c3ca4f0fa3828068>)) REFAC: move Needle interaction into imstk namespace
+- ([f1088c337](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f1088c337f587fe9f3f7d58e1307064db9df7734>)) BUG: Fix Needle detection on exit
+- ([3ac552584](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/3ac55258489fa6bcf07be2c12b2aad452452ff17>)) BUG: fix wrapping for puncture data
+- ([fbbc59b12](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fbbc59b12850600109a9d7d71659ec95f27db2f1>)) BUG: Prevent the constraints on the thread from being flipped
+- ([6930746db](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6930746db269a34b425477bf2f066db4097d6d3e>)) Uncrustify
+- ([15783dc1c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/15783dc1cb2a5b0c6ddf9f223d5bf493246032b4>)) ENH: Prevent Haptics manager from posting events
+- ([a269bf023](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/a269bf023fdeac07c0c04899fa6bdfa0f1ec80fd>)) ENH: Add test example for two devices
+- ([cdf076724](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/cdf0767241c7d691dbf0474c2c97ad4f26ff6e06>)) ENH: Refactor OH Device client and manager
+- ([c04abfa08](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c04abfa089b982a73c9e415f054089a55b72f8bb>)) BUG: Generate strain data on get
+- ([3148d32dc](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/3148d32dc8767b07b10673b64eaa31787e03029c>)) BUG: Fix new devicemanager shutdown
+- ([fa8b73c08](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/fa8b73c08612b9b10eb35647c19077fcc042dd62>)) BUG: Fix Strain Test
+- ([f6c8fc357](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f6c8fc3571d6877070d1e7803a52e9e430a0179e>)) COMP: Remove unused audio example
+- ([6557fa592](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6557fa592791f5e7111f733daf46daea8a952598>)) COMP: Disable PBDInjection example
+- ([041399126](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/0413991262eb894a5e5d61baacd79cbc56ecb5fe>)) COMP: Fix compilation warnings
+- ([edcd9c90d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/edcd9c90d866d6dd741dea88a84fbe1a0e35bbaa>)) DOC: Stub page for ReadTheDocs
+- ([c15c6530a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c15c6530aa9cc62bf0b35a12cd0cba07bd9f9e1e>)) DOC: Improve Clarity and spelling
+
+## Jacob Moore (40):
+- ([77f34f283](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/77f34f2835b4d5c1ecaf4bdb4f4f65454a78a7af>)) ENH: Handling for Tet Inversion
+- ([3a27f906d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/3a27f906d4b7a1d90f75ceb9d05a47be9675dce7>)) ENH: Adding screen control info
+- ([e26a4a16a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/e26a4a16af7fabf1bf1bcf231d82334603e4edba>)) ENH: Adding missing cases for capsule to surface mesh CD.
+- ([9c135d819](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9c135d819934b40ae470ef7c5b3338c2e0498f00>)) ENH: Adding default options for generating collisions
+- ([479d70b16](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/479d70b160369d0ea1f969fa6dad87b5eee3f3cd>)) Update header imstkCDObjectFactoryTest.cpp
+- ([6fe43172e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6fe43172e6820f183b2eaa0d10aa235f8b73ce2f>)) ENH: Improving stability of collision constraints near a boundary condition.
+- ([06acc9ba2](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/06acc9ba281ea8916d79365f950913a2de309d09>)) BUG: Updating analytic geometry data in initializer
+- ([288893e65](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/288893e6589ebc26663814be3c29db1a28e4940d>)) ENH: Adding LineMeshToSphereCD and LineMeshToCapsuleCD
+- ([c7b895a53](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c7b895a53503464775ae16c96b5c7cdde761b68e>)) DOC: Improve documentation for EdgeEdgeCCDState class
+- ([66f1af16a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/66f1af16a58de0fc12cf9028c16d0a4e2cdb2ac8>)) Feature/apply to data mesh normals
+- ([7a2e6963f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/7a2e6963f5626edb030556507a143a3130ee535b>)) BUG: Velocity compute and scale fix
+- ([25140a27a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/25140a27a495821c1de251e5803089c8ad460bbc>)) Feature/fix append mesh
+- ([6596cbdb7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/6596cbdb7eb2c6f70fc316c6c545180608a7abb6>)) ENH: Strain energy models
+- ([15463685f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/15463685fc95846ded679a2f7e811247b60bf452>)) Feature/ProximitySurfaceSelector
+- ([da1d4073e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/da1d4073ecc5249dff3c834938211d2505c71cc6>)) Feature/barycentric coordinates surf mesh
+- ([80461db26](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/80461db26c6e538ac4f69fcb0a95a988c2abc260>)) ENH: Connective tissue generator
+- ([b16c7e995](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/b16c7e99547d06a31459c2a888b574dd0956ad08>)) ENH: Connective tissue constraint generator
+- ([071014bd0](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/071014bd0692d72890838a6709e99e2ec15e4412>)) Update Maintainance.md to include SWIG wrapping
+- ([f2147107e](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/f2147107e939c6a800eaa8780deb4322bf9fc1ee>)) ENH: pbd object cell removal
+- ([629f99343](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/629f99343deb03427750812bfc1f569d06f2577d>)) ENH: Adding Tearable component.
+- ([69a9e0e77](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/69a9e0e771a60de7127741d0ebb4f2f92c7aca3b>)) Feature/burning dissection
+- ([7f35a1dd2](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/7f35a1dd2fd62e05a70fcb4c5060a3a55a70f07b>)) BUG: Debugging collision
+- ([016639d9c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/016639d9c19995a1583e4532b56aac8c068c6444>)) ENH: Fixing ct wall constraints
+- ([c62269188](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c6226918822af22fe58854f1feb3437a2bd60e79>)) BIG: Fix collision order
+- ([05c9e1f6d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/05c9e1f6dc7e817c837cf9d2742f39a88c164ab8>)) Feature/adding closed surface capsule collision
+- ([8f13fddb4](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/8f13fddb42b7fb9f5c7267bb69662869b12af561>)) ENH: Adding 2 way interaction WIP
+- ([7641c9530](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/7641c953076a9fa192cf6b8181712983771cfd5d>)) BUG: Fixing thread penetration WIP
+- ([7b832dc69](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/7b832dc69f6b6b91a2f80f7825d5d851461820ca>)) ENH: Adding setters and getters for stiffnesses
+- ([c5343a7f7](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/c5343a7f7eab21b14aaa4f566b4e49bab7d3b3c1>)) ENH: Fixing repeatablility issues. Fixed issue where needle could puncture on side, multiple clean ups
+- ([62106e7e6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/62106e7e6471ac2e5f354a6ffc08d1efbb85ae43>)) ENH: Exposing threshold
+- ([bfd43ec9d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/bfd43ec9dac7cdfaf45020ff74c72d5116154ee8>)) ENH: Adding 2 way constraints for needle to thread
+- ([358b39b3c](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/358b39b3ccb54c2c216f6b68eda35c71449b8bbf>)) ENH: Adding stride to suturing for performance
+- ([5d2b6a26a](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5d2b6a26a5f5b5a5ceae05c67e8760cd453b49bf>)) ENH: Adding ability to stitch multiple times with relesing the thread
+- ([131b187d5](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/131b187d50773bb49feeb3b54fbcf4bf5d809f9c>)) ENH: Adding getters for puncture data
+- ([5b99e1a06](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/5b99e1a069b132a039ff1a8b13b82cd8a3f044ed>)) ENH: Adding wrapping, and allowing BC constraints on setup
+- ([655b0ccc2](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/655b0ccc2cf43f29e58c921b1ebe1f24a73bca9b>)) ENH: Adding function to get world coordinates from cellID and barycentric point
+- ([2333a994b](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/2333a994baadc782be03bdfc4cc65a89840a87f6>)) BUG: Adding debugging and fix crash
+- ([9e7848948](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9e7848948191bd9d67547a4654863383e9a0c670>)) EXAMPLE: Tweaking 2 device example WIP
+- ([9fc285531](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/9fc285531c888f28a2b2abb56a3d5c16b0adb23d>)) EXAMPLE: Adding stomach to 2 device example
+- ([50bf2cecc](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/50bf2ceccf55d12c5b960acdea20a8f625862910>)) EXAMPLE: Updating 2 devices
+
+## JustinMWoo (1):
+- ([03652c3b4](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/03652c3b4f7a613dd613e03eb035d62215ac223b>)) Added getter for ModifiedChunks
+
+## Stephen Crowell (4):
+- ([b520ea992](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/b520ea9926906df54cf108852f7cfcd5376a7123>)) ENH: adding type name to Constraints
+- ([72a77929d](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/72a77929d74c226e41b007ef9f6ed2bb8277f9b1>)) ENH: add VandV
+- ([8e3b20c58](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/8e3b20c58d499f2900e68a23fcb891756ce8e1fd>)) BUG: fix CMBBE tests
+- ([89a3b4df2](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/89a3b4df21fc531502dcacb3fc5d5db9faf8b5c6>)) BUG: fix broken capsule to cube scenes
+
+## Tom Birdsong (2):
+- ([857e658b6](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/857e658b6f500875de02b64ae600a739a2173b62>)) DOC: Add steps to reproduce Linux CI build in local container
+- ([846e8a88f](<https://gitlab.kitware.com/iMSTK/iMSTK/-/commit/846e8a88fbc15187aef4f6b4290a6965b21018f3>)) Fixup for !917
+
+
+**Contributors**: Aaron Bray, Andrew Wilson, Ben Boeckel, Connor Bowley, Harald Scheirich, Jacob Moore, Stephen Crowell, Tom Birdsong, Shreeraj Jadhav (unintegrated ECS Branch)
+
 Release 6.0.0
 -------------
 
