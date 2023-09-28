@@ -1,6 +1,6 @@
 # Needles
 
-Needles have physics approximations in iMSTK. The needle interaction in iMSTK have not yet made it in iMSTK, however the storage of puncture points has. There are currently many examples within iMSTK that do implement needles to check out.
+Needles have physics approximations in iMSTK. There are currently many examples within iMSTK that do implement needles to check out. Amongst others, `PBDTissueSurfaceNeedleContact`, `PBDTissueVolumeNeedleContact`.
 
 <p align="center">
   <img src="media/needleTissue.gif" alt="pbd needle puncture volume"/>

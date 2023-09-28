@@ -455,7 +455,6 @@ ProgrammableClient::HoldCommand::activate(ProgrammableClient& pc)
         auto mesh = std::dynamic_pointer_cast<PointSet>(object->getPhysicsGeometry());
 
         std::shared_ptr<VecDataArray<double, 3>> verticesPtr = mesh->getVertexPositions();
-        VecDataArray<double, 3>&                 vertices    = *verticesPtr;
 
         for (int vert = 0; vert < vertexIds.size(); vert++)
         {
@@ -480,7 +479,7 @@ ProgrammableClient::HoldCommand::activate(ProgrammableClient& pc)
 }
 
 void
-ProgrammableClient::HoldCommand::updateDevice(ProgrammableClient& pc)
+ProgrammableClient::HoldCommand::updateDevice(ProgrammableClient&)
 {
     if (object->getPhysicsGeometry()->isMesh())
     {

@@ -1,6 +1,6 @@
 # Cutting
 
-Cutting is available in iMSTK. There are a large amount of cutting methods in surgical simulation. iMSTK currently supports a discrete mesh based cutting method in it's `PbdObjectCutting`. Discrete cut meaning it can only cut once in an instance and is not suitable for continuous cutting.
+Cutting is available in iMSTK. There are a large amount of cutting methods in surgical simulation. iMSTK currently supports a discrete mesh based cutting method in it's `PbdObjectCutting`. Discrete cut meaning it can only cut once in an instance and is not suitable for continuous cutting. The `PBDThinTissueCut` and `PBDTissueCut` examples can be a good first reference for using cutting.
 
 ## PbdObjectCutting
 

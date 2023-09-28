@@ -5,6 +5,7 @@
 */
 
 #include "imstkCollisionUtils.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -247,6 +248,9 @@ closestPointOnTriangle(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec
         v     = vb * denom;
         w     = vc * denom;
         return a + ab * v + ac * w; // = u*a + v*b + w*c, u = va * denom = 1.0f-v-w
+    default:
+        LOG(FATAL) << "Unexpected casetype in closestPointOnTriangle " << caseType;
+        return Vec3d(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
     }
 }
 

@@ -21,11 +21,11 @@ namespace imstk
 static void
 readToDelimiter(std::ifstream& file)
 {
-    char next = file.peek();
+    char next = static_cast<char>(file.peek());
     while (next == '\n' || next == ' ' || next == '\t' || next == '\r')
     {
         file.get();
-        next = file.peek();
+        next = static_cast<char>(file.peek());
     }
 }
 
@@ -36,7 +36,7 @@ template<int N>
 static std::shared_ptr<VecDataArray<int, N>>
 toVecDataArray(const std::vector<int>& vertIds)
 {
-    const int cellCount = vertIds.size() / N;
+    const int cellCount = static_cast<int>(vertIds.size() / N);
     CHECK(vertIds.size() % N == 0) << "Failed to convert array stride not divisable";
     std::shared_ptr<VecDataArray<int, N>> indicesPtr =
         std::make_shared<VecDataArray<int, N>>(cellCount);

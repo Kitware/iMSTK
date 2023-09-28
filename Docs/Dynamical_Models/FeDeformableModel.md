@@ -2,6 +2,8 @@
 
 The finite element method allows for simulation of many things but is aimed at deformable bodies in iMSTK. Particularly those with a tetrahedral mesh. FEM is currently one of the slower approaches in iMSTK but can be more accurate. In real-time simulation the problem is often performance/time not just performance.
 
+> **Note:** The `FEMDeformableBodyModel` is being deprecated, it is no longer supported by us and will most likely be removed in the next release. Use PBD and the appropriate strain engergy constraints.
+
 ## Usage
 
 FEM finds its use for tissues in iMSTK.

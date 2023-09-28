@@ -201,7 +201,7 @@ EntityToVTK::getVertexInformation(std::shared_ptr<PointSet> pointSet, std::share
     velArray->SetNumberOfComponents(3);
     displacementArray->SetNumberOfComponents(3);
 
-    int numVerticies = m_indexToRecord[name].size();
+    vtkIdType numVerticies = static_cast<vtkIdType>(m_indexToRecord[name].size());
     velArray->SetNumberOfTuples(numVerticies * 3);
     displacementArray->SetNumberOfTuples(numVerticies * 3);
     int i = 0;
@@ -279,7 +279,7 @@ EntityToVTK::addConstraintCount(std::shared_ptr<PbdObject> pbdObject, vtkSmartPo
 
     if (m_lastConstraintTotals.count(pbdObject->getName()) || m_lastConstraintTotals[pbdObject->getName()] != constraints.size())
     {
-        m_lastConstraintTotals[pbdObject->getName()] = constraints.size();
+        m_lastConstraintTotals[pbdObject->getName()] = static_cast<int>(constraints.size());
         for (const auto& index : m_indexToRecord[pbdObject->getName()])
         {
             int count = 0;

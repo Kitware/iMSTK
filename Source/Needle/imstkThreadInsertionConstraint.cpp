@@ -53,7 +53,7 @@ ThreadInsertionConstraint::initConstraint(
 }
 
 bool
-ThreadInsertionConstraint::computeValueAndGradient(PbdState& bodies,
+ThreadInsertionConstraint::computeValueAndGradient(PbdState&,
                                                    double& c, std::vector<Vec3d>& dcdx)
 {
     // \todo: No reprojection is done here so smooth multi iteration solve is not possible

@@ -1,6 +1,8 @@
 # Rigid Body Dynamics (RBD)
 
-iMSTK provides its own implementation of a rigid body model. However, this has been replaced with our PBD model which now does all rigid bodies, soft bodies/deformables, and fluids. Please use PBD instead.
+iMSTK provides its own implementation of a rigid body model. However, this has been replaced with our PBD model which now does all rigid bodies, soft bodies/deformables, and fluids.
+
+> **Note:** The `RigidBodyModel2` is being deprecated, it is no longer supported by us and will most likely be removed in the next release. Use PBD Rigids instead.
 
 The `RigidBodyModel2` in iMSTK is a linear constraint based system. It is solved with projceted-gauss-seidel (PGS). The constraints are polymorphic meaning it is easy to extend. This system solves for impulses/instant changes in velocities to separate bodies in contact.
 
