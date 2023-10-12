@@ -522,9 +522,9 @@ if(${PROJECT_NAME}_BUILD_EXAMPLES)
 endif()
 
 #--------------------------------------------------------------------------
-# Testing
+# VandV ..
 #--------------------------------------------------------------------------
-if (${PROJECT_NAME}_BUILD_TESTING)
+if (${PROJECT_NAME}_USE_RENDERING_VTK AND ${PROJECT_NAME}_BUILD_VISUAL_TESTING)
   add_subdirectory(Testing)
 endif()
 
