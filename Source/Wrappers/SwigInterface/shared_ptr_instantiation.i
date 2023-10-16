@@ -246,6 +246,7 @@
 %shared_ptr(imstk::MouseDeviceClient)
 %shared_ptr(imstk::MouseEvent)
 %shared_ptr(imstk::DeviceManager)
+%shared_ptr(imstk::DummyClient)
 %shared_ptr(imstk::HaplyDeviceClient)
 %shared_ptr(imstk::HaplyDeviceManager)
 %shared_ptr(imstk::OpenHapticDeviceClient)
