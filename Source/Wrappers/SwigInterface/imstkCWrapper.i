@@ -242,6 +242,7 @@
 #include "imstkDeviceClient.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkMouseDeviceClient.h"
+#include "imstkDummyClient.h"
 
 #ifdef iMSTK_USE_HAPLY
 #include "imstkHaplyDeviceManager.h"
@@ -552,6 +553,7 @@ namespace std
 %include "../../Devices/imstkDeviceClient.h"
 %include "../../Devices/imstkKeyboardDeviceClient.h"
 %include "../../Devices/imstkMouseDeviceClient.h"
+%include "../../Devices/imstkDummyClient.h"
 %include "../../Devices/imstkDeviceManager.h"
 %include "../../Devices/imstkDeviceManagerFactory.h"
 

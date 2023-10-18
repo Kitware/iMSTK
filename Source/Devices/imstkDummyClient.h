@@ -26,15 +26,9 @@ public:
 
 protected:
     ///
-    /// \brief Initialize the phantom omni device
+    /// \brief Initialize the client
     ///
-    void init(const unsigned int numButtons = 0)
-    {
-        for (unsigned int i = 0; i < numButtons; i++)
-        {
-            m_buttons[i] = false;
-        }
-    }
+    void init(const unsigned int numButtons = 0);
 
     void run()     = delete;
     void cleanUp() = delete;
@@ -43,25 +37,22 @@ public:
     ///
     /// \brief Set position
     ///
-    void setPosition(const Vec3d& pos) { m_position = pos; }
+    void setPosition(const Vec3d& pos);
 
     ///
     /// \brief Set velocity
     ///
-    void setVelocity(const Vec3d& vel) { m_velocity = vel; }
+    void setVelocity(const Vec3d& vel);
 
     ///
     /// \brief Set orientation
     ///
-    void setOrientation(const Quatd& orient) { m_orientation = orient; }
+    void setOrientation(const Quatd& orient);
 
     ///
     /// \brief Set orientation from 4x4 transform
     ///
-    void setOrientation(double* transform)
-    {
-        m_orientation = (Eigen::Affine3d(Eigen::Matrix4d(transform))).rotation();
-    }
+    void setOrientation(double* transform);
 
     ///
     /// \brief Set the button status if it exists
