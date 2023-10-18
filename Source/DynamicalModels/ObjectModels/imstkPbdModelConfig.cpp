@@ -16,6 +16,23 @@
 
 #include <algorithm>
 
+namespace
+{
+template<class FunctorType>
+void
+eraseOldFunctor(std::vector<std::shared_ptr<imstk::PbdConstraintFunctor>>& funcs, int bodyId)
+{
+    // Find and erase the functor with the same bodyId
+    funcs.erase(std::remove_if(funcs.begin(), funcs.end(), [bodyId](auto item) {
+            if (FunctorType* functor = dynamic_cast<FunctorType*>(item.get()))
+            {
+                return functor->m_bodyIndex == bodyId;
+            }
+            return false;
+                        }), funcs.end());
+}
+} // namespace
+
 namespace imstk
 {
 void
@@ -43,13 +60,7 @@ PbdModelConfig::enableConstraint(ConstraintGenType type, double stiffness, const
 {
     auto& funcs = m_functors[type];
 
-    funcs.erase(std::remove_if(funcs.begin(), funcs.end(), [bodyId](auto item) {
-            if (PbdBodyConstraintFunctor* functor = dynamic_cast<PbdBodyConstraintFunctor*>(item.get()))
-            {
-                return functor->m_bodyIndex == bodyId;
-            }
-            return false;
-        }), funcs.end());
+    eraseOldFunctor<PbdBodyConstraintFunctor>(funcs, bodyId);
 
     if (type == ConstraintGenType::Distance)
     {
@@ -105,13 +116,7 @@ PbdModelConfig::enableDistanceConstraint(const double stiffness, const double st
 {
     auto& funcs = m_functors[ConstraintGenType::Distance];
 
-    funcs.erase(std::remove_if(funcs.begin(), funcs.end(), [bodyId](auto item) {
-            if (PbdBodyConstraintFunctor* functor = dynamic_cast<PbdBodyConstraintFunctor*>(item.get()))
-            {
-                return functor->m_bodyIndex == bodyId;
-            }
-            return false;
-                }), funcs.end());
+    eraseOldFunctor<PbdBodyConstraintFunctor>(funcs, bodyId);
 
     auto functor = std::make_shared<PbdDistanceConstraintFunctor>();
     funcs.push_back(functor);
@@ -123,71 +128,81 @@ PbdModelConfig::enableDistanceConstraint(const double stiffness, const double st
 void
 PbdModelConfig::enableBendConstraint(const double stiffness, const int stride, const bool restLength0, const int bodyId)
 {
+    using FunctorType = PbdBendConstraintFunctor;
     auto& funcs = m_functors[ConstraintGenType::Bend];
 
-    // Find the functor with the same stride
-    std::shared_ptr<PbdBendConstraintFunctor> foundFunctor = nullptr;
-    for (auto functor : funcs)
-    {
-        auto bendFunctor = std::dynamic_pointer_cast<PbdBendConstraintFunctor>(functor);
-        if (bendFunctor->getStride() == stride)
-        {
-            foundFunctor = bendFunctor;
-            break;
-        }
-    }
+    // Find and remove the functor with the same bodyId and stride
+    funcs.erase(std::remove_if(funcs.begin(), funcs.end(), [bodyId, stride](auto item) {
+            if (FunctorType* functor = dynamic_cast<FunctorType*>(item.get()))
+            {
+                return functor->m_bodyIndex == bodyId && functor->getStride() == stride;
+            }
+            return false;
+                }), funcs.end());
 
-    // If one with stride not found, create our own
-    if (foundFunctor == nullptr)
-    {
-        foundFunctor = std::make_shared<PbdBendConstraintFunctor>();
-        funcs.push_back(foundFunctor);
-    }
+    auto functor = std::make_shared<FunctorType>();
 
-    foundFunctor->setRestLength(restLength0 ? 0.0 : -1.0);
-    foundFunctor->setBodyIndex(bodyId);
-    foundFunctor->setStiffness(stiffness);
-    foundFunctor->setStride(stride);
+    functor->setRestLength(restLength0 ? 0.0 : -1.0);
+    functor->setBodyIndex(bodyId);
+    functor->setStiffness(stiffness);
+    functor->setStride(stride);
+    funcs.push_back(functor);
 }
 
 void
 PbdModelConfig::enableConstantDensityConstraint(const double stiffness,
                                                 const double particleRadius, const double restDensity, const int bodyId)
 {
+    using FunctorType = PbdConstantDensityConstraintFunctor;
     auto& funcs = m_functors[ConstraintGenType::ConstantDensity];
 
-    // Find the functor with the same stride
-    std::shared_ptr<PbdConstantDensityConstraintFunctor> foundFunctor = nullptr;
-    if (funcs.size() != 0)
-    {
-        foundFunctor = std::dynamic_pointer_cast<PbdConstantDensityConstraintFunctor>(funcs[0]);
-    }
+    eraseOldFunctor<FunctorType>(funcs, bodyId);
 
-    // If not found, create it
-    if (foundFunctor == nullptr)
-    {
-        foundFunctor = std::make_shared<PbdConstantDensityConstraintFunctor>();
-        funcs.push_back(foundFunctor);
-    }
+    auto functor = std::make_shared<FunctorType>();
 
-    foundFunctor->setParticleRadius(particleRadius);
-    foundFunctor->setBodyIndex(bodyId);
-    foundFunctor->setStiffness(stiffness);
-    foundFunctor->setRestDensity(restDensity);
+    functor->setParticleRadius(particleRadius);
+    functor->setBodyIndex(bodyId);
+    functor->setStiffness(stiffness);
+    functor->setRestDensity(restDensity);
+
+    funcs.push_back(std::move(functor));
 }
 
 void
 PbdModelConfig::enableFemConstraint(PbdFemConstraint::MaterialType material, const int bodyId)
 {
+    using FunctorType = PbdFemTetConstraintFunctor;
     auto& funcs = m_functors[ConstraintGenType::FemTet];
-    if (funcs.size() == 0)
-    {
-        funcs.push_back(std::make_shared<PbdFemTetConstraintFunctor>());
-    }
-    auto functor = std::dynamic_pointer_cast<PbdFemTetConstraintFunctor>(funcs.front());
+
+    eraseOldFunctor<FunctorType>(funcs, bodyId);
+
+    auto functor = std::make_shared<FunctorType>();
+
     functor->setBodyIndex(bodyId);
     functor->setFemConfig(m_femParams);
     functor->setMaterialType(material);
+
+    funcs.push_back(std::move(functor));
+}
+
+void
+PbdModelConfig::enableFemConstraint(PbdFemConstraint::MaterialType material, double youngsModulus, double poisson, const int bodyId)
+{
+    using FunctorType = PbdFemTetConstraintFunctor;
+    auto& funcs = m_functors[ConstraintGenType::FemTet];
+
+    eraseOldFunctor<FunctorType>(funcs, bodyId);
+
+    auto functor = std::make_shared<FunctorType>();
+
+    auto params = std::make_shared<PbdFemConstraintConfig>();
+    params->setYoungAndPoisson(youngsModulus, poisson);
+
+    functor->setBodyIndex(bodyId);
+    functor->setFemConfig(params);
+    functor->setMaterialType(material);
+
+    funcs.push_back(std::move(functor));
 }
 
 void

@@ -282,11 +282,18 @@ PbdModel::integratePosition()
     clearVirtualParticles();
 
     // There are two virtual particles buffer, skip the first two
-    for (auto bodyIter = std::next(std::next(m_state.m_bodies.begin()));
-         bodyIter != m_state.m_bodies.end(); bodyIter++)
-    {
-        integratePosition(**bodyIter);
-    }
+//     for (auto bodyIter = std::next(std::next(m_state.m_bodies.begin()));
+//          bodyIter != m_state.m_bodies.end(); bodyIter++)
+//     {
+//         integratePosition(**bodyIter);
+//     }
+
+    int bodyCount = m_state.m_bodies.size() - 2;
+
+    ParallelUtils::parallelFor(bodyCount,
+        [&](const int i) {
+            integratePosition(*m_state.m_bodies[i + 2]);
+            });
 }
 
 void
