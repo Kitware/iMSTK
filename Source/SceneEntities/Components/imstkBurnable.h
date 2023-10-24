@@ -34,13 +34,15 @@ public:
     /// \brief Get the PBD object to be torn
     ///@{
     std::shared_ptr<PbdObject> getPbdObject() const { return m_burnableObject; }
-///@}
-
-protected:
+    ///@}
 
     // Check state of mesh and delete cells that are burned away
     // void update(double dt);
     void visualUpdate(const double& dt) override;
+
+protected:
+
+
 
     // Allocate state against mesh
     void init() override;

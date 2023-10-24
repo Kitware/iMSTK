@@ -134,6 +134,7 @@ protected:
 
 ///
 /// \class SceneBehaviour
+/// \class SceneBehaviour
 ///
 /// \brief A SceneBehaviour represents a single component system
 /// that resides in the scene. It makes the assumption that all
