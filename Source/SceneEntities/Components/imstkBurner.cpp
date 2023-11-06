@@ -59,20 +59,24 @@ Burner::handle()
         // Search through burnable objects for collision
         for (int burnableId = 0; burnableId < m_burnableObjects.size(); burnableId++)
         {
-            if (m_burnableObjects[burnableId].object == nullptr) continue;
-            if (m_burnableObjects[burnableId].picker == nullptr) {
-				// Create Picking Algorithms
-				auto cellPicker = std::make_shared<CellPicker>();
-				cellPicker->setPickingGeometry(m_burnGeometry);
+            if (m_burnableObjects[burnableId].object == nullptr)
+            {
+                continue;
+            }
+            if (m_burnableObjects[burnableId].picker == nullptr)
+            {
+                // Create Picking Algorithms
+                auto cellPicker = std::make_shared<CellPicker>();
+                cellPicker->setPickingGeometry(m_burnGeometry);
 
-				std::shared_ptr<Geometry> pbdPhysicsGeom = m_burnableObjects[burnableId].object->getPhysicsGeometry();
-				CHECK(pbdPhysicsGeom != nullptr) << "Physics geometry of burnable object: " << m_burnableObjects[burnableId].object->getName() << " is null in Burner";
+                std::shared_ptr<Geometry> pbdPhysicsGeom = m_burnableObjects[burnableId].object->getPhysicsGeometry();
+                CHECK(pbdPhysicsGeom != nullptr) << "Physics geometry of burnable object: " << m_burnableObjects[burnableId].object->getName() << " is null in Burner";
 
-				auto cdType = CDObjectFactory::getCDType(*m_burnGeometry, *pbdPhysicsGeom);
+                auto cdType = CDObjectFactory::getCDType(*m_burnGeometry, *pbdPhysicsGeom);
 
                 // TODO check if we can make the COllision remove burnable if not
 
-				cellPicker->setCollisionDetection(CDObjectFactory::makeCollisionDetection(cdType));
+                cellPicker->setCollisionDetection(CDObjectFactory::makeCollisionDetection(cdType));
 
                 m_burnableObjects[burnableId].picker = cellPicker;
             }

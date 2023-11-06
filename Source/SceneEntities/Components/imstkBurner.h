@@ -107,19 +107,19 @@ protected:
 
     std::shared_ptr<TaskNode> m_burningHandleNode;
 
-
-    struct Burnable {
+    struct Burnable
+    {
         std::shared_ptr<PbdObject> object;
         std::shared_ptr<CellPicker> picker;
     };
 
-    std::vector<Burnable> m_burnableObjects;  ///< Set of burnable objects, currently set by user during setup
+    std::vector<Burnable> m_burnableObjects; ///< Set of burnable objects, currently set by user during setup
 
-    double m_onTime      = 0.5; ///< On time for energy burning tool from [0,1].
-    double m_wattage     = 50;  ///< Tool wattage
-    double m_normWattage = 0.5; ///< Tool wattage / 100
-    double m_q = 4.0;           ///< Fitting parameter that modifies how quickly tissue gets burned
+    double m_onTime      = 0.5;              ///< On time for energy burning tool from [0,1].
+    double m_wattage     = 50;               ///< Tool wattage
+    double m_normWattage = 0.5;              ///< Tool wattage / 100
+    double m_q = 4.0;                        ///< Fitting parameter that modifies how quickly tissue gets burned
 
-    bool m_onState = false;     ///< flag if tool is currently on or not
+    bool m_onState = false;                  ///< flag if tool is currently on or not
 };
 } // namespace imstk

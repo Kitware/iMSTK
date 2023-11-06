@@ -42,8 +42,6 @@ public:
 
 protected:
 
-
-
     // Allocate state against mesh
     void init() override;
 
