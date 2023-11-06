@@ -160,6 +160,28 @@ struct PbdBody
             return orientations->at(0);
         }
 
+        /// \brief Override the current position and orientation this can be
+        /// used to handle pauses, switching of tools or other action that need
+        /// to transform the body without running through the physics.
+        /// Can only be used on Rigid bodies
+        void overrideRigidPositionAndOrientation(const Vec3d& pos, const Quatd& orientation)
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            (*vertices)[0]     = (*prevVertices)[0] = pos;
+            (*orientations)[0] = (*prevOrientations)[0] = orientation;
+        }
+
+        /// \brief Override the current linear and angular velocity this can be
+        /// used to handle pauses, switching of tools or other action that need
+        /// to transform the body without running through the physics.
+        /// Can only be used on Rigid bodies
+        void overrideLinearAndAngularVelocity(const Vec3d& velocity, const Vec3d& angularVelocity)
+        {
+            CHECK(bodyType == Type::RIGID) << "Body is not a rigid.";
+            (*velocities)[0] = velocity;
+            (*angularVelocities)[0] = angularVelocity;
+        }
+
         // Struct Data
         int bodyHandle; ///< Id in the system
         Type bodyType = Type::DEFORMABLE;
