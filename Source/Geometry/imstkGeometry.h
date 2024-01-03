@@ -205,7 +205,7 @@ protected:
     ///
     /// \brief Directly apply transform to data
     ///
-    virtual void applyTransform(const Mat4d& imstkNotUsed(m)) { }
+    virtual void applyTransform(const Mat4d&) { }
 
     ///
     /// \brief Get a unique ID for the new generated geometry object

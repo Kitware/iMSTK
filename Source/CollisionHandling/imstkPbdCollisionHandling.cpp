@@ -201,7 +201,7 @@ PbdCollisionHandling::getDataFromObject(std::shared_ptr<CollidingObject> obj)
     // Pack info into struct, gives some contextual hints as well
     CollisionSideData side;
     auto              pbdObj = std::dynamic_pointer_cast<PbdObject>(obj);
-    side.pbdObj  = pbdObj.get();   // Garunteed
+    side.pbdObj  = pbdObj.get();              // Garunteed
     side.colObj  = obj.get();
     side.objType = ObjType::Colliding;
     std::shared_ptr<Geometry> collidingGeometry = side.colObj->getCollidingGeometry();
@@ -305,76 +305,85 @@ PbdCollisionHandling::handle(
     const std::vector<CollisionElement>& elementsA,
     const std::vector<CollisionElement>& elementsB)
 {
-    // Clear constraints vectors
-    m_collisionConstraints.clear();
+    if (m_clearData)
+    {
+        // Clear constraints vectors
+        m_collisionConstraints.clear();
+    }
 
     // Break early if no collision elements
-    if (elementsA.size() == 0 && elementsB.size() == 0)
+    if (elementsA.size() != 0 || elementsB.size() != 0)
     {
-        return;
-    }
+        // Pack all the data needed for a particular side into a struct so we can
+        // swap it with the contact & pass it around
+        CollisionSideData dataSideA = getDataFromObject(getInputObjectA());
+        dataSideA.compliance = m_compliance;
+        dataSideA.stiffness  = m_stiffness[0];
+        CollisionSideData dataSideB = getDataFromObject(getInputObjectB());
+        dataSideB.compliance = m_compliance;
+        dataSideB.stiffness  = (dataSideB.pbdObj == nullptr) ? 0.0 : m_stiffness[1];
 
-    // Pack all the data needed for a particular side into a struct so we can
-    // swap it with the contact & pass it around
-    CollisionSideData dataSideA = getDataFromObject(getInputObjectA());
-    dataSideA.compliance = m_compliance;
-    dataSideA.stiffness  = m_stiffness[0];
-    CollisionSideData dataSideB = getDataFromObject(getInputObjectB());
-    dataSideB.compliance = m_compliance;
-    dataSideB.stiffness  = (dataSideB.pbdObj == nullptr) ? 0.0 : m_stiffness[1];
-
-    // Share the model with both sides even if B is not pbd, which makes it easier
-    // to acquire the model without knowing which object is pbd
-    if (dataSideB.model == nullptr)
-    {
-        dataSideB.model = dataSideA.model;
-    }
-
-    // If obj B is also pbd simulated, make sure they share the same model
-    CHECK(dataSideB.pbdObj == nullptr || dataSideA.model == dataSideB.model) <<
-        "PbdCollisionHandling input objects must share PbdModel";
-
-    // For CCD (store if available)
-    dataSideA.prevGeometry = m_colData->prevGeomA.get();
-    dataSideB.prevGeometry = m_colData->prevGeomB.get();
-
-    if (elementsA.size() == elementsB.size())
-    {
-        // Deal with two way contacts
-        for (size_t i = 0; i < elementsA.size(); i++)
+        // Share the model with both sides even if B is not pbd, which makes it easier
+        // to acquire the model without knowing which object is pbd
+        if (dataSideB.model == nullptr)
         {
-            handleElementPair(
-                { &elementsA[i], &dataSideA },
-                { &elementsB[i], &dataSideB });
+            dataSideB.model = dataSideA.model;
+        }
+
+        // If obj B is also pbd simulated, make sure they share the same model
+        CHECK(dataSideB.pbdObj == nullptr || dataSideA.model == dataSideB.model) <<
+            "PbdCollisionHandling input objects must share PbdModel";
+
+        // For CCD (store if available)
+        dataSideA.prevGeometry = m_colData->prevGeomA.get();
+        dataSideB.prevGeometry = m_colData->prevGeomB.get();
+
+        if (elementsA.size() == elementsB.size())
+        {
+            // Deal with two way contacts
+            for (size_t i = 0; i < elementsA.size(); i++)
+            {
+                handleElementPair(
+                    { &elementsA[i], &dataSideA },
+                    { &elementsB[i], &dataSideB });
+            }
+        }
+        else
+        {
+            // Deal with one way contacts (only one side is needed)
+            for (size_t i = 0; i < elementsA.size(); i++)
+            {
+                handleElementPair(
+                    { &elementsA[i], &dataSideA },
+                    { nullptr, nullptr });
+            }
+            for (size_t i = 0; i < elementsB.size(); i++)
+            {
+                handleElementPair(
+                    { &elementsB[i], &dataSideB },
+                    { nullptr, nullptr });
+            }
+        }
+
+        size_t constraints = 0;
+        for (int i = 0; i < NumTypes; ++i)
+        {
+            constraints += m_constraintBins[i].size();
         }
     }
-    else
+
+    if (m_processConstraints)
     {
-        // Deal with one way contacts (only one side is needed)
-        for (size_t i = 0; i < elementsA.size(); i++)
+        orderCollisionConstraints();
+
+        if (m_collisionConstraints.size() == 0)
         {
-            handleElementPair(
-                { &elementsA[i], &dataSideA },
-                { nullptr, nullptr });
+            return;
         }
-        for (size_t i = 0; i < elementsB.size(); i++)
-        {
-            handleElementPair(
-                { &elementsB[i], &dataSideB },
-                { nullptr, nullptr });
-        }
+        // ObjA guaranteed to be PbdObject
+        auto pbdObjectA = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
+        pbdObjectA->getPbdModel()->getSolver()->addConstraints(&m_collisionConstraints);
     }
-
-    orderCollisionConstraints();
-
-    if (m_collisionConstraints.size() == 0)
-    {
-        return;
-    }
-
-    // ObjA garunteed to be PbdObject
-    auto pbdObjectA = std::dynamic_pointer_cast<PbdObject>(getInputObjectA());
-    pbdObjectA->getPbdModel()->getSolver()->addConstraints(&m_collisionConstraints);
 }
 
 void
@@ -463,10 +472,10 @@ PbdCollisionHandling::addConstraint_Body_V(const ColElemSide& sideA, const ColEl
 
     PbdVertexToBodyConstraint* constraint = getCachedConstraint<PbdVertexToBodyConstraint>(BodyVertex);
     constraint->initConstraint(sideA.data->model->getBodies(),
-        ptAAndContact.first,
-        ptAAndContact.second,
-        ptB,
-        sideA.data->compliance);
+                        ptAAndContact.first,
+                        ptAAndContact.second,
+                        ptB,
+                        sideA.data->compliance);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
@@ -481,10 +490,10 @@ PbdCollisionHandling::addConstraint_Body_E(const ColElemSide& sideA, const ColEl
 
     PbdEdgeToBodyConstraint* constraint = getCachedConstraint<PbdEdgeToBodyConstraint>(BodyEdge);
     constraint->initConstraint(sideB.data->model->getBodies(),
-        ptAAndContact.first,
-        ptAAndContact.second,
-        ptsB[0], ptsB[1],
-        sideA.data->compliance);
+                        ptAAndContact.first,
+                        ptAAndContact.second,
+                        ptsB[0], ptsB[1],
+                        sideA.data->compliance);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
@@ -499,10 +508,10 @@ PbdCollisionHandling::addConstraint_Body_T(const ColElemSide& sideA, const ColEl
 
     PbdTriangleToBodyConstraint* constraint = getCachedConstraint<PbdTriangleToBodyConstraint>(BodyTriangle);
     constraint->initConstraint(sideB.data->model->getBodies(),
-        ptAAndContact.first,
-        ptAAndContact.second,
-        ptsB[0], ptsB[1], ptsB[2],
-        sideA.data->compliance);
+                        ptAAndContact.first,
+                        ptAAndContact.second,
+                        ptsB[0], ptsB[1], ptsB[2],
+                        sideA.data->compliance);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
@@ -524,13 +533,13 @@ PbdCollisionHandling::addConstraint_Body_Body(const ColElemSide& sideA, const Co
     PbdBodyToBodyNormalConstraint* constraint = getCachedConstraint<PbdBodyToBodyNormalConstraint>(BodyBody);
 
     constraint->initConstraint(
-        sideA.data->model->getBodies(),
-        ptAAndContact.first,
-        ptAAndContact.second,
-        ptBAndContact.first,
-        ptBAndContact.second,
-        normal,
-        sideA.data->compliance);
+                        sideA.data->model->getBodies(),
+                        ptAAndContact.first,
+                        ptAAndContact.second,
+                        ptBAndContact.first,
+                        ptBAndContact.second,
+                        normal,
+                        sideA.data->compliance);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
@@ -545,7 +554,7 @@ PbdCollisionHandling::addConstraint_V_T(const ColElemSide& sideA, const ColElemS
 
     PbdPointTriangleConstraint* constraint = getCachedConstraint<PbdPointTriangleConstraint>(VertexTriangle);
     constraint->initConstraint(ptA, ptsB[0], ptsB[1], ptsB[2],
-        sideA.data->stiffness, sideB.data->stiffness);
+                        sideA.data->stiffness, sideB.data->stiffness);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
@@ -561,7 +570,7 @@ PbdCollisionHandling::addConstraint_E_E(const ColElemSide& sideA, const ColElemS
 
     PbdEdgeEdgeConstraint* constraint = getCachedConstraint<PbdEdgeEdgeConstraint>(EdgeEdge);
     constraint->initConstraint(ptsA[0], ptsA[1], ptsB[0], ptsB[1],
-        sideA.data->stiffness, sideB.data->stiffness);
+                        sideA.data->stiffness, sideB.data->stiffness);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
@@ -584,10 +593,10 @@ PbdCollisionHandling::addConstraint_E_E_CCD(
 
     PbdEdgeEdgeCCDConstraint* constraint = getCachedConstraint<PbdEdgeEdgeCCDConstraint>(EdgeEdgeCCD);
     constraint->initConstraint(
-        prevPtsA[0], prevPtsA[1], prevPtsB[0], prevPtsB[1],
-        ptsA[0], ptsA[1], ptsB[0], ptsB[1],
-        sideA.data->stiffness, sideB.data->stiffness,
-        m_ccdSubsteps);
+                        prevPtsA[0], prevPtsA[1], prevPtsB[0], prevPtsB[1],
+                        ptsA[0], ptsA[1], ptsB[0], ptsB[1],
+                        sideA.data->stiffness, sideB.data->stiffness,
+                        m_ccdSubsteps);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
     constraint->setCorrectVelocity(m_useCorrectVelocity);
     m_constraintBins[EdgeEdgeCCD].push_back(constraint);
@@ -601,7 +610,7 @@ PbdCollisionHandling::addConstraint_V_E(const ColElemSide& sideA, const ColElemS
 
     PbdPointEdgeConstraint* constraint = getCachedConstraint<PbdPointEdgeConstraint>(VertexEdge);
     constraint->initConstraint(ptA, ptsB[0], ptsB[1],
-        sideA.data->stiffness, sideB.data->stiffness);
+                        sideA.data->stiffness, sideB.data->stiffness);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);
     constraint->setEnableBoundaryCollisions(m_enableBoundaryCollisions);
@@ -649,7 +658,7 @@ PbdCollisionHandling::addConstraint_V_V(const ColElemSide& sideA, const ColElemS
 
     PbdPointPointConstraint* constraint = getCachedConstraint<PbdPointPointConstraint>(VertexVertex);
     constraint->initConstraint(ptA, ptB,
-        sideA.data->stiffness,
+                        sideA.data->stiffness,
         (sideB.data == nullptr) ? 0.0 : sideB.data->stiffness);
     constraint->setFriction(m_friction);
     constraint->setRestitution(m_restitution);

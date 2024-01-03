@@ -6,6 +6,7 @@ include(imstkAddLibrary)
 imstk_add_library( CollisionDetection
   H_FILES
     CollisionDetection/imstkBidirectionalPlaneToSphereCD.h
+    CollisionDetection/imstkCompoundCD.h
     CollisionDetection/imstkCapsuleToCapsuleCD.h
     CollisionDetection/imstkClosedSurfaceMeshToMeshCD.h
     CollisionDetection/imstkClosedSurfaceMeshToCapsuleCD.h
@@ -41,6 +42,7 @@ imstk_add_library( CollisionDetection
     Picking/imstkVertexPicker.h
   CPP_FILES
     CollisionDetection/imstkBidirectionalPlaneToSphereCD.cpp
+    CollisionDetection/imstkCompoundCD.cpp
     CollisionDetection/imstkCapsuleToCapsuleCD.cpp
     CollisionDetection/imstkClosedSurfaceMeshToMeshCD.cpp
     CollisionDetection/imstkClosedSurfaceMeshToCapsuleCD.cpp

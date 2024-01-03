@@ -25,6 +25,7 @@ imstk_add_library( Geometry
     Mesh/imstkTetrahedralMesh.h
     Mesh/imstkVolumetricMesh.h
     Particles/imstkRenderParticles.h
+    imstkCompoundGeometry.h
     imstkGeometry.h
     imstkGeometryUtilities.h
   CPP_FILES
@@ -44,6 +45,7 @@ imstk_add_library( Geometry
     Mesh/imstkTetrahedralMesh.cpp
     Particles/imstkRenderParticles.cpp
     imstkGeometry.cpp
+    imstkCompoundGeometry.cpp
     imstkGeometryUtilities.cpp
   DEPENDS
     Common

@@ -35,7 +35,8 @@ function(imstk_add_test_internal target kind)
   set(test_driver_executable "${target}${kind}")
   
   # Get all source files
-  file(GLOB test_files "${CMAKE_CURRENT_SOURCE_DIR}/*Test.h"
+  file(GLOB test_files CONFIGURE_DEPENDS 
+                       "${CMAKE_CURRENT_SOURCE_DIR}/*Test.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/*Test.cpp")
 
   # Create test driver executable
