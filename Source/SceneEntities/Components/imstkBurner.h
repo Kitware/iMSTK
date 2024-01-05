@@ -33,10 +33,20 @@ public:
     void init() override;
 
     ///
-    /// \brief Get the geometry doing the burning
+    /// \brief Get the object doing the burning
     ///@{
-    std::shared_ptr<PbdObject> getBurnerGeometry() const { return m_burningObj; }
+    std::shared_ptr<PbdObject> getBurnerObject() const { return m_burningObj; }
     ///@}
+
+    /// \brief Get/Set the geometry doing the burning, if it's not set
+    /// the collision geoemtry of the burner object will be used 
+    /// @{
+    std::shared_ptr<AnalyticalGeometry> getBurnerGeometry() const { return m_burnGeometry; }
+    void setBurnerGeometry(std::shared_ptr<AnalyticalGeometry> geom) {
+        CHECK(geom != nullptr);
+        m_burnGeometry = geom;
+    }
+    /// @}
 
     ///
     /// \brief Get/Set the ontime from [0,1] where 1 is on fully and any value less than

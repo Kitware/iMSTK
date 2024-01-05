@@ -34,8 +34,10 @@ Burner::init()
 
     CHECK(m_burningObj != nullptr) << "Burner requires an object to do the burning";
 
-    m_burnGeometry = std::dynamic_pointer_cast<AnalyticalGeometry>(m_burningObj->getPhysicsGeometry());
-    CHECK(m_burnGeometry != nullptr) << "Burner requires analytical geometry for physics geometry";
+    if (m_burnGeometry == nullptr) {
+		m_burnGeometry = std::dynamic_pointer_cast<AnalyticalGeometry>(m_burningObj->getPhysicsGeometry());
+		CHECK(m_burnGeometry != nullptr) << "Burner requires analytical geometry for physics geometry";
+    }
 
     // Verify that some objects are burnable
     if (m_burnableObjects.empty())
