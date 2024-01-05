@@ -30,7 +30,6 @@
 
 using namespace imstk;
 
-
 std::shared_ptr<PbdObject>
 makeCompoundObject(std::shared_ptr<PbdModel> pbdModel, Vec3d startingPos)
 {
@@ -61,10 +60,10 @@ makeCompoundObject(std::shared_ptr<PbdModel> pbdModel, Vec3d startingPos)
 //      Mat4d m2 = trans2.matrix();
 
     rigidGeom->add(geom1);
-    rigidGeom->add(geom2);
-    rigidGeom->transformLocally(1, m1);
-//      rigidGeom->add(geom3);
-//      rigidGeom->transformLocally(2, m2);
+//     rigidGeom->add(geom2);
+//     rigidGeom->transformLocally(1, m1);
+//     rigidGeom->add(geom3);
+//     rigidGeom->transformLocally(2, m2);
 
     rigidPbdObj->setVisualGeometry(geom1);
     rigidPbdObj->setCollidingGeometry(rigidGeom);
@@ -93,7 +92,7 @@ makeCompoundObject(std::shared_ptr<PbdModel> pbdModel, Vec3d startingPos)
 
     // Setup body
     const Quatd orientation = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(1.0, 1.0, 1.0).normalized());
-    rigidPbdObj->getPbdBody()->setRigid(startingPos, 0.1, orientation, Mat3d::Identity() * 0.01);
+    rigidPbdObj->getPbdBody()->setRigid(startingPos, 1.0, orientation, Mat3d::Identity() * 0.01);
     return rigidPbdObj;
 }
 
@@ -143,21 +142,13 @@ TEST_F(CompoundCollisionVisualTest, CompoundCapsule)
         pbdConfig->m_doPartitioning      = false;
         pbdModel->configure(pbdConfig);
 
-    /*
-    auto planeObj = std::make_shared<CollidingObject>("plane");
-    auto planeGeom = std::make_shared<Plane>(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 1.0, 0.0));
-    planeGeom->setWidth(1.0);
-    planeObj->setVisualGeometry(planeGeom);
-    planeObj->setCollidingGeometry(planeGeom);
-    m_scene->addSceneObject(planeObj);
-    */
-
         auto planeObj = std::make_shared<CollidingObject>("plane");
 
-        auto plane = std::make_shared<Plane>(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, -1.0, 0.0));
+        auto plane = std::make_shared<Plane>(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 1.0, 0.0));
         plane->setWidth(1.0);
-        auto planeGeom = GeometryUtils::toSurfaceMesh(plane);
-        //auto  planeGeom = GeometryUtils::toTriangleGrid(Vec3d::Zero(), Vec2d(1, 1), Vec2i(4, 4));
+        auto planeGeom = plane;
+    //auto planeGeom = GeometryUtils::toSurfaceMesh(plane);
+    //auto  planeGeom = GeometryUtils::toTriangleGrid(Vec3d::Zero(), Vec2d(1, 1), Vec2i(4, 4));
         planeObj->setVisualGeometry(planeGeom);
         planeObj->setCollidingGeometry(planeGeom);
         m_scene->addSceneObject(planeObj);
@@ -165,19 +156,19 @@ TEST_F(CompoundCollisionVisualTest, CompoundCapsule)
         auto compoundRigid = makeCompoundObject(pbdModel, Vec3d(0.1, 0.15, 0.0));
         m_scene->addSceneObject(compoundRigid);
 
-//     {
-//         auto collision = std::make_shared<PbdObjectCollision>(compoundRigid, planeObj);
-//         collision->setUseCorrectVelocity(true);
-//         collision->setRigidBodyCompliance(0.00001);
-//         m_scene->addSceneObject(collision);
-//     }
+    {
+        auto collision = std::make_shared<PbdObjectCollision>(compoundRigid, planeObj);
+        collision->setUseCorrectVelocity(true);
+        collision->setRigidBodyCompliance(0.0001);
+        m_scene->addSceneObject(collision);
+    }
 
         auto simpleRigid = makeTestSphereObject(pbdModel, Vec3d(-0.2, 0.15, 0.0));
         m_scene->addSceneObject(simpleRigid);
-    {
-        auto collision = std::make_shared<PbdObjectCollision>(simpleRigid, planeObj);
+        {
+        auto collision = std::make_shared<PbdObjectCollision>(simpleRigid, planeObj, "UnidirectionalPlaneToSphereCD");
         collision->setUseCorrectVelocity(true);
-        collision->setRigidBodyCompliance(0.00001);
+        collision->setRigidBodyCompliance(0.0001);
         m_scene->addSceneObject(collision);
         }
 
@@ -186,25 +177,11 @@ TEST_F(CompoundCollisionVisualTest, CompoundCapsule)
         light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
         light->setIntensity(1.0);
         m_scene->addLight("Light", light);
+        m_scene->getConfig()->writeTaskGraph = true;
 
         std::shared_ptr<KeyboardDeviceClient> keyDevice = m_viewer->getKeyboardDevice();
         const Vec3d                           dx    = m_scene->getActiveCamera()->getPosition() - m_scene->getActiveCamera()->getFocalPoint();
         const double                          speed = 10.0;
-
-        connect<KeyEvent>(keyDevice, &KeyboardDeviceClient::keyPress, [&](KeyEvent* e)
-        {
-            if (e->m_key == 'f')
-            {
-//                              if (collision->getFriction() == 0.0)
-//                              {
-//                                      collision->setFriction(0.5);
-//                              }
-//                              else
-//                              {
-//                                      collision->setFriction(0.0);
-//                              }
-            }
-                });
 
         connect<Event>(m_sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
@@ -236,9 +213,9 @@ TEST_F(CompoundCollisionVisualTest, CompoundCapsule)
             {
                 extTorque += Vec3d(0.0, 0.1, 0.0);
             }
-            //rigidPbdObj->getPbdBody()->externalForce = extForce;
-            //rigidPbdObj->getPbdBody()->externalTorque = extTorque;
+            compoundRigid->getPbdBody()->externalForce  = extForce;
+            compoundRigid->getPbdBody()->externalTorque = extTorque;
                 });
 
-        runFor(40.0);
+        runFor(10.0);
 }

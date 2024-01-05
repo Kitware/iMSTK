@@ -39,13 +39,15 @@ public:
     ///@}
 
     /// \brief Get/Set the geometry doing the burning, if it's not set
-    /// the collision geoemtry of the burner object will be used 
+    /// the collision geoemtry of the burner object will be used
     /// @{
     std::shared_ptr<AnalyticalGeometry> getBurnerGeometry() const { return m_burnGeometry; }
-    void setBurnerGeometry(std::shared_ptr<AnalyticalGeometry> geom) {
+    void setBurnerGeometry(std::shared_ptr<AnalyticalGeometry> geom)
+    {
         CHECK(geom != nullptr);
         m_burnGeometry = geom;
     }
+
     /// @}
 
     ///

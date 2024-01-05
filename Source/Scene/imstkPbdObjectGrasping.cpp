@@ -311,7 +311,6 @@ void
 PbdObjectGrasping::addPickConstraints()
 {
     removePickConstraints();
-
     std::shared_ptr<PbdModel> model = m_objectToGrasp->getPbdModel();
     std::shared_ptr<Geometry> pbdPhysicsGeom = m_objectToGrasp->getPhysicsGeometry();
 
@@ -585,11 +584,13 @@ void
 PbdObjectGrasping::updatePicking()
 {
     // If started picking
-    if (!m_isPrevGrasping && m_isGrasping)
+    if ((!m_isPrevGrasping && m_isGrasping) || m_regrasp)
     {
         m_objectToGrasp->updateGeometries();
         addPickConstraints();
+        m_regrasp = false;
     }
+
     // If stopped picking
     if (!m_isGrasping && m_isPrevGrasping)
     {

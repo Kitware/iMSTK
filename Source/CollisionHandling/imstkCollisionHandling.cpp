@@ -58,17 +58,17 @@ CollisionHandling::getHandlingGeometryB()
 void
 CollisionHandling::setInputCollisionData(std::shared_ptr<CollisionData> collisionData)
 {
-    m_colData         = collisionData;
-    m_colVectorData   = nullptr;
-    m_updateFunction  = [this]() {
-                            if (m_colData == nullptr)
-                            {
-                                return;
-                            }
-							m_clearData = true;
-							m_processConstraints = true;
-                            updateCollisionData(m_colData);
-                        };
+    m_colData        = collisionData;
+    m_colVectorData  = nullptr;
+    m_updateFunction = [this]() {
+                           if (m_colData == nullptr)
+                           {
+                               return;
+                           }
+                           m_clearData = true;
+                           m_processConstraints = true;
+                           updateCollisionData(m_colData);
+                       };
 }
 
 void
@@ -82,7 +82,7 @@ CollisionHandling::setInputCollisionData(std::shared_ptr<std::vector<std::shared
                            {
                                return;
                            }
-                           m_clearData       = true;
+                           m_clearData = true;
                            m_processConstraints = false;
                            for (size_t i = 0; i < m_colVectorData->size(); ++i)
                            {
@@ -95,5 +95,4 @@ CollisionHandling::setInputCollisionData(std::shared_ptr<std::vector<std::shared
                            m_colData = nullptr;
                        };
 }
-
 } // namespace imstk

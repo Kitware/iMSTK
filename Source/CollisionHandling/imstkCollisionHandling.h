@@ -65,10 +65,10 @@ public:
     /// \brief Handle the input collision data
     ///
 
-	inline void update()
-	{
-		m_updateFunction();
-	}
+    inline void update()
+    {
+        m_updateFunction();
+    }
 
 protected:
     ///
@@ -90,8 +90,10 @@ protected:
     /// Expansion to allow collision detection to return multiple types of collision data
     std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>> m_colVectorData;
 
+#ifndef SWIG
     // This is the function that is executed in \sa update()
     std::function<void()> m_updateFunction = []() {};
+#endif // !SWIG
 
     // Checks the ordering of the elements and calls the virtual \sa handle() function
     void updateCollisionData(std::shared_ptr<const CollisionData> data);
@@ -99,7 +101,7 @@ protected:
     // Used to enable multiple /sa handle calls, m_clearData is true on the first pass
     // m_postConstraints is true on the last pass, if there is only one pass both will
     // be true
-    bool m_clearData       = true;
+    bool m_clearData = true;
     bool m_processConstraints = true;
 };
 } // namespace imstk

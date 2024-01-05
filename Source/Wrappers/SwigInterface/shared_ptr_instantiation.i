@@ -36,6 +36,7 @@
  * Geometry 
  */
 %shared_ptr(imstk::Geometry)
+%shared_ptr(imstk::CompoundGeometry)
 %shared_ptr(imstk::AbstractCellMesh)
 %shared_ptr(imstk::PointSet)
 %shared_ptr(imstk::ImageData)
@@ -157,6 +158,7 @@
  */
 %shared_ptr(imstk::CollisionDetectionAlgorithm)
 
+%shared_ptr(imstk::CompoundCD)
 %shared_ptr(imstk::ClosedSurfaceMeshToMeshCD)
 %shared_ptr(imstk::BidirectionalPlaneToSphereCD)
 %shared_ptr(imstk::ImplicitGeometryToPointSetCCD)

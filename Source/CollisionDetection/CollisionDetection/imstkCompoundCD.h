@@ -12,12 +12,14 @@
 namespace imstk
 {
 ///
-/// \class PointSetToPlaneCD
+/// \class CompoundCD
 ///
-/// \brief PointSet to unidirectional plane collision detection
-/// Generates point-direction contact data.
-/// By default only generates contact data for the pointset.
-///
+/// \brief Collision detection that supports a geometry consisting
+///     of multiple subgeometries. 
+/// For the actual calcualation the information gets passed to the appropriate
+/// shape/subshape CD algorithm. Currently Does not support adding/removing a shape during 
+/// runtime
+/// 
 class CompoundCD : public CollisionDetectionAlgorithm
 {
 public:
@@ -33,6 +35,7 @@ protected:
     bool areInputsValid() override;
 
 private:
+    /// List of cd algorithms that are being used
     std::vector<std::shared_ptr<CollisionDetectionAlgorithm>> m_cdAlgorithms;
 };
 } // namespace imstk

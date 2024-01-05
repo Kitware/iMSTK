@@ -88,7 +88,7 @@ CompoundGeometry::applyTransform(const Mat4d& mat)
 }
 
 void
-CompoundGeometry::transformLocally(size_t index, const Mat4d& transform)
+CompoundGeometry::setLocalTransform(size_t index, const Mat4d& transform)
 {
     if (index >= m_geometries.size())
     {
@@ -96,6 +96,18 @@ CompoundGeometry::transformLocally(size_t index, const Mat4d& transform)
     }
     m_transformApplied = false;
     m_geometries[index].localTransform = transform;
+}
+
+std::shared_ptr<imstk::Geometry> CompoundGeometry::get(size_t index) const
+{
+	if (index < m_geometries.size())
+	{
+		return m_geometries[index].geometry;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 void

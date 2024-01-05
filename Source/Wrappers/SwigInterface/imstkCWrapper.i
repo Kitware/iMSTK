@@ -36,6 +36,7 @@
  */
 #include "imstkGeometry.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkCompoundGeometry.h"
 #include "imstkPointSet.h"
 #include "imstkAbstractCellMesh.h"
 #include "imstkCellMesh.h"
@@ -148,6 +149,7 @@
  * CollisionDetection
  */
 #include "imstkCDObjectFactory.h"
+#include "imstkCompoundCD.h"
 #include "imstkClosedSurfaceMeshToMeshCD.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetectionAlgorithm.h"
@@ -329,6 +331,7 @@ namespace std
  * Geometry
  */
 %include "../../Geometry/imstkGeometry.h";
+%include "../../Geometry/imstkCompoundGeometry.h"
 %include "../../Geometry/Mesh/imstkPointSet.h"
 %include "../../Geometry/Mesh/imstkImageData.h"
 %include "../../Geometry/Mesh/imstkAbstractCellMesh.h"
@@ -468,6 +471,7 @@ namespace std
 %include "../../CollisionDetection/imstkCollisionDetectionAlgorithm.h"
 %include "../../CollisionDetection/imstkCollisionUtils.h"
 
+%include "../../CollisionDetection/CollisionDetection/imstkCompoundCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkBidirectionalPlaneToSphereCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkClosedSurfaceMeshToMeshCD.h"
 %include "../../CollisionDetection/CollisionDetection/imstkImplicitGeometryToPointSetCCD.h"

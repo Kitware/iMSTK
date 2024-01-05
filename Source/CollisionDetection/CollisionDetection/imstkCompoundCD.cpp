@@ -20,7 +20,6 @@ CompoundCD::CompoundCD()
     setRequiredInputType<Geometry>(1);
     m_colData       = nullptr;
     m_colVectorData = std::make_shared<std::vector<std::shared_ptr<CollisionData>>>();
-    // TODO Check what this means ????
     setGenerateCD(true, true);
 }
 
@@ -39,13 +38,14 @@ CompoundCD::areInputsValid()
 
     CHECK(valid) << "Invalid or missing inputs in CompoundCD";
 
-    int otherIndex = 1;
-    auto compound = std::dynamic_pointer_cast<CompoundGeometry>(getInput(0));
-    if (compound == nullptr) {
-        compound = std::dynamic_pointer_cast<CompoundGeometry>(getInput(1));
+    int  otherIndex = 1;
+    auto compound   = std::dynamic_pointer_cast<CompoundGeometry>(getInput(0));
+    if (compound == nullptr)
+    {
+        compound   = std::dynamic_pointer_cast<CompoundGeometry>(getInput(1));
         otherIndex = 0;
     }
-    auto other    = getInput(otherIndex);
+    auto other = getInput(otherIndex);
 
     // disregard additions of geometry during runtime
     if (m_cdAlgorithms.size() > 0)
