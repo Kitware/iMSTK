@@ -42,6 +42,7 @@
 #endif
 
 #include <iostream>
+#include "imstkCompoundGeometry.h"
 
 using namespace imstk;
 
@@ -174,6 +175,155 @@ makeKidney(const std::string& name, std::shared_ptr<PbdModel> model)
     return tissueObj;
 }
 
+static std::shared_ptr<PbdObject>
+makeHookToolObject(std::shared_ptr<PbdModel> model)
+{
+    auto body = std::make_shared<Capsule>();
+    body->setRadius(0.4);
+    body->setLength(4.0);
+    body->setPosition(Vec3d(0.0, 0.0, 0.0));
+    body->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
+
+    auto geometry = std::make_shared<CompoundGeometry>();
+    geometry->add(body);
+
+    auto hook = std::make_shared<Capsule>();
+    hook->setRadius(0.15);
+    hook->setLength(1);
+    hook->setPosition(Vec3d(0.0, -0.5, -2));
+    //hook->setOrientation(Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0, 0.0, 1.0)));
+    geometry->add(hook);
+
+    auto toolObj = std::make_shared<PbdObject>("Tool");
+
+    // Create the object
+    // toolObj->setVisualGeometry(body);
+    toolObj->setPhysicsGeometry(geometry);
+    toolObj->setCollidingGeometry(geometry);
+    toolObj->setDynamicalModel(model);
+    toolObj->getPbdBody()->setRigid(
+                Vec3d(0.0, 2.0, 2.0),
+                0.01,
+                Quatd::Identity(),
+                Mat3d::Identity() * 100000.0);
+    {
+        auto visuals = std::make_shared<VisualModel>();
+        visuals->setGeometry(body);
+        toolObj->addVisualModel(visuals);
+        toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.9);
+    }
+    {
+        auto visuals = std::make_shared<VisualModel>();
+        visuals->setGeometry(hook);
+        toolObj->addVisualModel(visuals);
+        toolObj->getVisualModel(1)->getRenderMaterial()->setOpacity(0.9);
+    }
+    // Add a component for controlling via another device
+    auto controller = toolObj->addComponent<PbdObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setTranslationScaling(100.0);     // this convertes from meters to cm
+    controller->setLinearKs(1000.0);              // in N/cm
+    controller->setAngularKs(1000000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.01);     // 1 N = 1 kg/(m*s^2) = 0.01 kg/(cm*s^2)
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setController(controller);
+
+    return toolObj;
+}
+
+Mat4d
+getJawPosition(double angle)
+{
+    const double    toolLength    = 2.0;
+    const double    capsuleLength = 1.0;
+    Eigen::Affine3d t(Eigen::Translation3d(0.0, 0.0, -toolLength));
+    t.rotate(Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitX()));
+    t.translate(Eigen::Vector3d(0.0, capsuleLength / 2.0, 0));
+    return t.matrix();
+}
+
+static std::shared_ptr<PbdObject>
+makeGraspingToolObject(std::shared_ptr<PbdModel> model)
+{
+    auto body = std::make_shared<Capsule>();
+    body->setRadius(0.4);
+    body->setLength(4.0);
+    body->setPosition(Vec3d(0.0, 0.0, 0.0));
+    body->setOrientation(Quatd(0.707, 0.707, 0.0, 0.0));
+
+    auto geometry = std::make_shared<CompoundGeometry>();
+    geometry->add(body);
+
+    auto hook1 = std::make_shared<Capsule>();
+    hook1->setRadius(0.15);
+    hook1->setLength(1);
+
+    //hook1->setPosition(Vec3d(0.0, -0.5, -2));
+    //hook->setOrientation(Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0, 0.0, 1.0)));
+    geometry->add(hook1);
+
+    geometry->setLocalTransform(1, getJawPosition(1.5));
+
+    auto hook2 = std::make_shared<Capsule>();
+    hook2->setRadius(0.15);
+    hook2->setLength(1);
+    //hook2->setPosition(Vec3d(0.0, 0.5, -2));
+    //hook->setOrientation(Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0, 0.0, 1.0)));
+    geometry->add(hook2);
+
+    geometry->setLocalTransform(2, getJawPosition(-1.5));
+
+    auto toolObj = std::make_shared<PbdObject>("Tool");
+
+    // Create the object
+    // toolObj->setVisualGeometry(body);
+    toolObj->setPhysicsGeometry(geometry);
+    toolObj->setCollidingGeometry(geometry);
+    toolObj->setDynamicalModel(model);
+    toolObj->getPbdBody()->setRigid(
+                Vec3d(0.0, 2.0, 2.0),
+                0.01,
+                Quatd::Identity(),
+                Mat3d::Identity() * 100000.0);
+    {
+        auto visuals = std::make_shared<VisualModel>();
+        visuals->setGeometry(body);
+        toolObj->addVisualModel(visuals);
+        toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(0.9);
+    }
+    {
+        auto visuals = std::make_shared<VisualModel>();
+        visuals->setGeometry(hook1);
+        toolObj->addVisualModel(visuals);
+        toolObj->getVisualModel(1)->getRenderMaterial()->setOpacity(0.9);
+    }
+    {
+        auto visuals = std::make_shared<VisualModel>();
+        visuals->setGeometry(hook2);
+        toolObj->addVisualModel(visuals);
+        toolObj->getVisualModel(2)->getRenderMaterial()->setOpacity(0.9);
+    }
+    // Add a component for controlling via another device
+    auto controller = toolObj->addComponent<PbdObjectController>();
+    controller->setControlledObject(toolObj);
+    controller->setTranslationScaling(100.0);     // this convertes from meters to cm
+    controller->setLinearKs(1000.0);              // in N/cm
+    controller->setAngularKs(1000000000.0);
+    controller->setUseCritDamping(true);
+    controller->setForceScaling(0.01);     // 1 N = 1 kg/(m*s^2) = 0.01 kg/(cm*s^2)
+    controller->setSmoothingKernelSize(15);
+    controller->setUseForceSmoothening(true);
+
+    auto controllerGhost = toolObj->addComponent<ObjectControllerGhost>();
+    controllerGhost->setController(controller);
+
+    return toolObj;
+}
+
 ///
 /// \brief Creates pbd simulated capsule to use as a tool
 ///
@@ -219,8 +369,42 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     return toolObj;
 }
 
+struct GraspingData
+{
+    std::shared_ptr<PbdObject> tool;
+    std::shared_ptr<CompoundGeometry> compoundGeometry;
+    std::vector<std::shared_ptr<PbdObjectGrasping>> graspers;
+    std::vector<std::shared_ptr<AnalyticalGeometry>> geometry;
+};
+
+void
+startGraspingToolGrasp(GraspingData& data)
+{
+    data.geometry.clear();
+    for (int i = 0; i < data.graspers.size(); ++i)
+    {
+        auto capsule = std::dynamic_pointer_cast<Capsule>(data.compoundGeometry->get(i + 1));
+        CHECK(capsule!=nullptr);
+        auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
+        dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
+        data.geometry.push_back(dilatedCapsule);
+        data.graspers[i]->beginCellGrasp(dilatedCapsule);
+    }
+}
+
+void
+regraspGraspingTool(GraspingData& data)
+{
+    for (int i = 0; i < data.graspers.size(); ++i)
+    {
+        auto t = data.compoundGeometry->get(i + 1)->getTransform();
+        data.geometry[i]->setTransform(t);
+        data.graspers[i]->regrasp();
+    }
+}
+
 int
-main()
+runHookToolScene()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();
@@ -250,11 +434,11 @@ main()
 
     // Create PBD object of connective strands with associated constraints
     double                     maxDist = 3.5;
-    std::shared_ptr<PbdObject> connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdModel, maxDist, 2.5, 7);
+    std::shared_ptr<PbdObject> connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdModel, maxDist, 2.5, 10);
     pbdModel->getConfig()->setBodyDamping(connectiveStrands->getPbdBody()->bodyHandle, 0.015, 0.0);
 
     // Add Tearing
-    connectiveStrands->addComponent<Tearable>();
+    // connectiveStrands->addComponent<Tearable>();
 
     // Add burnable
     auto burnable = std::make_shared<Burnable>();
@@ -264,7 +448,7 @@ main()
     scene->addSceneObject(connectiveStrands);
 
     // Setup a tool to grasp with
-    std::shared_ptr<PbdObject> toolObj = makeCapsuleToolObj(pbdModel);
+    std::shared_ptr<PbdObject> toolObj = makeHookToolObject(pbdModel);
     scene->addSceneObject(toolObj);
 
     // add collisions
@@ -286,6 +470,13 @@ main()
     // Add burner component to tool
     auto burning = std::make_shared<Burner>();
     burning->addObject(connectiveStrands);
+    burning->setOnTime(1.0);
+    burning->setWattage(200);
+    {
+        auto compound = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
+        auto geom     = std::dynamic_pointer_cast<AnalyticalGeometry>(compound->get(1));
+        burning->setBurnerGeometry(geom);
+    }
 
     toolObj->addComponent(burning);
 
@@ -331,8 +522,15 @@ main()
                 {
                     if (e->m_button == 1)
                     {
+                        std::shared_ptr<Capsule> capsule;
+                        capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
+                        // If using the hook the capsule the above will return nullptr
+                        if (capsule == nullptr)
+                        {
+                            auto compound = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
+                            capsule       = std::dynamic_pointer_cast<Capsule>(compound->get(1));
+                        }
                         // Use a slightly larger capsule since collision prevents intersection
-                        auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
                         auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                         dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                         grasper->beginCellGrasp(dilatedCapsule);
@@ -388,7 +586,8 @@ main()
         std::shared_ptr<Entity> mouseAndKeyControls =
             SimulationUtils::createDefaultSceneControl(driver);
         scene->addSceneObject(mouseAndKeyControls);
-
+        double angle  = 0.6;
+        double origin = PI + PI / 2;
         // Add keyboard controlls for burning and grasping (Note: only for haptic devices without buttons)
         std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
@@ -406,7 +605,14 @@ main()
                 if (keyDevice->getButton('g') == KEY_PRESS && grasper->getGraspState() == false && grasper_gall->getGraspState() == false)
                 {
                     // Use a slightly larger capsule since collision prevents intersection
-                    auto capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
+                    std::shared_ptr<Capsule> capsule;
+                    capsule = std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry());
+                    // If using the hook the capsule the above will return nullptr
+                    if (capsule == nullptr)
+                    {
+                        auto compound = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
+                        capsule       = std::dynamic_pointer_cast<Capsule>(compound->get(1));
+                    }
                     auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
                     dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
                     grasper->beginCellGrasp(dilatedCapsule);
@@ -414,12 +620,26 @@ main()
 
                     std::cout << "Grasping! \n";
                 }
-                if (keyDevice->getButton('g') == KEY_RELEASE && grasper->getGraspState() == true && grasper_gall->getGraspState() == true)
+                if (keyDevice->getButton('g') == KEY_RELEASE && (grasper_gall->getGraspState() || grasper->getGraspState()))
                 {
                     grasper->endGrasp();
                     grasper_gall->endGrasp();
 
                     std::cout << "Released! \n";
+                }
+                if (keyDevice->getButton('o') == KEY_PRESS)
+                {
+                    auto compound = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
+                    angle += (angle < 0.6) ? 0.025 : 0.0;
+                    compound->setLocalTransform(1, getJawPosition(origin + angle));
+                    compound->setLocalTransform(2, getJawPosition(origin - angle));
+                }
+                if (keyDevice->getButton('i') == KEY_PRESS)
+                {
+                    auto compound = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
+                    angle -= (angle > 0) ? 0.025 : 0.0;
+                    compound->setLocalTransform(1, getJawPosition(origin + angle));
+                    compound->setLocalTransform(2, getJawPosition(origin - angle));
                 }
             });
 
@@ -427,4 +647,222 @@ main()
     }
 
     return 0;
+}
+
+int
+runGraspingToolScene()
+{
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    // Setup the scene
+    auto scene = std::make_shared<Scene>("PbdConnectiveTissue");
+    scene->getActiveCamera()->setPosition(0.944275, 8.47551, 21.4164);
+    scene->getActiveCamera()->setFocalPoint(-0.450427, 0.519797, 0.817356);
+    scene->getActiveCamera()->setViewUp(-0.0370536, 0.933044, -0.357851);
+
+    // Setup the PBD Model
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->getConfig()->m_doPartitioning = false;
+    pbdModel->getConfig()->m_dt = 0.001;
+    pbdModel->getConfig()->m_iterations = 6;
+    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -981.0, 0.0);  //in cm/s^2
+    pbdModel->getConfig()->m_linearDampingCoeff  = 0.005;           // Removed from velocity
+    pbdModel->getConfig()->m_angularDampingCoeff = 0.005;
+
+    // Setup gallbladder object
+    std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdModel);
+    scene->addSceneObject(gallbladerObj);
+
+    // Setup kidney
+    std::shared_ptr<PbdObject> kidneyObj = makeKidney("Kidney", pbdModel);
+    scene->addSceneObject(kidneyObj);
+
+    // Create PBD object of connective strands with associated constraints
+    double                     maxDist = 3.5;
+    std::shared_ptr<PbdObject> connectiveStrands = makeConnectiveTissue(gallbladerObj, kidneyObj, pbdModel, maxDist, 2.5, 10);
+    pbdModel->getConfig()->setBodyDamping(connectiveStrands->getPbdBody()->bodyHandle, 0.015, 0.0);
+
+    // Add Tearing
+    // connectiveStrands->addComponent<Tearable>();
+
+    // Add burnable
+    auto burnable = std::make_shared<Burnable>();
+    connectiveStrands->addComponent(burnable);
+
+    // Add strands to scene
+    scene->addSceneObject(connectiveStrands);
+
+    // Setup a tool to grasp with
+    std::shared_ptr<PbdObject> toolObj = makeGraspingToolObject(pbdModel);
+    scene->addSceneObject(toolObj);
+
+    // add collisions
+    auto strandCollision = std::make_shared<PbdObjectCollision>(connectiveStrands, toolObj);
+    scene->addInteraction(strandCollision);
+
+    auto gallCollision = std::make_shared<PbdObjectCollision>(gallbladerObj, toolObj);
+    scene->addInteraction(gallCollision);
+
+    GraspingData graspingData;
+    graspingData.tool = toolObj;
+    graspingData.compoundGeometry = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
+
+    auto compoundGeomtry = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
+    CHECK(compoundGeomtry != nullptr);
+    // Need two graspers for each jaw
+    {
+        auto grasper = std::make_shared<PbdObjectGrasping>(connectiveStrands, toolObj);
+
+        grasper->setStiffness(0.5);
+        scene->addInteraction(grasper);
+        graspingData.graspers.push_back(grasper);
+    }
+    {
+        auto grasper = std::make_shared<PbdObjectGrasping>(connectiveStrands, toolObj);
+        grasper->setStiffness(0.5);
+        scene->addInteraction(grasper);
+        graspingData.graspers.push_back(grasper);
+    }
+
+    // Create new picking with constraints
+
+    auto grasper_gall = std::make_shared<PbdObjectGrasping>(gallbladerObj, toolObj);
+    grasper_gall->setStiffness(0.5);
+    scene->addInteraction(grasper_gall);
+
+    // Light
+    auto light = std::make_shared<DirectionalLight>();
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setIntensity(1.0);
+    scene->addLight("Light", light);
+
+    // Run the simulation
+    {
+        // Setup a viewer to render
+        auto viewer = std::make_shared<VTKViewer>();
+        viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
+        viewer->setActiveScene(scene);
+        viewer->setDebugAxesLength(1.0, 1.0, 1.0);
+
+        // Setup a scene manager to advance the scene
+        auto sceneManager = std::make_shared<SceneManager>();
+        sceneManager->setActiveScene(scene);
+        sceneManager->pause();         // Start simulation pause
+
+        auto driver = std::make_shared<SimulationManager>();
+        driver->setDesiredDt(0.005);
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
+
+        auto controller = toolObj->getComponent<PbdObjectController>();
+#ifdef iMSTK_USE_HAPTICS
+        // Setup default haptics manager
+        std::shared_ptr<DeviceManager> hapticManager = DeviceManagerFactory::makeDeviceManager();
+        if (hapticManager->getTypeName() == "HaplyDeviceManager")
+        {
+            controller->setTranslationOffset(Vec3d(2.0, 0.0, -2.0));
+        }
+        std::shared_ptr<DeviceClient> deviceClient = hapticManager->makeDeviceClient();
+        driver->addModule(hapticManager);
+#else
+        auto deviceClient = std::make_shared<DummyClient>();
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
+            [&](Event*)
+            {
+                const Vec2d mousePos = viewer->getMouseDevice()->getPos();
+                const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.1;
+
+                deviceClient->setPosition(worldPos);
+                        });
+
+        // Add click event and side effects
+        connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
+            [&](Event*)
+            {
+                grasper->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
+                //pbdToolCollision->setEnabled(false);
+                        });
+        connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
+            [&](Event*)
+            {
+                grasper->endGrasp();
+                //pbdToolCollision->setEnabled(true);
+                        });
+#endif
+
+        // auto controller = toolObj->getComponent<PbdObjectController>();
+        controller->setDevice(deviceClient);
+
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        scene->addSceneObject(mouseAndKeyControls);
+        double angle  = 0.6;
+        double origin = PI + PI / 2;
+        // Add keyboard controlls for burning and grasping (Note: only for haptic devices without buttons)
+        std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
+
+        bool m_closing = false;
+        bool m_opening = true;
+
+        auto openJaws = [&]() {
+                            if (!m_opening)
+                            {
+                                // Transitioning from closing to opening stop grasping
+                                for (auto& grasper : graspingData.graspers)
+                                {
+                                    grasper->endGrasp();
+                                }
+                                m_closing = false;
+                                m_opening = true;
+                            }
+                            auto compound = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
+                            angle += (angle < 0.6) ? 0.025 : 0.0;
+                            compound->setLocalTransform(1, getJawPosition(origin + angle));
+                            compound->setLocalTransform(2, getJawPosition(origin - angle));
+                        };
+
+        auto closeJaws = [&]() {
+                             if (!m_closing)
+                             {
+                                 // Transitioning from opening to closing, start grasping
+                                 startGraspingToolGrasp(graspingData);
+                                 m_closing = true;
+                                 m_opening = false;
+                             }
+                             else
+                             {
+                                 regraspGraspingTool(graspingData);
+                             }
+
+                             auto compound = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
+                             angle -= (angle > 0) ? 0.025 : 0.0;
+                             compound->setLocalTransform(1, getJawPosition(origin + angle));
+                             compound->setLocalTransform(2, getJawPosition(origin - angle));
+                         };
+
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
+            {
+                if (keyDevice->getButton('o') == KEY_PRESS || deviceClient->getButton(0) != 0)
+                {
+                    openJaws();
+                }
+                if (keyDevice->getButton('i') == KEY_PRESS || deviceClient->getButton(1) != 0)
+                {
+                    closeJaws();
+                }
+                        });
+
+        driver->start();
+    }
+
+    return 0;
+}
+
+int
+main()
+{
+    //runHookToolScene();
+    runGraspingToolScene();
 }

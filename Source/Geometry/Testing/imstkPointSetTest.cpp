@@ -148,10 +148,10 @@ TEST(imstkPointSetTest, VertexTangentsTransform)
     p.setVertexTangents("float3");
 
     auto vertexCopy = std::make_shared<VecDataArray<float, 3>>(VecDataArray<float, 3>({
-        Vec3f{ 0.0, 0.1, 0.2 },
-        Vec3f{ 1.0, 1.1, 1.2 },
-        Vec3f{ 2.0, 2.1, 2.2 },
-        Vec3f{ 3.0, 3.1, 3.2 },
+        Vec3f{ 0.0f, 0.1f, 0.2f },
+        Vec3f{ 1.0f, 1.1f, 1.2f },
+        Vec3f{ 2.0f, 2.1f, 2.2f },
+        Vec3f{ 3.0f, 3.1f, 3.2f },
         }));
 
     // Roatate mesh
