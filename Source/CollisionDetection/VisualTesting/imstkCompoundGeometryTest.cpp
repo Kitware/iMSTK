@@ -56,14 +56,14 @@ makeCompoundObject(std::shared_ptr<PbdModel> pbdModel, Vec3d startingPos)
 //      auto geom1 = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), radius);
 //      auto geom2 = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), radius);
 //      auto geom3 = std::make_shared<Sphere>(Vec3d(0.0, 0.0, 0.0), radius);
-//      Mat4d m1 = trans1.matrix();
-//      Mat4d m2 = trans2.matrix();
+//      Mat4d m1 = rot1.matrix();
+//      Mat4d m2 = rot2.matrix();
 
     rigidGeom->add(geom1);
-//     rigidGeom->add(geom2);
-//     rigidGeom->transformLocally(1, m1);
-//     rigidGeom->add(geom3);
-//     rigidGeom->transformLocally(2, m2);
+    rigidGeom->add(geom2);
+    rigidGeom->setLocalTransform(1, m1);
+    rigidGeom->add(geom3);
+    rigidGeom->setLocalTransform(2, m2);
 
     rigidPbdObj->setVisualGeometry(geom1);
     rigidPbdObj->setCollidingGeometry(rigidGeom);
@@ -165,7 +165,7 @@ TEST_F(CompoundCollisionVisualTest, CompoundCapsule)
 
         auto simpleRigid = makeTestSphereObject(pbdModel, Vec3d(-0.2, 0.15, 0.0));
         m_scene->addSceneObject(simpleRigid);
-        {
+    {
         auto collision = std::make_shared<PbdObjectCollision>(simpleRigid, planeObj, "UnidirectionalPlaneToSphereCD");
         collision->setUseCorrectVelocity(true);
         collision->setRigidBodyCompliance(0.0001);

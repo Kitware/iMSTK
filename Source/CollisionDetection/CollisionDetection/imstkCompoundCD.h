@@ -15,11 +15,11 @@ namespace imstk
 /// \class CompoundCD
 ///
 /// \brief Collision detection that supports a geometry consisting
-///     of multiple subgeometries. 
+///     of multiple subgeometries.
 /// For the actual calcualation the information gets passed to the appropriate
-/// shape/subshape CD algorithm. Currently Does not support adding/removing a shape during 
+/// shape/subshape CD algorithm. Currently Does not support adding/removing a shape during
 /// runtime
-/// 
+///
 class CompoundCD : public CollisionDetectionAlgorithm
 {
 public:

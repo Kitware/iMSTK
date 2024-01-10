@@ -99,11 +99,12 @@ public:
     void beginRayCellGrasp(std::shared_ptr<AnalyticalGeometry> geometry,
                            const Vec3d& rayStart, const Vec3d& rayDir, const double maxDist = -1.0);
 
-    /// 
+    ///
     /// \brief if you already started a grasp, recalculates grasping points
     /// As the currently grasped points are already constrained to the object
     /// this will capture those point plus any new candidates
-    void regrasp() {
+    void regrasp()
+    {
         m_regrasp = m_isGrasping;
     }
 
@@ -209,7 +210,7 @@ protected:
     GraspMode m_graspMode = GraspMode::Cell;
 
     bool m_isGrasping     = false;
-    bool m_regrasp = false; ///< Add grasped points to the current grasp
+    bool m_regrasp        = false; ///< Add grasped points to the current grasp
     bool m_isPrevGrasping = false;
 
     /// Stiffness of grasp, when 1 the position is completely moved too the grasp point

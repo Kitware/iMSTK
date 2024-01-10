@@ -68,6 +68,7 @@ CompoundGeometry::updatePostTransformData() const
         std::for_each(m_geometries.begin(), m_geometries.end(), [this](auto& geom) {
                 auto transform = m_transform * geom.localTransform;
                 CHECK(!transform.hasNaN());
+                CHECK(geom.geometry != nullptr);
                 geom.geometry->setTransform(transform);
                 geom.geometry->updatePostTransformData();
                                                                           });
@@ -98,16 +99,17 @@ CompoundGeometry::setLocalTransform(size_t index, const Mat4d& transform)
     m_geometries[index].localTransform = transform;
 }
 
-std::shared_ptr<imstk::Geometry> CompoundGeometry::get(size_t index) const
+std::shared_ptr<imstk::Geometry>
+CompoundGeometry::get(size_t index) const
 {
-	if (index < m_geometries.size())
-	{
-		return m_geometries[index].geometry;
-	}
-	else
-	{
-		return nullptr;
-	}
+    if (index < m_geometries.size())
+    {
+        return m_geometries[index].geometry;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 void
