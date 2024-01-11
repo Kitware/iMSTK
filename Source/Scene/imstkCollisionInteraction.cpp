@@ -126,9 +126,18 @@ CollisionInteraction::setEnabled(const bool enabled)
     m_collisionDetectionNode->setEnabled(enabled);
     if (m_colDetect != nullptr)
     {
-        // Clear the data (since CD clear is only run before CD is performed)
-        m_colDetect->getCollisionData()->elementsA.resize(0);
-        m_colDetect->getCollisionData()->elementsB.resize(0);
+        if (m_colDetect->getCollisionData() != nullptr) 
+        {
+			// Clear the data (since CD clear is only run before CD is performed)
+			m_colDetect->getCollisionData()->elementsA.resize(0);
+			m_colDetect->getCollisionData()->elementsB.resize(0);
+        }
+        else {
+            for (auto colDetect : *(m_colDetect->getCollisionVectorData())) {
+                colDetect->elementsA.resize(0);
+                colDetect->elementsB.resize(0);
+            }
+        }
     }
     else
     {
