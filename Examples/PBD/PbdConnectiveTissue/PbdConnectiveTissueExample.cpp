@@ -384,7 +384,7 @@ startGraspingToolGrasp(GraspingData& data)
     for (int i = 0; i < data.graspers.size(); ++i)
     {
         auto capsule = std::dynamic_pointer_cast<Capsule>(data.compoundGeometry->get(i + 1));
-        CHECK(capsule!=nullptr);
+        CHECK(capsule != nullptr);
         auto dilatedCapsule = std::make_shared<Capsule>(*capsule);
         dilatedCapsule->setRadius(capsule->getRadius() * 1.1);
         data.geometry.push_back(dilatedCapsule);
@@ -776,19 +776,6 @@ runGraspingToolScene()
                 deviceClient->setPosition(worldPos);
                         });
 
-        // Add click event and side effects
-        connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
-            [&](Event*)
-            {
-                grasper->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
-                //pbdToolCollision->setEnabled(false);
-                        });
-        connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
-            [&](Event*)
-            {
-                grasper->endGrasp();
-                //pbdToolCollision->setEnabled(true);
-                        });
 #endif
 
         // auto controller = toolObj->getComponent<PbdObjectController>();
