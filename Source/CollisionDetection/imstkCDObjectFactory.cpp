@@ -164,7 +164,7 @@ CDObjectFactory::getCDType(
 
     if (cdTypeMap.find(type1 + type2) == cdTypeMap.end())
     {
-        LOG(FATAL) << "No valid collision detection type for : " << type1 + type2;
+        LOG(INFO) << "No valid collision detection type for : " << type1 + type2;
         return std::string("");
     }
 
