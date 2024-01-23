@@ -11,6 +11,7 @@
 #include "imstkVecDataArray.h"
 
 #include <random>
+#include <iostream>
 
 namespace imstk
 {
@@ -105,6 +106,10 @@ ConnectiveStrandGenerator::createStrands(
     static std::mt19937             gen(rd());                                     // seed the generator
     std::uniform_int_distribution<> faceDistr(0, meshB->getNumCells() - 1);        // define the range over cells of mesh B
 
+    double angleThreshold = cos(m_allowedAngleDeviation);
+
+    Vec3d cardinalDirection = (meshA->getCenter() - meshB->getCenter()).normalized();
+
     // Storage for connectivity of line mesh
     auto lineMeshVerticesPtr = std::make_shared<VecDataArray<double, 3>>();
     auto lineMeshIndicesPtr  = std::make_shared<VecDataArray<int, 2>>();
@@ -128,6 +133,10 @@ ConnectiveStrandGenerator::createStrands(
             const Vec3d positionOnA = generateRandomPointOnFace(meshA, faces[cell_idA]);
             Vec3d       positionOnB = Vec3d::Zero();
 
+            double bestThreshold  = 0;
+            Vec3d  bestPositionB  = Vec3d::Zero();
+            int    iterationCount = 0;
+
             // Get index of cell on B that creates a strand that does not penetrate mesh B
             while (true)
             {
@@ -137,9 +146,26 @@ ConnectiveStrandGenerator::createStrands(
                 // Check that direction is not inside of mesh B
                 Vec3d  directionBA = (positionOnA - positionOnB).normalized();
                 double dotCheck    = meshB->getCellNormals()->at(sideBindx).dot(directionBA);
+                double inCardinalDirection = cardinalDirection.dot(directionBA);
+
                 if (dotCheck > 0.1)
                 {
-                    break;
+                    ++iterationCount;
+                    if (inCardinalDirection > angleThreshold)
+                    {
+                        break;
+                    }
+
+                    if (angleThreshold > bestThreshold)
+                    {
+                        bestThreshold = angleThreshold;
+                        bestPositionB = positionOnB;
+                    }
+                    if (iterationCount > 10)
+                    {
+                        positionOnB = bestPositionB;
+                        break;
+                    }
                 }
             }
 

@@ -241,12 +241,22 @@ main()
         rightController->setDevice(deviceClient);
         rightController->setTranslationOffset((*lapTool->getPbdBody()->vertices)[0]);
 
+        // Add default mouse and keyboard controls to the viewer
+        std::shared_ptr<Entity> mouseAndKeyControls =
+            SimulationUtils::createDefaultSceneControl(driver);
+        auto instructText = mouseAndKeyControls->getComponent<TextVisualModel>();
+        instructText->setText(instructText->getText() +
+                        "\nPress Haptic Button or Click to grasp" +
+                        "\nPress 1 to toggle gravity");
+        scene->addSceneObject(mouseAndKeyControls);
+
+        if (auto mouseControl = mouseAndKeyControls->getComponent<MouseSceneControl>())
+        {
+            mouseControl->setEnabled(true);
+        }
+
         // Add mouse and keyboard controls to the viewer
         {
-            auto mouseControl = std::make_shared<MouseSceneControl>();
-            mouseControl->setDevice(viewer->getMouseDevice());
-            mouseControl->setSceneManager(sceneManager);
-            scene->addControl(mouseControl);
             connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, [&](KeyEvent* e)
                 {
                     if (e->m_key == '1')
@@ -266,15 +276,6 @@ main()
                         viewer->update();
                     }
                 });
-
-            // Add default mouse and keyboard controls to the viewer
-            std::shared_ptr<Entity> mouseAndKeyControls =
-                SimulationUtils::createDefaultSceneControl(driver);
-            auto instructText = mouseAndKeyControls->getComponent<TextVisualModel>();
-            instructText->setText(instructText->getText() +
-                "\nPress Haptic Button or Click to grasp" +
-                "\nPress 1 to toggle gravity");
-            scene->addSceneObject(mouseAndKeyControls);
         }
 
         driver->start();
