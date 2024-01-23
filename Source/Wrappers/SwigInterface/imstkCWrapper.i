@@ -439,6 +439,7 @@ namespace std
 /*
  * SceneEntities
  */
+
 %include "../../SceneEntities/Components/imstkVisualModel.h";
 %include "../../SceneEntities/Components/imstkTearable.h";
 %include "../../SceneEntities/Components/imstkBurnable.h";

@@ -140,15 +140,29 @@ std::shared_ptr<PbdObject> addConnectiveTissueConstraints(
 ///        angle may cause the default generation algorithm to take a long time or not pass as it is using
 ///        a random algorithm to pick strands
 ///
+
+std::shared_ptr<PbdObject> makeConnectiveTissue(
+    std::shared_ptr<PbdObject>                objA,
+    std::shared_ptr<PbdObject>                objB,
+    std::shared_ptr<PbdModel>                 model,
+    double                                    maxDist,
+    double                                    strandsPerFace,
+    int                                       segmentsPerStrand,
+    std::shared_ptr<ProximitySurfaceSelector> selector,
+    double                                    mass,
+    double                                    distStiffness,
+    double                                    allowedAngleDeviation);
+
+
 std::shared_ptr<PbdObject> makeConnectiveTissue(
     std::shared_ptr<PbdObject>                objA,
     std::shared_ptr<PbdObject>                objB,
     std::shared_ptr<PbdModel>                 model,
     double                                    maxDist = 0.0,
-    double                                    strandsPerFace    = 1,
+    double                                    strandsPerFace = 1,
     int                                       segmentsPerStrand = 3,
-    std::shared_ptr<ProximitySurfaceSelector> selector = nullptr,
     double                                    mass = 0.005,
-    double                                    distStiffness = 10000000000,
+    double                                    distStiffness = 1.0e10,
     double                                    allowedAngleDeviation = PI);
+
 } // namespace imstk
