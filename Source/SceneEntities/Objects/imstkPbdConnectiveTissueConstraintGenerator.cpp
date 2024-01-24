@@ -285,9 +285,10 @@ makeConnectiveTissue(
     return connectiveStrands;
 }
 
-std::shared_ptr<imstk::PbdObject> makeConnectiveTissue(std::shared_ptr<PbdObject> objA, std::shared_ptr<PbdObject> objB, std::shared_ptr<PbdModel> model, double maxDist /*= 0.0*/, double strandsPerFace /*= 1*/, int segmentsPerStrand /*= 3*/, double mass /*= 0.005*/, double distStiffness /*= 1.0e10*/, double allowedAngleDeviation /*= PI*/)
+std::shared_ptr<imstk::PbdObject>
+makeConnectiveTissue(std::shared_ptr<PbdObject> objA, std::shared_ptr<PbdObject> objB, std::shared_ptr<PbdModel> model, double maxDist /*= 0.0*/, double strandsPerFace /*= 1*/,
+                     int segmentsPerStrand /*= 3*/, double mass /*= 0.005*/, double distStiffness /*= 1.0e10*/, double allowedAngleDeviation /*= PI*/)
 {
-	return makeConnectiveTissue(objA, objB, model, maxDist, strandsPerFace, segmentsPerStrand, nullptr, mass, distStiffness, allowedAngleDeviation);
+    return makeConnectiveTissue(objA, objB, model, maxDist, strandsPerFace, segmentsPerStrand, nullptr, mass, distStiffness, allowedAngleDeviation);
 }
-
 } // namespace imstk

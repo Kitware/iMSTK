@@ -53,6 +53,13 @@ public:
     ///
     void enableConstraint(ConstraintGenType type, const double stiffness, const int bodyId = 2);
 
+    /// \brief Enables a Distance constraint on the body
+    /// Will remove an existing distance constraint on the same body
+    /// \param stiffness How much constraint is enforced
+    /// \param stretch Allows to stretch or relax the material, the constraint restlength is multiplied by the strech factor
+    /// \param bodyId Body to add the constraint
+    void enableDistanceConstraint(const double stiffness, const double stretch, const int bodyId);
+
     ///
     /// \brief Enables a bend constraint with given stiffness, stride, and flag for 0 rest length
     /// You may enable multiple with differing strides

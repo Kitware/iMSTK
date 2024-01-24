@@ -106,9 +106,9 @@ ConnectiveStrandGenerator::createStrands(
     static std::mt19937             gen(rd());                                     // seed the generator
     std::uniform_int_distribution<> faceDistr(0, meshB->getNumCells() - 1);        // define the range over cells of mesh B
 
-    double angleThreshold = cos(m_allowedAngleDeviation);
-
-    Vec3d cardinalDirection = (meshA->getCenter() - meshB->getCenter()).normalized();
+    const int    maxIteration      = 10;
+    const double angleThreshold    = cos(m_allowedAngleDeviation);
+    const Vec3d  cardinalDirection = (meshA->getCenter() - meshB->getCenter()).normalized();
 
     // Storage for connectivity of line mesh
     auto lineMeshVerticesPtr = std::make_shared<VecDataArray<double, 3>>();
@@ -148,6 +148,7 @@ ConnectiveStrandGenerator::createStrands(
                 double dotCheck    = meshB->getCellNormals()->at(sideBindx).dot(directionBA);
                 double inCardinalDirection = cardinalDirection.dot(directionBA);
 
+                // Limit angular test to
                 if (dotCheck > 0.1)
                 {
                     ++iterationCount;
@@ -156,12 +157,13 @@ ConnectiveStrandGenerator::createStrands(
                         break;
                     }
 
-                    if (angleThreshold > bestThreshold)
+                    if (inCardinalDirection > bestThreshold)
                     {
                         bestThreshold = angleThreshold;
                         bestPositionB = positionOnB;
                     }
-                    if (iterationCount > 10)
+
+                    if (iterationCount > maxIteration)
                     {
                         positionOnB = bestPositionB;
                         break;

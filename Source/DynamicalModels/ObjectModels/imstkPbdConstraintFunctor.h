@@ -117,6 +117,7 @@ struct PbdDistanceConstraintFunctor : public PbdBodyConstraintFunctor
             auto constraint = std::make_shared<PbdDistanceConstraint>();
             constraint->initConstraint(vertices[i1], vertices[i2],
                 { m_bodyIndex, i1 }, { m_bodyIndex, i2 }, m_stiffness);
+            constraint->m_restLength *= m_stretch;
             return constraint;
         }
 
@@ -294,10 +295,18 @@ struct PbdDistanceConstraintFunctor : public PbdBodyConstraintFunctor
         ///@{
         void setStiffness(const double stiffness) { m_stiffness = stiffness; }
         double getStiffness() const { return m_stiffness; }
-    ///@}
+        ///@}
+
+        ///
+        /// \brief Get/Set the factor that modifies the restlength
+        ///@{
+        double getStretch() const { return m_stretch; }
+        void setStretch(double val) { m_stretch = val; }
+        ///@
 
     protected:
         double m_stiffness = 0.0;
+        double m_stretch   = 1.0;
 };
 
 ///
