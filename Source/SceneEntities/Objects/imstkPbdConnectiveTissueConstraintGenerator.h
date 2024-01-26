@@ -7,6 +7,7 @@
 #pragma once
 
 #include "imstkPbdConstraintFunctor.h"
+#include "imstkMath.h"
 
 #include <unordered_map>
 
@@ -134,15 +135,32 @@ std::shared_ptr<PbdObject> addConnectiveTissueConstraints(
 ///        there is a chance (equal to the fractional part) of the face having one more strand
 /// \param segmentsPerStrand  number of segments each strand is made of
 /// \param selector the selector type used to generate the faces, currently only ProximitySurfaceSelector
+/// \param allowedAngleDeviation the max angle in rad that strands are allow to diverge from the centroid
+///        to centroid axis (defaults to PI i.e any direction is allowed), note that picking too small an
+///        angle may cause the default generation algorithm to take a long time or not pass as it is using
+///        a random algorithm to pick strands
 ///
+
 std::shared_ptr<PbdObject> makeConnectiveTissue(
     std::shared_ptr<PbdObject>                objA,
     std::shared_ptr<PbdObject>                objB,
     std::shared_ptr<PbdModel>                 model,
-    double                                    maxDist = 0.0,
-    double                                    strandsPerFace    = 1,
-    int                                       segmentsPerStrand = 3,
-    std::shared_ptr<ProximitySurfaceSelector> selector = nullptr,
-    double                                    mass = 0.005,
-    double                                    distStiffness = 10000000000);
+    double                                    maxDist,
+    double                                    strandsPerFace,
+    int                                       segmentsPerStrand,
+    std::shared_ptr<ProximitySurfaceSelector> selector,
+    double                                    mass,
+    double                                    distStiffness,
+    double                                    allowedAngleDeviation);
+
+std::shared_ptr<PbdObject> makeConnectiveTissue(
+    std::shared_ptr<PbdObject> objA,
+    std::shared_ptr<PbdObject> objB,
+    std::shared_ptr<PbdModel>  model,
+    double                     maxDist = 0.0,
+    double                     strandsPerFace    = 1,
+    int                        segmentsPerStrand = 3,
+    double                     mass = 0.005,
+    double                     distStiffness = 1.0e10,
+    double                     allowedAngleDeviation = PI);
 } // namespace imstk

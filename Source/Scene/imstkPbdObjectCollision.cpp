@@ -163,7 +163,14 @@ PbdObjectCollision::setupConnections(std::shared_ptr<PbdObject> obj1, std::share
     std::shared_ptr<PbdCollisionHandling> ch = std::make_shared<PbdCollisionHandling>();
     ch->setInputObjectA(obj1);
     ch->setInputObjectB(obj2);
-    ch->setInputCollisionData(m_colDetect->getCollisionData());
+    if (m_colDetect->getCollisionVectorData() != nullptr)
+    {
+        ch->setInputCollisionData(m_colDetect->getCollisionVectorData());
+    }
+    else
+    {
+        ch->setInputCollisionData(m_colDetect->getCollisionData());
+    }
 
     m_updatePrevGeometryCCDNode = std::make_shared<TaskNode>([&]()
         {

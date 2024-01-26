@@ -158,6 +158,7 @@ PbdConnectiveTissueConstraintGenerator::generateDistanceConstraints()
 {
     m_connectiveStrandObj->getPbdModel()->getConfig()->enableConstraint(PbdModelConfig::ConstraintGenType::Distance, m_distStiffness,
         m_connectiveStrandObj->getPbdBody()->bodyHandle);
+    // m_connectiveStrandObj->getPbdModel()->getConfig()->enableBendConstraint(.5, 1, false, m_connectiveStrandObj->getPbdBody()->bodyHandle);
 }
 
 void
@@ -235,7 +236,8 @@ makeConnectiveTissue(
     int                                       segmentsPerStrand,
     std::shared_ptr<ProximitySurfaceSelector> proxSelector,
     double                                    mass,
-    double                                    distStiffness)
+    double                                    distStiffness,
+    double                                    allowedAngleDeviation)
 {
     proxSelector = std::make_shared<ProximitySurfaceSelector>();
 
@@ -270,6 +272,7 @@ makeConnectiveTissue(
         std::dynamic_pointer_cast<SurfaceMesh>(proxSelector->getOutput(1)));
     surfConnector->setSegmentsPerStrand(segmentsPerStrand);
     surfConnector->setStrandsPerFace(strandsPerFace);
+    surfConnector->setAllowedAngleDeviation(allowedAngleDeviation);
     surfConnector->update();
 
     // Get mesh for connective strands
@@ -280,5 +283,12 @@ makeConnectiveTissue(
         connectiveLineMesh, objA, objB, model, mass);
 
     return connectiveStrands;
+}
+
+std::shared_ptr<imstk::PbdObject>
+makeConnectiveTissue(std::shared_ptr<PbdObject> objA, std::shared_ptr<PbdObject> objB, std::shared_ptr<PbdModel> model, double maxDist /*= 0.0*/, double strandsPerFace /*= 1*/,
+                     int segmentsPerStrand /*= 3*/, double mass /*= 0.005*/, double distStiffness /*= 1.0e10*/, double allowedAngleDeviation /*= PI*/)
+{
+    return makeConnectiveTissue(objA, objB, model, maxDist, strandsPerFace, segmentsPerStrand, nullptr, mass, distStiffness, allowedAngleDeviation);
 }
 } // namespace imstk

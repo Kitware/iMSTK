@@ -190,7 +190,10 @@ PbdTriangleToBodyConstraint::computeInterpolantsAndContact(const PbdState& bodie
 
     // Compute barycentric coordinates u,v,w
     const Vec3d bary = baryCentric(p, x1, x2, x3);
-
+    if (bary.hasNaN())
+    {
+        return false;
+    }
     // Point
     weights[0] = 1.0;
     // Triangle off by 1 for point weight storage at [0]

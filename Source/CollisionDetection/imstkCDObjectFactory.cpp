@@ -3,12 +3,13 @@
 ** iMSTK is distributed under the Apache License, Version 2.0.
 ** See accompanying NOTICE for details.
 */
-
 #include "imstkCDObjectFactory.h"
+
 #include "imstkBidirectionalPlaneToSphereCD.h"
 #include "imstkCapsuleToCapsuleCD.h"
 #include "imstkClosedSurfaceMeshToCapsuleCD.h"
 #include "imstkClosedSurfaceMeshToMeshCD.h"
+#include "imstkCompoundCD.h"
 #include "imstkGeometry.h"
 #include "imstkImplicitGeometryToPointSetCCD.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
@@ -58,6 +59,7 @@ IMSTK_REGISTER_COLLISION_DETECTION(TetraToPointSetCD);
 IMSTK_REGISTER_COLLISION_DETECTION(TetraToLineMeshCD);
 IMSTK_REGISTER_COLLISION_DETECTION(UnidirectionalPlaneToSphereCD);
 IMSTK_REGISTER_COLLISION_DETECTION(UnidirectionalPlaneToCapsuleCD);
+IMSTK_REGISTER_COLLISION_DETECTION(CompoundCD);
 
 // Map types so order does not matter
 #define IMSTK_MAP_TYPES(geomA, geomB, cdType)                            \
@@ -146,11 +148,23 @@ CDObjectFactory::getCDType(
         IMSTK_MAP_TYPES(CompositeImplicitGeometry, SurfaceMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(CompositeImplicitGeometry, TetrahedralMesh, ImplicitGeometryToPointSetCD),
         IMSTK_MAP_TYPES(CompositeImplicitGeometry, HexahedralMesh, ImplicitGeometryToPointSetCD),
+
+        // CompoundGeometry, uses CompoundCD for all types,
+        // the check if CD actually exists is done at runtime
+        IMSTK_MAP_TYPES(CompoundGeometry, Plane, CompoundCD),
+        IMSTK_MAP_TYPES(CompoundGeometry, Sphere, CompoundCD),
+        IMSTK_MAP_TYPES(CompoundGeometry, Capsule, CompoundCD),
+        IMSTK_MAP_TYPES(CompoundGeometry, Cylinder, CompoundCD),
+        IMSTK_MAP_TYPES(CompoundGeometry, OrientedBox, CompoundCD),
+        IMSTK_MAP_TYPES(CompoundGeometry, PointSet, CompoundCD),
+        IMSTK_MAP_TYPES(CompoundGeometry, HexahedralMesh, CompoundCD),
+        IMSTK_MAP_TYPES(CompoundGeometry, LineMesh, CompoundCD),
+        IMSTK_MAP_TYPES(CompoundGeometry, SurfaceMesh, CompoundCD)
     };
 
     if (cdTypeMap.find(type1 + type2) == cdTypeMap.end())
     {
-        LOG(FATAL) << "No valid collision detection type for : " << type1 + type2;
+        LOG(INFO) << "No valid collision detection type for : " << type1 + type2;
         return std::string("");
     }
 

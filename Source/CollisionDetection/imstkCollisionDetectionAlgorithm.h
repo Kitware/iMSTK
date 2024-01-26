@@ -43,11 +43,12 @@ public:
     ///
     virtual const std::string getTypeName() const = 0;
 
-public:
     ///
     /// \brief Returns output collision data
     ///
     const std::shared_ptr<CollisionData> getCollisionData() const { return m_colData; }
+
+    const std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>> getCollisionVectorData() const { return m_colVectorData; }
 
     ///
     /// \brief If generateA is false, CD data will not be generated for input0,A
@@ -105,8 +106,8 @@ protected:
         std::shared_ptr<Geometry>      imstkNotUsed(geomB),
         std::vector<CollisionElement>& imstkNotUsed(elementsB)) { m_computeColDataBImplemented = false; }
 
-protected:
     std::shared_ptr<CollisionData> m_colData = nullptr;     ///< Collision data
+    std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>> m_colVectorData;
 
     bool m_flipOutput   = false;
     bool m_generateCD_A = true;

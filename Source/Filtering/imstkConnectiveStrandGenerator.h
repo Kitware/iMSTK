@@ -55,6 +55,9 @@ public:
     double getStrandsPerFace() { return m_strandsPerFace; }
 ///@}
 
+    void setAllowedAngleDeviation(double angle) { m_allowedAngleDeviation = angle; }
+    double getAllowedAgnleDeviation() const { return m_allowedAngleDeviation; }
+
 protected:
     void requestUpdate() override;
 
@@ -77,7 +80,8 @@ protected:
     /// \return A random point on the given face and the given mesh
     const Vec3d generateRandomPointOnFace(SurfaceMesh* mesh, int face) const;
 
-    int    m_segmentsPerStrand = 3;
-    double m_strandsPerFace    = 1;
+    int    m_segmentsPerStrand     = 3;
+    double m_strandsPerFace        = 1;
+    double m_allowedAngleDeviation = PI;
 };
 } // namespace imstk

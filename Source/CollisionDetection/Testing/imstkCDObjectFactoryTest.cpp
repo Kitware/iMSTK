@@ -48,5 +48,5 @@ TEST(imsktCDObjectFactoryTest, getCDType)
 
     //Verify invalid case for CDType
     auto lineMesh = std::make_shared<LineMesh>();
-    EXPECT_DEATH(CDObjectFactory::getCDType(*lineMesh, *pointSet), "No valid collision detection type for : LineMeshPointSet");
+    EXPECT_EQ(CDObjectFactory::getCDType(*lineMesh, *pointSet), "");
 }

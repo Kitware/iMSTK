@@ -29,7 +29,6 @@ public:
 
     virtual const std::string getTypeName() const = 0;
 
-public:
     ///
     /// \brief Set the input objects
     ///
@@ -52,14 +51,24 @@ public:
     ///
     /// \brief Set/Get the input collision data used for handling
     ///
-    void setInputCollisionData(std::shared_ptr<CollisionData> collisionData) { m_colData = collisionData; }
+    void setInputCollisionData(std::shared_ptr<CollisionData> collisionData);
+
+    ///
+    /// \brief Set/Get the input collision data used for handling
+    /// This supports collating information from multiple collision detect algorithms
+    ///
+    void setInputCollisionData(std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>> collisionVectorData);
+
     std::shared_ptr<const CollisionData> getInputCollisionData() const { return m_colData; }
 
-public:
     ///
     /// \brief Handle the input collision data
     ///
-    void update();
+
+    inline void update()
+    {
+        m_updateFunction();
+    }
 
 protected:
     ///
@@ -73,10 +82,26 @@ protected:
         const std::vector<CollisionElement>& elementsA,
         const std::vector<CollisionElement>& elementsB) = 0;
 
-protected:
     std::shared_ptr<CollidingObject> m_inputObjectA;
     std::shared_ptr<CollidingObject> m_inputObjectB;
 
-    std::shared_ptr<const CollisionData> m_colData = nullptr; ///< Collision data
+    std::shared_ptr<const CollisionData> m_colData;             ///< Collision data
+
+    /// Expansion to allow collision detection to return multiple types of collision data
+    std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>> m_colVectorData;
+
+#ifndef SWIG
+    // This is the function that is executed in \sa update()
+    std::function<void()> m_updateFunction = []() {};
+#endif // !SWIG
+
+    // Checks the ordering of the elements and calls the virtual \sa handle() function
+    void updateCollisionData(std::shared_ptr<const CollisionData> data);
+
+    // Used to enable multiple /sa handle calls, m_clearData is true on the first pass
+    // m_postConstraints is true on the last pass, if there is only one pass both will
+    // be true
+    bool m_clearData = true;
+    bool m_processConstraints = true;
 };
 } // namespace imstk

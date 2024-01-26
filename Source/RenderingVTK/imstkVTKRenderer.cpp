@@ -477,7 +477,7 @@ VTKRenderer::addEntity(std::shared_ptr<Entity> entity)
 void
 VTKRenderer::addVisualModel(std::shared_ptr<Entity> sceneObject, std::shared_ptr<VisualModel> visualModel)
 {
-    // Create a delegate for the visual m odel
+    // Create a delegate for the visual model
     auto renderDelegate = m_renderDelegates[visualModel] = VTKRenderDelegate::makeDelegate(visualModel);
     renderDelegate->initialize(visualModel);
     if (renderDelegate == nullptr)

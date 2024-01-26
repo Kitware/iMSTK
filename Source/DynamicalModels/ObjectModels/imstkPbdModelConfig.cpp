@@ -101,6 +101,26 @@ PbdModelConfig::enableConstraint(ConstraintGenType type, double stiffness, const
 }
 
 void
+PbdModelConfig::enableDistanceConstraint(const double stiffness, const double stretch, const int bodyId)
+{
+    auto& funcs = m_functors[ConstraintGenType::Distance];
+
+    funcs.erase(std::remove_if(funcs.begin(), funcs.end(), [bodyId](auto item) {
+            if (PbdBodyConstraintFunctor* functor = dynamic_cast<PbdBodyConstraintFunctor*>(item.get()))
+            {
+                return functor->m_bodyIndex == bodyId;
+            }
+            return false;
+                }), funcs.end());
+
+    auto functor = std::make_shared<PbdDistanceConstraintFunctor>();
+    funcs.push_back(functor);
+    functor->setStiffness(stiffness);
+    functor->setStretch(stretch);
+    functor->setBodyIndex(bodyId);
+}
+
+void
 PbdModelConfig::enableBendConstraint(const double stiffness, const int stride, const bool restLength0, const int bodyId)
 {
     auto& funcs = m_functors[ConstraintGenType::Bend];
