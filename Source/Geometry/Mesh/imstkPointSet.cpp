@@ -215,7 +215,7 @@ PointSet::applyTransform(const Mat4d& m)
 void
 PointSet::updatePostTransformData() const
 {
-    if (m_transformApplied)
+    if (m_transformApplied || m_transform.isApprox(Mat4d::Identity()))
     {
         return;
     }
