@@ -302,7 +302,7 @@ struct PbdDistanceConstraintFunctor : public PbdBodyConstraintFunctor
         ///@{
         double getStretch() const { return m_stretch; }
         void setStretch(double val) { m_stretch = val; }
-        ///@
+    ///@}
 
     protected:
         double m_stiffness = 0.0;
