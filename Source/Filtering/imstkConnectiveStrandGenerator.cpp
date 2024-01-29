@@ -103,7 +103,7 @@ ConnectiveStrandGenerator::createStrands(
 {
     // RNG for selecting faces to connect
     static std::random_device       rd;                                            // obtain a random number from hardware
-    static std::mt19937             gen(rd());                                     // seed the generator
+    static std::mt19937             gen((static_cast<unsigned int>(time(nullptr))));                                     // seed the generator
     std::uniform_int_distribution<> faceDistr(0, meshB->getNumCells() - 1);        // define the range over cells of mesh B
 
     const int    maxIteration      = 10;
@@ -133,7 +133,7 @@ ConnectiveStrandGenerator::createStrands(
             const Vec3d positionOnA = generateRandomPointOnFace(meshA, faces[cell_idA]);
             Vec3d       positionOnB = Vec3d::Zero();
 
-            double bestThreshold  = 0;
+            double bestThreshold  = std::numeric_limits<double>::min();
             Vec3d  bestPositionB  = Vec3d::Zero();
             int    iterationCount = 0;
 
@@ -169,6 +169,10 @@ ConnectiveStrandGenerator::createStrands(
                         break;
                     }
                 }
+            }
+
+            if (positionOnB.isApprox(Vec3d::Zero())) {
+                continue;
             }
 
             Vec3d stepVec = (positionOnB - positionOnA) / static_cast<double>(m_segmentsPerStrand);

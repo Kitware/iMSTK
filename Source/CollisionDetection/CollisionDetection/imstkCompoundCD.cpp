@@ -11,6 +11,7 @@
 #include "imstkCompoundGeometry.h"
 #include "imstkCDObjectFactory.h"
 #include "imstkLogger.h"
+#include "imstkParallelFor.h"
 
 namespace imstk
 {
@@ -26,8 +27,7 @@ CompoundCD::CompoundCD()
 void
 CompoundCD::requestUpdate()
 {
-    // Could be parallelized ...
-    std::for_each(m_cdAlgorithms.begin(), m_cdAlgorithms.end(), [](auto algo) { algo->update(); });
+	ParallelUtils::parallelFor(m_cdAlgorithms.size(), [this](const int idx) {m_cdAlgorithms[idx]->update(); }, true);
 }
 
 bool
