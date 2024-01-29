@@ -99,10 +99,16 @@ public:
     /// Get state of burner (on/off ~ true/false)
     bool getState() const { return m_onState; }
 
+	// Check state of mesh and delete cells that are burned away
+    // void update(double dt);
+	void visualUpdate(const double& dt) override;
+
 protected:
 
     // The handle does the picking to choose which cells are burned.
     void handle();
+
+    void handleBurnable(int burnableId);
 
     // Applies the burn using the burn model
     void applyBurn(int burnableId, int cellId);
@@ -133,5 +139,8 @@ protected:
     double m_q = 4.0;                        ///< Fitting parameter that modifies how quickly tissue gets burned
 
     bool m_onState = false;                  ///< flag if tool is currently on or not
+    bool m_burnOnce = false;
+private:
+    double m_burnTime = 0;
 };
 } // namespace imstk
