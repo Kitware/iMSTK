@@ -102,9 +102,9 @@ ConnectiveStrandGenerator::createStrands(
     SurfaceMesh*            meshB) const
 {
     // RNG for selecting faces to connect
-    static std::random_device       rd;                                            // obtain a random number from hardware
-    static std::mt19937             gen((static_cast<unsigned int>(time(nullptr))));                                     // seed the generator
-    std::uniform_int_distribution<> faceDistr(0, meshB->getNumCells() - 1);        // define the range over cells of mesh B
+    static std::random_device       rd;                                              // obtain a random number from hardware
+    static std::mt19937             gen((static_cast<unsigned int>(time(nullptr)))); // seed the generator
+    std::uniform_int_distribution<> faceDistr(0, meshB->getNumCells() - 1);          // define the range over cells of mesh B
 
     const int    maxIteration      = 10;
     const double angleThreshold    = cos(m_allowedAngleDeviation);
@@ -171,7 +171,8 @@ ConnectiveStrandGenerator::createStrands(
                 }
             }
 
-            if (positionOnB.isApprox(Vec3d::Zero())) {
+            if (positionOnB.isApprox(Vec3d::Zero()))
+            {
                 continue;
             }
 

@@ -27,7 +27,7 @@ CompoundCD::CompoundCD()
 void
 CompoundCD::requestUpdate()
 {
-	ParallelUtils::parallelFor(m_cdAlgorithms.size(), [this](const int idx) {m_cdAlgorithms[idx]->update(); }, true);
+    ParallelUtils::parallelFor(m_cdAlgorithms.size(), [this](const int idx) { m_cdAlgorithms[idx]->update(); }, true);
 }
 
 bool
