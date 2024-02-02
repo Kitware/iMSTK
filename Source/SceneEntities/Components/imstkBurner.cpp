@@ -16,6 +16,7 @@
 #include "imstkPickingAlgorithm.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskNode.h"
+#include "imstkParallelFor.h"
 
 namespace imstk
 {
@@ -54,59 +55,67 @@ Burner::init()
 }
 
 void
+Burner::visualUpdate(const double& dt)
+{
+    m_burnOnce = true;
+    m_burnTime = dt;
+}
+
+void
 Burner::handle()
 {
     // Check tool state
-    if (m_onState == true)
+    if (m_onState && m_burnOnce)
     {
-        // Search through burnable objects for collision
-        for (int burnableId = 0; burnableId < m_burnableObjects.size(); burnableId++)
+        m_burnOnce = false;
+        ParallelUtils::parallelFor(m_burnableObjects.size(), [this](const int index) {
+                handleBurnable(index);
+            }, m_burnableObjects.size() > 1);
+    }
+}
+
+void
+Burner::handleBurnable(int burnableId)
+{
+    if (m_burnableObjects[burnableId].object == nullptr)
+    {
+        return;
+    }
+
+    if (m_burnableObjects[burnableId].picker == nullptr)
+    {
+        // Create Picking Algorithms
+        auto cellPicker = std::make_shared<CellPicker>();
+        cellPicker->setPickingGeometry(m_burnGeometry);
+
+        std::shared_ptr<Geometry> pbdPhysicsGeom = m_burnableObjects[burnableId].object->getPhysicsGeometry();
+        CHECK(pbdPhysicsGeom != nullptr) << "Physics geometry of burnable object: " << m_burnableObjects[burnableId].object->getName() << " is null in Burner";
+
+        auto cdType = CDObjectFactory::getCDType(*m_burnGeometry, *pbdPhysicsGeom);
+
+        // TODO check if we can make the COllision remove burnable if not
+
+        cellPicker->setCollisionDetection(CDObjectFactory::makeCollisionDetection(cdType));
+
+        m_burnableObjects[burnableId].picker = cellPicker;
+    }
+
+    // Perform the picking on the burnable object
+    std::shared_ptr<Geometry>    geometryToPick = m_burnableObjects[burnableId].object->getPhysicsGeometry();
+    const std::vector<PickData>& pickData       = m_burnableObjects[burnableId].picker->pick(geometryToPick);
+
+    for (size_t i = 0; i < pickData.size(); i++)
+    {
+        const PickData& data = pickData[i];
+
+        // If no cell is grabbed, go to next PickData
+        if (data.cellId == -1)
         {
-            if (m_burnableObjects[burnableId].object == nullptr)
-            {
-                continue;
-            }
-            if (m_burnableObjects[burnableId].picker == nullptr)
-            {
-                // Create Picking Algorithms
-                auto cellPicker = std::make_shared<CellPicker>();
-                cellPicker->setPickingGeometry(m_burnGeometry);
-
-                std::shared_ptr<Geometry> pbdPhysicsGeom = m_burnableObjects[burnableId].object->getPhysicsGeometry();
-                CHECK(pbdPhysicsGeom != nullptr) << "Physics geometry of burnable object: " << m_burnableObjects[burnableId].object->getName() << " is null in Burner";
-
-                auto cdType = CDObjectFactory::getCDType(*m_burnGeometry, *pbdPhysicsGeom);
-
-                // TODO check if we can make the COllision remove burnable if not
-
-                cellPicker->setCollisionDetection(CDObjectFactory::makeCollisionDetection(cdType));
-
-                m_burnableObjects[burnableId].picker = cellPicker;
-            }
-
-            // Perform the picking on the burnable object
-            std::shared_ptr<Geometry>    geometryToPick = m_burnableObjects[burnableId].object->getPhysicsGeometry();
-            const std::vector<PickData>& pickData       = m_burnableObjects[burnableId].picker->pick(geometryToPick);
-
-            if (pickData.empty())
-            {
-                continue;
-            }
-
-            for (size_t i = 0; i < pickData.size(); i++)
-            {
-                const PickData& data = pickData[i];
-
-                // If no cell is grabbed, go to next PickData
-                if (data.cellId == -1)
-                {
-                    continue;
-                }
-
-                // Integrate the burn state with time
-                applyBurn(burnableId, data.cellId);
-            }
+            continue;
         }
+
+        // Integrate the burn state with time
+        applyBurn(burnableId, data.cellId);
     }
 }
 
@@ -114,7 +123,7 @@ void
 Burner::applyBurn(int burnableId, int cellId)
 {
     // Get model data
-    double dt = m_burnableObjects[burnableId].object->getPbdModel()->getConfig()->m_dt;
+    // double dt = m_burnableObjects[burnableId].object->getPbdModel()->getConfig()->m_dt;
 
     // Mesh state data
     auto               cellMesh      = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObjects[burnableId].object->getPhysicsGeometry());
@@ -124,7 +133,7 @@ Burner::applyBurn(int burnableId, int cellId)
     auto               burnVisualPtr = std::dynamic_pointer_cast<DataArray<double>>(cellMesh->getCellAttribute("BurnVisual"));
     DataArray<double>& burnVisual    = *burnVisualPtr;
 
-    monopolarToolModel(burnDamage[cellId], burnVisual[cellId], dt);
+    monopolarToolModel(burnDamage[cellId], burnVisual[cellId], m_burnTime);
 }
 
 void
