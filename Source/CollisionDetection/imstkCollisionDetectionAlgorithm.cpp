@@ -12,8 +12,9 @@
 namespace imstk
 {
 CollisionDetectionAlgorithm::CollisionDetectionAlgorithm() : GeometryAlgorithm(),
-    m_colData(std::make_shared<CollisionData>())
+    m_collisionDataVector(std::make_shared<std::vector<std::shared_ptr<CollisionData>>>())
 {
+    m_collisionDataVector->push_back(std::make_shared<CollisionData>());
     setNumInputPorts(2);
 }
 
@@ -74,11 +75,11 @@ CollisionDetectionAlgorithm::requestUpdate()
         }
     }
 
-    std::shared_ptr<Geometry> geomA = m_colData->geomA = getInput(0);
-    std::shared_ptr<Geometry> geomB = m_colData->geomB = getInput(1);
+    std::shared_ptr<Geometry> geomA = (*m_collisionDataVector)[0]->geomA = getInput(0);
+    std::shared_ptr<Geometry> geomB = (*m_collisionDataVector)[0]->geomB = getInput(1);
 
-    std::vector<CollisionElement>* a = &m_colData->elementsA;
-    std::vector<CollisionElement>* b = &m_colData->elementsB;
+    std::vector<CollisionElement>* a = &(*m_collisionDataVector)[0]->elementsA;
+    std::vector<CollisionElement>* b = &(*m_collisionDataVector)[0]->elementsB;
 
     a->resize(0);
     b->resize(0);

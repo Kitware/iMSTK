@@ -124,27 +124,20 @@ void
 CollisionInteraction::setEnabled(const bool enabled)
 {
     m_collisionDetectionNode->setEnabled(enabled);
+
     if (m_colDetect != nullptr)
     {
-        if (m_colDetect->getCollisionData() != nullptr)
+        for (size_t i = 0; i < m_colDetect->getCollisionDataVectorSize(); ++i)
         {
-            // Clear the data (since CD clear is only run before CD is performed)
-            m_colDetect->getCollisionData()->elementsA.resize(0);
-            m_colDetect->getCollisionData()->elementsB.resize(0);
-        }
-        else
-        {
-            for (auto colDetect : *(m_colDetect->getCollisionVectorData()))
+            if (auto data = m_colDetect->getCollisionData())
             {
-                colDetect->elementsA.resize(0);
-                colDetect->elementsB.resize(0);
+                // Clear the data (since CD clear is only run before CD is performed)
+                data->elementsA.resize(0);
+                data->elementsB.resize(0);
             }
         }
     }
-    else
-    {
-        LOG(FATAL) << "Tried to enable/disable collision, but no CD method was provided";
-    }
+    LOG(WARNING) << "Tried to enable/disable collision, but no CD method was provided";
 }
 
 bool

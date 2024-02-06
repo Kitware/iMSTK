@@ -78,10 +78,6 @@ CollisionHandling::setInputCollisionData(std::shared_ptr<std::vector<std::shared
     m_colData       = nullptr;
 
     m_updateFunction = [this]() {
-                           if (m_colVectorData == nullptr)
-                           {
-                               return;
-                           }
                            m_clearData = true;
                            m_processConstraints = false;
                            for (size_t i = 0; i < m_colVectorData->size(); ++i)
