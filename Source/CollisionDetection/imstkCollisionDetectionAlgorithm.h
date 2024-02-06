@@ -48,13 +48,15 @@ public:
     ///
     inline const std::shared_ptr<CollisionData> getCollisionData() const { return (*m_collisionDataVector)[0]; }
 
-    inline const std::shared_ptr<CollisionData> getCollisionData(int i) const {
+    inline const std::shared_ptr<CollisionData> getCollisionData(int i) const
+    {
         return m_collisionDataVector->size() > i ? m_collisionDataVector->at(i) : nullptr;
     }
 
     inline const std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>>& getCollisionDataVector() const { return m_collisionDataVector; }
 
-    inline size_t getCollisionDataVectorSize() const {
+    inline size_t getCollisionDataVectorSize() const
+    {
         return m_collisionDataVector->size();
     }
 

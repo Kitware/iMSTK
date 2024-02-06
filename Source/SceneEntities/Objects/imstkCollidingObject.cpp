@@ -27,6 +27,49 @@ CollidingObject::initialize()
     return true;
 }
 
+void
+CollidingObject::clearCollisions()
+{
+    for (auto& item : m_collisions)
+    {
+        item.second.clear();
+    }
+}
+
+void
+CollidingObject::addCollision(std::shared_ptr<CollidingObject> other, std::shared_ptr<CollisionData> data)
+{
+    m_collisions[other].push_back(data);
+}
+
+const std::vector<std::shared_ptr<imstk::CollisionData>>&
+CollidingObject::getCollisions(std::shared_ptr<CollidingObject> other) const
+{
+    static const std::vector<std::shared_ptr<imstk::CollisionData>> empty;
+
+    if (m_collisions.find(other) != m_collisions.end())
+    {
+        return m_collisions.at(other);
+    }
+    else
+    {
+        return empty;
+    }
+}
+
+void
+CollidingObject::update()
+{
+    SceneObject::update();
+    clearCollisions();
+}
+
+bool
+CollidingObject::didCollide(std::shared_ptr<CollidingObject> other)
+{
+    return !m_collisions[other].empty();
+}
+
 std::shared_ptr<Geometry>
 CollidingObject::getCollidingGeometry() const
 {

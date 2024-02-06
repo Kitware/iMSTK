@@ -84,6 +84,17 @@ CollisionInteraction::updateCD()
     {
         m_colDetect->update();
     }
+
+    auto dataVector = m_colDetect->getCollisionDataVector();
+    for (const auto& item : *dataVector)
+    {
+        if (item->elementsA.empty() && item->elementsB.empty())
+        {
+            continue;
+        }
+        m_objA->addCollision(m_objB, item);
+        m_objB->addCollision(m_objA, item);
+    }
 }
 
 void

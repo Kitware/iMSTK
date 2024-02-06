@@ -9,6 +9,9 @@
 #include "imstkSceneObject.h"
 #include "imstkMacros.h"
 #include "imstkMath.h"
+#include "imstkCollisionData.h"
+
+#include <unordered_map>
 
 namespace imstk
 {
@@ -51,13 +54,27 @@ public:
     ///
     bool initialize() override;
 
+    void update() override;
+
+    /// \return Whether `other` collided with this object since the last \sa update() call
+    /// \param other colliding object for the check
+    bool didCollide(std::shared_ptr<CollidingObject> other);
+
+    /// \brief Add data for collision with the object `other
+    void addCollision(std::shared_ptr<CollidingObject> other, std::shared_ptr<CollisionData> data);
+
+    const std::vector<std::shared_ptr<CollisionData>>& getCollisions(std::shared_ptr<CollidingObject> other) const;
 protected:
     void postModifiedAll() override;
 
-protected:
+    /// \brief resets the collision information
+    void clearCollisions();
+
     std::shared_ptr<Geometry>    m_collidingGeometry    = nullptr; ///< Geometry for collisions
     std::shared_ptr<GeometryMap> m_collidingToVisualMap = nullptr; ///< Maps transformations to visual geometry
     Vec3d m_force = Vec3d::Zero();
+
+    std::unordered_map<std::shared_ptr<CollidingObject>, std::vector<std::shared_ptr<CollisionData>>> m_collisions;
 };
 
 std::string getCDType(const CollidingObject& obj1, const CollidingObject& obj2);

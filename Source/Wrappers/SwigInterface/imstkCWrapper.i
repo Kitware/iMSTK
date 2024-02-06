@@ -293,6 +293,7 @@ namespace std
   %template(UnorderedMapStringDouble) unordered_map<std::string, double>;
   %template(VectorPuncturePoint) std::vector<imstk::NeedlePbdCH::PuncturePoint>;
   %template(VectorVectorPuncturePoint) std::vector<std::vector<imstk::NeedlePbdCH::PuncturePoint>>;
+  %template(VectorCollisionData) std::vector<std::shared_ptr<imstk::CollisionData>>;
 }
 
 %include <std_except.i>
