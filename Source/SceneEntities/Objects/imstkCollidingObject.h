@@ -61,9 +61,10 @@ public:
     bool didCollide(std::shared_ptr<CollidingObject> other);
 
     /// \brief Add data for collision with the object `other
-    void addCollision(std::shared_ptr<CollidingObject> other, std::shared_ptr<CollisionData> data);
+    void addCollision(std::shared_ptr<CollidingObject> other, std::shared_ptr<imstk::CollisionData> data);
 
-    const std::vector<std::shared_ptr<CollisionData>>& getCollisions(std::shared_ptr<CollidingObject> other) const;
+    const std::vector<std::shared_ptr<imstk::CollisionData>>& getCollisions(std::shared_ptr<CollidingObject> other) const;
+
 protected:
     void postModifiedAll() override;
 

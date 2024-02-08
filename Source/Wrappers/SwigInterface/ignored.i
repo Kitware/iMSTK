@@ -96,9 +96,6 @@
 %ignore imstk::CellMesh<4>::clone;
 %ignore imstk::CellMesh<8>::clone;
 
-%ignore imstk::CollisionElement::m_element;
-%ignore imstk::CollisionElement::m_type;
-
 %ignore imstk::HapticDeviceClient::hapticCallback;
 
 %ignore imstk::VRPNDeviceClient::trackerPositionChangeHandler;
