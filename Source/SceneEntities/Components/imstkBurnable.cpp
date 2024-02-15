@@ -31,8 +31,10 @@ Burnable::init()
     CHECK(m_burnableObject != nullptr) << "Burnable requires a input PBD object,"
         "please add it on creation";
 
-    // Create cell remover for removing torn cells
-    m_cellRemover = std::make_shared<PbdObjectCellRemoval>(m_burnableObject);
+    if (!m_trackOnly) {
+		// Create cell remover for removing torn cells
+		m_cellRemover = std::make_shared<PbdObjectCellRemoval>(m_burnableObject);
+    }
 
     // Allocate memory for mesh state and initialize values
     auto cellMesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_burnableObject->getPhysicsGeometry());
@@ -55,6 +57,8 @@ Burnable::init()
 void
 Burnable::visualUpdate(const double& dt)
 {
+    if (m_trackOnly) return;
+
     // Check that the cellConstraintMap exists, if not make it
     if (m_burnableObject->getPbdBody()->cellConstraintMap.empty())
     {

@@ -39,6 +39,9 @@
 %pointer_functions(double, doublePtr)
 %pointer_functions(unsigned char, ucharPtr)
 
+%csmethodmodifiers imstk::VecDataArray::operator[] "public"; 
+%csmethodmodifiers imstk::DataArray::operator[] "public"; 
+
 %rename(getValue) imstk::VecDataArray::operator[] (const size_t pos) const;
 %rename(setValue) imstk::VecDataArray::operator[] (const size_t pos);
 %rename(getValue) imstk::DataArray::operator[] (const size_t pos) const;
