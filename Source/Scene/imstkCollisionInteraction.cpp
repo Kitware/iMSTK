@@ -148,7 +148,10 @@ CollisionInteraction::setEnabled(const bool enabled)
             }
         }
     }
-    LOG(WARNING) << "Tried to enable/disable collision, but no CD method was provided";
+    else
+    {
+        LOG(WARNING) << "Tried to enable/disable collision, but no CD method was provided";
+    }
 }
 
 bool

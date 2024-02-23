@@ -36,9 +36,9 @@ public:
     std::shared_ptr<PbdObject> getPbdObject() const { return m_burnableObject; }
     ///@}
 
-	void setTrackOnly(bool val) { m_trackOnly = val; }
+    void setTrackOnly(bool val) { m_trackOnly = val; }
 
-	bool getTrackOnly() const { return m_trackOnly; }
+    bool getTrackOnly() const { return m_trackOnly; }
 
     // Check state of mesh and delete cells that are burned away
     // void update(double dt);
@@ -49,7 +49,7 @@ protected:
     // Allocate state against mesh
     void init() override;
 
-	bool m_trackOnly = false;
+    bool m_trackOnly = false;
 
     std::shared_ptr<PbdObject> m_burnableObject;             ///< Object being burned
     std::shared_ptr<PbdObjectCellRemoval> m_cellRemover;     ///< Cell remover for removing cells
