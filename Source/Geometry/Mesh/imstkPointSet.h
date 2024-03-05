@@ -191,6 +191,9 @@ protected:
     std::string m_activeVertexTangents = "";
     std::string m_activeVertexTCoords  = "";
 
+    Vec3d m_lowerCorner;
+    Vec3d m_upperCorner;
+
 private:
     PointSet* cloneImplementation() const;
 };

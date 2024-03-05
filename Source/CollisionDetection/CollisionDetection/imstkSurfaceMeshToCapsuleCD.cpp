@@ -40,6 +40,20 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = surfMesh->getVertexPositions();
     const VecDataArray<double, 3>&           vertices    = *verticesPtr;
 
+    Eigen::AlignedBox3d box1, box2;
+    Vec3d               lower, upper;
+    geomA->computeBoundingBox(lower, upper);
+    box1.extend(lower);
+    box1.extend(upper);
+    geomB->computeBoundingBox(lower, upper);
+    box2.extend(lower);
+    box2.extend(upper);
+
+    if (!box1.intersects(box2))
+    {
+        return;
+    }
+
     // \todo: Doesn't remove duplicate contacts (shared edges), refer to SurfaceMeshCD for easy method to do so
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(indices.size(), [&](int i)

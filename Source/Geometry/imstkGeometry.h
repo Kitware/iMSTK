@@ -197,7 +197,11 @@ public:
     ///
     /// \brief Post modified event
     ///
-    void postModified() { this->postEvent(Event(Geometry::modified())); }
+    void postModified()
+    {
+        m_boundsDirty = true;
+        this->postEvent(Event(Geometry::modified()));
+    }
 
     virtual void updatePostTransformData() const { }
 
@@ -219,6 +223,7 @@ protected:
 
 protected:
     mutable bool m_transformApplied = true; // Internally used for lazy evaluation
+    mutable bool m_boundsDirty      = true;
 
     Mat4d m_transform = Mat4d::Identity();  ///< Transformation matrix
 
