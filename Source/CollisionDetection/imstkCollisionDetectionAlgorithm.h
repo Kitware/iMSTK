@@ -46,9 +46,19 @@ public:
     ///
     /// \brief Returns output collision data
     ///
-    const std::shared_ptr<CollisionData> getCollisionData() const { return m_colData; }
+    inline const std::shared_ptr<CollisionData> getCollisionData() const { return (*m_collisionDataVector)[0]; }
 
-    const std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>> getCollisionVectorData() const { return m_colVectorData; }
+    inline const std::shared_ptr<CollisionData> getCollisionData(int i) const
+    {
+        return m_collisionDataVector->size() > i ? m_collisionDataVector->at(i) : nullptr;
+    }
+
+    inline const std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>>& getCollisionDataVector() const { return m_collisionDataVector; }
+
+    inline size_t getCollisionDataVectorSize() const
+    {
+        return m_collisionDataVector->size();
+    }
 
     ///
     /// \brief If generateA is false, CD data will not be generated for input0,A
@@ -106,8 +116,7 @@ protected:
         std::shared_ptr<Geometry>      imstkNotUsed(geomB),
         std::vector<CollisionElement>& imstkNotUsed(elementsB)) { m_computeColDataBImplemented = false; }
 
-    std::shared_ptr<CollisionData> m_colData = nullptr;     ///< Collision data
-    std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>> m_colVectorData;
+    std::shared_ptr<std::vector<std::shared_ptr<CollisionData>>> m_collisionDataVector;
 
     bool m_flipOutput   = false;
     bool m_generateCD_A = true;

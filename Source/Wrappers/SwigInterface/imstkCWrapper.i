@@ -281,6 +281,10 @@
  */
 
 %include <std_unordered_map.i> 
+
+
+%include "shared_ptr_instantiation.i"
+
 namespace std
 {
   %template(VectorInt) vector<int>;
@@ -291,15 +295,15 @@ namespace std
   %template(VectorString) vector<std::string>;
   %template(IntPair) pair<int, int>;
   %template(UnorderedMapStringDouble) unordered_map<std::string, double>;
-  %template(VectorPuncturePoint) std::vector<imstk::NeedlePbdCH::PuncturePoint>;
-  %template(VectorVectorPuncturePoint) std::vector<std::vector<imstk::NeedlePbdCH::PuncturePoint>>;
+  %template(VectorPuncturePoint) vector<imstk::NeedlePbdCH::PuncturePoint>;
+  %template(VectorVectorPuncturePoint) vector<std::vector<imstk::NeedlePbdCH::PuncturePoint>>;
+  %template(VectorCollisionData) vector<shared_ptr<imstk::CollisionData>>;
 }
 
 %include <std_except.i>
 %include <exception.i>
 
 
-%include "shared_ptr_instantiation.i"
 %include "weak_ptr.i"
 %include "ignored.i"
 %include "modifiers.i"
@@ -467,6 +471,18 @@ namespace std
 		return imstk::CDObjectFactory::getNames();
 	}
 }
+
+
+// HS20240207 There are issues with the CollisionElement::Element constructor 
+// when allowing modifications. There really isn't any need to write these from c# anyway 
+%immutable imstk::CollisionElement::m_type;
+%immutable imstk::CollisionElement::m_element;
+%immutable imstk::CollisionElement::m_ccdData;
+
+%rename(type) imstk::CollisionElement::m_type;
+%rename(element) imstk::CollisionElement::m_element;
+%rename(isCcdData) imstk::CollisionElement::m_ccdData;
+
 
 %include "../../CollisionDetection/imstkCollisionData.h"
 %include "../../CollisionDetection/imstkCollisionDetectionAlgorithm.h"

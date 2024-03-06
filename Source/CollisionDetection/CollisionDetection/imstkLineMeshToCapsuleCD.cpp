@@ -41,6 +41,20 @@ LineMeshToCapsuleCD::computeCollisionDataAB(
     std::shared_ptr<VecDataArray<double, 3>> verticesPtr = lineMesh->getVertexPositions();
     const VecDataArray<double, 3>&           vertices    = *verticesPtr;
 
+    Eigen::AlignedBox3d box1, box2;
+    Vec3d               lower, upper;
+    geomA->computeBoundingBox(lower, upper);
+    box1.extend(lower);
+    box1.extend(upper);
+    geomB->computeBoundingBox(lower, upper);
+    box2.extend(lower);
+    box2.extend(upper);
+
+    if (!box1.intersects(box2))
+    {
+        return;
+    }
+
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(indices.size(), [&](int i)
         {

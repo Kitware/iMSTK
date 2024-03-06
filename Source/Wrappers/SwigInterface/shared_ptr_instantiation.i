@@ -183,6 +183,7 @@
 %shared_ptr(imstk::CollisionHandling)
 %shared_ptr(imstk::RigidObjectCollidingCollisionPair)
 %shared_ptr(imstk::RigidBodyCH)
+%shared_ptr(imstk::CollisionData)
 
 /*
  * Controller

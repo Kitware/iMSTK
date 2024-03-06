@@ -19,8 +19,9 @@ CompoundCD::CompoundCD()
 {
     setRequiredInputType<CompoundGeometry>(0);
     setRequiredInputType<Geometry>(1);
-    m_colData       = nullptr;
-    m_colVectorData = std::make_shared<std::vector<std::shared_ptr<CollisionData>>>();
+
+    // Will be populated in the first run
+    m_collisionDataVector->clear();
     setGenerateCD(true, true);
 }
 
@@ -58,6 +59,8 @@ CompoundCD::areInputsValid()
         auto geom = compound->get(i);
         auto type = CDObjectFactory::getCDType(*geom, *other);
 
+        CHECK(type != getTypeName()) << "Can't stack a vector data algorithm inside of CompoundCD";
+
         if (type.empty())
         {
             LOG(WARNING) << "CompoundCD could not find a CD Algorithm for " << geom->getTypeName() << " and " <<
@@ -68,8 +71,7 @@ CompoundCD::areInputsValid()
             auto algorithm = CDObjectFactory::makeCollisionDetection(type);
             algorithm->setInput(geom, 0);
             algorithm->setInput(other, 1);
-            CHECK(algorithm->getCollisionData() != nullptr) << "Can't stack a vector data algorithm inside of CompoundCD";
-            m_colVectorData->push_back(algorithm->getCollisionData());
+            m_collisionDataVector->push_back(algorithm->getCollisionData());
             m_cdAlgorithms.push_back(algorithm);
         }
     }

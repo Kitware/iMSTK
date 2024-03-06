@@ -64,13 +64,20 @@ PointSet::print() const
 void
 PointSet::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent)
 {
+    bool updateBounds = !m_transformApplied || m_boundsDirty;
     updatePostTransformData();
-    ParallelUtils::findAABB(*m_vertexPositions, lowerCorner, upperCorner);
+    if (updateBounds)
+    {
+        ParallelUtils::findAABB(*m_vertexPositions, m_lowerCorner, m_upperCorner);
+        m_boundsDirty = false;
+    }
+    lowerCorner = m_lowerCorner;
+    upperCorner = m_upperCorner;
     if (paddingPercent > 0.0)
     {
-        const Vec3d range = upperCorner - lowerCorner;
-        lowerCorner = lowerCorner - range * (paddingPercent / 100.0);
-        upperCorner = upperCorner + range * (paddingPercent / 100.0);
+        const Vec3d range = (m_upperCorner - m_lowerCorner) * (paddingPercent / 100.0);
+        lowerCorner -= range;
+        upperCorner += range;
     }
 }
 
@@ -93,6 +100,7 @@ void
 PointSet::setVertexPositions(std::shared_ptr<VecDataArray<double, 3>> vertices)
 {
     m_vertexPositions = vertices;
+    m_boundsDirty     = true;
     //m_transformApplied = false;
 
     this->updatePostTransformData();
@@ -117,6 +125,7 @@ PointSet::setVertexPosition(const size_t vertNum, const Vec3d& pos)
 #endif
     (*m_vertexPositions)[vertNum] = pos;
     m_transformApplied = false;
+    m_boundsDirty      = true;
     this->updatePostTransformData();
 }
 
@@ -208,6 +217,7 @@ PointSet::applyTransform(const Mat4d& m)
         tangents.postModified();
     }
 
+    m_boundsDirty      = true;
     m_transformApplied = false;
     this->updatePostTransformData();
 }
@@ -234,6 +244,7 @@ PointSet::updatePostTransformData() const
             vertices[i] = (m_transform * Vec4d(initVertices[i][0], initVertices[i][1], initVertices[i][2], 1.0)).head<3>();
         });
     m_transformApplied = true;
+    m_boundsDirty      = true;
 }
 
 bool
