@@ -48,6 +48,15 @@ public:
     void setMap(const std::unordered_map<int, int>& sourceMap);
     const std::unordered_map<int, int>& getMap() const { return m_oneToOneMap; }
 
+    /// \brief Unsafe function for adding new points
+    /// Can be used in methods that modify the parent mesh when new vertices
+    /// are added to the child mesh
+    void addNewUniquePoint(int sourceId, int targetId)
+    {
+        m_oneToOneMap[sourceId] = targetId;
+        m_oneToOneMapVector.push_back({ sourceId, targetId });
+    }
+
     ///
     /// \brief Get the mapped/corresponding parent index, given a child index.
     /// returns -1 if no correspondence found.

@@ -34,7 +34,7 @@ Burnable::init()
     if (!m_trackOnly)
     {
         // Create cell remover for removing torn cells
-        m_cellRemover = std::make_shared<PbdObjectCellRemoval>(m_burnableObject);
+        m_cellRemover = std::make_shared<PbdObjectCellRemoval>(m_burnableObject, m_updateType);
     }
 
     // Allocate memory for mesh state and initialize values

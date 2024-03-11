@@ -7,6 +7,7 @@
 #include "imstkComponent.h"
 #include "imstkMath.h"
 #include "imstkVecDataArray.h"
+#include "imstkPbdObjectCellRemoval.h"
 
 #pragma once
 
@@ -44,12 +45,24 @@ public:
     // void update(double dt);
     void visualUpdate(const double& dt) override;
 
+    void setUpdateType(PbdObjectCellRemoval::OtherMeshUpdateType updateType)
+    {
+        m_updateType = updateType;
+    }
+
+    PbdObjectCellRemoval::OtherMeshUpdateType getUpdateType() const
+    {
+        return m_updateType;
+    }
+
 protected:
 
     // Allocate state against mesh
     void init() override;
 
     bool m_trackOnly = false;
+
+    PbdObjectCellRemoval::OtherMeshUpdateType m_updateType = PbdObjectCellRemoval::OtherMeshUpdateType::None;
 
     std::shared_ptr<PbdObject> m_burnableObject;             ///< Object being burned
     std::shared_ptr<PbdObjectCellRemoval> m_cellRemover;     ///< Cell remover for removing cells

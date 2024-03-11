@@ -109,6 +109,7 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
     auto mouseControl = debugEntity->addComponent<MouseSceneControl>();
     mouseControl->setDevice(m_viewer->getMouseDevice());
     mouseControl->setSceneManager(m_sceneManager);
+    mouseControl->setEnabled(true);
 
     // Add extra text object to display time and paused status of the test
     auto testStatusTxtModel = debugEntity->addComponent<TextVisualModel>("TestStatusText");
