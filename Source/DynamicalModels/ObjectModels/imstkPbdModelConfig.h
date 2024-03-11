@@ -85,12 +85,21 @@ public:
     /// \brief Enable a Fem constraint with the material provided
     /// \param material FEM model type
     /// \param bodyId Body to add the constraint throughout, -1 applies to all bodies
-    ///
+    /// This function uses the global deformable parameter object, its only provided for
+    /// backwards compatibility, don't use it
     void enableFemConstraint(PbdFemConstraint::MaterialType material, const int bodyId = 2);
 
     ///
+    /// \brief Enable a Fem constraint with the material provided and parameters
+    /// \param material FEM model type
+    /// \param youngsModulus the youngs modulus of the material
+    /// \param poissonRatio the Poisson ration of the material
+    /// \param bodyId Body to add the constraint throughout
+    void enableFemConstraint(PbdFemConstraint::MaterialType material, double youngsModulus, double poissonRatio, const int bodyId);
+
+    ///
     /// \brief If lame parameters (mu+lambda) are given in femParams, then youngs modulus and poissons ratio are computed
-    /// Conversly if youngs and poissons are given, lame parameters are computed
+    /// Conversely if youngs and poissons are given, lame parameters are computed
     ///
     void computeElasticConstants();
 
