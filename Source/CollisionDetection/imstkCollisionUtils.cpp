@@ -140,7 +140,7 @@ closestPointOnSegment(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, int&
 
     // find parameter value of closest point on segment
     double s12 = dx.dot(x2 - point) / m2;
-
+    caseType = 2;
     if (s12 < 0)
     {
         s12      = 0;
@@ -151,10 +151,7 @@ closestPointOnSegment(const Vec3d& point, const Vec3d& x1, const Vec3d& x2, int&
         s12      = 1.0;
         caseType = 0;
     }
-    else
-    {
-        caseType = 2;
-    }
+
     return (s12 * x1 + (1.0 - s12) * x2).eval();
 }
 
