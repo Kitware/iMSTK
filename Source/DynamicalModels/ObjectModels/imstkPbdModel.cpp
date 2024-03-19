@@ -280,16 +280,9 @@ PbdModel::integratePosition()
 {
     // resize 0 virtual particles (avoids reallocation)
     clearVirtualParticles();
-
-    // There are two virtual particles buffer, skip the first two
-//     for (auto bodyIter = std::next(std::next(m_state.m_bodies.begin()));
-//          bodyIter != m_state.m_bodies.end(); bodyIter++)
-//     {
-//         integratePosition(**bodyIter);
-//     }
-
     int bodyCount = m_state.m_bodies.size() - 2;
 
+    // There are two virtual particles buffer, skip the first two
     ParallelUtils::parallelFor(bodyCount,
         [&](const int i) {
             integratePosition(*m_state.m_bodies[i + 2]);
@@ -381,11 +374,11 @@ PbdModel::integratePosition(PbdBody& body)
 void
 PbdModel::updateVelocity()
 {
-    for (auto bodyIter = std::next(std::next(m_state.m_bodies.begin()));
-         bodyIter != m_state.m_bodies.end(); bodyIter++)
-    {
-        updateVelocity(**bodyIter);
-    }
+    int bodyCount = m_state.m_bodies.size() - 2;
+	ParallelUtils::parallelFor(bodyCount,
+		[&](const int i) {
+            updateVelocity(*m_state.m_bodies[i + 2]);
+		});
 
     // Correctly velocities for friction and restitution
     // Unfortunately the constraint would be clear after a solve
