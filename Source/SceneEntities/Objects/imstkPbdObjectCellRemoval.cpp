@@ -340,14 +340,13 @@ PbdObjectCellRemoval::addDummyVertex(std::shared_ptr<AbstractCellMesh> mesh)
 
 void
 PbdObjectCellRemoval::updateMesh(Meshdata& data)
-{
-    const int vertsPerCell = 4;                                                                              // m_mesh->getAbstractCells()->getNumberOfComponents();
+{                                                                             // m_mesh->getAbstractCells()->getNumberOfComponents();
     auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells());          // underlying 1D array
 
     auto& triangles = *(data.surfaceMesh->getCells());
     auto& vertices  = *(data.surfaceMesh->getVertexPositions());
 
-    auto& vertexMap = data.map->getMap();
+	auto        tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
 
     // "Remove" all triangles that are adjacent to tets that are being removed
     for (int cellId : m_cellsToRemove)
@@ -360,7 +359,6 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
         data.tetToTriMap.erase(cellId);
     }
 
-    auto        tetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
     const auto& tetrahedra  = *(tetMesh->getCells());
     const auto& tetVertices = *(tetMesh->getVertexPositions());
 
@@ -377,8 +375,6 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
                 && !std::binary_search(m_removedCells.cbegin(), m_removedCells.cend(), otherTetIndex))
             {
                 // Add Vertices
-
-                int   vertexIndex = vertices.size();
                 Vec3i triangle    = { 0, 0, 0 };
                 for (int i = 0; i < 3; ++i)
                 {
@@ -428,6 +424,11 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
         }
         data.tetAdjancencyMap.erase(cellId);
     }
+
+	for (int cellId : m_cellsToRemove)
+	{
+		tetMesh->setTetrahedraAsRemoved(cellId);
+	}
 
     if (!m_cellsToRemove.empty())
     {

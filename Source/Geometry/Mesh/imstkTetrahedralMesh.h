@@ -51,8 +51,11 @@ public:
     ///
     /// \brief Get/set method for removed elements from the mesh
     ///@{
-    void setTetrahedraAsRemoved(const unsigned int tetId) { m_removedMeshElems[tetId] = true; }
-    const std::vector<bool>& getRemovedTetrahedra() const { return m_removedMeshElems; }
+    void setTetrahedraAsRemoved(const unsigned int tetId) { 
+        m_removedMeshElems.reserve(getNumTetrahedra());
+        m_removedMeshElems.push_back(tetId);
+    }
+    const std::vector<int>& getRemovedTetrahedra() const { return m_removedMeshElems; }
     ///@}
 
     ///
@@ -86,7 +89,7 @@ public:
 ///@}
 
 protected:
-    std::vector<bool> m_removedMeshElems;
+    std::vector<int> m_removedMeshElems;
 
 private:
     TetrahedralMesh* cloneImplementation() const;
