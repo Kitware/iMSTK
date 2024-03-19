@@ -375,10 +375,10 @@ void
 PbdModel::updateVelocity()
 {
     int bodyCount = m_state.m_bodies.size() - 2;
-	ParallelUtils::parallelFor(bodyCount,
-		[&](const int i) {
+    ParallelUtils::parallelFor(bodyCount,
+        [&](const int i) {
             updateVelocity(*m_state.m_bodies[i + 2]);
-		});
+                });
 
     // Correctly velocities for friction and restitution
     // Unfortunately the constraint would be clear after a solve

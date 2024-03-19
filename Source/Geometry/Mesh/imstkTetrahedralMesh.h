@@ -51,10 +51,12 @@ public:
     ///
     /// \brief Get/set method for removed elements from the mesh
     ///@{
-    void setTetrahedraAsRemoved(const unsigned int tetId) { 
+    void setTetrahedraAsRemoved(const unsigned int tetId)
+    {
         m_removedMeshElems.reserve(getNumTetrahedra());
         m_removedMeshElems.push_back(tetId);
     }
+
     const std::vector<int>& getRemovedTetrahedra() const { return m_removedMeshElems; }
     ///@}
 

@@ -37,8 +37,11 @@ CollisionInteraction::CollisionInteraction(
 
     // Setup a step to update geometries before detecting collision
     m_collisionGeometryUpdateNode = std::make_shared<TaskNode>([this]() {
-		    if (m_didUpdateThisFrame) return;
-		    m_didUpdateThisFrame = true;
+            if (m_didUpdateThisFrame)
+            {
+                return;
+            }
+            m_didUpdateThisFrame = true;
             updateCollisionGeometry();
         },
         objA->getName() + "_vs_" + objB->getName() + "_CollisionGeometryUpdate", true);
@@ -122,7 +125,6 @@ CollisionInteraction::updateCHB()
 void
 CollisionInteraction::updateCollisionGeometry()
 {
-
     // Ensure the collision geometry is updated before checking collision
     // this could involve a geometry map or something, ex: simulated
     // tet mesh mapped to a collision surface mesh
@@ -165,9 +167,9 @@ CollisionInteraction::getEnabled() const
     return m_collisionDetectionNode->m_enabled;
 }
 
-void CollisionInteraction::visualUpdate()
+void
+CollisionInteraction::visualUpdate()
 {
     m_didUpdateThisFrame = false;
 }
-
 } // namespace imstk

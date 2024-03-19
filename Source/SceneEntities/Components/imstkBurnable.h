@@ -55,7 +55,8 @@ public:
         return m_updateType;
     }
 
-    std::shared_ptr<PbdObjectCellRemoval> getCellRemover() const {
+    std::shared_ptr<PbdObjectCellRemoval> getCellRemover() const
+    {
         return m_cellRemover;
     }
 
