@@ -256,5 +256,5 @@ TEST_F(PbdObjectTetMeshCellRemovalTest, TetMeshTest)
     createScene();
 
     // Run for 3s at 0.01 fixed timestep
-    runFor(10, 0.01);
+    runFor(3, 0.01);
 }

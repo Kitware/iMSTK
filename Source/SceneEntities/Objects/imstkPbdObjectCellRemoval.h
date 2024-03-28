@@ -34,8 +34,10 @@ public:
     {
         None = 0,
         Collision = 1,
-        Visual = 2,
-        CollisionAndVisual = Collision | Visual
+        VisualSharedVertices = 2,
+        VisualSeparateVertices = 4,
+        CollisionAndVisual = Collision | VisualSeparateVertices,
+        AnyVisual = VisualSeparateVertices | VisualSeparateVertices
     };
 
     PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, OtherMeshUpdateType alsoUpdate = OtherMeshUpdateType::None);
@@ -73,6 +75,7 @@ protected:
 private:
     struct Meshdata
     {
+        bool newVertexOnSplit;
         std::shared_ptr<SurfaceMesh> surfaceMesh;
         std::shared_ptr<PointwiseMap> map;
 

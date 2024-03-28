@@ -129,7 +129,7 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
                 }
             }
 
-            if ((static_cast<int>(alsoUpdate) & static_cast<int>(OtherMeshUpdateType::Visual)) != 0)
+            if ((static_cast<int>(alsoUpdate) & static_cast<int>(OtherMeshUpdateType::AnyVisual)) != 0)
             {
                 auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getVisualGeometry());
                 auto map  = std::dynamic_pointer_cast<PointwiseMap>(pbdObj->getPhysicsToVisualMap());
@@ -144,6 +144,7 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
                 else
                 {
                     setupForExtraMeshUpdates(mesh, map);
+                    m_meshData.back().newVertexOnSplit = alsoUpdate == OtherMeshUpdateType::VisualSeparateVertices;
                 }
             }
         }
@@ -343,6 +344,8 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
 {                                                                                           // m_mesh->getAbstractCells()->getNumberOfComponents();
     auto cellVerts = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells()); // underlying 1D array
 
+    constexpr int vertsPerTri = 3;
+
     auto& triangles = *(data.surfaceMesh->getCells());
     auto& vertices  = *(data.surfaceMesh->getVertexPositions());
 
@@ -376,22 +379,24 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
             {
                 // Add Vertices
                 Vec3i triangle = { 0, 0, 0 };
-                for (int i = 0; i < 3; ++i)
+                for (int i = 0; i < vertsPerTri; ++i)
                 {
                     int tetVertexIndex = faceOnTetMesh[i];
 
                     auto found = data.tetVertToTriVertMap.find(tetVertexIndex);
-                    //auto found = data.tetVertToTriVertMap.cend();
-                    if (found != data.tetVertToTriVertMap.cend())
-                    {
-                        triangle[i] = found->second;
-                    }
-                    else
+                    // Reuse vertex _if_ its found
+                    // For visual meshes we want a new vertex so a different uv coordinate
+                    // can be calculated
+                    if (data.newVertexOnSplit || found == data.tetVertToTriVertMap.cend())
                     {
                         vertices.push_back(tetVertices[tetVertexIndex]);
                         triangle[i] = vertices.size() - 1;
                         data.tetVertToTriVertMap[tetVertexIndex] = triangle[i];
                         data.map->addNewUniquePoint(triangle[i], tetVertexIndex);
+                    }
+                    else
+                    {
+                        triangle[i] = found->second;
                     }
                 }
 
@@ -410,7 +415,7 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
 
                 int triangleIndex = triangles.size();
 
-                // If the normal is correct, it should be pointing in the same direction as the (face centroid-unusedVertex)
+                // If the normal is correct, it should be pointing in the same direction as the (face centroid - tetCentroid)
                 if (normal.dot(centroid - tetCentroid) < 0)
                 {
                     triangles.push_back({ triangle[0], triangle[2], triangle[1] });
