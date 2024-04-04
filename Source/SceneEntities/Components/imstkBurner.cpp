@@ -25,7 +25,7 @@ Burner::Burner(const std::string& name) : SceneBehaviour(true, name)
     m_burningHandleNode = std::make_shared<TaskNode>([this]()
         {
             handle();
-    }, "Handle_" + m_name);
+                        }, "Handle_" + m_name);
 }
 
 void
@@ -58,7 +58,15 @@ void
 Burner::visualUpdate(const double& dt)
 {
     m_burnOnce = true;
+    m_didBurnLastPhysics = m_didBurn;
+    m_didBurn  = false;
     m_burnTime = dt;
+}
+
+bool
+Burner::getDidBurn() const
+{
+    return m_didBurnLastPhysics;
 }
 
 void
@@ -70,7 +78,7 @@ Burner::handle()
         m_burnOnce = false;
         ParallelUtils::parallelFor(m_burnableObjects.size(), [this](const int index) {
                 handleBurnable(index);
-            }, m_burnableObjects.size() > 1);
+                                }, m_burnableObjects.size() > 1);
     }
 }
 
@@ -134,6 +142,7 @@ Burner::applyBurn(int burnableId, int cellId)
     DataArray<double>& burnVisual    = *burnVisualPtr;
 
     monopolarToolModel(burnDamage[cellId], burnVisual[cellId], m_burnTime);
+    m_didBurn = true;
 }
 
 void

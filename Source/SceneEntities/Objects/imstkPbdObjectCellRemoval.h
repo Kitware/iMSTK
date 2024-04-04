@@ -7,14 +7,19 @@
 
 #include "imstkSceneObject.h"
 #include "imstkMacros.h"
+#include "imstkMath.h"
 
 #include <unordered_set>
+#include <map>
+#include <unordered_map>
 
 namespace imstk
 {
 class PointSet;
 class AbstractCellMesh;
 class PbdObject;
+class SurfaceMesh;
+class PointwiseMap;
 ///
 /// \class PbdObjectCellRemoval
 ///
@@ -24,7 +29,18 @@ class PbdObject;
 class PbdObjectCellRemoval : public SceneObject
 {
 public:
-    PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj);
+
+    enum class OtherMeshUpdateType
+    {
+        None = 0,
+        Collision = 1,
+        VisualSharedVertices = 2,
+        VisualSeparateVertices = 4,
+        CollisionAndVisual = Collision | VisualSeparateVertices,
+        AnyVisual = VisualSeparateVertices | VisualSeparateVertices
+    };
+
+    PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, OtherMeshUpdateType alsoUpdate = OtherMeshUpdateType::None);
     ~PbdObjectCellRemoval() override = default;
 
     IMSTK_TYPE_NAME(PbdObjectCellRemoval)
@@ -55,5 +71,28 @@ protected:
     std::shared_ptr<AbstractCellMesh> m_mesh; ///< Mesh from object cells are removed from
     std::vector<int> m_cellsToRemove;         ///< List of cells to remove, cleared after removal
     std::vector<int> m_removedCells;          ///< Cells that have been removed
+
+private:
+    struct Meshdata
+    {
+        bool newVertexOnSplit;
+        std::shared_ptr<SurfaceMesh> surfaceMesh;
+        std::shared_ptr<PointwiseMap> map;
+
+        /// Maps tet indices to surface mesh triangles
+        std::multimap<int, int> tetToTriMap;
+
+        /// Adjacent tets that share a _face_ with the key tet
+        /// pair.first is other tet, pair.second is face# on other tet
+        std::multimap<int, std::pair<int, Vec3i>> tetAdjancencyMap;
+
+        // The reverse of the PointwiseMap mapping
+        std::unordered_map<int, int> tetVertToTriVertMap;
+    };
+
+    std::vector<Meshdata> m_meshData;
+
+    void updateMesh(Meshdata& data);
+    void setupForExtraMeshUpdates(std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointwiseMap> map);
 };
 } // namespace imstk

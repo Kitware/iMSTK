@@ -59,7 +59,7 @@ public:
     }
 
     ///
-    /// \brief Computes neighboring triangles for all vertices
+    /// \brief Computes neighboring cells for all vertices
     ///
     void computeVertexToCellMap() override
     {

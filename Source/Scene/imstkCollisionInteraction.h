@@ -67,6 +67,8 @@ public:
     virtual bool getEnabled() const;
 ///@}
 
+    void visualUpdate() override;
+
 protected:
     ///
     /// \brief Update collision
@@ -94,5 +96,7 @@ protected:
     std::shared_ptr<TaskNode> m_collisionHandleANode        = nullptr;
     std::shared_ptr<TaskNode> m_collisionHandleBNode        = nullptr;
     std::shared_ptr<TaskNode> m_collisionGeometryUpdateNode = nullptr;
+
+    bool m_didUpdateThisFrame = false;
 };
 } // namespace imstk

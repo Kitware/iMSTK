@@ -103,6 +103,8 @@ public:
     // void update(double dt);
     void visualUpdate(const double& dt) override;
 
+    bool getDidBurn() const;
+
 protected:
 
     // The handle does the picking to choose which cells are burned.
@@ -139,8 +141,10 @@ protected:
     double m_q = 4.0;                        ///< Fitting parameter that modifies how quickly tissue gets burned
 
     bool m_onState  = false;                 ///< flag if tool is currently on or not
-    bool m_burnOnce = false;
+    bool m_burnOnce = false;                 ///< Rate limit the burning to once per phyics cycle
+    bool m_didBurnLastPhysics = false;       ///< Buffer for providing information to the user
 private:
+    bool   m_didBurn  = false;               ///< true if anything was burned since the last call to visualUpdate
     double m_burnTime = 0;
 };
 } // namespace imstk

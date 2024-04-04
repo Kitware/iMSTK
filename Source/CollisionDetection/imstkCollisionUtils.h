@@ -816,8 +816,7 @@ testSphereToTriangle(const Vec3d& spherePt, const double sphereRadius,
 {
     int caseType = 0;
     triangleContactPt = closestPointOnTriangle(spherePt, a, b, c, caseType);
-    const Vec3d  diff = spherePt - triangleContactPt;
-    const double dist = diff.squaredNorm();
+    const double dist = (spherePt - triangleContactPt).squaredNorm();
 
     // If intersecting
     if (dist <= sphereRadius * sphereRadius)

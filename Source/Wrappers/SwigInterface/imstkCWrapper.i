@@ -293,6 +293,7 @@ namespace std
   %template(VectorCollisionElement) vector<imstk::CollisionElement>;
   %template(VectorPbdBody) vector<imstk::PbdBody>;
   %template(VectorString) vector<std::string>;
+  %template(VectorBool) vector<bool>;
   %template(IntPair) pair<int, int>;
   %template(UnorderedMapStringDouble) unordered_map<std::string, double>;
   %template(VectorPuncturePoint) vector<imstk::NeedlePbdCH::PuncturePoint>;

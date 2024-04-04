@@ -69,8 +69,8 @@ ClosedSurfaceMeshToCapsuleCD::computeCollisionDataAB(
                 const auto segmentPointA = CollisionUtils::closestPointOnSegment(trianglePointA, capsulePosA, capsulePosB, unusedCaseType);
                 const auto segmentPointB = CollisionUtils::closestPointOnSegment(trianglePointB, capsulePosA, capsulePosB, unusedCaseType);
 
-                const auto distanceA = (segmentPointA - trianglePointA).norm();
-                const auto distanceB = (segmentPointB - trianglePointB).norm();
+                const auto distanceA = (segmentPointA - trianglePointA).squaredNorm();
+                const auto distanceB = (segmentPointB - trianglePointB).squaredNorm();
 
                 const double sphereRadius = capsuleRadius;
                 Vec3d spherePos(0, 0, 0);
