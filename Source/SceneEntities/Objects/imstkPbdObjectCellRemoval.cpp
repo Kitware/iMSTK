@@ -74,6 +74,7 @@ tryGetSharedFace(imstk::Vec4i left, imstk::Vec4i right, std::pair<imstk::Vec3i, 
     }
     return false;
 }
+
 } // namespace
 
 namespace imstk
@@ -97,8 +98,9 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
     pbdObj->initialize();
 
     // Note: maps on the pbdObject are no longer valid after this point
+    int alsoUpdateInt = static_cast<int>(alsoUpdate);
 
-    if (static_cast<int>(alsoUpdate) != 0)
+    if (alsoUpdateInt != 0)
     {
         auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
 
@@ -111,7 +113,7 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
 
             tetMesh->computeVertexToCellMap();
 
-            if ((static_cast<int>(alsoUpdate) & static_cast<int>(OtherMeshUpdateType::Collision)) != 0)
+            if ((alsoUpdateInt & static_cast<int>(OtherMeshUpdateType::Collision)) != 0)
             {
                 auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getCollidingGeometry());
                 auto map  = std::dynamic_pointer_cast<PointwiseMap>(pbdObj->getPhysicsToCollidingMap());
@@ -129,7 +131,8 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
                 }
             }
 
-            if ((static_cast<int>(alsoUpdate) & static_cast<int>(OtherMeshUpdateType::AnyVisual)) != 0)
+            if ((alsoUpdateInt & ( static_cast<int>(OtherMeshUpdateType::VisualSeparateVertices) |
+                                   static_cast<int>(OtherMeshUpdateType::VisualReuseVertices))) != 0)
             {
                 auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getVisualGeometry());
                 auto map  = std::dynamic_pointer_cast<PointwiseMap>(pbdObj->getPhysicsToVisualMap());
