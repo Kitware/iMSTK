@@ -18,6 +18,7 @@
 #include "imstkMouseSceneControl.h"
 #include "imstkObjectControllerGhost.h"
 #include "imstkPbdConnectiveTissueConstraintGenerator.h"
+#include "imstkPbdObjectCellRemoval.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdModelConfig.h"
 #include "imstkPbdObject.h"
@@ -427,6 +428,8 @@ runHookToolScene()
     // Setup gallbladder object
     std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdModel);
     scene->addSceneObject(gallbladerObj);
+    auto burnable = gallbladerObj->addComponent<Burnable>();
+    burnable->setUpdateType(PbdObjectCellRemoval::OtherMeshUpdateType::Collision);
 
     // Setup kidney
     std::shared_ptr<PbdObject> kidneyObj = makeKidney("Kidney", pbdModel);
@@ -441,7 +444,7 @@ runHookToolScene()
     // connectiveStrands->addComponent<Tearable>();
 
     // Add burnable
-    auto burnable = std::make_shared<Burnable>();
+    burnable = std::make_shared<Burnable>();
     connectiveStrands->addComponent(burnable);
 
     // Add strands to scene
@@ -469,7 +472,7 @@ runHookToolScene()
 
     // Add burner component to tool
     auto burning = std::make_shared<Burner>();
-    burning->addObject(connectiveStrands);
+    burning->addObject(gallbladerObj);
     burning->setOnTime(1.0);
     burning->setWattage(200);
     {
@@ -673,6 +676,8 @@ runGraspingToolScene()
     // Setup gallbladder object
     std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdModel);
     scene->addSceneObject(gallbladerObj);
+    auto burnable = gallbladerObj->addComponent<Burnable>();
+    burnable->setUpdateType(PbdObjectCellRemoval::OtherMeshUpdateType::Collision);
 
     // Setup kidney
     std::shared_ptr<PbdObject> kidneyObj = makeKidney("Kidney", pbdModel);
@@ -687,7 +692,7 @@ runGraspingToolScene()
     // connectiveStrands->addComponent<Tearable>();
 
     // Add burnable
-    auto burnable = std::make_shared<Burnable>();
+    burnable = std::make_shared<Burnable>();
     connectiveStrands->addComponent(burnable);
 
     // Add strands to scene
@@ -850,6 +855,6 @@ runGraspingToolScene()
 int
 main()
 {
-    //runHookToolScene();
-    runGraspingToolScene();
+    runHookToolScene();
+    //runGraspingToolScene();
 }

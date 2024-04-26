@@ -74,7 +74,6 @@ tryGetSharedFace(imstk::Vec4i left, imstk::Vec4i right, std::pair<imstk::Vec3i, 
     }
     return false;
 }
-
 } // namespace
 
 namespace imstk
@@ -131,8 +130,8 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
                 }
             }
 
-            if ((alsoUpdateInt & ( static_cast<int>(OtherMeshUpdateType::VisualSeparateVertices) |
-                                   static_cast<int>(OtherMeshUpdateType::VisualReuseVertices))) != 0)
+            if ((alsoUpdateInt & (static_cast<int>(OtherMeshUpdateType::VisualSeparateVertices) |
+                                  static_cast<int>(OtherMeshUpdateType::VisualReuseVertices))) != 0)
             {
                 auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getVisualGeometry());
                 auto map  = std::dynamic_pointer_cast<PointwiseMap>(pbdObj->getPhysicsToVisualMap());
@@ -173,20 +172,17 @@ PbdObjectCellRemoval::removeConstraints()
     // First process all removed cells by removing the constraints and setting the cell to the dummy vertex
     for (int i = 0; i < m_cellsToRemove.size(); i++)
     {
-        int cellId = m_cellsToRemove[i];
+        int                     cellId = m_cellsToRemove[i];
+        std::unordered_set<int> cellVertIds;
+        for (int vertId = 0; vertId < vertsPerCell; vertId++)
+        {
+            cellVertIds.insert((*cellVerts)[cellId * vertsPerCell + vertId]);
+        }
 
         // Find and remove the associated constraints
         for (auto j = constraints.begin(); j != constraints.end();)
         {
             const std::vector<PbdParticleId>& vertexIds = (*j)->getParticles();
-
-            // Dont remove any constraints that do not involve
-            // every node of the cell
-            if (vertexIds.size() < vertsPerCell)
-            {
-                j++;
-                continue;
-            }
 
             // Check that constraint involves this body and get associated vertices
             bool isBody = false;
@@ -220,13 +216,6 @@ PbdObjectCellRemoval::removeConstraints()
 
             // Sets for comparing constraint vertices to cell vertices
             std::unordered_set<int> constraintVertIds;
-            std::unordered_set<int> cellVertIds;
-            // Fill in sets
-            for (int vertId = 0; vertId < vertsPerCell; vertId++)
-            {
-                cellVertIds.insert((*cellVerts)[cellId * vertsPerCell + vertId]);
-            }
-
             for (int cVertId = 0; cVertId < vertexIds.size(); cVertId++)
             {
                 constraintVertIds.insert(vertexIds[cVertId].second);
@@ -256,11 +245,7 @@ PbdObjectCellRemoval::removeConstraints()
                 }
             }
 
-            if (isSubset == true)
-            {
-                j = constraintsPtr->eraseConstraint(j);
-            }
-            else if (isMultiBodyConstraint && isSubset == false)
+            if (isSubset == true || (isMultiBodyConstraint && isSubset == false))
             {
                 j = constraintsPtr->eraseConstraint(j);
             }

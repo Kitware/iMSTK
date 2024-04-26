@@ -25,10 +25,10 @@ class PointwiseMap;
 ///
 /// \brief This class defines a method of removing cells and their associated constraints from a
 /// Pbd object.
-/// Note: The two modes for visual meshes exist to support generating new texture coordinates, when reusing 
-///       a vertex from a visual mesh the vertex should already have uv coordinates assigned to it. Assigning 
-///       new ones _may_ break the current look of the object as the vertex _may_ still be in use. With the 
-///       `VisualSeparateVertices` mode, new vertices will be generated for newly exposed surface. This allows 
+/// Note: The two modes for visual meshes exist to support generating new texture coordinates, when reusing
+///       a vertex from a visual mesh the vertex should already have uv coordinates assigned to it. Assigning
+///       new ones _may_ break the current look of the object as the vertex _may_ still be in use. With the
+///       `VisualSeparateVertices` mode, new vertices will be generated for newly exposed surface. This allows
 ///       the user to assign new uv coordinates to those new points
 class PbdObjectCellRemoval : public SceneObject
 {
@@ -79,7 +79,7 @@ protected:
 private:
     struct Meshdata
     {
-        bool newVertexOnSplit;
+        bool newVertexOnSplit = false;
         std::shared_ptr<SurfaceMesh> surfaceMesh;
         std::shared_ptr<PointwiseMap> map;
 
