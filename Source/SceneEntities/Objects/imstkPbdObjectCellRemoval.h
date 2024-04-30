@@ -70,6 +70,7 @@ protected:
 
     void addDummyVertexPointSet(std::shared_ptr<PointSet> pointSet);
     void addDummyVertex(std::shared_ptr<AbstractCellMesh> mesh);
+	void verify();
 
     std::shared_ptr<PbdObject> m_obj;         ///< Object that cells are removed from
     std::shared_ptr<AbstractCellMesh> m_mesh; ///< Mesh from object cells are removed from

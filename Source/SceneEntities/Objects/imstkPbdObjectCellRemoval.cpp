@@ -169,6 +169,8 @@ PbdObjectCellRemoval::removeConstraints()
     std::shared_ptr<PbdConstraintContainer>            constraintsPtr = m_obj->getPbdModel()->getConstraints();
     const std::vector<std::shared_ptr<PbdConstraint>>& constraints    = constraintsPtr->getConstraints();
 
+
+
     // First process all removed cells by removing the constraints and setting the cell to the dummy vertex
     for (int i = 0; i < m_cellsToRemove.size(); i++)
     {
@@ -253,6 +255,7 @@ PbdObjectCellRemoval::removeConstraints()
             {
                 j++;
             }
+
         }
 
         // Set removed cell to dummy vertex
@@ -273,6 +276,11 @@ PbdObjectCellRemoval::removeConstraints()
 void
 PbdObjectCellRemoval::apply()
 {
+    if (m_cellsToRemove.empty())
+    {
+		return;
+	}
+
     for (auto& data : m_meshData)
     {
         updateMesh(data);
@@ -282,6 +290,53 @@ PbdObjectCellRemoval::apply()
     m_removedCells.insert(m_removedCells.end(), m_cellsToRemove.begin(), m_cellsToRemove.end());
     std::sort(m_removedCells.begin(), m_removedCells.end());
     m_cellsToRemove.clear();
+
+    verify();
+}
+
+void PbdObjectCellRemoval::verify()
+{
+
+    auto volumeMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
+    // Gather all the actual points in the tetrahedron
+    std::unordered_set<int> tetPoints;
+    for (const auto& tet : *volumeMesh->getTetrahedraIndices())
+    {
+        tetPoints.insert(tet[0]);
+        tetPoints.insert(tet[1]);
+        tetPoints.insert(tet[2]);
+        tetPoints.insert(tet[3]);
+    }
+
+    for (auto& meshData : m_meshData) {
+        
+        auto m = meshData.map->getMap();
+        int triIndex = 0;
+        for (const auto& tri : *meshData.surfaceMesh->getTriangleIndices())
+        {
+            std::vector<std::pair<int, int>> invalidPoints;
+            for (int i = 0; i < 3; ++i)
+            {
+                if (tri[i] != 0 && tetPoints.find(m[tri[i]]) == tetPoints.end())
+                {
+                    invalidPoints.push_back({ tri[i], m[tri[i]] });
+                }
+            }
+
+            if (invalidPoints.size() > 0)
+            {
+                std::stringstream ss;
+                ss << "One triangle " << triIndex <<"\n";
+                for (const auto& pair : invalidPoints)
+                {
+                    ss << "Surface vertex " << pair.first << " points to tet vertex " << pair.second << " which is not in the tet\n";
+                }
+                LOG(WARNING) << ss.str();
+            }
+            ++triIndex;
+        }
+        //CHECK(invalidPoints.size() > 0) << "Found vertices in mesh and the map that point to vertices in the tet that aren't there anymore";
+    }
 }
 
 void
@@ -422,6 +477,30 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
     {
         tetMesh->setTetrahedraAsRemoved(cellId);
     }
+
+	//For each triangle, for each vertex check if it's pointing to a valid tetrahedral vertex if not remove triangle'
+    // HACK
+	std::unordered_set<int> validTetVertices;
+	for (const auto& tet : *std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh)->getTetrahedraIndices())
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			validTetVertices.insert(tet[i]);
+		}
+	}
+
+    auto map = data.map->getMap();
+    for (int i = 0; i < triangles.size(); i++) {
+        for (int j = 0; j < 3; j++) {
+            auto& tri = triangles[i];
+            if (tri[j] != 0 && validTetVertices.find(map[tri[j]]) == validTetVertices.end()) {
+				tri = { 0, 0, 0 };
+				break;
+			}
+		}
+    }
+
+
 
     if (!m_cellsToRemove.empty())
     {
