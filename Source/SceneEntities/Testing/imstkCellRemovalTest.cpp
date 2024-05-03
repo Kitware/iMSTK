@@ -285,56 +285,54 @@ TEST_F(imstkCellRemovalTest, TwoBodyConstraints)
     EXPECT_EQ(5, pbdModel->getConstraints()->getConstraints().size());
 }
 
-std::vector<std::pair<int, int>> verifyMap(std::shared_ptr<TetrahedralMesh> volumeMesh,
-	std::shared_ptr<SurfaceMesh>surfaceMesh, std::shared_ptr<PointwiseMap> map)
+std::vector<std::pair<int, int>>
+verifyMap(std::shared_ptr<TetrahedralMesh> volumeMesh,
+          std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointwiseMap> map)
 {
-	std::vector<std::pair<int, int>> invalidPoints;
-	// Gather all the actual points in the tetrahedron
-	std::unordered_set<int> tetPoints;
-	for (const auto& tet : *volumeMesh->getTetrahedraIndices())
-	{
-		tetPoints.insert(tet[0]);
-		tetPoints.insert(tet[1]);
-		tetPoints.insert(tet[2]);
-		tetPoints.insert(tet[3]);
-	}
+    std::vector<std::pair<int, int>> invalidPoints;
+    // Gather all the actual points in the tetrahedron
+    std::unordered_set<int> tetPoints;
+    for (const auto& tet : *volumeMesh->getTetrahedraIndices())
+    {
+        tetPoints.insert(tet[0]);
+        tetPoints.insert(tet[1]);
+        tetPoints.insert(tet[2]);
+        tetPoints.insert(tet[3]);
+    }
 
+    std::unordered_set<int> surfacePoints;
+    for (const auto& tri : *surfaceMesh->getTriangleIndices())
+    {
+        surfacePoints.insert(tri[0]);
+        surfacePoints.insert(tri[1]);
+        surfacePoints.insert(tri[2]);
+    }
 
-	std::unordered_set<int> surfacePoints;
-	for (const auto& tri : *surfaceMesh->getTriangleIndices())
-	{
-		surfacePoints.insert(tri[0]);
-		surfacePoints.insert(tri[1]);
-		surfacePoints.insert(tri[2]);
-	}
-
-	auto m = map->getMap();
-	for (int i : surfacePoints)
-	{
-		if (tetPoints.find(m[i]) == tetPoints.end())
-		{
-			invalidPoints.push_back({ i, m[i] });
-		}
-	}
-	return invalidPoints;
+    auto m = map->getMap();
+    for (int i : surfacePoints)
+    {
+        if (tetPoints.find(m[i]) == tetPoints.end())
+        {
+            invalidPoints.push_back({ i, m[i] });
+        }
+    }
+    return invalidPoints;
 }
 
 TEST_F(imstkCellRemovalTest, validateMaps)
 {
-	auto remover = std::make_shared<PbdObjectCellRemoval>(pbdObject, PbdObjectCellRemoval::OtherMeshUpdateType::CollisionAndVisualReused);
+        auto remover = std::make_shared<PbdObjectCellRemoval>(pbdObject, PbdObjectCellRemoval::OtherMeshUpdateType::CollisionAndVisualReused);
 
-	remover->initialize();
-	pbdModel->initialize();
-
+        remover->initialize();
+        pbdModel->initialize();
 
     auto pointwiseMap = std::dynamic_pointer_cast<PointwiseMap>(pbdObject->getPhysicsToCollidingMap());
 
     ASSERT_NE(nullptr, pointwiseMap);
     EXPECT_TRUE(verifyMap(volumeMesh, visualMesh, pointwiseMap).size() == 0);
 
-	remover->removeCellOnApply(0);
-	remover->apply();
+        remover->removeCellOnApply(0);
+        remover->apply();
 
     EXPECT_TRUE(verifyMap(volumeMesh, visualMesh, pointwiseMap).size() == 0);
-
 }

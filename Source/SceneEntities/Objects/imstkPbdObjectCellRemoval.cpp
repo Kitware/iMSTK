@@ -168,8 +168,8 @@ PbdObjectCellRemoval::apply()
 {
     if (m_cellsToRemove.empty())
     {
-		return;
-	}
+        return;
+    }
 
     for (auto& data : m_meshData)
     {
@@ -218,7 +218,7 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
         for (auto item = range.first; item != range.second; ++item)
         {
             auto otherTetIndex = item->second.first;
-            
+
             // Don't add if the other tet is in the progress of being removed or has already been removed
             if (std::find(m_cellsToRemove.cbegin(), m_cellsToRemove.cend(), otherTetIndex) != m_cellsToRemove.cend()
                 || std::find(m_removedCells.cbegin(), m_removedCells.cend(), otherTetIndex) != m_removedCells.cend())
@@ -260,9 +260,9 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
             const Vec4i& tet = tetrahedra[otherTetIndex];
             const Vec3d  tetCentroid =
                 (tetVertices[tet[0]] +
-                    tetVertices[tet[1]] +
-                    tetVertices[tet[2]] +
-                    tetVertices[tet[3]]) / 4.0;
+                 tetVertices[tet[1]] +
+                 tetVertices[tet[2]] +
+                 tetVertices[tet[3]]) / 4.0;
 
             int triangleIndex = triangles.size();
 
@@ -276,7 +276,6 @@ PbdObjectCellRemoval::updateMesh(Meshdata& data)
                 triangles.push_back(triangle);
             }
             data.tetToTriMap.insert({ otherTetIndex, triangleIndex });
-
         }
         data.tetAdjancencyMap.erase(cellId);
     }
@@ -305,8 +304,6 @@ PbdObjectCellRemoval::removeConstraints()
     // Constraint Data
     std::shared_ptr<PbdConstraintContainer>            constraintsPtr = m_obj->getPbdModel()->getConstraints();
     const std::vector<std::shared_ptr<PbdConstraint>>& constraints    = constraintsPtr->getConstraints();
-
-
 
     // First process all removed cells by removing the constraints and setting the cell to the dummy vertex
     for (int i = 0; i < m_cellsToRemove.size(); i++)
@@ -392,7 +389,6 @@ PbdObjectCellRemoval::removeConstraints()
             {
                 j++;
             }
-
         }
 
         // Set removed cell to dummy vertex
@@ -410,9 +406,9 @@ PbdObjectCellRemoval::removeConstraints()
     }
 }
 
-void PbdObjectCellRemoval::fixup()
+void
+PbdObjectCellRemoval::fixup()
 {
-
     auto volumeMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
     // Gather all the actual points in the tetrahedron
     std::unordered_set<int> validTetVertices;
@@ -424,17 +420,20 @@ void PbdObjectCellRemoval::fixup()
         validTetVertices.insert(tet[3]);
     }
 
-    for (auto& meshData : m_meshData) {       
-        auto map = meshData.map->getMap();
+    for (auto& meshData : m_meshData)
+    {
+        auto  map       = meshData.map->getMap();
         auto& triangles = *(meshData.surfaceMesh->getTriangleIndices());
         for (auto& tri : triangles)
         {
-			for (int j = 0; j < 3; j++) {
-				if (tri[j] != 0 && validTetVertices.find(map[tri[j]]) == validTetVertices.end()) {
-					tri = { 0, 0, 0 };
-					break;
-				}
-			}
+            for (int j = 0; j < 3; j++)
+            {
+                if (tri[j] != 0 && validTetVertices.find(map[tri[j]]) == validTetVertices.end())
+                {
+                    tri = { 0, 0, 0 };
+                    break;
+                }
+            }
         }
     }
 }
@@ -531,6 +530,7 @@ PbdObjectCellRemoval::setupForExtraMeshUpdates(std::shared_ptr<SurfaceMesh> surf
     data.tetAdjancencyMap = tetAdjancencyMap;
     m_meshData.push_back(data);
 }
+
 void
 PbdObjectCellRemoval::addDummyVertexPointSet(std::shared_ptr<PointSet> pointSet)
 {
@@ -567,5 +567,4 @@ PbdObjectCellRemoval::addDummyVertex(std::shared_ptr<AbstractCellMesh> mesh)
         }
     }
 }
-
 } // namespace imstk

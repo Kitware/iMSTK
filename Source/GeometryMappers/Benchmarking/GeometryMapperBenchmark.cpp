@@ -134,36 +134,33 @@ BM_CopyLoop(benchmark::State& state)
 
     const int numPoints = state.range(0);
 
-
     auto parentVerticesPtr = std::make_shared<VecDataArray<double, 3>>(numPoints);
     auto childVerticesPtr  = std::make_shared<VecDataArray<double, 3>>(numPoints);
 
     // randomize parent vertices
     for (int i = 0; i < numPoints; i++)
     {
-		(*parentVerticesPtr)[i] = Vec3d::Random();
-	}
+        (*parentVerticesPtr)[i] = Vec3d::Random();
+    }
     parent->setInitialVertexPositions(parentVerticesPtr);
     child->setInitialVertexPositions(childVerticesPtr);
 
     // Create the map
-    
+
     std::vector<std::pair<int, int>> map;
     for (int i = 0; i < numPoints; i++)
     {
-		map.push_back({ i, numPoints - i - 1 });
-	}
-    
-   
+        map.push_back({ i, numPoints - i - 1 });
+    }
+
     // Copy loop
     for (auto _ : state)
     {
         for (int i = 0; i < numPoints; i++)
         {
-			(*childVerticesPtr)[map[i].second] = (*parentVerticesPtr)[map[i].first];
-		}
-	}
-  
+            (*childVerticesPtr)[map[i].second] = (*parentVerticesPtr)[map[i].first];
+        }
+    }
 }
 
 BENCHMARK(BM_CopyLoop)
@@ -174,54 +171,50 @@ BENCHMARK(BM_CopyLoop)
 static void
 BM_CopyParallel(benchmark::State& state)
 {
-	std::shared_ptr<PointSet> parent = std::make_shared<PointSet>();
-	std::shared_ptr<PointSet> child = std::make_shared<PointSet>();
+    std::shared_ptr<PointSet> parent = std::make_shared<PointSet>();
+    std::shared_ptr<PointSet> child  = std::make_shared<PointSet>();
 
-	const int numPoints = state.range(0);
+    const int numPoints = state.range(0);
 
+    auto parentVerticesPtr = std::make_shared<VecDataArray<double, 3>>(numPoints);
+    auto childVerticesPtr  = std::make_shared<VecDataArray<double, 3>>(numPoints);
 
-	auto parentVerticesPtr = std::make_shared<VecDataArray<double, 3>>(numPoints);
-	auto childVerticesPtr = std::make_shared<VecDataArray<double, 3>>(numPoints);
+    // randomize parent vertices
+    for (int i = 0; i < numPoints; i++)
+    {
+        (*parentVerticesPtr)[i] = Vec3d::Random();
+    }
+    parent->setInitialVertexPositions(parentVerticesPtr);
+    child->setInitialVertexPositions(childVerticesPtr);
 
-	// randomize parent vertices
-	for (int i = 0; i < numPoints; i++)
-	{
-		(*parentVerticesPtr)[i] = Vec3d::Random();
-	}
-	parent->setInitialVertexPositions(parentVerticesPtr);
-	child->setInitialVertexPositions(childVerticesPtr);
+    // Create the map
 
-	// Create the map
-
-	std::vector<std::pair<int, int>> map;
-	for (int i = 0; i < numPoints; i++)
-	{
-		map.push_back({ i, numPoints - i - 1 });
-	}
-
+    std::vector<std::pair<int, int>> map;
+    for (int i = 0; i < numPoints; i++)
+    {
+        map.push_back({ i, numPoints - i - 1 });
+    }
 
     VecDataArray<double, 3>& parentVertices = *parentVerticesPtr;
-    VecDataArray<double, 3>& childVertices = *childVerticesPtr;
+    VecDataArray<double, 3>& childVertices  = *childVerticesPtr;
 
-	// Copy loop
-	for (auto _ : state)
-	{
+    // Copy loop
+    for (auto _ : state)
+    {
         const int size = map.size();
-		ParallelUtils::parallelFor(map.size(),
-			[&](const size_t idx)
-			{
-				const auto& mapValue = map[idx];
-				childVertices[mapValue.first] = parentVertices[mapValue.second];
-			}, size > 8191);
-	}
-
+        ParallelUtils::parallelFor(map.size(),
+            [&](const size_t idx)
+            {
+                const auto& mapValue = map[idx];
+                childVertices[mapValue.first] = parentVertices[mapValue.second];
+                        }, size > 8191);
+    }
 }
 
 BENCHMARK(BM_CopyParallel)
 ->Unit(benchmark::kMicrosecond)
 ->Name("Copy vertices in parallel")
 ->RangeMultiplier(2)->Range(8, 16 << 10);
-
 
 // Run the benchmark
 BENCHMARK_MAIN();
