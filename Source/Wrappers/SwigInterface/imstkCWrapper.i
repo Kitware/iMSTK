@@ -300,6 +300,7 @@ namespace std
   %template(VectorPuncturePoint) vector<imstk::NeedlePbdCH::PuncturePoint>;
   %template(VectorVectorPuncturePoint) vector<std::vector<imstk::NeedlePbdCH::PuncturePoint>>;
   %template(VectorCollisionData) vector<shared_ptr<imstk::CollisionData>>;
+  %template(VectorConstraint) vector<shared_ptr<imstk::PbdConstraint>>;
 }
 
 %include <std_except.i>
