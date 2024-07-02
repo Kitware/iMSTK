@@ -25,11 +25,15 @@ class PointwiseMap;
 ///
 /// \brief This class defines a method of removing cells and their associated constraints from a
 /// Pbd object.
+/// Can update the visual and collision representation when using a tetrahedral mesh as physics object
+/// Does not support updating visual and collision representation when the physics mesh is a LineMesh or
+/// a SurfaceMesh AND they differ.
 /// Note: The two modes for visual meshes exist to support generating new texture coordinates, when reusing
 ///       a vertex from a visual mesh the vertex should already have uv coordinates assigned to it. Assigning
 ///       new ones _may_ break the current look of the object as the vertex _may_ still be in use. With the
 ///       `VisualSeparateVertices` mode, new vertices will be generated for newly exposed surface. This allows
 ///       the user to assign new uv coordinates to those new points
+///
 class PbdObjectCellRemoval : public SceneObject
 {
 public:
@@ -78,7 +82,7 @@ protected:
     std::vector<int> m_removedCells;          ///< Cells that have been removed
 
 private:
-    struct Meshdata
+    struct LinkedMeshData
     {
         bool newVertexOnSplit = false;
         std::shared_ptr<SurfaceMesh> surfaceMesh;
@@ -95,9 +99,11 @@ private:
         std::unordered_map<int, int> tetVertToTriVertMap;
     };
 
-    std::vector<Meshdata> m_meshData;
+    OtherMeshUpdateType m_updateMode;
 
-    void updateMesh(Meshdata& data);
+    std::vector<LinkedMeshData> m_linkedMeshData;
+
+    void updateMesh(LinkedMeshData& data);
     void setupForExtraMeshUpdates(std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointwiseMap> map);
 };
 } // namespace imstk

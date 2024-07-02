@@ -79,7 +79,8 @@ tryGetSharedFace(imstk::Vec4i left, imstk::Vec4i right, std::pair<imstk::Vec3i, 
 namespace imstk
 {
 PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, OtherMeshUpdateType alsoUpdate) :
-    m_obj(pbdObj)
+    m_obj(pbdObj),
+    m_updateMode(alsoUpdate)
 {
     // Add checks here as needed
 
@@ -146,13 +147,14 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
                 else
                 {
                     setupForExtraMeshUpdates(mesh, map);
-                    m_meshData.back().newVertexOnSplit = alsoUpdate == OtherMeshUpdateType::VisualSeparateVertices;
+                    m_linkedMeshData.back().newVertexOnSplit = alsoUpdate == OtherMeshUpdateType::VisualSeparateVertices;
                 }
             }
         }
         else
         {
             LOG(WARNING) << "Underlying mesh not a tet mesh, cannot maintain other meshes";
+            m_updateMode = OtherMeshUpdateType::None;
         }
     }
 }
@@ -171,12 +173,14 @@ PbdObjectCellRemoval::apply()
         return;
     }
 
-    for (auto& data : m_meshData)
+    // Only for tetmeshes...
+    for (auto& data : m_linkedMeshData)
     {
         updateMesh(data);
     }
 
     removeConstraints();
+
     m_removedCells.insert(m_removedCells.end(), m_cellsToRemove.begin(), m_cellsToRemove.end());
     std::sort(m_removedCells.begin(), m_removedCells.end());
     m_cellsToRemove.clear();
@@ -185,7 +189,7 @@ PbdObjectCellRemoval::apply()
 }
 
 void
-PbdObjectCellRemoval::updateMesh(Meshdata& data)
+PbdObjectCellRemoval::updateMesh(LinkedMeshData& data)
 {                                                                                           // m_mesh->getAbstractCells()->getNumberOfComponents();
     auto cellVerts = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells()); // underlying 1D array
 
@@ -299,26 +303,28 @@ PbdObjectCellRemoval::removeConstraints()
     // Mesh Data
     int       bodyId       = m_obj->getPbdBody()->bodyHandle;
     const int vertsPerCell = m_mesh->getAbstractCells()->getNumberOfComponents();
-    auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells());                   // underlying 1D array
+    auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells());  // underlying 1D array
 
     // Constraint Data
     std::shared_ptr<PbdConstraintContainer>            constraintsPtr = m_obj->getPbdModel()->getConstraints();
     const std::vector<std::shared_ptr<PbdConstraint>>& constraints    = constraintsPtr->getConstraints();
 
-    // First process all removed cells by removing the constraints and setting the cell to the dummy vertex
     for (int i = 0; i < m_cellsToRemove.size(); i++)
     {
-        int                     cellId = m_cellsToRemove[i];
-        std::unordered_set<int> cellVertIds;
-        for (int vertId = 0; vertId < vertsPerCell; vertId++)
-        {
-            cellVertIds.insert((*cellVerts)[cellId * vertsPerCell + vertId]);
-        }
+        int cellId = m_cellsToRemove[i];
 
         // Find and remove the associated constraints
         for (auto j = constraints.begin(); j != constraints.end();)
         {
             const std::vector<PbdParticleId>& vertexIds = (*j)->getParticles();
+
+            // Dont remove any constraints that do not involve
+            // every node of the cell
+            if (vertexIds.size() < vertsPerCell)
+            {
+                j++;
+                continue;
+            }
 
             // Check that constraint involves this body and get associated vertices
             bool isBody = false;
@@ -352,6 +358,13 @@ PbdObjectCellRemoval::removeConstraints()
 
             // Sets for comparing constraint vertices to cell vertices
             std::unordered_set<int> constraintVertIds;
+            std::unordered_set<int> cellVertIds;
+            // Fill in sets
+            for (int vertId = 0; vertId < vertsPerCell; vertId++)
+            {
+                cellVertIds.insert((*cellVerts)[cellId * vertsPerCell + vertId]);
+            }
+
             for (int cVertId = 0; cVertId < vertexIds.size(); cVertId++)
             {
                 constraintVertIds.insert(vertexIds[cVertId].second);
@@ -403,6 +416,7 @@ PbdObjectCellRemoval::removeConstraints()
         // Note: if the collision geometry is different from the physics geometry the collision geometry
         // will need to be updated. This is not yet implemented.
         m_mesh->getAbstractCells()->postModified();
+        std::cout << "Removing " << m_cellsToRemove.size() << " Cells";
     }
 }
 
@@ -410,6 +424,10 @@ void
 PbdObjectCellRemoval::fixup()
 {
     auto volumeMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
+    if (volumeMesh == nullptr)
+    {
+        return;
+    }
     // Gather all the actual points in the tetrahedron
     std::unordered_set<int> validTetVertices;
     for (const auto& tet : *volumeMesh->getTetrahedraIndices())
@@ -420,7 +438,7 @@ PbdObjectCellRemoval::fixup()
         validTetVertices.insert(tet[3]);
     }
 
-    for (auto& meshData : m_meshData)
+    for (auto& meshData : m_linkedMeshData)
     {
         auto  map       = meshData.map->getMap();
         auto& triangles = *(meshData.surfaceMesh->getTriangleIndices());
@@ -447,7 +465,7 @@ PbdObjectCellRemoval::setupForExtraMeshUpdates(std::shared_ptr<SurfaceMesh> surf
     CHECK(surfaceMesh != nullptr);
     CHECK(map != nullptr);
 
-    Meshdata data;
+    LinkedMeshData data;
     data.surfaceMesh = surfaceMesh;
     data.map = map;
 
@@ -528,7 +546,7 @@ PbdObjectCellRemoval::setupForExtraMeshUpdates(std::shared_ptr<SurfaceMesh> surf
 
     data.tetToTriMap      = tetToTriMap;
     data.tetAdjancencyMap = tetAdjancencyMap;
-    m_meshData.push_back(data);
+    m_linkedMeshData.push_back(data);
 }
 
 void
