@@ -79,7 +79,8 @@ tryGetSharedFace(imstk::Vec4i left, imstk::Vec4i right, std::pair<imstk::Vec3i, 
 namespace imstk
 {
 PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, OtherMeshUpdateType alsoUpdate) :
-    m_obj(pbdObj)
+    m_obj(pbdObj),
+    m_updateMode(alsoUpdate)
 {
     // Add checks here as needed
 
@@ -97,8 +98,9 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
     pbdObj->initialize();
 
     // Note: maps on the pbdObject are no longer valid after this point
+    int alsoUpdateInt = static_cast<int>(alsoUpdate);
 
-    if (static_cast<int>(alsoUpdate) != 0)
+    if (alsoUpdateInt != 0)
     {
         auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
 
@@ -111,7 +113,7 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
 
             tetMesh->computeVertexToCellMap();
 
-            if ((static_cast<int>(alsoUpdate) & static_cast<int>(OtherMeshUpdateType::Collision)) != 0)
+            if ((alsoUpdateInt & static_cast<int>(OtherMeshUpdateType::Collision)) != 0)
             {
                 auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getCollidingGeometry());
                 auto map  = std::dynamic_pointer_cast<PointwiseMap>(pbdObj->getPhysicsToCollidingMap());
@@ -129,7 +131,8 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
                 }
             }
 
-            if ((static_cast<int>(alsoUpdate) & static_cast<int>(OtherMeshUpdateType::AnyVisual)) != 0)
+            if ((alsoUpdateInt & (static_cast<int>(OtherMeshUpdateType::VisualSeparateVertices) |
+                                  static_cast<int>(OtherMeshUpdateType::VisualReuseVertices))) != 0)
             {
                 auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(pbdObj->getVisualGeometry());
                 auto map  = std::dynamic_pointer_cast<PointwiseMap>(pbdObj->getPhysicsToVisualMap());
@@ -144,14 +147,153 @@ PbdObjectCellRemoval::PbdObjectCellRemoval(std::shared_ptr<PbdObject> pbdObj, Ot
                 else
                 {
                     setupForExtraMeshUpdates(mesh, map);
-                    m_meshData.back().newVertexOnSplit = alsoUpdate == OtherMeshUpdateType::VisualSeparateVertices;
+                    m_linkedMeshData.back().newVertexOnSplit = alsoUpdate == OtherMeshUpdateType::VisualSeparateVertices;
                 }
             }
         }
         else
         {
             LOG(WARNING) << "Underlying mesh not a tet mesh, cannot maintain other meshes";
+            m_updateMode = OtherMeshUpdateType::None;
         }
+    }
+}
+
+void
+PbdObjectCellRemoval::removeCellOnApply(int cellId)
+{
+    m_cellsToRemove.push_back(cellId);
+}
+
+void
+PbdObjectCellRemoval::apply()
+{
+    if (m_cellsToRemove.empty())
+    {
+        return;
+    }
+
+    // Only for tetmeshes...
+    for (auto& data : m_linkedMeshData)
+    {
+        updateMesh(data);
+    }
+
+    removeConstraints();
+
+    m_removedCells.insert(m_removedCells.end(), m_cellsToRemove.begin(), m_cellsToRemove.end());
+    std::sort(m_removedCells.begin(), m_removedCells.end());
+    m_cellsToRemove.clear();
+
+    fixup();
+}
+
+void
+PbdObjectCellRemoval::updateMesh(LinkedMeshData& data)
+{                                                                                           // m_mesh->getAbstractCells()->getNumberOfComponents();
+    auto cellVerts = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells()); // underlying 1D array
+
+    constexpr int vertsPerTri = 3;
+
+    auto& triangles = *(data.surfaceMesh->getCells());
+    auto& vertices  = *(data.surfaceMesh->getVertexPositions());
+
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
+
+    // "Remove" all triangles that are adjacent to tets that are being removed
+    for (int cellId : m_cellsToRemove)
+    {
+        auto range = data.tetToTriMap.equal_range(cellId);
+        for (auto item = range.first; item != range.second; ++item)
+        {
+            triangles[item->second] = { 0, 0, 0 };
+        }
+        data.tetToTriMap.erase(cellId);
+    }
+
+    const auto& tetrahedra  = *(tetMesh->getCells());
+    const auto& tetVertices = *(tetMesh->getVertexPositions());
+
+    // Add all triangles that are on neighboring faces but NOT on other removed tets
+    for (int cellId : m_cellsToRemove)
+    {
+        // All neighbors of the tetrahedron
+        auto range = data.tetAdjancencyMap.equal_range(cellId);
+        for (auto item = range.first; item != range.second; ++item)
+        {
+            auto otherTetIndex = item->second.first;
+
+            // Don't add if the other tet is in the progress of being removed or has already been removed
+            if (std::find(m_cellsToRemove.cbegin(), m_cellsToRemove.cend(), otherTetIndex) != m_cellsToRemove.cend()
+                || std::find(m_removedCells.cbegin(), m_removedCells.cend(), otherTetIndex) != m_removedCells.cend())
+            {
+                continue;
+            }
+
+            auto faceOnTetMesh = item->second.second;
+            // Add Vertices
+            Vec3i triangle = { 0, 0, 0 };
+            for (int i = 0; i < vertsPerTri; ++i)
+            {
+                int tetVertexIndex = faceOnTetMesh[i];
+
+                // Check if the tet vertex is already on the surface mesh
+                auto found = data.tetVertToTriVertMap.find(tetVertexIndex);
+                // Reuse vertex _if_ its found
+                // For visual meshes we want a new vertex so a different uv coordinate
+                // can be calculated
+                if (data.newVertexOnSplit || found == data.tetVertToTriVertMap.cend())
+                {
+                    triangle[i] = vertices.size();
+                    vertices.push_back(tetVertices[tetVertexIndex]);
+                    data.tetVertToTriVertMap[tetVertexIndex] = triangle[i];
+                    data.map->addNewUniquePoint(triangle[i], tetVertexIndex);
+                }
+                else
+                {
+                    triangle[i] = found->second;
+                }
+            }
+
+            const Vec3d& v0       = tetVertices[faceOnTetMesh[0]];
+            const Vec3d& v1       = tetVertices[faceOnTetMesh[1]];
+            const Vec3d& v2       = tetVertices[faceOnTetMesh[2]];
+            const Vec3d  normal   = ((v1 - v0).cross(v2 - v0));
+            const Vec3d  centroid = (v0 + v1 + v2) / 3.0;
+
+            const Vec4i& tet = tetrahedra[otherTetIndex];
+            const Vec3d  tetCentroid =
+                (tetVertices[tet[0]] +
+                 tetVertices[tet[1]] +
+                 tetVertices[tet[2]] +
+                 tetVertices[tet[3]]) / 4.0;
+
+            int triangleIndex = triangles.size();
+
+            // If the normal is correct, it should be pointing in the same direction as the (face centroid - tetCentroid)
+            if (normal.dot(centroid - tetCentroid) < 0)
+            {
+                triangles.push_back({ triangle[0], triangle[2], triangle[1] });
+            }
+            else
+            {
+                triangles.push_back(triangle);
+            }
+            data.tetToTriMap.insert({ otherTetIndex, triangleIndex });
+        }
+        data.tetAdjancencyMap.erase(cellId);
+    }
+
+    for (int cellId : m_cellsToRemove)
+    {
+        tetMesh->setTetrahedraAsRemoved(cellId);
+    }
+
+    if (!m_cellsToRemove.empty())
+    {
+        data.surfaceMesh->postModified();
+        data.surfaceMesh->getVertexPositions()->postModified();
+        data.surfaceMesh->getCells()->postModified();
     }
 }
 
@@ -161,13 +303,12 @@ PbdObjectCellRemoval::removeConstraints()
     // Mesh Data
     int       bodyId       = m_obj->getPbdBody()->bodyHandle;
     const int vertsPerCell = m_mesh->getAbstractCells()->getNumberOfComponents();
-    auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells());                   // underlying 1D array
+    auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells());  // underlying 1D array
 
     // Constraint Data
     std::shared_ptr<PbdConstraintContainer>            constraintsPtr = m_obj->getPbdModel()->getConstraints();
     const std::vector<std::shared_ptr<PbdConstraint>>& constraints    = constraintsPtr->getConstraints();
 
-    // First process all removed cells by removing the constraints and setting the cell to the dummy vertex
     for (int i = 0; i < m_cellsToRemove.size(); i++)
     {
         int cellId = m_cellsToRemove[i];
@@ -176,14 +317,6 @@ PbdObjectCellRemoval::removeConstraints()
         for (auto j = constraints.begin(); j != constraints.end();)
         {
             const std::vector<PbdParticleId>& vertexIds = (*j)->getParticles();
-
-            // Dont remove any constraints that do not involve
-            // every node of the cell
-            if (vertexIds.size() < vertsPerCell)
-            {
-                j++;
-                continue;
-            }
 
             // Check that constraint involves this body and get associated vertices
             bool isBody = false;
@@ -253,11 +386,7 @@ PbdObjectCellRemoval::removeConstraints()
                 }
             }
 
-            if (isSubset == true)
-            {
-                j = constraintsPtr->eraseConstraint(j);
-            }
-            else if (isMultiBodyConstraint && isSubset == false)
+            if (isSubset == true || (isMultiBodyConstraint && isSubset == false))
             {
                 j = constraintsPtr->eraseConstraint(j);
             }
@@ -279,167 +408,43 @@ PbdObjectCellRemoval::removeConstraints()
         // Note: if the collision geometry is different from the physics geometry the collision geometry
         // will need to be updated. This is not yet implemented.
         m_mesh->getAbstractCells()->postModified();
+        std::cout << "Removing " << m_cellsToRemove.size() << " Cells";
     }
 }
 
 void
-PbdObjectCellRemoval::apply()
+PbdObjectCellRemoval::fixup()
 {
-    for (auto& data : m_meshData)
+    auto volumeMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
+    if (volumeMesh == nullptr)
     {
-        updateMesh(data);
+        return;
+    }
+    // Gather all the actual points in the tetrahedron
+    std::unordered_set<int> validTetVertices;
+    for (const auto& tet : *volumeMesh->getTetrahedraIndices())
+    {
+        validTetVertices.insert(tet[0]);
+        validTetVertices.insert(tet[1]);
+        validTetVertices.insert(tet[2]);
+        validTetVertices.insert(tet[3]);
     }
 
-    removeConstraints();
-    m_removedCells.insert(m_removedCells.end(), m_cellsToRemove.begin(), m_cellsToRemove.end());
-    std::sort(m_removedCells.begin(), m_removedCells.end());
-    m_cellsToRemove.clear();
-}
-
-void
-PbdObjectCellRemoval::removeCellOnApply(int cellId)
-{
-    m_cellsToRemove.push_back(cellId);
-}
-
-void
-PbdObjectCellRemoval::addDummyVertexPointSet(std::shared_ptr<PointSet> pointSet)
-{
-    // Add a dummy vertex to the vertices
-    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSet->getVertexPositions();
-    VecDataArray<double, 3>&                 vertices    = *verticesPtr;
-    vertices.resize(vertices.size() + 1);
-
-    for (int i = vertices.size() - 1; i >= 1; i--)
+    for (auto& meshData : m_linkedMeshData)
     {
-        vertices[i] = vertices[i - 1];
-    }
-
-    // Note: may cause collision issues
-    vertices[0] = Vec3d(0.0, 0.0, 0.0);
-    pointSet->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*verticesPtr));
-}
-
-void
-PbdObjectCellRemoval::addDummyVertex(std::shared_ptr<AbstractCellMesh> mesh)
-{
-    addDummyVertexPointSet(mesh);
-
-    // Mesh data
-    const int vertsPerCell = mesh->getAbstractCells()->getNumberOfComponents();
-    auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(mesh->getAbstractCells());
-
-    // Then shift all indices by 1
-    for (int cellId = 0; cellId < mesh->getNumCells(); cellId++)
-    {
-        for (int vertId = 0; vertId < vertsPerCell; vertId++)
+        auto  map       = meshData.map->getMap();
+        auto& triangles = *(meshData.surfaceMesh->getTriangleIndices());
+        for (auto& tri : triangles)
         {
-            (*cellVerts)[cellId * vertsPerCell + vertId]++;
-        }
-    }
-}
-
-void
-PbdObjectCellRemoval::updateMesh(Meshdata& data)
-{                                                                                           // m_mesh->getAbstractCells()->getNumberOfComponents();
-    auto cellVerts = std::dynamic_pointer_cast<DataArray<int>>(m_mesh->getAbstractCells()); // underlying 1D array
-
-    constexpr int vertsPerTri = 3;
-
-    auto& triangles = *(data.surfaceMesh->getCells());
-    auto& vertices  = *(data.surfaceMesh->getVertexPositions());
-
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_mesh);
-
-    // "Remove" all triangles that are adjacent to tets that are being removed
-    for (int cellId : m_cellsToRemove)
-    {
-        auto range = data.tetToTriMap.equal_range(cellId);
-        for (auto item = range.first; item != range.second; ++item)
-        {
-            triangles[item->second] = { 0, 0, 0 };
-        }
-        data.tetToTriMap.erase(cellId);
-    }
-
-    const auto& tetrahedra  = *(tetMesh->getCells());
-    const auto& tetVertices = *(tetMesh->getVertexPositions());
-
-    // Add all triangles that are on neighboring faces but NOT on other removed tets
-    for (int cellId : m_cellsToRemove)
-    {
-        auto range = data.tetAdjancencyMap.equal_range(cellId);
-        for (auto item = range.first; item != range.second; ++item)
-        {
-            auto otherTetIndex = item->second.first;
-            auto faceOnTetMesh = item->second.second;
-            // Don't add if the other tet is in the progress of being removed or has already been removed
-            if (std::find(m_cellsToRemove.cbegin(), m_cellsToRemove.cend(), otherTetIndex) == m_cellsToRemove.cend()
-                && !std::binary_search(m_removedCells.cbegin(), m_removedCells.cend(), otherTetIndex))
+            for (int j = 0; j < 3; j++)
             {
-                // Add Vertices
-                Vec3i triangle = { 0, 0, 0 };
-                for (int i = 0; i < vertsPerTri; ++i)
+                if (tri[j] != 0 && validTetVertices.find(map[tri[j]]) == validTetVertices.end())
                 {
-                    int tetVertexIndex = faceOnTetMesh[i];
-
-                    auto found = data.tetVertToTriVertMap.find(tetVertexIndex);
-                    // Reuse vertex _if_ its found
-                    // For visual meshes we want a new vertex so a different uv coordinate
-                    // can be calculated
-                    if (data.newVertexOnSplit || found == data.tetVertToTriVertMap.cend())
-                    {
-                        vertices.push_back(tetVertices[tetVertexIndex]);
-                        triangle[i] = vertices.size() - 1;
-                        data.tetVertToTriVertMap[tetVertexIndex] = triangle[i];
-                        data.map->addNewUniquePoint(triangle[i], tetVertexIndex);
-                    }
-                    else
-                    {
-                        triangle[i] = found->second;
-                    }
+                    tri = { 0, 0, 0 };
+                    break;
                 }
-
-                const Vec3d& v0       = tetVertices[faceOnTetMesh[0]];
-                const Vec3d& v1       = tetVertices[faceOnTetMesh[1]];
-                const Vec3d& v2       = tetVertices[faceOnTetMesh[2]];
-                const Vec3d  normal   = ((v1 - v0).cross(v2 - v0));
-                const Vec3d  centroid = (v0 + v1 + v2) / 3.0;
-
-                const Vec4i& tet = tetrahedra[otherTetIndex];
-                const Vec3d  tetCentroid =
-                    (tetVertices[tet[0]] +
-                     tetVertices[tet[1]] +
-                     tetVertices[tet[2]] +
-                     tetVertices[tet[3]]) / 4.0;
-
-                int triangleIndex = triangles.size();
-
-                // If the normal is correct, it should be pointing in the same direction as the (face centroid - tetCentroid)
-                if (normal.dot(centroid - tetCentroid) < 0)
-                {
-                    triangles.push_back({ triangle[0], triangle[2], triangle[1] });
-                }
-                else
-                {
-                    triangles.push_back(triangle);
-                }
-                data.tetToTriMap.insert({ otherTetIndex, triangleIndex });
             }
         }
-        data.tetAdjancencyMap.erase(cellId);
-    }
-
-    for (int cellId : m_cellsToRemove)
-    {
-        tetMesh->setTetrahedraAsRemoved(cellId);
-    }
-
-    if (!m_cellsToRemove.empty())
-    {
-        data.surfaceMesh->postModified();
-        data.surfaceMesh->getVertexPositions()->postModified();
-        data.surfaceMesh->getCells()->postModified();
     }
 }
 
@@ -452,7 +457,7 @@ PbdObjectCellRemoval::setupForExtraMeshUpdates(std::shared_ptr<SurfaceMesh> surf
     CHECK(surfaceMesh != nullptr);
     CHECK(map != nullptr);
 
-    Meshdata data;
+    LinkedMeshData data;
     data.surfaceMesh = surfaceMesh;
     data.map = map;
 
@@ -533,6 +538,43 @@ PbdObjectCellRemoval::setupForExtraMeshUpdates(std::shared_ptr<SurfaceMesh> surf
 
     data.tetToTriMap      = tetToTriMap;
     data.tetAdjancencyMap = tetAdjancencyMap;
-    m_meshData.push_back(data);
+    m_linkedMeshData.push_back(data);
+}
+
+void
+PbdObjectCellRemoval::addDummyVertexPointSet(std::shared_ptr<PointSet> pointSet)
+{
+    // Add a dummy vertex to the vertices
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = pointSet->getVertexPositions();
+    VecDataArray<double, 3>&                 vertices    = *verticesPtr;
+    vertices.resize(vertices.size() + 1);
+
+    for (int i = vertices.size() - 1; i >= 1; i--)
+    {
+        vertices[i] = vertices[i - 1];
+    }
+
+    // Note: may cause collision issues
+    vertices[0] = Vec3d(0.0, 0.0, 0.0);
+    pointSet->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*verticesPtr));
+}
+
+void
+PbdObjectCellRemoval::addDummyVertex(std::shared_ptr<AbstractCellMesh> mesh)
+{
+    addDummyVertexPointSet(mesh);
+
+    // Mesh data
+    const int vertsPerCell = mesh->getAbstractCells()->getNumberOfComponents();
+    auto      cellVerts    = std::dynamic_pointer_cast<DataArray<int>>(mesh->getAbstractCells());
+
+    // Then shift all indices by 1
+    for (int cellId = 0; cellId < mesh->getNumCells(); cellId++)
+    {
+        for (int vertId = 0; vertId < vertsPerCell; vertId++)
+        {
+            (*cellVerts)[cellId * vertsPerCell + vertId]++;
+        }
+    }
 }
 } // namespace imstk

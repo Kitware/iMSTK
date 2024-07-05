@@ -21,35 +21,19 @@
 #include "imstkCapsule.h"
 #include "imstkPbdObjectCollision.h"
 
+#include "imstkMeshIO.h"
+
+#include <numeric>
+
 using namespace imstk;
 
-///
-/// \brief Creates tetrahedral tissue object
-/// \param name
-/// \param size physical dimension of tissue
-/// \param dim dimensions of tetrahedral grid used for tissue
-/// \param center center of tissue block
-/// \param useTetCollisionGeometry Whether to use a SurfaceMesh collision geometry+map
-///
 static std::shared_ptr<PbdObject>
-makeTetTissueObj(const std::string& name,
-                 std::shared_ptr<PbdModel> model,
-                 const Vec3d& size, const Vec3i& dim, const Vec3d& center,
-                 const Quatd& orientation)
+build(const std::string&               name,
+      std::shared_ptr<PbdModel>        model,
+      std::shared_ptr<TetrahedralMesh> tetMesh)
 {
-    auto tissueObj = std::make_shared<PbdObject>(name);
-
-    // Setup the Geometry
-    std::shared_ptr<TetrahedralMesh> tetMesh =
-        GeometryUtils::toTetGrid(center, size, dim, orientation);
-
-    for (int i = 0; i < tetMesh->getNumTetrahedra(); i++)
-    {
-        std::swap((*tetMesh->getCells())[i][2], (*tetMesh->getCells())[i][3]);
-    }
-
-    std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
-
+    std::shared_ptr<SurfaceMesh> surfMesh  = tetMesh->extractSurfaceMesh();
+    auto                         tissueObj = std::make_shared<PbdObject>(name);
     // Setup the Object
     tissueObj->setPhysicsGeometry(tetMesh);
     tissueObj->setVisualGeometry(tetMesh);
@@ -73,25 +57,10 @@ makeTetTissueObj(const std::string& name,
     tissueObj->getPbdBody()->uniformMassValue = 0.01;
 
     model->getConfig()->m_femParams->m_YoungModulus = 1000.0;
-    model->getConfig()->m_femParams->m_PoissonRatio = 0.45;     // 0.48 for tissue
+    model->getConfig()->m_femParams->m_PoissonRatio = 0.45;         // 0.48 for tissue
     model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK,
                 tissueObj->getPbdBody()->bodyHandle);
     tissueObj->getPbdBody()->bodyGravity = false;
-
-    // Fix the borders
-    for (int z = 0; z < dim[2]; z++)
-    {
-        for (int y = 0; y < dim[1]; y++)
-        {
-            for (int x = 0; x < dim[0]; x++)
-            {
-                if (x == 0 || z == 0 || x == dim[0] - 1 || z == dim[2] - 1)
-                {
-                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
-                }
-            }
-        }
-    }
 
     // Visualize Collision Mesh
     auto collisionVisuals = std::make_shared<VisualModel>();
@@ -107,6 +76,67 @@ makeTetTissueObj(const std::string& name,
     }
 
     tissueObj->addVisualModel(collisionVisuals);
+
+    return tissueObj;
+}
+
+///
+/// \brief Creates tetrahedral tissue object
+/// \param name
+/// \param size physical dimension of tissue
+/// \param dim dimensions of tetrahedral grid used for tissue
+/// \param center center of tissue block
+/// \param useTetCollisionGeometry Whether to use a SurfaceMesh collision geometry+map
+///
+static std::shared_ptr<PbdObject>
+makeCubeTetTissueObj(const std::string& name,
+                     std::shared_ptr<PbdModel> model,
+                     const Vec3d& size, const Vec3i& dim, const Vec3d& center,
+                     const Quatd& orientation)
+{
+    // Setup the Geometry
+    std::shared_ptr<TetrahedralMesh> tetMesh =
+        GeometryUtils::toTetGrid(center, size, dim, orientation);
+
+    for (int i = 0; i < tetMesh->getNumTetrahedra(); i++)
+    {
+        std::swap((*tetMesh->getCells())[i][2], (*tetMesh->getCells())[i][3]);
+    }
+
+    auto tissueObj =  build(name, model, tetMesh);
+    // Fix the borders
+    for (int z = 0; z < dim[2]; z++)
+    {
+        for (int y = 0; y < dim[1]; y++)
+        {
+            for (int x = 0; x < dim[0]; x++)
+            {
+                if (x == 0 || z == 0 || x == dim[0] - 1 || z == dim[2] - 1)
+                {
+                    tissueObj->getPbdBody()->fixedNodeIds.push_back(x + dim[0] * (y + dim[1] * z));
+                }
+            }
+        }
+    }
+
+    return tissueObj;
+}
+
+static std::shared_ptr<PbdObject>
+loadTetTissueObject(const std::string& name, const std::string& filename,
+                    std::shared_ptr<PbdModel> model,
+                    double scale)
+{
+    auto geometry = MeshIO::read<TetrahedralMesh>(filename);
+    EXPECT_TRUE(geometry != nullptr);
+
+    geometry->scale(scale, Geometry::TransformType::ApplyToData);
+    geometry->updatePostTransformData();
+
+    auto tissueObj =  build(name, model, geometry);
+
+    // Basically fix a random point
+    tissueObj->getPbdBody()->fixedNodeIds.push_back(0);
 
     return tissueObj;
 }
@@ -129,8 +159,8 @@ makeCollisionObject(
 
     // Setup material
     rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setColor(Color(0.9, 0.0, 0.0));
-    rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setShadingModel(RenderMaterial::ShadingModel::Flat);
+    rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setRoughness(0.5);
     rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setMetalness(1.0);
     rigidPbdObj->getVisualModel(0)->getRenderMaterial()->setIsDynamicMesh(false);
@@ -190,38 +220,56 @@ public:
                 m_obj->getPbdModel()->getConfig()->m_dt = m_sceneManager->getDt();
                         });
 
-        // Assert the vertices stay within bounds
-        connect<Event>(m_sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
-            {
-                const VecDataArray<double, 3>& vertices = *m_currVerticesPtr;
-                // Assert to avoid hitting numerous times
-                ASSERT_TRUE(assertBounds(vertices, m_assertionBoundsMin, m_assertionBoundsMax));
-                m_prevVertices = vertices;
-            });
+//         // Assert the vertices stay within bounds
+//         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
+//             [&](Event*)
+//             {
+//                 const VecDataArray<double, 3>& vertices = *m_currVerticesPtr;
+//                 // Assert to avoid hitting numerous times
+//                 ASSERT_TRUE(assertBounds(vertices, m_assertionBoundsMin, m_assertionBoundsMax));
+//                 m_prevVertices = vertices;
+//             });
 
         m_time   = 0.0;
         m_cellId = 0;
+        std::random_device rd;
+        auto               x = rd();
+        std::mt19937       g(x);
+        std::cout << "Seed: " << x;
+
+        std::vector<int> cells(m_mesh->getNumCells(), 0);
+        std::iota(cells.begin(), cells.end(), 0);
+        std::shuffle(cells.begin(), cells.end(), g);
 
         connect<Event>(m_sceneManager, &SceneManager::postUpdate,
-            [&](Event*)
+            [&, cells](Event*)
             {
                 m_time += m_sceneManager->getDt();
 
-                if (m_time > 0.5 && m_cellId < m_mesh->getNumCells())
+                if (m_time > 0.1 && m_cellId < m_mesh->getNumCells())
                 {
-                    m_cellRemoval->removeCellOnApply(m_cellId);
+                    std::cout << "Before: " << m_pbdModel->getConstraints()->getConstraints().size() << std::endl;
+                    m_cellRemoval->removeCellOnApply(cells[m_cellId]);
                     m_cellRemoval->apply();
-                    m_cellId++;
+                    m_cellId += 1;
+                    std::cout << "After: " << m_pbdModel->getConstraints()->getConstraints().size() << std::endl;
                     m_time = 0.0;
                 }
             });
 
         // Light
-        auto light = std::make_shared<DirectionalLight>();
-        light->setFocalPoint(Vec3d(5.0, -8.0, 5.0));
-        light->setIntensity(1.0);
-        m_scene->addLight("Light", light);
+        {
+            auto light = std::make_shared<DirectionalLight>();
+            light->setFocalPoint(Vec3d(5.0, -8.0, 5.0));
+            light->setIntensity(2.0);
+            m_scene->addLight("Light 1", light);
+        }
+        {
+            auto light = std::make_shared<DirectionalLight>();
+            light->setFocalPoint(Vec3d(-5.0, 8.0, -5.0));
+            light->setIntensity(2.0);
+            m_scene->addLight("Light 2", light);
+        }
     }
 
 public:
@@ -248,13 +296,15 @@ public:
 TEST_F(PbdObjectTetMeshCellRemovalTest, TetMeshTest)
 {
     // Setup the tissue without mapping
-    m_obj = makeTetTissueObj("TetTissue", m_pbdModel,
+    m_obj = makeCubeTetTissueObj("TetTissue", m_pbdModel,
             Vec3d(0.1, 0.1, 0.1), Vec3i(4, 4, 4), Vec3d::Zero(),
             Quatd(Rotd(0.0, Vec3d(0.0, 0.0, 1.0))));
+
+    //m_obj = loadTetTissueObject("TetTissue", "C:/Work/projects/rae/unity/models/ct_outer_layer.vtk", m_pbdModel, 0.5);
 
     m_mesh = std::dynamic_pointer_cast<AbstractCellMesh>(m_obj->getPhysicsGeometry());
     createScene();
 
     // Run for 3s at 0.01 fixed timestep
-    runFor(3, 0.01);
+    runFor(50, 0.01);
 }

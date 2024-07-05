@@ -169,6 +169,6 @@ ClosedSurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     lock.unlock();
                 }
             }
-        }, false);
+        }, surfMesh->getNumTriangles() > 200);
 }
 } // namespace imstk

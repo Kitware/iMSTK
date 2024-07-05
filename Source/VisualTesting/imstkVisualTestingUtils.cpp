@@ -72,7 +72,7 @@ VisualTest::runFor(const double duration, const double fixedTimestep)
         [&](KeyEvent* e)
         {
             // If any key is pressed, stop the timer (stopping condition in postUpdate below)
-            m_timerPaused = true;
+            m_timerPaused = !m_timerPaused;
 
             // If key advance is on
             if (e->m_key == '1')

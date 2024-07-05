@@ -85,3 +85,7 @@ if( ${PROJECT_NAME}_BUILD_TESTING )
   add_subdirectory(Testing)
   add_subdirectory(VisualTesting)
 endif()
+
+if( ${PROJECT_NAME}_BUILD_BENCHMARK )
+  add_subdirectory(Benchmarking)
+endif()

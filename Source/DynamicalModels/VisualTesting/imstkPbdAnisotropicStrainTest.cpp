@@ -82,7 +82,7 @@ makeVolumeCubeObj(const std::string& name,
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
-    cubeObj->addVisualModel(visualModel);
+    cubeObj->setVisualGeometry(surfMesh);
     cubeObj->setPhysicsGeometry(tetMesh);
     cubeObj->setCollidingGeometry(surfMesh);
     cubeObj->setDynamicalModel(pbdModel);

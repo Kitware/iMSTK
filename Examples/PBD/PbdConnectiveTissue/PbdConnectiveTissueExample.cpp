@@ -64,7 +64,7 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdModel> model)
     auto        tissueMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/Organs/Gallblader/gallblader.msh");
     const Vec3d center     = tissueMesh->getCenter();
     tissueMesh->translate(-center, Geometry::TransformType::ApplyToData);
-    tissueMesh->scale(100.0, Geometry::TransformType::ApplyToData); // scale from meters (input mesh) to cm
+    tissueMesh->scale(100.0, Geometry::TransformType::ApplyToData);     // scale from meters (input mesh) to cm
     tissueMesh->rotate(Vec3d(0.0, 0.0, 1.0), 30.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
 
     const Vec3d shift = { -4.0, 0.0, 0.0 };
@@ -97,7 +97,7 @@ makeGallBladder(const std::string& name, std::shared_ptr<PbdModel> model)
     // Gallblader is about 60g
     tissueObj->getPbdBody()->uniformMassValue = 0.06 / tissueMesh->getNumVertices();
 
-    model->getConfig()->m_femParams->m_YoungModulus = 100.0; // in kg/(cm*s^2)
+    model->getConfig()->m_femParams->m_YoungModulus = 100.0;     // in kg/(cm*s^2)
     model->getConfig()->m_femParams->m_PoissonRatio = 0.4;
     model->getConfig()->enableFemConstraint(PbdFemConstraint::MaterialType::StVK);
     model->getConfig()->setBodyDamping(tissueObj->getPbdBody()->bodyHandle, 0.01);
@@ -131,7 +131,7 @@ makeKidney(const std::string& name, std::shared_ptr<PbdModel> model)
     const Vec3d center     = tissueMesh->getCenter();
 
     tissueMesh->translate(-center, Geometry::TransformType::ApplyToData);
-    tissueMesh->scale(100.0, Geometry::TransformType::ApplyToData); // scale from meters (input mesh) to cm
+    tissueMesh->scale(100.0, Geometry::TransformType::ApplyToData);     // scale from meters (input mesh) to cm
     tissueMesh->rotate(Vec3d(0.0, 0.0, 1.0), 30.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
     tissueMesh->rotate(Vec3d(0.0, 1.0, 0.0), 90.0 / 180.0 * 3.14, Geometry::TransformType::ApplyToData);
 
@@ -221,11 +221,11 @@ makeHookToolObject(std::shared_ptr<PbdModel> model)
     // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
     controller->setControlledObject(toolObj);
-    controller->setTranslationScaling(100.0);     // this convertes from meters to cm
-    controller->setLinearKs(1000.0);              // in N/cm
+    controller->setTranslationScaling(100.0);         // this convertes from meters to cm
+    controller->setLinearKs(1000.0);                  // in N/cm
     controller->setAngularKs(1000000000.0);
     controller->setUseCritDamping(true);
-    controller->setForceScaling(0.01);     // 1 N = 1 kg/(m*s^2) = 0.01 kg/(cm*s^2)
+    controller->setForceScaling(0.01);         // 1 N = 1 kg/(m*s^2) = 0.01 kg/(cm*s^2)
     controller->setSmoothingKernelSize(15);
     controller->setUseForceSmoothening(true);
 
@@ -310,11 +310,11 @@ makeGraspingToolObject(std::shared_ptr<PbdModel> model)
     // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
     controller->setControlledObject(toolObj);
-    controller->setTranslationScaling(100.0);     // this convertes from meters to cm
-    controller->setLinearKs(1000.0);              // in N/cm
+    controller->setTranslationScaling(100.0);         // this convertes from meters to cm
+    controller->setLinearKs(1000.0);                  // in N/cm
     controller->setAngularKs(1000000000.0);
     controller->setUseCritDamping(true);
-    controller->setForceScaling(0.01);     // 1 N = 1 kg/(m*s^2) = 0.01 kg/(cm*s^2)
+    controller->setForceScaling(0.01);         // 1 N = 1 kg/(m*s^2) = 0.01 kg/(cm*s^2)
     controller->setSmoothingKernelSize(15);
     controller->setUseForceSmoothening(true);
 
@@ -344,21 +344,21 @@ makeCapsuleToolObj(std::shared_ptr<PbdModel> model)
     toolObj->setCollidingGeometry(toolGeometry);
     toolObj->setDynamicalModel(model);
     toolObj->getPbdBody()->setRigid(
-        Vec3d(0.0, 2.0, 2.0),
-        0.01,
-        Quatd::Identity(),
-        Mat3d::Identity() * 100000.0);
+                Vec3d(0.0, 2.0, 2.0),
+                0.01,
+                Quatd::Identity(),
+                Mat3d::Identity() * 100000.0);
 
     toolObj->getVisualModel(0)->getRenderMaterial()->setOpacity(1.0);
 
     // Add a component for controlling via another device
     auto controller = toolObj->addComponent<PbdObjectController>();
     controller->setControlledObject(toolObj);
-    controller->setTranslationScaling(100.0); // this convertes from meters to cm
-    controller->setLinearKs(1000.0);          // in N/cm
+    controller->setTranslationScaling(100.0);     // this convertes from meters to cm
+    controller->setLinearKs(1000.0);              // in N/cm
     controller->setAngularKs(1000000000.0);
     controller->setUseCritDamping(true);
-    controller->setForceScaling(0.01); // 1 N = 1 kg/(m*s^2) = 0.01 kg/(cm*s^2)
+    controller->setForceScaling(0.01);     // 1 N = 1 kg/(m*s^2) = 0.01 kg/(cm*s^2)
     controller->setSmoothingKernelSize(15);
     controller->setUseForceSmoothening(true);
 
@@ -420,13 +420,14 @@ runHookToolScene()
     pbdModel->getConfig()->m_doPartitioning = false;
     pbdModel->getConfig()->m_dt = 0.001;
     pbdModel->getConfig()->m_iterations = 6;
-    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -981.0, 0.0); //in cm/s^2
-    pbdModel->getConfig()->m_linearDampingCoeff  = 0.005;          // Removed from velocity
+    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -981.0, 0.0);  //in cm/s^2
+    pbdModel->getConfig()->m_linearDampingCoeff  = 0.005;           // Removed from velocity
     pbdModel->getConfig()->m_angularDampingCoeff = 0.005;
 
     // Setup gallbladder object
     std::shared_ptr<PbdObject> gallbladerObj = makeGallBladder("Gallbladder", pbdModel);
     scene->addSceneObject(gallbladerObj);
+    gallbladerObj->addComponent<Burnable>();
 
     // Setup kidney
     std::shared_ptr<PbdObject> kidneyObj = makeKidney("Kidney", pbdModel);
@@ -441,8 +442,7 @@ runHookToolScene()
     // connectiveStrands->addComponent<Tearable>();
 
     // Add burnable
-    auto burnable = std::make_shared<Burnable>();
-    connectiveStrands->addComponent(burnable);
+    connectiveStrands->addComponent<Burnable>();
 
     // Add strands to scene
     scene->addSceneObject(connectiveStrands);
@@ -470,11 +470,12 @@ runHookToolScene()
     // Add burner component to tool
     auto burning = std::make_shared<Burner>();
     burning->addObject(connectiveStrands);
+    burning->addObject(gallbladerObj);
     burning->setOnTime(1.0);
     burning->setWattage(200);
     {
         auto compound = std::dynamic_pointer_cast<CompoundGeometry>(toolObj->getCollidingGeometry());
-        auto geom     = std::dynamic_pointer_cast<AnalyticalGeometry>(compound->get(1));
+        auto geom     = std::dynamic_pointer_cast<AnalyticalGeometry>(compound->get(0));
         burning->setBurnerGeometry(geom);
     }
 
@@ -497,7 +498,7 @@ runHookToolScene()
         // Setup a scene manager to advance the scene
         auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
-        sceneManager->pause(); // Start simulation pause
+        sceneManager->pause();         // Start simulation pause
 
         auto driver = std::make_shared<SimulationManager>();
         driver->setDesiredDt(0.005);
@@ -552,7 +553,7 @@ runHookToolScene()
                         std::cout << "Released! \n";
                     }
                 }
-            });
+                        });
 #else
         auto deviceClient = std::make_shared<DummyClient>();
         connect<Event>(sceneManager, &SceneManager::postUpdate,
@@ -562,7 +563,7 @@ runHookToolScene()
                 const Vec3d worldPos = Vec3d(mousePos[0] - 0.5, mousePos[1] - 0.5, 0.0) * 0.1;
 
                 deviceClient->setPosition(worldPos);
-            });
+                        });
 
         // Add click event and side effects
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonPress,
@@ -570,13 +571,13 @@ runHookToolScene()
             {
                 grasper->beginVertexGrasp(std::dynamic_pointer_cast<Capsule>(toolObj->getCollidingGeometry()));
                 //pbdToolCollision->setEnabled(false);
-            });
+                        });
         connect<Event>(viewer->getMouseDevice(), &MouseDeviceClient::mouseButtonRelease,
             [&](Event*)
             {
                 grasper->endGrasp();
                 //pbdToolCollision->setEnabled(true);
-            });
+                        });
 #endif
 
         // auto controller = toolObj->getComponent<PbdObjectController>();
@@ -641,7 +642,7 @@ runHookToolScene()
                     compound->setLocalTransform(1, getJawPosition(origin + angle));
                     compound->setLocalTransform(2, getJawPosition(origin - angle));
                 }
-            });
+                        });
 
         driver->start();
     }
@@ -666,8 +667,8 @@ runGraspingToolScene()
     pbdModel->getConfig()->m_doPartitioning = false;
     pbdModel->getConfig()->m_dt = 0.001;
     pbdModel->getConfig()->m_iterations = 6;
-    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -981.0, 0.0);  //in cm/s^2
-    pbdModel->getConfig()->m_linearDampingCoeff  = 0.005;           // Removed from velocity
+    pbdModel->getConfig()->m_gravity    = Vec3d(0.0, -981.0, 0.0);   //in cm/s^2
+    pbdModel->getConfig()->m_linearDampingCoeff  = 0.005;            // Removed from velocity
     pbdModel->getConfig()->m_angularDampingCoeff = 0.005;
 
     // Setup gallbladder object
@@ -684,7 +685,7 @@ runGraspingToolScene()
     pbdModel->getConfig()->setBodyDamping(connectiveStrands->getPbdBody()->bodyHandle, 0.015, 0.0);
 
     // Add Tearing
-    // connectiveStrands->addComponent<Tearable>();
+    connectiveStrands->addComponent<Tearable>();
 
     // Add burnable
     auto burnable = std::make_shared<Burnable>();
@@ -748,7 +749,7 @@ runGraspingToolScene()
         // Setup a scene manager to advance the scene
         auto sceneManager = std::make_shared<SceneManager>();
         sceneManager->setActiveScene(scene);
-        sceneManager->pause();         // Start simulation pause
+        sceneManager->pause();                 // Start simulation pause
 
         auto driver = std::make_shared<SimulationManager>();
         driver->setDesiredDt(0.005);
@@ -850,6 +851,6 @@ runGraspingToolScene()
 int
 main()
 {
-    //runHookToolScene();
-    runGraspingToolScene();
+    runHookToolScene();
+    //runGraspingToolScene();
 }

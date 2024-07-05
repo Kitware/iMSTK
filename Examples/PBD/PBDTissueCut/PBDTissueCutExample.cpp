@@ -29,6 +29,7 @@
 #include "imstkSimulationUtils.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
+#include "imstkVertexLabelVisualModel.h"
 
 using namespace imstk;
 
@@ -67,7 +68,7 @@ makeTissueObj(const std::string& name,
     // Setup the Object
     auto tissueObj = std::make_shared<PbdObject>(name);
     tissueObj->setPhysicsGeometry(tissueMesh);
-    tissueObj->setVisualGeometry(tissueMesh);
+    tissueObj->setVisualGeometry(surfMesh);
     tissueObj->setCollidingGeometry(surfMesh);
     auto map = std::make_shared<PointwiseMap>(tissueMesh, surfMesh);
     tissueObj->setPhysicsToCollidingMap(map);
@@ -105,7 +106,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
     toolObj->setPhysicsGeometry(toolGeom);
     toolObj->setDynamicalModel(model);
     toolObj->getVisualModel(0)->getRenderMaterial()->setColor(Color::Blue);
-    toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    toolObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     toolObj->getVisualModel(0)->getRenderMaterial()->setBackFaceCulling(false);
     toolObj->getVisualModel(0)->getRenderMaterial()->setLineWidth(1.0);
 
@@ -122,7 +123,7 @@ makeToolObj(std::shared_ptr<PbdModel> model)
     controller->setLinearKd(50.0);
     controller->setAngularKs(10000000.0);
     controller->setAngularKd(500000.0);
-    controller->setForceScaling(0.001);
+    controller->setForceScaling(0.0001);
 
     return toolObj;
 }
@@ -153,11 +154,11 @@ main()
 
     // Setup a tissue
     std::shared_ptr<PbdObject> tissueObj = makeTissueObj("Tissue",
-        Vec3d(10.0, 3.0, 10.0), Vec3i(10, 3, 10), Vec3d(0.0, -1.0, 0.0),
+        Vec3d(10.0, 3.0, 10.0), Vec3i(8, 3, 8), Vec3d(0.0, -1.0, 0.0),
         pbdModel);
     scene->addSceneObject(tissueObj);
 
-    auto cellRemoval = std::make_shared<PbdObjectCellRemoval>(tissueObj);
+    auto cellRemoval = std::make_shared<PbdObjectCellRemoval>(tissueObj, PbdObjectCellRemoval::OtherMeshUpdateType::Collision);
     scene->addInteraction(cellRemoval);
 
     std::shared_ptr<PbdObject> toolObj = makeToolObj(pbdModel);
@@ -166,6 +167,11 @@ main()
     /*auto interaction = std::make_shared<PbdObjectCollision>(
         toolObj, tissueObj, "ClosedSurfaceMeshToMeshCD");
     scene->addInteraction(interaction);*/
+
+    auto sceneObject = std::make_shared<SceneObject>();
+    auto visualModel = sceneObject->addComponent<VertexLabelVisualModel>();
+    visualModel->setGeometry(tissueObj->getCollidingGeometry());
+    //scene->addSceneObject(sceneObject);
 
     // Light
     auto light = std::make_shared<DirectionalLight>();

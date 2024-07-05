@@ -295,10 +295,13 @@ namespace std
   %template(VectorString) vector<std::string>;
   %template(VectorBool) vector<bool>;
   %template(IntPair) pair<int, int>;
+  %template(UnorderedMapIntInt) unordered_map<int, int>;
   %template(UnorderedMapStringDouble) unordered_map<std::string, double>;
   %template(VectorPuncturePoint) vector<imstk::NeedlePbdCH::PuncturePoint>;
   %template(VectorVectorPuncturePoint) vector<std::vector<imstk::NeedlePbdCH::PuncturePoint>>;
   %template(VectorCollisionData) vector<shared_ptr<imstk::CollisionData>>;
+  %template(VectorConstraint) vector<shared_ptr<imstk::PbdConstraint>>;
+  %template(VectorIntPair) vector<std::pair<int, int>>;
 }
 
 %include <std_except.i>

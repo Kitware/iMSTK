@@ -255,6 +255,9 @@ SurfaceMeshToCapsuleCD::computeCollisionDataAB(
                     lock.unlock();
                 }
             }
-    }, false);
+    }, surfMesh->getNumTriangles() > 200);
+    // Tipping point for payoff is around 200 triangles, the benchmark is very simple
+    // with regard to triangle distribution and tests
+    // 200 triangles was determined experimentally see SurfaceMeshCDBenchmark
 }
 } // namespace imstk

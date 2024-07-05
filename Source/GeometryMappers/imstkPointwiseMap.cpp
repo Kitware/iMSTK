@@ -130,12 +130,15 @@ PointwiseMap::requestUpdate()
     VecDataArray<double, 3>&                 childVertices     = *childVerticesPtr;
     std::shared_ptr<VecDataArray<double, 3>> parentVerticesPtr = meshParent->getVertexPositions();
     const VecDataArray<double, 3>&           parentVertices    = *parentVerticesPtr;
+
+    // For this loop 8000 is about the break even point for parallel vs serial
+    // see GeometryMapperBenchmark.cpp
     ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
         [&](const size_t idx)
         {
             const auto& mapValue = m_oneToOneMapVector[idx];
             childVertices[mapValue.first] = parentVertices[mapValue.second];
-        });
+        }, m_oneToOneMapVector.size() > 8000);
     meshChild->postModified();
 
     setOutput(meshChild);
