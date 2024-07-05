@@ -271,9 +271,11 @@ TEST_F(imstkCellRemovalTest, TwoBodyConstraints)
     remover->removeCellOnApply(0);
     remover->apply();
 
-    // We're over-removing body/body constraints all constraints on the
-    // removed tetrahedron are removed, even though some of the vertices
-    // are still "alive"
+    // Removed one cell on one cube this removes
+    // 1 Tetrahedron constraint and 1 point to point constraint between bodies
+    // but we are over removing body-body constraints due to removing constraints
+    // on all vertices of the removed tet.
+
     EXPECT_EQ(5 + 4 + 4, pbdModel->getConstraints()->getConstraints().size());
 
     for (int i = 0; i < volumeMesh->getNumTetrahedra(); ++i)

@@ -318,14 +318,6 @@ PbdObjectCellRemoval::removeConstraints()
         {
             const std::vector<PbdParticleId>& vertexIds = (*j)->getParticles();
 
-            // Dont remove any constraints that do not involve
-            // every node of the cell
-            if (vertexIds.size() < vertsPerCell)
-            {
-                j++;
-                continue;
-            }
-
             // Check that constraint involves this body and get associated vertices
             bool isBody = false;
             for (int cVertId = 0; cVertId < vertexIds.size(); cVertId++)
