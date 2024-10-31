@@ -26,7 +26,7 @@ stages:
 # Additionally, jobs may also contain:
 #
 #   - artifacts
-#   - dependency/needs jobs for required jobs
+#   - needs for required jobs
 ################################################################################
 
 pages:
@@ -53,8 +53,6 @@ fedora36:test:
         - .cmake_test_artifacts
         - .linux_test_tags
         - .run_dependent
-    dependencies:
-        - fedora36:build
     needs:
         - fedora36:build
 
@@ -77,7 +75,5 @@ windows-vs2022-ninja:test:
         - .cmake_test_artifacts
         - .windows_builder_tags
         - .run_dependent
-    dependencies:
-        - windows-vs2022-ninja:build
     needs:
         - windows-vs2022-ninja:build
