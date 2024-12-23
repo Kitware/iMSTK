@@ -1,6 +1,6 @@
 {
     "latest-master": [
-        { "group": "master", "site": "gitlab-ci", "buildname": "iMSTK-windows_vs2019_ninja" },
+        { "group": "master", "site": "gitlab-ci", "buildname": "iMSTK-windows_vs2022_ninja" },
         { "group": "master", "site": "gitlab-ci", "buildname": "iMSTK-fedora36" }
     ]
 }
